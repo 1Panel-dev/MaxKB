@@ -9,18 +9,15 @@ import PrologueContent from '../prologue-content/index.vue'
 import { SEND_MESSAGE_KEY, useMessageListStore } from './index'
 import ShareFooter from './share/ShareFooter.vue'
 import ShareMessageRow from './share/ShareMessageRow.vue'
-import { useShareLinkStoreOptional } from './share/index'
 defineProps<{ appName?: string }>()
 
-const { appInfo, messages, loading, streamLoading, hasMore, loadMore, onStreamProgress, sendMessage } = useMessageListStore()
+const { appInfo, messages, messageRecordIds, loading, streamLoading, hasMore, loadMore, onStreamProgress, sendMessage } = useMessageListStore()
 const { isShared } = useConversationListStore()
 // 消息内容项（如表单）经此发起续跑；分享时收回发送能力，内容项只读
 provide(
   SEND_MESSAGE_KEY,
   computed(() => (isShared.value ? null : sendMessage)),
 )
-// 分享选择的记录 ID、勾选与提交由分享链接 Store 维护；未提供时（调试等）不进入分享选择。
-const shareLink = useShareLinkStoreOptional()
 const scrollRef = ref<InstanceType<typeof ReverseInfiniteScroll>>()
 
 // 开场白随智能体信息变化（debug 保存后为最新草稿）
@@ -52,7 +49,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
       </div>
     </template>
     <template v-for="(msg, i) in messages" :key="msg.id || i">
-      <ShareMessageRow :active="isShared" :record-id="shareLink?.messageRecordIds.value[i]">
+      <ShareMessageRow :active="isShared" :record-id="messageRecordIds[i]">
         <!-- 用户提问靠右：头像独占一行在上，提问容器在下方靠右收缩 -->
         <div v-if="msg.role === 'USER'">
           <div v-if="showUserAvatar" class="text-right mb-2">

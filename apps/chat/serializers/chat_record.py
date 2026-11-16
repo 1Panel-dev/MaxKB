@@ -20,6 +20,7 @@ from application.serializers.application_chat_record import (
     ChatRecordSerializerModel,
     ApplicationChatRecordQuerySerializers,
 )
+from chat.serializers.chat_history import ChatHistory
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.lock import RedisLock
@@ -213,6 +214,22 @@ class HistoricalConversationRecordSerializer(serializers.Serializer):
         self.is_valid(raise_exception=True)
         queryset = self.get_queryset()
         return [ChatRecordSerializerModel(r).data for r in queryset]
+
+    def truncate(self, chat_record_id):
+        """
+        截断会话：删除该记录及其之后的全部记录，如编辑提问前清除该轮及之后的对话。
+        会话须属于当前应用与对话用户（is_valid），记录须属于该会话；
+        历史缓存整体失效，下次读取从 DB 重建，被删的轮次不再进入上下文。
+        """
+        self.is_valid(raise_exception=True)
+        chat_id = self.data.get("chat_id")
+        chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
+        if chat_record is None:
+            raise AppApiException(500, _("Conversation record does not exist"))
+        QuerySet(ChatRecord).filter(chat_id=chat_id, create_time__gte=chat_record.create_time).delete()
+        ChatHistory(chat_id).clear()
+        ChatCountSerializer(data={"chat_id": chat_id}).update_chat()
+        return True
 
     def debug_page(self, current_page, page_size):
         self.is_valid(raise_exception=True)

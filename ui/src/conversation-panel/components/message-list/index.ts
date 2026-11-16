@@ -1,4 +1,4 @@
-import { inject, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { nanoid } from 'nanoid'
 import type { ChatMessage, ChatRecordMeta, ConversationApiAdapter, ConversationAppInfo, SendMessageOptions, StreamChunk } from '../../core/types'
 import type { ChatFeedback, ChatLogRecord, Dict } from '@/api/types'
@@ -8,7 +8,7 @@ import { ConversationStream } from '../../core/stream'
 
 export interface MessageListDeps extends Pick<
   ConversationApiAdapter,
-  'feedback' | 'pageRecords' | 'recordDetail' | 'chatMessage' | 'resumeMessage' | 'cancel' | 'uploadFile'
+  'feedback' | 'pageRecords' | 'recordDetail' | 'chatMessage' | 'resumeMessage' | 'cancel' | 'truncate' | 'uploadFile'
 > {
   // 只读获取当前会话 id(单一数据源在 conversation-list)。必须无副作用:不可惰性创建,
   // 否则无会话时的 stop/cancel/loadMore 会凭空生成 id 并误请求后端。
@@ -28,10 +28,15 @@ const buildRecordMeta = (raw?: ChatLogRecord | null): ChatRecordMeta => ({
   executionDetails: raw?.execution_details || [],
 })
 
+/** 每条消息所属问答轮次的记录 ID：提问取紧随其后那条回答的记录 ID；回答尚未返回记录 ID 时为 undefined。 */
+export const getMessageRecordIds = (messages: ChatMessage[]) =>
+  messages.map((message, index) => (message.role === 'ASSISTANT' ? message.recordId : messages[index + 1]?.recordId))
+
 export function createMessageListStore(deps: MessageListDeps) {
-  const { pageRecords, recordDetail, chatMessage, resumeMessage, cancel: cancelApi, uploadFile, getChatId, appInfo } = deps
+  const { pageRecords, recordDetail, chatMessage, resumeMessage, cancel: cancelApi, truncate: truncateApi, uploadFile, getChatId, appInfo } = deps
 
   const messages = ref<ChatMessage[]>([])
+  const messageRecordIds = computed(() => getMessageRecordIds(messages.value))
   const loading = ref(false)
   const streamLoading = ref(false)
 
@@ -77,6 +82,26 @@ export function createMessageListStore(deps: MessageListDeps) {
     messages.value = []
     currentPage.value = 1
     hasMore.value = false
+  }
+
+  // 截断会话：后端删除该记录及之后的记录成功后，同步移除该轮提问起的全部消息；请求失败时保留现有消息
+  // 截断请求期间不允许发起对话（重新生成、表单续跑等），避免操作即将被删除的记录
+  let truncating = false
+  const truncateFrom = async (chatRecordId: string) => {
+    const cid = getChatId()
+    if (!cid || truncating) return
+    truncating = true
+    try {
+      await truncateApi(cid, chatRecordId)
+    } finally {
+      truncating = false
+    }
+    // 请求期间切换了会话时，当前列表已不是被截断的会话
+    if (cid !== getChatId()) return
+    const answerIndex = messages.value.findIndex((message) => message.recordId === chatRecordId)
+    if (answerIndex < 0) return
+    const questionIndex = messages.value[answerIndex - 1]?.role === 'USER' ? answerIndex - 1 : answerIndex
+    messages.value.splice(questionIndex)
   }
 
   // 对话结束后拉取该条记录详情,填充底部信息栏(tokens/耗时/知识来源/执行详情)
@@ -162,7 +187,7 @@ export function createMessageListStore(deps: MessageListDeps) {
   const sendMessage = (opts: SendMessageOptions) => {
     // 新建会话由调用方(message-input)惰性生成后传入 chatId;表单续跑等缺省沿用当前会话
     const cid = opts.chatId || getChatId()
-    if (!cid) return
+    if (!cid || truncating) return
 
     if (opts.newQuestion) {
       messages.value.push({ role: 'USER', content: [opts.questionContent ?? opts.message], id: nanoid() })
@@ -258,11 +283,13 @@ export function createMessageListStore(deps: MessageListDeps) {
     feedback: deps.feedback ? (recordId: string, data: ChatFeedback) => deps.feedback!(getChatId(), recordId, data) : undefined,
     appInfo,
     messages,
+    messageRecordIds,
     loading,
     streamLoading,
     hasMore,
     load,
     loadMore,
+    truncateFrom,
     sendMessage,
     regenerate,
     uploadFile,
@@ -280,6 +307,14 @@ export function useMessageListStore(): MessageListStore {
   const store = inject(MESSAGE_LIST_KEY)
   if (!store) throw new Error('useMessageListStore 必须在 ConversationView 内使用')
   return store
+}
+
+/** 消息所属问答轮次的记录 ID，由消息列表逐行提供给消息内容，供内容项的编辑、分享等入口定位所属轮次。 */
+export const MESSAGE_RECORD_ID_KEY: InjectionKey<Readonly<Ref<string | undefined>>> = Symbol('message-record-id')
+
+/** 未提供时（日志等不经消息列表渲染的视图）为 undefined。 */
+export function useMessageRecordId(): Readonly<Ref<string | undefined>> {
+  return inject(MESSAGE_RECORD_ID_KEY, ref(undefined))
 }
 
 // 通用发送能力，由消息列表或外部宿主（如工具调试结果抽屉）提供；内容项按自身场景组装参数。

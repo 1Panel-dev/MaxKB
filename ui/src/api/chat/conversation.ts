@@ -36,6 +36,10 @@ const getConversationRecordDetail = (applicationId: string, chatId: string, chat
 const getConversationRecordPage = (applicationId: string, chatId: string, page: number, size: number) =>
   get<{ records: ChatLogRecord[] }>(`${getApplicationPath(applicationId)}/chat/${chatId}/chat_record/${page}/${size}`)
 
+/** 截断会话：删除该记录及其之后的全部记录，如编辑提问前清除该轮及之后的对话。 */
+const truncateConversation = (applicationId: string, chatId: string, chatRecordId: string) =>
+  post(`${getApplicationPath(applicationId)}/chat/${chatId}/chat_record/${chatRecordId}/truncate`, {})
+
 /** 删除会话。 */
 const deleteConversation = (applicationId: string, chatId: string) => del(`${getApplicationPath(applicationId)}/chat/${chatId}`)
 
@@ -69,6 +73,7 @@ export default {
   getPortalConversationPage,
   getConversationRecordDetail,
   getConversationRecordPage,
+  truncateConversation,
   deleteConversation,
   putConversation,
   postShareConversation,

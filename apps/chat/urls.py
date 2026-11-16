@@ -25,6 +25,7 @@ v3=[
         path('chat/<str:chat_id>/chat_record/<str:chat_record_id>',v3_views.ChatRecordView.as_view(),name='v3_conversation_details'),
         path('chat/<str:chat_id>/chat_record/<str:chat_record_id>/vote',v3_views.VoteView.as_view(), name='v3_vote'),
         path('chat/<str:chat_id>/chat_record/<str:chat_record_id>/resume_chat_message',v3_views.ResumeStreamView.as_view(), name='v3_resume_chat_message'),
+        path('chat/<str:chat_id>/chat_record/<str:chat_record_id>/truncate',v3_views.ChatRecordTruncateView.as_view(), name='v3_truncate_chat_record'),
         path('chat/<str:chat_id>/share_chat',ChatRecordLinkView.as_view(),name='v3_share_chat'),
         path('chat/<str:chat_id>',v3_views.HistoricalConversationView.Operate.as_view(), name='v3_historical_conversation_operate'),
         path('mcp', v3_views.mcp_view),

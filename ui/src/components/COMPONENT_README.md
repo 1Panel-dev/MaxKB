@@ -1036,11 +1036,13 @@ Chat、Portal 和 Display 面板直接放置消息列表，并以当前会话 ID
 `show_share` provide `SHOW_SHARE_KEY`（门户还要求已选定智能体），调试、日志等视图不提供，即不显示。
 门户侧栏与历史对话抽屉的分享入口跨多个智能体，暂不受 `show_share` 控制。
 分享选择放在 `message-list/share/`：`index.ts` 的 `createShareLinkStore({ messages, share, setShared })` 维护
-每条消息的记录 ID、已选记录、数量与全选状态、单条切换、全选、进入（`enterShare`）、提交（`copyShareLink`）
+已选记录、数量与全选状态、单条切换、全选、进入（`enterShare`）、提交（`copyShareLink`）
 及退出（`exitShare`）；提交成功后退出，失败保留选择。分享模式开关仍由会话 Store 的 `isShared` 维护，
 Store 经 `setShared` 开关。所有分享入口调用 `enterShare(recordIds?)` 进入：提问与回答的入口传入所属轮次记录 ID
-以预先勾选，标题栏、会话菜单与门户历史入口不传；传入的 ID 只保留当前可分享记录。`ShareMessageRow` 通过
-`SHARE_RECORD_ID_KEY` 向消息内容提供所属轮次记录 ID，内容项以 `useShareRecordId()` 读取。
+以预先勾选，标题栏、会话菜单与门户历史入口不传；传入的 ID 只保留当前可分享记录。每条消息所属轮次的记录 ID
+由消息列表 Store 的 `messageRecordIds` 维护（提问取紧随其后那条回答的记录 ID），与是否提供分享 Store 无关；
+`ShareMessageRow` 通过 `message-list/index.ts` 的 `MESSAGE_RECORD_ID_KEY` 逐行提供给消息内容，内容项以
+`useMessageRecordId()` 读取，用于分享预先勾选和编辑提问。
 Chat、Portal 视图创建并 provide `SHARE_LINK_KEY`，组件通过 `useShareLinkStoreOptional()` 获取，未提供时不进入选择态。
 `ShareMessageRow` 通过插槽承载消息，`ShareFooter` 展示全选、数量、取消与创建链接并在卸载时退出分享态；
 两者只绑定 Store 状态与方法，不维护逻辑。`message-list/index.vue` 只组合组件并传入 Store 提供的记录 ID。

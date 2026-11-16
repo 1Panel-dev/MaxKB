@@ -74,6 +74,8 @@ export interface ConversationApiAdapter {
   pageRecords: (chatId: string, page: number, size: number) => Promise<{ records?: ChatLogRecord[] } | null | undefined>
   recordDetail: (chatId: string, chatRecordId: string) => Promise<ChatLogRecord | null | undefined>
   remove: (chatId: string) => Promise<unknown>
+  /** 截断会话：删除该记录及其之后的全部记录。 */
+  truncate: (chatId: string, chatRecordId: string) => Promise<unknown>
   rename: (chatId: string, data: { abstract: string }) => Promise<unknown>
   chatMessage: (chatId: string, data: Dict<unknown>) => Promise<Response>
   resumeMessage: (chatId: string, chatRecordId: string) => Promise<Response>

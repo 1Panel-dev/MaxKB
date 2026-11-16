@@ -127,3 +127,28 @@ class PageHistoricalConversationRecordAPI(APIMixin):
     @staticmethod
     def get_response():
         return PageApplicationRecordResponse
+
+
+class TruncateConversationRecordAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="chat_id",
+                description="对话id",
+                type=OpenApiTypes.STR,
+                location="path",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="chat_record_id",
+                description="对话记录id",
+                type=OpenApiTypes.STR,
+                location="path",
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
