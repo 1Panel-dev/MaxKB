@@ -29,17 +29,18 @@ const userPwdDialogRef = useTemplateRef<InstanceType<typeof UserPwdDialog>>('use
 const apiKeyDialogRef = useTemplateRef<InstanceType<typeof ApiKeyDialog>>('apiKeyDialogRef')
 
 // 退出对话账号后回到当前场景首页，不停留在上一用户的对话；由守卫决定匿名认证或跳转登录页。
-const handleLogout = () => {
-  return auth
-    .logout()
-    .then(() =>
-      router.replace(
-        route.meta.portal
-          ? { name: 'portal-application-list', force: true }
-          : { name: 'chat-home', params: { accessToken: route.params.accessToken }, force: true },
-      ),
+// 必须先回到首页再退出：守卫签发匿名 token 时会立即重建对话面板，此时若仍在原地址，
+// 面板会用匿名身份请求上一用户的智能体与会话，需要认证的智能体返回 403。
+const handleLogout = async () => {
+  try {
+    await router.replace(
+      route.meta.portal ? { name: 'portal-application-list' } : { name: 'chat-home', params: { accessToken: route.params.accessToken } },
     )
-    .catch(() => {})
+    await auth.logout()
+    await router.replace({ path: router.currentRoute.value.fullPath, force: true })
+  } catch {
+    // 接口错误由请求层提示
+  }
 }
 
 // 匿名用户主动登录，登录成功后回到当前地址；透传钉钉客户端入口参数
