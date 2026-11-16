@@ -36,12 +36,14 @@ class ChatUserQuotaAvailabilityTests(SimpleTestCase):
             patch.object(ChatSerializers, "get_application", return_value=object()),
             patch.object(ChatSerializers, "is_valid_chat"),
             patch.object(ChatSerializers, "is_valid_intraday_access_num"),
+            patch.object(ChatSerializers, "save_failure_record") as save_failure_record,
             patch.object(ChatSerializers, "chat_work_flow") as workflow,
         ):
             serializer = ChatSerializers(data=data)
             with self.assertRaises(AppApiException):
                 serializer.chat(instance)
             workflow.assert_not_called()
+            save_failure_record.assert_called_once()
 
     def test_available_quota_lets_workflow_run(self):
         """配额未用尽时，前置校验不拦截，正常进入工作流。"""

@@ -142,8 +142,19 @@ class ChatSerializers(serializers.Serializer):
         ):
             raise ChatException(500, _("Conversation does not exist"))
 
+    def is_valid_chat_record(self, chat_record_id):
+        """
+        带 chat_record_id（重答 / 表单续跑）时，该记录必须存在且属于当前会话。
+        后续按记录 id 读取 workflow_context、回填 messages/details，都不再带 chat_id 条件，
+        所以在这里拦住：否则可拿自己的 chat_id 读写别人会话的记录，或对不存在的记录空跑不落库。
+        """
+        if chat_record_id is None:
+            return
+        if not QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=self.data.get("chat_id")).exists():
+            raise ChatException(500, _("Conversation record does not exist"))
+
     def is_valid_intraday_access_num(self):
-        if not self.data.get("debug") and [
+        if [
             ChatUserType.ANONYMOUS_USER.value,
             ChatUserType.CHAT_USER.value,
         ].__contains__(self.data.get("chat_user_type")):
@@ -460,13 +471,76 @@ class ChatSerializers(serializers.Serializer):
             usage = self._usage_from_details(work_flow_manage.get_details())
             return base_to_response.to_block(chat_id, chat_record_id_str, aggregation.get_contents(), usage)
 
+    # ---------- 前置校验 ----------
+    def valid_access(self, instance: dict):
+        """
+        准入校验：会话归属 + 记录归属 + 应用可用，返回 application。
+        失败时没有可写入的合法会话（越权 / 记录不属于该会话 / 应用不存在或未发布），直接抛出、不落库。
+        """
+        self.is_valid_chat()
+        self.is_valid_chat_record(instance.get("chat_record_id"))
+        return self.get_application()
+
+    def valid_limit(self):
+        """额度校验：当日访问次数 + token 配额。失败由 chat 落库并按对话格式返回。"""
+        self.is_valid_intraday_access_num()
+        ChatUserTokenQuota.check_available(self.data.get("chat_user_id"))
+
+    def save_failure_record(self, instance: dict, chat_record_id, block: dict):
+        """校验失败落库：惰性建 Chat 行，并写入一条以 FAILURE 块作为回答的 ChatRecord。"""
+        chat_id = self.data.get("chat_id")
+        message_dict = instance.get("message")
+        question = message_dict.get("content", "") if isinstance(message_dict, dict) else message_dict
+        form_data = instance.get("form_data") or {}
+        chat_user = resolve_chat_user(
+            self.data.get("chat_user_id"), self.data.get("chat_user_type"), asker=form_data.get("asker")
+        )
+        self.ensure_chat_row(question, chat_user)
+        record = ChatRecord(id=chat_record_id, **{**self.get_defaults_record(message_dict), "messages": [block]})
+        record.save(force_insert=True)
+        QuerySet(Chat).filter(id=chat_id).update(update_time=timezone.now())
+        ChatCountSerializer(data={"chat_id": chat_id}).update_chat()
+        record.create_time = record.create_time or timezone.now()
+        ChatHistory(chat_id).append(record)
+
+    def chat_valid_failure(self, error: AppApiException, instance: dict, base_to_response: BaseToResponse):
+        """
+        校验失败的收口：落库 + 返回失败响应。
+        - 落库：仅新提问（未带 chat_record_id）时写入；重答/表单续跑不覆盖已有记录。
+        - 响应：与工作流运行出错一致，流式下发 FAILURE 帧后 [DONE]，非流式抛出原异常。
+        """
+        chat_id = self.data.get("chat_id")
+        chat_record_id = instance.get("chat_record_id")
+        chat_record_id_str = str(uuid.uuid7()) if chat_record_id is None else str(chat_record_id)
+        # extra.code 标识是哪种校验失败（如 1002 访问次数超限），前端 FAILURE 聚合器会原样保留 extra
+        block = FailureContent(
+            str(uuid_utils.uuid7()), str(error.message), Status.SUCCESS, None, None, extra={"code": error.code}
+        ).to_dict()
+        if chat_record_id is None:
+            try:
+                self.save_failure_record(instance, chat_record_id_str, block)
+            except Exception as e:
+                # 落库失败不能盖掉校验失败本身，仍按校验失败返回
+                maxkb_logger.error(f"save chat valid failure record error [{chat_id}]: {e}")
+        if not instance.get("stream", True):
+            raise error
+
+        def generate():
+            frame = base_to_response.to_stream(chat_id, chat_record_id_str, block)
+            if frame is not None:
+                yield "data: " + frame + "\n\n"
+            yield "data: [DONE]\n\n"
+
+        return to_stream_response_simple(generate())
+
     def chat(self, instance: dict, base_to_response: BaseToResponse = SystemToResponse()):
         self.is_valid(raise_exception=True)
         ChatMessageSerializers(data=instance).is_valid(raise_exception=True)
-        self.is_valid_chat()
-        application = self.get_application()
-        self.is_valid_intraday_access_num()
-        ChatUserTokenQuota.check_available(self.data.get("chat_user_id"))
+        application = self.valid_access(instance)
+        try:
+            self.valid_limit()
+        except AppApiException as e:
+            return self.chat_valid_failure(e, instance, base_to_response)
         return self.chat_work_flow(application, instance, base_to_response)
 
 
