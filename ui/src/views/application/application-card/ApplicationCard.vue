@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { ApplicationDetail } from '@/api/types'
+import type { ApiInputField } from '@/workflow-canvas/nodes/base-node/types'
 import { isWorkFlow } from '@/utils/common'
 import { dateFormat } from '@/utils/time'
+import { hasRenderableSlotContent } from '@/utils/vnode'
 import applicationAPI from '@/api/admin/workspace/application/application'
 
 import { computed } from 'vue'
@@ -11,19 +13,19 @@ const props = defineProps<{ application: ApplicationDetail; selectable?: boolean
 import { CHAT_API_BASE_PATH } from '@/api/constants'
 const emit = defineEmits<{ click: []; selected: [selected: boolean] }>()
 
-defineSlots<{ 'action-dropdown'?: () => unknown }>()
+const slots = defineSlots<{ 'action-dropdown'?: () => unknown }>()
+const hasActionDropdown = computed(() => hasRenderableSlotContent(slots['action-dropdown']?.()))
 const apiQuery = computed(() => {
   const query = props.application?.work_flow?.nodes
     ?.find((n) => n.id === 'base-node')
-    ?.properties?.api_input_field_list.map((f: any) => {
-      return `${f.variable}=${f.default_value}`
+    ?.properties?.api_input_field_list.map((field: ApiInputField) => {
+      return `${field.variable}=${field.default_value}`
     })
     .join('&')
   if (query) {
     return '?' + query
   }
   return ''
-
 })
 
 const chatBasePath = CHAT_API_BASE_PATH.replace(/\/api$/, '')
@@ -88,10 +90,12 @@ function toChat() {
             <MkIcon name="icon_new-chat_outlined" />
           </el-button>
         </MkTooltip>
-        <el-divider direction="vertical" />
-        <component :is="ActionDropdown">
-          <slot name="action-dropdown" />
-        </component>
+        <template v-if="hasActionDropdown">
+          <el-divider direction="vertical" />
+          <component :is="ActionDropdown">
+            <slot name="action-dropdown" />
+          </component>
+        </template>
       </component>
     </template>
   </MkResourceCard>
