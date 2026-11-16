@@ -127,4 +127,9 @@ class Migration(migrations.Migration):
             name="remark",
             field=models.CharField(blank=True, default="", max_length=256, verbose_name="备注"),
         ),
+        migrations.AddField(
+            model_name="applicationaccesstoken",
+            name="enable_api_key",
+            field=models.BooleanField(default=False, verbose_name="是否启用api key访问应用"),
+        ),
     ]

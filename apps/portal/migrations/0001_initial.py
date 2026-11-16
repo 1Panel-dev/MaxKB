@@ -47,6 +47,7 @@ class Migration(migrations.Migration):
                 ("logo", models.CharField(blank=True, max_length=512, null=True, verbose_name="门户Logo地址")),
                 ("enable_public_access", models.BooleanField(default=True, verbose_name="是否开启公开访问")),
                 ("enable_api", models.BooleanField(default=True, verbose_name="是否开启API服务")),
+                ("enable_agent_mcp_service", models.BooleanField(default=True, verbose_name="是否开启智能体MCP服务")),
                 ("enable_knowledge_base_api", models.BooleanField(default=True, verbose_name="是否开启知识库API")),
                 ("enable_auth", models.BooleanField(default=False, verbose_name="是否开启身份认证")),
                 ("auth_config", models.JSONField(blank=True, default=dict, verbose_name="身份认证配置")),

@@ -78,6 +78,57 @@ class V2MigrationUpgradeTests(TransactionTestCase):
         upgraded.refresh_from_db()
         self.assertEqual(upgraded.remark, "saved after upgrade")
 
+    def test_application_v3_entry_adds_api_key_switch_and_preserves_existing_access_token(self):
+        apps = self.v2_state.apps
+        folder = apps.get_model("application", "ApplicationFolder").objects.create(
+            id="access-token-upgrade", name="v2 folder", lft=1, rght=2, tree_id=1, level=0
+        )
+        application = apps.get_model("application", "Application").objects.create(folder=folder)
+        token = apps.get_model("application", "ApplicationAccessToken").objects.create(
+            application=application,
+            access_token="migration-test-access-token",
+            is_active=False,
+            access_num=23,
+            white_active=True,
+            white_list=["example.test"],
+        )
+        target = [("application", "0016_v3_upgrade")]
+        executor = MigrationExecutor(connection)
+        executor.migrate(target)
+        current = executor.loader.project_state(target).apps
+        upgraded = current.get_model("application", "ApplicationAccessToken").objects.get(pk=token.pk)
+        self.assertFalse(upgraded.enable_api_key)
+        for field in ("application_id", "access_token", "is_active", "access_num", "white_active", "white_list"):
+            self.assertEqual(getattr(upgraded, field), getattr(token, field))
+
+        upgraded.enable_api_key = True
+        upgraded.save(update_fields=["enable_api_key"])
+        executor = MigrationExecutor(connection)
+        self.assertEqual(executor.migration_plan(target), [])
+        executor.migrate(target)
+        upgraded.refresh_from_db()
+        self.assertTrue(upgraded.enable_api_key)
+
+    def test_portal_initial_migration_includes_mcp_switch_and_preserves_configuration(self):
+        target = [("portal", "0001_initial")]
+        executor = MigrationExecutor(connection)
+        executor.migrate(target)
+        current = executor.loader.project_state(target).apps
+        Portal = current.get_model("portal", "Portal")
+        portal = Portal.objects.get(pk="019fca92-0371-7a03-a7bb-445ebeb1314c")
+        self.assertTrue(portal.enable_agent_mcp_service)
+
+        portal.enable_agent_mcp_service = False
+        portal.name = "custom portal"
+        portal.save(update_fields=["enable_agent_mcp_service", "name"])
+        executor = MigrationExecutor(connection)
+        self.assertEqual(executor.migration_plan(target), [])
+        executor.migrate(target)
+        portal.refresh_from_db()
+        self.assertFalse(portal.enable_agent_mcp_service)
+        self.assertEqual(portal.name, "custom portal")
+        self.assertEqual(Portal.objects.count(), 1)
+
     def test_upgrade_preserves_public_access_and_all_default_model_settings(self):
         apps = self.v2_state.apps
         access = apps.get_model("knowledge", "PublicFileAccess").objects.create(
