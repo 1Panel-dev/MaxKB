@@ -9,7 +9,7 @@ import type {
   VisibilityFieldOption,
   VisibilityRules,
 } from '../type'
-import { DYNAMIC_FORM_TYPE_MESSAGE_KEYS, dynamicFormTypeOptions } from '@/components/mk-dynamics-form/constant'
+import { DYNAMIC_FORM_TYPES } from '@/components/mk-dynamics-form/constant'
 import BasicInfoConstructor from './BasicInfoConstructor.vue'
 import VisibilityConstructor from './visibility/index.vue'
 const { t } = useI18n({ useScope: 'global' })
@@ -44,9 +44,9 @@ const props = withDefaults(
 const inputTypeOptions = computed(
   () =>
     props.fieldTypeOptions ??
-    dynamicFormTypeOptions.map((option) => ({
-      label: t(DYNAMIC_FORM_TYPE_MESSAGE_KEYS[option.value]!),
-      value: `${option.value}Constructor`,
+    DYNAMIC_FORM_TYPES.map(({ labelKey, value }) => ({
+      label: t(labelKey),
+      value: `${value}Constructor`,
     })),
 )
 

@@ -46,15 +46,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form-item :label="t('dynamicForm.fields.fileCount.label')" required prop="limit">
-    <el-input-number
-      style="width: 100%"
-      v-model="formValue.limit"
-      :rules="[{ required: true, message: t('common.validation.inputRequired'), trigger: 'change' }]"
-      :min="0"
-      controls-position="right"
-      align="left"
-    />
+  <el-form-item
+    :label="t('dynamicForm.fields.fileCount.label')"
+    required
+    prop="limit"
+    :rules="[{ required: true, message: t('common.validation.inputRequired'), trigger: 'change' }]"
+  >
+    <el-input-number v-model="formValue.limit" :min="0" controls-position="right" align="left" />
   </el-form-item>
   <el-form-item
     :label="t('dynamicForm.fields.fileSize.label')"
@@ -62,7 +60,7 @@ onMounted(() => {
     prop="max_file_size"
     :rules="[{ required: true, message: t('common.validation.inputRequired'), trigger: 'change' }]"
   >
-    <el-input-number style="width: 100%" v-model="formValue.max_file_size" :min="0" controls-position="right" align="left" />
+    <el-input-number v-model="formValue.max_file_size" :min="0" controls-position="right" align="left" />
   </el-form-item>
   <el-form-item
     :label="t('dynamicForm.fields.fileTypes.label')"

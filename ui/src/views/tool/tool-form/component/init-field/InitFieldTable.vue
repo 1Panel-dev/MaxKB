@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormField } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
-import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
+import { DYNAMIC_FORM_TYPES } from '@/components/mk-dynamics-form'
 import InitFieldDialog from './InitFieldDialog.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'InitFieldTable' })
 
@@ -33,7 +36,8 @@ function handleDeleteInitField(index: number) {
 }
 
 function getTypeLabel(inputType: string) {
-  return dynamicFormTypeOptions.find((option) => option.value === inputType)?.label ?? inputType
+  const definition = DYNAMIC_FORM_TYPES.find(({ value }) => value === inputType)
+  return definition ? t(definition.labelKey) : inputType
 }
 </script>
 
@@ -60,7 +64,7 @@ function getTypeLabel(inputType: string) {
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="默认值" prop="default_value" show-overflow-tooltip> </el-table-column>
+      <el-table-column label="默认值" prop="default_value" show-overflow-tooltip></el-table-column>
       <el-table-column label="必填" width="80">
         <template #default="{ row }">
           <el-switch v-model="row.required" size="small" disabled />

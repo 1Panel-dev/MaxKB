@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FormField } from '@/components/mk-dynamics-form'
-import { MkDynamicsFormConstructor, dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
+import { DYNAMIC_FORM_TYPES, MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ submit: [data: FormField, index?: number] }>()
 const constructorRef = useTemplateRef<InstanceType<typeof MkDynamicsFormConstructor>>('constructorRef')
@@ -10,9 +13,12 @@ const dialogVisible = ref(false)
 const editingIndex = ref<number>()
 const currentField = ref<Partial<FormField>>(createField())
 const allowedInputTypes = ['TextInput', 'PasswordInput', 'SingleSelect', 'MultiSelect', 'RadioCard', 'DatePicker', 'SwitchInput']
-const fieldTypeOptions = dynamicFormTypeOptions
-  .filter(({ value }) => allowedInputTypes.includes(value))
-  .map(({ label, value }) => ({ label, value: `${value}Constructor` }))
+const fieldTypeOptions = computed(() =>
+  DYNAMIC_FORM_TYPES.filter(({ value }) => allowedInputTypes.includes(value)).map(({ labelKey, value }) => ({
+    label: t(labelKey),
+    value: `${value}Constructor`,
+  })),
+)
 
 function createField(): Partial<FormField> {
   return { input_type: 'TextInput', required: false, attrs: { maxlength: 200, minlength: 0 }, show_default_value: true }

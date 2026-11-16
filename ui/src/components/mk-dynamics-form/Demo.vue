@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed, provide, ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import type { Dict } from '@/api/types'
 import type { DynamicFormValue, FormField, VisibilityFieldOption } from '@/components/mk-dynamics-form'
 import ModelApi from '@/api/admin/workspace/model'
-import { MkDynamicsForm, MkDynamicsFormConstructor, dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
+import { DYNAMIC_FORM_TYPES, MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'MkDynamicsFormDemo' })
 provide('getSelectModelList', ModelApi.getModelListWithShared)
@@ -45,8 +48,8 @@ const getFieldLabel = (row: FormField) => {
 }
 
 const getTypeLabel = (inputType: string) => {
-  const item = dynamicFormTypeOptions.find((i) => i.value === inputType)
-  return item ? item.label : inputType
+  const definition = DYNAMIC_FORM_TYPES.find(({ value }) => value === inputType)
+  return definition ? t(definition.labelKey) : inputType
 }
 
 const openAddDialog = () => {

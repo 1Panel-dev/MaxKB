@@ -51,7 +51,6 @@
       "requiredMessage": "Enter a default value",
       "selectRequiredMessage": "Select a default value",
       "lengthMessage": "Length must be between {min} and {max} characters",
-      "propertyRequiredMessage": "This property is required",
       "datePlaceholder": "Select a date"
     },
     "optionLabel": {
@@ -114,6 +113,8 @@
       "placeholder": "Select a variable"
     },
     "comparisonValue": {
+      "placeholder": "Enter a comparison value",
+      "selectPlaceholder": "Select a comparison value",
       "requiredMessage": "Enter a comparison value"
     },
     "fileTypes": {
