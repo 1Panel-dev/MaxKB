@@ -63,7 +63,7 @@
 | `login/`、`login/forgot-password/`                                                    | Admin 登录与找回密码                         |
 | `chat/`、`portal/`                                                                    | 单应用与门户对话                             |
 | `chat/share/`                                                                         | 公开分享链接的只读问答展示与失败重试         |
-| `chat/login/`、`chat/error/`                                                          | Chat 登录、独立 404 与服务不可用展示                            |
+| `chat/login/`、`chat/error/`                                                          | Chat 登录、独立 404 与服务不可用展示         |
 | `error/404.vue`、`error/NoPermission.vue`、`error/NoService.vue`                      | Admin 页面不存在、无访问权限与服务不可用展示 |
 | `details-demo/`                                                                       | 临时执行详情预览                             |
 
@@ -514,6 +514,8 @@ System 资源管理的修正内容与添加知识库选项仅包含当前智能�
   Admin 与 Chat 登录成功统一使用替换导航，优先返回 `redirect` 记录的站内原地址，没有时进入各自场景首页。
 
 ### 正式对话与门户
+
+`conversation-panel/components/message-input/url-upload/` 维护 URL 附件浮层：开启 URL 上传时，附件按钮打开浮层，按启用的文件类型选择分类、逐行输入 HTTP／HTTPS 地址；确认后直接作为附件地址发送，复用附件总数限制，不下载远程文件或在前端校验远程文件大小。此模式禁用输入区的拖拽及文件粘贴上传，本地上传开启时通过浮层底部按钮选择文件。仅本地上传模式沿用原有直接选择、拖拽和粘贴入口。
 
 - Chat／Portal 页面以 auth token 为面板 key，token 变化重建并加载用户档案；路由认证见路由文档。
   会话装配在 conversation-panel，列表 Store 不感知 Router；门户复用 chat 装配，保留各智能体最近会话分组。
