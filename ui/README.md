@@ -60,6 +60,8 @@ OSS 文件接口。前端业务接口需要可用的后端服务。
 
 `npm run lint` 当前仅配置了 `run-s "lint:*"`，但尚未定义任何 `lint:*` 子脚本，不能作为已执行
 ESLint 检查的依据。需要检查代码时，可运行 `npx eslint <待检查的文件或目录>`。
+导入顺序由项目 ESLint 规则检查，使用 `npx eslint <文件或目录> --fix` 自动整理；
+分组与顺序见 [AGENTS.md](AGENTS.md#import-顺序)。
 
 路由菜单、知识库角色权限与问题分段关联回归测试使用 Node 内置测试运行器：`node --test tests/*.test.mjs`。
 

@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { v7 as uuidv7 } from 'uuid'
-import { aggregators } from '@/conversation-panel/core/aggregators'
 import type { AgentEvent } from '../type'
+import { aggregators } from '@/conversation-panel/core/aggregators'
 
 /**
  * 生成面板的活动：把扁平 AgentEvent 流（每条带 position）转成 conversation-panel 的内容项，

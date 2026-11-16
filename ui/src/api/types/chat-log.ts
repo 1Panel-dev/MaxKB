@@ -1,7 +1,7 @@
-import type { CHAT_LOG_SOURCE } from '@/api/enums'
 import type { Dict } from './common'
 import type { DocumentResourceType } from './document'
 import type { KnowledgeHitTestAsset, KnowledgeType } from './knowledge'
+import type { CHAT_LOG_SOURCE } from '@/api/enums'
 
 export type ChatLogSource = (typeof CHAT_LOG_SOURCE)[keyof typeof CHAT_LOG_SOURCE]
 

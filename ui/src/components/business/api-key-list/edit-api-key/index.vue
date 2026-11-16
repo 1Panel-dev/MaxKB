@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import type { ApiKeyPayload, ApiKeyRecord } from '@/api/types'
-import type ApplicationApiKeyApi from '@/api/admin/workspace/application/api-key'
-import type SystemResourceApiKeyApi from '@/api/admin/system/resource-management/application/api-key'
+import type { ExpirationType } from '../expiration'
 import type SystemApiKeyApi from '@/api/admin/system/api-key'
-import { expirationOptions, getApiKeyExpireTime, type ExpirationType } from '../expiration'
+import type SystemResourceApiKeyApi from '@/api/admin/system/resource-management/application/api-key'
+import type ApplicationApiKeyApi from '@/api/admin/workspace/application/api-key'
+import type { ApiKeyPayload, ApiKeyRecord } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import { expirationOptions, getApiKeyExpireTime } from '../expiration'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
 

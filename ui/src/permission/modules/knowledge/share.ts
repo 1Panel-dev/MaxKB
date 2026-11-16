@@ -1,7 +1,7 @@
 /** 系统「共享知识库」按钮权限（系统 > 共享 > 知识库）。全局判定，无 id。 */
 
+import { PermissionConstants as P, hasEdition } from '../../core'
 import { canSys } from '../../policy'
-import { PermissionConstants as P,hasEdition} from '../../core'
 import { Edition } from '@/permission/core/common'
 
 const share = {

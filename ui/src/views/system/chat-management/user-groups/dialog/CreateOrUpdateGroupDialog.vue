@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import type { ListItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatGroupsApi from '@/api/admin/system/chat-management/chat-user-groups'
-import type { ListItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 const emit = defineEmits<{ refresh: [groupId?: string] }>()

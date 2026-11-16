@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { computed, ref, type Component } from 'vue'
+import { computed, ref } from 'vue'
 import type { ChatContent, Dict } from '@/api/types'
-import ToolItem from './components/ToolItem.vue'
-import Terminal from '../tool/Terminal.vue'
+import type { Component } from 'vue'
+import CreateFile from '../tool/CreateFile.vue'
+import DownloadSkills from '../tool/DownloadSkills.vue'
+import Glob from '../tool/Glob.vue'
+import Grep from '../tool/Grep.vue'
+import ListDir from '../tool/ListDir.vue'
+import ListSkills from '../tool/ListSkills.vue'
 import Patch from '../tool/Patch.vue'
 import ReadFile from '../tool/ReadFile.vue'
-import ListDir from '../tool/ListDir.vue'
-import Grep from '../tool/Grep.vue'
-import Glob from '../tool/Glob.vue'
-import CreateFile from '../tool/CreateFile.vue'
-import ListSkills from '../tool/ListSkills.vue'
-import DownloadSkills from '../tool/DownloadSkills.vue'
 import RunSkill from '../tool/RunSkill.vue'
+import Terminal from '../tool/Terminal.vue'
+import ToolItem from './components/ToolItem.vue'
 
 defineOptions({ name: 'ConversationGroupToolContent' })
 

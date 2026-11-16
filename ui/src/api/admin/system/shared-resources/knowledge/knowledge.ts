@@ -1,19 +1,19 @@
-import { del, get, getExportFile, post, put } from '@/api/admin/core/request'
-import type LogicFlow from '@logicflow/core'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type {
   Dict,
-  KnowledgeHitTestPayload,
-  KnowledgeHitTestResult,
   KnowledgeCreatePayload,
   KnowledgeDetail,
   KnowledgeGeneratePayload,
+  KnowledgeHitTestPayload,
+  KnowledgeHitTestResult,
   KnowledgeItem,
   KnowledgeSyncType,
   KnowledgeWorkflowCreatePayload,
   LarkKnowledgeCreatePayload,
   WebKnowledgeCreatePayload,
 } from '@/api/types'
+import type LogicFlow from '@logicflow/core'
+import { del, get, getExportFile, post, put } from '@/api/admin/core/request'
 
 const prefix = '/system/shared/knowledge'
 

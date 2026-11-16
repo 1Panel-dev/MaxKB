@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { MsgError } from '@/utils/message'
 import type { ChatInputField } from '../../types'
 import ConversationVariableDialog from './ConversationVariableDialog.vue'
+import { MsgError } from '@/utils/message'
 
 const inputFields = defineModel<ChatInputField[]>({ required: true })
 const fieldDialogRef = useTemplateRef<InstanceType<typeof ConversationVariableDialog>>('fieldDialogRef')

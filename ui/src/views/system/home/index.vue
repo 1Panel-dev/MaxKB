@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import SystemHomepageApi from '@/api/admin/system/homepage'
-import WorkspaceApi from '@/api/admin/system/workspace'
-import SystemApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type { ApplicationDetail, WorkspaceItem } from '@/api/types'
+import SystemHomepageApi from '@/api/admin/system/homepage'
+import SystemApplicationApi from '@/api/admin/system/resource-management/application/application'
+import WorkspaceApi from '@/api/admin/system/workspace'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
-import { useStore } from '@/stores'
-import perm from '@/permission'
 import HomeResourceOverview from '@/views/home/components/HomeResourceOverview.vue'
 import HomeStatistics from '@/views/home/components/HomeStatistics.vue'
 import HomeRankings from '@/views/home/components/ranking/HomeRankings.vue'
+import { useStore } from '@/stores'
+import perm from '@/permission'
 
 defineOptions({ name: 'SystemHomeView' })
 

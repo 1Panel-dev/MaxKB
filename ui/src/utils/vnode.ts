@@ -1,6 +1,6 @@
 /** 提供 Vue 插槽 VNode 内容判断。 */
 
-import { Comment, Fragment, isVNode, Text } from 'vue'
+import { Comment, Fragment, Text, isVNode } from 'vue'
 
 /** 判断插槽输出是否包含可渲染内容，忽略空白文本、注释和空 Fragment。 */
 export function hasRenderableSlotContent(children: unknown): boolean {

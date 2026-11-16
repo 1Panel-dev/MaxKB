@@ -1,4 +1,5 @@
-import { ref, inject, type InjectionKey } from 'vue'
+import { inject, ref } from 'vue'
+import type { InjectionKey } from 'vue'
 
 /**
  * debug 面板状态:显隐 + 放大。debug header 深嵌在会话主面板内,用注入而非 props 获取。

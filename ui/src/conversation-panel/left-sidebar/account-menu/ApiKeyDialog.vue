@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import ChatUserApi from '@/api/chat/chat-user'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
+import { useMessageListStore } from '@/conversation-panel/components/message-list'
+import { VIEW_TYPE, useViewType } from '@/conversation-panel/view'
 import { useStore } from '@/stores/chat'
 import { copyText } from '@/utils/clipboard'
-import { useViewType, VIEW_TYPE } from '@/conversation-panel/view'
-import { useMessageListStore } from '@/conversation-panel/components/message-list'
 
 defineOptions({ name: 'ConversationApiKeyDialog' })
 

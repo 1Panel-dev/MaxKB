@@ -1,14 +1,15 @@
 /** Admin 登录页与外观设置登录预览使用的登录服务，对接 Admin 认证接口与 Store。 */
 
-import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { v7 as uuidv7 } from 'uuid'
+import type { LoginService } from './types'
+import type { LoginMethod } from '@/api/types'
+import type { RouteLocationRaw } from 'vue-router'
+import { LOGIN_METHOD } from '@/api/enums'
 import ExternalLoginApi from '@/api/admin/auth/external-login'
 import LoginApi from '@/api/admin/auth/login'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
-import { LOGIN_METHOD } from '@/api/enums'
-import type { LoginMethod } from '@/api/types'
 import { useStore } from '@/stores'
-import type { LoginService } from './types'
 
 const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
   if (authType === LOGIN_METHOD.SAML2) return ExternalLoginApi.getSamlLoginUrl()

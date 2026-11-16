@@ -1,6 +1,6 @@
 /** 工作空间触发器操作权限。 */
 import { can } from '../policy'
-import { hasPermission, PermissionConstants as P } from '../core'
+import { PermissionConstants as P, hasPermission } from '../core'
 import { AggregatePermission, Role, RoleConstants } from '../core/common'
 import { getWorkspaceId } from '@/utils/resource-context'
 export default {

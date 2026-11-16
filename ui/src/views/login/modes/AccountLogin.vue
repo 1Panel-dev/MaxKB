@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import JSEncrypt from 'jsencrypt'
 import { useRoute } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
+import JSEncrypt from 'jsencrypt'
 import { useI18n } from 'vue-i18n'
-import { LOGIN_METHOD_LABEL_KEYS } from '../constants'
-import { LOGIN_METHOD } from '@/api/enums'
-import type { LoginConfig, LoginMethod } from '@/api/types'
 import type { AccountLoginForm, LoginService } from '../types'
+import type { LoginConfig, LoginMethod } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import { LOGIN_METHOD } from '@/api/enums'
+import { LOGIN_METHOD_LABEL_KEYS } from '../constants'
 
 defineOptions({ name: 'AccountLogin' })
 

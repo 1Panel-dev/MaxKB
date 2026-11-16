@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useStore } from '@/stores/chat'
-import { formatTokenNumber } from '@/utils/number'
 import { QUOTA_TYPE } from '@/api/enums'
 import { useConversationListStore } from '../conversation-list/index'
-import UserPwdDialog from './UserPwdDialog.vue'
 import ApiKeyDialog from './ApiKeyDialog.vue'
+import UserPwdDialog from './UserPwdDialog.vue'
+import { useStore } from '@/stores/chat'
+import { formatTokenNumber } from '@/utils/number'
 
 defineOptions({ name: 'ConversationAccountMenu' })
 

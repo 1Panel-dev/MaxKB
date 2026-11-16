@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, nextTick } from 'vue'
-import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form/constant'
-import VisibilityConstructor from './visibility/index.vue'
-import BasicInfoConstructor from './BasicInfoConstructor.vue'
+import { nextTick, onMounted, ref } from 'vue'
 import type {
   DynamicFormConstructorExpose,
   DynamicFormConstructorOption,
@@ -11,6 +8,9 @@ import type {
   VisibilityFieldOption,
   VisibilityRules,
 } from '../type'
+import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form/constant'
+import BasicInfoConstructor from './BasicInfoConstructor.vue'
+import VisibilityConstructor from './visibility/index.vue'
 
 interface VisibilityConstructorExpose {
   getData: () => VisibilityRules | null

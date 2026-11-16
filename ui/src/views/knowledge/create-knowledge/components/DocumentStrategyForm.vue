@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { DOCUMENT_SPLIT_PATTERN_OPTIONS } from '@/constants/document'
 import { computed, reactive, ref } from 'vue'
-import type { FormInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import type { DocumentStrategy, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
-import ModelApi from '@/api/admin/workspace/model'
-import SystemResourceModelApi from '@/api/admin/system/resource-management/model'
-import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
+import type { FormInstance } from 'element-plus'
 import ProviderApi from '@/api/admin/model-provider'
-import ToolApi from '@/api/admin/workspace/tool/tool'
+import SystemResourceModelApi from '@/api/admin/system/resource-management/model'
 import SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
+import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
+import ModelApi from '@/api/admin/workspace/model'
+import ToolApi from '@/api/admin/workspace/tool/tool'
 import SelectModel from '@/components/business/select-model/index.vue'
+import { DOCUMENT_SPLIT_PATTERN_OPTIONS } from '@/constants/document'
 import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'DocumentStrategyForm' })

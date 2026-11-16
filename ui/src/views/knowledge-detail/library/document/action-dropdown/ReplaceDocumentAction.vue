@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { MsgSuccess, MsgWarning } from '@/utils/message'
-import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
-import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_EXTENSIONS, KNOWLEDGE_IMAGE_TYPE_LABEL } from '@/constants/knowledge'
+import type { DocumentItem } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { UploadFile } from 'element-plus'
-import type { DocumentItem } from '@/api/types'
+import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
+import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_EXTENSIONS, KNOWLEDGE_IMAGE_TYPE_LABEL } from '@/constants/knowledge'
+import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ReplaceDocumentAction' })
 const props = defineProps<{

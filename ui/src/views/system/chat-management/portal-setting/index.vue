@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
+import type { PortalSetting, PortalSettingPayload } from '@/api/types'
 import PortalApi from '@/api/admin/system/chat-management/portal-setting.ts'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
-import type { PortalSetting, PortalSettingPayload } from '@/api/types'
-import { copyText } from '@/utils/clipboard'
-import { MsgSuccess } from '@/utils/message'
-import { perm } from '@/permission'
-import PortalPreview from './components/PortalPreview.vue'
 import ButtonEditPortal from './components/ButtonEditPortal.vue'
 import ButtonPortalAuthSetting from './components/ButtonPortalAuthSetting.vue'
 import ButtonPortalCorsSetting from './components/ButtonPortalCorsSetting.vue'
+import PortalPreview from './components/PortalPreview.vue'
 import { useStore } from '@/stores'
+import { copyText } from '@/utils/clipboard'
+import { MsgSuccess } from '@/utils/message'
+import { perm } from '@/permission'
 
 type AccessField = 'enable_public_access' | 'enable_api' | 'enable_agent_mcp_service' | 'enable_knowledge_base_api' | 'enable_auth' | 'enable_cors'
 

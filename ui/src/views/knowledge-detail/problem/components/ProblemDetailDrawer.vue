@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
 import type { ProblemItem, ProblemParagraph } from '@/api/types'
-import MkEditName from '@/components/mk-edit-name/index.vue'
-import { MsgSuccess } from '@/utils/message'
-import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
-import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
-import { getFileIconUrl } from '@/utils/icon'
-import { getFileUrl } from '@/utils/common'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
-import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import MkEditName from '@/components/mk-edit-name/index.vue'
+import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { getFileUrl } from '@/utils/common'
+import { getFileIconUrl } from '@/utils/icon'
+import { MsgSuccess } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
 
 /**

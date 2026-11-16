@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { compareList } from '@/workflow-canvas/config/constants'
 import type { VisibilityConditionState, VisibilityFieldOption } from '../../type'
+import { compareList } from '@/workflow-canvas/config/constants'
 import FieldSelector from './FieldSelector.vue'
 import { getAllowedOps, getFieldConfig, inferFieldType } from './utils'
 

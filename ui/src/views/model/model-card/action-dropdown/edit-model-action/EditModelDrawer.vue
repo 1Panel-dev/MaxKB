@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, watch } from 'vue'
-import type ModelApi from '@/api/admin/workspace/model'
 import type SystemResourceModelApi from '@/api/admin/system/resource-management/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
+import type ModelApi from '@/api/admin/workspace/model'
 import type { BaseModelOption, Dict, ModelItem, ModelPayload, ModelProviderItem } from '@/api/types'
+import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import ProviderApi from '@/api/admin/model-provider'
-import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
-import { MODEL_TYPE_LABELS } from '@/constants'
+import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import { loadCachedBaseModelOptions, loadCachedOrBuiltinBaseModelOptions } from '@/views/model/base-model-options'
+import { MODEL_TYPE_LABELS } from '@/constants'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'EditModelDrawer' })

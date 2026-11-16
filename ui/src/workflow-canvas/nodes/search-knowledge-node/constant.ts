@@ -1,5 +1,5 @@
-import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
 import type { KnowledgeSearchSetting } from './types'
+import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
 
 export const defaultSearchSetting: KnowledgeSearchSetting = {
   top_n: 3,

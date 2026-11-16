@@ -1,5 +1,5 @@
-import { get, put } from '../../core/request'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
+import { get, put } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (applicationId: string) => `/workspace/${getWorkspaceId()}/application/${applicationId}/application_version`

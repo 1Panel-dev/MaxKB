@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { computed, provide, ref, useTemplateRef, type Component } from 'vue'
+import { computed, provide, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { AxiosProgressEvent } from 'axios'
-import type LogicFlow from '@logicflow/core'
-import FileApi from '@/api/admin/file'
-import { FILE_SOURCE_TYPE } from '@/api/enums'
-import type { KnowledgeWorkflowApi, Dict, KnowledgeWorkflowDebugPayload } from '@/api/types'
-import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
-import { WorkflowNodeType } from '@/workflow-canvas/types'
+import type { Dict, KnowledgeWorkflowApi, KnowledgeWorkflowDebugPayload } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
+import type LogicFlow from '@logicflow/core'
+import type { AxiosProgressEvent } from 'axios'
+import type { Component } from 'vue'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
+import FileApi from '@/api/admin/file'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
 import DataSource from './action/DataSource.vue'
 import KnowledgeBase from './action/KnowledgeBase.vue'
 import Result from './action/Result.vue'
+import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 
 defineOptions({ name: 'KnowledgeWorkflowDebugDrawer' })
 

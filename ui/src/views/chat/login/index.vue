@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft } from '@element-plus/icons-vue'
-import { useI18n } from 'vue-i18n'
-import { getDingTalkClientAuthCode } from '@/views/login/dingtalk-client-login'
-import { type RouteLocationRaw, useRoute, useRouter } from 'vue-router'
 import { v7 as uuidv7 } from 'uuid'
+import { useI18n } from 'vue-i18n'
+import type { ApplicationAuthProfileMeta, LoginConfig, LoginMethod, PortalAuthProfileMeta } from '@/api/types'
+import type { LoginService } from '@/views/login/types'
+import type { RouteLocationRaw } from 'vue-router'
+import { LOGIN_METHOD } from '@/api/enums'
 import ChatAuthApi from '@/api/chat/auth'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
-import { LOGIN_METHOD } from '@/api/enums'
-import type { ApplicationAuthProfileMeta, LoginConfig, LoginMethod, PortalAuthProfileMeta } from '@/api/types'
-import { useStore } from '@/stores/chat'
 import NoService from '@/views/chat/error/NoService.vue'
 import LoginModePanel from '@/views/login/components/LoginModePanel.vue'
-import type { LoginService } from '@/views/login/types'
+import { getDingTalkClientAuthCode } from '@/views/login/dingtalk-client-login'
+import { useStore } from '@/stores/chat'
 
 defineOptions({ name: 'ChatLogin' })
 

@@ -1,6 +1,6 @@
+import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { createUpdateTool, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
-import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
 /** data-source-local-node（本地文件数据源）的 AI 生成配置：流程入口，无入参，只有上传限制 */
 

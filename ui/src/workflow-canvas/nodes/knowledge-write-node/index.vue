@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormInstance, FormRules } from 'element-plus'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { isLastNode } from '@/workflow-canvas/core/utils'
 
 defineOptions({ name: 'WorkflowKnowledgeWriteNode' })

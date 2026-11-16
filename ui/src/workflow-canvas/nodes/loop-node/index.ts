@@ -1,9 +1,9 @@
-import LoopNodeVue from './index.vue'
-import LoopNodeDetail from './details/index.vue'
-import agent from './agent'
+import type { Model } from '@logicflow/core'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
-import type { Model } from '@logicflow/core'
+import agent from './agent'
+import LoopNodeDetail from './details/index.vue'
+import LoopNodeVue from './index.vue'
 
 class LoopNodeModel extends WorkflowNodeModel {
   getDefaultAnchor(): Model.AnchorConfig[] {

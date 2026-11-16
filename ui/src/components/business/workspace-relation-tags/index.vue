@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { h, ref } from 'vue'
-import { ElScrollbar, type TableTooltipData } from 'element-plus'
+import { ElScrollbar } from 'element-plus'
+import type { TableTooltipData } from 'element-plus'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 defineOptions({ name: 'WorkspaceRelationTags' })
 

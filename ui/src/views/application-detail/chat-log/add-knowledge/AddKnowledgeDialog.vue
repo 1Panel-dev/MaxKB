@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import type { ApplicationChatLogApi } from '../../context'
-import WorkspaceKnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type { DocumentItem, KnowledgeItem } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import SystemResourceDocumentApi from '@/api/admin/system/resource-management/knowledge/document'
 import SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import WorkspaceDocumentApi from '@/api/admin/workspace/knowledge/document'
-import SystemResourceDocumentApi from '@/api/admin/system/resource-management/knowledge/document'
-import { isSystemResource } from '@/utils/resource-context'
-import type { DocumentItem, KnowledgeItem } from '@/api/types'
-import { MsgSuccess } from '@/utils/message'
+import WorkspaceKnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import { getFileIconUrl } from '@/utils/icon'
+import { MsgSuccess } from '@/utils/message'
+import { isSystemResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'AddKnowledgeDialog' })
 const props = defineProps<{

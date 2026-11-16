@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { inject } from 'vue'
-import { DROPDOWN_INJECTION_KEY } from 'element-plus'
 import { useRoute } from 'vue-router'
-import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { DROPDOWN_INJECTION_KEY } from 'element-plus'
 import type { DocumentItem } from '@/api/types'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 
 defineOptions({ name: 'ExportDocumentAction' })
 

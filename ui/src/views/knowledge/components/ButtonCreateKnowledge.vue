@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, type CSSProperties } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { UploadFile, UploadInstance } from 'element-plus'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import type { UploadFile, UploadInstance } from 'element-plus'
+import type { CSSProperties } from 'vue'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import CreateBaseKnowledgeDialog from '../create-knowledge/BaseKnowledgeDialog.vue'
+import CreateLarkKnowledgeDialog from '../create-knowledge/LarkKnowledgeDialog.vue'
+import CreateWebKnowledgeDrawer from '../create-knowledge/WebKnowledgeDrawer.vue'
+import CreateWorkflowKnowledgeDialog from '../create-knowledge/WorkflowKnowledgeDialog.vue'
 import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { useStore } from '@/stores'
 import { MsgConfirm } from '@/utils/message'
 import { isSystemSharedResource } from '@/utils/resource-context'
-import CreateBaseKnowledgeDialog from '../create-knowledge/BaseKnowledgeDialog.vue'
-import CreateWebKnowledgeDrawer from '../create-knowledge/WebKnowledgeDrawer.vue'
-import CreateLarkKnowledgeDialog from '../create-knowledge/LarkKnowledgeDialog.vue'
-import CreateWorkflowKnowledgeDialog from '../create-knowledge/WorkflowKnowledgeDialog.vue'
 
 defineOptions({ name: 'ButtonCreateKnowledge' })
 

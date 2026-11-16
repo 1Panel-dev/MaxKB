@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import type { PortalSetting } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
 import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
 
 const props = defineProps<{

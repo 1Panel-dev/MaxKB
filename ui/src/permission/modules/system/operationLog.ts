@@ -1,7 +1,7 @@
 /** 系统「操作日志」按钮权限。$perm.operationLog.* */
 
+import { PermissionConstants as P, hasEdition } from '../../core'
 import { canSys } from '../../policy'
-import { PermissionConstants as P,hasEdition} from '../../core'
 import { Edition } from '@/permission/core/common'
 
 export default {

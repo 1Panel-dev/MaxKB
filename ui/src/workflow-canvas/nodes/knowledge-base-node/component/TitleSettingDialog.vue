@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import type { FormInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import type { KnowledgeFieldConfig } from '../types'
+import type { FormInstance } from 'element-plus'
 
 const emit = defineEmits<{ submit: [data: KnowledgeFieldConfig] }>()
 const formRef = useTemplateRef<FormInstance>('formRef')

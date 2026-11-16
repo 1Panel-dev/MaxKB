@@ -1,5 +1,5 @@
-import { createValidateTool, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
+import { createValidateTool, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 
 /** data-source-web-node（Web 站点数据源）的 AI 生成配置：流程入口，无入参也无配置项 */
 

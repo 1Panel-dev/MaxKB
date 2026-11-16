@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { DOCUMENT_TASK_STATE } from '@/api/enums'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { DOCUMENT_TASK_STATE } from '@/api/enums'
 
 defineOptions({ name: 'BatchTokenizeAction' })
 const props = defineProps<{

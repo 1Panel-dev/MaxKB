@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
-import AuthScanApi from '@/api/admin/system/settings/auth-scan-setting'
 import type { QrLoginPlatformPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
-import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
+import AuthScanApi from '@/api/admin/system/settings/auth-scan-setting'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
+import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
 import { copyText } from '@/utils/clipboard'
-import { MsgSuccess, MsgError } from '@/utils/message'
+import { MsgError, MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
 
 const emit = defineEmits<{ refresh: [] }>()

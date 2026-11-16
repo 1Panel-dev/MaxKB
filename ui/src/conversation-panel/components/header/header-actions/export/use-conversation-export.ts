@@ -1,8 +1,8 @@
 import { computed, ref } from 'vue'
 import DOMPurify from 'dompurify'
 import type { ChatContent } from '@/api/types'
-import { useMessageListStore } from '../../../message-list/index'
 import { useConversationListStore } from '../../../../left-sidebar/conversation-list/index'
+import { useMessageListStore } from '../../../message-list/index'
 import { MsgError } from '@/utils/message'
 
 export function downloadBlob(blob: Blob, fileName: string) {

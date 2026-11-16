@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, useId, useTemplateRef, watch } from 'vue'
-import { ElOverlay, TrapFocus as vTrapFocus, useLockscreen, useZIndex, type ButtonInstance } from 'element-plus'
+import { ElOverlay, TrapFocus as vTrapFocus, useLockscreen, useZIndex } from 'element-plus'
 import type { MediaPreviewProps } from './types'
+import type { ButtonInstance } from 'element-plus'
 
 defineOptions({ name: 'MkMediaPreview' })
 const props = defineProps<MediaPreviewProps>()

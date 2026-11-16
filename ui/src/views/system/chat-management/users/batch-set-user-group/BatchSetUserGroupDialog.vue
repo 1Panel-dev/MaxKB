@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import type { BatchSetChatUserGroupsRequest, ListItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
 import ChatUserGroupsApi from '@/api/admin/system/chat-management/chat-user-groups'
-import type { BatchSetChatUserGroupsRequest, ListItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'BatchSetUserGroupDialog' })

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue'
-import { useStore } from '@/stores/admin'
 import DisplaySettingDialog from './DisplaySettingDialog.vue'
 import XpackDisplaySettingDialog from './XpackDisplaySettingDialog.vue'
+import { useStore } from '@/stores/admin'
 
 defineOptions({ name: 'ButtonDisplaySetting' })
 

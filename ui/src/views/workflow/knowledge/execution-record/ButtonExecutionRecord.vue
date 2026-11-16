@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { KnowledgeWorkflowApi } from '@/api/types'
 import { nextTick, ref, useTemplateRef } from 'vue'
+import type { KnowledgeWorkflowApi } from '@/api/types'
 import ExecutionRecordDrawer from './ExecutionRecordDrawer.vue'
 
 defineOptions({ name: 'ButtonKnowledgeExecutionRecord', inheritAttrs: false })

@@ -1,10 +1,10 @@
-import IntentNodeViewVue from './index.vue'
-import IntentNodeDetail from './details/index.vue'
-import agent from './agent'
+import type { Model } from '@logicflow/core'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
+import agent from './agent'
+import IntentNodeDetail from './details/index.vue'
+import IntentNodeViewVue from './index.vue'
 import { randomId } from '@/utils/common'
-import type { Model } from '@logicflow/core'
 
 interface IntentNodeBranch {
   id: string

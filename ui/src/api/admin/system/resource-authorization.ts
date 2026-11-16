@@ -1,5 +1,5 @@
-import { get, put } from '../core/request'
 import type { Dict, ResourceAuthorizationType, ResourcePermissionItem, ResourcePermissionPayload } from '@/api/types'
+import { get, put } from '../core/request'
 
 /** 系统管理用户资源授权 */
 const prefix = (workspaceId: string) => `/workspace/${workspaceId}/user_resource_permission`

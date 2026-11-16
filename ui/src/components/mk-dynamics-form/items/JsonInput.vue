@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import JsonEditor from '@/components/codemirror-editor/Json.vue'
 import type { DynamicFormValue } from '../type'
+import JsonEditor from '@/components/codemirror-editor/Json.vue'
 
 defineOptions({ name: 'DynamicFormJsonInput', inheritAttrs: false })
 

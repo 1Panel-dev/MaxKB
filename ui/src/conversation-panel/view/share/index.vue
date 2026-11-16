@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
+import { SHARE_PANEL_KEY, createSharePanelStore } from '../../main/share-panel/index'
 import SharePanel from '../../main/share-panel/index.vue'
-import { createSharePanelStore, SHARE_PANEL_KEY } from '../../main/share-panel/index'
-import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, createDeviceType } from '../index.ts'
+import { DEVICE_KEY, VIEW_KEY, VIEW_TYPE, createDeviceType } from '../index.ts'
 
 defineOptions({ name: 'ShareConversation' })
 

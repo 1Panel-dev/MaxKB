@@ -1,7 +1,8 @@
-import { computed, inject, ref, type InjectionKey, type Ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { v7 as uuidv7 } from 'uuid'
 import type { SidePanelMode } from '../../core/layout/types'
 import type { Conversation, ConversationAccount, ConversationAppInfo } from '../../core/types'
+import type { InjectionKey, Ref } from 'vue'
 
 // 由 Chat / Debug 入口注入本组件需要的会话接口。
 export interface ConversationListDeps {

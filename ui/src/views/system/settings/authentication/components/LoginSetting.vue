@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, onActivated, reactive, ref, useTemplateRef } from 'vue'
 import { pick } from 'lodash'
-import CurrentUserApi from '@/api/admin/auth/current-user'
-import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
-import UserGroupsApi from '@/api/admin/system/user-groups'
 import type { ListItem, LoginAuthSettingPayload, LoginMethod, SystemUserGroup } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
+import CurrentUserApi from '@/api/admin/auth/current-user'
+import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
+import UserGroupsApi from '@/api/admin/system/user-groups'
 import { LOGIN_METHOD_LABELS } from '@/constants'
-import { MsgSuccess } from '@/utils/message'
 import { useStore } from '@/stores'
+import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
 
 defineOptions({ name: 'AuthenticationSetting' })

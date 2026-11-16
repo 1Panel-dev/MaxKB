@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
+import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 

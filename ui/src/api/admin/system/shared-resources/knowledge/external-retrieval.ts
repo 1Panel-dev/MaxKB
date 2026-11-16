@@ -1,5 +1,5 @@
-import { get, put } from '@/api/admin/core/request'
 import type { KnowledgeExternalRetrievalPayload, KnowledgeExternalRetrievalSetting } from '@/api/types'
+import { get, put } from '@/api/admin/core/request'
 
 const getPrefix = (knowledgeId: string) => `/system/shared/knowledge/${knowledgeId}`
 

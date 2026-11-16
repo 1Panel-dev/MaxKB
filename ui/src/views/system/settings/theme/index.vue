@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules, UploadFile } from 'element-plus'
 import type { ThemeInfo } from '@/api/admin/auth/types'
+import type { FormInstance, FormRules, UploadFile } from 'element-plus'
 import ThemeSettingApi from '@/api/admin/system/settings/theme-setting'
+import LoginPreview from './components/LoginPreview.vue'
+import PlatformPreview from './components/PlatformPreview.vue'
 import { DEFAULT_PLATFORM_SETTING, DEFAULT_THEME_SETTING, THEME_OPTIONS } from '@/constants/theme'
 import { useStore } from '@/stores'
 import { MsgError, MsgSuccess } from '@/utils/message'
-import LoginPreview from './components/LoginPreview.vue'
-import PlatformPreview from './components/PlatformPreview.vue'
 import perm from '@/permission/index.ts'
 
 type ThemeImageField = 'icon' | 'loginImage' | 'loginLogo'

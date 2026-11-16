@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
-import type { KnowledgeWorkflowApi, KnowledgeWorkflowAction } from '@/api/types'
-import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
+import type { KnowledgeWorkflowAction, KnowledgeWorkflowApi } from '@/api/types'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
+import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'DebugResult' })

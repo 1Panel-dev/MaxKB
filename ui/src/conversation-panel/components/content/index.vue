@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue'
-import TextItem from './items/text.vue'
-import HtmlItem from './items/html.vue'
+import { computed } from 'vue'
+import type { Component } from 'vue'
 import EchartsItem from './items/echarts.vue'
-import ReasoningItem from './items/reasoning.vue'
-import ToolItem from './items/tool/index.vue'
+import FailureItem from './items/failure.vue'
+import FormItem from './items/form.vue'
 import GroupToolItem from './items/group-tool/index.vue'
 import GroupItem from './items/group/index.vue'
-import FormItem from './items/form.vue'
-import FailureItem from './items/failure.vue'
+import HtmlItem from './items/html.vue'
 import QuestionItem from './items/question/index.vue'
+import ReasoningItem from './items/reasoning.vue'
+import TextItem from './items/text.vue'
+import ToolItem from './items/tool/index.vue'
 
 defineOptions({ name: 'ConversationContent' })
 

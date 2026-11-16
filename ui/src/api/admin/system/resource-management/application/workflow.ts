@@ -1,5 +1,5 @@
-import { get, put } from '@/api/admin/core/request'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
+import { get, put } from '@/api/admin/core/request'
 
 const getPrefix = (applicationId: string) => `/system/resource/application/${applicationId}/application_version`
 

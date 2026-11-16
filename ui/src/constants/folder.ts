@@ -1,7 +1,7 @@
 /** 提供资源文件夹的全部与共享入口，全部入口使用当前工作空间 ID。 */
 
-import { RESOURCE_TYPE } from '@/api/enums'
 import type { FolderItem, FolderSource } from '@/api/types'
+import { RESOURCE_TYPE } from '@/api/enums'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 export const FOLDER_ENTRY_ID = {

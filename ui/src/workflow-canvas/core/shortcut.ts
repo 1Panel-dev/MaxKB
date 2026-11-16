@@ -1,12 +1,12 @@
 import { cloneDeep } from 'lodash'
 import type LogicFlow from '@logicflow/core'
 import { type GraphModel } from '@logicflow/core'
-import { MsgError, MsgConfirm } from '@/utils/message'
+import { workflowModelDict } from '@/workflow-canvas/config/node-mapping'
+import { getMenuNodes } from '@/workflow-canvas/node-menu/menu'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import { copyText } from '@/utils/clipboard'
 import { randomId } from '@/utils/common'
-import { workflowModelDict } from '@/workflow-canvas/config/node-mapping'
-import { getMenuNodes } from '@/workflow-canvas/node-menu/menu'
+import { MsgConfirm, MsgError } from '@/utils/message'
 let activeCanvasId: string | null = null
 type Point = { x: number; y: number }
 type WorkflowGraphModel = GraphModel & { get_provide: (node: LogicFlow.NodeData | null, graph: GraphModel | null) => { workflowMode: WorkflowMode } }

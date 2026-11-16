@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import HomepageApi from '@/api/admin/workspace/homepage'
-import ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail } from '@/api/types'
-import perm from '@/permission'
+import ApplicationApi from '@/api/admin/workspace/application/application'
+import HomepageApi from '@/api/admin/workspace/homepage'
 import HomeQuickCreate from './components/HomeQuickCreate.vue'
 import HomeResourceOverview from './components/HomeResourceOverview.vue'
 import HomeStatistics from './components/HomeStatistics.vue'
 import HomeRankings from './components/ranking/HomeRankings.vue'
+import perm from '@/permission'
 const route = useRoute()
 const workspaceId = computed(() => String(route.params.workspaceId))
 

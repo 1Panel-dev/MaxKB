@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import { downloadByURL, getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
-import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 
 defineOptions({ name: 'RerankerNodeDetail' })
 

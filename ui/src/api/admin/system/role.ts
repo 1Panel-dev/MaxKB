@@ -1,4 +1,3 @@
-import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type {
   CreateRoleMembersRequest,
@@ -10,6 +9,7 @@ import type {
   RoleTypeGroup,
   SaveRolePermissionRequest,
 } from '@/api/types'
+import { del, get, post } from '../core/request'
 
 const prefix = '/system/role'
 

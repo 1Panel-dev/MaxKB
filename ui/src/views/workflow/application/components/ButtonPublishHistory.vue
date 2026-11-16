@@ -2,8 +2,8 @@
 import { ref, useTemplateRef } from 'vue'
 import type WorkflowApi from '@/api/admin/workspace/application/workflow'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
-import { MsgSuccess } from '@/utils/message'
 import PublishHistoryDrawer from '@/views/workflow/components/publish-history/PublishHistoryDrawer.vue'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ButtonApplicationPublishHistory' })
 

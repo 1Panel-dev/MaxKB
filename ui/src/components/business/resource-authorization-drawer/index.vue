@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
-import SystemResourceAuthorizationApi from '@/api/admin/system/resource-management/resource-authorization'
-import { RESOURCE_AUTHORIZATION_TARGET_TYPE as TARGET, RESOURCE_PERMISSION } from '@/api/enums'
 import type { FolderItem, ResourceAuthorizationTargetType, ResourcePermission } from '@/api/types'
-import { RESOURCE_PERMISSION_OPTIONS } from '@/constants/resource-authorization'
-import { buildBaseResourcePermission, hasPermission, PermissionConstants as P, Role, RoleConstants } from '@/permission/core'
-import { useStore } from '@/stores'
-import { isSystemResource } from '@/utils/resource-context'
-import { MsgSuccess } from '@/utils/message'
+import { RESOURCE_AUTHORIZATION_TARGET_TYPE as TARGET, RESOURCE_PERMISSION } from '@/api/enums'
+import SystemResourceAuthorizationApi from '@/api/admin/system/resource-management/resource-authorization'
+import ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
 import PermissionConfigDialog from './PermissionConfigDialog.vue'
 import UserAuthorization from './UserAuthorization.vue'
 import UserGroupAuthorization from './user-group/UserGroupAuthorization.vue'
+import { RESOURCE_PERMISSION_OPTIONS } from '@/constants/resource-authorization'
+import { PermissionConstants as P, Role, RoleConstants, buildBaseResourcePermission, hasPermission } from '@/permission/core'
+import { useStore } from '@/stores'
+import { MsgSuccess } from '@/utils/message'
+import { isSystemResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'ResourceAuthorizationDrawer' })
 const props = defineProps<{

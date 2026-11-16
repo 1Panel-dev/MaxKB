@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import UploadImageDrawer from './UploadImageDrawer.vue'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import UploadImageDrawer from './UploadImageDrawer.vue'
 
 defineOptions({ name: 'ButtonUploadImage' })
 defineProps<{

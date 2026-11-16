@@ -37,9 +37,9 @@
 import { onMounted, ref, watch } from 'vue'
 import { cloneDeep, set } from 'lodash'
 import type { BaseNodeModel } from '@logicflow/core'
+import { isLoopBuiltinField } from '../constant'
 import LoopFieldDialog from './LoopFieldDialog.vue'
 import { MsgError } from '@/utils/message'
-import { isLoopBuiltinField } from '../constant'
 
 defineOptions({ name: 'LoopFieldTable' })
 const props = defineProps<{ nodeModel: BaseNodeModel }>()

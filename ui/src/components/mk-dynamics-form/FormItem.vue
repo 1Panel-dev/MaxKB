@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, type Component, type Ref } from 'vue'
-import type { FormItemRule } from 'element-plus'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { get } from 'lodash'
+import type { DynamicFormTriggerMap, DynamicFormTriggerSetting, DynamicFormValue, FormField, FormFieldLabel, SerializedFormRule } from './type'
 import type { Dict } from '@/api/types'
-import bus from '@/utils/bus'
+import type { FormItemRule } from 'element-plus'
+import type { Component, Ref } from 'vue'
 import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
 import FormItemLabel from './FormItemLabel.vue'
-import type { DynamicFormTriggerMap, DynamicFormTriggerSetting, DynamicFormValue, FormField, FormFieldLabel, SerializedFormRule } from './type'
+import bus from '@/utils/bus'
 
 defineOptions({ name: 'MkDynamicsFormItem' })
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { UploadCardFile } from './types'
 import { getFileIconUrl } from '@/utils/icon'
 import { formatFileSize } from '@/utils/number'
-import type { UploadCardFile } from './types'
 
 defineOptions({ name: 'FileUploadCard' })
 const props = withDefaults(

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { DOCUMENT_TASK_STATE } from '@/api/enums'
 import type { DocumentTaskState } from '@/api/types'
+import { DOCUMENT_TASK_STATE } from '@/api/enums'
 
 defineOptions({ name: 'DocumentEmbeddingDialog' })
 const props = defineProps<{ loading: boolean }>()

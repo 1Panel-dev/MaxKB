@@ -1,41 +1,41 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
+import { cloneDeep } from 'lodash'
+import type {
+  DefaultModelSettingPayload,
+  ToolItem,
+  ToolWorkflowDetail,
+  WorkflowStoreTemplate,
+  WorkflowVersion,
+  WorkflowVersionPayload,
+} from '@/api/types'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
-import { cloneDeep } from 'lodash'
 import { TOOL_TYPE } from '@/api/enums'
-import WorkspaceModelApi from '@/api/admin/workspace/model'
-import WorkspaceToolApi from '@/api/admin/workspace/tool/tool'
-import WorkspaceToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
 import SystemModelApi from '@/api/admin/system/resource-management/model'
 import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
 import SystemToolWorkflowApi from '@/api/admin/system/resource-management/tool/tool-workflow'
 import SharedModelApi from '@/api/admin/system/shared-resources/model'
 import SharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import SharedToolWorkflowApi from '@/api/admin/system/shared-resources/tool/tool-workflow'
-import type {
-  DefaultModelSettingPayload,
-  ToolItem,
-  ToolWorkflowDetail,
-  WorkflowVersion,
-  WorkflowVersionPayload,
-  WorkflowStoreTemplate,
-} from '@/api/types'
-import { getResourceScope, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
-import { MsgConfirm, MsgSuccess, MsgError } from '@/utils/message'
-import WorkflowCanvas from '@/workflow-canvas/index.vue'
-import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
-import { WorkflowMode } from '@/workflow-canvas/types'
-import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
+import WorkspaceModelApi from '@/api/admin/workspace/model'
+import WorkspaceToolApi from '@/api/admin/workspace/tool/tool'
+import WorkspaceToolWorkflowApi from '@/api/admin/workspace/tool/workflow'
 import ButtonDefaultModelSetting from '@/views/workflow/components/default-model-setting/ButtonDefaultModelSetting.vue'
 import EditPublishVersionDialog from '@/views/workflow/components/publish-history/EditPublishVersionDialog.vue'
 import { showWorkflowValidateError } from '@/views/workflow/components/validate-error'
+import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
+import WorkflowCanvas from '@/workflow-canvas/index.vue'
+import { WorkflowMode } from '@/workflow-canvas/types'
+import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonAiGenerate from './components/ButtonAiGenerate.vue'
-import ButtonPublishHistory from './components/ButtonPublishHistory.vue'
 import ButtonDebug from './components/ButtonDebug.vue'
+import ButtonPublishHistory from './components/ButtonPublishHistory.vue'
 import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
 import { goBack } from './navigation'
+import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
+import { getResourceScope, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'ToolWorkflowView' })

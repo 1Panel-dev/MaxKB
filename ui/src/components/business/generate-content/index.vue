@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, reactive, ref, useTemplateRef, watch } from 'vue'
+import type { ModelItem, ModelProviderItem, PromptGenerateMessage } from '@/api/types'
 import type { ScrollbarInstance } from 'element-plus'
 import SelectModel from '@/components/business/select-model/index.vue'
-import type { ModelItem, ModelProviderItem, PromptGenerateMessage } from '@/api/types'
-import { ConversationStream } from '@/conversation-panel/core/stream'
 import { inputShortcut } from '@/conversation-panel/core/shortcuts'
+import { ConversationStream } from '@/conversation-panel/core/stream'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'GenerateContent' })

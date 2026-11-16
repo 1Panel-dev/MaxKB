@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { cloneDeep } from 'lodash'
+import type { DocumentItem, DocumentSettingPayload } from '@/api/types'
 import type { FormInstance } from 'element-plus'
 import { DOCUMENT_HIT_HANDLING } from '@/api/enums'
-import type { DocumentItem, DocumentSettingPayload } from '@/api/types'
-import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
-import { cloneDeep } from 'lodash'
+import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 
 defineOptions({ name: 'DocumentSettingDialog' })
 const props = defineProps<{ loading: boolean; batch?: boolean }>()

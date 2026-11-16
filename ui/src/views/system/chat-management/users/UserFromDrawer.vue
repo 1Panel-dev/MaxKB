@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import JSEncrypt from 'jsencrypt'
-import CommonSystemApi from '@/api/admin/system/common'
+import type { ChatUser, ChatUserPayload, ListItem } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
 import ChatUserGroupsApi from '@/api/admin/system/chat-management/chat-user-groups'
+import CommonSystemApi from '@/api/admin/system/common'
 import { useStore } from '@/stores'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import type { ListItem, ChatUser, ChatUserPayload } from '@/api/types'
-import type { FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'UserFromDrawer' })
 

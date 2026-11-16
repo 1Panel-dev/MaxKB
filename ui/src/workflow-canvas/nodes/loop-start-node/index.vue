@@ -28,8 +28,8 @@ import { computed, inject } from 'vue'
 import type { BaseNodeModel } from '@logicflow/core'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import LoopFieldTable from './component/LoopFieldTable.vue'
-import { copyText } from '@/utils/clipboard'
 import { isLoopBuiltinField } from './constant'
+import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'WorkflowLoopStartNode' })
 const getModel = inject('getModel') as () => BaseNodeModel

@@ -1,14 +1,5 @@
-import {
-  Role,
-  RoleConstants,
-  Compare,
-  Permission,
-  Edition,
-  AggregatePermission,
-  type PermissionContext,
-  type PermissionFactory,
-  type RoleFactory,
-} from './common'
+import type { PermissionContext, PermissionFactory, RoleFactory } from './common'
+import { AggregatePermission, Compare, Edition, Permission, Role, RoleConstants } from './common'
 import { useStore } from '@/stores'
 import { getWorkspaceId } from '@/utils/resource-context'
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance, FormRules } from 'element-plus'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { createAnchorGuard } from '@/workflow-canvas/core/utils'
 
 defineOptions({ name: 'WorkflowDataSourceLocalNode' })

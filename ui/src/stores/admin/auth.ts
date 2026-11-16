@@ -1,10 +1,10 @@
 /** 管理 Admin 认证凭证及登录前可访问的平台公开档案。 */
 
 import { defineStore } from 'pinia'
+import type { BaseProfile, LoginRequest } from '@/api/admin/auth/types'
 import BaseInfoApi from '@/api/admin/auth/base-info'
 import ExternalLoginApi from '@/api/admin/auth/external-login'
 import LoginApi from '@/api/admin/auth/login'
-import type { BaseProfile, LoginRequest } from '@/api/admin/auth/types'
 import { useThemeStore } from './theme'
 import { useUserStore } from './user'
 

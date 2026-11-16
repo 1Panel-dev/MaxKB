@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { KnowledgeItem } from '@/api/types'
 import type { FormField } from '../../type'
+import type { KnowledgeItem } from '@/api/types'
 
 defineOptions({ name: 'DynamicFormKnowledge', inheritAttrs: false })
 

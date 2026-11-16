@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+import _ from 'lodash'
 import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
-import { computed, ref, watch } from 'vue'
 import type { TableInstance } from 'element-plus'
-
-import _ from 'lodash'
 import TableColumn from '@/components/mk-dynamics-form/items/table/TableColumn.vue'
 const filterText = ref<string>('')
 const props = defineProps<{

@@ -1,5 +1,5 @@
-import type { CascaderValue, CheckboxValueType } from 'element-plus'
 import type { Dict } from '@/api/types'
+import type { CascaderValue, CheckboxValueType } from 'element-plus'
 
 export interface TableFilterOption {
   label: string

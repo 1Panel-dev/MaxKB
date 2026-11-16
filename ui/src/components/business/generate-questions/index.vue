@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { computed, provide, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { DocumentTaskState, ModelItem, ModelProviderItem, RelatedQuestionsConfig } from '@/api/types'
 import type { FormInstance } from 'element-plus'
 import { DOCUMENT_TASK_STATE, MODEL_STATUS } from '@/api/enums'
-import type { DocumentTaskState, ModelItem, ModelProviderItem, RelatedQuestionsConfig } from '@/api/types'
-import ModelApi from '@/api/admin/workspace/model'
+import ModelProviderApi from '@/api/admin/model-provider'
 import SystemResourceModelApi from '@/api/admin/system/resource-management/model'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
-import ModelProviderApi from '@/api/admin/model-provider'
+import ModelApi from '@/api/admin/workspace/model'
 import SelectModel from '@/components/business/select-model/index.vue'
+import { getPromptConfig, savePromptConfig } from './prompt-cache'
 import { useStore } from '@/stores'
 import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
-import { getPromptConfig, savePromptConfig } from './prompt-cache'
 
 defineOptions({ name: 'GenerateQuestionsDialog' })
 const props = withDefaults(defineProps<{ loading: boolean; showParagraphScope?: boolean }>(), {

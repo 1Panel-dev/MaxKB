@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
-import type LogicFlow from '@logicflow/core'
 import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
-import DebugDrawer from '../debug/DebugDrawer.vue'
+import type LogicFlow from '@logicflow/core'
 import { showWorkflowValidateError } from '../../components/validate-error'
+import DebugDrawer from '../debug/DebugDrawer.vue'
 
 defineOptions({ name: 'ButtonDebug' })
 

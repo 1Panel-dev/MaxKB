@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
-import AuthScanApi from '@/api/admin/system/settings/auth-scan-setting'
 import type { QrCodeProvider, QrLoginPlatform, QrLoginPlatformPayload } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
-import { LOGIN_METHOD_LABELS } from '@/constants'
-import { MsgSuccess } from '@/utils/message'
+import AuthScanApi from '@/api/admin/system/settings/auth-scan-setting'
 import dingtalkLogo from '@/assets/logo/logo_dingtalk.svg'
 import enterpriseWechatLogo from '@/assets/logo/logo_enterprise-wechat.svg'
 import larkLogo from '@/assets/logo/logo_lark.svg'
 import EditSCANDrawer from '../EditSCANDrawer.vue'
+import { LOGIN_METHOD_LABELS } from '@/constants'
+import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
 
 interface QrLoginPlatformView extends QrLoginPlatformPayload {

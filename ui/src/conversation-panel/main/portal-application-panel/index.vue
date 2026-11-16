@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import PortalApplicationCards from '../../components/portal-application-cards/index.vue'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { usePortalConversationListStore } from '../../left-sidebar/portal-conversation-list/index'
-import PortalApplicationCards from '../../components/portal-application-cards/index.vue'
 
 defineOptions({ name: 'PortalApplicationPanel' })
 

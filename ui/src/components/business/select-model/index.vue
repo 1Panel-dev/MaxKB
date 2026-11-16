@@ -1,15 +1,15 @@
 <script setup lang="ts" generic="Multiple extends boolean = false">
 import { computed, useTemplateRef } from 'vue'
+import { groupBy } from 'lodash'
+import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { SelectInstance } from 'element-plus'
 import { MODEL_STATUS } from '@/api/enums'
-import type { ModelProviderItem, ModelItem } from '@/api/types'
-import { groupBy } from 'lodash'
-import ModelParamsDialog from './ModelParamsDialog.vue'
-import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
-import ModelApi from '@/api/admin/workspace/model'
 import SystemModelApi from '@/api/admin/system/resource-management/model'
 import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
-import { isWorkspaceResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import ModelApi from '@/api/admin/workspace/model'
+import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
+import ModelParamsDialog from './ModelParamsDialog.vue'
+import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
 
 defineOptions({ name: 'SelectModel', inheritAttrs: false })

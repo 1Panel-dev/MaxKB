@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance } from 'element-plus'
+import type { RerankerSetting } from './types'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
-import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
 import type { NodeModelData } from '@/workflow-canvas/component/node-model-select/types'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormInstance } from 'element-plus'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import SearchSetting from './component/SearchSetting.vue'
-import type { RerankerSetting } from './types'
 
 defineOptions({ name: 'WorkflowRerankerNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel

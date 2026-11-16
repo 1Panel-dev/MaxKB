@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import type SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
 import type SystemSharedRelatedResourcesApi from '@/api/admin/system/shared-resources/related-resources'
+import type RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import type { KnowledgeItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
-import { MsgError } from '@/utils/message'
 import RelatedResourcesDrawer from '@/components/business/related-resources-drawer/index.vue'
+import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'RelatedResourcesKnowledgeAction' })
 const props = defineProps<{

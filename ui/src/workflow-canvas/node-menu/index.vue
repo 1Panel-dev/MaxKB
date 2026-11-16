@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { NodeMenuItem, NodeMenuTab } from './types'
 import { RESOURCE_TYPE } from '@/api/enums'
+import { WorkflowMode } from '@/workflow-canvas/types'
 import BasicNodeMenu from './BasicNodeMenu.vue'
 import ResourceNodeMenu from './ResourceNodeMenu.vue'
-import { WorkflowMode } from '@/workflow-canvas/types'
-import type { NodeMenuItem, NodeMenuTab } from './types'
 
 defineOptions({ name: 'NodeMenu' })
 

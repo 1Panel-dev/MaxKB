@@ -1,6 +1,6 @@
-import { del, get, post, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type { TermbaseItem, TermbaseUpdatePayload } from '@/api/types'
+import { del, get, post, put } from '@/api/admin/core/request'
 
 const getPrefix = (knowledgeId: string) => `/system/resource/knowledge/${knowledgeId}/termbase`
 

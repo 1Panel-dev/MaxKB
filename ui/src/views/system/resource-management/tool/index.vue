@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
-import SystemToolWorkflowApi from '@/api/admin/system/resource-management/tool/tool-workflow'
-import SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
-import SystemResourceTriggerApi from '@/api/admin/system/resource-management/resource-trigger'
-import SystemCommonApi from '@/api/admin/system/common'
-import SystemWorkspaceApi from '@/api/admin/system/workspace'
 import type { Dict, OptionItem, ToolItem } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
-import { TOOL_TYPE_OPTIONS } from '@/constants'
-import { useStore } from '@/stores'
-import { datetimeFormat } from '@/utils/time'
-import { toOrderBy } from '@/utils/common'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import SystemCommonApi from '@/api/admin/system/common'
+import SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
+import SystemResourceTriggerApi from '@/api/admin/system/resource-management/resource-trigger'
+import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
+import SystemToolWorkflowApi from '@/api/admin/system/resource-management/tool/tool-workflow'
+import SystemWorkspaceApi from '@/api/admin/system/workspace'
 import ToolStatusSwitch from '@/views/tool/tool-card/ToolStatusSwitch.vue'
 import {
   AuthorizeToolAction,
@@ -25,6 +20,11 @@ import {
   RelatedResourcesToolAction,
   TriggerToolAction,
 } from '@/views/tool/tool-card/action-dropdown'
+import { TOOL_TYPE_OPTIONS } from '@/constants'
+import { useStore } from '@/stores'
+import { toOrderBy } from '@/utils/common'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission'
 
 const { auth } = useStore()

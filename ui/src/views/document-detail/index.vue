@@ -1,23 +1,24 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, type Directive } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import type MkViewLayout from '@/components/global/mk-view-layout/index.vue'
-import { provideDocumentDetailContext } from './context'
 import type { ParamsPage } from '@/api/admin/core/types'
 import type { DocumentItem, ParagraphItem, ParagraphQuery } from '@/api/types'
-import { getFileIconUrl } from '@/utils/icon'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
-import { useParagraphSort } from './action-dropdown/move/useParagraphSort'
-import CreateParagraphDialog from './paragraph-dialog/CreateParagraphDialog.vue'
-import EditParagraphDialog from './paragraph-dialog/ParagraphDialog.vue'
+import type MkViewLayout from '@/components/global/mk-view-layout/index.vue'
+import type { Directive } from 'vue'
 import {
-  BatchMigrateParagraphAction,
-  MigrateParagraphAction,
   BatchGenerateQuestionsAction,
+  BatchMigrateParagraphAction,
   GenerateQuestionsAction,
+  MigrateParagraphAction,
   MoveParagraphAction,
 } from './action-dropdown'
-import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { useParagraphSort } from './action-dropdown/move/useParagraphSort'
+import { provideDocumentDetailContext } from './context'
+import CreateParagraphDialog from './paragraph-dialog/CreateParagraphDialog.vue'
+import EditParagraphDialog from './paragraph-dialog/ParagraphDialog.vue'
+import { getFileIconUrl } from '@/utils/icon'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
 
 /**

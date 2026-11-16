@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, provide, ref } from 'vue'
-import { EXPORT_MESSAGE_ELEMENT_KEY } from '../../components/header/header-actions/export/context.ts'
 import ChatHeader from '../../components/header/chat/index.vue'
-import MessageList from '../../components/message-list/index.vue'
-import MessageInput from '../../components/message-input/index.vue'
-import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
+import { EXPORT_MESSAGE_ELEMENT_KEY } from '../../components/header/header-actions/export/context.ts'
 import { useMessageInputStore } from '../../components/message-input/index'
+import MessageInput from '../../components/message-input/index.vue'
+import MessageList from '../../components/message-list/index.vue'
+import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 
 const mainRef = ref<HTMLElement>()
 provide(EXPORT_MESSAGE_ELEMENT_KEY, () => mainRef.value?.querySelector<HTMLElement>('.mk-conversation-content') ?? null)

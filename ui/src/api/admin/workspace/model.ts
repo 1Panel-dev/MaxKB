@@ -1,8 +1,8 @@
-import { del, get, post, postStream, put } from '../core/request'
-import type { Dict, DynamicFormField, ModelPayload, ModelItem } from '@/api/types'
-import { getWorkspaceId } from '@/utils/resource-context'
+import type { Dict, DynamicFormField, ModelItem, ModelPayload } from '@/api/types'
 import type { ChatCompletionPayload, PromptGeneratePayload } from '@/api/types'
+import { del, get, post, postStream, put } from '../core/request'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
+import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
   const workspaceId = getWorkspaceId()

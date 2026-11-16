@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, inject, onMounted } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormField } from '@/components/mk-dynamics-form'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import { copyText } from '@/utils/clipboard'
 import type { KnowledgeFieldConfig } from './types'
+import type { FormField } from '@/components/mk-dynamics-form'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import UserInputFieldTable from './component/UserInputFieldTable.vue'
+import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'WorkflowKnowledgeBaseNode' })
 

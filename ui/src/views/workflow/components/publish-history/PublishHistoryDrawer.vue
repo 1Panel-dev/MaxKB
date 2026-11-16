@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
-import EditPublishVersionDialog from './EditPublishVersionDialog.vue'
 import DescriptionDialog from './DescriptionDialog.vue'
+import EditPublishVersionDialog from './EditPublishVersionDialog.vue'
+import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'PublishHistoryDrawer' })
 

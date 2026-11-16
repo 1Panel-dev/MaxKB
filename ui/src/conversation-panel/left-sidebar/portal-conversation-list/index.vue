@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import type { Conversation } from '../../core/types'
+import type { PortalApplicationGroup } from './index'
+import { useMessageListStore } from '../../components/message-list/index'
+import RenameConversation from '../../components/rename/index.vue'
+import AccountMenu from '../account-menu/index.vue'
+import { useConversationListStore } from '../conversation-list/index'
+import HistoryConversationDrawer from './HistoryConversationDrawer.vue'
+import { usePortalConversationListStore } from './index'
 import { useStore } from '@/stores/chat'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { relativeTimeFormat } from '@/utils/time'
-import type { Conversation } from '../../core/types'
-import { useConversationListStore } from '../conversation-list/index'
-import HistoryConversationDrawer from './HistoryConversationDrawer.vue'
-import AccountMenu from '../account-menu/index.vue'
-import { usePortalConversationListStore, type PortalApplicationGroup } from './index'
-import RenameConversation from '../../components/rename/index.vue'
-import { useMessageListStore } from '../../components/message-list/index'
 
 defineOptions({ name: 'PortalConversationList' })
 

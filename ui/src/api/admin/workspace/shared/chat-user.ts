@@ -1,6 +1,6 @@
-import { get } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type { ChatUserAuthorization, ChatUserAuthorizationGroup, ChatUserAuthorizationResource, Dict } from '@/api/types'
+import { get } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (resource: ChatUserAuthorizationResource) =>

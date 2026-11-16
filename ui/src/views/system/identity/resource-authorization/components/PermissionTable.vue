@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import ProviderApi from '@/api/admin/model-provider.ts'
-import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
 import type {
+  Dict,
   ModelProviderItem,
   OptionItem,
-  Dict,
   ResourceAuthorizationType,
   ResourcePermission,
   ResourcePermissionItem,
   ResourcePermissionPayload,
 } from '@/api/types'
+import { RESOURCE_PERMISSION, RESOURCE_TYPE } from '@/api/enums'
+import ProviderApi from '@/api/admin/model-provider.ts'
 import { getPermissionOptions } from '../constants'
 import BatchSetPermissionDialog from '../dialog/BatchSetPermissionDialog.vue'
 

@@ -1,4 +1,5 @@
-import { onBeforeUnmount, watch, type Ref } from 'vue'
+import { onBeforeUnmount, watch } from 'vue'
+import type { Ref } from 'vue'
 import { Scroll } from './scroll'
 
 /**

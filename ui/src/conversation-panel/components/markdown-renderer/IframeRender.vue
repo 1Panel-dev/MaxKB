@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useIframeBridge, type IframeSendMessage } from './iframe-bridge'
+import type { IframeSendMessage } from './iframe-bridge'
+import { useIframeBridge } from './iframe-bridge'
 
 defineOptions({ name: 'MarkdownIframeRender' })
 

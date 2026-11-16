@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
-import { getFileIconUrl } from '@/utils/icon'
-import { downloadByURL } from '@/utils/common'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
+import { downloadByURL } from '@/utils/common'
+import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'ApplicationNodeDetail' })
 

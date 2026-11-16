@@ -1,7 +1,8 @@
 /** html_rander / iframe_render 共用的沙箱 iframe：生成 srcdoc，并处理 iframe 发回的高度、发送消息、跳转与用户信息请求。 */
 
-import { onBeforeUnmount, onMounted, type Ref } from 'vue'
+import { onBeforeUnmount, onMounted } from 'vue'
 import type { Dict } from '@/api/types'
+import type { Ref } from 'vue'
 import { randomId } from '@/utils/common'
 
 export type IframeSendMessage = (question: string, otherParams?: Dict<unknown>) => void

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { referenceOptionsHelp } from '../../constant'
-import { computed, onMounted, inject } from 'vue'
-import MultiRow from '../../items/MultiRow.vue'
-import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import { computed, inject, onMounted } from 'vue'
 import type { DynamicFormConstructorOption, DynamicFormValidatorCallback, DynamicFormValue, FormField } from '../../type'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import { referenceOptionsHelp } from '../../constant'
+import MultiRow from '../../items/MultiRow.vue'
 const getModel = inject<() => DynamicFormValue>('getModel')
 
 const assignmentMethodOptions = computed(() => {

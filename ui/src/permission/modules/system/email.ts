@@ -1,7 +1,7 @@
 /** 系统「邮箱设置」按钮权限。$perm.email.* */
 
-import { canSys } from '../../policy'
 import { PermissionConstants as P } from '../../core'
+import { canSys } from '../../policy'
 
 export default {
   /**

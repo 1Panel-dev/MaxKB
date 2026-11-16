@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
-import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
+import type ApplicationApi from '@/api/admin/workspace/application/application'
+import type ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import type { ApplicationDetail } from '@/api/types'
-import { MsgError } from '@/utils/message'
 import ApplicationTriggerDialog from './ApplicationTriggerDialog.vue'
+import { MsgError } from '@/utils/message'
 
 const props = defineProps<{
   api: typeof ResourceTriggerApi

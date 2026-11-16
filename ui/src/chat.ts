@@ -1,11 +1,10 @@
 import { createApp } from 'vue'
 import ElementPlus from 'element-plus'
-
-import App from './App.vue'
 import { configureMarkdownEditor } from '@/components/global/markdown-editor/config'
+import App from './App.vue'
+import { createAppI18n } from '@/locales'
 import router from '@/router/chat'
 import { pinia, useStore } from '@/stores/chat'
-import { createAppI18n } from '@/locales'
 import 'element-plus/dist/index.css'
 import '@/styles/tailwind.css'
 import '@/styles/index.scss'

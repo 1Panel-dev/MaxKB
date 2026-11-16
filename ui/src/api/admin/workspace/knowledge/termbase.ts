@@ -1,6 +1,6 @@
-import { del, get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type { TermbaseItem, TermbaseUpdatePayload } from '@/api/types'
+import { del, get, post, put } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = (knowledgeId: string) => `/workspace/${getWorkspaceId()}/knowledge/${knowledgeId}/termbase`

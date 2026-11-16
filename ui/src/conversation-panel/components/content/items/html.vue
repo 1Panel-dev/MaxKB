@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useChatUserProfileGetter } from '../../../view/index'
 import { useIframeBridge } from '../../markdown-renderer/iframe-bridge'
 import { useSendQuestionOptional } from '../../message-input/index'
-import { useChatUserProfileGetter } from '../../../view/index'
 
 defineOptions({ name: 'ContentHtmlItem' })
 

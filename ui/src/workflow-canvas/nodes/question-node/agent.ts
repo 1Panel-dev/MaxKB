@@ -1,15 +1,15 @@
+import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getNode, readNodeData, validatePromptVariables, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import {
+  MODEL_FIELD_SCHEMA,
   argReference,
   finishWithValidate,
   getModelsTool,
-  MODEL_FIELD_SCHEMA,
   promptVariableOf,
   resolveModelFields,
   useNodeAgent,
 } from '@/workflow-canvas/ai-generate/tools/node'
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
-import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 
 /** question-node（问题优化）的 AI 生成配置 */
 

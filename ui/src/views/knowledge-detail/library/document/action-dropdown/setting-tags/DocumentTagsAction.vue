@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { DocumentItem } from '@/api/types'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import DocumentTagsDrawer from './DocumentTagsDrawer.vue'
 
 defineOptions({ name: 'DocumentTagsAction' })

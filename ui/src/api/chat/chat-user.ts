@@ -1,7 +1,7 @@
 /** 提供当前对话用户档案、密码与 API Key 接口。 */
 
+import type { ChatUserApiKey, ChatUserProfile } from '@/api/types'
 import { get, post } from './core/request'
-import type { ChatUserProfile, ChatUserApiKey } from '@/api/types'
 
 /** 获取当前登录的对话用户档案。 */
 const getChatUserProfile = () => {

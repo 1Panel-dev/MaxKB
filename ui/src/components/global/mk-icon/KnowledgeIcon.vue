@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { KNOWLEDGE_TYPE } from '@/api/enums'
 import type { KnowledgeType } from '@/api/types'
+import { KNOWLEDGE_TYPE } from '@/api/enums'
 import { KNOWLEDGE_TYPE_KEY, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 
 defineOptions({ name: 'KnowledgeIcon' })

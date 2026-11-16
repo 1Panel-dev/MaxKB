@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RESOURCE_TYPE } from '@/api/enums'
 import type { TriggerTask } from '@/api/types'
+import { RESOURCE_TYPE } from '@/api/enums'
 
 const props = withDefaults(defineProps<{ tasks?: TriggerTask[] }>(), { tasks: () => [] })
 

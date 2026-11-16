@@ -1,6 +1,7 @@
-import { inject, ref, type InjectionKey } from 'vue'
-import type { ChatParagraphSource } from '@/api/types'
+import { inject, ref } from 'vue'
 import type { ChatRecordMeta } from '../core/types'
+import type { ChatParagraphSource } from '@/api/types'
+import type { InjectionKey } from 'vue'
 import { createExecutionDetailStore } from './execution-detail/index'
 import { createKnowledgeSourceStore } from './knowledge-source/index'
 

@@ -1,6 +1,14 @@
+import type { ParamsPage, PasswordRequest, ResponsePage } from '../core/types'
+import type {
+  BatchSetUserRolesRequest,
+  BatchSetUserWorkspaceRolesRequest,
+  ChatUserSyncResult,
+  Dict,
+  SystemUser,
+  SystemUserPayload,
+  SystemUserUpdateRequest,
+} from '@/api/types'
 import { del, get, getExportFile, post, put } from '../core/request'
-import type { ResponsePage, ParamsPage, PasswordRequest } from '../core/types'
-import type { Dict, SystemUser, SystemUserPayload, SystemUserUpdateRequest, BatchSetUserRolesRequest, BatchSetUserWorkspaceRolesRequest, ChatUserSyncResult } from '@/api/types'
 
 const prefix = '/user_manage'
 

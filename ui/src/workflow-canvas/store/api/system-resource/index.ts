@@ -1,11 +1,11 @@
-import ApplicationApi from '@/api/admin/system/resource-management/application/application'
-import { get, post } from '@/api/admin/core/request'
 import type { KnowledgeTagGroup } from '@/api/types'
 import type { McpTool } from '@/workflow-canvas/store'
+import { get, post } from '@/api/admin/core/request'
+import ProviderApi from '@/api/admin/model-provider'
+import ApplicationApi from '@/api/admin/system/resource-management/application/application'
+import KnowledgeWorkflowApi from '@/api/admin/system/resource-management/knowledge/workflow'
 import ModelApi from '@/api/admin/system/resource-management/model'
 import ToolApi from '@/api/admin/system/resource-management/tool/tool'
-import ProviderApi from '@/api/admin/model-provider'
-import KnowledgeWorkflowApi from '@/api/admin/system/resource-management/knowledge/workflow'
 
 /** 查询当前系统范围的 MCP 服务工具定义。 */
 const getMcpTools = (resourceType: string, resourceId: string, mcpServers: string) =>

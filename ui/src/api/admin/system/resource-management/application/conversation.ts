@@ -1,5 +1,5 @@
 import type { ChatLogRecord, PortalConversationSummary } from '@/api/types'
-import { get, post, put, del, postStream } from '@/api/admin/core/request'
+import { del, get, post, postStream, put } from '@/api/admin/core/request'
 import { ADMIN_API_BASE_PATH as adminApiBase } from '@/api/constants'
 
 const getPrefix = (applicationId: string) => `/system/resource/application/${applicationId}`

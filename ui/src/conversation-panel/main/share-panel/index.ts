@@ -1,4 +1,5 @@
-import { inject, type InjectionKey, type MaybeRefOrGetter } from 'vue'
+import { inject } from 'vue'
+import type { InjectionKey, MaybeRefOrGetter } from 'vue'
 import { createShareMessageListStore } from '../../components/share-message-list/index'
 
 export interface SharePanelDeps {

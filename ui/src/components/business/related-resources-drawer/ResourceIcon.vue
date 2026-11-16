@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import type { ModelProviderItem, ResourceType } from '@/api/types'
+import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 
 defineOptions({ name: 'RelatedResourceIcon' })
 const props = defineProps<{

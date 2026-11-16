@@ -1,9 +1,10 @@
 import { computed, ref } from 'vue'
-import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
+import type { PreviewDocument } from './document-preview/index'
 import type { ChatParagraphSource, ChatParagraphSourceMeta, DocumentResourceType, KnowledgeType } from '@/api/types'
+import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
+import { isPdfDocument } from './document-preview/index'
 import { downloadByURL, getFileUrl } from '@/utils/common'
 import { MsgInfo } from '@/utils/message'
-import { isPdfDocument, type PreviewDocument } from './document-preview/index'
 
 /**
  * 来源文档的打开方式：知识库文件中的 PDF 在知识来源内用 pdf.js 预览，其他文件直接下载，均不交给浏览器原生打开；

@@ -1,6 +1,6 @@
-import { postExportExcel, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type { Dict, OperateLog, OperateLogMenuOption } from '@/api/types'
+import { get, post, postExportExcel } from '../core/request'
 
 const prefix = '/operate_log'
 

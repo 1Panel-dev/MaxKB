@@ -2,7 +2,8 @@
 import { inject, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { DynamicFormField } from '@/api/types'
-import { MkDynamicsForm, type FormField } from '@/components/mk-dynamics-form'
+import type { FormField } from '@/components/mk-dynamics-form'
+import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'ModelParamsDialog' })
 

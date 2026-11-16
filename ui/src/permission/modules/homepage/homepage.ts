@@ -1,7 +1,7 @@
 /** 工作空间「概览」按钮权限。* */
 
-import { can } from '../../policy'
 import { PermissionConstants as P } from '../../core'
+import { can } from '../../policy'
 
 export default {
   /**

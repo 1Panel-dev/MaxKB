@@ -1,8 +1,8 @@
-import VariableAggregationNodeVue from './index.vue'
-import VariableAggregationNodeDetail from './details/index.vue'
-import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
+import agent from './agent'
+import VariableAggregationNodeDetail from './details/index.vue'
+import VariableAggregationNodeVue from './index.vue'
 
 class VariableAggregationNodeView extends WorkflowNodeView {
   constructor(props: ConstructorParameters<typeof WorkflowNodeView>[0]) {

@@ -1,6 +1,7 @@
 /** 提供统一的 Element Plus 全局消息提示。 */
 
-import { ElMessage, ElMessageBox, type ElMessageBoxOptions, type MessageOptions, type MessageType } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import type { ElMessageBoxOptions, MessageOptions, MessageType } from 'element-plus'
 
 type MessageContent = MessageOptions['message']
 type MessageOverrides = Omit<Partial<MessageOptions>, 'message' | 'type'>

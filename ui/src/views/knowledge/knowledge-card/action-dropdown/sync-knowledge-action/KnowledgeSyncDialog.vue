@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
+import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type { KnowledgeSyncType } from '@/api/types'
 import { KNOWLEDGE_SYNC_TYPE } from '@/api/enums'
 import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
-import type { KnowledgeSyncType } from '@/api/types'
-import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'KnowledgeSyncDialog' })

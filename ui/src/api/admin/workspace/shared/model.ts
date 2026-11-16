@@ -1,5 +1,5 @@
-import { get } from '../../core/request'
 import type { Dict, ModelItem } from '@/api/types'
+import { get } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => `/system/shared/workspace/${getWorkspaceId()}/model`

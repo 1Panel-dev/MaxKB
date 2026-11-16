@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import type { TagProps } from 'element-plus'
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 
 defineOptions({ name: 'MkTagGroup' })
 

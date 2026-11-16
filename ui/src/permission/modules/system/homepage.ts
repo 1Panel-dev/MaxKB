@@ -1,7 +1,7 @@
 /** 系统「首页」按钮权限 → $perm.homepage.* */
 
+import { Compare, PermissionConstants as P, RoleConstants, hasEdition, hasPermission } from '../../core'
 import { Edition } from '@/permission/core/common'
-import { PermissionConstants as P, hasPermission, RoleConstants, Compare, hasEdition} from '../../core'
 
 export default {
   /**

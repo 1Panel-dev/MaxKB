@@ -1,8 +1,8 @@
 /** 提供单应用对话与门户的认证前置配置、匿名认证、账号／第三方／扫码登录和登出接口。 */
 
-import { get, post, promise, request } from './core/request'
 import type { ApiResponse } from './core/types'
 import type { ApplicationAuthProfile, ChatLoginRequest, ChatLoginResponse, ExternalAuthSetting, PortalAuthProfile, QrCodeSource } from '@/api/types'
+import { get, post, promise, request } from './core/request'
 
 interface ChatCaptchaResponse {
   captcha: string

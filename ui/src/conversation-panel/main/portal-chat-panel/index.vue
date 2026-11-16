@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, provide, ref } from 'vue'
 import { EXPORT_MESSAGE_ELEMENT_KEY } from '../../components/header/header-actions/export/context.ts'
-import { useShareLinkStoreOptional } from '../../components/message-list/share/index'
 import PortalHeader from '../../components/header/portal/index.vue'
-import MessageList from '../../components/message-list/index.vue'
-import MessageInput from '../../components/message-input/index.vue'
-import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { useMessageInputStore } from '../../components/message-input/index'
+import MessageInput from '../../components/message-input/index.vue'
+import MessageList from '../../components/message-list/index.vue'
+import { useShareLinkStoreOptional } from '../../components/message-list/share/index'
+import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { usePortalConversationListStore } from '../../left-sidebar/portal-conversation-list/index'
 
 defineOptions({ name: 'PortalChatPanel' })

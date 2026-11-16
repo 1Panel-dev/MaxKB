@@ -1,24 +1,24 @@
-import { del, downloadRequest, get, getExportFile, post, postExportExcel, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
-import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import type {
   Dict,
-  DocumentGeneratePayload,
   DocumentFileImportPayload,
+  DocumentGeneratePayload,
   DocumentImportPayload,
-  DocumentSplitResult,
-  DocumentStrategy,
   DocumentItem,
   DocumentQuickCreatePayload,
   DocumentResourceType,
   DocumentSettingPayload,
+  DocumentSplitResult,
+  DocumentStrategy,
   DocumentTaskState,
   DocumentTaskType,
   DocumentUpdatePayload,
-  WebDocumentImportPayload,
-  LarkDocumentList,
   LarkDocumentImportPayload,
+  LarkDocumentList,
+  WebDocumentImportPayload,
 } from '@/api/types'
+import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
+import { del, downloadRequest, get, getExportFile, post, postExportExcel, put } from '@/api/admin/core/request'
 
 const getPrefix = (knowledgeId: string) => `/system/resource/knowledge/${knowledgeId}/document`
 

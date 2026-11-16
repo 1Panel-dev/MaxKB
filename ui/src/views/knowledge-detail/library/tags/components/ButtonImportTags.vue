@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref } from 'vue'
-import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 

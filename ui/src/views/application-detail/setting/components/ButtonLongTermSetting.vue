@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { cloneDeep } from 'lodash'
-import { MODEL_STATUS } from '@/api/enums'
-import { SCHEDULE_OPTION } from '@/constants/schedule'
-import type { CascaderOption, FormInstance } from 'element-plus'
-import SelectModel from '@/components/business/select-model/index.vue'
-import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { LongTermSettingData } from '../settings'
+import type { ModelItem, ModelProviderItem } from '@/api/types'
+import type { CascaderOption, FormInstance } from 'element-plus'
+import { MODEL_STATUS } from '@/api/enums'
+import SelectModel from '@/components/business/select-model/index.vue'
+import { SCHEDULE_OPTION } from '@/constants/schedule'
 
 defineOptions({ name: 'ButtonLongTermSetting' })
 

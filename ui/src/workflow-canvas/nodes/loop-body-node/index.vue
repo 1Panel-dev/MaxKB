@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { inject, onMounted, onUnmounted, shallowRef, useTemplateRef } from 'vue'
-import { cloneDeep, set } from 'lodash'
 import LogicFlow from '@logicflow/core'
 import { SelectionSelect } from '@logicflow/extension'
+import { cloneDeep, set } from 'lodash'
+import type { ModelItem } from '@/api/types'
+import type { ShapeItem } from '@/workflow-canvas/types'
 import type { BaseNodeModel, GraphModel } from '@logicflow/core'
-import LoopBodyContainer from './LoopBodyContainer.vue'
-import Dagre from '@/workflow-canvas/plugins/dagre'
 import AppEdge from '@/workflow-canvas/core/edge/index'
 import LoopEdge from '@/workflow-canvas/core/edge/loop-edge'
 import { initDefaultShortcut } from '@/workflow-canvas/core/shortcut'
 import { disconnectByFlow } from '@/workflow-canvas/core/teleport'
 import { KnowledgeWorkFlowInstance, WorkFlowInstance } from '@/workflow-canvas/core/validate'
-import type { ModelItem } from '@/api/types'
-import { WorkflowMode, type ShapeItem } from '@/workflow-canvas/types'
+import Dagre from '@/workflow-canvas/plugins/dagre'
+import { WorkflowMode } from '@/workflow-canvas/types'
+import LoopBodyContainer from './LoopBodyContainer.vue'
 
 defineOptions({ name: 'WorkflowLoopBodyNode' })
 const getModel = inject('getModel') as () => BaseNodeModel

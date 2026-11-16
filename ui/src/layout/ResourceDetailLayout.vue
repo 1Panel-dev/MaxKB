@@ -9,9 +9,9 @@ export interface ResourceDetailPageProps {
 <script setup lang="ts">
 import { computed, shallowRef } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
-import { getMatchedChildRouteList } from '@/router/admin/utils'
 import type { LayoutMenuItem } from './types'
 import ResourceDetailMenu from './sidebar/ResourceDetailMenu.vue'
+import { getMatchedChildRouteList } from '@/router/admin/utils'
 
 defineOptions({ name: 'ResourceDetailLayout' })
 

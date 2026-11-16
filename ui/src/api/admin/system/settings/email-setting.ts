@@ -1,5 +1,5 @@
-import { get, post, put } from '../../core/request'
 import type { EmailSettingPayload } from '@/api/types'
+import { get, post, put } from '../../core/request'
 
 const prefix = '/email_setting'
 

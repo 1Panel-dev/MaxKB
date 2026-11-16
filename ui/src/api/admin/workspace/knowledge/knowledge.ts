@@ -1,19 +1,19 @@
-import { del, get, getExportFile, post, put } from '../../core/request'
-import type LogicFlow from '@logicflow/core'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   Dict,
+  KnowledgeCreatePayload,
+  KnowledgeDetail,
+  KnowledgeGeneratePayload,
   KnowledgeHitTestPayload,
   KnowledgeHitTestResult,
-  KnowledgeDetail,
   KnowledgeItem,
-  KnowledgeGeneratePayload,
   KnowledgeSyncType,
-  KnowledgeCreatePayload,
   KnowledgeWorkflowCreatePayload,
-  WebKnowledgeCreatePayload,
   LarkKnowledgeCreatePayload,
+  WebKnowledgeCreatePayload,
 } from '@/api/types'
+import type LogicFlow from '@logicflow/core'
+import { del, get, getExportFile, post, put } from '../../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {

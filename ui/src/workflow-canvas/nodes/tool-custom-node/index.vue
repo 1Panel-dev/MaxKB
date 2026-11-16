@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance } from 'element-plus'
 import type { ToolInputField } from '@/api/types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormInstance } from 'element-plus'
 import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import FieldSetting from './component/FieldSetting.vue'
 

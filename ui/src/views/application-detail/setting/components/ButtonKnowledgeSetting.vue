@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { ApplicationSettings } from '../settings'
 import type { FormInstance } from 'element-plus'
 import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
+import { DEFAULT_DESIGNATED_ANSWER, createSettings } from '../settings'
 import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
-import { createSettings, DEFAULT_DESIGNATED_ANSWER, type ApplicationSettings } from '../settings'
 
 defineOptions({ name: 'ButtonKnowledgeSetting' })
 

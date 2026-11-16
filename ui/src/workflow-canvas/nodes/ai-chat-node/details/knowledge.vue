@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
-import MkVideo from '@/components/global/mk-media-preview/MkVideo.vue'
-import { getFileIconUrl } from '@/utils/icon'
-import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import MkVideo from '@/components/global/mk-media-preview/MkVideo.vue'
+import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
+import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
+import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'AiChatKnowledgeDetails' })
 

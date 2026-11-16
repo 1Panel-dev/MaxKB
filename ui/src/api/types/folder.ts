@@ -1,7 +1,7 @@
 /** Workspace 下多个资源模块共用的文件夹业务类型。 */
 
-import { RESOURCE_TYPE } from '@/api/enums'
 import type { ResourceType } from './resource-authorization'
+import { RESOURCE_TYPE } from '@/api/enums'
 
 /** 文件夹接口支持的资源类型，不包含没有文件夹层级的模型。 */
 export type FolderSource = Exclude<ResourceType, typeof RESOURCE_TYPE.MODEL>

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { useRoute, useRouter } from 'vue-router'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import KnowledgeBaseForm from './components/KnowledgeBaseForm.vue'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import KnowledgeBaseForm from './components/KnowledgeBaseForm.vue'
 
 defineOptions({ name: 'CreateBaseKnowledgeDialog' })
 const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi; folderId: string }>()

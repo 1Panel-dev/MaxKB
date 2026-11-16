@@ -1,7 +1,7 @@
 /** 系统资源授权 API 与页面共用的业务类型。 */
 
-import { RESOURCE_TYPE, RESOURCE_PERMISSION, RESOURCE_AUTHORIZATION_TARGET_TYPE } from '@/api/enums'
 import type { ToolType } from './tool'
+import { RESOURCE_AUTHORIZATION_TARGET_TYPE, RESOURCE_PERMISSION, RESOURCE_TYPE } from '@/api/enums'
 
 export type ResourceType = (typeof RESOURCE_TYPE)[keyof typeof RESOURCE_TYPE]
 export type ResourceAuthorizationType = ResourceType

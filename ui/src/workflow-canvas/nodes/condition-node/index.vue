@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef, type Directive } from 'vue'
-import type { FormInstance } from 'element-plus'
 import type { BaseNodeModel } from '@logicflow/core'
-
+import type { FormInstance } from 'element-plus'
+import type { Directive } from 'vue'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import { compareList } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
-import { compareList } from '@/workflow-canvas/config/constants'
 import { randomId } from '@/utils/common'
 import { useSortable } from '@/utils/use-sortable'
 

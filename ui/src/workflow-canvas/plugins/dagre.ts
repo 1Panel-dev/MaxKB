@@ -1,6 +1,7 @@
+import { DagreLayout } from '@antv/layout'
+import type { DagreLayoutOptions } from '@antv/layout'
 import type LogicFlow from '@logicflow/core'
 import type { BaseEdgeModel, BaseNodeModel } from '@logicflow/core'
-import { DagreLayout, type DagreLayoutOptions } from '@antv/layout'
 
 type DagreNodeData = { id: string; model: BaseNodeModel; size: { height: number; width: number } }
 

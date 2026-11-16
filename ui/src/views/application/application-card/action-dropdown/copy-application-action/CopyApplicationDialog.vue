@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { cloneDeep, omit } from 'lodash'
 import { useRoute, useRouter } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
+import { cloneDeep, omit } from 'lodash'
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail, ApplicationFormPayload } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
 import { useStore } from '@/stores'
 import { isWorkFlow } from '@/utils/common'
 import { MsgSuccess } from '@/utils/message'

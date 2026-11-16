@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeMount, ref, watch, type Ref } from 'vue'
-import type { FormInstance } from 'element-plus'
+import { computed, nextTick, onBeforeMount, ref, watch } from 'vue'
 import { cloneDeep, isEqual } from 'lodash'
-import { del, get, post, put } from '@/api/admin/core/request'
-import type { Dict } from '@/api/types'
-import { MsgWarning } from '@/utils/message'
-import FormItem from './FormItem.vue'
 import type {
   DynamicFormResponse,
   DynamicFormSource,
@@ -16,6 +11,12 @@ import type {
   VisibilityCondition,
   VisibilityRules,
 } from './type'
+import type { Dict } from '@/api/types'
+import type { FormInstance } from 'element-plus'
+import type { Ref } from 'vue'
+import { del, get, post, put } from '@/api/admin/core/request'
+import FormItem from './FormItem.vue'
+import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'MkDynamicsForm' })
 

@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useStore } from '@/stores/chat'
-import { MsgConfirm } from '@/utils/message'
-import RenameConversation from '../../components/rename/index.vue'
-import { relativeTimeFormat } from '@/utils/time'
 import type { Conversation } from '../../core/types'
-import { useConversationListStore } from './index'
-import AccountMenu from '../account-menu/index.vue'
-
+import type { ViewType } from '../../view/index'
 import { useMessageListStore } from '../../components/message-list/index'
 import { useShareLinkStoreOptional } from '../../components/message-list/share/index'
-import { useShowShare, useViewType, VIEW_TYPE, type ViewType } from '../../view/index'
+import RenameConversation from '../../components/rename/index.vue'
+import { VIEW_TYPE, useShowShare, useViewType } from '../../view/index'
+import AccountMenu from '../account-menu/index.vue'
+import { useConversationListStore } from './index'
+import { useStore } from '@/stores/chat'
+import { MsgConfirm } from '@/utils/message'
+import { relativeTimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'ConversationList' })
 

@@ -3,8 +3,8 @@ import { nextTick, ref, useTemplateRef } from 'vue'
 import type RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import type { ToolItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
-import { MsgError } from '@/utils/message'
 import RelatedResourcesDrawer from '@/components/business/related-resources-drawer/index.vue'
+import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'RelatedResourcesToolAction' })
 const props = defineProps<{

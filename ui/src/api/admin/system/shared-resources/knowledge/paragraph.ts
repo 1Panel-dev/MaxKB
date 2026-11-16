@@ -1,4 +1,3 @@
-import { del, get, post, put } from '@/api/admin/core/request'
 import type { ParamsPage, ResponsePage } from '@/api/admin/core/types'
 import type {
   ParagraphCreatePayload,
@@ -9,6 +8,7 @@ import type {
   ParagraphProblem,
   ParagraphQuery,
 } from '@/api/types'
+import { del, get, post, put } from '@/api/admin/core/request'
 
 const getPrefix = (knowledgeId: string, documentId: string) => `/system/shared/knowledge/${knowledgeId}/document/${documentId}/paragraph`
 

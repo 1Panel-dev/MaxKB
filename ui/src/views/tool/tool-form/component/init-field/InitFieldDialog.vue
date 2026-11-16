@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { dynamicFormTypeOptions, MkDynamicsFormConstructor, type DynamicFormConstructorOption, type FormField } from '@/components/mk-dynamics-form'
+import type { DynamicFormConstructorOption, FormField } from '@/components/mk-dynamics-form'
+import { MkDynamicsFormConstructor, dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'InitFieldDialog' })
 

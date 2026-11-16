@@ -1,6 +1,6 @@
-import { get } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type { Dict, RelatedResource, ResourceType } from '@/api/types'
+import { get } from '../../core/request'
 
 const prefix = '/system/shared'
 

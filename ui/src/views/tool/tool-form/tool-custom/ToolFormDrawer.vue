@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance, FormRules } from 'element-plus'
-import type { DynamicFormField, ToolInputField, ToolItem } from '@/api/types'
-import { FILE_SOURCE_TYPE } from '@/api/enums'
-import FileApi from '@/api/admin/file'
-import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
-import { useStore } from '@/stores'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import type ToolApi from '@/api/admin/workspace/tool/tool'
+import type { DynamicFormField, ToolInputField, ToolItem } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
+import FileApi from '@/api/admin/file'
 import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
-import ToolDebugDrawer from './ToolDebugDrawer.vue'
 import InitFieldTable from '../component/init-field/InitFieldTable.vue'
 import InputFieldTable from '../component/input-field/InputFieldTable.vue'
 import ToolCodeGenerate from '../component/python-code/CodeGenerate.vue'
+import ToolDebugDrawer from './ToolDebugDrawer.vue'
+import { useStore } from '@/stores'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ToolFormDrawer' })
 

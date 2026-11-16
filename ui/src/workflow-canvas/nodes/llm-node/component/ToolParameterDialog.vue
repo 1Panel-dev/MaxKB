@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { LlmToolParameter } from '../types'
 import type { FormInstance, FormRules } from 'element-plus'
-import { toolParameterTypes, type LlmToolParameter } from '../types'
+import { toolParameterTypes } from '../types'
 
 defineOptions({ name: 'WorkflowLlmToolParameterDialog' })
 

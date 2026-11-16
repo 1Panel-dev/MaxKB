@@ -1,6 +1,6 @@
-import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type { Dict, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
+import { del, get, post } from '../core/request'
 
 const prefix = (workspaceId: string) => `/system/workspace/${workspaceId}/user_group`
 

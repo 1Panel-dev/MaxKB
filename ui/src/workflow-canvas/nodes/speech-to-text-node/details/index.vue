@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import MkAudio from '@/components/global/mk-media-preview/MkAudio.vue'
-import { getFileIconUrl } from '@/utils/icon'
-import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import MkAudio from '@/components/global/mk-media-preview/MkAudio.vue'
+import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
+import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'SpeechToTextNodeDetail' })
 

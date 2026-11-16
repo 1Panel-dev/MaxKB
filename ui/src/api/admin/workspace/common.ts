@@ -1,5 +1,5 @@
-import { get } from '../core/request'
 import type { Dict, WorkspaceUserOption } from '@/api/types'
+import { get } from '../core/request'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 /** 获取当前工作空间下的用户选项。 */

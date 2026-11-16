@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { RESOURCE_TYPE } from '@/api/enums'
 import type { SharedResourceType, SharedWorkspaceAuthorization, WorkspaceItem } from '@/api/types'
+import { RESOURCE_TYPE } from '@/api/enums'
 import AuthorizationApi from '@/api/admin/system/shared-resources/authorization'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import { MsgSuccess } from '@/utils/message'

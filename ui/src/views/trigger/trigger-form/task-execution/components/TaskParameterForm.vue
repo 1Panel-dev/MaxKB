@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
+import { get, set } from 'lodash'
+import type { ApplicationDetail, ToolItem, TriggerBodyField, TriggerParameters, TriggerType } from '@/api/types'
+import type { TriggerParameter } from '@/api/types'
 import type { FormInstance, FormItemRule } from 'element-plus'
 import { RESOURCE_TYPE, TRIGGER_TYPE } from '@/api/enums'
-import type { ApplicationDetail, ToolItem, TriggerBodyField, TriggerParameters, TriggerType } from '@/api/types'
-import { get, set } from 'lodash'
-import type { TriggerParameter } from '@/api/types'
 interface TaskParameterField {
   path: string[]
   label: string

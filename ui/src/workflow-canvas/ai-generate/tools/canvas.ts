@@ -1,11 +1,12 @@
 import { nextTick, reactive } from 'vue'
 import { cloneDeep } from 'lodash'
-import type LogicFlow from '@logicflow/core'
-import type { BaseNodeModel, Model } from '@logicflow/core'
 import type { ModelConfig } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { ShapeItem, WorkflowNodeField } from '@/workflow-canvas/types'
+import type LogicFlow from '@logicflow/core'
+import type { BaseNodeModel, Model } from '@logicflow/core'
 import { getMenuNodes } from '@/workflow-canvas/node-menu/menu'
-import { WorkflowMode, WorkflowNodeType, type ShapeItem, type WorkflowNodeField } from '@/workflow-canvas/types'
+import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 
 /**
  * MaxKB 画布适配层：AI 生成通过这里读写 LogicFlow 图，屏蔽主画布 / 循环体画布的差异。

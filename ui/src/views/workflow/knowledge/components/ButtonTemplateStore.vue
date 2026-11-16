@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import StoreApi from '@/api/admin/store'
 import type { WorkflowStoreTemplate } from '@/api/types'
+import StoreApi from '@/api/admin/store'
 import TemplateStoreDialog from '@/views/workflow/components/template-store/TemplateStoreDialog.vue'
 
 defineOptions({ name: 'ButtonKnowledgeTemplateStore' })

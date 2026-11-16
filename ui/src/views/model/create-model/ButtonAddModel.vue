@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
-import type ModelApi from '@/api/admin/workspace/model'
 import type SystemModelApi from '@/api/admin/system/resource-management/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
+import type ModelApi from '@/api/admin/workspace/model'
 import type { ModelProviderItem } from '@/api/types'
 import CreateModelDrawer from './CreateModelDrawer.vue'
 import SelectProviderDrawer from './SelectProviderDrawer.vue'

@@ -1,8 +1,8 @@
-import VariableSplittingNodeVue from './index.vue'
-import VariableSplittingNodeDetail from './details/index.vue'
-import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
+import agent from './agent'
+import VariableSplittingNodeDetail from './details/index.vue'
+import VariableSplittingNodeVue from './index.vue'
 
 class VariableSplittingNodeView extends WorkflowNodeView {
   constructor(props: ConstructorParameters<typeof WorkflowNodeView>[0]) {

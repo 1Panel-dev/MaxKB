@@ -1,8 +1,8 @@
-import { randomId } from '@/utils/common'
+import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getFieldOptions, getNode, readNodeData, validateReference, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { finishWithValidate, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
-import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
+import { randomId } from '@/utils/common'
 
 const VALUE_TYPES = ['string', 'num', 'json', 'bool']
 const SOURCES = ['custom', 'referencing', 'null']

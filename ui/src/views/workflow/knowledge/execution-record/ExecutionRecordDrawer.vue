@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
+import type { Dict, KnowledgeExecutionRecord, KnowledgeWorkflowApi } from '@/api/types'
 import { STATE_TYPES } from '@/api/enums'
-import type { KnowledgeWorkflowApi, Dict, KnowledgeExecutionRecord } from '@/api/types'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
-import { datetimeFormat } from '@/utils/time'
+import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { toOrderBy } from '@/utils/common'
 import { MsgConfirm } from '@/utils/message'
-import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
+import { datetimeFormat } from '@/utils/time'
 
 const props = defineProps<{ api: KnowledgeWorkflowApi; knowledgeId: string }>()
 const emit = defineEmits<{ closed: [] }>()

@@ -1,7 +1,7 @@
 import type { ChatLogRecord, PortalConversationSummary } from '@/api/types'
-import { get, post, put, del, postStream } from '../core/request'
-import { getWorkspaceId } from '@/utils/resource-context'
+import { del, get, post, postStream, put } from '../core/request'
 import { ADMIN_API_BASE_PATH as adminApiBase } from '@/api/constants'
+import { getWorkspaceId } from '@/utils/resource-context'
 
 /** 打开对话。 */
 const getConversationOpen = (applicationId: string) => get(`/workspace/${getWorkspaceId()}/application/${applicationId}/open`)

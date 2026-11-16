@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type ModelApi from '@/api/admin/workspace/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
+import type ModelApi from '@/api/admin/workspace/model'
 import type { ModelItem } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 

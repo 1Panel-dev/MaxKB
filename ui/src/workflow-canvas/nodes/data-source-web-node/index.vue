@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { inject } from 'vue'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 
 defineOptions({ name: 'WorkflowDataSourceWebNode' })
 

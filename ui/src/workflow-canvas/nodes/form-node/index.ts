@@ -1,8 +1,8 @@
-import FormNodeVue from './index.vue'
-import FormNodeDetail from './details/index.vue'
-import agent from './agent'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
+import agent from './agent'
+import FormNodeDetail from './details/index.vue'
+import FormNodeVue from './index.vue'
 
 class FormNodeView extends WorkflowNodeView {
   constructor(props: ConstructorParameters<typeof WorkflowNodeView>[0]) {

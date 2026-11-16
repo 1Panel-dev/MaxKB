@@ -1,6 +1,6 @@
-import ConditionNodeVue from './index.vue'
-import ConditionNodeDetail from './details/index.vue'
 import agent from './agent'
+import ConditionNodeDetail from './details/index.vue'
+import ConditionNodeVue from './index.vue'
 import { type BaseEdgeModel, type Model } from '@logicflow/core'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'

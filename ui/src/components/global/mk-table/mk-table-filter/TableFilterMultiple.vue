@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { CheckboxValueType } from 'element-plus'
 import type { TableFilterOption } from './types'
+import type { CheckboxValueType } from 'element-plus'
 
 defineOptions({ name: 'TableFilterMultiple' })
 const props = withDefaults(

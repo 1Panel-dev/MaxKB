@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { perm } from '@/permission'
-import { isSystemResource, isWorkspaceResource } from '@/utils/resource-context'
 import { ref } from 'vue'
-import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import type { KnowledgeItem } from '@/api/types'
-import { copyText } from '@/utils/clipboard'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type { KnowledgeItem } from '@/api/types'
 import { formatKnowledgeMcpConfig } from '@/views/knowledge/external-retrieval-config'
+import { copyText } from '@/utils/clipboard'
+import { isSystemResource, isWorkspaceResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
 
 defineOptions({ name: 'McpConfigKnowledgeAction' })
 

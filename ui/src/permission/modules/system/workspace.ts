@@ -1,7 +1,7 @@
 /** 系统「工作空间」实体管理按钮权限。$perm.workspace.* */
 
+import { Compare, PermissionConstants as P, RoleConstants, hasEdition, hasPermission } from '../../core'
 import { canSys } from '../../policy'
-import { PermissionConstants as P, hasPermission, RoleConstants, Compare,hasEdition} from '../../core'
 import { Edition } from '@/permission/core/common'
 
 export default {

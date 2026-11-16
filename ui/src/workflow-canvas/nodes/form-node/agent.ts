@@ -1,9 +1,9 @@
-import { randomId } from '@/utils/common'
+import type { VisibilityCompareOperator, VisibilityCondition, VisibilityRules } from '@/components/mk-dynamics-form'
+import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { finishWithValidate, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
-import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
-import type { VisibilityCompareOperator, VisibilityCondition, VisibilityRules } from '@/components/mk-dynamics-form'
+import { randomId } from '@/utils/common'
 
 /** 可由 AI 生成的字段类型，数据结构与 mk-dynamics-form 各字段配置器的 getData 一致 */
 const INPUT_TYPES = [

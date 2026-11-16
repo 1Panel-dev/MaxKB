@@ -1,5 +1,5 @@
-import { get, post } from './core/request'
 import type { BaseModelOption, DynamicFormField, ModelProviderItem, ModelTypeOption } from '@/api/types'
+import { get, post } from './core/request'
 
 const prefix = '/provider'
 

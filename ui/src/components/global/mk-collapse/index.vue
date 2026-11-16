@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { CaretBottom } from '@element-plus/icons-vue'
-import { computed, ref, type HTMLAttributes } from 'vue'
+import type { HTMLAttributes } from 'vue'
 
 defineOptions({ name: 'MkCollapse' })
 

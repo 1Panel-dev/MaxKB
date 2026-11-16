@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import JSEncrypt from 'jsencrypt'
-import type { FormInstance, FormRules } from 'element-plus'
 import { useRouter } from 'vue-router'
-import CurrentUserApi from '@/api/admin/auth/current-user'
+import JSEncrypt from 'jsencrypt'
 import type { UpdatePasswordForm } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import CurrentUserApi from '@/api/admin/auth/current-user'
 import { useStore } from '@/stores'
 import { MsgError, MsgSuccess } from '@/utils/message'
 

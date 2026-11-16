@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { computed, ref, watch } from 'vue'
-import TriggerApi from '@/api/admin/workspace/trigger/trigger'
-import { RESOURCE_TYPE, TOOL_TYPE, STATE_TYPES } from '@/api/enums'
 import type { TriggerTaskRecord, TriggerTaskRecordDetail } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
-import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import { RESOURCE_TYPE, STATE_TYPES, TOOL_TYPE } from '@/api/enums'
+import TriggerApi from '@/api/admin/workspace/trigger/trigger'
+import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
+import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
+import { datetimeFormat } from '@/utils/time'
 
 const props = defineProps<{
   record: TriggerTaskRecord

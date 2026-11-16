@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
-import WorkspaceApi from '@/api/admin/system/workspace'
+import type { Dict, LoginMethod, OptionItem, SystemUserGroup, SystemUserGroupMember, WorkspaceItem } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import type { Dict, OptionItem, WorkspaceItem, SystemUserGroup, SystemUserGroupMember, LoginMethod } from '@/api/types'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import WorkspaceApi from '@/api/admin/system/workspace'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
-import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
-import { useStore } from '@/stores'
-import perm from '@/permission/index.ts'
-import { LOGIN_METHOD } from '@/api/enums'
+import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 import { LOGIN_METHOD_LABELS } from '@/constants'
+import { useStore } from '@/stores'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import perm from '@/permission/index.ts'
 const { auth, user } = useStore()
 
 /* 选择工作空间列表 */

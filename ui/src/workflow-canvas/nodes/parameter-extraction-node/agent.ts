@@ -1,6 +1,6 @@
-import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
-import { finishWithValidate, getModelsTool, MODEL_FIELD_SCHEMA, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
+import { MODEL_FIELD_SCHEMA, finishWithValidate, getModelsTool, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
 
 const PARAMETER_TYPES = ['string', 'int', 'number', 'boolean', 'array', 'object']

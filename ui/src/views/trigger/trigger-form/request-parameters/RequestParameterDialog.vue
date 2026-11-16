@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance, FormRules } from 'element-plus'
 import type { TriggerBodyField } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
 
 const props = defineProps<{ fields: TriggerBodyField[] }>()
 const emit = defineEmits<{ submit: [field: TriggerBodyField, index?: number] }>()

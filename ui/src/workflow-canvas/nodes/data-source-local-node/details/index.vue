@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
+import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import { downloadByURL, getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
-import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 
 defineOptions({ name: 'DataSourceLocalNodeDetail' })
 

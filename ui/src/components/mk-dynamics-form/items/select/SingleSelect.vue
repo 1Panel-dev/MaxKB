@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { computed, useAttrs } from 'vue'
 import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
-import { computed, useAttrs } from 'vue'
 const attrs = useAttrs() as DynamicFormValue
 
 const props = defineProps<{

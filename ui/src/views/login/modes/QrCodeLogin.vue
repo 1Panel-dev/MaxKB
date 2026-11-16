@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { LoginService } from '../types'
 import type { LoginConfig, QrCodeConfig, QrCodeProvider } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
-import { useI18n } from 'vue-i18n'
 import { LOGIN_METHOD_LABEL_KEYS } from '../constants'
 import DingTalkQrCode from '../scanComponents/dingtalkQrCode.vue'
 import LarkQrCode from '../scanComponents/larkQrCode.vue'
 import WecomQrCode from '../scanComponents/wecomQrCode.vue'
-import type { LoginService } from '../types'
 
 defineOptions({ name: 'QrCodeLogin' })
 

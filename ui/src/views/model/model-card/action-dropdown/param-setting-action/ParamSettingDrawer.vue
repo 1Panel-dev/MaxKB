@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import type ModelApi from '@/api/admin/workspace/model'
 import type SystemResourceModelApi from '@/api/admin/system/resource-management/model'
 import type SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
+import type ModelApi from '@/api/admin/workspace/model'
 import type { DynamicFormField, ModelItem } from '@/api/types'
-import { MsgSuccess } from '@/utils/message'
 import AdvancedSettingsTable from '@/views/model/advanced-settings-table/AdvancedSettingsTable.vue'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ParamSettingDrawer' })
 

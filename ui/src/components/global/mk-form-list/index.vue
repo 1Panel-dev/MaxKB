@@ -1,7 +1,8 @@
 <script setup lang="ts" generic="T">
-import { cloneDeep } from 'lodash'
 import { computed, useTemplateRef } from 'vue'
-import { useSortable, type SortableChange } from '@/utils/use-sortable'
+import { cloneDeep } from 'lodash'
+import type { SortableChange } from '@/utils/use-sortable'
+import { useSortable } from '@/utils/use-sortable'
 
 defineOptions({ name: 'MkFormList' })
 

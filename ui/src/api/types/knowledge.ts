@@ -1,11 +1,11 @@
 /** Workspace 知识库列表和知识库卡片共用的业务类型。 */
 
-import type LogicFlow from '@logicflow/core'
-import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
-import { KNOWLEDGE_HIT_UNIT_TYPE, KNOWLEDGE_SEARCH_MODE, KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
-import type { DefaultModelSettingPayload } from './model'
 import type { DocumentResourceType, DocumentTaskState } from './document'
+import type { DefaultModelSettingPayload } from './model'
 import type { ParagraphItem } from './paragraph'
+import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
+import type LogicFlow from '@logicflow/core'
+import { KNOWLEDGE_HIT_UNIT_TYPE, KNOWLEDGE_SEARCH_MODE, KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
 
 /** 工作流页面的范围接口；只读共享范围不提供目录查询能力。 */
 export type KnowledgeWorkflowApi = Omit<typeof WorkflowApi, 'getKnowledgeDatasourceDocuments'> &

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { inject, provide, ref } from 'vue'
-import { useWorkflowStore } from '@/workflow-canvas/store'
 import { cloneDeep, groupBy } from 'lodash'
-import { MODEL_STATUS } from '@/api/enums'
 import type { ModelItem, ModelProviderItem, PromptGenerateMessage } from '@/api/types'
+import { MODEL_STATUS } from '@/api/enums'
 import GenerateContent from '@/components/business/generate-content/index.vue'
+import { useWorkflowStore } from '@/workflow-canvas/store'
 defineOptions({ name: 'PromptGenerate' })
 const props = defineProps<{
   modelId?: string

@@ -1,8 +1,8 @@
 import { omit } from 'lodash'
-import { randomId } from '@/utils/common'
-import { getNode, readNodeData, refreshBranchAnchors, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { createValidateTool, getModelsTool, MODEL_FIELD_SCHEMA, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import type { AgentTool, JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
+import { getNode, readNodeData, refreshBranchAnchors, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
+import { MODEL_FIELD_SCHEMA, createValidateTool, getModelsTool, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { randomId } from '@/utils/common'
 
 /**
  * intent-node（意图识别）的 AI 生成配置。

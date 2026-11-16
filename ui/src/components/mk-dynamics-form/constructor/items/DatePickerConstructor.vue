@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeMount } from 'vue'
-import { dateFormat, datetimeFormat } from '@/utils/time'
 import type { DynamicFormConstructorOption, DynamicFormValue } from '../../type'
+import { dateFormat, datetimeFormat } from '@/utils/time'
 
 type DatePickerType = 'year' | 'month' | 'date' | 'datetime'
 type DateFormatOption = Pick<DynamicFormConstructorOption, 'value'>

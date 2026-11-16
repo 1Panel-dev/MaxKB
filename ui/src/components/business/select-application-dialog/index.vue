@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { isSystemResource, isWorkspaceResource } from '@/utils/resource-context'
-import ApplicationApi from '@/api/admin/workspace/application/application'
-import SystemApplicationApi from '@/api/admin/system/resource-management/application/application'
-import type { FolderItem, ApplicationDetail } from '@/api/types'
+import type { ApplicationDetail, FolderItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
-import { FOLDER_ENTRIES } from '@/constants/folder'
+import SystemApplicationApi from '@/api/admin/system/resource-management/application/application'
+import ApplicationApi from '@/api/admin/workspace/application/application'
 import FolderTree from '@/components/business/folder-tree/index.vue'
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
+import { FOLDER_ENTRIES } from '@/constants/folder'
+import { isSystemResource, isWorkspaceResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'SelectApplicationDialog' })
 

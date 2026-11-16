@@ -1,8 +1,8 @@
-import DataSourceLocalNode from './index.vue'
-import agent from './agent'
-import DataSourceLocalNodeDetail from './details/index.vue'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
+import agent from './agent'
+import DataSourceLocalNodeDetail from './details/index.vue'
+import DataSourceLocalNode from './index.vue'
 
 class DataSourceLocalNodeView extends WorkflowNodeView {
   constructor(props: ConstructorParameters<typeof WorkflowNodeView>[0]) {

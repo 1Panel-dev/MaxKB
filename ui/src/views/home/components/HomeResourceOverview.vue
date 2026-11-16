@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type HomepageApi from '@/api/admin/workspace/homepage'
-import type { HomeApplicationAggregation, HomeKnowledgeAggregation, HomeToolAggregation, HomeModelAggregation } from '@/api/types'
+import type { HomeApplicationAggregation, HomeKnowledgeAggregation, HomeModelAggregation, HomeToolAggregation } from '@/api/types'
 import { toThousands } from '@/utils/number'
 import perm from '@/permission'
 interface HomeResourceCard {

@@ -1,6 +1,7 @@
-import { ref, inject, type InjectionKey, type Ref } from 'vue'
-import type { ChatLogRecord } from '@/api/types'
+import { inject, ref } from 'vue'
 import type { ChatMessage, ChatRecordMeta, ConversationAppInfo } from '../../core/types'
+import type { ChatLogRecord } from '@/api/types'
+import type { InjectionKey, Ref } from 'vue'
 
 // 只读会话记录(如对话日志):只分页拉取历史记录,不发送、不续跑、不流式。
 // 与 message-list 刻意不共用 store 约定,也不注入 MESSAGE_LIST_KEY,表单等内容项因此自动只读。

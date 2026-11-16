@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import type { DynamicFormField } from '@/api/types'
-import { dynamicFormTypeOptions, type FormField } from '@/components/mk-dynamics-form'
-import { MsgError } from '@/utils/message'
+import type { FormField } from '@/components/mk-dynamics-form'
+import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
 import ModelParamDialog from './ModelParamDialog.vue'
+import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'ModelAdvancedSettings' })
 

@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
-
-import GroupFieldDialog from './component/GroupFieldDialog.vue'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import GroupFieldDialog from './component/GroupFieldDialog.vue'
 import { randomId } from '@/utils/common'
 import { MsgError } from '@/utils/message'
 

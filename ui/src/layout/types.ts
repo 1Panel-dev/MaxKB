@@ -1,6 +1,6 @@
 /** 应用布局和菜单使用的类型。 */
 
-import type { RouteLocationRaw ,RouteLocationNormalizedLoaded,RouteLocationNormalized} from 'vue-router'
+import type { RouteLocationNormalized, RouteLocationNormalizedLoaded, RouteLocationRaw } from 'vue-router'
  
 export interface LayoutMenuItem {
   name: string

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, inject, useTemplateRef } from 'vue'
 import { DROPDOWN_INJECTION_KEY, ElMessageBox } from 'element-plus'
-import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
+import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail, ExportError } from '@/api/types'
 import { MsgError } from '@/utils/message'
 import perm from '@/permission'

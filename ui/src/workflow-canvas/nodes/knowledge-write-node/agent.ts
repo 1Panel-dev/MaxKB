@@ -1,8 +1,8 @@
+import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule, NodeReference } from '@/workflow-canvas/ai-generate/type'
 import type LogicFlow from '@logicflow/core'
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { argReference, finishWithValidate, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import { AgentErrorResult, ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
-import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule, NodeReference } from '@/workflow-canvas/ai-generate/type'
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 
 /** knowledge-write-node（知识库写入）的 AI 生成配置：只有入参 documents（带分段的文档列表），无其他可配置项 */

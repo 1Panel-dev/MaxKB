@@ -1,28 +1,28 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import WorkspaceApi from '@/api/admin/system/workspace'
-import CommonSystemApi from '@/api/admin/system/common'
-import UserGroupsApi from '@/api/admin/system/user-groups'
-import ResourceAuthorizationApi from '@/api/admin/system/resource-authorization'
-import { RESOURCE_TYPE } from '@/api/enums'
 import type {
+  CommonUserOption,
+  OptionItem,
   ResourceAuthorizationType,
   ResourcePermissionItem,
   ResourcePermissionPayload,
-  CommonUserOption,
-  OptionItem,
   SystemUserGroup,
   WorkspaceItem,
 } from '@/api/types'
-import { useStore } from '@/stores'
-import { perm } from '@/permission'
-import { MsgSuccess } from '@/utils/message'
+import { RESOURCE_TYPE } from '@/api/enums'
+import CommonSystemApi from '@/api/admin/system/common'
+import ResourceAuthorizationApi from '@/api/admin/system/resource-authorization'
+import UserGroupsApi from '@/api/admin/system/user-groups'
+import WorkspaceApi from '@/api/admin/system/workspace'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import PermissionTable from './components/PermissionTable.vue'
 import UserAuthorizationList from './components/UserAuthorizationList.vue'
 import UserGroupAuthorizationList from './components/user-group/UserGroupAuthorizationList.vue'
 import { RESOURCE_AUTHORIZATION_LABELS } from './constants'
+import { useStore } from '@/stores'
+import { MsgSuccess } from '@/utils/message'
+import { perm } from '@/permission'
 
 const { auth, user } = useStore()
 const route = useRoute()

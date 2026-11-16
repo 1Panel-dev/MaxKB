@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import StoreApi from '@/api/admin/store'
-import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type { WorkflowStoreTemplate } from '@/api/types'
+import StoreApi from '@/api/admin/store'
+import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import TemplateStoreDialog from '@/views/workflow/components/template-store/TemplateStoreDialog.vue'
 import WorkflowKnowledgeDialog from '../create-knowledge/WorkflowKnowledgeDialog.vue'
 import { MsgError } from '@/utils/message'

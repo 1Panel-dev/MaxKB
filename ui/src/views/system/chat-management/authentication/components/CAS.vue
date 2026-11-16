@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import ChatUserAuthApi from '@/api/admin/system/chat-management/chat-user-auth'
-import { LOGIN_METHOD } from '@/api/enums'
 import type { AuthProviderSettingPayload } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import { LOGIN_METHOD } from '@/api/enums'
+import ChatUserAuthApi from '@/api/admin/system/chat-management/chat-user-auth'
+import { CHAT_API_BASE_PATH } from '@/api/constants.ts'
 import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
-import { CHAT_API_BASE_PATH } from '@/api/constants.ts'
 
 defineOptions({ name: 'CasAuthenticationSetting' })
 

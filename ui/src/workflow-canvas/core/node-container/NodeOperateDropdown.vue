@@ -1,8 +1,7 @@
 <script setup lang="ts">
+import { computed, ref, useTemplateRef } from 'vue'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
-import { computed, ref, useTemplateRef } from 'vue'
-
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 import { MsgConfirm, MsgError } from '@/utils/message'
 

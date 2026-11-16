@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import RoleApi from '@/api/admin/system/role'
-import type { RoleItem, RoleType, RolePayload } from '@/api/types'
+import type { RoleItem, RolePayload, RoleType } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ROLE_TYPE } from '@/api/enums'
+import RoleApi from '@/api/admin/system/role'
 import { ROLE_TYPE_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 

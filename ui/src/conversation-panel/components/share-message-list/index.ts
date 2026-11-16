@@ -1,7 +1,8 @@
-import { computed, inject, ref, toValue, type InjectionKey, type MaybeRefOrGetter } from 'vue'
-import ConversationApi from '@/api/chat/conversation'
-import type { ChatShareDetail } from '@/api/types'
+import { computed, inject, ref, toValue } from 'vue'
 import type { ChatMessage } from '../../core/types'
+import type { ChatShareDetail } from '@/api/types'
+import type { InjectionKey, MaybeRefOrGetter } from 'vue'
+import ConversationApi from '@/api/chat/conversation'
 
 export interface ShareMessageListDeps {
   /** 公开分享链接 ID */

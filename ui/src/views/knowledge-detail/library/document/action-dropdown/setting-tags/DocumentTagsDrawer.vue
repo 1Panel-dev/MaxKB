@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
-import type { TableColumnCtx } from 'element-plus'
-import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeTagGroup } from '@/api/types'
-import { MsgSuccess } from '@/utils/message'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import type { TableColumnCtx } from 'element-plus'
 import AddTagDialog from './AddTagDialog.vue'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DocumentTagsDrawer' })
 const props = defineProps<{

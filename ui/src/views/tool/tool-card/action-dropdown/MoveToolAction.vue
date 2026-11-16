@@ -3,8 +3,8 @@ import { nextTick, ref, useTemplateRef } from 'vue'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ToolItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
-import { FOLDER_ENTRY_ID } from '@/constants'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
+import { FOLDER_ENTRY_ID } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'MoveToolAction' })

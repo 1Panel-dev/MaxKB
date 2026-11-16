@@ -1,9 +1,9 @@
 import { cloneDeep } from 'lodash'
+import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums/knowledge'
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { argReference, finishWithValidate, getKnowledgeListTool, loadKnowledge, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
-import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { defaultSearchSetting } from './constant'
 
 /** search-knowledge-node（知识库检索）的 AI 生成配置 */

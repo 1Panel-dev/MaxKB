@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { KnowledgeTagUpdatePayload } from '@/api/types'
+import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import type { FormInstance, FormRules } from 'element-plus'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'EditTagDialog' })

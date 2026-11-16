@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue'
-import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
+import { computed } from 'vue'
 import type { ExecutionNodeDetail } from './types'
+import type { Component } from 'vue'
+import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'ExecutionDetailContent' })
 

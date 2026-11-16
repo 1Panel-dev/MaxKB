@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
-import ButtonFeedback from './feedback/ButtonFeedback.vue'
-import FeedbackCard from './feedback/FeedbackCard.vue'
-import { MsgSuccess } from '@/utils/message'
-import type { ChatContent, ChatFeedback } from '@/api/types'
-import { copyText } from '@/utils/clipboard'
-import { datetimeFormat } from '@/utils/time'
 import type { ChatMessage, ChatRecordMeta } from '../../core/types'
+import type { ChatContent, ChatFeedback } from '@/api/types'
 import { useRightSidebarStore } from '../../right-sidebar/index'
-
+import { useShowShare } from '../../view/index'
 import { MESSAGE_LIST_KEY } from '../message-list/index'
 import { useShareLinkStoreOptional } from '../message-list/share/index'
-import { useShowShare } from '../../view/index'
+import ButtonFeedback from './feedback/ButtonFeedback.vue'
+import FeedbackCard from './feedback/FeedbackCard.vue'
+import { copyText } from '@/utils/clipboard'
+import { MsgSuccess } from '@/utils/message'
+import { datetimeFormat } from '@/utils/time'
 
 const props = defineProps<{ message: ChatMessage }>()
 const emit = defineEmits<{ resize: [] }>()

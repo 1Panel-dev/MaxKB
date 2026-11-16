@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { computed, ref, watch } from 'vue'
 import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
-import { TOOL_RECORD_SOURCE, KNOWLEDGE_TYPE } from '@/api/enums'
 import type { ToolExecutionRecord, ToolExecutionRecordDetail } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
-import { isSystemSharedResource } from '@/utils/resource-context'
-import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import { KNOWLEDGE_TYPE, TOOL_RECORD_SOURCE } from '@/api/enums'
+import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
+import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
+import { isSystemSharedResource } from '@/utils/resource-context'
+import { datetimeFormat } from '@/utils/time'
 
 const props = defineProps<{
   api: typeof WorkflowApi

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { PatchFileInfo } from './patch/patchTypes'
 import type { ChatContent } from '@/api/types'
 import ScrollDiff from './components/ScrollDiff.vue'
-import type { PatchFileInfo } from './patch/patchTypes'
 import { extractPartialJsonField } from './extract-partial-json'
 
 defineOptions({ name: 'ConversationCreateFileContent' })

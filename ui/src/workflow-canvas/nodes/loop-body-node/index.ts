@@ -1,8 +1,8 @@
-import LoopBodyNodeVue from './index.vue'
-import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
-import { WorkflowNodeType } from '@/workflow-canvas/types'
 import type LogicFlow from '@logicflow/core'
 import type { Model } from '@logicflow/core'
+import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
+import LoopBodyNodeVue from './index.vue'
 
 class LoopBodyModel extends WorkflowNodeModel {
   setLoopBody?: () => void

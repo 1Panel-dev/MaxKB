@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, inject, ref, useTemplateRef } from 'vue'
 import { DROPDOWN_INJECTION_KEY } from 'element-plus'
-import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
-import type { KnowledgeItem } from '@/api/types'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
+import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
+import type { KnowledgeItem } from '@/api/types'
 
 defineOptions({ name: 'ExportKnowledgeAction' })
 

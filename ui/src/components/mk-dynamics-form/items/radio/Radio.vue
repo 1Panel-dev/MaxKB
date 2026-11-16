@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { DynamicFormValue } from '../../type'
 import { computed } from 'vue'
+import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 
 defineOptions({ name: 'DynamicFormRadio' })

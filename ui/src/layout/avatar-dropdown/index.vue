@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
+import type { Locale } from '@/locales/config'
+import { LOGIN_METHOD } from '@/api/enums'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import LoginApi from '@/api/admin/auth/login'
-import { LOGIN_METHOD } from '@/api/enums'
-import { LOCALE_OPTIONS, type Locale } from '@/locales/config'
-import { useStore } from '@/stores'
-import ChangePasswordDialog from './ChangePasswordDialog.vue'
 import AboutDialog from './AboutDialog.vue'
 import ApiKeyDialog from './ApiKeyDialog.vue'
+import ChangePasswordDialog from './ChangePasswordDialog.vue'
+import { LOCALE_OPTIONS } from '@/locales/config'
+import { useStore } from '@/stores'
 import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'AvatarDropdown' })

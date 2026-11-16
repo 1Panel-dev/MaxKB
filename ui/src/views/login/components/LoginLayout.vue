@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { CaretBottom } from '@element-plus/icons-vue'
-import { LOCALE_OPTIONS } from '@/locales/config'
 import type { ThemeInfo } from '@/api/admin/auth/types'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
-import { DEFAULT_THEME_COLOR, DEFAULT_THEME_SETTING, getThemeImg } from '@/constants'
-import { useStore } from '@/stores'
 import DefaultThemeAnimation from './DefaultThemeAnimation.vue'
+import { DEFAULT_THEME_COLOR, DEFAULT_THEME_SETTING, getThemeImg } from '@/constants'
+import { LOCALE_OPTIONS } from '@/locales/config'
+import { useStore } from '@/stores'
 
 defineOptions({ name: 'LoginLayout' })
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, useTemplateRef } from 'vue'
-import type { FormItemInstance } from 'element-plus'
+import type { FormField } from '../../type'
 import type { KnowledgeItem } from '@/api/types'
+import type { FormItemInstance } from 'element-plus'
 import SelectKnowledgeDialog from '@/components/business/select-knowledge-dialog/index.vue'
 import Knowledge from '../../items/knowledge/Knowledge.vue'
-import type { FormField } from '../../type'
 
 type KnowledgeOption = Pick<KnowledgeItem, 'id'> & Partial<Pick<KnowledgeItem, 'name' | 'type' | 'embedding_model_id'>>
 interface KnowledgeConstructorValue {

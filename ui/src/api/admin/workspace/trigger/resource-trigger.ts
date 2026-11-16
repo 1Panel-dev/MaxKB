@@ -1,5 +1,5 @@
-import { get, post, put, del } from '../../core/request'
 import type { ResourceTrigger, ResourceTriggerDetail, ResourceTriggerResource, TriggerPayload } from '@/api/types'
+import { del, get, post, put } from '../../core/request'
 
 const getPrefix = (resource: ResourceTriggerResource) => `/workspace/${resource.workspace_id}/${resource.source_type}/${resource.source_id}/trigger`
 

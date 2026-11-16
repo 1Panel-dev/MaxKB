@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import DOMPurify from 'dompurify'
-import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import { REPLY_CONTENT_TYPE_LABELS } from '../constant'
 
 defineOptions({ name: 'ReplyNodeDetail' })

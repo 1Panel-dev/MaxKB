@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, useTemplateRef, provide } from 'vue'
+import { computed, inject, onMounted, provide, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormInstance } from 'element-plus'
 import type { FormField, VisibilityFieldOption } from '@/components/mk-dynamics-form'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormInstance } from 'element-plus'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
-import FormSettingTable from './component/form-setting/FormSettingTable.vue'
 import { useWorkflowStore } from '@/workflow-canvas/store'
+import FormSettingTable from './component/form-setting/FormSettingTable.vue'
 defineOptions({ name: 'WorkflowFormNode' })
 const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const store = useWorkflowStore(resourceScope)

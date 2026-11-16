@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
-import { useFormItem } from 'element-plus'
-import { DocumentChecked } from '@element-plus/icons-vue'
 import { json, jsonParseLinter } from '@codemirror/lang-json'
 import { linter } from '@codemirror/lint'
+import { DocumentChecked } from '@element-plus/icons-vue'
+import { useFormItem } from 'element-plus'
 import { Codemirror } from 'vue-codemirror'
 
 defineOptions({ name: 'JsonInput', inheritAttrs: false })

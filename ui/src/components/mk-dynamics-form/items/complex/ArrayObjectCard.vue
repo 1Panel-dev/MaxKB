@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { DynamicFormValue } from '../../type'
 import { computed, ref } from 'vue'
+import type { DynamicFormValue } from '../../type'
 import type { DynamicFormResponse, FormField } from '../../type'
 import DynamicsForm from '../../index.vue'
 const props = defineProps<{

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import type { WorkspaceItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import WorkspaceApi from '@/api/admin/system/workspace'
-import type { WorkspaceItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CreateOrUpdateWorkspaceDialog' })

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { computed, ref } from 'vue'
-import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, STATE_TYPES } from '@/api/enums'
 import type { DocumentStatusMeta, DocumentTaskState, DocumentTaskType } from '@/api/types'
+import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, STATE_TYPES } from '@/api/enums'
+import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { DOCUMENT_STATUS_OPTIONS } from '../status'
 
 defineOptions({ name: 'DocumentStatus' })

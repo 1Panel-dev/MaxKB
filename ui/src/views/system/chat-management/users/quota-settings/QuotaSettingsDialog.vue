@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
-import { PERIOD_TYPE, QUOTA_TYPE } from '@/api/enums'
 import type { ChatUserQuotaPayload, PeriodType, QuotaType } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import { PERIOD_TYPE, QUOTA_TYPE } from '@/api/enums'
+import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'QuotaSettingsDialog' })

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { cloneDeep } from 'lodash'
-import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { Dict, DocumentItem, KnowledgeTagUpdatePayload } from '@/api/types'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { getFileIconUrl } from '@/utils/icon'
-import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { datetimeFormat } from '@/utils/time'
 import { perm } from '@/permission'
 
 /**

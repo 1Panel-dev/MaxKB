@@ -1,8 +1,9 @@
-import LoopStartNodeVue from './index.vue'
-import LoopStartNodeDetail from './details/index.vue'
+import type { WorkflowNodeField } from '@/workflow-canvas/types'
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
-import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
-import { isLoopBuiltinField, LOOP_BUILTIN_FIELDS } from './constant'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
+import { LOOP_BUILTIN_FIELDS, isLoopBuiltinField } from './constant'
+import LoopStartNodeDetail from './details/index.vue'
+import LoopStartNodeVue from './index.vue'
 
 interface LoopStartNodeProperties {
   config?: { fields?: Array<{ label: string; value: string }>; globalFields?: unknown[] }

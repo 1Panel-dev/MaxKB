@@ -2,8 +2,8 @@
 import { nextTick, ref, useTemplateRef } from 'vue'
 import type { DocumentSettingPayload } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
-import { MsgSuccess } from '@/utils/message'
 import DocumentSettingDialog from './DocumentSettingDialog.vue'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'BatchSettingDocumentAction' })
 const props = defineProps<{

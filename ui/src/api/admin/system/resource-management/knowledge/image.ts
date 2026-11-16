@@ -1,5 +1,5 @@
-import { post, put } from '@/api/admin/core/request'
 import type { DocumentFileImportPayload, DocumentItem, DocumentStrategy, ImageDocumentImportPayload, ImageDocumentPreview } from '@/api/types'
+import { post, put } from '@/api/admin/core/request'
 
 const getPrefix = (knowledgeId: string) => `/system/resource/knowledge/${knowledgeId}/document/image`
 

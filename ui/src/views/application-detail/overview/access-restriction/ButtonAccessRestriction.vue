@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import AccessRestrictionDrawer from './AccessRestrictionDrawer.vue'
 import type { ApplicationAccessToken } from '@/api/types'
+import AccessRestrictionDrawer from './AccessRestrictionDrawer.vue'
 
 defineProps<{ accessTokenConfig?: ApplicationAccessToken }>()
 

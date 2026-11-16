@@ -1,7 +1,7 @@
 /** Admin Router 的业务范围和路由元信息声明。 */
 
-import type { RouteParamsGeneric } from 'vue-router'
 import type { ResourceAuthorizationType } from '@/api/types'
+import type { RouteParamsGeneric } from 'vue-router'
 
 export type RouteScope = 'workspace' | 'system'
 export type ResourceScope = 'workspace' | 'workspace-shared' | 'system-resource' | 'system-shared'

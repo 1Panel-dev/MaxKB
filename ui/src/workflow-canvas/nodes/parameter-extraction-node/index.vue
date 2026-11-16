@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
-
-import type { FormInstance } from 'element-plus'
-import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
-import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import { useWorkflowStore } from '@/workflow-canvas/store'
-import type { BaseNodeModel } from '@logicflow/core'
+import type { ParameterField } from './component/parameters-field/types'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { BaseNodeModel } from '@logicflow/core'
+import type { FormInstance } from 'element-plus'
+import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
+import { useWorkflowStore } from '@/workflow-canvas/store'
 import ParametersFieldTable from './component/parameters-field/ParametersFieldTable.vue'
-import type { ParameterField } from './component/parameters-field/types'
 
 defineOptions({ name: 'WorkflowParameterExtractionNode' })
 const getModel = inject('getModel') as () => BaseNodeModel

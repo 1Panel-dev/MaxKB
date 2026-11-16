@@ -1,9 +1,12 @@
 <script setup lang="ts" generic="T extends object">
-import { cloneVNode, computed, Fragment, h, isVNode, nextTick, onBeforeUnmount, onMounted, ref, type VNode } from 'vue'
-import { ElTableColumn, type TableColumnCtx, type TableInstance } from 'element-plus'
-import LayoutBatchFooter from '../mk-view-layout/LayoutBatchFooter.vue'
-import { useSortable, type SortableChange } from '@/utils/use-sortable'
+import { Fragment, cloneVNode, computed, h, isVNode, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { ElTableColumn } from 'element-plus'
 import { get } from 'lodash'
+import type { SortableChange } from '@/utils/use-sortable'
+import type { TableColumnCtx, TableInstance } from 'element-plus'
+import type { VNode } from 'vue'
+import LayoutBatchFooter from '../mk-view-layout/LayoutBatchFooter.vue'
+import { useSortable } from '@/utils/use-sortable'
 
 defineOptions({ name: 'MkTable', inheritAttrs: false })
 

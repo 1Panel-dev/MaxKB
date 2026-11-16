@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { CHAT_API_BASE_PATH } from '@/api/constants'
 import type { ApplicationDetail } from '@/api/types'
+import { CHAT_API_BASE_PATH } from '@/api/constants'
 import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'McpConfigApplicationAction' })

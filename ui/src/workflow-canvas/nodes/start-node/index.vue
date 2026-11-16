@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted } from 'vue'
 import { cloneDeep } from 'lodash'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
-import { copyText } from '@/utils/clipboard'
+import type { WorkflowNodeField } from '@/workflow-canvas/types'
 import type { BaseNodeModel } from '@logicflow/core'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
+import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'WorkflowStartNode' })
 

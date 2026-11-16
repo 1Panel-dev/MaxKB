@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import type { VariableField } from './types'
+import type { FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'VariableSplittingFieldDialog' })
 

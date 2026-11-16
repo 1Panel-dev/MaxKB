@@ -1,10 +1,10 @@
 /** Workspace 工具列表和工具维护共用的业务类型。 */
 
-import type LogicFlow from '@logicflow/core'
-import { TOOL_RECORD_SOURCE, TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
 import type { DynamicFormField } from './common'
 import type { WorkflowStoreTemplate } from './workflow-template'
 import type { DefaultModelSettingPayload } from '@/api/types/model.ts'
+import type LogicFlow from '@logicflow/core'
+import { TOOL_RECORD_SOURCE, TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
 
 export type ToolScope = (typeof TOOL_SCOPE)[keyof typeof TOOL_SCOPE]
 export type ToolType = (typeof TOOL_TYPE)[keyof typeof TOOL_TYPE]

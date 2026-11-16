@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef, watch } from 'vue'
-import RoleApi from '@/api/admin/system/role'
 import type { RoleItem, RoleType, RoleTypeGroup } from '@/api/types'
-import { ROLE_TYPE_LABELS } from '@/constants'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import RoleApi from '@/api/admin/system/role'
 import RoleMemberList from './components/RoleMemberList.vue'
 import RolePermissionConfiguration from './components/RolePermissionConfiguration.vue'
 import CreateOrUpdateRoleDialog from './dialog/CreateOrUpdateRoleDialog.vue'
+import { ROLE_TYPE_LABELS } from '@/constants'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
 type RoleDetailTab = 'permission' | 'member'

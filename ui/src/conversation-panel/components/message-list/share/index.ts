@@ -1,5 +1,6 @@
-import { computed, inject, ref, type InjectionKey, type Ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import type { ChatMessage } from '../../../core/types'
+import type { InjectionKey, Ref } from 'vue'
 
 export interface ShareLinkDeps {
   /** 当前会话消息：只读，由消息列表 Store 维护 */

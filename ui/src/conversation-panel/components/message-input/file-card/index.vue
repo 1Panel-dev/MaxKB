@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import FileUploadCard from '@/components/mk-drag-upload/FileUploadCard.vue'
 import type { UploadCardFile } from '@/components/mk-drag-upload/types'
+import FileUploadCard from '@/components/mk-drag-upload/FileUploadCard.vue'
 
 defineOptions({ name: 'MessageInputFileUploadCard' })
 withDefaults(defineProps<{ file: UploadCardFile; percentage?: number; disabled?: boolean }>(), { disabled: false })

@@ -1,5 +1,5 @@
-import perm from '@/permission'
 import type { RouteRecordRaw } from 'vue-router'
+import perm from '@/permission'
 
 export const homeRoutes: RouteRecordRaw[] = [
   {

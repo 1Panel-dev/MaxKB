@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
-import ApplicationApi from '@/api/admin/workspace/application/application'
 import { APPLICATION_TYPE } from '@/api/enums'
+import ApplicationApi from '@/api/admin/workspace/application/application'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowApplicationNode' })

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { FolderSource } from '@/api/types'
-import { FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from './index.vue'
+import { FOLDER_ENTRY_ID } from '@/constants'
 
 defineOptions({ name: 'MoveToDialog' })
 

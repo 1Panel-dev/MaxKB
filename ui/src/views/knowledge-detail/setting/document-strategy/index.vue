@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { perm } from '@/permission'
-import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { ref, useTemplateRef, watch } from 'vue'
+import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
-import { MsgSuccess } from '@/utils/message'
-import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import { useKnowledgeDetailContext } from '../../context'
+import { MsgSuccess } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
 
 /**
  * 知识库「文档处理策略」权限判断

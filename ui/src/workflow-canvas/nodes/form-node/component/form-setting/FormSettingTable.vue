@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { dynamicFormTypeOptions, type FormField, type VisibilityFieldOption } from '@/components/mk-dynamics-form'
-import { MsgError } from '@/utils/message'
+import type { FormField, VisibilityFieldOption } from '@/components/mk-dynamics-form'
+import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
 import FormFieldDialog from './FormFieldDialog.vue'
+import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowFormFieldTable' })
 

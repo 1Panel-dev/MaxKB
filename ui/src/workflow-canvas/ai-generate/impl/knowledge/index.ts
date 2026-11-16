@@ -1,3 +1,4 @@
+import type { AgentBindings, RunnableAgent } from '@/workflow-canvas/ai-generate/type'
 import { useAgentConfig } from '@/workflow-canvas/ai-generate/common'
 import {
   addEdgeTool,
@@ -7,14 +8,13 @@ import {
   deleteNodeTool,
   getCanvasDetailTool,
   getLastRunTool,
-  getNodeDetailTool,
   getNodeAnchorsTool,
+  getNodeDetailTool,
   getToolsTool,
   layoutTool,
   listDataSourceTool,
   validateTool,
 } from '@/workflow-canvas/ai-generate/tools'
-import type { AgentBindings, RunnableAgent } from '@/workflow-canvas/ai-generate/type'
 import { buildParentPrompt, createPlanTool, renderCatalog } from '../shared'
 
 /**

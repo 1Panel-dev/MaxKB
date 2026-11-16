@@ -1,10 +1,11 @@
 /** 分段菜单移动和两处拖拽共用位置保存及本地排序。 */
 import type { Ref } from 'vue'
-import type { ParagraphItem } from '@/api/types'
-import type { useDocumentDetailContext } from '@/views/document-detail/context'
 import type { ParagraphMoveDirection } from './types'
-import { useSortable, type SortableChange } from '@/utils/use-sortable'
+import type { ParagraphItem } from '@/api/types'
+import type { SortableChange } from '@/utils/use-sortable'
+import type { useDocumentDetailContext } from '@/views/document-detail/context'
 import { MsgSuccess } from '@/utils/message'
+import { useSortable } from '@/utils/use-sortable'
 
 interface ParagraphSortOptions {
   paragraphs: Ref<ParagraphItem[]>

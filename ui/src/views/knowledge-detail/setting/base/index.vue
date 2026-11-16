@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { perm } from '@/permission'
-import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import { cloneDeep } from 'lodash'
-import { KNOWLEDGE_TYPE } from '@/api/enums'
 import type { KnowledgeItem } from '@/api/types'
-import { KNOWLEDGE_TYPE_LABELS, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
+import type { FormInstance, FormRules } from 'element-plus'
+import { KNOWLEDGE_TYPE } from '@/api/enums'
 import KnowledgeBaseForm from '@/views/knowledge/create-knowledge/components/KnowledgeBaseForm.vue'
 import { useKnowledgeDetailContext } from '../../context'
-import { isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import { KNOWLEDGE_TYPE_LABELS, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { perm } from '@/permission'
 /**
  * 知识库「设置」权限判断
  */

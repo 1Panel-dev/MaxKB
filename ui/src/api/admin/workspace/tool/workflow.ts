@@ -1,5 +1,3 @@
-import type LogicFlow from '@logicflow/core'
-import { get, put, postStream } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   DefaultModelSettingPayload,
@@ -11,6 +9,8 @@ import type {
   WorkflowVersion,
   WorkflowVersionPayload,
 } from '@/api/types'
+import type LogicFlow from '@logicflow/core'
+import { get, postStream, put } from '../../core/request'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
 import { getWorkspaceId } from '@/utils/resource-context'
 

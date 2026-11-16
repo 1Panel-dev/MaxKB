@@ -1,5 +1,5 @@
+import type { ApplicationStoreResponse, Dict, KnowledgeWorkflowStoreResponse, ToolStoreResponse, ToolWorkflowStoreResponse } from '@/api/types'
 import { get } from './core/request'
-import type { ApplicationStoreResponse, KnowledgeWorkflowStoreResponse, Dict, ToolStoreResponse, ToolWorkflowStoreResponse } from '@/api/types'
 
 /** 获取工具商店列表。 */
 const getStoreToolList = (query?: Dict<unknown>) => {

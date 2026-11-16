@@ -1,5 +1,5 @@
-import { get, post, put } from '../../core/request'
 import type { AuthProviderSettingPayload, AuthProviderType, LoginAuthSettingPayload } from '@/api/types'
+import { get, post, put } from '../../core/request'
 
 const prefix = '/auth'
 

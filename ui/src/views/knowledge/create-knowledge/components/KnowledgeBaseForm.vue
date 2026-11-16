@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
+import type { KnowledgeCreatePayload, ModelItem, ModelProviderItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MODEL_STATUS } from '@/api/enums'
-import type { KnowledgeCreatePayload, ModelItem, ModelProviderItem } from '@/api/types'
-import SystemModelApi from '@/api/admin/system/resource-management/model'
-import ModelApi from '@/api/admin/workspace/model'
-import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
 import ModelProviderApi from '@/api/admin/model-provider'
+import SystemModelApi from '@/api/admin/system/resource-management/model'
+import SystemSharedModelApi from '@/api/admin/system/shared-resources/model'
+import ModelApi from '@/api/admin/workspace/model'
 import SelectModel from '@/components/business/select-model/index.vue'
 import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 

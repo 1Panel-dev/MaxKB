@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CommonUserOption } from '@/api/types'
-import { useStore } from '@/stores'
 import MkSearchList from '@/components/mk-search-list/index.vue'
+import { useStore } from '@/stores'
 
 defineOptions({ name: 'UserAuthorizationList' })
 

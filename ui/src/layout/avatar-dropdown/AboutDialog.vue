@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import type { LicenseInfo } from '@/api/types'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import LicenseApi from '@/api/admin/auth/license'
-import type { LicenseInfo } from '@/api/types'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
-import { perm } from '@/permission'
 import { useStore } from '@/stores/admin'
+import { perm } from '@/permission'
 
 defineOptions({ name: 'AboutDialog' })
 

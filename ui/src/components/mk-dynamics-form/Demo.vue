@@ -1,16 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, provide } from 'vue'
+import { computed, provide, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { Dict } from '@/api/types'
-import {
-  dynamicFormTypeOptions,
-  MkDynamicsForm,
-  MkDynamicsFormConstructor,
-  type DynamicFormValue,
-  type FormField,
-  type VisibilityFieldOption,
-} from '@/components/mk-dynamics-form'
+import type { DynamicFormValue, FormField, VisibilityFieldOption } from '@/components/mk-dynamics-form'
 import ModelApi from '@/api/admin/workspace/model'
+import { MkDynamicsForm, MkDynamicsFormConstructor, dynamicFormTypeOptions } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'MkDynamicsFormDemo' })
 provide('getSelectModelList', ModelApi.getModelListWithShared)

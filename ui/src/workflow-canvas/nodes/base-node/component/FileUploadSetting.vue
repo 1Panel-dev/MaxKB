@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { FileUploadSettingData } from '../types'
 import type { FormInstance, FormRules } from 'element-plus'
-import { DOCUMENT_EXTENSIONS, IMAGE_EXTENSIONS, AUDIO_EXTENSIONS, VIDEO_EXTENSIONS } from '@/constants/file-type'
+import audioIcon from '@/assets/file-type/file-audio-icon.svg'
 import documentIcon from '@/assets/file-type/file-document-icon.svg'
 import imageIcon from '@/assets/file-type/file-image-icon.svg'
-import audioIcon from '@/assets/file-type/file-audio-icon.svg'
 import videoIcon from '@/assets/file-type/file-video-icon.svg'
 import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
 import MkTagsEdit from '@/components/mk-tags-edit/index.vue'
 import { defaultFileUploadSetting } from '../constant'
-import type { FileUploadSettingData } from '../types'
+import { AUDIO_EXTENSIONS, DOCUMENT_EXTENSIONS, IMAGE_EXTENSIONS, VIDEO_EXTENSIONS } from '@/constants/file-type'
 
 defineOptions({ name: 'BaseNodeFileUploadSetting' })
 

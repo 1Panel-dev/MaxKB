@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted } from 'vue'
+import type { ToolInputField } from '../tool-base-node/types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { copyText } from '@/utils/clipboard'
-import type { ToolInputField } from '../tool-base-node/types'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 
 defineOptions({ name: 'WorkflowToolStartNode' })
 

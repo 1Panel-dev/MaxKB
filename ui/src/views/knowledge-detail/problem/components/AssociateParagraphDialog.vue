@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
-import type MkViewLayout from '@/components/global/mk-view-layout/index.vue'
-import MkSearchList from '@/components/mk-search-list/index.vue'
 import type { ParamsPage } from '@/api/admin/core/types'
-import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import type { DocumentItem, DocumentResourceType, ParagraphItem, ProblemParagraphReference } from '@/api/types'
+import type MkViewLayout from '@/components/global/mk-view-layout/index.vue'
+import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
+import MkSearchList from '@/components/mk-search-list/index.vue'
+import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 import { MsgSuccess } from '@/utils/message'
-import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 
 defineOptions({ name: 'AssociateParagraphDialog' })
 const emit = defineEmits<{ success: [] }>()

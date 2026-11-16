@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, inject, onMounted } from 'vue'
 import { cloneDeep } from 'lodash'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import { WorkflowNodeType } from '@/workflow-canvas/types'
 import type { ToolFieldConfig, ToolInputField, ToolOutputField } from './types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
 import InputFieldTable from './component/input/InputFieldTable.vue'
 import OutputFieldTable from './component/output/OutputFieldTable.vue'
 

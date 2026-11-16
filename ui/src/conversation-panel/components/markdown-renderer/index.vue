@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { computed, useId, type Component } from 'vue'
+import { computed, useId } from 'vue'
+import type { RenderTag } from './parse-tags'
 import type { Dict } from '@/api/types'
+import type { Component } from 'vue'
 import loadErrorImage from '@/assets/conversation/load_error.png'
-import { useSendQuestionOptional } from '../message-input/index'
-import { parseRenderNodes, type RenderTag } from './parse-tags'
-import QuickQuestion from './QuickQuestion.vue'
-import IframeRender from './IframeRender.vue'
-import FormRender from './FormRender.vue'
-import ReasoningRender from './ReasoningRender.vue'
-import ToolCallsRender from './tool-calls-render/index.vue'
-import HtmlItem from '../content/items/html.vue'
 import EchartsItem from '../content/items/echarts.vue'
+import HtmlItem from '../content/items/html.vue'
+import { useSendQuestionOptional } from '../message-input/index'
+import FormRender from './FormRender.vue'
+import IframeRender from './IframeRender.vue'
+import QuickQuestion from './QuickQuestion.vue'
+import ReasoningRender from './ReasoningRender.vue'
+import { parseRenderNodes } from './parse-tags'
+import ToolCallsRender from './tool-calls-render/index.vue'
 
 defineOptions({ name: 'MarkdownRenderer' })
 

@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, provide, watch } from 'vue'
-import ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import type { ApplicationDetail, ChatLogRecord } from '@/api/types'
-import ConversationLayout from '../../core/layout/index.vue'
-import LogMessageList from '../../components/log-message-list/index.vue'
-import RightSidebar from '../../right-sidebar/index.vue'
+import ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import { LOG_MESSAGE_LIST_KEY, createLogMessageListStore } from '../../components/log-message-list/index'
+import LogMessageList from '../../components/log-message-list/index.vue'
+import ConversationLayout from '../../core/layout/index.vue'
 import { RIGHT_SIDEBAR_KEY, createRightSidebarStore } from '../../right-sidebar/index'
+import RightSidebar from '../../right-sidebar/index.vue'
+import { DEVICE_KEY, VIEW_KEY, VIEW_TYPE, createDeviceType } from '../index.ts'
 import { toLogAppInfo } from './app-info'
-import { VIEW_KEY, VIEW_TYPE, DEVICE_KEY, createDeviceType } from '../index.ts'
 
 defineOptions({ name: 'LogConversation' })
 

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue'
 import { useFormItem } from 'element-plus'
-import type { UploadFile, UploadFiles, UploadUserFile } from 'element-plus'
-import SingleFileUpload from './SingleFileUpload.vue'
-import MultipleFileUpload from './MultipleFileUpload.vue'
 import type { DragUploadFile, DragUploadMode } from './types'
+import type { UploadFile, UploadFiles, UploadUserFile } from 'element-plus'
+import MultipleFileUpload from './MultipleFileUpload.vue'
+import SingleFileUpload from './SingleFileUpload.vue'
 
 defineOptions({ name: 'MkDragUpload' })
 

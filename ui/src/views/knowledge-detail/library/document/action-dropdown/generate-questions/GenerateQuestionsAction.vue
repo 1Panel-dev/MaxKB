@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
-import { DOCUMENT_TASK_TYPE } from '@/api/enums'
 import type { DocumentItem, DocumentTaskState, RelatedQuestionsConfig } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import { DOCUMENT_TASK_TYPE } from '@/api/enums'
 import GenerateQuestionsDialog from '@/components/business/generate-questions/index.vue'
-import { MsgSuccess } from '@/utils/message'
 import { isDocumentTaskRunning } from '../../status'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'GenerateQuestionsAction' })
 const props = defineProps<{

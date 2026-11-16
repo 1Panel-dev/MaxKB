@@ -1,9 +1,9 @@
+import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getLoopBodyLf, getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
-import { isLoopBuiltinField } from '@/workflow-canvas/nodes/loop-start-node/constant'
-import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { argReference, finishWithValidate, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
-import type { JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
+import { isLoopBuiltinField } from '@/workflow-canvas/nodes/loop-start-node/constant'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
 
 /** loop-node（循环）的 AI 生成配置 */
 

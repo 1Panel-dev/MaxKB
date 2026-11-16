@@ -1,5 +1,5 @@
 import type LogicFlow from '@logicflow/core'
-import { WorkflowNodeType, WorkflowMode, WorkflowKind } from '@/workflow-canvas/types'
+import { WorkflowKind, WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 
 interface WorkflowBranch {
   id: string

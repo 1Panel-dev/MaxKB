@@ -1,7 +1,7 @@
 /** 工作空间「工具」按钮权限。 */
 
-import { can, canRes } from '../../policy'
 import { PermissionConstants as P } from '../../core'
+import { can, canRes } from '../../policy'
 
 const workspace = {
   // —— 工作空间级 ——

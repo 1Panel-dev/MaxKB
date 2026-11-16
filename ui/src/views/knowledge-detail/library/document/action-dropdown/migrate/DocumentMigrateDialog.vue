@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
+import type { DocumentResourceType, KnowledgeItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
-import type { DocumentResourceType, KnowledgeItem } from '@/api/types'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { MsgSuccess } from '@/utils/message'
 

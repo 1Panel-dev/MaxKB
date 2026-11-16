@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { DynamicFormValue } from '../../type'
 import { computed, ref } from 'vue'
+import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
 const emit = defineEmits(['update:modelValue', 'change'])

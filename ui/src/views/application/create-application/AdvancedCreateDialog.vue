@@ -2,13 +2,13 @@
 import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
-import type { FormInstance, FormRules } from 'element-plus'
-import ApplicationApi from '@/api/admin/workspace/application/application'
-import { APPLICATION_TYPE } from '@/api/enums'
 import type { ApplicationFormPayload, ApplicationStoreTemplate } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import { APPLICATION_TYPE } from '@/api/enums'
+import ApplicationApi from '@/api/admin/workspace/application/application'
+import { applicationTemplate } from './template'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import { applicationTemplate } from './template'
 
 defineOptions({ name: 'AdvancedCreateDialog' })
 

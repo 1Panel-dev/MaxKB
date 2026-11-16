@@ -1,16 +1,17 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { ApplicationDetail } from '@/api/types'
 import type { ApiInputField } from '@/workflow-canvas/nodes/base-node/types'
+import applicationAPI from '@/api/admin/workspace/application/application'
+import { CHAT_API_BASE_PATH } from '@/api/constants'
 import { isWorkFlow } from '@/utils/common'
 import { dateFormat } from '@/utils/time'
 import { hasRenderableSlotContent } from '@/utils/vnode'
-import applicationAPI from '@/api/admin/workspace/application/application'
 
-import { computed } from 'vue'
 defineOptions({ name: 'ApplicationCard' })
 
 const props = defineProps<{ application: ApplicationDetail; selectable?: boolean; selected?: boolean }>()
-import { CHAT_API_BASE_PATH } from '@/api/constants'
+
 const emit = defineEmits<{ click: []; selected: [selected: boolean] }>()
 
 const slots = defineSlots<{ 'action-dropdown'?: () => unknown }>()

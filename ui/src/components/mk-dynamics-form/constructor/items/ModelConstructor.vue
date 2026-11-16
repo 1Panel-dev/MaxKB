@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { ModelItem } from '@/api/types'
-import type { DynamicFormValue } from '../../type'
 import { computed, inject, provide, ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import type { DynamicFormValue } from '../../type'
+import type { ModelItem } from '@/api/types'
 import SelectModel from '@/components/business/select-model/index.vue'
 import { providerList as providerOptions } from '../../items/model/provider-data'
 import { MODEL_TYPE_LABELS } from '@/constants/model'

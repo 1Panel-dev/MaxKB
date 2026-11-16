@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import WorkspaceToolStoreApi from '@/api/admin/workspace/tool/store'
 import type { ToolItem, ToolStoreResponse } from '@/api/types'
+import WorkspaceToolStoreApi from '@/api/admin/workspace/tool/store'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ButtonUpdateVersion' })

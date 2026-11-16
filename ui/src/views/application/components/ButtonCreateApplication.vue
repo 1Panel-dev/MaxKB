@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, type CSSProperties } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import type { UploadFile, UploadInstance } from 'element-plus'
+import type { CSSProperties } from 'vue'
 import ApplicationApi from '@/api/admin/workspace/application/application'
-import { useStore } from '@/stores'
-import { MsgSuccess } from '@/utils/message'
 import AdvancedCreateDialog from '@/views/application/create-application/AdvancedCreateDialog.vue'
 import SimpleCreateDialog from '@/views/application/create-application/SimpleCreateDialog.vue'
+import { useStore } from '@/stores'
+import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
 
 defineOptions({ name: 'CreateApplicationDropdown' })

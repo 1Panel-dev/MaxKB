@@ -1,7 +1,7 @@
-import { randomId } from '@/utils/common'
+import type { AgentTool, JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getNode, readNodeData, refreshBranchAnchors, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { CONDITION_SCHEMA, createValidateTool, normalizeConditions, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
-import type { AgentTool, JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
+import { randomId } from '@/utils/common'
 
 /**
  * condition-node（判断器）的 AI 生成配置。

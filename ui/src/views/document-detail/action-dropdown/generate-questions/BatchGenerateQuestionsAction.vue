@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type { DocumentParagraphApi } from '@/views/document-detail/context'
 import type { RelatedQuestionsConfig } from '@/api/types'
+import type { DocumentParagraphApi } from '@/views/document-detail/context'
 import GenerateQuestionsDialog from '@/components/business/generate-questions/index.vue'
 import { MsgSuccess } from '@/utils/message'
 

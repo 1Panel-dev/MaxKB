@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
-import WorkspaceParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
+import type { FormInstance, FormRules } from 'element-plus'
 import SystemParagraphApi from '@/api/admin/system/resource-management/knowledge/paragraph'
-import { isSystemResource } from '@/utils/resource-context'
+import WorkspaceParagraphApi from '@/api/admin/workspace/knowledge/paragraph'
 import { MsgSuccess } from '@/utils/message'
+import { isSystemResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'MarkDialog' })
 const props = defineProps<{

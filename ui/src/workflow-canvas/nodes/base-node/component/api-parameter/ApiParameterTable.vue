@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type { FormField } from '@/components/mk-dynamics-form'
-import { MsgError } from '@/utils/message'
 import type { ApiInputField } from '../../types'
+import type { FormField } from '@/components/mk-dynamics-form'
 import ApiParameterDialog from './ApiParameterDialog.vue'
+import { MsgError } from '@/utils/message'
 
 const props = defineProps<{ userFields: FormField[] }>()
 const inputFields = defineModel<ApiInputField[]>({ required: true })

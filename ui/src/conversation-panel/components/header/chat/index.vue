@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import HeaderActions from '../header-actions/index.vue'
-import ExportAction from '../header-actions/export/ExportAction.vue'
 import { useConversationListStore } from '../../../left-sidebar/conversation-list/index'
+import { DEVICE_TYPE, useDeviceType, useShowShare } from '../../../view/index'
 import { useMessageListStore } from '../../message-list/index'
 import { useShareLinkStoreOptional } from '../../message-list/share/index'
-import { DEVICE_TYPE, useDeviceType, useShowShare } from '../../../view/index'
+import ExportAction from '../header-actions/export/ExportAction.vue'
+import HeaderActions from '../header-actions/index.vue'
 
 const props = defineProps<{
   /** 新建对话；不传时在当前应用中新建（门户在没有当前智能体时改为选择智能体） */

@@ -1,6 +1,7 @@
-import { TOOL_TYPE } from '@/api/enums'
 import type { ToolType } from '@/api/types'
-import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
+import type { ShapeItem } from '@/workflow-canvas/types'
+import { TOOL_TYPE } from '@/api/enums'
+import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import * as NodeData from './node-data'
 interface WorkflowModelNode {
   properties?: { node_data?: { tool_type?: ToolType } }

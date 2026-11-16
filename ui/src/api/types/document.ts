@@ -1,5 +1,5 @@
-import type { DOCUMENT_HIT_HANDLING, DOCUMENT_RESOURCE_TYPE, DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
 import type { DocumentStrategy, KnowledgeGeneratePayload, KnowledgeType } from './knowledge'
+import type { DOCUMENT_HIT_HANDLING, DOCUMENT_RESOURCE_TYPE, DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
 export type DocumentHitHandling = (typeof DOCUMENT_HIT_HANDLING)[keyof typeof DOCUMENT_HIT_HANDLING]
 export type DocumentResourceType = (typeof DOCUMENT_RESOURCE_TYPE)[keyof typeof DOCUMENT_RESOURCE_TYPE]
 export type DocumentTaskState = (typeof DOCUMENT_TASK_STATE)[keyof typeof DOCUMENT_TASK_STATE]

@@ -1,17 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
-import SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
-import SystemCommonApi from '@/api/admin/system/common'
-import SystemWorkspaceApi from '@/api/admin/system/workspace'
-import type { KnowledgeItem, Dict, OptionItem } from '@/api/types'
-import { useStore } from '@/stores'
-import { datetimeFormat } from '@/utils/time'
-import { toOrderBy } from '@/utils/common'
+import type { Dict, KnowledgeItem, OptionItem } from '@/api/types'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
+import SystemCommonApi from '@/api/admin/system/common'
+import SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
-
+import SystemWorkspaceApi from '@/api/admin/system/workspace'
 import {
   AuthorizeKnowledgeAction,
   DeleteKnowledgeAction,
@@ -23,6 +18,10 @@ import {
   RelatedResourcesKnowledgeAction,
   SyncKnowledgeAction,
 } from '@/views/knowledge/knowledge-card/action-dropdown/index.ts'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
+import { useStore } from '@/stores'
+import { toOrderBy } from '@/utils/common'
+import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission'
 
 const { auth } = useStore()

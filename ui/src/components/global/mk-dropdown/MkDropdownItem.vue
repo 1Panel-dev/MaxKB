@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
 import { Check } from '@element-plus/icons-vue'
+import type { Component } from 'vue'
 
 defineOptions({ name: 'MkDropdownItem', inheritAttrs: false })
 

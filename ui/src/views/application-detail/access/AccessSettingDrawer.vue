@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { useApplicationDetailContext } from '../context'
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-
-import { APPLICATION_ACCESS_PLATFORM } from '@/api/enums'
+import type { AccessPlatformDefinition } from './platforms'
 import type { ApplicationAccessConfig } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import { APPLICATION_ACCESS_PLATFORM } from '@/api/enums'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
+import { useApplicationDetailContext } from '../context'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import type { AccessPlatformDefinition } from './platforms'
 import { isSystemResource } from '@/utils/resource-context.ts'
 import perm from '@/permission/index.ts'
 

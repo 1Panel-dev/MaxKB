@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
-import { MsgSuccess } from '@/utils/message'
+import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import PublishHistoryDrawer from '@/views/workflow/components/publish-history/PublishHistoryDrawer.vue'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ButtonToolPublishHistory' })
 

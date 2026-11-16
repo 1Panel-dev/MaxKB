@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
+import type { FormInstance, FormRules } from 'element-plus'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
 import { MsgSuccess } from '@/utils/message'
 

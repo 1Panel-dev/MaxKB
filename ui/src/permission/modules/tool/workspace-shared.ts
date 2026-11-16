@@ -1,7 +1,7 @@
 /** 工作空间「共享工具」按钮权限。 */
 
-import { can } from '../../policy'
 import { PermissionConstants as P } from '../../core'
+import { can } from '../../policy'
 
 const workspace = {
   // —— 系统页不提供 ——

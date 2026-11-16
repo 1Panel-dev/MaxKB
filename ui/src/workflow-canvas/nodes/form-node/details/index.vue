@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
-import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
+import { MkDynamicsForm } from '@/components/mk-dynamics-form'
+import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 
 defineOptions({ name: 'FormNodeDetail' })
 

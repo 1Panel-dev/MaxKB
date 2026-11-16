@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import type { ThemeInfo } from '@/api/admin/auth/types'
-import { LOGIN_METHOD } from '@/api/enums'
 import type { LoginConfig } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
 import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
-import { getThemeImg } from '@/constants/theme'
+import { useAdminLoginService } from '@/views/login/admin-login-service'
 import LoginLayout from '@/views/login/components/LoginLayout.vue'
 import AccountLogin from '@/views/login/modes/AccountLogin.vue'
-import { useAdminLoginService } from '@/views/login/admin-login-service'
+import { getThemeImg } from '@/constants/theme'
 
 type ThemeImageValue = File | string
 type ThemePreviewData = Omit<ThemeInfo, 'icon' | 'loginImage' | 'loginLogo'> & {

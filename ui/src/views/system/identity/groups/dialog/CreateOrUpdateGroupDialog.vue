@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import type { SystemUserGroup } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import type { SystemUserGroup } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 const emit = defineEmits<{ refresh: [group: SystemUserGroup] }>()

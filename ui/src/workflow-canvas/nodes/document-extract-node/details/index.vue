@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
-import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
-import { getFileIconUrl } from '@/utils/icon'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
+import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
+import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
+import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'DocumentExtractNodeDetail' })
 

@@ -1,6 +1,6 @@
+import type { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
 import type { KnowledgeItem } from '@/api/types'
 import type { NodeSearchScopeData } from '@/workflow-canvas/component/node-search-scope/types'
-import type { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
 
 export interface KnowledgeSearchSetting {
   top_n: number

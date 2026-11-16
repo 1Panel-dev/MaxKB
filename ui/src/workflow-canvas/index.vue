@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import { inject, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef } from 'vue'
-import { cloneDeep } from 'lodash'
-import LogicFlow, { type GraphModel } from '@logicflow/core'
+import LogicFlow from '@logicflow/core'
 import { SelectionSelect } from '@logicflow/extension'
+import { cloneDeep } from 'lodash'
+import type { DefaultModelSettingPayload } from '@/api/types'
+import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { ShapeItem } from '@/workflow-canvas/types'
+import type { GraphModel } from '@logicflow/core'
 import AppEdge from '@/workflow-canvas/core/edge/index'
 import LoopEdge from '@/workflow-canvas/core/edge/loop-edge'
 import { initDefaultShortcut } from '@/workflow-canvas/core/shortcut'
 import { disconnectAll, getTeleport } from '@/workflow-canvas/core/teleport'
 import { validateWorkflow } from '@/workflow-canvas/core/validate'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import Dagre from '@/workflow-canvas/plugins/dagre'
-import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
-import type { DefaultModelSettingPayload } from '@/api/types'
+import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import NodeAdd from './component/NodeAdd.vue'
-import NodeSearch from './component/NodeSearch.vue'
 import NodeControl from './component/NodeControl.vue'
+import NodeSearch from './component/NodeSearch.vue'
 defineOptions({ name: 'WorkflowCanvas' })
 
 type CanvasWorkflowNodeModel = WorkflowNodeModel & { set_loop_body?: () => void }

@@ -1,6 +1,7 @@
-import { computed, inject, toValue, type InjectionKey, type MaybeRefOrGetter, type Ref } from 'vue'
-import type { ChatUserProfile } from '@/api/types'
+import { computed, inject, toValue } from 'vue'
 import type { SidePanelMode } from '../core/layout/types'
+import type { ChatUserProfile } from '@/api/types'
+import type { InjectionKey, MaybeRefOrGetter, Ref } from 'vue'
 
 export const VIEW_TYPE = {
   CHAT: 'CHAT',

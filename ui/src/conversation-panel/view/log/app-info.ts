@@ -1,7 +1,7 @@
 /** 对话日志的智能体信息：由 Admin 智能体详情转为对话端 profile 结构。 */
 
-import type { ApplicationDetail } from '@/api/types'
 import type { ConversationAppInfo } from '../../core/types'
+import type { ApplicationDetail } from '@/api/types'
 
 /**
  * 只读日志只回放历史记录：不显示开场白、不发送消息，也不受显示设置影响。

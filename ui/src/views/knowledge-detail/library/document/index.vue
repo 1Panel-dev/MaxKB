@@ -1,50 +1,50 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { CascaderOption, TableColumnCtx } from 'element-plus'
-import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
-import MkEditName from '@/components/mk-edit-name/index.vue'
-import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
-import CommonApi from '@/api/admin/workspace/common'
-import CommonSystemApi from '@/api/admin/system/common'
-import { DOCUMENT_TASK_TYPE } from '@/api/enums'
-import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
-import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
-import { DOCUMENT_STATUS_FILTER_OPTIONS } from './status'
 import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
-import { datetimeFormat } from '@/utils/time'
-import { numberFormat } from '@/utils/number'
-import { toOrderBy, isWorkFlow } from '@/utils/common'
-import { MsgSuccess, MsgWarning } from '@/utils/message'
-import { getFileIconUrl } from '@/utils/icon'
-import { isWorkspaceResource, isWorkspaceSharedResource, isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
-import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
-import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
-import ButtonExecutionRecord from './components/ButtonExecutionRecord.vue'
+import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
+import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
+import type { CascaderOption, TableColumnCtx } from 'element-plus'
+import { DOCUMENT_TASK_TYPE } from '@/api/enums'
+import CommonSystemApi from '@/api/admin/system/common'
+import CommonApi from '@/api/admin/workspace/common'
+import MkEditName from '@/components/mk-edit-name/index.vue'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
-import DocumentStatus from './components/DocumentStatus.vue'
-import DocumentTags from './components/DocumentTags.vue'
 import {
-  BatchEmbeddingAction,
   BatchCancelTaskAction,
+  BatchDocumentTagsAction,
+  BatchEmbeddingAction,
+  BatchExportDocumentAction,
+  BatchGenerateQuestionsAction,
+  BatchSettingDocumentAction,
+  BatchSyncDocumentAction,
+  BatchTokenizeAction,
   DeleteDocumentAction,
   DocumentTagsAction,
-  BatchDocumentTagsAction,
-  EmbeddingDocumentAction,
-  GenerateQuestionsAction,
-  BatchGenerateQuestionsAction,
   DownloadDocumentAction,
+  EmbeddingDocumentAction,
   ExportDocumentAction,
-  BatchExportDocumentAction,
+  GenerateQuestionsAction,
   MigrateDocumentAction,
   ReplaceDocumentAction,
   SettingDocumentAction,
-  BatchSettingDocumentAction,
   SyncDocumentAction,
-  BatchSyncDocumentAction,
   TokenizeDocumentAction,
-  BatchTokenizeAction,
 } from './action-dropdown'
+import ButtonExecutionRecord from './components/ButtonExecutionRecord.vue'
+import DocumentStatus from './components/DocumentStatus.vue'
+import DocumentTags from './components/DocumentTags.vue'
+import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
+import { DOCUMENT_STATUS_FILTER_OPTIONS } from './status'
+import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
+import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
+import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
+import { isWorkFlow, toOrderBy } from '@/utils/common'
+import { getFileIconUrl } from '@/utils/icon'
+import { MsgSuccess, MsgWarning } from '@/utils/message'
+import { numberFormat } from '@/utils/number'
+import { isSystemResource, isSystemSharedResource, isWorkspaceResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import { datetimeFormat } from '@/utils/time'
 import { perm } from '@/permission'
 
 /**

@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed, provide, ref, watch } from 'vue'
 import { cloneDeep, isEqual } from 'lodash'
-import type LogicFlow from '@logicflow/core'
-import { WorkflowNodeType } from '@/workflow-canvas/types'
-import type SharedModelApi from '@/api/admin/system/shared-resources/model'
 import type SystemModelApi from '@/api/admin/system/resource-management/model'
+import type SharedModelApi from '@/api/admin/system/shared-resources/model'
 import type ModelApi from '@/api/admin/workspace/model'
-import ModelProviderApi from '@/api/admin/model-provider'
 import type { DefaultModelSettingPayload, DefaultModelType, ModelConfig, ModelItem, ModelProviderItem } from '@/api/types'
+import type LogicFlow from '@logicflow/core'
+import ModelProviderApi from '@/api/admin/model-provider'
 import SelectModel from '@/components/business/select-model/index.vue'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { MODEL_TYPE_LABELS } from '@/constants/model'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DefaultModelSettingDrawer' })
 

@@ -3,8 +3,8 @@
  * 全局判定，无 workspace / 资源 id；系统页不存在的按钮直接返回 false。
  */
 
-import { canSys } from '../../policy'
 import { PermissionConstants as P, hasEdition } from '../../core'
+import { canSys } from '../../policy'
 import { Edition } from '@/permission/core/common'
 
 const system = {

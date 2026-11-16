@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef, watch } from 'vue'
 import { cloneDeep, set, throttle } from 'lodash'
-import type { FormInstance } from 'element-plus'
 import type { BaseNodeModel } from '@logicflow/core'
-import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
+import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { loopBodyNode, loopStartNode } from '@/workflow-canvas/config/node-data'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowLoopNode' })

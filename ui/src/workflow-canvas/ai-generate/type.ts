@@ -1,6 +1,6 @@
-import type LogicFlow from '@logicflow/core'
 import type { ChatCompletionMessage } from '@/api/types'
 import type { WorkflowMode } from '@/workflow-canvas/types'
+import type LogicFlow from '@logicflow/core'
 
 /**
  * 工作流 AI 生成的类型定义（纯类型）。

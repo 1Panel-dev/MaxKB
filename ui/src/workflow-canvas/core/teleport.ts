@@ -1,6 +1,6 @@
+import { Fragment, Teleport, defineComponent, h, isVue3, markRaw, reactive } from 'vue-demi'
 import type { BaseEdgeModel, BaseNodeModel, GraphModel } from '@logicflow/core'
 import type { Component } from 'vue'
-import { defineComponent, h, reactive, isVue3, Teleport, markRaw, Fragment } from 'vue-demi'
 
 type TeleportNodeModel = BaseNodeModel | BaseEdgeModel
 type TeleportProvide = Record<string | symbol, unknown>

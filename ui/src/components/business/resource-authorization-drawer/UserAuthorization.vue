@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
-import { RESOURCE_PERMISSION } from '@/api/enums'
-import { RESOURCE_PERMISSION_OPTIONS } from '@/constants/resource-authorization'
-import type { Dict, ResourceAuthorizationTargetType, ResourcePermission, ResourceUserPermission } from '@/api/types'
-import MkTable from '@/components/global/mk-table/index.vue'
-import { useStore } from '@/stores'
-import type ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
-import type SystemResourceAuthorizationApi from '@/api/admin/system/resource-management/resource-authorization'
 import type { ResourcePermissionOption } from './types'
+import type SystemResourceAuthorizationApi from '@/api/admin/system/resource-management/resource-authorization'
+import type ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
+import type { Dict, ResourceAuthorizationTargetType, ResourcePermission, ResourceUserPermission } from '@/api/types'
+import { RESOURCE_PERMISSION } from '@/api/enums'
+import MkTable from '@/components/global/mk-table/index.vue'
+import { RESOURCE_PERMISSION_OPTIONS } from '@/constants/resource-authorization'
+import { useStore } from '@/stores'
 
 const props = defineProps<{
   api: typeof ResourceAuthorizationApi | typeof SystemResourceAuthorizationApi

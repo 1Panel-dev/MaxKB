@@ -1,6 +1,6 @@
-import { del, get, post, postStream, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { Dict, DynamicFormField, ModelItem, ModelPayload, ChatCompletionPayload, PromptGeneratePayload } from '@/api/types'
+import type { ChatCompletionPayload, Dict, DynamicFormField, ModelItem, ModelPayload, PromptGeneratePayload } from '@/api/types'
+import { del, get, post, postStream, put } from '../../core/request'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
 
 const prefix = '/system/resource/model'
