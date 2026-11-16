@@ -14758,11 +14758,14 @@ msgstr "Please analyze the content of the video."
 msgid "Please analyze the content of the file."
 msgstr "Please analyze the content of the file."
 
-#: apps/xpack/serializers/channel/aibot/bot_manager.py:548
-#: apps/xpack/serializers/channel/wecom.py:270
-#: apps/xpack/serializers/channel/wecomBot.py:122
+#: apps/xpack/serializers/channel/wecom.py:302
 msgid "Enterprise WeChat user: "
 msgstr "Enterprise WeChat user: "
+
+#: apps/xpack/serializers/channel/aibot/bot_manager.py:493
+#: apps/xpack/serializers/channel/wecomBot.py:132
+msgid "AI bot user: "
+msgstr "AI bot user: "
 
 #: apps/xpack/serializers/channel/chat_manage.py:149
 msgid "The user is not authorized to access this application"

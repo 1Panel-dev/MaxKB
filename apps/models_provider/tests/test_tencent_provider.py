@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.test import SimpleTestCase
 
+from models_provider.base_model_provider import ModelTypeConst
 from models_provider.impl.tencent_model_provider.tencent_model_provider import TencentModelProvider
 
 
@@ -30,3 +31,22 @@ class TencentModelProviderTests(SimpleTestCase):
         self.assertIsInstance(credential, TencentTokenhubSTTModelCredential)
         fields = {item.get("field") for item in credential.to_form_list()}
         self.assertIn("api_key", fields)
+
+    def test_dynamic_classify_vision_as_image(self):
+        # TokenHub 的 /models 不带模态元数据，含 vision 的多模态理解模型应收敛到 IMAGE。
+        for model_id in (
+            "hy-vision-2.0-instruct",
+            "hunyuan-t1-vision-20250916",
+            "deepseek/deepseek-v4-flash-vision-exp",
+        ):
+            self.assertEqual(TencentModelProvider.classify_dynamic_model(model_id), ModelTypeConst.IMAGE)
+
+    def test_dynamic_classify_yt_video_as_itv(self):
+        self.assertEqual(TencentModelProvider.classify_dynamic_model("yt-video-humanactor"), ModelTypeConst.ITV)
+
+    def test_dynamic_classify_vision_video_stays_ttv(self):
+        # 带 video 的视觉模型仍是视频生成任务，不应被误判为视觉模型。
+        self.assertEqual(
+            TencentModelProvider.classify_dynamic_model("hunyuan-turbos-vision-video-20250728"),
+            ModelTypeConst.TTV,
+        )
