@@ -119,6 +119,29 @@ class MiniMaxProviderTest(unittest.TestCase):
         self.assertEqual([m["name"] for m in fallback], [m["name"] for m in builtin])
         self.assertTrue(len(builtin) > 0)
 
+    def test_dynamic_model_list_type_missing_falls_back_to_builtin(self):
+        """官方 /models 未返回所选类型（如 MiniMax 的 TTS/TTI）时，get_model_list 须回退到内置列表。"""
+        from models_provider.base_model_provider import ModelTypeConst
+
+        def fake_get(url, headers=None, timeout=None):
+            resp = Mock()
+            resp.status_code = 200
+            # 官方列表只返回对话模型，不含 TTS（复现 Bug 1：语音合成获取模型返回 data: []）。
+            resp.json.return_value = {"object": "list", "data": [{"id": "MiniMax-M2", "object": "model"}]}
+            return resp
+
+        with patch("models_provider.base_model_provider.requests.get", side_effect=fake_get):
+            # 实时查询（不带内置兜底）对该类型仍应为空。
+            live = self.provider.get_model_list("TTS", api_key="type-missing-key", allow_builtin_fallback=False)
+            # 内置兜底开启时，应返回内置 TTS 模型，而不是空列表。
+            tts = self.provider.get_model_list("TTS", api_key="type-missing-key")
+
+        self.assertEqual(live, [])
+        builtin_tts = self.provider.get_model_list("TTS")
+        self.assertEqual([m["name"] for m in tts], [m["name"] for m in builtin_tts])
+        self.assertTrue(len(tts) > 0)
+        self.assertEqual(tts[0]["model_type"], ModelTypeConst.TTS.name)
+
     def test_current_catalog_and_default(self):
         self.assertEqual(
             [model["name"] for model in self.provider.get_model_list("LLM")],
