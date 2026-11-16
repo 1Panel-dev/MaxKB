@@ -40,8 +40,9 @@ const appInfo = computed(() => (props.application ? toLogAppInfo(props.applicati
 // 只读日志:只读消息列表 + 执行详情,无会话列表、无输入框。
 // 不注入 MESSAGE_LIST_KEY,表单等内容项拿不到发送能力即自动只读。
 const msgs = createLogMessageListStore({
-  // 降序取(最新在前),store 页内 reverse 成正序、上滑加载更旧
-  pageRecords: (cid, p, s) => props.chatLogApi.getChatRecordLog(props.applicationId || '', cid, { currentPage: p, pageSize: s }, false),
+  // 降序取(最新在前),store 页内 reverse 成正序、上滑加载更旧。
+  // 后端分页接口的 order_asc 语义与名称相反：true 或不传为降序，false 为升序
+  pageRecords: (cid, p, s) => props.chatLogApi.getChatRecordLog(props.applicationId || '', cid, { currentPage: p, pageSize: s }, true),
   getChatId: () => props.chatId,
   appInfo,
 })
