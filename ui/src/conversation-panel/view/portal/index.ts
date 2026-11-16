@@ -62,6 +62,7 @@ export function createPortalConversation(options: PortalConversationOptions): Po
     currentApplicationId,
     isApplicationListActive,
     openApplication,
+    clearApplicationConversations: (applicationId) => ConversationApi.clearConversations(applicationId),
     // 跨智能体通过导航激活，等待路由驱动的消息加载结束后再全选分享。
     shareConversation: async (applicationId, chatId) => {
       if (bundle.msgs.loading.value) return false

@@ -93,6 +93,28 @@ const handleClearConversations = () => {
       clearing.value = false
     })
 }
+
+// 清空指定智能体的全部历史对话；若为当前智能体，同步清空会话列表并新建对话。
+const clearGroupConversationLoading = ref(false)
+const handleClearGroupConversations = (group: PortalApplicationGroup) => {
+  if (clearGroupConversationLoading.value) return
+  clearGroupConversationLoading.value = true
+  MsgConfirm('确认清空该智能体的全部历史对话？', '清空后无法恢复。', { confirmButtonText: '清空' })
+    .then(() =>
+      portalList.clearGroupConversations(group.id, () => {
+        if (group.id === currentApplicationId.value) {
+          conversations.value = []
+          switchShared(false)
+          newConversation()
+        }
+      }),
+    )
+    .then(() => MsgSuccess('清空成功'))
+    .catch(() => {})
+    .finally(() => {
+      clearGroupConversationLoading.value = false
+    })
+}
 </script>
 
 <template>
@@ -175,9 +197,9 @@ const handleClearConversations = () => {
                         <span>新建对话</span>
                       </MkDropdownItem>
                       <!-- 删除智能体历史分组，待接入对应接口 -->
-                      <MkDropdownItem divided disabled>
+                      <MkDropdownItem divided @click="handleClearGroupConversations(group)">
                         <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                        <span>删除</span>
+                        <span>清空对话</span>
                       </MkDropdownItem>
                     </MkDropdownMenu>
                   </template>

@@ -56,6 +56,9 @@ const getShareConversation = (shareId: string) => get<ChatShareDetail>(`/share/$
 /** 将语音转换为文字。 */
 const postSpeechToText = (applicationId: string, data: unknown) => post(`${getApplicationPath(applicationId)}/speech_to_text`, data)
 
+/** 清空某个智能体的全部历史对话（当前对话用户）。 */
+const clearConversations = (applicationId: string) => del(`${getApplicationPath(applicationId)}/chat/clear`)
+
 export default {
   putConversationFeedback,
   getConversationOpen,
@@ -71,4 +74,5 @@ export default {
   postShareConversation,
   getShareConversation,
   postSpeechToText,
+  clearConversations,
 }

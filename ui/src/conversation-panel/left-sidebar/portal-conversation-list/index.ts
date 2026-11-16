@@ -19,6 +19,8 @@ export interface PortalConversationListDeps {
   /** 分页获取某个智能体的历史会话，展开分组时刷新。 */
   pageGroupConversations: (applicationId: string, page: number, size: number) => Promise<{ records?: Conversation[] } | null | undefined>
   removeConversation: (applicationId: string, chatId: string) => Promise<unknown>
+  /** 清空某个智能体当前用户的全部历史会话。 */
+  clearApplicationConversations: (applicationId: string) => Promise<unknown>
   /** 当前对话的智能体 ID；门户首页与全部智能体页为空。 */
   currentApplicationId: Readonly<Ref<string>>
   /** 当前是否处于全部智能体页。 */
@@ -45,7 +47,7 @@ const GROUP_CONVERSATION_LIMIT = 20
  * 侧栏展示时以其为准，保证新建、重命名和删除即时生效；其他智能体使用分组接口返回的最近会话。
  */
 export function createPortalConversationListStore(deps: PortalConversationListDeps) {
-  const { pageApplicationConversations, pageApplications, pageGroupConversations, removeConversation, currentApplicationId } = deps
+  const { pageApplicationConversations, pageApplications, pageGroupConversations, removeConversation, clearApplicationConversations, currentApplicationId } = deps
 
   // 历史对话分组
   const applicationGroups = ref<PortalApplicationGroup[]>([])
@@ -100,6 +102,17 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
       group.count = Math.max(0, group.count - 1)
       await completeGroupConversations()
     }
+  }
+
+  // 清空某一智能体的全部历史对话；onCleared 用于同步当前智能体会话列表 Store。
+  const clearGroupConversations = async (applicationId: string, onCleared: () => void) => {
+    await clearApplicationConversations(applicationId)
+    const group = applicationGroups.value.find((applicationGroup) => applicationGroup.id === applicationId)
+    if (group) {
+      group.conversations = []
+      group.count = 0
+    }
+    onCleared()
   }
 
   // 先查询全部分组和会话，再删除，避免边删除边翻页造成记录遗漏。
@@ -176,6 +189,7 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
     shareConversation: deps.shareConversation,
     openApplicationList: deps.openApplicationList,
     newConversation,
+    clearGroupConversations,
   }
 }
 
