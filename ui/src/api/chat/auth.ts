@@ -46,7 +46,8 @@ const postLogin = (loginRequest: ChatLoginRequest, accessToken?: string, savedTo
 /** 使用 LDAP 账号登录；传入 accessToken 时登录到对应应用，否则登录门户。携带本地保存的 token。 */
 const postLdapLogin = (loginRequest: ChatLoginRequest, accessToken?: string, savedToken?: string) => {
   return promise<ChatLoginResponse>(
-    request.post<ApiResponse<ChatLoginResponse>>(accessToken ? `/auth/ldap/login/${accessToken}` : '/auth/ldap/login', loginRequest, {
+    request.post<ApiResponse<ChatLoginResponse>>('/auth/ldap/login', loginRequest, {
+      params: accessToken ? { accessToken } : undefined,
       headers: getSavedTokenHeaders(savedToken),
     }),
   )
