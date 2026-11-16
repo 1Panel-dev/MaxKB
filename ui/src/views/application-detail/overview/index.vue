@@ -50,7 +50,7 @@ const chatBasePath = CHAT_API_BASE_PATH.replace(/\/api$/, '')
 
 const apiDocUrl = new URL(`${CHAT_API_BASE_PATH}-doc/`, window.location.origin).href
 const apiQuery=computed(()=>{
-const query=application.value?.work_flow?.nodes?.find(n=>n.id==='base-node')?.properties?.api_input_field_list.map((f:any)=>{
+const query=application.value?.work_flow?.nodes?.find(n=>n.id==='base-node')?.properties?.api_input_field_list?.map((f:any)=>{
   return `${f.variable}=${f.default_value}`
 }).join('&')
 if(query){
