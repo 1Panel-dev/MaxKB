@@ -154,6 +154,9 @@ def _initialize_model_info():
     ]
     tencent_embedding_model_info = model_info_embedding_list[0]
 
+    # STT 默认模型：未选择基础模型时 model_form 依赖该默认凭证表单，避免返回“模型不支持”。
+    model_info_stt_list = [info for info in model_info_list if info.model_type == ModelTypeConst.STT.name]
+
     model_info_vision_list = [
         _create_model_info(
             "hunyuan-vision",
@@ -214,6 +217,7 @@ def _initialize_model_info():
         .append_model_info_list(model_info_itv_list)
         .append_default_model_info(model_info_itv_list[0])
         .append_default_model_info(model_info_list[0])
+        .append_default_model_info(model_info_stt_list[0])
         .append_default_model_info(tencent_embedding_model_info)
         .build()
     )

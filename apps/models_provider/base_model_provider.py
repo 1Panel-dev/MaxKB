@@ -123,8 +123,12 @@ class IModelProvider(ABC):
         if api_key or credential:
             manage = self._get_dynamic_manage_cached(api_key, api_base, credential)
             if manage is not None:
-                return manage.get_model_list_by_model_type(model_type)
-            if not allow_builtin_fallback:
+                dynamic_list = manage.get_model_list_by_model_type(model_type)
+                # 官方实时列表里没有该类型的模型时，按 allow_builtin_fallback 决定是否
+                # 回退到内置列表；否则返回空列表，交由视图继续走缓存/内置兜底。
+                if dynamic_list or not allow_builtin_fallback:
+                    return dynamic_list
+            elif not allow_builtin_fallback:
                 return []
         return self.get_model_info_manage().get_model_list_by_model_type(model_type)
 
