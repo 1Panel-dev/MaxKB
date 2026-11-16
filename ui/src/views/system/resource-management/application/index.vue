@@ -8,6 +8,7 @@ import SystemWorkspaceApi from '@/api/admin/system/workspace'
 import SystemResourceTriggerApi from '@/api/admin/system/resource-management/resource-trigger'
 import type { ApplicationDetail, Dict, OptionItem } from '@/api/types'
 import { APPLICATION_TYPE } from '@/api/enums'
+import { CHAT_API_BASE_PATH } from '@/api/constants'
 import { useStore } from '@/stores'
 import { datetimeFormat } from '@/utils/time'
 import { isWorkFlow, toOrderBy } from '@/utils/common'
@@ -24,6 +25,24 @@ import perm from '@/permission'
 
 const { auth } = useStore()
 const router = useRouter()
+const chatBasePath = CHAT_API_BASE_PATH.replace(/\/api$/, '')
+
+function apiQuery(application: ApplicationDetail) {
+  const query = application?.work_flow?.nodes?.find(n => n.id === 'base-node')?.properties?.api_input_field_list.map((f: any) => {
+    return `${f.variable}=${f.default_value}`
+  }).join('&')
+  if (query) {
+    return '?' + query
+  }
+  return ''
+}
+
+function toChat(application: ApplicationDetail) {
+  return SystemResourceApplicationApi.getAccessToken(application.id).then((ok) => {
+    const accessUrl = ok.access_token ? `${window.location.origin}${chatBasePath}/${ok.access_token}/${apiQuery(application)}` : ''
+    window.open(accessUrl, '_blank')
+  })
+}
 
 function handleOpenApplication(application: ApplicationDetail) {
   void router.push({ name: 'system-resource-application-detail', params: { applicationId: application.id, type: application.type } })
@@ -176,9 +195,9 @@ onMounted(() => {
         <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
-              <!-- TODO：对话 -->
+              <!-- 去对话 -->
               <MkTooltip content="去对话">
-                <el-button text type="primary">
+                <el-button text type="primary" @click="toChat(row)">
                   <MkIcon name="icon_new-chat_outlined" />
                 </el-button>
               </MkTooltip>
