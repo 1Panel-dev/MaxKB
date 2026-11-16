@@ -118,7 +118,7 @@ function loadResources() {
   })
 }
 function handleNavigate(card: HomeResourceCard) {
-  if (card.disabled) return
+  if (loading.value || card.disabled) return
   router.push({ name: card.route, params: { workspaceId: props.workspaceId } })
 }
 onMounted(loadResources)
@@ -126,7 +126,7 @@ defineExpose({ refresh: loadResources })
 </script>
 <template>
   <section>
-    <div v-loading="loading" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <template v-for="card in resourceGroups" :key="card.route">
         <!-- 进入未禁用资源的列表 -->
         <el-card
@@ -135,29 +135,31 @@ defineExpose({ refresh: loadResources })
           :style="{ color: card.color, backgroundImage: `linear-gradient(to bottom, ${card.color}0A 0%, #FFFFFF 40%, #FFFFFF 100%)` }"
           @click="handleNavigate(card)"
         >
-          <div class="flex-between text-N900">
-            <div>
-              <p class="text-N600 mb-1">{{ card.label }}</p>
-              <p class="text-3xl leading-9.5 font-semibold tabular-nums">{{ toThousands(card.total) }}</p>
+          <el-skeleton :loading="loading" animated>
+            <div class="flex-between text-N900">
+              <div>
+                <p class="text-N600 mb-1">{{ card.label }}</p>
+                <p class="text-3xl leading-9.5 font-semibold tabular-nums">{{ toThousands(card.total) }}</p>
+              </div>
+
+              <el-avatar
+                shape="square"
+                :size="44"
+                :style="{ color: card.color, backgroundColor: `${card.color}14`, '--el-avatar-border-radius': '12px' }"
+              >
+                <MkIcon :name="card.icon" :size="26" />
+              </el-avatar>
             </div>
 
-            <el-avatar
-              shape="square"
-              :size="44"
-              :style="{ color: card.color, backgroundColor: `${card.color}14`, '--el-avatar-border-radius': '12px' }"
-            >
-              <MkIcon :name="card.icon" :size="26" />
-            </el-avatar>
-          </div>
-
-          <div class="flex mt-4 gap-4">
-            <template v-for="[label, value] in card.details" :key="String(label)">
-              <div class="min-w-0 flex-1">
-                <p class="text-N600">{{ label }}</p>
-                <h2 class="mt-1 text-N900">{{ toThousands(value) }}</h2>
-              </div>
-            </template>
-          </div>
+            <div class="flex mt-4 gap-4">
+              <template v-for="[label, value] in card.details" :key="String(label)">
+                <div class="min-w-0 flex-1">
+                  <p class="text-N600">{{ label }}</p>
+                  <h2 class="mt-1 text-N900">{{ toThousands(value) }}</h2>
+                </div>
+              </template>
+            </div>
+          </el-skeleton>
         </el-card>
       </template>
     </div>

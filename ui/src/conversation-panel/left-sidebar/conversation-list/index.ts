@@ -25,6 +25,7 @@ export function createConversationListStore(deps: ConversationListDeps) {
 
   // 历史会话分页
   const conversations = ref<Conversation[]>([])
+  const initialLoading = ref(true)
   const pageSize = 50
   const currentPage = ref(1)
   const hasMore = ref(true)
@@ -45,6 +46,8 @@ export function createConversationListStore(deps: ConversationListDeps) {
       hasMore.value = records.length >= pageSize
     } catch {
       // 部分模式可能不提供历史接口，加载失败时保留现有列表和分页状态。
+    } finally {
+      initialLoading.value = false
     }
   }
 
@@ -110,6 +113,7 @@ export function createConversationListStore(deps: ConversationListDeps) {
     switchShared,
     bindLeftSideMode,
     conversations,
+    initialLoading,
     currentChatId,
     currentConversation,
     appInfo,

@@ -86,5 +86,3 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
   </ReverseInfiniteScroll>
   <ShareFooter v-if="isShared" />
 </template>
-
-<style scoped lang="scss"></style>

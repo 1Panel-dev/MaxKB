@@ -32,7 +32,8 @@ function getRecordPercentage(record: HomeRankingRecord) {
         <MkIcon name="icon_right_outlined" />
       </el-button>
     </div>
-    <MkEmpty v-if="!loading && !records?.length" :image-size="80" />
+    <el-skeleton v-if="loading" :rows="7" animated />
+    <MkEmpty v-else-if="!records?.length" :image-size="80" />
     <div v-else class="space-y-6">
       <template v-for="(record, index) in records" :key="index">
         <div class="flex-between gap-3">

@@ -25,7 +25,7 @@ const shareLink = useShareLinkStoreOptional()
 const showShare = useShowShare()
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value && !msgs.loading.value)
 
-const { appInfo, conversations, currentChatId, selectConversation, newConversation, deleteChat, toggleLeftSide, hasMore, loadMore } =
+const { appInfo, conversations, initialLoading, currentChatId, selectConversation, newConversation, deleteChat, toggleLeftSide, hasMore, loadMore } =
   useConversationListStore()
 
 // 非当前会话先激活并加载消息，避免分享到其他会话。
@@ -99,7 +99,8 @@ function handleClearConversations() {
 
     <!-- 历史列表独立滚动，应用信息和新建入口保持固定。 -->
     <el-scrollbar class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
-      <div v-if="conversations.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
+      <el-skeleton v-if="initialLoading" animated />
+      <div v-else-if="conversations.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
       <div v-else class="space-y-1">
         <template v-for="conversation in conversations" :key="conversation.id">
           <MkListItem :active="currentChatId === conversation.id" @click="selectConversation(conversation.id)">

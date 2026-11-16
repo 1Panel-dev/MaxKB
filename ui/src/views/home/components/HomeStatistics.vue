@@ -81,31 +81,33 @@ watch(() => [props.workspaceId, props.applicationId], loadMonitoring, { immediat
         <slot name="application" :loading="loading" />
       </div>
     </div>
-    <div v-loading="loading" class="min-h-40">
+    <div class="min-h-40">
       <div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <template v-for="metric in metrics" :key="metric.id">
           <el-card shadow="never">
-            <p class="text-N600">{{ metric.title }}</p>
-            <div class="mt-1 flex-align-center gap-4 tabular-nums">
-              <template v-if="metric.id === 'feedback'">
-                <template v-for="(series, index) in metric.series" :key="series.name">
-                  <div class="flex-align-center gap-2" :title="series.name">
-                    <MkIcon
-                      :name="index === 0 ? 'icon_thumbsup_filled' : 'icon_thumbdown_filled'"
-                      class="shrink-0"
-                      :class="index === 0 ? 'text-[#FFC60A]!' : 'text-danger!'"
-                    />
-                    <h2>{{ numberFormat(series.total) }}</h2>
-                  </div>
+            <el-skeleton :loading="loading" :rows="1" animated>
+              <p class="text-N600">{{ metric.title }}</p>
+              <div class="mt-1 flex-align-center gap-4 tabular-nums">
+                <template v-if="metric.id === 'feedback'">
+                  <template v-for="(series, index) in metric.series" :key="series.name">
+                    <div class="flex-align-center gap-2" :title="series.name">
+                      <MkIcon
+                        :name="index === 0 ? 'icon_thumbsup_filled' : 'icon_thumbdown_filled'"
+                        class="shrink-0"
+                        :class="index === 0 ? 'text-[#FFC60A]!' : 'text-danger!'"
+                      />
+                      <h2>{{ numberFormat(series.total) }}</h2>
+                    </div>
+                  </template>
                 </template>
-              </template>
-              <template v-else>
-                <h2>
-                  {{ metric.id === 'tokens' ? formatTokenNumber(metric.series[0]?.total) : numberFormat(metric.series[0]?.total) }}
-                </h2>
-                <h6 v-if="metric.id === 'activeUsers'" class="-ml-1 text-danger" title="新增用户">+{{ numberFormat(metric.series[1]?.total) }}</h6>
-              </template>
-            </div>
+                <template v-else>
+                  <h2>
+                    {{ metric.id === 'tokens' ? formatTokenNumber(metric.series[0]?.total) : numberFormat(metric.series[0]?.total) }}
+                  </h2>
+                  <h6 v-if="metric.id === 'activeUsers'" class="-ml-1 text-danger" title="新增用户">+{{ numberFormat(metric.series[1]?.total) }}</h6>
+                </template>
+              </div>
+            </el-skeleton>
           </el-card>
         </template>
       </div>
@@ -113,7 +115,9 @@ watch(() => [props.workspaceId, props.applicationId], loadMonitoring, { immediat
         <template v-for="metric in metrics" :key="metric.id">
           <el-card shadow="never">
             <h4>{{ metric.title }}</h4>
+            <el-skeleton v-if="loading" animated class="h-89 mt-4" :rows="8" />
             <MkLineChart
+              v-else
               :value-formatter="metric.id === 'tokens' ? formatTokenNumber : numberFormat"
               class="-mt-6"
               :option="{ xData: days, yData: metric.series }"
