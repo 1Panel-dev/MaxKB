@@ -65,7 +65,7 @@ function handleRemoveMember(member: RoleMember) {
 /* 批量删除成员 */
 const batchSelectedMembers = ref<RoleMember[]>([])
 function handleBatchDelete() {
-  MsgConfirm(`是否删除选中的 ${batchSelectedMembers.value.length} 个成员？`, '')
+  MsgConfirm(`是否移除选中的 ${batchSelectedMembers.value.length} 个成员？`, '', { confirmButtonText: '移除' })
     .then(() => {
       loading.value = true
       const memberIds = batchSelectedMembers.value.map((member) => member.user_relation_id)
