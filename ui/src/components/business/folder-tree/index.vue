@@ -10,7 +10,7 @@ import ResourceAuthorizationDrawer from '@/components/business/resource-authoriz
 import FolderFormDialog from './FolderFormDialog.vue'
 import VirtualizedTree from './VirtualizedTree.vue'
 import { FOLDER_SORT } from './types'
-import { FOLDER_ENTRY_ID, getFolderEntry } from '@/constants/folder'
+import { FOLDER_ENTRY_ID } from '@/constants/folder'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { getWorkspaceId } from '@/utils/resource-context'
@@ -54,16 +54,29 @@ if (props.showAll && typeof routeFolderId === 'string' && routeFolderId) current
 
 const emit = defineEmits<{ loaded: [folder?: FolderItem]; select: [folder: FolderItem] }>()
 
-const rootFolderEntry = computed(() => {
-  const entry = getFolderEntry(props.source, 'all', t)
+const folderEntryKeys = {
+  [RESOURCE_TYPE.APPLICATION]: { all: 'application.categories.all', shared: 'application.categories.shared' },
+  [RESOURCE_TYPE.KNOWLEDGE]: { all: 'knowledge.categories.all', shared: 'knowledge.categories.shared' },
+  [RESOURCE_TYPE.TOOL]: { all: 'tool.categories.all', shared: 'tool.categories.shared' },
+} as const satisfies Record<FolderSource, { all: string; shared: string }>
+
+const folderEntries = computed(() => {
+  const keys = folderEntryKeys[props.source]
   return {
-    id: entry.id,
-    get name() {
-      return props.rootLabel || entry.name
+    all: {
+      id: FOLDER_ENTRY_ID.ALL,
+      get name() {
+        return props.rootLabel || t(keys.all)
+      },
+    },
+    shared: {
+      id: FOLDER_ENTRY_ID.SHARED,
+      get name() {
+        return t(keys.shared)
+      },
     },
   }
 })
-const sharedFolderEntry = computed(() => getFolderEntry(props.source, 'shared', t))
 
 interface SelectableFolderItem extends Omit<FolderItem, 'children'> {
   children?: SelectableFolderItem[]
@@ -234,7 +247,7 @@ const formTitleKey = ref('folder.actions.create')
 
 function handleOpenCreateFolder() {
   formTitleKey.value = 'folder.actions.create'
-  folderFormDialogRef.value?.open(workspaceId ?? rootFolderEntry.value.id)
+  folderFormDialogRef.value?.open(workspaceId ?? folderEntries.value.all.id)
 }
 
 function handleOpenCreateChildFolder(folder: FolderItem) {
@@ -304,10 +317,10 @@ function findFolderById(folders: FolderItem[], folderId: string): FolderItem | u
 }
 
 function resolveCurrentFolder() {
-  if (currentNodeKey.value === FOLDER_ENTRY_ID.ALL && props.showAll) return rootFolderEntry.value
-  if (currentNodeKey.value === FOLDER_ENTRY_ID.SHARED && props.showShared) return sharedFolderEntry.value
+  if (currentNodeKey.value === FOLDER_ENTRY_ID.ALL && props.showAll) return folderEntries.value.all
+  if (currentNodeKey.value === FOLDER_ENTRY_ID.SHARED && props.showShared) return folderEntries.value.shared
 
-  return findFolderById(folderTreeData.value, currentNodeKey.value) ?? (props.showAll ? rootFolderEntry.value : sortTreeData.value[0])
+  return findFolderById(folderTreeData.value, currentNodeKey.value) ?? (props.showAll ? folderEntries.value.all : sortTreeData.value[0])
 }
 
 function getFolderDeleteContext(folder: FolderItem) {
@@ -327,7 +340,7 @@ function getFolderDeleteContext(folder: FolderItem) {
 
   if (!findFolderById([deletedFolder], currentNodeKey.value)) return { positionCache }
   if (parentId !== FOLDER_ENTRY_ID.ALL) {
-    const targetFolder = findFolderById(folderTreeData.value, parentId) ?? rootFolderEntry.value
+    const targetFolder = findFolderById(folderTreeData.value, parentId) ?? folderEntries.value.all
     return { positionCache, targetFolder }
   }
 
@@ -335,7 +348,7 @@ function getFolderDeleteContext(folder: FolderItem) {
   const siblingFolders = sortTreeData.value
   const folderIndex = siblingFolders.findIndex(({ id }) => id === deletedFolder.id)
   const targetFolder =
-    folderIndex < 0 ? rootFolderEntry.value : (siblingFolders[folderIndex + 1] ?? siblingFolders[folderIndex - 1] ?? rootFolderEntry.value)
+    folderIndex < 0 ? folderEntries.value.all : (siblingFolders[folderIndex + 1] ?? siblingFolders[folderIndex - 1] ?? folderEntries.value.all)
   return { positionCache, targetFolder }
 }
 
@@ -412,17 +425,17 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
 
     <div v-if="showShared || showAll" class="px-4 mb-1">
       <div v-if="showShared">
-        <MkListItem :active="currentNodeKey === sharedFolderEntry.id" @click="handleFolderClick(sharedFolderEntry)">
-          <MkIcon :name="currentNodeKey === sharedFolderEntry.id ? 'icon_folder-share_filled' : 'icon_folder_outlined'" :size="18" class="mr-2" />
-          <span>{{ sharedFolderEntry.name }}</span>
+        <MkListItem :active="currentNodeKey === folderEntries.shared.id" @click="handleFolderClick(folderEntries.shared)">
+          <MkIcon :name="currentNodeKey === folderEntries.shared.id ? 'icon_folder-share_filled' : 'icon_folder_outlined'" :size="18" class="mr-2" />
+          <span>{{ folderEntries.shared.name }}</span>
         </MkListItem>
 
         <el-divider class="my-1!" />
       </div>
 
-      <MkListItem v-if="showAll" :active="currentNodeKey === rootFolderEntry.id" @click="handleFolderClick(rootFolderEntry)">
-        <MkIcon :name="currentNodeKey === rootFolderEntry.id ? 'icon_card_filled' : 'icon_card_outlined'" :size="18" class="mr-2" />
-        <span>{{ rootFolderEntry.name }}</span>
+      <MkListItem v-if="showAll" :active="currentNodeKey === folderEntries.all.id" @click="handleFolderClick(folderEntries.all)">
+        <MkIcon :name="currentNodeKey === folderEntries.all.id ? 'icon_card_filled' : 'icon_card_outlined'" :size="18" class="mr-2" />
+        <span>{{ folderEntries.all.name }}</span>
       </MkListItem>
     </div>
 

@@ -26,7 +26,7 @@ import {
 import ButtonBatchCleanStrategy from './components/ButtonBatchCleanStrategy.vue'
 import ButtonCreateApplication from './components/ButtonCreateApplication.vue'
 import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
-import { FOLDER_ENTRY_ID, getFolderEntry } from '@/constants/folder'
+import { FOLDER_ENTRY_ID } from '@/constants/folder'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
@@ -36,22 +36,18 @@ const route = useRoute()
 const router = useRouter()
 
 /* 当前文件夹 */
-const allApplicationsFolder = computed(() => getFolderEntry(RESOURCE_TYPE.APPLICATION, 'all', t))
 const currentFolderId = ref<string>(FOLDER_ENTRY_ID.ALL)
-const currentFolder = ref<FolderItem>(allApplicationsFolder.value)
+const selectedFolder = ref<FolderItem>()
+const currentFolder = computed<FolderItem>(() => selectedFolder.value ?? { id: FOLDER_ENTRY_ID.ALL, name: t('application.categories.all') })
 
-function handleFolderSelect(folder: FolderItem) {
-  const folderChanged = folder.id !== currentFolder.value.id
-  currentFolderId.value = folder.id
-  currentFolder.value = folder
-  if (folderChanged) {
+function handleFolderSelect(folder?: FolderItem) {
+  const previousFolderId = currentFolder.value.id
+  selectedFolder.value = folder
+  currentFolderId.value = currentFolder.value.id
+  if (previousFolderId !== currentFolderId.value) {
     cancelBatchSelection()
     refreshApplications()
   }
-}
-
-function handleFolderLoaded(folder?: FolderItem) {
-  handleFolderSelect(folder ?? allApplicationsFolder.value)
 }
 
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
@@ -216,7 +212,7 @@ function handleBatchDelete() {
         :source="RESOURCE_TYPE.APPLICATION"
         :show-shared="false"
         draggable
-        @loaded="handleFolderLoaded"
+        @loaded="handleFolderSelect"
         @select="handleFolderSelect"
       />
     </template>

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import type { ApplicationRankingKind, HomeDateRange, HomeRankingRecord } from '@/api/types'
-import type { MkDateRangeValue } from '@/components/mk-date-range/types'
-import MkDateRange from '@/components/mk-date-range/index.vue'
+import type { MkDateRangeValue } from '@/components/global/mk-date-range/types'
 import { useApplicationDetailContext } from '../../context'
 import { formatTokenNumber, numberFormat } from '@/utils/number'
 import { isSystemResource } from '@/utils/resource-context'

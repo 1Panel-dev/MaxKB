@@ -2,7 +2,6 @@
 import { nextTick, ref, watch } from 'vue'
 import type { ProblemItem, ProblemParagraph } from '@/api/types'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
-import MkEditName from '@/components/mk-edit-name/index.vue'
 import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { getFileUrl } from '@/utils/common'

@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import type { ChatLog, ChatLogSource, Dict, OptionItem } from '@/api/types'
-import type { MkDateRangeValue } from '@/components/mk-date-range/types'
+import type { MkDateRangeValue } from '@/components/global/mk-date-range/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { TableColumnCtx } from 'element-plus'
-import MkDateRange from '@/components/mk-date-range/index.vue'
 import { useApplicationDetailContext } from '../context'
 import ChatLogDetailDrawer from './ChatLogDetailDrawer.vue'
 import ButtonAddKnowledge from './add-knowledge/ButtonAddKnowledge.vue'

@@ -301,7 +301,7 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 `FileUploadSettingData`，确认时校验上传方式必填；节点写回后发送 `refreshFileUploadConfig`
 刷新开始节点文件变量。
 
-文件类型与其他文件选择复用手动导入的 `MkCardCheckbox`；扩展名编辑复用非全局组件
+文件类型与其他文件选择复用全局组件 `MkCardCheckbox`；扩展名编辑复用非全局组件
 `MkTagsEdit`，通过 `v-model` 编辑草稿的 `otherExtensions`，文件类型中已有的扩展名通过
 `presetExtensions` 传入用于重复检查。扩展名去除前导点、转大写与重复检查由 `MkTagsEdit` 内部统一处理，
 调用方无需传入格式化函数。组件内部阻止点击冒泡，避免增删扩展名时切换文件类型；

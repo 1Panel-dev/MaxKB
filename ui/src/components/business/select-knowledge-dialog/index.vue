@@ -10,9 +10,8 @@ import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import SharedKnowledgeApi from '@/api/admin/workspace/shared/knowledge/knowledge'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
-import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
 import KnowledgeCard from '@/views/knowledge/knowledge-card/KnowledgeCard.vue'
-import { FOLDER_ENTRY_ID, getFolderEntry } from '@/constants/folder'
+import { FOLDER_ENTRY_ID } from '@/constants/folder'
 import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -24,7 +23,8 @@ const visible = ref(false)
 const loading = ref(false)
 const searchKeyword = ref('')
 const appliedSearchKeyword = ref('')
-const currentFolder = ref<FolderItem>(getFolderEntry(RESOURCE_TYPE.KNOWLEDGE, 'all', t))
+const selectedFolder = ref<FolderItem>()
+const currentFolder = computed<FolderItem>(() => selectedFolder.value ?? { id: FOLDER_ENTRY_ID.ALL, name: t('knowledge.categories.all') })
 const knowledgeOptions = ref<KnowledgeItem[]>([])
 const selectedKnowledge = ref<(Partial<KnowledgeItem> & { id: string })[]>([])
 const knowledgeLayoutRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>('knowledgeLayoutRef')
@@ -86,7 +86,7 @@ function refreshResources() {
 
 function selectFolder(folder?: FolderItem) {
   if (!folder || folder.id === currentFolder.value.id) return
-  currentFolder.value = folder
+  selectedFolder.value = folder
   void refreshKnowledge()
 }
 
@@ -104,7 +104,7 @@ function resetData() {
   loading.value = false
   searchKeyword.value = ''
   appliedSearchKeyword.value = ''
-  currentFolder.value = getFolderEntry(RESOURCE_TYPE.KNOWLEDGE, 'all', t)
+  selectedFolder.value = undefined
   knowledgeOptions.value = []
   selectedKnowledge.value = []
 }

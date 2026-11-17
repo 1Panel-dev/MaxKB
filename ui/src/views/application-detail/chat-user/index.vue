@@ -4,7 +4,6 @@ import type { ChatUserAuthorization, ChatUserAuthorizationGroup, ChatUserAuthori
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { CheckboxValueType } from 'element-plus'
 import { LOGIN_METHOD, RESOURCE_TYPE } from '@/api/enums'
-import MkSearchList from '@/components/mk-search-list/index.vue'
 import { useApplicationDetailContext } from '../context'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'

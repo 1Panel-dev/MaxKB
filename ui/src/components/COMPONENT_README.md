@@ -471,11 +471,45 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 新行包含业务 ID 时，`default-item` 应传工厂函数，在每次点击添加时生成新 ID；普通无 ID 数据
 仍可传默认对象。
 
-## 手动导入的共享 UI
+### MkDateRange
+
+位于 `global/mk-date-range/index.vue`，模板中直接使用；事件类型 `MkDateRangeValue` 从
+`@/components/global/mk-date-range/types` 显式导入。
+
+组合日期预设下拉框和自定义日期区间选择器。默认显示“过去 7 天”，仅在用户修改筛选条件时通过
+`change` 返回 `{ startTime, endTime }`；组件挂载时不主动触发 `change`。预设日期的 `endTime` 为
+当前日期（`YYYY-MM-DD`）；自定义日期缺少结束日期时同样使用当前日期，清空时开始日期为空。组件不绑定具体接口字段，使用方负责初始化
+默认查询参数，并将筛选结果映射为业务查询参数。
+`defaultValue` 接收 `{ startTime, endTime }`，仅在挂载时回填：匹配预设范围时选中对应预设，
+否则显示自定义日期。切换到自定义时保留当前范围，不立即触发查询，选定日期后触发 `change`。
+
+### MkSearchList
+
+位于 `global/mk-search-list/index.vue`，模板中直接使用，放在有明确高度的纵向 Flex 容器中。
+`v-model` 为搜索词；`data` 传全量数组，默认按 `name` 忽略大小写与首尾空格过滤，以 `id` 识别行。
+`props.label` / `props.value` 可映射字段，唯一值不能重复。`defaultActive` 设置选中值，后续变更也会同步。
+设置 `remote` 后不做前端过滤，输入（含清空）停止 300ms 后触发 `search(keyword)`（去除首尾空格），由调用方请求并更新 `data`、管理 loading。
+每批渲染 50 条，搜索或数据变化重置滚动位置；这是前端分批渲染，不替代接口分页。
+
+默认插槽提供 `{ row, index, active }`。`action`、`action-dropdown` 的
+参数与优先级沿用 `MkListItem`，下拉直接放 `MkDropdownItem`。`click(row, index)` 返回原始行。
+`empty` 可自定义空态；默认空数据使用 `emptyText`（“暂无数据”），有搜索词时显示“没有找到相关内容”。
+
+### MkCardCheckbox
+
+卡片式复选组件，位于 `global/mk-card-checkbox/index.vue`，模板中直接使用。
+通过布尔 `v-model` 管理选中状态，`label` 必填并作为复选框的无障碍名称；`disabled` 禁止切换。
+默认插槽放置图标、标题、描述等内容。卡片统一维护悬停阴影、选中边框及右侧复选框，
+点击卡片或复选框均更新一次 `v-model` 并触发 `change(checked)`；复选框保留原生键盘操作。
+插槽中的输入框、按钮等独立交互区域使用 `@click.stop`，避免操作时切换卡片。
+其余卡片属性和样式通过 `$attrs` 透传到 `el-card`。
+知识库、工具（含 Skills）、智能体选择弹窗，以及动态表单配置器的添加知识库列表统一使用
+该组件。集合选择通过 `:model-value` 与 `@update:model-value` 接入原有业务选择逻辑，
+保留筛选、跨目录选择和已选快照；不要同时监听 `change` 重复更新同一集合。
 
 ### MkEditName（行内编辑名称）
 
-手动导入 `@/components/mk-edit-name/index.vue`，不全局注册。必填 `v-model` 保存已生效名称，
+位于 `global/mk-edit-name/index.vue`，模板中直接使用。必填 `v-model` 保存已生效名称，
 必填 `save(name): Promise<string>` 由调用方执行业务请求并返回最终保存的名称；失败必须 reject，
 不可吞掉错误后当作成功返回。组件不调用业务 API，仅在保存成功后回写模型。
 
@@ -494,6 +528,8 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 表格通过列默认插槽使用，列表以资源 ID 为 key；该列不再启用 `show-overflow-tooltip`，避免编辑时
 叠加表格提示。单元格可用宽度控制组件宽度，业务图标在编辑态隐藏。
+
+## 手动导入的共享 UI
 
 ### MkEditAvatar（修改头像）
 
@@ -537,18 +573,6 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 已有数据不自动改写，新添加的后缀按上述格式保存。添加按钮和输入提示固定为“添加后缀名”。
 组件内部维护输入框显隐与自动聚焦，根节点阻止点击冒泡；外部间距通过 `class` 设置。
 
-### MkCardCheckbox
-
-卡片式复选组件，手动导入 `@/components/mk-card-checkbox/index.vue`，不参与全局注册。
-通过布尔 `v-model` 管理选中状态，`label` 必填并作为复选框的无障碍名称；`disabled` 禁止切换。
-默认插槽放置图标、标题、描述等内容。卡片统一维护悬停阴影、选中边框及右侧复选框，
-点击卡片或复选框均更新一次 `v-model` 并触发 `change(checked)`；复选框保留原生键盘操作。
-插槽中的输入框、按钮等独立交互区域使用 `@click.stop`，避免操作时切换卡片。
-其余卡片属性和样式通过 `$attrs` 透传到 `el-card`。
-知识库、工具（含 Skills）、智能体选择弹窗，以及动态表单配置器的添加知识库列表统一使用
-该组件。集合选择通过 `:model-value` 与 `@update:model-value` 接入原有业务选择逻辑，
-保留筛选、跨目录选择和已选快照；不要同时监听 `change` 重复更新同一集合。
-
 ### LogoFull、LogoIcon
 
 `LogoFull` 展示带产品名称的完整 Logo，`LogoIcon` 展示不带产品名称的图形 Logo，使用时分别从
@@ -571,15 +595,6 @@ Logo 数据统一从 Theme Store 获取。
 `yData` 使用 ECharts 折线系列配置，可传 `name`、`data`、`smooth` 等。默认开启面积填充，
 透明度为 `0.05`；`area: false` 可关闭默认填充，显式 `areaStyle` 可覆盖默认配置。尺寸属性与基础容器一致。
 标题由页面展示；内置图例、坐标轴与提示，两条及以上系列显示图例，单条隐藏。`valueFormatter` 默认使用 `numberFormat`，Tokens 图表传入 `formatTokenNumber`，当前图表颜色直接使用固定颜色值，不跟随主题切换。
-
-### MkDateRange
-
-组合日期预设下拉框和自定义日期区间选择器。默认显示“过去 7 天”，仅在用户修改筛选条件时通过
-`change` 返回 `{ startTime, endTime }`；组件挂载时不主动触发 `change`。预设日期的 `endTime` 为
-当前日期（`YYYY-MM-DD`）；自定义日期缺少结束日期时同样使用当前日期，清空时开始日期为空。组件不绑定具体接口字段，使用方负责初始化
-默认查询参数，并将筛选结果映射为业务查询参数。
-`defaultValue` 接收 `{ startTime, endTime }`，仅在挂载时回填：匹配预设范围时选中对应预设，
-否则显示自定义日期。切换到自定义时保留当前范围，不立即触发查询，选定日期后触发 `change`。
 
 ### MkDragUpload
 
@@ -646,18 +661,6 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 文本，空白或无效 JSON 提示“请输入正确的 JSON 格式”；外层 `rules` 接入该方法后，表单提交
 也会检查语法。无法解析的输入不会覆盖最后一次有效的 `v-model` 值，不要直接对已经解析的
 `value` 再调用 `JSON.parse(value)`。必填等业务规则继续放在外层表单项。
-
-### MkSearchList
-
-手动导入 `mk-search-list/index.vue`，放在有明确高度的纵向 Flex 容器中。
-`v-model` 为搜索词；`data` 传全量数组，默认按 `name` 忽略大小写与首尾空格过滤，以 `id` 识别行。
-`props.label` / `props.value` 可映射字段，唯一值不能重复。`defaultActive` 设置选中值，后续变更也会同步。
-设置 `remote` 后不做前端过滤，输入（含清空）停止 300ms 后触发 `search(keyword)`（去除首尾空格），由调用方请求并更新 `data`、管理 loading。
-每批渲染 50 条，搜索或数据变化重置滚动位置；这是前端分批渲染，不替代接口分页。
-
-默认插槽提供 `{ row, index, active }`。`action`、`action-dropdown` 的
-参数与优先级沿用 `MkListItem`，下拉直接放 `MkDropdownItem`。`click(row, index)` 返回原始行。
-`empty` 可自定义空态；默认空数据使用 `emptyText`（“暂无数据”），有搜索词时显示“没有找到相关内容”。
 
 ### MkDynamicsForm、MkDynamicsFormConstructor
 

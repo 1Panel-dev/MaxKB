@@ -32,7 +32,7 @@ import {
   ToolWorkflowAction,
   TriggerToolAction,
 } from './tool-card/action-dropdown'
-import { FOLDER_ENTRY_ID, getFolderEntry } from '@/constants/folder'
+import { FOLDER_ENTRY_ID } from '@/constants/folder'
 import { TOOL_TYPE_OPTIONS } from '@/constants/tool'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
@@ -41,12 +41,13 @@ const { t } = useI18n({ useScope: 'global' })
 
 /* 当前文件夹 */
 
-const currentFolder = ref<FolderItem>(getFolderEntry(RESOURCE_TYPE.TOOL, 'all', t))
+const selectedFolder = ref<FolderItem>()
+const currentFolder = computed<FolderItem>(() => selectedFolder.value ?? { id: FOLDER_ENTRY_ID.ALL, name: t('tool.categories.all') })
 const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARED)
 
 function handleFolderSelect(folder: FolderItem) {
   const folderChanged = folder.id !== currentFolder.value.id
-  currentFolder.value = folder
+  selectedFolder.value = folder
   if (folderChanged) {
     cancelBatchSelection()
     refreshTool()

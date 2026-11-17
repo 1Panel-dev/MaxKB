@@ -9,8 +9,7 @@ import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
-import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
-import { getFolderEntry } from '@/constants/folder'
+import { FOLDER_ENTRY_ID } from '@/constants/folder'
 import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -28,7 +27,8 @@ const visible = ref(false)
 const loading = ref(false)
 const searchKeyword = ref('')
 const appliedSearchKeyword = ref('')
-const currentFolder = ref<FolderItem>(getFolderEntry(RESOURCE_TYPE.TOOL, 'all', t))
+const selectedFolder = ref<FolderItem>()
+const currentFolder = computed<FolderItem>(() => selectedFolder.value ?? { id: FOLDER_ENTRY_ID.ALL, name: t('tool.categories.all') })
 const toolOptions = ref<ToolItem[]>([])
 const selectedTool = ref<(Partial<ToolItem> & { id: string })[]>([])
 const toolLayoutRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>('toolLayoutRef')
@@ -82,7 +82,7 @@ function refreshResources() {
 
 function selectFolder(folder?: FolderItem) {
   if (!folder || folder.id === currentFolder.value.id) return
-  currentFolder.value = folder
+  selectedFolder.value = folder
   void refreshTool()
 }
 
@@ -107,7 +107,7 @@ function resetData() {
   loading.value = false
   searchKeyword.value = ''
   appliedSearchKeyword.value = ''
-  currentFolder.value = getFolderEntry(RESOURCE_TYPE.TOOL, 'all', t)
+  selectedFolder.value = undefined
   toolOptions.value = []
   selectedTool.value = []
 }

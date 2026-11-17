@@ -9,8 +9,7 @@
 常量名称使用能够表达所属领域和用途的全大写命名，使用方从具体文件直接导入。
 
 `folder.ts` 的 `FOLDER_ENTRY_ID.ALL` 在读取时取当前路由的工作空间 ID，无工作空间上下文时使用 `default`。
-`getFolderEntry(source, entry, t)` 创建全部或共享入口，创建时确定 ID，共享入口的 ID 固定为 `shared`。
-入口的 `name` 在读取时通过调用方的 `t` 翻译对应业务分类。
+共享入口的 `FOLDER_ENTRY_ID.SHARED` 固定为 `shared`。目录名称的翻译归属见[国际化规则](../locales/LOCALE_README.md#文件夹)。
 
 后端枚举与类型归属统一见 [API_README.md](../api/API_README.md#枚举与类型组织)。`constants` 只维护标签、颜色、选项等前端映射；映射的键应引用
 API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一数据源，`constants/auth.ts`
