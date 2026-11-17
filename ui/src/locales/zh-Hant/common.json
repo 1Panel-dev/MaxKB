@@ -7,7 +7,8 @@
     "updatedAt": "更新時間",
     "all": "全部",
     "details": "詳情",
-    "basicInfo": "基本資訊"
+    "basicInfo": "基本資訊",
+    "type": "類型"
   },
   "name": {
     "label": "名稱",

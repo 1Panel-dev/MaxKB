@@ -113,8 +113,10 @@ MkResourceCard、MkComplexSearch、MkEmpty 的默认创建信息、占位和空�
 
 ## 工具列表
 
-工作空间的工具菜单、列表标题和普通工具类型名称共用 `tool.title`。Skill、工作流、MCP 和数据源的类型名称使用各自分组的 `label`，与表单文案一起维护在 `tool.json` 中。
+工作空间、系统资源管理和系统共享资源的工具菜单，以及普通工具类型名称共用 `tool.title`。列表标题“工具”使用 `tool.title`，“全部工具”使用 `tool.categories.all`。
+Skill、工作流、MCP 和数据源的类型名称使用各自分组的 `label`，与表单文案一起维护在 `tool.json` 中。
 内置目录用 tool.categories，按文件夹 ID 选择译文。自建文件夹名称、工具名称和描述直接展示接口值，类型筛选和请求使用原协议值。
+工具列表和输入参数共用 `tool.source.label`、`tool.source.custom`。工具列表的“工具商店”复用 `tool.store.title`，输入参数的“引用参数”使用 `tool.source.reference`。
 启停、删除和版本更新的工具专属提示归 tool；通用操作、启停状态和操作结果归 common。
 资源共享标签、MCP 服务配置、触发器及执行记录入口归 resource。
 工具商店的内置分类、搜索结果计数和应用工具文案归 `tool.store`。工具名称的专属占位和校验归 `tool.fields.name`。

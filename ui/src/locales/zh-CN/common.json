@@ -7,7 +7,8 @@
     "updatedAt": "更新时间",
     "all": "全部",
     "details": "详情",
-    "basicInfo": "基本信息"
+    "basicInfo": "基本信息",
+    "type": "类型"
   },
   "name": {
     "label": "名称",

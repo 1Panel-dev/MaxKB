@@ -7,7 +7,8 @@
     "updatedAt": "Updated at",
     "all": "All",
     "details": "Details",
-    "basicInfo": "Basic information"
+    "basicInfo": "Basic information",
+    "type": "Type"
   },
   "name": {
     "label": "Name",

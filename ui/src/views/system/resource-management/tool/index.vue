@@ -47,19 +47,19 @@ const selectedSource = ref('')
 const selectedStatus = ref('')
 const selectedWorkspaceIds = ref<string[]>([])
 const searchFields = computed(() => [
-  { label: '名称', value: 'name' },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.name.label'), value: 'name' },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 const translatedToolTypes = computed(() => TOOL_TYPE_OPTIONS.map(({ value, labelKey }) => ({ value, label: t(labelKey) })))
 const toolTypeOptions = computed(() => translatedToolTypes.value.filter(({ value }) => value))
-const sourceOptions = [
-  { label: '工具商店', value: 'TOOL_STORE' },
-  { label: '自定义', value: 'CUSTOM' },
-]
-const statusOptions = [
-  { label: '已启用', value: 'enabled' },
-  { label: '已禁用', value: 'disabled' },
-]
+const sourceOptions = computed(() => [
+  { label: t('tool.store.title'), value: 'TOOL_STORE' },
+  { label: t('tool.source.custom'), value: 'CUSTOM' },
+])
+const statusOptions = computed(() => [
+  { label: t('common.status.enabled'), value: 'enabled' },
+  { label: t('common.status.disabled'), value: 'disabled' },
+])
 const toolTypeLabels = computed(() => new Map(translatedToolTypes.value.map(({ value, label }) => [value, label])))
 
 function loadCreatorOptions(keyword: string) {
@@ -121,13 +121,13 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
 /* 删除后重新查询，保留筛选并处理末页删空。 */
 function handleDeleteTool(tool: ToolItem) {
   return MsgConfirm(
-    `确认删除工具：${tool.name}？`,
-    tool.resource_count ? `该工具已被 ${tool.resource_count} 个资源引用，删除后相关资源将无法正常运行，请谨慎操作。` : '',
+    t('tool.delete.title', { name: tool.name }),
+    tool.resource_count ? t('tool.delete.description', { count: tool.resource_count }, tool.resource_count) : '',
   )
     .then(() => {
       operationLoading.value = true
       return SystemToolApi.deleteTool(tool.id).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         if (tools.value.length === 1 && pagination.value.currentPage > 1) pagination.value.currentPage -= 1
         return loadTools()
       })
@@ -149,7 +149,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout>
+  <MkViewLayout :title="t('tool.title')">
     <template #default="{ Header, title }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -165,7 +165,7 @@ onMounted(() => {
         @sort-change="handleSortChange"
         resizable
       >
-        <el-table-column prop="name" label="名称" min-width="220" show-overflow-tooltip>
+        <el-table-column prop="name" :label="t('common.name.label')" min-width="220" show-overflow-tooltip>
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <ToolIcon :icon="row.icon" :type="row.tool_type" :size="20" class="shrink-0" />
@@ -173,44 +173,64 @@ onMounted(() => {
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="tool_type" label="类型" width="120">
+        <el-table-column prop="tool_type" :label="t('common.labels.type')" width="120">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedToolType" label="类型" :options="toolTypeOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedToolType"
+              :label="t('common.labels.type')"
+              :options="toolTypeOptions"
+              @change="handleFilterChange"
+            />
           </template>
           <template #default="{ row }">{{ toolTypeLabels.get(row.tool_type) ?? row.tool_type }}</template>
         </el-table-column>
-        <el-table-column label="来源" width="120">
+        <el-table-column :label="t('tool.source.label')" width="120">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedSource" label="来源" :options="sourceOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedSource"
+              :label="t('tool.source.label')"
+              :options="sourceOptions"
+              @change="handleFilterChange"
+            />
           </template>
-          <template #default="{ row }">{{ row.template_id ? '工具商店' : '自定义' }}</template>
+          <template #default="{ row }">{{ row.template_id ? t('tool.store.title') : t('tool.source.custom') }}</template>
         </el-table-column>
-        <el-table-column label="启用状态" width="100">
+        <el-table-column :label="t('common.status.label')" width="100">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="statusOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedStatus"
+              :label="t('common.status.label')"
+              :options="statusOptions"
+              @change="handleFilterChange"
+            />
           </template>
-          <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
+          <template #default="{ row }">
+            <MkStatusLabel :active="row.is_active" :active-text="t('common.status.enabled')" :inactive-text="t('common.status.disabled')" />
+          </template>
         </el-table-column>
         <el-table-column v-if="auth.isEE" prop="workspace_name" min-width="160" show-overflow-tooltip>
           <template #header>
             <MkTableFilter
               mode="multiple"
               v-model="selectedWorkspaceIds"
-              label="工作空间"
+              :label="t('workspace.title')"
               filterable
               :options="workspaceOptions"
               @change="handleFilterChange"
             />
           </template>
         </el-table-column>
-        <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="update_time" label="更新时间" width="180" sortable>
+        <el-table-column prop="nick_name" :label="t('common.labels.creator')" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="update_time" :label="t('common.labels.updatedAt')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
         </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
+        <el-table-column prop="create_time" :label="t('common.labels.createdAt')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="140" fixed="right">
+        <el-table-column :label="t('common.labels.operation')" width="140" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 启用或禁用工具 -->
@@ -226,7 +246,7 @@ onMounted(() => {
               <EditToolAction
                 v-if="perm.tool.system.edit()"
                 display="button"
-                label="编辑"
+                :label="t('common.actions.edit')"
                 :api="SystemToolApi"
                 :tool="row"
                 @update="handleToolUpdate"
@@ -236,25 +256,25 @@ onMounted(() => {
                 <!-- 打开工具工作流 -->
                 <MkDropdownItem v-if="row.tool_type === TOOL_TYPE.WORKFLOW" @click="handleOpenWorkflow(row, $event)">
                   <template #icon><MkIcon name="icon_setting" /></template>
-                  工作流
+                  {{ t('tool.workflow.label') }}
                 </MkDropdownItem>
                 <!-- 启动参数 -->
                 <InitParamAction
                   v-if="row.init_field_list?.length"
                   v-model:loading="operationLoading"
-                  label="启动参数"
+                  :label="t('tool.initParams.title')"
                   :api="SystemToolApi"
                   :tool="row"
                   @update="handleToolUpdate"
                 />
 
                 <!-- 资源授权 -->
-                <AuthorizeToolAction v-if="perm.tool.system.auth()" label="资源授权" :tool="row" />
+                <AuthorizeToolAction v-if="perm.tool.system.auth()" :label="t('resource.authorization.title')" :tool="row" />
                 <!-- 查看 MCP 配置 -->
                 <McpConfigAction
                   v-if="row.tool_type === TOOL_TYPE.MCP"
                   v-model:loading="operationLoading"
-                  label="MCP 服务配置"
+                  :label="t('resource.mcpConfig.title')"
                   :api="SystemToolApi"
                   :tool="row"
                 />
@@ -263,16 +283,21 @@ onMounted(() => {
                   :tool-api="SystemToolApi"
                   :tool-workflow-api="SystemToolWorkflowApi"
                   v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type) && perm.tool.system.triggerRead()"
-                  label="触发器"
+                  :label="t('resource.triggers.title')"
                   :api="SystemResourceTriggerApi"
                   :tool="row"
                 />
                 <!-- 查看关联资源 -->
-                <RelatedResourcesToolAction v-if="perm.tool.system.relateMap()" label="查看关联资源" :api="SystemRelatedResourcesApi" :tool="row" />
+                <RelatedResourcesToolAction
+                  v-if="perm.tool.system.relateMap()"
+                  :label="t('resource.relations.title')"
+                  :api="SystemRelatedResourcesApi"
+                  :tool="row"
+                />
                 <!-- 查看执行记录 -->
                 <ExecutionRecordToolAction
                   v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type) && perm.tool.system.record()"
-                  label="查看执行记录"
+                  :label="t('resource.actions.viewExecutionRecords')"
                   :api="SystemToolWorkflowApi"
                   :tool="row"
                 />
@@ -280,14 +305,14 @@ onMounted(() => {
                 <ExportToolAction
                   v-if="!row.template_id && perm.tool.system.export()"
                   v-model:loading="operationLoading"
-                  label="导出"
+                  :label="t('common.actions.export')"
                   :api="SystemToolApi"
                   :tool="row"
                 />
                 <!-- 删除工具 -->
                 <MkDropdownItem @click="handleDeleteTool(row)" v-if="perm.tool.system.delete()">
                   <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                  删除
+                  {{ t('common.actions.delete') }}
                 </MkDropdownItem>
               </MkTableMoreDropdown>
             </div>

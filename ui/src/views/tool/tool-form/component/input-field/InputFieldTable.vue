@@ -50,9 +50,9 @@ function handleDeleteInputField(index: number) {
           <el-tag size="small" type="info">{{ row.type }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('tool.inputParams.source.label')" min-width="100">
+      <el-table-column :label="t('tool.source.label')" min-width="100">
         <template #default="{ row }">
-          {{ row.source === 'custom' ? t('tool.inputParams.source.custom') : t('tool.inputParams.source.reference') }}
+          {{ row.source === 'custom' ? t('tool.source.custom') : t('tool.source.reference') }}
         </template>
       </el-table-column>
       <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" min-width="80">

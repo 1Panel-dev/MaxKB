@@ -7,6 +7,11 @@
     "all": "全部工具",
     "shared": "共用工具"
   },
+  "source": {
+    "label": "來源",
+    "reference": "引用參數",
+    "custom": "自訂"
+  },
   "fields": {
     "name": {
       "placeholder": "請輸入工具名稱",
@@ -98,11 +103,6 @@
     },
     "dataType": {
       "label": "資料類型"
-    },
-    "source": {
-      "label": "來源",
-      "reference": "引用參數",
-      "custom": "自訂"
     }
   },
   "outputParams": {
@@ -129,6 +129,7 @@
   },
   "delete": {
     "title": "確定刪除工具「{name}」？",
+    "description": "此工具已被 {count} 個資源引用，刪除後這些資源將無法正常執行，請謹慎操作。",
     "batchTitle": "確定批次刪除 {count} 個工具？"
   },
   "disable": {

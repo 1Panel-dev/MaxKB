@@ -175,7 +175,7 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'tools',
           name: 'system-resource-tools',
           component: () => import('@/views/system/resource-management/tool/index.vue'),
-          meta: { title: '工具', order: 30, permission: perm.tool.system.read, next: 'system-resource-models' },
+          meta: { title: 'tool.title', order: 30, permission: perm.tool.system.read, next: 'system-resource-models' },
         },
         {
           path: 'models',
@@ -213,7 +213,7 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'tools',
           name: 'system-shared-tools',
           component: () => import('@/views/system/shared-resources/tool/index.vue'),
-          meta: { title: '工具', order: 20, permission: perm.tool.share.read, next: 'system-shared-models' },
+          meta: { title: 'tool.title', order: 20, permission: perm.tool.share.read, next: 'system-shared-models' },
         },
         {
           path: 'models',

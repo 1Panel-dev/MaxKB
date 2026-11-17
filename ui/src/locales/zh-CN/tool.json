@@ -7,6 +7,11 @@
     "all": "全部工具",
     "shared": "共享工具"
   },
+  "source": {
+    "label": "来源",
+    "reference": "引用参数",
+    "custom": "自定义"
+  },
   "fields": {
     "name": {
       "placeholder": "请输入工具名称",
@@ -98,11 +103,6 @@
     },
     "dataType": {
       "label": "数据类型"
-    },
-    "source": {
-      "label": "来源",
-      "reference": "引用参数",
-      "custom": "自定义"
     }
   },
   "outputParams": {
@@ -129,6 +129,7 @@
   },
   "delete": {
     "title": "确认删除工具：{name}？",
+    "description": "该工具已被 {count} 个资源引用，删除后相关资源将无法正常运行，请谨慎操作。",
     "batchTitle": "是否批量删除 {count} 个工具？"
   },
   "disable": {
