@@ -650,7 +650,22 @@
   &__wrapper {
     padding: 1px 11px;
   }
-  &__prefix {
+
+  // 密码显隐图标统一使用项目图标，保留 Element Plus 的点击和焦点处理。
+  &__password {
+    > svg {
+      display: none;
+    }
+    &::before {
+      content: '';
+      width: 1em;
+      height: 1em;
+      background-color: currentColor;
+      mask: url('@/assets/icon_invisible_outlined.svg') center / contain no-repeat;
+    }
+  }
+  &:has(.el-input__inner[type='text']) &__password::before {
+    mask-image: url('@/assets/icon_visible_outlined.svg');
   }
   &:has(.el-input__inner[readonly]) {
     --el-input-focus-border-color: var(--el-input-border-color);
