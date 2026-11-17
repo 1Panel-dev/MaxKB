@@ -252,6 +252,8 @@ onMounted(() => {
           :max-table-height="280"
           v-model:pagination-config="paginationConfig"
           :data="userGroupMembers"
+          @current-change="loadUserGroupMembers()"
+          @size-change="loadUserGroupMembers()"
           @selection-change="handleMemberSelectionChange"
         >
           <el-table-column type="selection" width="40" />
