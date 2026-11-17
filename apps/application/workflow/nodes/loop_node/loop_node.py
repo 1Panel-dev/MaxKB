@@ -248,8 +248,8 @@ class LoopNode(INode):
         details.update(
             {
                 "params": self.data.get("params"),
-                "index": self.get_context("index"),
-                "item": self.get_context("item"),
+                "current_item": self.get_context("item"),
+                "current_index": self.get_context("index"),
                 "message_tokens": self.data.get("message_tokens"),
                 "answer_tokens": self.data.get("answer_tokens"),
             }
