@@ -32,9 +32,13 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
                 **kwargs) -> NodeResult:
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         user_id = self.workflow_manage.get_resource_user_id()
+        published_knowledge_ids = self.workflow_manage.get_published_knowledge_ids()
 
         if search_scope_type == 'custom':  # 手动选择知识库
-            knowledge_id_list = filter_authorized_ids('knowledge', knowledge_id_list, workspace_id, user_id=user_id)
+            knowledge_id_list = filter_authorized_ids(
+                'knowledge', knowledge_id_list, workspace_id, user_id=user_id,
+                published_knowledge_ids=published_knowledge_ids,
+            )
             document_id_list = QuerySet(Document).filter(
                 knowledge_id__in=knowledge_id_list
             ).values_list('id', flat=True)
@@ -44,7 +48,8 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
             else:  # 知识库
                 ref_knowledge_ids = filter_authorized_ids('knowledge',
                                                           self.get_reference_content(search_scope_reference),
-                                                          workspace_id, user_id=user_id)
+                                                          workspace_id, user_id=user_id,
+                                                          published_knowledge_ids=published_knowledge_ids)
                 document_id_list = QuerySet(Document).filter(
                     knowledge_id__in=ref_knowledge_ids
                 ).values_list('id', flat=True)
@@ -53,6 +58,7 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
         actual_knowledge_ids = QuerySet(Document).filter(id__in=document_id_list).values_list('knowledge_id', flat=True)
         authorized_knowledge_ids = filter_authorized_ids(
             'knowledge', list(actual_knowledge_ids), workspace_id, user_id=user_id,
+            published_knowledge_ids=published_knowledge_ids,
         )
         document_id_list = QuerySet(Document).filter(
             id__in=document_id_list, knowledge_id__in=authorized_knowledge_ids,

@@ -100,7 +100,8 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
                                                                  knowledge_id_list)
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         knowledge_id_list = filter_authorized_ids(
-            'knowledge', knowledge_id_list, workspace_id, user_id=self.workflow_manage.get_resource_user_id()
+            'knowledge', knowledge_id_list, workspace_id, user_id=self.workflow_manage.get_resource_user_id(),
+            published_knowledge_ids=self.workflow_manage.get_published_knowledge_ids(),
         )
         if len(knowledge_id_list) == 0:
             return get_none_result(question)

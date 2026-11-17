@@ -194,6 +194,16 @@ class ChatInfo:
         # 发布时校验的是发布者的资源权限，旧版本未记录发布者时沿用创建者。
         return getattr(self.application, 'publish_user_id', None) or self.application.user_id
 
+    def get_published_knowledge_ids(self):
+        if self.debug:
+            return []
+        from application.serializers.application import get_bound_knowledge_ids
+        # 发布版本已校验绑定权限，发布者之后的个人授权变更不改变该版本的知识库绑定。
+        return get_bound_knowledge_ids({
+            'work_flow': self.application.work_flow,
+            'knowledge_id_list': getattr(self.application, 'knowledge_ids', []),
+        })
+
     def get_chat_user(self, asker=None):
         if self.chat_user:
             return self.chat_user
