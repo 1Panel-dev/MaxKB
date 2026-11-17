@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ToolItem } from '@/api/types'
 import { copyText } from '@/utils/clipboard'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'McpConfigAction' })
 
@@ -41,11 +44,16 @@ function handleDialogClosed() {
     <span>{{ label }}</span>
   </MkDropdownItem>
 
-  <MkDialog v-model="visible" title="MCP 服务配置" @closed="handleDialogClosed">
+  <MkDialog v-model="visible" :title="t('resource.mcpConfig.title')" @closed="handleDialogClosed">
     <div class="group relative">
       <el-input v-model="config" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
       <!-- 复制 MCP 配置 -->
-      <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle :disabled="!config" @click="copyText(config)">
+      <el-button
+        class="group-hover-visible absolute right-3 top-3 z-10 shadow-md"
+        circle
+        :disabled="!config"
+        @click="copyText(config, t('common.messages.copied'))"
+      >
         <MkIcon name="icon_copy_outlined" />
       </el-button>
     </div>

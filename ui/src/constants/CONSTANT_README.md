@@ -24,6 +24,9 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 工作流默认模型设置和动态表单模型控件使用。调用方通过当前应用的 `t` 翻译，依赖语言的
 选项在 computed 中生成；不在常量内绑定入口国际化实例，不改变类型协议值。
 
+`tool.ts` 的 `TOOL_TYPE_OPTIONS` 为工作空间及系统工具列表提供有序的 `value` 和 `labelKey`。
+调用方展示时翻译 `labelKey`，筛选继续使用原 `value`，“全部”对应空字符串。
+
 `resource-authorization.ts` 的 `RESOURCE_PERMISSION_OPTIONS` 统一维护权限标签和说明；
 资源授权页面与资源用户授权抽屉按版本和根目录约束筛选选项。
 

@@ -1,0 +1,37 @@
+{
+  "title": "Tools",
+  "categories": {
+    "all": "All tools",
+    "shared": "Shared tools"
+  },
+  "types": {
+    "custom": "Tool",
+    "skill": "Skills",
+    "workflow": "Workflow",
+    "mcp": "MCP",
+    "dataSource": "Data source"
+  },
+  "store": {
+    "title": "Tool store"
+  },
+  "initParams": {
+    "title": "Startup parameters"
+  },
+  "delete": {
+    "title": "Delete tool “{name}”?",
+    "batchTitle": "Delete {count} tool? | Delete {count} tools?"
+  },
+  "disable": {
+    "title": "Disable tool “{name}”?",
+    "description": "Resources that use this tool will fail when they run."
+  },
+  "messages": {
+    "publishBeforeEnabling": "Publish the workflow before enabling this tool."
+  },
+  "updateVersion": {
+    "action": "Update version",
+    "title": "Update tool “{name}”?",
+    "description": "Updating this tool may affect resources that use it.",
+    "success": "Version updated successfully"
+  }
+}

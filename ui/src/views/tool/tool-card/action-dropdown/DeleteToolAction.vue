@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ToolItem } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'DeleteToolAction' })
 
@@ -13,7 +16,10 @@ const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ delete: [toolId: string] }>()
 
 function handleDeleteTool() {
-  return MsgConfirm(`确认删除工具：${props.tool.name}？`)
+  return MsgConfirm(t('tool.delete.title', { name: props.tool.name }), undefined, {
+    cancelButtonText: t('common.actions.cancel'),
+    confirmButtonText: t('common.actions.delete'),
+  })
     .then(() => {
       loading.value = true
       return props.api
@@ -21,7 +27,7 @@ function handleDeleteTool() {
         .finally(() => (loading.value = false))
         .then(() => {
           emit('delete', props.tool.id)
-          MsgSuccess('删除成功')
+          MsgSuccess(t('common.messages.deleteSuccess'))
         })
     })
     .catch(() => {})

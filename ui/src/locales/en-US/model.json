@@ -75,7 +75,6 @@
     "fetchModels": "Fetch models"
   },
   "states": {
-    "shared": "Shared",
     "downloading": "Downloading"
   },
   "messages": {

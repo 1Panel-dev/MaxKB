@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { Dict, OptionItem, ToolItem } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
 import SystemCommonApi from '@/api/admin/system/common'
@@ -27,6 +28,8 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission'
 
+const { t } = useI18n({ useScope: 'global' })
+
 const { auth } = useStore()
 const router = useRouter()
 
@@ -47,7 +50,8 @@ const searchFields = computed(() => [
   { label: '名称', value: 'name' },
   { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
-const toolTypeOptions = TOOL_TYPE_OPTIONS.filter(({ value }) => value)
+const translatedToolTypes = computed(() => TOOL_TYPE_OPTIONS.map(({ value, labelKey }) => ({ value, label: t(labelKey) })))
+const toolTypeOptions = computed(() => translatedToolTypes.value.filter(({ value }) => value))
 const sourceOptions = [
   { label: '工具商店', value: 'TOOL_STORE' },
   { label: '自定义', value: 'CUSTOM' },
@@ -56,7 +60,7 @@ const statusOptions = [
   { label: '已启用', value: 'enabled' },
   { label: '已禁用', value: 'disabled' },
 ]
-const toolTypeLabels = new Map(TOOL_TYPE_OPTIONS.map(({ value, label }) => [value, label]))
+const toolTypeLabels = computed(() => new Map(translatedToolTypes.value.map(({ value, label }) => [value, label])))
 
 function loadCreatorOptions(keyword: string) {
   return SystemCommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {

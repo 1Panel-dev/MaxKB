@@ -5,7 +5,9 @@
     "operation": "Actions",
     "createdOn": "created on",
     "createdAt": "Created at",
-    "updatedAt": "Updated at"
+    "updatedAt": "Updated at",
+    "all": "All",
+    "status": "Status"
   },
   "actions": {
     "edit": "Edit",
@@ -14,10 +16,21 @@
     "save": "Save",
     "add": "Add",
     "previous": "Previous",
-    "uploadFiles": "Upload files"
+    "uploadFiles": "Upload files",
+    "create": "Create",
+    "createFromImport": "Create from file",
+    "duplicate": "Duplicate",
+    "export": "Export",
+    "moveTo": "Move to",
+    "batchSelect": "Select multiple",
+    "cancelSelection": "Cancel selection",
+    "disable": "Disable",
+    "saveAndEnable": "Save and enable",
+    "confirm": "Confirm"
   },
   "dialogs": {
-    "notice": "Notice"
+    "notice": "Notice",
+    "deleteWarning": "This action cannot be undone."
   },
   "messages": {
     "saveSuccess": "Saved successfully",
@@ -25,7 +38,13 @@
     "deleteFailed": "Deletion failed",
     "createSuccess": "Created successfully",
     "fetchSuccess": "Fetched successfully",
-    "updateSuccess": "Updated successfully"
+    "updateSuccess": "Updated successfully",
+    "moveSuccess": "Moved successfully",
+    "importSuccess": "Imported successfully",
+    "enableSuccess": "Enabled successfully",
+    "disableSuccess": "Disabled successfully",
+    "exportFailed": "Export failed: {reason}",
+    "copied": "Copied"
   },
   "placeholders": {
     "input": "Please enter",
@@ -40,5 +59,9 @@
   "empty": {
     "default": "No data",
     "search": "No results found"
+  },
+  "states": {
+    "enabled": "Enabled",
+    "disabled": "Disabled"
   }
 }

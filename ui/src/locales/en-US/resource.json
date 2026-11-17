@@ -7,5 +7,20 @@
   },
   "workspaceAuthorization": {
     "title": "Authorize workspaces"
+  },
+  "folder": {
+    "create": "Create folder"
+  },
+  "states": {
+    "shared": "Shared"
+  },
+  "mcpConfig": {
+    "title": "MCP server configuration"
+  },
+  "triggers": {
+    "title": "Triggers"
+  },
+  "actions": {
+    "viewExecutionRecords": "View execution history"
   }
 }

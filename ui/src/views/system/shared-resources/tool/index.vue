@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { ParamsPage } from '@/api/admin/core/types'
 import type { Dict, OptionItem, ToolItem, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
@@ -25,6 +26,8 @@ import EditToolForm from '@/views/tool/tool-form/EditToolForm.vue'
 import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
 import { TOOL_TYPE_OPTIONS } from '@/constants'
 import perm from '@/permission'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const router = useRouter()
 
@@ -110,7 +113,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
           <h4>全部工具</h4>
           <el-divider direction="vertical" />
           <el-select v-model="toolType" class="w-30!" :empty-values="[null, undefined]" @change="refreshTools">
-            <el-option v-for="option in TOOL_TYPE_OPTIONS" :key="option.value" :label="option.label" :value="option.value" />
+            <el-option v-for="option in TOOL_TYPE_OPTIONS" :key="option.value" :label="t(option.labelKey)" :value="option.value" />
           </el-select>
         </div>
         <div class="flex-align-center gap-3">
@@ -179,7 +182,12 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                     :tool="tool"
                   />
                   <!-- 授权工作空间 -->
-                  <AuthorizedWorkspaceAction v-if="perm.tool.share.authToWorkspace()" label="授权工作空间" :resource="tool" :resource-type="RESOURCE_TYPE.TOOL" />
+                  <AuthorizedWorkspaceAction
+                    v-if="perm.tool.share.authToWorkspace()"
+                    label="授权工作空间"
+                    :resource="tool"
+                    :resource-type="RESOURCE_TYPE.TOOL"
+                  />
 
                   <!-- 查看关联资源 -->
                   <RelatedResourcesToolAction

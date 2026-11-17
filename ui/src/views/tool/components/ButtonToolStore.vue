@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ToolStoreDialog from '../tool-store/ToolStoreDialog.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ButtonToolStore' })
 
@@ -18,7 +21,7 @@ function handleOpenToolStore() {
 <template>
   <el-button plain @click="handleOpenToolStore">
     <MkIcon name="icon_application-shop_filled" />
-    <span>工具商店</span>
+    <span>{{ t('tool.store.title') }}</span>
   </el-button>
   <ToolStoreDialog ref="toolStoreDialogRef" @refresh="emit('refresh')" />
 </template>

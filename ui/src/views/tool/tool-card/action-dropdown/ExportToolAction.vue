@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ExportError, ToolItem } from '@/api/types'
 import { MsgError } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ExportToolAction' })
 
@@ -18,7 +21,7 @@ function handleExportTool() {
     .catch((error: ExportError) => {
       if (error.response.status !== 403) {
         return error.response.data.text().then((response: string) => {
-          MsgError(`导出失败：${JSON.parse(response).message}`)
+          MsgError(t('common.messages.exportFailed', { reason: JSON.parse(response).message }))
         })
       }
     })

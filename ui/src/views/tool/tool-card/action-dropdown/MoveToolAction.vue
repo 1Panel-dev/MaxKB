@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ToolItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { FOLDER_ENTRY_ID } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'MoveToolAction' })
 
@@ -32,7 +35,7 @@ function handleMoveTool(targetFolderId: string) {
       loading.value = false
     })
     .then(() => {
-      MsgSuccess('移动成功')
+      MsgSuccess(t('common.messages.moveSuccess'))
       moveToDialogRef.value?.close()
       if (props.currentFolderId !== FOLDER_ENTRY_ID.ALL) emit('delete', props.tool.id)
     })

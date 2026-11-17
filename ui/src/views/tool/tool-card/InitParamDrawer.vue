@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
@@ -8,6 +9,8 @@ import type { Dict, ToolItem } from '@/api/types'
 import type { DynamicFormValue } from '@/components/mk-dynamics-form'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import { MsgSuccess } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'InitParamDrawer' })
 
@@ -49,7 +52,7 @@ function handleSubmit() {
     return props.api
       .putTool(currentTool.id, { init_params: cloneDeep(initParams.value), is_active: targetActive.value })
       .then((updatedTool) => {
-        MsgSuccess(enableAfterSave.value ? '启用成功' : '保存成功')
+        MsgSuccess(enableAfterSave.value ? t('common.messages.enableSuccess') : t('common.messages.saveSuccess'))
         emit('update', updatedTool)
         visible.value = false
       })
@@ -68,13 +71,13 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="启动参数" @closed="handleClosed">
+  <MkDrawer v-model="visible" :title="t('tool.initParams.title')" @closed="handleClosed">
     <MkDynamicsForm v-if="toolDetail" ref="dynamicsFormRef" v-model="initParams" :render-data="toolDetail.init_field_list ?? []" />
 
     <template #footer>
-      <el-button :disabled="loading" plain @click="visible = false">取消</el-button>
+      <el-button :disabled="loading" plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <el-button type="primary" :loading="loading" @click="handleSubmit">
-        {{ enableAfterSave ? '保存并启用' : '保存' }}
+        {{ enableAfterSave ? t('common.actions.saveAndEnable') : t('common.actions.save') }}
       </el-button>
     </template>
   </MkDrawer>

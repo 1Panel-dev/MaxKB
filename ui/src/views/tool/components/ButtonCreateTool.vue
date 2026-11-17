@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type { ToolType } from '@/api/types'
 import type { UploadFile, UploadInstance } from 'element-plus'
@@ -15,6 +16,8 @@ import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import perm from '@/permission/index.ts'
+
+const { t } = useI18n({ useScope: 'global' })
 
 /**
  * 工具「导入」权限判断
@@ -111,7 +114,7 @@ function handleImportCreate(file: UploadFile) {
     .postToolImport(file.raw, props.folderId)
     .then(() => {
       return auth.loadAuthBaseProfile().then(() => {
-        MsgSuccess('导入成功')
+        MsgSuccess(t('common.messages.importSuccess'))
         handleRefresh()
       })
     })
@@ -142,7 +145,7 @@ function handleRefresh() {
     </div>
     <!-- 创建工具 -->
     <el-button v-else type="primary">
-      <span class="mr-1">创建</span>
+      <span class="mr-1">{{ t('common.actions.create') }}</span>
       <MkIcon name="icon_down_outlined" :size="14" />
     </el-button>
 
@@ -151,27 +154,27 @@ function handleRefresh() {
         <!-- 创建工具 -->
         <MkDropdownItem class="py-2!" @click="handleOpenToolForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.CUSTOM" /></template>
-          <span>工具</span>
+          <span>{{ t('tool.types.custom') }}</span>
         </MkDropdownItem>
         <!-- 创建工作流工具 -->
         <MkDropdownItem class="py-2!" @click="handleOpenWorkflowForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.WORKFLOW" /></template>
-          <span>工作流</span>
+          <span>{{ t('tool.types.workflow') }}</span>
         </MkDropdownItem>
         <!-- 创建 Skill -->
         <MkDropdownItem class="py-2!" @click="handleOpenSkillForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.SKILL" /></template>
-          <span>Skills</span>
+          <span>{{ t('tool.types.skill') }}</span>
         </MkDropdownItem>
         <!-- 创建 MCP -->
         <MkDropdownItem class="py-2!" @click="handleOpenMcpForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.MCP" /></template>
-          <span>MCP</span>
+          <span>{{ t('tool.types.mcp') }}</span>
         </MkDropdownItem>
         <!-- 创建数据源 -->
         <MkDropdownItem class="py-2!" @click="handleOpenDataSourceForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.DATA_SOURCE" /></template>
-          <span>数据源</span>
+          <span>{{ t('tool.types.dataSource') }}</span>
         </MkDropdownItem>
         <!-- 导入创建 -->
         <el-upload
@@ -190,7 +193,7 @@ function handleRefresh() {
             <template #icon>
               <img src="@/assets/mk_icon_import.svg" alt="" />
             </template>
-            <span>导入创建</span>
+            <span>{{ t('common.actions.createFromImport') }}</span>
           </MkDropdownItem>
         </el-upload>
       </MkDropdownMenu>

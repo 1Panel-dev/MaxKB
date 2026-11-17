@@ -7,5 +7,20 @@
   },
   "workspaceAuthorization": {
     "title": "授权工作空间"
+  },
+  "folder": {
+    "create": "创建文件夹"
+  },
+  "states": {
+    "shared": "共享"
+  },
+  "mcpConfig": {
+    "title": "MCP 服务配置"
+  },
+  "triggers": {
+    "title": "触发器"
+  },
+  "actions": {
+    "viewExecutionRecords": "查看执行记录"
   }
 }

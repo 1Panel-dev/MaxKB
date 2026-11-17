@@ -6,7 +6,7 @@
 ## 分类
 
 按“业务域 → 对象或场景 → 文案用途”组织；文件按业务域划分，不对应组件目录。
-当前建立实际使用的 auth、model、common、resource、dynamicForm、workspace 语言包；其他业务包按需创建，不保留空包。
+当前建立实际使用的 auth、model、tool、common、resource、dynamicForm、workspace 语言包；其他业务包按需创建，不保留空包。
 
 | 业务域      | 内容                                             |
 | ----------- | ------------------------------------------------ |
@@ -100,6 +100,13 @@ model、common、resource，工作空间名称字段标签使用 workspace.title
 MkResourceCard、MkComplexSearch、MkEmpty 的默认创建信息、占位和空状态文案使用 common；
 自定义属性、插槽及接口返回内容保持原值。授权、关联资源、工作空间授权弹窗及表头筛选器的内部文案
 仍按各自共享组件批次处理。
+
+## 工具列表
+
+工作空间的工具菜单和列表标题共用 tool.title。内置目录用 tool.categories，按文件夹 ID 选择译文；
+自建文件夹名称、工具名称和描述直接展示接口值。工具类型复用 tool.types，筛选和请求始终使用原协议值。
+启停、删除和版本更新的工具专属提示归 tool；通用操作、启停状态和操作结果归 common。
+资源共享标签、文件夹操作、MCP 服务配置、触发器及执行记录入口归 resource。
 
 ## 动态表单
 
