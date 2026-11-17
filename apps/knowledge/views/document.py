@@ -1,22 +1,18 @@
-from knowledge.permissions import (
-    batch_document_permission,
-    cancel_document_task_permission,
-    document_list_permission,
-    document_permission,
-)
 import json
+
+from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema
+from rest_framework.parsers import MultiPartParser
+from rest_framework.request import Request
+from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
 from common.exception.app_exception import AppApiException
 from common.log.log import log
 from common.result import result
-from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import extend_schema
 from knowledge.api.document import (
     BatchCancelTaskAPI,
     BatchEditHitHandlingAPI,
@@ -49,6 +45,12 @@ from knowledge.api.document import (
     WebDocumentCreateAPI,
 )
 from knowledge.api.tag import DocsTagDeleteAPI
+from knowledge.permissions import (
+    batch_document_permission,
+    cancel_document_task_permission,
+    document_list_permission,
+    document_permission,
+)
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.document import DocumentSerializers, normalize_document_resource_type
 from knowledge.views.common import (
@@ -56,9 +58,6 @@ from knowledge.views.common import (
     get_document_operation_object_batch,
     get_knowledge_document_operation_object,
 )
-from rest_framework.parsers import MultiPartParser
-from rest_framework.request import Request
-from rest_framework.views import APIView
 
 
 def _get_document_split_payload(request: Request):
@@ -98,11 +97,6 @@ class DocumentView(APIView):
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
     )
     @log(
         menu="document",
@@ -243,11 +237,6 @@ class DocumentView(APIView):
             PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(
@@ -277,11 +266,6 @@ class DocumentView(APIView):
             PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(
@@ -311,11 +295,6 @@ class DocumentView(APIView):
             PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="document",
@@ -560,11 +539,6 @@ class DocumentView(APIView):
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="document",
@@ -1131,11 +1105,6 @@ class WebDocumentView(APIView):
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
     )
     @log(
         menu="document",
@@ -1173,11 +1142,6 @@ class QaDocumentView(APIView):
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
     )
     @log(
         menu="document",
@@ -1214,11 +1178,6 @@ class QaDocumentByFileView(APIView):
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
     )
     @log(
         menu="document",
@@ -1256,11 +1215,6 @@ class TableDocumentView(APIView):
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
     )
     @log(
         menu="document",
@@ -1297,11 +1251,6 @@ class TableDocumentByFileView(APIView):
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
     )
     @log(
         menu="document",

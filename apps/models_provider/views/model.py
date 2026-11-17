@@ -7,18 +7,20 @@
 @desc:
 """
 
-from common.auth import TokenAuth
-from common.auth.authentication import has_permissions
-from common.auth.constants.compare_constants import CompareConstants
-from common.auth.constants.permission_constants import PermissionConstants
-from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
-from common.log.log import log
-from common.result import result
-from common.utils.common import query_params_to_single_dict
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
+from rest_framework.request import Request
+from rest_framework.views import APIView
+
+from common.auth import TokenAuth
+from common.auth.authentication import has_permissions
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.log.log import log
+from common.result import result
+from common.utils.common import query_params_to_single_dict
+from models_provider.api.chat_completion import ChatCompletionAPI
 from models_provider.api.model import (
     DefaultModelResponse,
     GetModelApi,
@@ -29,15 +31,12 @@ from models_provider.api.model import (
     ModelMetaResponse,
     ModelSummaryListResponse,
 )
-from models_provider.api.chat_completion import ChatCompletionAPI
 from models_provider.api.prompt_generate import PromptGenerateAPI
 from models_provider.api.provide import ProvideApi
 from models_provider.models import Model
 from models_provider.serializers.chat_completion_serializers import ChatCompletionSerializers
 from models_provider.serializers.model_serializer import ModelSerializer, WorkspaceSharedModelSerializer
 from models_provider.serializers.prompt_generate_serializers import PromptGenerateSerializers
-from rest_framework.request import Request
-from rest_framework.views import APIView
 from system_manage.views import encryption_str
 
 
@@ -146,11 +145,6 @@ class ModelSetting(APIView):
             PermissionConstants.MODEL_EDIT.get_workspace_model_permission(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             PermissionConstants.MODEL_EDIT.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.MODEL.get_workspace_model_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="model",
@@ -178,11 +172,6 @@ class ModelSetting(APIView):
             PermissionConstants.MODEL_DELETE.get_workspace_model_permission(),
             PermissionConstants.MODEL_DELETE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.MODEL.get_workspace_model_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="model",
@@ -209,11 +198,6 @@ class ModelSetting(APIView):
             PermissionConstants.MODEL_READ.get_workspace_model_permission(),
             PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.MODEL.get_workspace_model_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
@@ -265,11 +249,6 @@ class ModelSetting(APIView):
             PermissionConstants.MODEL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             PermissionConstants.MODEL_READ.get_workspace_permission(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.MODEL.get_workspace_model_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="model",
@@ -300,11 +279,6 @@ class ModelSetting(APIView):
             PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             PermissionConstants.MODEL_READ.get_workspace_permission(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.MODEL.get_workspace_model_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
@@ -328,11 +302,6 @@ class ModelSetting(APIView):
             PermissionConstants.MODEL_CREATE.get_workspace_model_permission(),
             PermissionConstants.MODEL_CREATE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.MODEL.get_workspace_model_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         def put(self, request: Request, workspace_id: str, model_id: str):
             return result.success(

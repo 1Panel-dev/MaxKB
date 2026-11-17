@@ -6,10 +6,8 @@ from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 from common.result import result
 from knowledge.api.tag_import import TagImportAPI, TagTemplateExportAPI
@@ -33,11 +31,6 @@ class KnowledgeTagImportView(APIView):
         PermissionConstants.KNOWLEDGE_TAG_CREATE.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_TAG_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
     )
     @log(
         menu="tag",
@@ -65,11 +58,6 @@ class KnowledgeTagTemplateView(APIView):
         PermissionConstants.KNOWLEDGE_TAG_CREATE.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_TAG_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
     )
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
         return TagImportSerializers(data={"workspace_id": workspace_id, "knowledge_id": knowledge_id}).export_template()

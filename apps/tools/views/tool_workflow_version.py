@@ -16,17 +16,15 @@ from rest_framework.views import APIView
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
+from knowledge.models import Knowledge
 from tools.api.tool_workflow import (
     ToolWorkflowVersionListApi,
     ToolWorkflowVersionPageApi,
     ToolWorkflowVersionOperateApi,
 )
-from knowledge.models import Knowledge
 from tools.serializers.tool_version import ToolWorkflowVersionSerializer
 from tools.views import get_tool_operation_object
 
@@ -53,11 +51,6 @@ class ToolWorkflowVersionView(APIView):
     @has_permissions(
         PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
         PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.TOOL.get_workspace_tool_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def get(self, request: Request, workspace_id, tool_id: str):
@@ -82,11 +75,6 @@ class ToolWorkflowVersionView(APIView):
         @has_permissions(
             PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
             PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, tool_id: str, current_page: int, page_size: int):
@@ -111,11 +99,6 @@ class ToolWorkflowVersionView(APIView):
         @has_permissions(
             PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
             PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, tool_id: str, tool_version_id: str):
@@ -143,11 +126,6 @@ class ToolWorkflowVersionView(APIView):
         @has_permissions(
             PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(

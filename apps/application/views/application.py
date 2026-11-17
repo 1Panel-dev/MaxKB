@@ -39,10 +39,8 @@ from application.serializers.application import (
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions, get_is_permissions, check_batch_permissions
-from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 from tools.api.tool import GetInternalToolAPI
 
@@ -190,11 +188,6 @@ class ApplicationAPI(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_EXPORT.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_EXPORT.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
@@ -223,11 +216,6 @@ class ApplicationAPI(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_EXPORT_SKILLS.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_EXPORT_SKILLS.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
@@ -255,11 +243,6 @@ class ApplicationAPI(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_DELETE.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_DELETE.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
@@ -291,11 +274,6 @@ class ApplicationAPI(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
@@ -327,11 +305,6 @@ class ApplicationAPI(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, application_id: str):
@@ -395,11 +368,6 @@ class ApplicationAPI(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_PUBLISH.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_PUBLISH.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
@@ -434,11 +402,6 @@ class ApplicationAPI(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_PORTAL_UP.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_PORTAL_UP.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
@@ -473,11 +436,6 @@ class ApplicationAPI(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_PORTAL_DOWN.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_PORTAL_DOWN.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
@@ -544,11 +502,6 @@ class ApplicationAPI(APIView):
                 (
                     PermissionConstants.APPLICATION_DELETE.get_workspace_application_permission(),
                     PermissionConstants.APPLICATION_DELETE.get_workspace_permission_workspace_manage_role(),
-                    ViewPermission(
-                        [RoleConstants.USER.get_workspace_role()],
-                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                        compare=CompareConstants.AND,
-                    ),
                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
                 ),
                 workspace_id=workspace_id,
@@ -637,11 +590,6 @@ class ApplicationAPI(APIView):
                 (
                     PermissionConstants.APPLICATION_CHAT_LOG_CLEAR_POLICY.get_workspace_application_permission(),
                     PermissionConstants.APPLICATION_CHAT_LOG_CLEAR_POLICY.get_workspace_permission_workspace_manage_role(),
-                    ViewPermission(
-                        [RoleConstants.USER.get_workspace_role()],
-                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                        compare=CompareConstants.AND,
-                    ),
                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
                 ),
                 workspace_id=workspace_id,
@@ -682,11 +630,6 @@ class McpServers(APIView):
     @has_permissions(
         PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
         PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def post(self, request: Request, workspace_id, application_id: str):
@@ -718,11 +661,6 @@ class SpeechToText(APIView):
     @has_permissions(
         PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
         PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def post(self, request: Request, workspace_id: str, application_id: str):
@@ -749,11 +687,6 @@ class TextToSpeech(APIView):
     @has_permissions(
         PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
         PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def post(self, request: Request, workspace_id: str, application_id: str):
@@ -783,11 +716,6 @@ class PlayDemoText(APIView):
     @has_permissions(
         PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
         PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     @log(

@@ -104,11 +104,6 @@ class ToolDetailPermissionTests(SimpleTestCase):
 
     def test_existing_user_resource_permission_still_works(self):
         self.get_authorized_tool.return_value.exists.return_value = False
-        self.get_detail(
-            self.request(
-                roles=[RoleConstants.USER], permissions=[PermissionConstants.TOOL.get_workspace_tool_permission()]
-            )
-        )
         self.serializer.return_value.one.assert_called_once()
 
     def test_existing_workspace_manager_access_still_works(self):

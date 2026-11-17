@@ -1,20 +1,18 @@
 # coding=utf-8
 
-from application.api.application_api import SpeechToTextAPI
-from common.auth import TokenAuth
-from common.auth.authentication import has_permissions
-from common.auth.constants.compare_constants import CompareConstants
-from common.auth.constants.permission_constants import PermissionConstants
-from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
-from common.log.log import log
-from common.result import DefaultResultSerializer, result
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
-from knowledge.api.knowledge_workflow import KnowledgeWorkflowApi
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from application.api.application_api import SpeechToTextAPI
+from common.auth import TokenAuth
+from common.auth.authentication import has_permissions
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.log.log import log
+from common.result import DefaultResultSerializer, result
+from knowledge.api.knowledge_workflow import KnowledgeWorkflowApi
 from tools.api.tool import GetInternalToolAPI
 from tools.api.tool_workflow import ToolWorkflowApi
 from tools.serializers.tool_workflow import (
@@ -45,11 +43,6 @@ class ToolWorkflowView(APIView):
         @has_permissions(
             PermissionConstants.TOOL_PUBLISH.get_workspace_tool_permission(),
             PermissionConstants.TOOL_PUBLISH.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
@@ -85,11 +78,6 @@ class ToolWorkflowView(APIView):
             PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="Tool",
@@ -116,11 +104,6 @@ class ToolWorkflowView(APIView):
             PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
             PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         def get(self, request: Request, workspace_id: str, tool_id: str):
             return result.success(
@@ -146,11 +129,6 @@ class ToolWorkflowDebugView(APIView):
         PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
         PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.TOOL.get_workspace_tool_permission()],
-            compare=CompareConstants.AND,
-        ),
     )
     def post(self, request: Request, workspace_id: str, tool_id: str):
         return ToolWorkflowSerializer.Operate(
@@ -174,11 +152,6 @@ class McpServers(APIView):
     @has_permissions(
         PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
         PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.TOOL.get_workspace_tool_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def post(self, request: Request, workspace_id, tool_id: str):

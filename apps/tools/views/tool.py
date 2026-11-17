@@ -1,18 +1,17 @@
-from common import result
-from common.result import ResultStringSerializer
-from common.auth import TokenAuth
-from common.auth.authentication import check_batch_permissions, has_permissions
-from common.auth.constants.compare_constants import CompareConstants
-from common.auth.constants.permission_constants import PermissionConstants
-from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
-from common.log.log import log
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
+
+from common import result
+from common.auth import TokenAuth
+from common.auth.authentication import check_batch_permissions, has_permissions
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.log.log import log
+from common.result import ResultStringSerializer
 from tools.api.tool import (
     AddInternalToolAPI,
     EditIconAPI,
@@ -163,11 +162,6 @@ class ToolView(APIView):
             PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="Tool",
@@ -192,11 +186,6 @@ class ToolView(APIView):
             get_tool_read_permission,
             PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(menu="Tool", operate="Get tool")
         def get(self, request: Request, workspace_id: str, tool_id: str):
@@ -215,11 +204,6 @@ class ToolView(APIView):
             PermissionConstants.TOOL_DELETE.get_workspace_tool_permission(),
             PermissionConstants.TOOL_DELETE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="Tool",
@@ -256,11 +240,6 @@ class ToolView(APIView):
                 (
                     PermissionConstants.TOOL_DELETE.get_workspace_tool_permission(),
                     PermissionConstants.TOOL_DELETE.get_workspace_permission_workspace_manage_role(),
-                    ViewPermission(
-                        [RoleConstants.USER.get_workspace_role()],
-                        [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                        compare=CompareConstants.AND,
-                    ),
                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
                 ),
                 workspace_id=workspace_id,
@@ -482,11 +461,6 @@ class ToolView(APIView):
             PermissionConstants.TOOL_EXPORT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EXPORT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="Tool",
@@ -536,11 +510,6 @@ class ToolView(APIView):
             PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         def put(self, request: Request, tool_id: str, workspace_id: str):
             return result.success(
@@ -748,11 +717,6 @@ class ToolView(APIView):
             PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         def get(self, request: Request, tool_id: str, workspace_id: str, current_page: int, page_size: int):
             return result.success(
@@ -784,11 +748,6 @@ class ToolView(APIView):
             PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         def get(self, request: Request, tool_id: str, workspace_id: str, record_id: str):
             return result.success(
@@ -841,11 +800,6 @@ class ToolView(APIView):
             PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         def get(self, request: Request, workspace_id: str, tool_id: str):
             return ToolSerializer.DownloadSkillFile(
