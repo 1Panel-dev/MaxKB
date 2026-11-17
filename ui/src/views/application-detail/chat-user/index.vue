@@ -240,10 +240,9 @@ onMounted(() => loadChatUserGroups())
             <template #header>
               <!-- 批量设置当前页授权 -->
               <el-checkbox
-                v-if="applicationchatUserPermission('chatUserEdit')"
                 :model-value="allChecked"
                 :indeterminate="allIndeterminate"
-                :disabled="authorizationDisabled"
+                :disabled="authorizationDisabled || !applicationchatUserPermission('chatUserEdit')"
                 @change="handleCheckAll"
               >
                 授权
@@ -253,9 +252,8 @@ onMounted(() => loadChatUserGroups())
               <!-- 设置对话用户授权 -->
               <el-checkbox
                 :model-value="row.is_auth"
-                :disabled="authorizationDisabled"
+                :disabled="authorizationDisabled || !applicationchatUserPermission('chatUserEdit')"
                 @change="(value: CheckboxValueType) => handleRowChange(value, row)"
-                v-if="applicationchatUserPermission('chatUserEdit')"
               />
             </template>
           </el-table-column>
