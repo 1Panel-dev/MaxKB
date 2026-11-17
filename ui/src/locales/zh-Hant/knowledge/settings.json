@@ -18,14 +18,6 @@
       "placeholder": "請選擇分段符號",
       "description": "依照所選符號的順序遞迴分割內容。超過設定長度的分段會截短至該長度。"
     },
-    "delimiterOptions": {
-      "space": "空格",
-      "semicolon": "分號",
-      "comma": "逗號",
-      "period": "句號",
-      "newline": "換行",
-      "blankLine": "空白行"
-    },
     "paragraphLength": "分段長度",
     "childChunkLength": {
       "label": "子區塊長度",

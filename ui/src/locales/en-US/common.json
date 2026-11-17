@@ -31,16 +31,35 @@
     "edit": "Edit parameter"
   },
   "upload": {
-    "dropHint": "Drop a file here.",
+    "dropHint": "Drag and drop here.",
     "selectFile": "Choose a file to upload",
+    "selectFiles": "Choose files",
+    "selectFolder": "Choose folder",
     "replaceFile": "Replace file",
-    "emptyFileMessage": "Cannot upload an empty file."
+    "retryUpload": "Retry upload",
+    "limits": "Upload up to {count} file at a time, no larger than {size} MB. | Upload up to {count} files at a time, each no larger than {size} MB.",
+    "formats": "Supported formats: {formats}",
+    "emptyFileMessage": "Cannot upload an empty file.",
+    "sizeLimitMessage": "File too large",
+    "unsupportedFormatMessage": "Unsupported file format",
+    "countLimitMessage": "You can upload up to {count} file at a time. | You can upload up to {count} files at a time.",
+    "networkErrorMessage": "Network error",
+    "uploadInProgressMessage": "Please wait for the upload to finish.",
+    "noSuccessfulFilesMessage": "No files were uploaded successfully. Try uploading again.",
+    "fileError": "{name}: {reason}",
+    "status": {
+      "completed": "{completed} of {total} completed",
+      "uploading": "Uploading",
+      "failed": "{count} failed",
+      "allSucceeded": "All files uploaded"
+    }
   },
   "actions": {
     "manage": "Manage",
     "edit": "Edit",
     "delete": "Delete",
     "cancel": "Cancel",
+    "retry": "Retry",
     "save": "Save",
     "add": "Add",
     "previous": "Previous",
@@ -55,6 +74,7 @@
     "disable": "Disable",
     "saveAndEnable": "Save and enable",
     "confirm": "Confirm",
+    "submit": "Submit",
     "testConnection": "Test connection"
   },
   "dialogs": {
@@ -68,6 +88,7 @@
     "deleteFailed": "Deletion failed",
     "createSuccess": "Created successfully",
     "addSuccess": "Added successfully",
+    "removeSuccess": "Removed successfully",
     "fetchSuccess": "Fetched successfully",
     "updateSuccess": "Updated successfully",
     "moveSuccess": "Moved successfully",

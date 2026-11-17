@@ -103,7 +103,7 @@ onMounted(() => {
             <div class="flex-between">
               <span class="mk-required">重排内容</span>
               <!-- 添加重排内容 -->
-              <el-button text type="primary" title="添加重排内容" @click="addReference">
+              <el-button text type="primary" @click="addReference">
                 <MkIcon name="icon_add_outlined" />
               </el-button>
             </div>

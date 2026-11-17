@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentItem } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import AddTagDialog from '../action-dropdown/setting-tags/AddTagDialog.vue'
 
 defineOptions({ name: 'DocumentTags' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api?: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags']
   knowledgeId: string
@@ -58,7 +60,7 @@ function handleDialogClosed() {
     <!-- 添加文档标签 -->
     <el-button class="mk-add-tag-button" plain v-if="!disabled" :disabled="loading" @click.stop="handleOpenDialog">
       <MkIcon name="icon_add_outlined" size="14" />
-      <span>标签</span>
+      <span>{{ t('knowledge.tags.label') }}</span>
     </el-button>
   </div>
   <AddTagDialog

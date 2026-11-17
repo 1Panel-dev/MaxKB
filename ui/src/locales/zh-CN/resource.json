@@ -21,7 +21,8 @@
     "apply": "应用",
     "missingDownloadUrl": "模板缺少下载地址，无法使用"
   },
-  "actions": {
-    "viewExecutionRecords": "查看执行记录"
+  "executionRecords": {
+    "title": "执行记录",
+    "view": "查看执行记录"
   }
 }

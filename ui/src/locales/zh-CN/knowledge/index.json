@@ -38,6 +38,11 @@
       "placeholder": "请选择向量模型",
       "requiredMessage": "请选择向量模型"
     },
+    "targetKnowledge": {
+      "label": "选择知识库",
+      "placeholder": "请选择知识库",
+      "requiredMessage": "请选择知识库"
+    },
     "webRootUrl": {
       "label": "Web 根地址",
       "placeholder": "请输入 Web 根地址",
@@ -50,6 +55,7 @@
   },
   "stats": {
     "documents": "{count} 文档",
+    "paragraphs": "{count} 分段",
     "characters": "{count} 字符",
     "images": "{count} 图片"
   },
@@ -58,7 +64,14 @@
     "generateEmbeddings": "向量化",
     "generateQuestions": "生成问题",
     "cancelGenerateQuestions": "取消生成问题",
-    "buildKeywordIndex": "分词索引"
+    "buildKeywordIndex": "分词索引",
+    "cancelEmbeddings": "取消向量化",
+    "cancelKeywordIndex": "取消分词索引"
+  },
+  "paragraphScope": {
+    "label": "选择分段",
+    "unsuccessful": "仅执行未成功部分",
+    "all": "全部分段"
   },
   "import": {
     "embeddingNotice": "导入创建知识库成功，文档数据未向量化，请先设置知识库的向量模型，并对文档进行向量化操作"
@@ -75,6 +88,7 @@
     "batchTitle": "是否批量删除 {count} 个知识库？"
   },
   "messages": {
-    "missingWorkspace": "知识库缺少所属工作空间信息"
+    "missingWorkspace": "知识库缺少所属工作空间信息",
+    "migrateSuccess": "迁移成功"
   }
 }

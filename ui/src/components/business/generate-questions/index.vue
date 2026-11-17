@@ -134,10 +134,10 @@ defineExpose({ open, close })
       >
         <el-input v-model="form.prompt" type="textarea" :rows="8" />
       </el-form-item>
-      <el-form-item v-if="showParagraphScope" :label="t('knowledge.generateQuestions.scope.label')">
+      <el-form-item v-if="showParagraphScope" :label="t('knowledge.paragraphScope.label')">
         <el-radio-group v-model="scope">
-          <el-radio value="error">{{ t('knowledge.generateQuestions.scope.unsuccessful') }}</el-radio>
-          <el-radio value="all">{{ t('knowledge.generateQuestions.scope.all') }}</el-radio>
+          <el-radio value="error">{{ t('knowledge.paragraphScope.unsuccessful') }}</el-radio>
+          <el-radio value="all">{{ t('knowledge.paragraphScope.all') }}</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>

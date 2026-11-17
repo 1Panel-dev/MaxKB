@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { UploadCardFile } from './types'
 
 defineOptions({ name: 'ImageUploadCard' })
+const { t } = useI18n({ useScope: 'global' })
 const props = withDefaults(
   defineProps<{
     file: UploadCardFile
@@ -41,11 +43,17 @@ const percentage = computed(() => props.percentage ?? props.file.percentage ?? 0
       <el-progress :percentage="file.status === 'uploading' ? percentage : 0" :stroke-width="4" :show-text="false" />
     </div>
     <div v-if="file.status === 'fail'" class="absolute-center flex-align-center gap-3">
-      <MkTooltip v-if="showError" :content="`${file.name}：${file.errMsg}`" :disabled="!file.errMsg" placement="top" :offset="size / 2">
+      <MkTooltip
+        v-if="showError"
+        :content="t('common.upload.fileError', { name: file.name, reason: file.errMsg })"
+        :disabled="!file.errMsg"
+        placement="top"
+        :offset="size / 2"
+      >
         <span class="flex-center"><MkIcon name="icon_warning_filled" class="text-danger!" :size="iconSize" /></span>
       </MkTooltip>
       <!-- 重新上传失败图片 -->
-      <MkTooltip content="重新上传" placement="top" :offset="size / 2">
+      <MkTooltip :content="t('common.upload.retryUpload')" placement="top" :offset="size / 2">
         <button type="button" class="flex-center cursor-pointer disabled:cursor-not-allowed" :disabled="disabled" @click.stop="emit('retry')">
           <MkIcon name="icon_refresh_outlined" class="text-white!" :size="iconSize" />
         </button>
@@ -56,7 +64,6 @@ const percentage = computed(() => props.percentage ?? props.file.percentage ?? 0
       v-if="showRemove"
       type="button"
       class="group-hover-visible mk-remove-button disabled:cursor-not-allowed"
-      title="删除图片"
       :disabled="disabled"
       @click.stop="emit('remove')"
     >

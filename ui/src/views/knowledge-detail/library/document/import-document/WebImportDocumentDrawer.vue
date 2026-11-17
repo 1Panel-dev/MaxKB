@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { FormInstance, FormRules } from 'element-plus'
 import DocumentStrategyForm from '@/views/knowledge/create-knowledge/components/DocumentStrategyForm.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'WebImportDocumentDrawer' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']; knowledgeId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 
@@ -25,9 +27,9 @@ const sourceUrls = computed(() => [
 ])
 const formRef = ref<FormInstance>()
 const strategyRef = useTemplateRef<InstanceType<typeof DocumentStrategyForm>>('strategyRef')
-const rules: FormRules = {
-  source_url: [{ required: true, whitespace: true, message: '请输入文档地址', trigger: 'blur' }],
-}
+const rules = computed<FormRules<typeof form.value>>(() => ({
+  source_url: [{ required: true, whitespace: true, message: t('knowledge.document.sourceUrl.requiredMessage'), trigger: 'blur' }],
+}))
 function open() {
   visible.value = true
 }
@@ -57,7 +59,7 @@ function handleSubmit() {
           doc_strategy: strategyRef.value.getStrategy(),
         })
         .then(() => {
-          MsgSuccess('导入成功')
+          MsgSuccess(t('common.messages.importSuccess'))
           visible.value = false
           emit('refresh')
         })
@@ -76,39 +78,47 @@ defineExpose({ open })
   <MkDrawer v-model="visible" direction="btt" @closed="emit('closed')">
     <template #header>
       <div class="flex w-full">
-        <h4>导入文档</h4>
+        <h4>{{ t('knowledge.document.import.title') }}</h4>
         <el-steps :active="activeStep" finish-status="success" class="absolute-center w-85!">
-          <el-step title="基本信息" />
-          <el-step title="文档处理策略" />
+          <el-step :title="t('common.labels.basicInfo')" />
+          <el-step :title="t('knowledge.documentStrategy.title')" />
         </el-steps>
       </div>
     </template>
     <div v-loading="loading" class="mx-auto w-full max-w-200">
       <section v-show="activeStep === 0">
-        <h4 class="mb-4 mk-title-decoration">基本信息</h4>
-        <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
-          <el-form-item label="文档地址" prop="source_url">
-            <el-input v-model="form.source_url" type="textarea" :rows="5" placeholder="请输入文档地址，一行一个，地址不正确文档会导入失败。" />
+        <h4 class="mb-4 mk-title-decoration">{{ t('common.labels.basicInfo') }}</h4>
+        <el-form
+          ref="formRef"
+          :model="form"
+          :rules="rules"
+          :validate-on-rule-change="false"
+          label-position="top"
+          require-asterisk-position="right"
+          @submit.prevent
+        >
+          <el-form-item :label="t('knowledge.document.sourceUrl.label')" prop="source_url">
+            <el-input v-model="form.source_url" type="textarea" :rows="5" :placeholder="t('knowledge.document.sourceUrl.placeholder')" />
           </el-form-item>
-          <el-form-item label="选择器">
-            <el-input v-model="form.selector" placeholder="默认为 body，可输入 .classname/#idname/tagname" />
+          <el-form-item :label="t('knowledge.fields.selector.label')">
+            <el-input v-model="form.selector" :placeholder="t('knowledge.fields.selector.placeholder')" />
           </el-form-item>
         </el-form>
       </section>
       <section v-if="strategyMounted" v-show="activeStep === 1">
-        <h4 class="mb-4 mk-title-decoration">文档处理策略</h4>
+        <h4 class="mb-4 mk-title-decoration">{{ t('knowledge.documentStrategy.title') }}</h4>
         <DocumentStrategyForm ref="strategyRef" />
       </section>
     </div>
     <template #footer>
       <!-- 取消导入 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 返回基本信息 -->
-      <el-button plain v-if="activeStep === 1" :disabled="loading" @click="activeStep = 0">上一步</el-button>
+      <el-button plain v-if="activeStep === 1" :disabled="loading" @click="activeStep = 0">{{ t('common.actions.previous') }}</el-button>
       <!-- 进入文档处理策略 -->
-      <el-button v-if="activeStep === 0" type="primary" @click="handleNext">下一步</el-button>
+      <el-button v-if="activeStep === 0" type="primary" @click="handleNext">{{ t('common.actions.next') }}</el-button>
       <!-- 提交 Web 文档导入 -->
-      <el-button v-else type="primary" :loading="loading" @click="handleSubmit">开始导入</el-button>
+      <el-button v-else type="primary" :loading="loading" @click="handleSubmit">{{ t('knowledge.document.import.start') }}</el-button>
     </template>
   </MkDrawer>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { DocumentItem } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
@@ -8,6 +9,7 @@ import { isWorkFlow } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'SyncDocumentAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   label: string
@@ -26,8 +28,8 @@ function handleSync() {
   if (!document.id) return
   const isWorkflow = isWorkFlow(String(knowledgeType.value ?? ''))
   if ((knowledgeType.value === KNOWLEDGE_TYPE_KEY.WEB || isWorkflow) && !document.meta?.source_url) {
-    MsgConfirm('提示', '无法同步，请先去设置文档 URL 地址', {
-      confirmButtonText: '确认',
+    MsgConfirm(t('common.dialogs.notice'), t('knowledge.document.sync.missingUrlMessage'), {
+      confirmButtonText: t('common.actions.confirm'),
       confirmButtonType: 'primary',
       type: 'warning',
     })
@@ -37,12 +39,10 @@ function handleSync() {
   const knowledgeId = props.knowledgeId
   const documentId = document.id
   const isLark = knowledgeType.value === KNOWLEDGE_TYPE_KEY.LARK
-  const message = isWorkflow
-    ? '将按知识库工作流的提取、分段配置同步当前 Web 文档，其他文档保持不变。'
-    : '文档内容无更新时跳过，有更新时会使用新内容更新旧分段内容。'
-  return MsgConfirm(`是否同步：${document.name}?`, message, {
-    cancelButtonText: '取消',
-    confirmButtonText: '同步',
+  const message = isWorkflow ? t('knowledge.document.sync.workflowDescription') : t('knowledge.document.sync.description')
+  return MsgConfirm(t('knowledge.document.sync.title', { name: document.name }), message, {
+    cancelButtonText: t('common.actions.cancel'),
+    confirmButtonText: t('knowledge.actions.sync'),
     confirmButtonType: 'primary',
   })
     .then(() => {
@@ -51,7 +51,7 @@ function handleSync() {
       const request = isLark ? props.api.putLarkDocumentSync?.(knowledgeId, documentId) : props.api.putDocumentSync?.(knowledgeId, documentId)
       return (
         request?.then(() => {
-          MsgSuccess(isWorkflow ? '同步任务发送成功' : '操作成功')
+          MsgSuccess(isWorkflow ? t('knowledge.sync.taskSubmitted') : t('common.messages.operationSuccess'))
           emit('refresh')
         }) ?? Promise.resolve()
       ).finally(() => {

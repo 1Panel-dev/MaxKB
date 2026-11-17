@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { UploadFile, UploadFiles, UploadInstance, UploadUserFile } from 'element-plus'
 import uploadImage from '@/assets/mk_icon_upload.svg'
 import { getFileIconUrl } from '@/utils/icon'
 import { formatFileSize } from '@/utils/number'
 
 defineOptions({ name: 'SingleFileUpload' })
+const { t } = useI18n({ useScope: 'global' })
 
 withDefaults(
   defineProps<{
@@ -20,9 +22,6 @@ withDefaults(
   {
     accept: '',
     disabled: false,
-    dragText: '将文件拖至此区域或',
-    replaceText: '更换文件',
-    selectText: '选择文件上传',
     tipText: '',
   },
 )
@@ -84,8 +83,8 @@ defineExpose({ clearFiles, handleRemove })
       </div>
       <div class="el-upload__text">
         <p>
-          {{ dragText }}
-          <em>{{ selectText }}</em>
+          {{ dragText ?? t('common.upload.dropHint') }}
+          <em>{{ selectText ?? t('common.upload.selectFile') }}</em>
         </p>
         <p v-if="tipText" class="mt-1 text-N500">{{ tipText }}</p>
       </div>
@@ -124,7 +123,7 @@ defineExpose({ clearFiles, handleRemove })
         :show-file-list="false"
       >
         <!-- 更换文件 -->
-        <el-button :disabled="disabled" link type="primary">{{ replaceText }}</el-button>
+        <el-button :disabled="disabled" link type="primary">{{ replaceText ?? t('common.upload.replaceFile') }}</el-button>
       </el-upload>
     </div>
   </div>

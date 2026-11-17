@@ -18,14 +18,6 @@
       "placeholder": "Select paragraph delimiters",
       "description": "The document is split recursively using the delimiters in the order you select. Paragraphs longer than the configured length are truncated."
     },
-    "delimiterOptions": {
-      "space": "Space",
-      "semicolon": "Semicolon (；)",
-      "comma": "Comma (，)",
-      "period": "Full stop (。)",
-      "newline": "Line break",
-      "blankLine": "Blank line"
-    },
     "paragraphLength": "Paragraph length",
     "childChunkLength": {
       "label": "Child chunk length",

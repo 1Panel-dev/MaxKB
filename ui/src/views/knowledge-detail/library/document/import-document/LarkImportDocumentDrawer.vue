@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { LarkDocumentNode } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { TableInstance, TreeNode } from 'element-plus'
@@ -8,6 +9,7 @@ import { getFileIconUrl } from '@/utils/icon'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'LarkImportDocumentDrawer' })
+const { locale, t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -19,6 +21,7 @@ const emit = defineEmits<{ refresh: []; closed: [] }>()
 interface LarkDocumentRow extends LarkDocumentNode {
   hasChildren: boolean
 }
+const larkDocumentFormats = ['TXT', 'Markdown', 'PDF', 'DOCX', 'HTML', 'XLS', 'XLSX', 'CSV', 'ZIP']
 const visible = ref(false)
 const loading = ref(false)
 const pendingLoads = ref(0)
@@ -90,7 +93,7 @@ function handleNext() {
     (document) => !document.is_exist,
   )
   if (!selectedDocuments.value.length) {
-    MsgWarning('请选择文档')
+    MsgWarning(t('knowledge.document.import.selectionRequiredMessage'))
     return
   }
   strategyMounted.value = true
@@ -115,7 +118,7 @@ function handleSubmit() {
           })),
         )
         .then(() => {
-          MsgSuccess('导入成功')
+          MsgSuccess(t('common.messages.importSuccess'))
           visible.value = false
           emit('refresh')
         })
@@ -134,21 +137,21 @@ defineExpose({ open })
   <MkDrawer v-model="visible" direction="btt" @closed="emit('closed')">
     <template #header>
       <div class="flex w-full">
-        <h4>导入文档</h4>
+        <h4>{{ t('knowledge.document.import.title') }}</h4>
         <el-steps :active="activeStep" finish-status="success" class="absolute-center w-85!">
-          <el-step title="导入文档" />
-          <el-step title="文档处理策略" />
+          <el-step :title="t('knowledge.document.import.title')" />
+          <el-step :title="t('knowledge.documentStrategy.title')" />
         </el-steps>
       </div>
     </template>
     <div v-loading="loading" class="mx-auto w-full max-w-200">
       <section v-show="activeStep === 0">
-        <h4 class="mb-4 mk-title-decoration">导入文档</h4>
+        <h4 class="mb-4 mk-title-decoration">{{ t('knowledge.document.import.title') }}</h4>
         <el-alert type="primary" show-icon :closable="false" class="mb-4!">
           <template #icon><MkIcon name="icon_info_filled" /></template>
           <ol class="list-inside list-decimal space-y-1">
-            <li>支持文档和表格类型，包含 TXT、Markdown、PDF、DOCX、HTML、XLS、XLSX、CSV、ZIP 格式</li>
-            <li>导入文档前，建议规范文档的分段标识。</li>
+            <li>{{ t('knowledge.document.import.larkFormatsHint', { formats: larkDocumentFormats.join(locale === 'en-US' ? ', ' : '、') }) }}</li>
+            <li>{{ t('knowledge.document.import.delimiterHint') }}</li>
           </ol>
         </el-alert>
 
@@ -163,7 +166,7 @@ defineExpose({ open })
         >
           <!-- 选择文档或文件夹，全选由表格维护 -->
           <el-table-column type="selection" width="40" reserve-selection :selectable="(row: LarkDocumentRow) => !row.is_exist" />
-          <el-table-column class-name="expand-name-column" label="全部文档" prop="name">
+          <el-table-column class-name="expand-name-column" :label="t('knowledge.document.import.allDocuments')" prop="name">
             <template #default="{ row }: { row: LarkDocumentRow }">
               <div class="flex-align-center min-w-0 flex-1 gap-2">
                 <img v-if="row.type === 'folder'" src="@/assets/file-type/file-icon.svg" alt="" class="w-4.5 shrink-0" />
@@ -180,19 +183,21 @@ defineExpose({ open })
         </MkTable>
       </section>
       <section v-if="strategyMounted" v-show="activeStep === 1">
-        <h4 class="mb-4 mk-title-decoration">文档处理策略</h4>
+        <h4 class="mb-4 mk-title-decoration">{{ t('knowledge.documentStrategy.title') }}</h4>
         <DocumentStrategyForm ref="strategyRef" />
       </section>
     </div>
     <template #footer>
       <!-- 取消导入 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 返回文档选择 -->
-      <el-button plain v-if="activeStep === 1" :disabled="loading" @click="activeStep = 0">上一步</el-button>
+      <el-button plain v-if="activeStep === 1" :disabled="loading" @click="activeStep = 0">{{ t('common.actions.previous') }}</el-button>
       <!-- 进入文档处理策略 -->
-      <el-button v-if="activeStep === 0" type="primary" :disabled="!folderToken || pendingLoads > 0" @click="handleNext">下一步</el-button>
+      <el-button v-if="activeStep === 0" type="primary" :disabled="!folderToken || pendingLoads > 0" @click="handleNext">
+        {{ t('common.actions.next') }}
+      </el-button>
       <!-- 提交飞书文档导入 -->
-      <el-button v-else type="primary" :loading="loading" @click="handleSubmit">开始导入</el-button>
+      <el-button v-else type="primary" :loading="loading" @click="handleSubmit">{{ t('knowledge.document.import.start') }}</el-button>
     </template>
   </MkDrawer>
 </template>

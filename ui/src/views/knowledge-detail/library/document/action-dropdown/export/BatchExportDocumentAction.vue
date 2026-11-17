@@ -2,9 +2,11 @@
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
 import { DROPDOWN_INJECTION_KEY } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 
 defineOptions({ name: 'BatchExportDocumentAction' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']; documentIds: string[]; label: string }>()
 const route = useRoute()
@@ -16,8 +18,8 @@ const parentDropdown = inject(DROPDOWN_INJECTION_KEY, undefined)
 
 /* 批量文档导出菜单 */
 const exportOptions = [
-  { label: '导出文档 Excel', method: 'exportMulDocument' },
-  { label: '导出文档 ZIP', method: 'exportMulDocumentZip' },
+  { labelKey: 'knowledge.export.documentsExcel', method: 'exportMulDocument' },
+  { labelKey: 'knowledge.export.documentsZip', method: 'exportMulDocumentZip' },
 ] as const
 
 // 固定选中文档 ID，批量只选一个文档时仍按批量导出。
@@ -46,7 +48,7 @@ function handleExportDocuments(method: (typeof exportOptions)[number]['method'])
           <template v-for="exportOption in exportOptions" :key="exportOption.method">
             <!-- 按所选格式批量导出文档 -->
             <MkDropdownItem :disabled="loading" @click="handleExportDocuments(exportOption.method)">
-              {{ exportOption.label }}
+              {{ t(exportOption.labelKey) }}
             </MkDropdownItem>
           </template>
         </MkDropdownMenu>

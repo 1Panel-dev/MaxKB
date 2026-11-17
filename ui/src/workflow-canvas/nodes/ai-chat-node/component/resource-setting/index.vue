@@ -154,7 +154,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
             工具
             <span v-if="selectedTools.length">（{{ selectedTools.length }}）</span>
           </span>
-          <el-button text type="primary" title="添加工具" @click.stop="openToolDialog(false)">
+          <el-button text type="primary" @click.stop="openToolDialog(false)">
             <MkIcon name="icon_add_outlined" />
           </el-button>
         </div>

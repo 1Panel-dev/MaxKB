@@ -44,11 +44,11 @@ const percentage = computed(() => props.percentage ?? props.file.percentage ?? 0
       </div>
       <div v-if="showRemove || file.status === 'fail'" class="flex shrink-0 gap-1">
         <!-- 重新上传失败附件 -->
-        <el-button v-if="file.status === 'fail'" :disabled="disabled" text title="重新上传" @click.stop="emit('retry')">
+        <el-button v-if="file.status === 'fail'" :disabled="disabled" text @click.stop="emit('retry')">
           <MkIcon name="icon_refresh_outlined" />
         </el-button>
         <!-- 删除已选附件 -->
-        <el-button v-if="showRemove" :disabled="disabled" text title="删除文件" @click.stop="emit('remove')">
+        <el-button v-if="showRemove" :disabled="disabled" text @click.stop="emit('remove')">
           <MkIcon name="icon_delete-trash_outlined" />
         </el-button>
       </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, provide, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, KnowledgeWorkflowApi, KnowledgeWorkflowDebugPayload } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import type LogicFlow from '@logicflow/core'
@@ -14,6 +15,7 @@ import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowImportDocumentDrawer' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ api: KnowledgeWorkflowApi; knowledgeId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 
@@ -55,7 +57,7 @@ const knowledgeBaseNode = computed(() => currentWorkflow.value?.nodes?.find((nod
 const hasKnowledgeBaseInput = computed(
   () => ((knowledgeBaseNode.value?.properties?.user_input_field_list as FormField[] | undefined)?.length ?? 0) > 0,
 )
-const userInputTitle = computed(() => knowledgeBaseNode.value?.properties?.user_input_config?.title || '用户输入')
+const userInputTitle = computed(() => knowledgeBaseNode.value?.properties?.user_input_config?.title || t('workflow.userInput.title'))
 const showNext = computed(() => hasKnowledgeBaseInput.value && active.value === 'data_source')
 const showPrev = computed(() => hasKnowledgeBaseInput.value && active.value === 'knowledge_base')
 const showImport = computed(() => (hasKnowledgeBaseInput.value ? active.value === 'knowledge_base' : active.value === 'data_source'))
@@ -71,7 +73,7 @@ function getActionData() {
     const successfulFiles = data.file_list.filter((file) => file.file_id && (!file.status || file.status === 'success'))
     data.file_list = successfulFiles
     if (!successfulFiles.length) {
-      MsgWarning('没有上传成功的文件，请重新上传')
+      MsgWarning(t('common.upload.noSuccessfulFilesMessage'))
       return undefined
     }
   }
@@ -137,9 +139,9 @@ defineExpose({ open })
   <MkDrawer v-model="visible" direction="btt" @closed="emit('closed')">
     <template #header>
       <div class="flex w-full">
-        <h4>导入文档</h4>
+        <h4>{{ t('knowledge.document.import.title') }}</h4>
         <el-steps v-if="hasKnowledgeBaseInput" :active="activeStep" finish-status="success" class="absolute-center w-85!">
-          <el-step title="选择数据源" />
+          <el-step :title="t('workflow.dataSource.selectTitle')" />
           <el-step :title="userInputTitle" />
         </el-steps>
       </div>
@@ -159,17 +161,25 @@ defineExpose({ open })
     </div>
     <template #footer>
       <!-- 取消导入 -->
-      <el-button v-if="active !== 'result'" plain :disabled="loading || uploadingCount > 0" @click="visible = false">取消</el-button>
+      <el-button v-if="active !== 'result'" plain :disabled="loading || uploadingCount > 0" @click="visible = false">
+        {{ t('common.actions.cancel') }}
+      </el-button>
       <!-- 继续导入 -->
-      <el-button v-if="active === 'result'" plain @click="handleContinueImport">继续导入</el-button>
+      <el-button v-if="active === 'result'" plain @click="handleContinueImport">{{ t('knowledge.document.import.continue') }}</el-button>
       <!-- 返回数据源 -->
-      <el-button v-if="showPrev" plain :disabled="loading || uploadingCount > 0" @click="handlePrevious">上一步</el-button>
+      <el-button v-if="showPrev" plain :disabled="loading || uploadingCount > 0" @click="handlePrevious">
+        {{ t('common.actions.previous') }}
+      </el-button>
       <!-- 进入用户输入 -->
-      <el-button v-if="showNext" type="primary" :disabled="loading || uploadingCount > 0" @click="handleNext">下一步</el-button>
+      <el-button v-if="showNext" type="primary" :disabled="loading || uploadingCount > 0" @click="handleNext">
+        {{ t('common.actions.next') }}
+      </el-button>
       <!-- 执行工作流导入 -->
-      <el-button v-if="showImport" type="primary" :loading="loading" :disabled="uploadingCount > 0" @click="handleSubmit">开始导入</el-button>
+      <el-button v-if="showImport" type="primary" :loading="loading" :disabled="uploadingCount > 0" @click="handleSubmit">
+        {{ t('knowledge.document.import.start') }}
+      </el-button>
       <!-- 完成导入 -->
-      <el-button v-if="active === 'result'" type="primary" @click="handleFinish">前往文档</el-button>
+      <el-button v-if="active === 'result'" type="primary" @click="handleFinish">{{ t('knowledge.document.import.goToDocuments') }}</el-button>
     </template>
   </MkDrawer>
 </template>

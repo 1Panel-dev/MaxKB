@@ -21,7 +21,8 @@
     "apply": "套用",
     "missingDownloadUrl": "範本缺少下載網址，無法使用"
   },
-  "actions": {
-    "viewExecutionRecords": "查看執行記錄"
+  "executionRecords": {
+    "title": "執行記錄",
+    "view": "查看執行記錄"
   }
 }

@@ -1,0 +1,31 @@
+{
+  "tags": {
+    "title": "Tag management",
+    "label": "Tags",
+    "settings": "Tag settings",
+    "key": {
+      "label": "Tag name",
+      "placeholder": "Enter a tag name",
+      "selectPlaceholder": "Select a tag",
+      "requiredMessage": "Enter a tag name",
+      "selectRequiredMessage": "Select a tag"
+    },
+    "value": {
+      "label": "Tag value",
+      "placeholder": "Enter a tag value",
+      "selectPlaceholder": "Select a tag value",
+      "requiredMessage": "Enter a tag value",
+      "selectRequiredMessage": "Select a tag value",
+      "unavailableMessage": "This tag value is no longer available. Select another value."
+    },
+    "actions": {
+      "add": "Add tags",
+      "create": "Create tag",
+      "createValue": "Create tag value",
+      "addValue": "Add tag value"
+    },
+    "messages": {
+      "duplicateTag": "This tag name and value are already in the list."
+    }
+  }
+}

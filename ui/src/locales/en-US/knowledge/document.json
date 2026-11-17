@@ -1,0 +1,92 @@
+{
+  "document": {
+    "title": "Documents",
+    "name": {
+      "label": "Document name",
+      "placeholder": "Enter a document name"
+    },
+    "sourceUrl": {
+      "label": "Document URL",
+      "placeholder": "Enter one document URL per line. Documents with invalid URLs cannot be imported.",
+      "requiredMessage": "Enter a document URL"
+    },
+    "labels": {
+      "activeStatus": "Activation status",
+      "characters": "Characters",
+      "paragraphs": "Paragraphs",
+      "retrievalCount": "Retrieval count",
+      "lastRetrievedAt": "Last retrieved"
+    },
+    "hitHandling": {
+      "label": "Retrieval handling",
+      "optimization": "Model optimization",
+      "directlyReturn": "Direct answer"
+    },
+    "status": {
+      "label": "File status",
+      "pending": "Queued",
+      "started": "Running",
+      "embedding": "Indexing",
+      "generate": "Generating questions",
+      "sync": "Syncing",
+      "tokenize": "Building keyword index",
+      "success": "Succeeded",
+      "failure": "Failed",
+      "canceling": "Canceling",
+      "canceled": "Canceled",
+      "progress": "{completed}/{total} completed"
+    },
+    "actions": {
+      "quickCreate": "Create a blank document",
+      "generatePreview": "Generate preview",
+      "migrate": "Migrate",
+      "migrateTo": "Migrate to",
+      "downloadOriginal": "Download original document",
+      "replaceOriginal": "Replace original document"
+    },
+    "delete": {
+      "title": "Delete document “{name}”?",
+      "description": "This will also delete {count} paragraph in this document. | This will also delete {count} paragraphs in this document.",
+      "batchTitle": "Delete {count} selected document? | Delete {count} selected documents?",
+      "batchDescription": "All paragraphs in the selected documents will also be deleted."
+    },
+    "sync": {
+      "title": "Sync “{name}”?",
+      "batchTitle": "Sync {count} selected document? | Sync {count} selected documents?",
+      "description": "Sync skips unchanged documents and updates existing paragraphs in documents that have changed.",
+      "workflowDescription": "Only this web document will be synced, using the workflow’s extraction and splitting settings.",
+      "missingUrlMessage": "Set the document URL before syncing."
+    },
+    "upload": {
+      "title": "Upload documents",
+      "textLabel": "Text files",
+      "textTitle": "Upload text files",
+      "tableLabel": "Spreadsheets",
+      "tableTitle": "Upload spreadsheets",
+      "qaLabel": "Q&A pairs",
+      "qaTitle": "Upload Q&A pairs",
+      "delimiterHint": "Use consistent paragraph delimiters before uploading your files.",
+      "templateHint": "Download a template and fill it in.",
+      "downloadTemplate": "Download {format} template",
+      "columnHeaderHint": "Use meaningful column headings in the first row. Each subsequent row becomes a paragraph.",
+      "sheetHint": "Each worksheet becomes a separate document with the same name as the worksheet."
+    },
+    "import": {
+      "title": "Import documents",
+      "start": "Start import",
+      "continue": "Import more",
+      "goToDocuments": "Go to documents",
+      "allDocuments": "All documents",
+      "selectionRequiredMessage": "Select at least one document.",
+      "larkFormatsHint": "Supported document and spreadsheet formats: {formats}.",
+      "delimiterHint": "Use consistent paragraph delimiters before importing documents."
+    },
+    "preview": {
+      "title": "Preview",
+      "emptyParagraphs": "No paragraphs",
+      "emptyDocuments": "No documents to preview",
+      "finishEditingMessage": "Save or cancel your paragraph edits first.",
+      "deleteParagraphConfirm": "Delete this paragraph?"
+    }
+  }
+}

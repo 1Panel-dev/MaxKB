@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentItem, DocumentTaskState } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { DOCUMENT_TASK_TYPE } from '@/api/enums'
@@ -8,6 +9,7 @@ import DocumentEmbeddingDialog from './DocumentEmbeddingDialog.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'EmbeddingDocumentAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -37,7 +39,7 @@ function handleCancelEmbedding() {
     props.api
       .putCancelTask?.(props.knowledgeId, props.document.id, DOCUMENT_TASK_TYPE.EMBEDDING)
       .then(() => {
-        MsgSuccess('发送成功')
+        MsgSuccess(t('common.messages.submitSuccess'))
         emit('refresh')
       })
       .catch(() => {}) ?? Promise.resolve()
@@ -67,7 +69,7 @@ function handleEmbedding(stateList: DocumentTaskState[]) {
   <!-- 向量化或取消向量化 -->
   <MkAction
     display="button"
-    :label="running ? '取消向量化' : '向量化'"
+    :label="running ? t('knowledge.actions.cancelEmbeddings') : t('knowledge.actions.generateEmbeddings')"
     :icon="running ? 'icon_close_outlined' : 'icon_sheet-datareference_outlined'"
     :disabled="loading"
     @click="running ? handleCancelEmbedding() : handleOpenDialog()"

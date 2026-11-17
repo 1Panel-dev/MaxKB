@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
 import ExecutionRecordDrawer from '@/views/workflow/knowledge/execution-record/ExecutionRecordDrawer.vue'
 
 defineOptions({ name: 'ButtonExecutionRecord' })
+const { t } = useI18n({ useScope: 'global' })
 defineProps<{ api: typeof WorkflowApi; knowledgeId: string }>()
 
 /* 执行记录抽屉按需挂载，关闭动画结束后卸载。 */
@@ -22,7 +24,7 @@ function handleOpenExecutionRecords() {
     <!-- 查看工作流执行记录 -->
     <el-button plain @click="handleOpenExecutionRecords">
       <MkIcon name="icon_schedule-report_outlined" />
-      <span>执行记录</span>
+      <span>{{ t('resource.executionRecords.title') }}</span>
     </el-button>
   </span>
   <ExecutionRecordDrawer v-if="drawerMounted" ref="executionRecordDrawerRef" :api="api" :knowledge-id="knowledgeId" @closed="drawerMounted = false" />

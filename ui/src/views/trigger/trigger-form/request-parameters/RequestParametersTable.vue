@@ -37,7 +37,7 @@ function formatFieldType(type: TriggerBodyField['type']) {
     <div class="flex-between mt-4">
       <p>请求参数</p>
       <!-- 添加请求参数 -->
-      <el-button text type="primary" title="添加请求参数" @click="dialogRef?.open()">
+      <el-button text type="primary" @click="dialogRef?.open()">
         <MkIcon name="icon_add_outlined" />
       </el-button>
     </div>
@@ -52,7 +52,7 @@ function formatFieldType(type: TriggerBodyField['type']) {
           <el-tag size="small" type="info">{{ formatFieldType(row.type) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="描述" min-width="110" >
+      <el-table-column label="描述" min-width="110">
         <template #default="{ row }">
           <span class="block truncate" :title="row.desc || '-'">{{ row.desc || '-' }}</span>
         </template>
@@ -66,11 +66,11 @@ function formatFieldType(type: TriggerBodyField['type']) {
       <el-table-column label="操作" width="80">
         <template #default="{ row, $index }">
           <!-- 编辑请求参数 -->
-          <el-button text type="primary" title="编辑" @click="dialogRef?.open(row, $index)">
+          <el-button text type="primary" @click="dialogRef?.open(row, $index)">
             <MkIcon name="icon_edit_outlined" />
           </el-button>
           <!-- 删除请求参数 -->
-          <el-button text type="primary" title="删除" @click="removeField($index)">
+          <el-button text type="primary" @click="removeField($index)">
             <MkIcon name="icon_delete-trash_outlined" />
           </el-button>
         </template>

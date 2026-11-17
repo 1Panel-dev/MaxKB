@@ -54,6 +54,8 @@ Element Plus 已在 Admin、Chat 入口注册。使用前先检查原生 API，�
   事件及内容，避免将循环指令与展示属性混写。此规则适用于页面、公共组件、对话面板、
   布局和工作流画布；已有循环暂不批量改写。
 - 不编写 `aria-label`；按钮前添加简短中文用途注释，已有注释不重复添加。
+- `<el-button>` 和原生 `<button>` 不设置 `title` 属性，包括 `:title` / `v-bind:title` 动态绑定，避免引入额外的翻译文案。
+  此规则适用于页面、公共组件、对话面板和工作流画布。
 - `global` 不创建仅用于二次导出的聚合入口。
 - `el-input-number` 设置 `controls-position="right"` 时，同时设置 `align="left"`。
 - Tooltip、Popover、Popconfirm、Dropdown 的触发插槽只保留一个有实际布局盒的根节点；
@@ -614,7 +616,7 @@ Logo 数据统一从 Theme Store 获取。
 - `accept`、`limit` 控制格式／数量，多文件 `sizeLimit` 默认 100MB；格式、空文件、重复选择移除，
   大小超限保留 fail 文件，图片模式保留原图和红框；所有失败均提供重试，重试仍执行原有文件校验。
   超量发出 exceed，DS_Store 格式不支持时静默移除。
-- `dragText`、`selectText`、`tipText`、`replaceText` 覆盖文案；download 作用域插槽提供下载操作。
+- 默认按钮、拖拽提示和上传状态随界面语言切换。`dragText`、`selectText`、`tipText`、`replaceText` 支持调用方传入自定义文案，包括空字符串。download 作用域插槽提供下载操作。
 - 多文件通过 `inject('upload')` 获取 `DragUploadHandler`，返回 `{ request: Promise<string>, abort }`。
   change 后等待调用方回写和校验，再上传 ready 文件；响应成功才标记 success 并提取 file_id，100% 仅表示传输完成。
 - 未注入请求时只选择文件，重试发出 retry(file)。删除／清空／卸载取消上传；移除有 file_id 的成功文件会调用

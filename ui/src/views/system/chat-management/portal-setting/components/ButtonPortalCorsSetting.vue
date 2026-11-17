@@ -40,7 +40,7 @@ function handleClosed() {
 
 <template>
   <!-- 配置跨域地址 -->
-  <el-button text type="primary" title="跨域设置" :disabled="disabled || saving" @click="handleOpenCorsSetting">
+  <el-button text type="primary" :disabled="disabled || saving" @click="handleOpenCorsSetting">
     <MkIcon name="icon_setting" />
   </el-button>
   <MkDialog v-model="corsVisible" title="跨域设置" @closed="handleClosed">

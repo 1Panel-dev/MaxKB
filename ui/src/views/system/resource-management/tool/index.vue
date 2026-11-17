@@ -297,7 +297,7 @@ onMounted(() => {
                 <!-- 查看执行记录 -->
                 <ExecutionRecordToolAction
                   v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type) && perm.tool.system.record()"
-                  :label="t('resource.actions.viewExecutionRecords')"
+                  :label="t('resource.executionRecords.view')"
                   :api="SystemToolWorkflowApi"
                   :tool="row"
                 />

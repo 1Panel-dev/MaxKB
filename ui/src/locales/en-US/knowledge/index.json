@@ -38,6 +38,11 @@
       "placeholder": "Select an embedding model",
       "requiredMessage": "Select an embedding model"
     },
+    "targetKnowledge": {
+      "label": "Destination knowledge",
+      "placeholder": "Select a destination",
+      "requiredMessage": "Select a destination"
+    },
     "webRootUrl": {
       "label": "Website root URL",
       "placeholder": "Enter the website root URL",
@@ -50,6 +55,7 @@
   },
   "stats": {
     "documents": "{count} doc | {count} docs",
+    "paragraphs": "{count} paragraph | {count} paragraphs",
     "characters": "{count} character | {count} characters",
     "images": "{count} image | {count} images"
   },
@@ -58,7 +64,14 @@
     "generateEmbeddings": "Generate embeddings",
     "generateQuestions": "Generate questions",
     "cancelGenerateQuestions": "Cancel question generation",
-    "buildKeywordIndex": "Build keyword index"
+    "buildKeywordIndex": "Build keyword index",
+    "cancelEmbeddings": "Cancel embedding generation",
+    "cancelKeywordIndex": "Cancel keyword indexing"
+  },
+  "paragraphScope": {
+    "label": "Select paragraphs",
+    "unsuccessful": "Skip previously successful paragraphs",
+    "all": "All paragraphs"
   },
   "import": {
     "embeddingNotice": "Knowledge imported successfully. The documents do not have embeddings yet. Select an embedding model in settings, then generate embeddings for the documents."
@@ -75,6 +88,7 @@
     "batchTitle": "Delete selected knowledge ({count})?"
   },
   "messages": {
-    "missingWorkspace": "Workspace information is missing for this knowledge."
+    "missingWorkspace": "Workspace information is missing for this knowledge.",
+    "migrateSuccess": "Migrated successfully"
   }
 }

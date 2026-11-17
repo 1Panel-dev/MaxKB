@@ -9,11 +9,6 @@
       "description": "The system replaces {data} in the prompt with the paragraph text and sends it to the AI model.\nAsk the model to wrap each generated question in {questionTags} so the system can link it to the paragraph.\nYou can adjust the prompt or choose another model to improve the results.",
       "requiredMessage": "Enter a prompt",
       "defaultValue": "Content: {data}\n\nSummarize the content above and use the summary to generate 5 questions.\nOutput requirements:\n- Output only the questions.\n- Wrap each question in {questionTags}."
-    },
-    "scope": {
-      "label": "Select paragraphs",
-      "unsuccessful": "Skip previously successful paragraphs",
-      "all": "All paragraphs"
     }
   }
 }

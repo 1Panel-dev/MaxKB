@@ -35,9 +35,9 @@ import ButtonExecutionRecord from './components/ButtonExecutionRecord.vue'
 import DocumentStatus from './components/DocumentStatus.vue'
 import DocumentTags from './components/DocumentTags.vue'
 import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
-import { DOCUMENT_STATUS_FILTER_OPTIONS } from './status'
+import { DOCUMENT_STATUS_FILTER_OPTIONS, DOCUMENT_STATUS_OPTIONS } from './status'
 import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
-import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
+import { DOCUMENT_HIT_HANDLING_MESSAGE_KEYS } from '@/constants/document'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import { isWorkFlow, toOrderBy } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
@@ -151,8 +151,8 @@ const documentQuery = ref<Dict<unknown>>({})
 const orderBy = ref<string>()
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
-  { label: '名称', value: 'name' },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.name.label'), value: 'name' },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 
 function loadCreatorOptions(keyword: string) {
@@ -165,17 +165,22 @@ function loadCreatorOptions(keyword: string) {
 /* 过滤项 */
 // 文档状态
 const selectedDocumentStatus = ref<string | null>(null)
+const documentStatusOptions = computed(() =>
+  DOCUMENT_STATUS_FILTER_OPTIONS.map(({ value }) => ({ value, label: t(DOCUMENT_STATUS_OPTIONS[value].labelKey) })),
+)
 const documentStatusFilter = computed(() => DOCUMENT_STATUS_FILTER_OPTIONS.find(({ value }) => value === selectedDocumentStatus.value))
 
 // 启用状态
-const documentActiveOptions = [
-  { label: '已启用', value: true },
-  { label: '已禁用', value: false },
-]
+const documentActiveOptions = computed(() => [
+  { label: t('common.status.enabled'), value: true },
+  { label: t('common.status.disabled'), value: false },
+])
 const selectedDocumentActive = ref<boolean | null>(null)
 
 // 召回处理
-const documentHitHandlingOptions = Object.entries(DOCUMENT_HIT_HANDLING_LABELS).map(([value, label]) => ({ value, label }))
+const documentHitHandlingOptions = computed(() =>
+  Object.entries(DOCUMENT_HIT_HANDLING_MESSAGE_KEYS).map(([value, key]) => ({ value, label: t(key) })),
+)
 const selectedDocumentHitHandling = ref<DocumentHitHandling | null>(null)
 
 // 标签
@@ -386,12 +391,18 @@ onBeforeUnmount(() => {
   >
     <template v-if="showQuickCreate && !isWorkspaceSharedResource()" #body-prepend>
       <!-- 快速创建空白文档 -->
-      <MkQuickCreate v-if="knowledgeDocPermission('docCreate')" ref="quickCreateRef" text="快速创建空白文档" placeholder="请输入文档名称" @create="handleCreateDocument" />
+      <MkQuickCreate
+        v-if="knowledgeDocPermission('docCreate')"
+        ref="quickCreateRef"
+        :text="t('knowledge.document.actions.quickCreate')"
+        :placeholder="t('knowledge.document.name.placeholder')"
+        @create="handleCreateDocument"
+      />
     </template>
 
     <el-table-column type="selection" width="40" reserve-selection v-if="!isWorkspaceSharedResource()" />
 
-    <el-table-column prop="name" label="文档名称" min-width="220" show-overflow-tooltip>
+    <el-table-column prop="name" :label="t('knowledge.document.name.label')" min-width="220" show-overflow-tooltip>
       <template #default="{ row }: { row: DocumentItem }">
         <!-- 编辑文档名称 -->
         <MkEditName
@@ -409,13 +420,13 @@ onBeforeUnmount(() => {
       </template>
     </el-table-column>
 
-    <el-table-column width="140">
+    <el-table-column min-width="140">
       <template #header>
         <MkTableFilter
           v-model="selectedDocumentStatus"
           mode="single"
-          label="文件状态"
-          :options="DOCUMENT_STATUS_FILTER_OPTIONS"
+          :label="t('knowledge.document.status.label')"
+          :options="documentStatusOptions"
           @change="handleDocumentFilterChange"
         />
       </template>
@@ -423,24 +434,26 @@ onBeforeUnmount(() => {
         <DocumentStatus :status="row.status" :status-meta="row.status_meta" />
       </template>
     </el-table-column>
-    <el-table-column width="120">
+    <el-table-column min-width="170">
       <template #header>
         <MkTableFilter
           v-model="selectedDocumentActive"
           mode="single"
-          label="启用状态"
+          :label="t('knowledge.document.labels.activeStatus')"
           :options="documentActiveOptions"
           @change="handleDocumentFilterChange"
         />
       </template>
-      <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
+      <template #default="{ row }">
+        <MkStatusLabel :active="row.is_active" :active-text="t('common.status.enabled')" :inactive-text="t('common.status.disabled')" />
+      </template>
     </el-table-column>
-    <el-table-column prop="char_length" label="字符数" min-width="90" sortable>
+    <el-table-column prop="char_length" :label="t('knowledge.document.labels.characters')" min-width="120" sortable>
       <template #default="{ row }">
         {{ numberFormat(row.char_length) }}
       </template>
     </el-table-column>
-    <el-table-column prop="paragraph_count" label="分段" sortable>
+    <el-table-column prop="paragraph_count" :label="t('knowledge.document.labels.paragraphs')" min-width="120" sortable>
       <template #default="{ row }">
         {{ numberFormat(row.paragraph_count) }}
       </template>
@@ -451,7 +464,7 @@ onBeforeUnmount(() => {
         <MkTableFilter
           v-model="selectedDocumentTags"
           mode="cascader"
-          label="标签"
+          :label="t('knowledge.tags.label')"
           :options="documentTagOptions"
           @open="loadDocumentTagOptions"
           @change="handleDocumentFilterChange"
@@ -469,36 +482,36 @@ onBeforeUnmount(() => {
       </template>
     </el-table-column>
 
-    <el-table-column width="130">
+    <el-table-column min-width="180">
       <template #header>
         <MkTableFilter
           v-model="selectedDocumentHitHandling"
           mode="single"
-          label="召回处理"
+          :label="t('knowledge.document.hitHandling.label')"
           :options="documentHitHandlingOptions"
           @change="handleDocumentFilterChange"
         />
       </template>
       <template #default="{ row }: { row: DocumentItem }">
-        {{ DOCUMENT_HIT_HANDLING_LABELS[row.hit_handling_method] }}
+        {{ documentHitHandlingOptions.find((option) => option.value === row.hit_handling_method)?.label }}
       </template>
     </el-table-column>
-    <el-table-column prop="hit_num" width="120" label="召回次数" sortable>
+    <el-table-column prop="hit_num" min-width="140" :label="t('knowledge.document.labels.retrievalCount')" sortable>
       <template #default="{ row }">
         {{ numberFormat(row.hit_num) }}
       </template>
     </el-table-column>
-    <el-table-column prop="last_hit_time" label="最后一次召回时间" width="180" sortable>
+    <el-table-column prop="last_hit_time" :label="t('knowledge.document.labels.lastRetrievedAt')" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.last_hit_time) }}</template>
     </el-table-column>
-    <el-table-column prop="nick_name" width="120" label="创建者" show-overflow-tooltip />
-    <el-table-column prop="update_time" label="更新时间" width="180" sortable>
+    <el-table-column prop="nick_name" width="120" :label="t('common.labels.creator')" show-overflow-tooltip />
+    <el-table-column prop="update_time" :label="t('common.labels.updatedAt')" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
     </el-table-column>
-    <el-table-column prop="create_time" label="创建时间" width="180" sortable>
+    <el-table-column prop="create_time" :label="t('common.labels.createdAt')" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
-    <el-table-column label="操作" width="160" fixed="right" v-if="!isWorkspaceSharedResource()">
+    <el-table-column :label="t('common.labels.operation')" width="160" fixed="right" v-if="!isWorkspaceSharedResource()">
       <template #default="{ row }: { row: DocumentItem }">
         <div class="flex-align-center" @click.stop>
           <!-- 启用或禁用文档 -->
@@ -543,7 +556,7 @@ onBeforeUnmount(() => {
               />
               <!-- 设置当前文档的标签 -->
               <DocumentTagsAction
-                label="标签设置"
+                :label="t('knowledge.tags.settings')"
                 icon="icon_tag"
                 :api="resourceApi.tags"
                 :knowledge-id="knowledgeId"
@@ -555,7 +568,7 @@ onBeforeUnmount(() => {
               <!-- 同步 -->
               <SyncDocumentAction
                 v-if="knowledgeType !== KNOWLEDGE_TYPE_KEY.BASE && knowledgeDocPermission('docSync')"
-                label="同步"
+                :label="t('knowledge.actions.sync')"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
                 :document="row"
@@ -565,7 +578,7 @@ onBeforeUnmount(() => {
 
               <!-- 文档设置 -->
               <SettingDocumentAction
-                label="设置"
+                :label="t('common.labels.settings')"
                 icon="icon_setting"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
@@ -577,7 +590,7 @@ onBeforeUnmount(() => {
 
               <!-- 迁移文档 -->
               <MigrateDocumentAction
-                label="迁移"
+                :label="t('knowledge.document.actions.migrate')"
                 icon="icon_move2_outlined"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
@@ -589,7 +602,7 @@ onBeforeUnmount(() => {
               <!-- 导出文档 -->
               <ExportDocumentAction
                 v-if="knowledgeDocPermission('docExport')"
-                label="导出"
+                :label="t('common.actions.export')"
                 :api="resourceApi.document"
                 v-model:loading="operationLoading"
                 :document="row"
@@ -660,7 +673,7 @@ onBeforeUnmount(() => {
       />
       <!-- 批量文档设置 -->
       <BatchSettingDocumentAction
-        label="设置"
+        :label="t('common.labels.settings')"
         :api="resourceApi.document"
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
@@ -669,7 +682,7 @@ onBeforeUnmount(() => {
       />
       <!-- 为选中文档批量添加标签 -->
       <BatchDocumentTagsAction
-        label="标签设置"
+        :label="t('knowledge.tags.settings')"
         :api="resourceApi.tags"
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
@@ -689,7 +702,7 @@ onBeforeUnmount(() => {
             <!-- 批量同步 -->
             <BatchSyncDocumentAction
               v-if="knowledgeType !== KNOWLEDGE_TYPE_KEY.BASE && knowledgeDocPermission('docSync')"
-              label="同步"
+              :label="t('knowledge.actions.sync')"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
@@ -698,7 +711,7 @@ onBeforeUnmount(() => {
             />
             <!-- 批量迁移文档 -->
             <MigrateDocumentAction
-              label="迁移至"
+              :label="t('knowledge.document.actions.migrateTo')"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
               :document-ids="selectedDocumentIds"
@@ -709,7 +722,7 @@ onBeforeUnmount(() => {
 
             <!-- 批量导出文档 -->
             <BatchExportDocumentAction
-              label="导出"
+              :label="t('common.actions.export')"
               :api="resourceApi.document"
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
@@ -722,7 +735,7 @@ onBeforeUnmount(() => {
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
               :task-type="DOCUMENT_TASK_TYPE.EMBEDDING"
-              label="取消向量化"
+              :label="t('knowledge.actions.cancelEmbeddings')"
               @refresh="refreshAfterOperation"
             />
             <!-- 批量取消生成问题 -->

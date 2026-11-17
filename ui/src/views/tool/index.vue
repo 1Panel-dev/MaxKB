@@ -356,7 +356,7 @@ onMounted(() => {
                   <!-- 查看执行记录 -->
                   <ExecutionRecordToolAction
                     v-if="(tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW) && perm.tool.workspace.record(tool.id)"
-                    :label="t('resource.actions.viewExecutionRecords')"
+                    :label="t('resource.executionRecords.view')"
                     :api="WorkflowApi"
                     :tool="tool"
                   />

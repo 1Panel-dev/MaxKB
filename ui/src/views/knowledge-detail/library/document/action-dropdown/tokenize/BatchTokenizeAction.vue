@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { DOCUMENT_TASK_STATE } from '@/api/enums'
 
 defineOptions({ name: 'BatchTokenizeAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -31,5 +33,5 @@ function handleTokenize() {
 
 <template>
   <!-- 批量分词索引 -->
-  <el-button plain type="primary" :disabled="loading" @click="handleTokenize">分词索引</el-button>
+  <el-button plain type="primary" :disabled="loading" @click="handleTokenize">{{ t('knowledge.actions.buildKeywordIndex') }}</el-button>
 </template>

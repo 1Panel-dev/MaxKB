@@ -1,0 +1,31 @@
+{
+  "tags": {
+    "title": "標籤管理",
+    "label": "標籤",
+    "settings": "標籤設定",
+    "key": {
+      "label": "標籤",
+      "placeholder": "請輸入標籤",
+      "selectPlaceholder": "請選擇標籤",
+      "requiredMessage": "請輸入標籤",
+      "selectRequiredMessage": "請選擇標籤"
+    },
+    "value": {
+      "label": "標籤值",
+      "placeholder": "請輸入標籤值",
+      "selectPlaceholder": "請選擇標籤值",
+      "requiredMessage": "請輸入標籤值",
+      "selectRequiredMessage": "請選擇標籤值",
+      "unavailableMessage": "此標籤值已無法使用，請重新選擇。"
+    },
+    "actions": {
+      "add": "新增標籤",
+      "create": "建立標籤",
+      "createValue": "建立標籤值",
+      "addValue": "新增標籤值"
+    },
+    "messages": {
+      "duplicateTag": "標籤已存在"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ParagraphUpdatePayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { Footers, ToolbarNames } from 'md-editor-v3'
@@ -7,15 +8,17 @@ import { FILE_SOURCE_TYPE } from '@/api/enums'
 import FileApi from '@/api/admin/file'
 
 defineOptions({ name: 'ParagraphForm' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ knowledgeId: string }>()
 const paragraphForm = defineModel<ParagraphUpdatePayload>({ required: true })
 const formRef = ref<FormInstance>()
-const paragraphRules: FormRules<ParagraphUpdatePayload> = {
+const contentMaxLength = 100000
+const paragraphRules = computed<FormRules<ParagraphUpdatePayload>>(() => ({
   content: [
-    { required: true, whitespace: true, message: '请输入内容', trigger: 'blur' },
-    { max: 100000, message: '内容最多 100000 字符', trigger: 'blur' },
+    { required: true, whitespace: true, message: t('knowledge.paragraph.content.requiredMessage'), trigger: 'blur' },
+    { max: contentMaxLength, message: t('knowledge.paragraph.content.lengthMessage', { max: contentMaxLength }), trigger: 'blur' },
   ],
-}
+}))
 
 /* Markdown 内容编辑与知识库图片上传 */
 const toolbars: ToolbarNames[] = [
@@ -74,19 +77,20 @@ defineExpose({ validate })
     ref="formRef"
     :model="paragraphForm"
     :rules="paragraphRules"
+    :validate-on-rule-change="false"
     label-position="top"
     require-asterisk-position="right"
     class="min-w-0 flex-1"
     @submit.prevent
   >
-    <el-form-item label="标题" prop="title">
-      <el-input v-model="paragraphForm.title" maxlength="256" placeholder="请输入标题" />
+    <el-form-item :label="t('knowledge.paragraph.heading.label')" prop="title">
+      <el-input v-model="paragraphForm.title" maxlength="256" :placeholder="t('knowledge.paragraph.heading.placeholder')" />
     </el-form-item>
-    <el-form-item label="内容" prop="content">
+    <el-form-item :label="t('knowledge.paragraph.content.label')" prop="content">
       <MdEditor
         v-model="paragraphForm.content"
-        placeholder="请输入内容"
-        :max-length="100000"
+        :placeholder="t('knowledge.paragraph.content.placeholder')"
+        :max-length="contentMaxLength"
         :preview="false"
         :toolbars="toolbars"
         :footers="footers"
@@ -95,7 +99,7 @@ defineExpose({ validate })
         @on-blur="handleContentBlur"
       >
         <template #defFooters>
-          <span class="-ml-[6px]">/ 100000</span>
+          <span class="-ml-[6px]">/ {{ contentMaxLength }}</span>
         </template>
       </MdEditor>
     </el-form-item>

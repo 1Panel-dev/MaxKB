@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentUploadMode } from './constants'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import UploadDocumentDrawer from './UploadDocumentDrawer.vue'
 
 defineOptions({ name: 'ButtonUploadDocument' })
+const { t } = useI18n({ useScope: 'global' })
 defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -26,7 +28,7 @@ function handleOpenUpload(mode: DocumentUploadMode) {
   <MkDropdown trigger="click" placement="bottom-end">
     <!-- 上传文档 -->
     <el-button type="primary">
-      <span class="mr-1">上传文档</span>
+      <span class="mr-1">{{ t('knowledge.document.upload.title') }}</span>
       <MkIcon name="icon_down_outlined" :size="14" />
     </el-button>
     <template #dropdown>
@@ -34,17 +36,17 @@ function handleOpenUpload(mode: DocumentUploadMode) {
         <!-- 上传文本文件 -->
         <MkDropdownItem class="py-2!" @click="handleOpenUpload('text')">
           <template #icon><img src="@/assets/file-type/file-document-icon.svg" alt="" class="size-6" /></template>
-          <span>文本文件</span>
+          <span>{{ t('knowledge.document.upload.textLabel') }}</span>
         </MkDropdownItem>
         <!-- 上传表格 -->
         <MkDropdownItem class="py-2!" @click="handleOpenUpload('table')">
           <template #icon><img src="@/assets/file-type/file-table-icon.svg" alt="" class="size-6" /></template>
-          <span>表格</span>
+          <span>{{ t('knowledge.document.upload.tableLabel') }}</span>
         </MkDropdownItem>
         <!-- 上传 QA 问答对 -->
         <MkDropdownItem class="py-2!" @click="handleOpenUpload('qa')">
           <template #icon><img src="@/assets/file-type/file-qa-icon.svg" alt="" class="size-6" /></template>
-          <span>QA 问答对</span>
+          <span>{{ t('knowledge.document.upload.qaLabel') }}</span>
         </MkDropdownItem>
       </MkDropdownMenu>
     </template>

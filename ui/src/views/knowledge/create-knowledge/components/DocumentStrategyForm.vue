@@ -167,12 +167,7 @@ defineExpose({ validate, getStrategy, setStrategy })
                   :placeholder="t('knowledge.documentStrategy.delimiter.placeholder')"
                   class="w-full"
                 >
-                  <el-option
-                    v-for="pattern in DOCUMENT_SPLIT_PATTERN_OPTIONS"
-                    :key="pattern.value"
-                    :label="pattern.labelKey ? t(pattern.labelKey) : pattern.label"
-                    :value="pattern.value"
-                  />
+                  <el-option v-for="pattern in DOCUMENT_SPLIT_PATTERN_OPTIONS" :key="pattern.value" :label="pattern.label" :value="pattern.value" />
                 </el-select>
               </el-form-item>
               <el-form-item :label="t('knowledge.documentStrategy.paragraphLength')">

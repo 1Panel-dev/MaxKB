@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { DocumentItem } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DownloadDocumentAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -19,7 +21,7 @@ function handleDownload() {
     props.api
       .downloadDocumentSource?.(props.knowledgeId, props.document)
       .then(() => {
-        MsgSuccess('操作成功')
+        MsgSuccess(t('common.messages.operationSuccess'))
       })
       .catch(() => {}) ?? Promise.resolve()
   ).finally(() => {
@@ -30,5 +32,5 @@ function handleDownload() {
 
 <template>
   <!-- 下载原文档 -->
-  <MkAction label="下载原文档" icon="icon_download_outlined" :disabled="loading" @click="handleDownload" />
+  <MkAction :label="t('knowledge.document.actions.downloadOriginal')" icon="icon_download_outlined" :disabled="loading" @click="handleDownload" />
 </template>

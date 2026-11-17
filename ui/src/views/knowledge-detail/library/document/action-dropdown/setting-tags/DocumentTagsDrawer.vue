@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeTagGroup } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { TableColumnCtx } from 'element-plus'
@@ -7,6 +8,7 @@ import AddTagDialog from './AddTagDialog.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DocumentTagsDrawer' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   knowledgeId: string
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags']
@@ -92,7 +94,7 @@ function handleDeleteTags(tags: DocumentTagRow[]) {
   operationLoading.value = true
   return (
     props.api.putDeleteDocumentTags?.(targetKnowledgeId.value, targetDocumentId.value, tagIds).then(() => {
-      MsgSuccess('移除成功')
+      MsgSuccess(t('common.messages.removeSuccess'))
       return handleTagsChanged()
     }) ?? Promise.resolve()
   ).finally(() => {
@@ -104,14 +106,14 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="标签设置" @closed="emit('closed')">
+  <MkDrawer v-model="visible" :title="t('knowledge.tags.settings')" @closed="emit('closed')">
     <div class="flex-between gap-4 mb-4">
       <!-- 为当前文档添加标签 -->
       <el-button type="primary" @click="handleOpenAddTag">
         <MkIcon name="icon_add_outlined" />
-        <span>添加标签</span>
+        <span>{{ t('knowledge.tags.actions.add') }}</span>
       </el-button>
-      <MkSearchInput v-model="searchText" class="w-60!" @change="loadTags" />
+      <MkSearchInput v-model="searchText" class="w-60!" :placeholder="t('common.placeholders.search')" @change="loadTags" />
     </div>
     <MkTable
       ref="tagTableRef"
@@ -122,12 +124,12 @@ defineExpose({ open })
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="40" />
-      <el-table-column prop="key" label="标签" min-width="160" show-overflow-tooltip />
-      <el-table-column prop="value" label="标签值" min-width="160" class-name="border-l!" show-overflow-tooltip />
-      <el-table-column label="操作" width="64">
+      <el-table-column prop="key" :label="t('knowledge.tags.key.label')" min-width="160" show-overflow-tooltip />
+      <el-table-column prop="value" :label="t('knowledge.tags.value.label')" min-width="160" class-name="border-l!" show-overflow-tooltip />
+      <el-table-column :label="t('common.labels.operation')" width="80">
         <template #default="{ row }: { row: DocumentTagRow }">
           <!-- 移除当前文档的标签关联 -->
-          <MkTooltip content="删除" placement="top">
+          <MkTooltip :content="t('common.actions.delete')" placement="top">
             <el-button type="primary" text :disabled="loading || operationLoading" @click="handleDeleteTags([row])">
               <MkIcon name="icon_delete-trash_outlined" />
             </el-button>
@@ -136,7 +138,9 @@ defineExpose({ open })
       </el-table-column>
       <template #footer-batch-actions>
         <!-- 批量移除当前文档的标签关联 -->
-        <el-button plain type="danger" :disabled="loading || operationLoading" @click="handleDeleteTags(selectedTags)">删除</el-button>
+        <el-button plain type="danger" :disabled="loading || operationLoading" @click="handleDeleteTags(selectedTags)">
+          {{ t('common.actions.delete') }}
+        </el-button>
       </template>
     </MkTable>
   </MkDrawer>

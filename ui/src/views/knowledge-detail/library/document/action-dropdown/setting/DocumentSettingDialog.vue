@@ -2,13 +2,15 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { DocumentItem, DocumentSettingPayload } from '@/api/types'
 import type { FormInstance } from 'element-plus'
 import { DOCUMENT_HIT_HANDLING } from '@/api/enums'
-import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
+import { DOCUMENT_HIT_HANDLING_MESSAGE_KEYS } from '@/constants/document'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 
 defineOptions({ name: 'DocumentSettingDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ loading: boolean; batch?: boolean }>()
 const emit = defineEmits<{ submit: [data: DocumentSettingPayload]; closed: [] }>()
 const route = useRoute()
@@ -81,8 +83,8 @@ defineExpose({ open, close })
           </span>
         </template>
         <el-radio-group v-model="form.hit_handling_method">
-          <template v-for="(label, value) in DOCUMENT_HIT_HANDLING_LABELS" :key="value">
-            <el-radio :value="value">{{ label }}</el-radio>
+          <template v-for="(labelKey, value) in DOCUMENT_HIT_HANDLING_MESSAGE_KEYS" :key="value">
+            <el-radio :value="value">{{ t(labelKey) }}</el-radio>
           </template>
         </el-radio-group>
       </el-form-item>

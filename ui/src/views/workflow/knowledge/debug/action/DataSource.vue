@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, provide, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, KnowledgeWorkflowApi } from '@/api/types'
 import type { DynamicFormTreeLoader, DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import WorkflowApi from '@/api/admin/workspace/knowledge/workflow'
@@ -9,6 +10,7 @@ import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 defineOptions({ name: 'DataSource' })
+const { t } = useI18n({ useScope: 'global' })
 
 interface WorkflowNode {
   id: string
@@ -57,7 +59,7 @@ provide<DynamicFormTreeLoader>('loadTreeData', (functionName, currentNode) => {
   const toolId = sourceContext.value.current_tool_id
   if (!toolId) return Promise.resolve([])
   const loadDocuments = (props.api ?? WorkflowApi).getKnowledgeDatasourceDocuments
-  if (!loadDocuments) return Promise.reject(new Error('当前知识库不支持数据源文件查询'))
+  if (!loadDocuments) return Promise.reject(new Error(t('workflow.dataSource.documentsUnavailableMessage')))
   return loadDocuments(props.knowledgeId, toolId, functionName, currentNode)
 })
 
@@ -115,8 +117,8 @@ defineExpose({ validate, getData })
     :other-params="{ current_workspace_id: getWorkspaceId(), current_knowledge_id: knowledgeId }"
   >
     <template #default>
-      <h4 v-if="hasKnowledgeBaseInput" class="mb-4 mk-title-decoration">选择数据源</h4>
-      <el-form-item label="数据源类型">
+      <h4 v-if="hasKnowledgeBaseInput" class="mb-4 mk-title-decoration">{{ t('workflow.dataSource.selectTitle') }}</h4>
+      <el-form-item :label="t('workflow.dataSource.typeLabel')">
         <div class="grid w-full grid-cols-3 gap-2">
           <template v-for="node in sourceNodeList" :key="node.id">
             <el-card

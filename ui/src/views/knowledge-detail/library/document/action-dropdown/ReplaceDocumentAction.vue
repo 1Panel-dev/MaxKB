@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentItem } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { UploadFile } from 'element-plus'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
-import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_EXTENSIONS, KNOWLEDGE_IMAGE_TYPE_LABEL } from '@/constants/knowledge'
+import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_EXTENSIONS } from '@/constants/knowledge'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ReplaceDocumentAction' })
+const { locale, t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -22,7 +24,8 @@ const accept = computed(() => (isImage.value ? KNOWLEDGE_IMAGE_ACCEPT : ''))
 function handleReplace(file: UploadFile) {
   if (!file.raw || loading.value) return
   if (isImage.value && !KNOWLEDGE_IMAGE_EXTENSIONS.includes(file.raw.name.split('.').pop()?.toUpperCase() ?? '')) {
-    MsgWarning(`仅支持 ${KNOWLEDGE_IMAGE_TYPE_LABEL} 格式的图片`)
+    const formats = KNOWLEDGE_IMAGE_EXTENSIONS.join(locale.value === 'en-US' ? ', ' : '、')
+    MsgWarning(t('knowledge.image.unsupportedFormatMessage', { formats }))
     return
   }
   loading.value = true
@@ -30,7 +33,7 @@ function handleReplace(file: UploadFile) {
     props.api
       .postReplaceDocumentSource?.(props.knowledgeId, props.document.id, file.raw)
       .then(() => {
-        MsgSuccess('操作成功')
+        MsgSuccess(t('common.messages.operationSuccess'))
         emit('refresh')
       })
       .catch(() => {}) ?? Promise.resolve()
@@ -45,7 +48,7 @@ function handleReplace(file: UploadFile) {
   <el-upload action="#" :accept="accept" :auto-upload="false" :show-file-list="false" :file-list="[]" :disabled="loading" :on-change="handleReplace">
     <MkDropdownItem :disabled="loading">
       <template #icon><MkIcon name="icon_doc-replace_outlined" /></template>
-      <span>替换原文档</span>
+      <span>{{ t('knowledge.document.actions.replaceOriginal') }}</span>
     </MkDropdownItem>
   </el-upload>
 </template>

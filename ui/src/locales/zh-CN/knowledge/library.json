@@ -2,13 +2,8 @@
   "library": {
     "title": "资料库"
   },
-  "document": {
-    "title": "文档"
-  },
   "image": {
-    "title": "图片"
-  },
-  "tags": {
-    "title": "标签管理"
+    "title": "图片",
+    "unsupportedFormatMessage": "仅支持 {formats} 格式的图片"
   }
 }

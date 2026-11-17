@@ -107,7 +107,7 @@ defineExpose({ open })
         </div>
 
         <!-- 刷新智能体 -->
-        <el-button text class="h-7! w-7! min-w-0! p-1!" title="刷新" @click="refreshResources">
+        <el-button text class="h-7! w-7! min-w-0! p-1!" @click="refreshResources">
           <MkIcon name="icon_refresh_outlined" :size="20" />
         </el-button>
       </div>
