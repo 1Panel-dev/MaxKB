@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeCreatePayload, ModelItem, ModelProviderItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { MODEL_STATUS } from '@/api/enums'
@@ -11,6 +12,7 @@ import SelectModel from '@/components/business/select-model/index.vue'
 import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'KnowledgeBaseForm' })
+const { t } = useI18n({ useScope: 'global' })
 const props = withDefaults(defineProps<{ mode?: 'create' | 'setting'; disabled?: boolean }>(), {
   mode: 'create',
 })
@@ -20,11 +22,11 @@ type KnowledgeBaseDraft = Pick<KnowledgeCreatePayload, 'name' | 'desc' | 'embedd
 /* 基本信息与校验 */
 const formRef = ref<FormInstance>()
 const form = reactive<KnowledgeBaseDraft>({ name: '', desc: '', embedding_model_id: '' })
-const rules: FormRules<KnowledgeBaseDraft> = {
-  name: [{ required: true, whitespace: true, message: '请输入知识库名称', trigger: 'blur' }],
-  desc: [{ required: true, whitespace: true, message: '请输入知识库描述', trigger: 'blur' }],
-  embedding_model_id: [{ required: true, message: '请选择向量模型', trigger: 'change' }],
-}
+const rules = computed<FormRules<KnowledgeBaseDraft>>(() => ({
+  name: [{ required: true, whitespace: true, message: t('knowledge.fields.name.requiredMessage'), trigger: 'blur' }],
+  desc: [{ required: true, whitespace: true, message: t('knowledge.fields.description.requiredMessage'), trigger: 'blur' }],
+  embedding_model_id: [{ required: true, message: t('knowledge.fields.embeddingModel.requiredMessage'), trigger: 'change' }],
+}))
 
 function validate() {
   return formRef.value?.validate().catch(() => false) ?? Promise.resolve(false)
@@ -73,29 +75,44 @@ defineExpose({ form, validate, validateEmbeddingModel, reset })
 </script>
 
 <template>
-  <el-form ref="formRef" :model="form" :rules="rules" :disabled="disabled" label-position="top" require-asterisk-position="right" @submit.prevent>
-    <el-form-item label="名称" prop="name">
-      <el-input v-model="form.name" placeholder="请输入知识库名称" maxlength="64" show-word-limit @blur="form.name = form.name.trim()" />
+  <el-form
+    ref="formRef"
+    :model="form"
+    :rules="rules"
+    :validate-on-rule-change="false"
+    :disabled="disabled"
+    label-position="top"
+    require-asterisk-position="right"
+    @submit.prevent
+  >
+    <el-form-item :label="t('common.name.label')" prop="name">
+      <el-input
+        v-model="form.name"
+        :placeholder="t('knowledge.fields.name.placeholder')"
+        maxlength="64"
+        show-word-limit
+        @blur="form.name = form.name.trim()"
+      />
     </el-form-item>
-    <el-form-item label="描述" prop="desc">
+    <el-form-item :label="t('common.description.label')" prop="desc">
       <el-input
         v-model="form.desc"
         type="textarea"
-        placeholder="请输入知识库描述"
+        :placeholder="t('knowledge.fields.description.placeholder')"
         maxlength="256"
         show-word-limit
         :rows="3"
         @blur="form.desc = form.desc.trim()"
       />
     </el-form-item>
-    <el-form-item v-loading="loading" label="向量模型" prop="embedding_model_id">
+    <el-form-item v-loading="loading" :label="t('model.types.embedding.label')" prop="embedding_model_id">
       <SelectModel
         teleported
         v-model="form.embedding_model_id"
         :options="modelOptions"
         :provider-options="providerOptions"
         :disabled="disabled || loading"
-        placeholder="请选择向量模型"
+        :placeholder="t('knowledge.fields.embeddingModel.placeholder')"
         :can-add="!isWorkspaceSharedResource()"
         @refresh="loadModelOptions"
       />

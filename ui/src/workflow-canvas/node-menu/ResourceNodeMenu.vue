@@ -188,7 +188,7 @@ onMounted(() => {
             </el-popover>
           </template>
         </div>
-        <MkEmpty v-else :type="searchKeyword ? 'search' : 'default'" :image-size="72" />
+        <MkEmpty v-else :type="searchKeyword ? 'search' : 'default'" />
       </el-scrollbar>
     </section>
   </div>

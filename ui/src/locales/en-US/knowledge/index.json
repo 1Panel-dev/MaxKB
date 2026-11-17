@@ -1,0 +1,80 @@
+{
+  "title": "Knowledge",
+  "categories": {
+    "all": "All knowledge",
+    "shared": "Shared knowledge"
+  },
+  "base": {
+    "label": "General knowledge",
+    "createTitle": "Create general knowledge",
+    "description": "Upload files or enter content manually."
+  },
+  "web": {
+    "label": "Web knowledge",
+    "createTitle": "Create web knowledge",
+    "description": "Import content from website links."
+  },
+  "lark": {
+    "label": "Lark knowledge",
+    "createTitle": "Create Lark knowledge",
+    "description": "Import content from Lark documents."
+  },
+  "workflow": {
+    "title": "Workflow",
+    "label": "Workflow knowledge",
+    "createTitle": "Create workflow knowledge",
+    "description": "Use a custom workflow to build knowledge."
+  },
+  "fields": {
+    "name": {
+      "placeholder": "Enter a name for this knowledge",
+      "requiredMessage": "Enter a name for this knowledge"
+    },
+    "description": {
+      "placeholder": "Enter a description for this knowledge",
+      "requiredMessage": "Enter a description for this knowledge"
+    },
+    "embeddingModel": {
+      "placeholder": "Select an embedding model",
+      "requiredMessage": "Select an embedding model"
+    },
+    "webRootUrl": {
+      "label": "Website root URL",
+      "placeholder": "Enter the website root URL",
+      "requiredMessage": "Enter the website root URL"
+    },
+    "selector": {
+      "label": "CSS selector",
+      "placeholder": "Defaults to body. Use .classname, #idname, or tagname."
+    }
+  },
+  "stats": {
+    "documents": "{count} doc | {count} docs",
+    "characters": "{count} character | {count} characters",
+    "images": "{count} image | {count} images"
+  },
+  "actions": {
+    "sync": "Sync",
+    "generateEmbeddings": "Generate embeddings",
+    "generateQuestions": "Generate questions",
+    "cancelGenerateQuestions": "Cancel question generation",
+    "buildKeywordIndex": "Build keyword index"
+  },
+  "import": {
+    "embeddingNotice": "Knowledge imported successfully. The documents do not have embeddings yet. Select an embedding model in settings, then generate embeddings for the documents."
+  },
+  "export": {
+    "title": "Export knowledge",
+    "documentsExcel": "Export documents as Excel",
+    "documentsZip": "Export documents as ZIP",
+    "includeSourceFiles": "Include source files",
+    "sourceFilesDescription": "Include the original files in the ZIP to restore file associations automatically on import. Leave this unchecked to export only the text."
+  },
+  "delete": {
+    "title": "Delete knowledge “{name}”?",
+    "batchTitle": "Delete selected knowledge ({count})?"
+  },
+  "messages": {
+    "missingWorkspace": "Workspace information is missing for this knowledge."
+  }
+}

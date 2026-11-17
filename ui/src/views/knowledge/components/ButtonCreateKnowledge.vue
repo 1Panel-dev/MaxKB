@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import type { CSSProperties } from 'vue'
@@ -28,6 +29,7 @@ const props = withDefaults(
   }>(),
   { api: () => KnowledgeApi, trigger: 'click', fitTriggerWidth: false },
 )
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 const route = useRoute()
 const router = useRouter()
@@ -90,9 +92,9 @@ function handleImportCreate(file: UploadFile) {
       // 先刷新新资源权限，再通知列表加载导入的知识库。
       return auth.loadAuthBaseProfile().then(() => {
         emit('refresh')
-        return MsgConfirm('提示', '导入创建知识库成功，文档数据未向量化，请先设置知识库的向量模型，并对文档进行向量化操作', {
+        return MsgConfirm(t('common.dialogs.notice'), t('knowledge.import.embeddingNotice'), {
           showCancelButton: false,
-          confirmButtonText: '确定',
+          confirmButtonText: t('common.actions.confirm'),
           confirmButtonType: 'primary',
         }).then(() => {
           const routePrefix = isSystemSharedResource() ? 'system-shared-knowledge' : 'workspace-knowledge'
@@ -131,7 +133,7 @@ function handleImportCreate(file: UploadFile) {
     </div>
     <!-- 创建知识库 -->
     <el-button v-else type="primary">
-      <span class="mr-1">创建</span>
+      <span class="mr-1">{{ t('common.actions.create') }}</span>
       <MkIcon name="icon_down_outlined" :size="14" />
     </el-button>
     <template #dropdown>
@@ -140,32 +142,32 @@ function handleImportCreate(file: UploadFile) {
         <MkDropdownItem class="py-2!" @click="handleCreateBaseKnowledge">
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.BASE" /></template>
           <div class="min-w-0">
-            <p>通用知识库</p>
-            <p class="text-sm text-N600 whitespace-normal">通过上传文件或手动录入构建知识库</p>
+            <p>{{ t('knowledge.base.label') }}</p>
+            <p class="text-sm text-N600 whitespace-normal">{{ t('knowledge.base.description') }}</p>
           </div>
         </MkDropdownItem>
         <!-- 创建 Web 知识库 -->
         <MkDropdownItem class="py-2!" @click="handleCreateWebKnowledge">
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.WEB" /></template>
           <div class="min-w-0">
-            <p>Web 知识库</p>
-            <p class="text-sm text-N600 whitespace-normal">通过网站链接构建知识库</p>
+            <p>{{ t('knowledge.web.label') }}</p>
+            <p class="text-sm text-N600 whitespace-normal">{{ t('knowledge.web.description') }}</p>
           </div>
         </MkDropdownItem>
         <!-- 创建飞书知识库 -->
         <MkDropdownItem class="py-2!" @click="handleCreateLarkKnowledge">
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.LARK" /></template>
           <div class="min-w-0">
-            <p>飞书知识库</p>
-            <p class="text-sm text-N600 whitespace-normal">通过飞书文档构建知识库</p>
+            <p>{{ t('knowledge.lark.label') }}</p>
+            <p class="text-sm text-N600 whitespace-normal">{{ t('knowledge.lark.description') }}</p>
           </div>
         </MkDropdownItem>
         <!-- 创建工作流知识库 -->
         <MkDropdownItem class="py-2!" @click="handleCreateWorkflowKnowledge">
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.WORKFLOW" /></template>
           <div class="min-w-0">
-            <p>工作流知识库</p>
-            <p class="text-sm text-N600 whitespace-normal">通过自定义工作流方式构建知识库</p>
+            <p>{{ t('knowledge.workflow.label') }}</p>
+            <p class="text-sm text-N600 whitespace-normal">{{ t('knowledge.workflow.description') }}</p>
           </div>
         </MkDropdownItem>
         <!-- 导入创建 -->
@@ -182,7 +184,7 @@ function handleImportCreate(file: UploadFile) {
             <template #icon>
               <img class="size-6" src="@/assets/mk_icon_import.svg" alt="" />
             </template>
-            <span>导入创建</span>
+            <span>{{ t('common.actions.createFromImport') }}</span>
           </MkDropdownItem>
         </el-upload>
       </MkDropdownMenu>

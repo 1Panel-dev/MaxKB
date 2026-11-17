@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import animationBottom from '@/assets/login-animation/1bottom.png'
 import animationCircle from '@/assets/login-animation/2circle.png'
-import animationLine from '@/assets/login-animation/3line.gif'
+import animationLine from '@/assets/login-animation/3line.png'
 import animationRobot from '@/assets/login-animation/4robot.png'
 import animationPanel from '@/assets/login-animation/5panel.png'
 

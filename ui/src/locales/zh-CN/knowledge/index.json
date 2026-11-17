@@ -1,0 +1,80 @@
+{
+  "title": "知识库",
+  "categories": {
+    "all": "全部知识库",
+    "shared": "共享知识库"
+  },
+  "base": {
+    "label": "通用知识库",
+    "createTitle": "创建通用知识库",
+    "description": "通过上传文件或手动录入构建知识库"
+  },
+  "web": {
+    "label": "Web 知识库",
+    "createTitle": "创建 Web 知识库",
+    "description": "通过网站链接构建知识库"
+  },
+  "lark": {
+    "label": "飞书知识库",
+    "createTitle": "创建飞书知识库",
+    "description": "通过飞书文档构建知识库"
+  },
+  "workflow": {
+    "title": "工作流",
+    "label": "工作流知识库",
+    "createTitle": "创建工作流知识库",
+    "description": "通过自定义工作流方式构建知识库"
+  },
+  "fields": {
+    "name": {
+      "placeholder": "请输入知识库名称",
+      "requiredMessage": "请输入知识库名称"
+    },
+    "description": {
+      "placeholder": "请输入知识库描述",
+      "requiredMessage": "请输入知识库描述"
+    },
+    "embeddingModel": {
+      "placeholder": "请选择向量模型",
+      "requiredMessage": "请选择向量模型"
+    },
+    "webRootUrl": {
+      "label": "Web 根地址",
+      "placeholder": "请输入 Web 根地址",
+      "requiredMessage": "请输入 Web 根地址"
+    },
+    "selector": {
+      "label": "选择器",
+      "placeholder": "默认为 body，可输入 .classname/#idname/tagname"
+    }
+  },
+  "stats": {
+    "documents": "{count} 文档",
+    "characters": "{count} 字符",
+    "images": "{count} 图片"
+  },
+  "actions": {
+    "sync": "同步",
+    "generateEmbeddings": "向量化",
+    "generateQuestions": "生成问题",
+    "cancelGenerateQuestions": "取消生成问题",
+    "buildKeywordIndex": "分词索引"
+  },
+  "import": {
+    "embeddingNotice": "导入创建知识库成功，文档数据未向量化，请先设置知识库的向量模型，并对文档进行向量化操作"
+  },
+  "export": {
+    "title": "导出知识库",
+    "documentsExcel": "导出文档 Excel",
+    "documentsZip": "导出文档 ZIP",
+    "includeSourceFiles": "同时导出源文件",
+    "sourceFilesDescription": "勾选后将原始文件一并打包至 ZIP，导入时可自动恢复文件关联；不勾选，则仅导出文本内容。"
+  },
+  "delete": {
+    "title": "确认删除知识库：{name}？",
+    "batchTitle": "是否批量删除 {count} 个知识库？"
+  },
+  "messages": {
+    "missingWorkspace": "知识库缺少所属工作空间信息"
+  }
+}

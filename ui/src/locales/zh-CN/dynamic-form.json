@@ -96,8 +96,7 @@
       "notFoundMessage": "未找到引用变量"
     },
     "model": {
-      "requiredMessage": "请选择模型",
-      "placeholder": "请选择模型"
+      "requiredMessage": "请选择模型"
     },
     "knowledge": {
       "requiredMessage": "请选择知识库",

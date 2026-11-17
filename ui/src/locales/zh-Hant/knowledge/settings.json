@@ -1,0 +1,85 @@
+{
+  "baseSettings": {
+    "title": "基本設定"
+  },
+  "documentStrategy": {
+    "title": "文件處理策略",
+    "splitRules": "分段規則",
+    "smart": {
+      "label": "智慧分段（建議）",
+      "description": "若不確定如何設定分段規則，建議使用智慧分段"
+    },
+    "advanced": {
+      "label": "進階分段",
+      "description": "可依文件格式自行設定分段符號、分段長度及清理規則"
+    },
+    "delimiter": {
+      "label": "分段符號",
+      "placeholder": "請選擇分段符號",
+      "description": "依照所選符號的順序遞迴分割內容。超過設定長度的分段會截短至該長度。"
+    },
+    "delimiterOptions": {
+      "space": "空格",
+      "semicolon": "分號",
+      "comma": "逗號",
+      "period": "句號",
+      "newline": "換行",
+      "blankLine": "空白行"
+    },
+    "paragraphLength": "分段長度",
+    "childChunkLength": {
+      "label": "子區塊長度",
+      "description": "子區塊僅用於向量檢索，命中後會顯示其所屬的完整分段"
+    },
+    "autoClean": {
+      "label": "自動清理",
+      "description": "（移除多餘的符號、空格、空白行與定位字元）"
+    },
+    "imageProcessing": "圖片處理",
+    "visualEnhancement": {
+      "label": "視覺增強",
+      "description": "將文件中的圖片交由所選模型或工具處理，並將傳回的內容寫入圖片說明。"
+    },
+    "enhancementMethod": {
+      "label": "增強策略",
+      "model": "模型增強",
+      "tool": "工具增強"
+    },
+    "visionModel": {
+      "placeholder": "請選擇視覺模型",
+      "requiredMessage": "請選擇視覺模型"
+    },
+    "enhancementTool": {
+      "label": "增強工具",
+      "placeholder": "請選擇增強工具",
+      "requiredMessage": "請選擇增強工具"
+    },
+    "indexEnhancement": "索引增強",
+    "titleAsQuestion": {
+      "label": "將分段標題設為問題索引",
+      "description": "啟用後，系統會自動將分段標題新增為關聯問題。"
+    }
+  },
+  "scheduledSync": {
+    "title": "排程同步"
+  },
+  "sync": {
+    "title": "同步知識庫",
+    "method": "同步方式",
+    "incremental": {
+      "label": "增量同步",
+      "description": "略過未更新的文件，更新有變更的文件，並移除來源中已不存在的文件"
+    },
+    "replace": {
+      "label": "取代同步",
+      "description": "重新取得來源文件並取代相符的文件，保留不相符的舊文件"
+    },
+    "complete": {
+      "label": "完整同步",
+      "description": "重新取得來源文件並重建該來源的文件，保留其他來源的文件"
+    },
+    "incrementalWarning": "注意：增量同步會略過內容未變更的文件，並更新內容有變更的文件分段，請謹慎操作。",
+    "rebuildWarning": "注意：同步會刪除現有資料並重新取得資料，請謹慎操作。",
+    "taskSubmitted": "同步任務已送出"
+  }
+}

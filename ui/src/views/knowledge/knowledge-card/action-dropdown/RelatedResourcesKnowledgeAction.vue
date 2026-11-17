@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
 import type SystemSharedRelatedResourcesApi from '@/api/admin/system/shared-resources/related-resources'
 import type RelatedResourcesApi from '@/api/admin/workspace/related-resources'
@@ -9,6 +10,7 @@ import RelatedResourcesDrawer from '@/components/business/related-resources-draw
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'RelatedResourcesKnowledgeAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: typeof RelatedResourcesApi | typeof SystemRelatedResourcesApi | typeof SystemSharedRelatedResourcesApi
   knowledge: KnowledgeItem
@@ -21,7 +23,7 @@ const relatedResourcesDrawerRef = useTemplateRef<InstanceType<typeof RelatedReso
 function handleOpenRelatedResources() {
   const workspaceId = props.knowledge.workspace_id
   if (!workspaceId) {
-    MsgError('知识库缺少所属工作空间信息')
+    MsgError(t('knowledge.messages.missingWorkspace'))
     return
   }
   const knowledge = { ...props.knowledge, workspace_id: workspaceId }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeSyncScheduleType, KnowledgeSyncSetting } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -25,6 +26,7 @@ function knowledgeScheduledSyncPermission(method: KnowledgeScheduledSyncPermissi
 }
 
 defineOptions({ name: 'KnowledgeScheduledSyncView' })
+const { t } = useI18n({ useScope: 'global' })
 
 defineProps<ResourceDetailPageProps>()
 
@@ -217,13 +219,13 @@ watch(
               <el-input v-else v-model="syncSetting.cron_expression" placeholder="请输入Cron表达式（如：0 0 1 * *）" />
             </div>
           </el-form-item>
-          <el-form-item label="同步方式">
+          <el-form-item :label="t('knowledge.sync.method')">
             <el-radio-group v-model="syncSetting.sync_type" class="w-full space-y-2">
               <template v-for="method in KNOWLEDGE_SYNC_OPTIONS" :key="method.value">
                 <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': syncSetting.sync_type === method.value }">
                   <el-radio :value="method.value" class="mk-card-radio">
-                    <h6>{{ method.label }}</h6>
-                    <span class="block text-sm text-N600">{{ method.description }}</span>
+                    <h6>{{ t(method.labelKey) }}</h6>
+                    <span class="block text-sm text-N600">{{ t(method.descriptionKey) }}</span>
                   </el-radio>
                 </el-card>
               </template>
@@ -231,7 +233,14 @@ watch(
           </el-form-item>
         </div>
         <!-- 保存定时同步设置 -->
-        <el-button v-if="knowledgeScheduledSyncPermission('scheduledSyncEdit')" type="primary" class="mt-4" :loading="saving" :disabled="!settingLoaded" @click="handleSave">
+        <el-button
+          v-if="knowledgeScheduledSyncPermission('scheduledSyncEdit')"
+          type="primary"
+          class="mt-4"
+          :loading="saving"
+          :disabled="!settingLoaded"
+          @click="handleSave"
+        >
           保存
         </el-button>
       </el-form>

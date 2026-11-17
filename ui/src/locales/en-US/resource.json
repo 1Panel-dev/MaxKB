@@ -8,14 +8,18 @@
   "workspaceAuthorization": {
     "title": "Authorize workspaces"
   },
-  "states": {
-    "shared": "Shared"
-  },
+  "shared": "Shared",
   "mcpConfig": {
     "title": "MCP server configuration"
   },
   "triggers": {
     "title": "Triggers"
+  },
+  "templateStore": {
+    "title": "Template library",
+    "searchResults": "{count} matching template | {count} matching templates",
+    "apply": "Use template",
+    "missingDownloadUrl": "This template cannot be used because its download URL is missing."
   },
   "actions": {
     "viewExecutionRecords": "View execution history"

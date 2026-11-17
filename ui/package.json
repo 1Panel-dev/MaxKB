@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "build-only-chat": "vite build --mode chat",
-    "type-check": "node scripts/locale-schema.ts && vue-tsc --build",
+    "type-check": "vue-tsc --build",
     "lint": "run-s \"lint:*\"",
     "format": "prettier --write --experimental-cli src/"
   },

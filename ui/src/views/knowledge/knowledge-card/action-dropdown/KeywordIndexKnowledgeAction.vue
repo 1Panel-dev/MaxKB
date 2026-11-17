@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
@@ -6,8 +7,13 @@ import type { KnowledgeItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'KeywordIndexKnowledgeAction' })
+const { t } = useI18n({ useScope: 'global' })
 
-const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi; knowledge: KnowledgeItem; label: string }>()
+const props = defineProps<{
+  api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi
+  knowledge: KnowledgeItem
+  label: string
+}>()
 const loading = defineModel<boolean>('loading', { default: false })
 
 /* 知识库分词索引 */
@@ -17,7 +23,7 @@ function handleKeywordIndex() {
   return props.api
     .putKnowledgeKeywordIndex(props.knowledge.id)
     .then(() => {
-      MsgSuccess('提交成功')
+      MsgSuccess(t('common.messages.submitSuccess'))
     })
     .finally(() => {
       loading.value = false

@@ -38,26 +38,32 @@ export const DOCUMENT_SPLIT_PATTERN_OPTIONS = [
   },
   {
     label: '空格',
+    labelKey: 'knowledge.documentStrategy.delimiterOptions.space',
     value: '(?<! ) (?! )',
   },
   {
     label: '分号',
+    labelKey: 'knowledge.documentStrategy.delimiterOptions.semicolon',
     value: '(?<!；)；(?!；)',
   },
   {
     label: '逗号',
+    labelKey: 'knowledge.documentStrategy.delimiterOptions.comma',
     value: '(?<!，)，(?!，)',
   },
   {
     label: '句号',
+    labelKey: 'knowledge.documentStrategy.delimiterOptions.period',
     value: '(?<!。)。(?!。)',
   },
   {
     label: '回车',
+    labelKey: 'knowledge.documentStrategy.delimiterOptions.newline',
     value: '(?<!\\n)\\n(?!\\n)',
   },
   {
     label: '空行',
+    labelKey: 'knowledge.documentStrategy.delimiterOptions.blankLine',
     value: '(?<!\\n)\\n\\n(?!\\n)',
   },
 ]

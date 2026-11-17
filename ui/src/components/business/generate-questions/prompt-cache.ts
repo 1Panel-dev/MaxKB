@@ -9,15 +9,6 @@ interface PromptCacheEntry {
   formValue: RelatedQuestionsConfig
 }
 
-function defaultConfig(): RelatedQuestionsConfig {
-  return {
-    model_id: '',
-    model_params_setting: {},
-    prompt:
-      '内容：{data}\n\n请总结上面的内容，并根据内容总结生成 5 个问题。\n回答要求：\n- 请只输出问题；\n- 请将每个问题放置<question></question>标签中。',
-  }
-}
-
 function readPromptCache(): PromptCacheEntry[] {
   try {
     const saved = JSON.parse(localStorage.getItem(PROMPT_CACHE_KEY) || '[]')
@@ -37,10 +28,9 @@ function readPromptCache(): PromptCacheEntry[] {
 }
 
 /** 每次打开读取当前用户配置，表单修改不影响已保存内容。 */
-export function getPromptConfig(userId: string): RelatedQuestionsConfig {
-  if (!userId) return defaultConfig()
-  const saved = readPromptCache().find(({ user }) => user === userId)
-  return saved ? cloneDeep(saved.formValue) : defaultConfig()
+export function getPromptConfig(userId: string, defaultPrompt: string): RelatedQuestionsConfig {
+  const saved = userId ? readPromptCache().find(({ user }) => user === userId) : undefined
+  return saved ? cloneDeep(saved.formValue) : { model_id: '', model_params_setting: {}, prompt: defaultPrompt }
 }
 
 /** 提交时仅替换当前用户记录，保留其他用户的配置。 */

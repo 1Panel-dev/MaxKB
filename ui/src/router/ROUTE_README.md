@@ -177,6 +177,7 @@ Workspace 根据目标路由中的 workspaceId、knowledgeId 判断权限，权�
 ## 导航生成
 
 模型相关路由的 `meta.title` 使用 `model.title`。工作空间、系统资源管理和系统共享资源的工具列表路由共用 `tool.title`。
+工作空间、系统资源管理和系统共享资源的知识库列表路由，以及工作空间知识库菜单共用 `knowledge.title`。
 Workspace、System 侧栏在 computed 中生成菜单，并传入当前应用的标题翻译函数；仅翻译存在的 key，
 尚未迁移的中文标题原样展示。导航工具不依赖入口国际化单例，权限判断可省略翻译函数。
 这些列表页将已翻译的 title 显式传入布局；共用资源授权页按当前路由解析标题。
@@ -195,11 +196,12 @@ Workspace、System 侧栏在 computed 中生成菜单，并传入当前应用的
 `WorkspaceSidebar` 和 `SystemSidebar` 分别调用该方法，不需要在页面组件中维护菜单数组。
 
 资源详情页面统一使用 `ResourceDetailLayout`。`admin/utils.ts` 中的
-`getMatchedChildRouteList(route)` 从 `route.matched` 的记录自身 meta 中查找 `resourceDetailRoot: true`，定位详情父路由，并复用与
+`getMatchedChildRouteList(route, translateTitle?)` 从 `route.matched` 的记录自身 meta 中查找 `resourceDetailRoot: true`，定位详情父路由，并复用与
 `getChildRouteList(scope)` 相同的过滤、排序和菜单字段转换逻辑生成二级导航。详情菜单支持一级入口与二级折叠分组混排，分组直接使用路由 `children`。详情子路由通过
 `title`、`icon`、`activeIcon` 和 `order` 配置二级菜单；更深层页面通过
 `detailActiveMenu` 指定需要保持激活的二级菜单路由名称，不配置 `parentPath` 或 `parentName`。
-`ResourceDetailLayout` 切换二级菜单时保留当前 query；详情容器返回列表时按业务来源状态透传或
+`ResourceDetailLayout` 按当前语言解析菜单和页面标题，子页通过 `title` 接收相同的译文；尚未迁移的路由显示原文。
+切换二级菜单时保留当前 query；详情容器返回列表时按业务来源状态透传或
 重新生成 query。
 
 路由导航图标统一使用 `src/assets/iconfont.js` 中的完整 Symbol ID 字符串，并由

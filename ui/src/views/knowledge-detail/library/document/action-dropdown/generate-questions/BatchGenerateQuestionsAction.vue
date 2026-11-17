@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentTaskState, RelatedQuestionsConfig } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import GenerateQuestionsDialog from '@/components/business/generate-questions/index.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'BatchGenerateQuestionsAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -41,7 +43,7 @@ function handleSubmit(config: RelatedQuestionsConfig, stateList: DocumentTaskSta
         state_list: stateList,
       })
       .then(() => {
-        MsgSuccess('操作成功')
+        MsgSuccess(t('common.messages.operationSuccess'))
         dialogRef.value?.close()
         emit('refresh')
       })
@@ -60,6 +62,6 @@ function handleClosed() {
 
 <template>
   <!-- 批量生成问题 -->
-  <el-button plain type="primary" :disabled="disabled || loading" @click="handleOpenDialog">生成问题</el-button>
+  <el-button plain type="primary" :disabled="disabled || loading" @click="handleOpenDialog">{{ t('knowledge.actions.generateQuestions') }}</el-button>
   <GenerateQuestionsDialog v-if="dialogMounted" ref="dialogRef" :loading="loading" @submit="handleSubmit" @closed="handleClosed" />
 </template>

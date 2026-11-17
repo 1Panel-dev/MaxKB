@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type { WorkflowStoreTemplate } from '@/api/types'
 import StoreApi from '@/api/admin/store'
@@ -9,10 +10,10 @@ import WorkflowKnowledgeDialog from '../create-knowledge/WorkflowKnowledgeDialog
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'ButtonTemplateStore' })
-const props = withDefaults(
-  defineProps<{ api?: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi; folderId: string }>(),
-  { api: () => KnowledgeApi },
-)
+const { t } = useI18n({ useScope: 'global' })
+const props = withDefaults(defineProps<{ api?: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi; folderId: string }>(), {
+  api: () => KnowledgeApi,
+})
 const templateStoreDialogRef = useTemplateRef<InstanceType<typeof TemplateStoreDialog>>('templateStoreDialogRef')
 const emit = defineEmits<{ refresh: [] }>()
 
@@ -47,7 +48,7 @@ function handleUse(template: WorkflowStoreTemplate) {
   if (createDialogMounted.value) return
   const downloadUrl = template.downloadUrl
   if (!downloadUrl) {
-    MsgError('模板缺少下载地址，无法使用')
+    MsgError(t('resource.templateStore.missingDownloadUrl'))
     return
   }
   createDialogMounted.value = true
@@ -63,7 +64,7 @@ function handleCreated() {
   <!-- 打开模板中心 -->
   <el-button plain @click="handleOpen">
     <MkIcon name="icon_template_outlined" />
-    <span>模板中心</span>
+    <span>{{ t('resource.templateStore.title') }}</span>
   </el-button>
   <TemplateStoreDialog
     ref="templateStoreDialogRef"

@@ -6,6 +6,9 @@
     "public": "Public models",
     "private": "Private models"
   },
+  "select": {
+    "placeholder": "Select a model"
+  },
   "provider": {
     "label": "Provider",
     "placeholder": "Select a provider",
@@ -37,7 +40,7 @@
     },
     "embedding": {
       "label": "Embedding model",
-      "description": "Embedding model: converts document content into vectors in knowledge bases."
+      "description": "Embedding model: converts documents in Knowledge into vectors."
     },
     "reranker": {
       "label": "Reranking model",
@@ -75,6 +78,7 @@
     "fetchModels": "Fetch models"
   },
   "states": {
+    "unavailable": "Unavailable",
     "downloading": "Downloading"
   },
   "messages": {

@@ -1,0 +1,11 @@
+{
+  "integration": {
+    "title": "授權與整合"
+  },
+  "chatUsers": {
+    "title": "對話使用者"
+  },
+  "externalRetrieval": {
+    "title": "外部檢索服務"
+  }
+}

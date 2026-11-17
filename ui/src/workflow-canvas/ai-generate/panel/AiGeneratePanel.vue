@@ -293,7 +293,6 @@ defineExpose({ open, close })
             :options="modelOptions"
             :provider-options="providerOptions"
             :disabled="started"
-            placeholder="请选择模型"
             teleported
           />
           <div>

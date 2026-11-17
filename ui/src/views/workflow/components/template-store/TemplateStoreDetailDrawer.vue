@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowStoreTemplate } from '@/api/types'
 import { resetUrl } from '@/utils/icon'
 import { numberFormat } from '@/utils/number'
 
 defineOptions({ name: 'TemplateStoreDetailDrawer' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ resource: 'application' | 'knowledge' | 'tool'; disabled?: boolean }>()
 const emit = defineEmits<{ use: [template: WorkflowStoreTemplate]; closed: [] }>()
 const visible = ref(false)
@@ -31,7 +33,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="详情" size="60%" @closed="handleClosed">
+  <MkDrawer v-model="visible" :title="t('common.labels.details')" size="60%" @closed="handleClosed">
     <template v-if="workflowTemplate">
       <div class="border-b pb-6 mb-3">
         <div class="flex-between gap-4">
@@ -48,11 +50,11 @@ defineExpose({ open })
             </div>
           </div>
           <!-- 使用模板 -->
-          <el-button type="primary" :disabled="disabled" @click="handleUse">应用</el-button>
+          <el-button type="primary" :disabled="disabled" @click="handleUse">{{ t('resource.templateStore.apply') }}</el-button>
         </div>
         <p class="mt-3 text-N600">{{ workflowTemplate.desc }}</p>
       </div>
-      <MdPreview :model-value="workflowTemplate.readMe || workflowTemplate.desc || '暂无详细说明'" />
+      <MdPreview :model-value="workflowTemplate.readMe || workflowTemplate.desc || t('common.empty.noDetails')" />
     </template>
   </MkDrawer>
 </template>

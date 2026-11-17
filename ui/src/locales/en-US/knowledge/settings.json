@@ -1,0 +1,85 @@
+{
+  "baseSettings": {
+    "title": "Basic settings"
+  },
+  "documentStrategy": {
+    "title": "Document processing strategy",
+    "splitRules": "Paragraph splitting",
+    "smart": {
+      "label": "Smart splitting (recommended)",
+      "description": "Use smart splitting if you are unsure which rules to choose."
+    },
+    "advanced": {
+      "label": "Advanced splitting",
+      "description": "Choose delimiters, paragraph length, and cleanup rules to suit the document format."
+    },
+    "delimiter": {
+      "label": "Paragraph delimiters",
+      "placeholder": "Select paragraph delimiters",
+      "description": "The document is split recursively using the delimiters in the order you select. Paragraphs longer than the configured length are truncated."
+    },
+    "delimiterOptions": {
+      "space": "Space",
+      "semicolon": "Semicolon (；)",
+      "comma": "Comma (，)",
+      "period": "Full stop (。)",
+      "newline": "Line break",
+      "blankLine": "Blank line"
+    },
+    "paragraphLength": "Paragraph length",
+    "childChunkLength": {
+      "label": "Child chunk length",
+      "description": "Vector search uses these smaller chunks. When a chunk matches, the full paragraph is shown."
+    },
+    "autoClean": {
+      "label": "Automatic cleanup",
+      "description": "(Remove redundant symbols, spaces, blank lines, and tabs)"
+    },
+    "imageProcessing": "Image processing",
+    "visualEnhancement": {
+      "label": "Visual enhancement",
+      "description": "Send images in the document to the selected model or tool and save its output as the image description."
+    },
+    "enhancementMethod": {
+      "label": "Enhancement method",
+      "model": "Use a model",
+      "tool": "Use a tool"
+    },
+    "visionModel": {
+      "placeholder": "Select a vision model",
+      "requiredMessage": "Select a vision model"
+    },
+    "enhancementTool": {
+      "label": "Enhancement tool",
+      "placeholder": "Select an enhancement tool",
+      "requiredMessage": "Select an enhancement tool"
+    },
+    "indexEnhancement": "Index enhancement",
+    "titleAsQuestion": {
+      "label": "Index paragraph titles as questions",
+      "description": "Automatically add each paragraph title as a related question."
+    }
+  },
+  "scheduledSync": {
+    "title": "Scheduled sync"
+  },
+  "sync": {
+    "title": "Sync knowledge",
+    "method": "Sync method",
+    "incremental": {
+      "label": "Incremental sync",
+      "description": "Skip unchanged documents, update changed documents, and remove documents that no longer exist in the source."
+    },
+    "replace": {
+      "label": "Replace matching documents",
+      "description": "Fetch documents from the source again and replace matching documents. Keep existing documents with no match."
+    },
+    "complete": {
+      "label": "Full sync",
+      "description": "Fetch and rebuild all documents from this source. Keep documents from other sources."
+    },
+    "incrementalWarning": "Incremental sync updates the paragraphs of changed documents and skips unchanged documents.",
+    "rebuildWarning": "Sync deletes existing data before fetching fresh data. Proceed with care.",
+    "taskSubmitted": "Sync task submitted"
+  }
+}

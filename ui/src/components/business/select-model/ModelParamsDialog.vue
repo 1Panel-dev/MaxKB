@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { inject, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormField } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'ModelParamsDialog' })
+const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ submit: [settings: Record<string, unknown>] }>()
 
@@ -68,14 +70,14 @@ defineExpose({ open, resetDefault })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="模型参数设置" @closed="resetData">
+  <MkDialog v-model="visible" :title="t('model.actions.parameters')" @closed="resetData">
     <div v-loading="loading">
       <MkDynamicsForm ref="formRef" v-model="formData" :render-data="formFields" default-item-width="100%" />
     </div>
 
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" :loading="loading" @click="submit">确定</el-button>
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <el-button type="primary" :loading="loading" @click="submit">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

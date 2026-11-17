@@ -1,0 +1,14 @@
+{
+  "library": {
+    "title": "Library"
+  },
+  "document": {
+    "title": "Documents"
+  },
+  "image": {
+    "title": "Images"
+  },
+  "tags": {
+    "title": "Tag management"
+  }
+}

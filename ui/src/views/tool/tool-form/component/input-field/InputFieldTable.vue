@@ -36,7 +36,7 @@ function handleDeleteInputField(index: number) {
     <div class="mb-4 flex-between">
       <div class="flex-align-center gap-2">
         <h4 class="mk-title-decoration">{{ t('tool.inputParams.title') }}</h4>
-        <span class="text-N600">{{ t('tool.parameters.shownWhenUsed') }}</span>
+        <span class="text-N600">{{ t('tool.help.shownWhenUsed') }}</span>
       </div>
       <!-- 添加输入参数 -->
       <el-button text type="primary" @click="handleOpenInputField()">

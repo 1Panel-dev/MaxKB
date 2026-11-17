@@ -32,9 +32,21 @@ export const KNOWLEDGE_TYPE_LABELS = {
 
 /** 手动同步与定时同步共用的同步方式选项。 */
 export const KNOWLEDGE_SYNC_OPTIONS = [
-  { value: KNOWLEDGE_SYNC_TYPE.INCREMENTAL, label: '增量同步', description: '跳过未更新的文档，更新有变化的文档，并清理来源中已不存在的文档' },
-  { value: KNOWLEDGE_SYNC_TYPE.REPLACE, label: '替换同步', description: '重新获取来源文档并替换匹配的文档，保留未匹配的旧文档' },
-  { value: KNOWLEDGE_SYNC_TYPE.COMPLETE, label: '完整同步', description: '重新获取来源文档并重建该来源的文档，保留其他来源的文档' },
+  {
+    value: KNOWLEDGE_SYNC_TYPE.INCREMENTAL,
+    labelKey: 'knowledge.sync.incremental.label',
+    descriptionKey: 'knowledge.sync.incremental.description',
+  },
+  {
+    value: KNOWLEDGE_SYNC_TYPE.REPLACE,
+    labelKey: 'knowledge.sync.replace.label',
+    descriptionKey: 'knowledge.sync.replace.description',
+  },
+  {
+    value: KNOWLEDGE_SYNC_TYPE.COMPLETE,
+    labelKey: 'knowledge.sync.complete.label',
+    descriptionKey: 'knowledge.sync.complete.description',
+  },
 ] as const
 
 /** 召回测试与工作流知识库检索共用的模式选项。 */

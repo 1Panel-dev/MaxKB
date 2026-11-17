@@ -15,9 +15,12 @@ export const MARKDOWN_LOCALES = {
   'en-US': 'en-US',
 } as const satisfies Record<Locale, string>
 
-/** 将语言包文件名转为业务命名空间，如 dynamic-form.json 对应 dynamicForm。 */
-export function getLocaleNamespace(filename: string): string {
-  return filename.replace(/\.json$/, '').replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase())
+/** 语言目录下的文件名或第一级目录名决定业务命名空间。 */
+export function getLocaleNamespace(file: string): string {
+  return file
+    .split('/')[0]!
+    .replace(/\.json$/, '')
+    .replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase())
 }
 
 /** 将浏览器或账号语言映射到已支持的界面语言。 */

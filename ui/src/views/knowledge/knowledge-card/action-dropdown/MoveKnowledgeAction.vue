@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
@@ -8,6 +9,7 @@ import { FOLDER_ENTRY_ID } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'MoveKnowledgeAction' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ api: typeof KnowledgeApi; knowledge: KnowledgeItem; currentFolderId: string; label: string }>()
 
@@ -26,13 +28,14 @@ function handleOpenMoveKnowledge() {
 function handleMoveKnowledge(targetFolderId: string) {
   if (loading.value) return
   loading.value = true
-  return props.api.putMoveKnowledge(props.knowledge.id, targetFolderId)
+  return props.api
+    .putMoveKnowledge(props.knowledge.id, targetFolderId)
     .finally(() => {
       // 转出当前文件夹会卸载卡片，先释放页面操作状态。
       loading.value = false
     })
     .then(() => {
-      MsgSuccess('移动成功')
+      MsgSuccess(t('common.messages.moveSuccess'))
       moveToDialogRef.value?.close()
       emit('move', props.knowledge.id, targetFolderId)
       if (props.currentFolderId !== FOLDER_ENTRY_ID.ALL && props.currentFolderId !== targetFolderId) emit('delete', props.knowledge.id)

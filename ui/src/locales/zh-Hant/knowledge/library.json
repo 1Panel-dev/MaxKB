@@ -1,0 +1,14 @@
+{
+  "library": {
+    "title": "資料庫"
+  },
+  "document": {
+    "title": "文件"
+  },
+  "image": {
+    "title": "圖片"
+  },
+  "tags": {
+    "title": "標籤管理"
+  }
+}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { Dict, DocumentHitHandling, DocumentItem, OptionItem, ParagraphItem } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { CascaderOption, TableColumnCtx } from 'element-plus'
@@ -39,6 +40,7 @@ import { datetimeFormat } from '@/utils/time'
 import { perm } from '@/permission'
 
 defineOptions({ name: 'ImageListView' })
+const { t } = useI18n({ useScope: 'global' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 
@@ -635,7 +637,7 @@ onBeforeUnmount(() => {
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
               :task-type="DOCUMENT_TASK_TYPE.GENERATE_PROBLEM"
-              label="取消生成"
+              :label="t('knowledge.actions.cancelGenerateQuestions')"
               @refresh="refreshAfterOperation"
             />
             <!-- 批量删除文档 -->

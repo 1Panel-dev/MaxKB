@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, provide, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { DocumentTaskState, ModelItem, ModelProviderItem, RelatedQuestionsConfig } from '@/api/types'
 import type { FormInstance } from 'element-plus'
 import { DOCUMENT_TASK_STATE, MODEL_STATUS } from '@/api/enums'
@@ -14,13 +15,14 @@ import { useStore } from '@/stores'
 import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'GenerateQuestionsDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = withDefaults(defineProps<{ loading: boolean; showParagraphScope?: boolean }>(), {
   showParagraphScope: true,
 })
 const emit = defineEmits<{ submit: [config: RelatedQuestionsConfig, stateList: DocumentTaskState[]]; closed: [] }>()
 const { user } = useStore()
-const promptTip =
-  '提示词中的 {data} 是分段内容占位符，执行时会替换为分段内容并发送给 AI 模型；\nAI 模型根据分段内容生成相关问题，请将生成的问题放至<question></question>标签中，系统会自动关联标签中的问题；\n生成效果依赖于所选模型和提示词，用户可自行调整至最佳效果。'
+const promptPlaceholders = { data: '{data}', questionTags: '<question></question>' }
+const promptTip = computed(() => t('knowledge.generateQuestions.prompt.description', promptPlaceholders))
 
 const modelLoading = ref(false)
 provide('getModelParamsForm', (modelId: string) => {
@@ -68,7 +70,7 @@ function loadModels() {
 
 function open() {
   targetUserId.value = user.userInfo?.id ?? ''
-  form.value = getPromptConfig(targetUserId.value)
+  form.value = getPromptConfig(targetUserId.value, t('knowledge.generateQuestions.prompt.defaultValue', promptPlaceholders))
   visible.value = true
   return loadModels()
 }
@@ -94,13 +96,25 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="生成问题" @closed="emit('closed')">
-    <el-form ref="formRef" :model="form" label-position="top" require-asterisk-position="right" v-loading="loading || modelLoading" @submit.prevent>
+  <MkDialog v-model="visible" :title="t('knowledge.actions.generateQuestions')" @closed="emit('closed')">
+    <el-form
+      ref="formRef"
+      :model="form"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      v-loading="loading || modelLoading"
+      @submit.prevent
+    >
       <el-alert :closable="false" type="primary" class="mb-4!" show-icon>
         <template #icon><MkIcon name="icon_info_filled" /></template>
         {{ promptTip }}
       </el-alert>
-      <el-form-item label="AI 模型" prop="model_id" :rules="[{ required: true, message: '请选择 AI 模型', trigger: 'change' }]">
+      <el-form-item
+        :label="t('knowledge.generateQuestions.model.label')"
+        prop="model_id"
+        :rules="[{ required: true, message: t('knowledge.generateQuestions.model.requiredMessage'), trigger: 'change' }]"
+      >
         <SelectModel
           v-model="form.model_id"
           v-model:model-params="form.model_params_setting"
@@ -113,21 +127,27 @@ defineExpose({ open, close })
           @refresh="loadModels"
         />
       </el-form-item>
-      <el-form-item label="提示词" prop="prompt" :rules="[{ required: true, whitespace: true, message: '请输入提示词', trigger: 'blur' }]">
+      <el-form-item
+        :label="t('knowledge.generateQuestions.prompt.label')"
+        prop="prompt"
+        :rules="[{ required: true, whitespace: true, message: t('knowledge.generateQuestions.prompt.requiredMessage'), trigger: 'blur' }]"
+      >
         <el-input v-model="form.prompt" type="textarea" :rows="8" />
       </el-form-item>
-      <el-form-item v-if="showParagraphScope" label="选择分段">
+      <el-form-item v-if="showParagraphScope" :label="t('knowledge.generateQuestions.scope.label')">
         <el-radio-group v-model="scope">
-          <el-radio value="error">仅执行未成功部分</el-radio>
-          <el-radio value="all">全部分段</el-radio>
+          <el-radio value="error">{{ t('knowledge.generateQuestions.scope.unsuccessful') }}</el-radio>
+          <el-radio value="all">{{ t('knowledge.generateQuestions.scope.all') }}</el-radio>
         </el-radio-group>
       </el-form-item>
     </el-form>
     <template #footer>
       <!-- 取消生成问题配置 -->
-      <el-button plain :disabled="loading || modelLoading" @click="close">取消</el-button>
+      <el-button plain :disabled="loading || modelLoading" @click="close">{{ t('common.actions.cancel') }}</el-button>
       <!-- 提交生成问题任务 -->
-      <el-button type="primary" :loading="loading" :disabled="loading || modelLoading || !modelAvailable" @click="handleSubmit">确认</el-button>
+      <el-button type="primary" :loading="loading" :disabled="loading || modelLoading || !modelAvailable" @click="handleSubmit">
+        {{ t('common.actions.confirm') }}
+      </el-button>
     </template>
   </MkDialog>
 </template>

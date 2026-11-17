@@ -48,7 +48,7 @@ function handleClick(event: MouseEvent) {
     </template>
 
     <template #tag>
-      <el-tag v-if="shared" size="small" type="info">{{ t('resource.states.shared') }}</el-tag>
+      <el-tag v-if="shared" size="small" type="info">{{ t('resource.shared') }}</el-tag>
       <ButtonUpdateVersion
         v-else-if="!selectable"
         v-model:loading="loading"

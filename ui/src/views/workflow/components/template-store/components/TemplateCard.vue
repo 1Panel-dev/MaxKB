@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowStoreTemplate } from '@/api/types'
 import TemplateStoreDetailDrawer from '../TemplateStoreDetailDrawer.vue'
 import { resetUrl } from '@/utils/icon'
@@ -7,6 +8,7 @@ import { numberFormat } from '@/utils/number'
 
 defineOptions({ name: 'TemplateCard' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   resource: 'application' | 'knowledge' | 'tool'
   disabled?: boolean
@@ -47,9 +49,11 @@ function handleUseTemplate() {
       <component :is="Action" class="flex-1!">
         <div class="flex min-w-0 flex-1" @click.stop>
           <!-- 查看模板详情 -->
-          <el-button class="flex-1!" plain @click="handleOpenDetail">详情</el-button>
+          <el-button class="flex-1!" plain @click="handleOpenDetail">{{ t('common.labels.details') }}</el-button>
           <!-- 应用模板 -->
-          <el-button class="flex-1!" type="primary" :disabled="disabled" @click="handleUseTemplate">应用</el-button>
+          <el-button class="flex-1!" type="primary" :disabled="disabled" @click="handleUseTemplate">
+            {{ t('resource.templateStore.apply') }}
+          </el-button>
         </div>
       </component>
     </template>

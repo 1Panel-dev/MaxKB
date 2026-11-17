@@ -8,14 +8,18 @@
   "workspaceAuthorization": {
     "title": "授權工作空間"
   },
-  "states": {
-    "shared": "共用"
-  },
+  "shared": "共用",
   "mcpConfig": {
     "title": "MCP 服務設定"
   },
   "triggers": {
     "title": "觸發器"
+  },
+  "templateStore": {
+    "title": "範本中心",
+    "searchResults": "找到 {count} 個相關範本",
+    "apply": "套用",
+    "missingDownloadUrl": "範本缺少下載網址，無法使用"
   },
   "actions": {
     "viewExecutionRecords": "查看執行記錄"

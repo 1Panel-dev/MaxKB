@@ -162,7 +162,7 @@ function handleReplaceCode(value: string, replaceCode?: (value: string) => void)
     <div class="mb-4 flex-between">
       <div class="flex-align-center gap-2">
         <h4 class="mk-title-decoration mk-required">{{ t('tool.pythonCode.title') }}</h4>
-        <span class="text-N600">{{ t('tool.pythonCode.description') }}</span>
+        <span class="text-N600">{{ t('tool.help.hiddenWhenUsed') }}</span>
       </div>
       <!-- 生成工具代码 -->
       <GenerateContent

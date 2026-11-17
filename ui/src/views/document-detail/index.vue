@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { ParamsPage } from '@/api/admin/core/types'
 import type { DocumentItem, ParagraphItem, ParagraphQuery } from '@/api/types'
 import type MkViewLayout from '@/components/global/mk-view-layout/index.vue'
@@ -34,6 +35,7 @@ function knowledgeDocPermission(method: KnowledgeDocPermissionMethod): boolean {
 }
 
 defineOptions({ name: 'KnowledgeParagraphView' })
+const { t } = useI18n({ useScope: 'global' })
 
 /* 文档详情与分段查询 */
 const route = useRoute()
@@ -405,7 +407,7 @@ onMounted(() => {
                           <MkDropdownMenu>
                             <!-- 生成当前分段的问题 -->
                             <GenerateQuestionsAction
-                              label="生成问题"
+                              :label="t('knowledge.actions.generateQuestions')"
                               :api="resourceApi.paragraph"
                               :knowledge-id="knowledgeId"
                               :document-id="documentId"
