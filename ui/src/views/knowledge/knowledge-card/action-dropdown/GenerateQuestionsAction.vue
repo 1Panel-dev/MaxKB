@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
@@ -8,6 +9,7 @@ import GenerateQuestionsDialog from '@/components/business/generate-questions/in
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'GenerateQuestionsAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi
   knowledge: KnowledgeItem
@@ -34,7 +36,7 @@ function handleSubmit(config: RelatedQuestionsConfig, stateList: DocumentTaskSta
   return props.api
     .putGenerateKnowledgeQuestions(targetKnowledgeId.value, { ...config, state_list: stateList })
     .then(() => {
-      MsgSuccess('任务已提交')
+      MsgSuccess(t('common.messages.taskSubmitted'))
       dialogRef.value?.close()
     })
     .catch(() => {})

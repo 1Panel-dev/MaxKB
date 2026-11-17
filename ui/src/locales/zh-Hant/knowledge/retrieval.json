@@ -1,0 +1,14 @@
+{
+  "retrieval": {
+    "title": "檢索最佳化"
+  },
+  "hitTest": {
+    "title": "召回測試"
+  },
+  "questions": {
+    "title": "問題"
+  },
+  "termbase": {
+    "title": "自訂分詞"
+  }
+}

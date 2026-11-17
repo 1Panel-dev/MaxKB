@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import type { RoleItem, RolePermission, RolePermissionModule, RolePermissionModuleGroup } from '@/api/types'
 import RoleApi from '@/api/admin/system/role'
 import { MsgSuccess } from '@/utils/message'
-import perm from '@/permission';
+import perm from '@/permission'
 
 interface PermissionTableRow {
   id: string
@@ -157,10 +157,11 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
               <el-checkbox
                 v-model="permission.enable"
                 :disabled="disabled"
-                class="w-30"
+                class="permission-option h-auto! min-h-8 w-30 items-start! py-1"
                 @change="(value: boolean) => handlePermissionChange(value, permission, row)"
-                >{{ permission.name }}</el-checkbox
               >
+                {{ permission.name }}
+              </el-checkbox>
             </template>
           </div>
         </template>
@@ -193,6 +194,20 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
 </template>
 
 <style scoped lang="scss">
+// TODO
+.permission-option {
+  :deep(.el-checkbox__input) {
+    margin-top: 3px;
+  }
+
+  :deep(.el-checkbox__label) {
+    line-height: var(--mk-line-height-base);
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+}
+
 :deep(.role-permission-table.el-table) {
   border: 1px solid var(--el-table-border-color);
 

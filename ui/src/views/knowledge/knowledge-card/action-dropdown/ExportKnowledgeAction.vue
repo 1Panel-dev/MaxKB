@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, inject, ref, useTemplateRef } from 'vue'
 import { DROPDOWN_INJECTION_KEY } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import type { KnowledgeItem } from '@/api/types'
 
 defineOptions({ name: 'ExportKnowledgeAction' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   api: typeof KnowledgeApi | typeof SystemResourceKnowledgeApi | typeof SystemSharedKnowledgeApi
@@ -24,9 +26,9 @@ const exportMenuContainer = computed(() => exportTriggerRef.value?.closest<HTMLE
 
 /* 知识库导出菜单 */
 const exportOptions = [
-  { label: '导出文档 Excel', method: 'exportKnowledgeExcel' },
-  { label: '导出文档 ZIP', method: 'exportKnowledgeZip' },
-  { label: '导出知识库', method: 'exportKnowledge' },
+  { labelKey: 'knowledge.export.documentsExcel', method: 'exportKnowledgeExcel' },
+  { labelKey: 'knowledge.export.documentsZip', method: 'exportKnowledgeZip' },
+  { labelKey: 'knowledge.export.title', method: 'exportKnowledge' },
 ] as const
 
 const exportDialogVisible = ref(false)
@@ -87,24 +89,24 @@ function handleExportDialogClosed() {
             :disabled="loading"
             @click="handleExportKnowledge(exportOption.method)"
           >
-            {{ exportOption.label }}
+            {{ t(exportOption.labelKey) }}
           </MkDropdownItem>
         </MkDropdownMenu>
       </template>
     </MkDropdown>
   </MkDropdownItem>
 
-  <MkDialog v-model="exportDialogVisible" title="导出知识库" width="420" @closed="handleExportDialogClosed">
+  <MkDialog v-model="exportDialogVisible" :title="t('knowledge.export.title')" width="420" @closed="handleExportDialogClosed">
     <div v-loading="loading">
       <!-- 选择是否同时导出源文件 -->
-      <el-checkbox v-model="withSourceFile">同时导出源文件</el-checkbox>
-      <p class="ml-6 text-N600">勾选后将原始文件一并打包至 ZIP，导入时可自动恢复文件关联；不勾选，则仅导出文本内容。</p>
+      <el-checkbox v-model="withSourceFile">{{ t('knowledge.export.includeSourceFiles') }}</el-checkbox>
+      <p class="ml-6 text-N600">{{ t('knowledge.export.sourceFilesDescription') }}</p>
     </div>
     <template #footer>
       <!-- 取消导出知识库 -->
-      <el-button plain :disabled="loading" @click="exportDialogVisible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="exportDialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 确认导出知识库 -->
-      <el-button type="primary" :loading="loading" @click="handleConfirmExport">导出</el-button>
+      <el-button type="primary" :loading="loading" @click="handleConfirmExport">{{ t('common.actions.export') }}</el-button>
     </template>
   </MkDialog>
 </template>

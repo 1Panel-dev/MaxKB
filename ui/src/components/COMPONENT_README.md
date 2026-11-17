@@ -899,6 +899,7 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 
 `loading` 默认为 `false`，透传给 `el-select` 展示列表加载状态；模型选项加载使用 `loading`，不因此禁用选择器。
 `disabled` 继续表示只读或业务禁用。
+默认占位随界面语言显示“请选择模型”。需要指定模型类型时，调用方通过 `placeholder` 传入该场景的译文。
 
 `teleported` 默认为 `false`，画布节点内保留此默认值，使下拉浮层跟随画布。
 画布外的表单、Dialog 和 Drawer 显式传入 `teleported`（即 `true`），将下拉浮层挂载到 body，

@@ -85,11 +85,11 @@
     },
     "searchResults": "{count} matching tool | {count} matching tools",
     "apply": "Use tool",
-    "addTitle": "Add tool",
-    "noDetails": "No details available"
+    "addTitle": "Add tool"
   },
-  "parameters": {
-    "shownWhenUsed": "Shown when using the tool"
+  "help": {
+    "shownWhenUsed": "Shown when using the tool",
+    "hiddenWhenUsed": "Hidden when using the tool"
   },
   "initParams": {
     "title": "Startup parameters"
@@ -111,7 +111,6 @@
   },
   "pythonCode": {
     "title": "Tool code (Python)",
-    "description": "Hidden when using the tool",
     "generate": {
       "title": "Generate Python code",
       "placeholder": "Describe what the tool should do",

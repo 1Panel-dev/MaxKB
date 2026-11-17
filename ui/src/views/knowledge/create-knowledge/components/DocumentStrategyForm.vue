@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { DocumentStrategy, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
 import type { FormInstance } from 'element-plus'
 import ProviderApi from '@/api/admin/model-provider'
@@ -15,6 +16,7 @@ import { DOCUMENT_SPLIT_PATTERN_OPTIONS } from '@/constants/document'
 import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'DocumentStrategyForm' })
+const { t } = useI18n({ useScope: 'global' })
 
 /* 文档处理策略 */
 const formRef = ref<FormInstance>()
@@ -31,10 +33,7 @@ const visualModelId = computed({
 })
 
 const splitPatterns = ref<string[]>([])
-const splitOptions = [
-  { value: 'smart', title: '智能分段（推荐）', desc: '不了解如何设置分段规则时推荐使用智能分段' },
-  { value: 'advanced', title: '高级分段', desc: '用户可根据文档规范自行设置分段标识符、分段长度以及清洗规则' },
-] as const
+const splitModes = ['smart', 'advanced'] as const
 function validate() {
   return formRef.value?.validate().catch(() => false) ?? Promise.resolve(false)
 }
@@ -126,51 +125,64 @@ defineExpose({ validate, getStrategy, setStrategy })
 </script>
 
 <template>
-  <el-form ref="formRef" :model="strategy" label-position="top" require-asterisk-position="right" @submit.prevent>
-    <p class="mb-2">分段规则</p>
+  <el-form ref="formRef" :model="strategy" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <p class="mb-2">{{ t('knowledge.documentStrategy.splitRules') }}</p>
 
     <div class="w-full space-y-2">
-      <template v-for="option in splitOptions" :key="option.value">
+      <template v-for="mode in splitModes" :key="mode">
         <!-- 选择分段规则 -->
         <MkResourceCard
-          :title="option.title"
+          :title="t(`knowledge.documentStrategy.${mode}.label`)"
           class="min-h-0!"
-          :class="{ 'border-primary!': strategy.split.mode === option.value }"
-          :aria-checked="strategy.split.mode === option.value"
-          @click="strategy.split.mode = option.value"
+          :class="{ 'border-primary!': strategy.split.mode === mode }"
+          :aria-checked="strategy.split.mode === mode"
+          @click="strategy.split.mode = mode"
         >
           <template #icon>
-            <el-avatar v-if="option.value === 'smart'" shape="square" :size="24" class="shrink-0">
+            <el-avatar v-if="mode === 'smart'" shape="square" :size="24" class="shrink-0">
               <MkIcon name="icon_center-alignment_outlined" :size="15" />
             </el-avatar>
             <el-avatar v-else shape="square" :size="24" class="shrink-0 bg-warning!">
               <MkIcon name="icon_setting" :size="15" />
             </el-avatar>
           </template>
-          <template #subtitle>{{ option.desc }}</template>
-          <template v-if="option.value === 'advanced' && strategy.split.mode === 'advanced'" #default>
+          <template #subtitle>{{ t(`knowledge.documentStrategy.${mode}.description`) }}</template>
+          <template v-if="mode === 'advanced' && strategy.split.mode === 'advanced'" #default>
             <div class="mk-gray-card-lg cursor-default text-N900" @click.stop @keydown.stop>
               <el-form-item>
                 <template #label>
                   <span class="flex-align-center gap-1">
-                    分段标识
-                    <MkTooltip content="按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。" placement="right">
+                    {{ t('knowledge.documentStrategy.delimiter.label') }}
+                    <MkTooltip :content="t('knowledge.documentStrategy.delimiter.description')" placement="right">
                       <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
                     </MkTooltip>
                   </span>
                 </template>
-                <el-select v-model="splitPatterns" multiple filterable allow-create default-first-option placeholder="请选择分段标识" class="w-full">
-                  <el-option v-for="pattern in DOCUMENT_SPLIT_PATTERN_OPTIONS" :key="pattern.value" :label="pattern.label" :value="pattern.value" />
+                <el-select
+                  v-model="splitPatterns"
+                  multiple
+                  filterable
+                  allow-create
+                  default-first-option
+                  :placeholder="t('knowledge.documentStrategy.delimiter.placeholder')"
+                  class="w-full"
+                >
+                  <el-option
+                    v-for="pattern in DOCUMENT_SPLIT_PATTERN_OPTIONS"
+                    :key="pattern.value"
+                    :label="pattern.labelKey ? t(pattern.labelKey) : pattern.label"
+                    :value="pattern.value"
+                  />
                 </el-select>
               </el-form-item>
-              <el-form-item label="分段长度">
+              <el-form-item :label="t('knowledge.documentStrategy.paragraphLength')">
                 <MkSlider v-model="strategy.split.limit" show-input :min="50" :max="100000" />
               </el-form-item>
               <el-form-item>
                 <template #label>
                   <span class="flex-align-center gap-1">
-                    子块长度
-                    <MkTooltip content="子块长度仅用于向量检索，命中后将回溯显示其所在分段" placement="right">
+                    {{ t('knowledge.documentStrategy.childChunkLength.label') }}
+                    <MkTooltip :content="t('knowledge.documentStrategy.childChunkLength.description')" placement="right">
                       <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
                     </MkTooltip>
                   </span>
@@ -181,8 +193,8 @@ defineExpose({ validate, getStrategy, setStrategy })
               <el-form-item class="mb-0!">
                 <template #label>
                   <span class="flex-align-center">
-                    <span>自动清洗</span>
-                    <span class="text-N600">（去掉重复多余符号空格、空行、制表符）</span>
+                    <span>{{ t('knowledge.documentStrategy.autoClean.label') }}</span>
+                    <span class="text-N600">{{ t('knowledge.documentStrategy.autoClean.description') }}</span>
                   </span>
                 </template>
 
@@ -193,28 +205,28 @@ defineExpose({ validate, getStrategy, setStrategy })
         </MkResourceCard>
       </template>
     </div>
-    <p class="mt-4 mb-2">图片处理</p>
+    <p class="mt-4 mb-2">{{ t('knowledge.documentStrategy.imageProcessing') }}</p>
 
     <el-card shadow="never" class="w-full">
       <div class="flex-between gap-4">
         <div>
-          <h6>视觉增强</h6>
-          <p class="mt-1 text-N600 text-sm">识别文档中图片，将图片按照策略发给模型或工具处理，并将返回内容写入图片的描述中</p>
+          <h6>{{ t('knowledge.documentStrategy.visualEnhancement.label') }}</h6>
+          <p class="mt-1 text-N600 text-sm">{{ t('knowledge.documentStrategy.visualEnhancement.description') }}</p>
         </div>
         <el-switch v-model="strategy.visual.enabled" @change="handleVisualChange" />
       </div>
       <div v-if="strategy.visual.enabled" class="mk-gray-card-lg mt-4">
-        <el-form-item label="增强策略" required>
+        <el-form-item :label="t('knowledge.documentStrategy.enhancementMethod.label')" required>
           <el-radio-group v-model="strategy.visual.strategy" @change="handleVisualChange">
-            <el-radio value="model">模型增强</el-radio>
-            <el-radio value="tool">工具增强</el-radio>
+            <el-radio value="model">{{ t('knowledge.documentStrategy.enhancementMethod.model') }}</el-radio>
+            <el-radio value="tool">{{ t('knowledge.documentStrategy.enhancementMethod.tool') }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item
           v-if="strategy.visual.strategy === 'model'"
-          label="视觉模型"
+          :label="t('model.types.image.label')"
           prop="visual.model_id"
-          :rules="{ required: true, message: '请选择视觉模型', trigger: 'change' }"
+          :rules="{ required: true, message: t('knowledge.documentStrategy.visionModel.requiredMessage'), trigger: 'change' }"
           class="mb-0! mt-4"
         >
           <SelectModel
@@ -222,7 +234,7 @@ defineExpose({ validate, getStrategy, setStrategy })
             :options="modelOptions"
             :provider-options="providerOptions"
             :loading="modelOptionsLoading"
-            placeholder="请选择视觉模型"
+            :placeholder="t('knowledge.documentStrategy.visionModel.placeholder')"
             teleported
             can-add
             @refresh="loadModelOptions"
@@ -230,12 +242,19 @@ defineExpose({ validate, getStrategy, setStrategy })
         </el-form-item>
         <el-form-item
           v-else
-          label="增强工具"
+          :label="t('knowledge.documentStrategy.enhancementTool.label')"
           prop="visual.tool_id"
-          :rules="{ required: true, message: '请选择增强工具', trigger: 'change' }"
+          :rules="{ required: true, message: t('knowledge.documentStrategy.enhancementTool.requiredMessage'), trigger: 'change' }"
           class="mb-0! mt-4"
         >
-          <el-select v-model="strategy.visual.tool_id" :loading="toolOptionsLoading" placeholder="请选择增强工具" filterable clearable class="w-full">
+          <el-select
+            v-model="strategy.visual.tool_id"
+            :loading="toolOptionsLoading"
+            :placeholder="t('knowledge.documentStrategy.enhancementTool.placeholder')"
+            filterable
+            clearable
+            class="w-full"
+          >
             <template #label="{ label }">
               <div class="flex-align-center gap-2">
                 <ToolIcon
@@ -260,13 +279,13 @@ defineExpose({ validate, getStrategy, setStrategy })
         </el-form-item>
       </div>
     </el-card>
-    <p class="mt-4 mb-2">索引增强</p>
+    <p class="mt-4 mb-2">{{ t('knowledge.documentStrategy.indexEnhancement') }}</p>
 
     <el-card shadow="never" class="w-full">
       <div class="flex-between">
         <div>
-          <h6>分段标题设置为问题索引</h6>
-          <p class="mt-1 text-N600 text-sm">开启后会将分段标题自动添加为关联问题</p>
+          <h6>{{ t('knowledge.documentStrategy.titleAsQuestion.label') }}</h6>
+          <p class="mt-1 text-N600 text-sm">{{ t('knowledge.documentStrategy.titleAsQuestion.description') }}</p>
         </div>
         <el-switch v-model="strategy.index.title_as_question" />
       </div>

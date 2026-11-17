@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { ParamsPage } from '@/api/admin/core/types'
 import type { Dict, KnowledgeItem, OptionItem } from '@/api/types'
 import { KNOWLEDGE_TYPE, RESOURCE_TYPE } from '@/api/enums'
@@ -23,6 +24,8 @@ import {
 import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
 import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import perm from '@/permission/index.ts'
+
+const { t } = useI18n({ useScope: 'global' })
 
 /* 共享知识库详情入口 */
 const router = useRouter()
@@ -47,18 +50,18 @@ const knowledgeOperationLoading = ref(false)
 const creatorOptions = ref<OptionItem<string>[]>([])
 const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const searchFields = computed(() => [
-  { label: '名称', value: 'name' },
+  { label: t('common.name.label'), value: 'name' },
   {
-    label: '类型',
+    label: t('common.labels.type'),
     value: 'type',
     options: [
-      { value: KNOWLEDGE_TYPE.BASE, label: '通用知识库' },
-      { value: KNOWLEDGE_TYPE.WEB, label: 'Web 知识库' },
-      { value: KNOWLEDGE_TYPE.LARK, label: '飞书知识库' },
-      { value: KNOWLEDGE_TYPE.WORKFLOW, label: '工作流知识库' },
+      { value: KNOWLEDGE_TYPE.BASE, label: t('knowledge.base.label') },
+      { value: KNOWLEDGE_TYPE.WEB, label: t('knowledge.web.label') },
+      { value: KNOWLEDGE_TYPE.LARK, label: t('knowledge.lark.label') },
+      { value: KNOWLEDGE_TYPE.WORKFLOW, label: t('knowledge.workflow.label') },
     ],
   },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 
 function loadCreatorOptions(keyword: string) {
@@ -82,16 +85,21 @@ function handleSearchChange(query?: Dict<unknown>) {
 </script>
 
 <template>
-  <MkViewLayout class="shared-knowledge-view">
-    <template #default="{ Header }">
+  <MkViewLayout :title="t('knowledge.title')" class="shared-knowledge-view">
+    <template #default="{ Header, title }">
       <component :is="Header">
-        <h4>知识库</h4>
+        <h4>{{ title }}</h4>
         <div class="flex-align-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
           <!-- 模板中心 -->
           <ButtonTemplateStore folder-id="default" :api="SystemSharedKnowledgeApi" @refresh="refreshKnowledge" />
           <!-- 创建共享知识库 -->
-          <ButtonCreateKnowledge v-if="perm.knowledge.share.create()" folder-id="default" :api="SystemSharedKnowledgeApi" @refresh="refreshKnowledge" />
+          <ButtonCreateKnowledge
+            v-if="perm.knowledge.share.create()"
+            folder-id="default"
+            :api="SystemSharedKnowledgeApi"
+            @refresh="refreshKnowledge"
+          />
         </div>
       </component>
 
@@ -105,14 +113,14 @@ function handleSearchChange(query?: Dict<unknown>) {
                   <SyncKnowledgeAction
                     v-if="knowledge.type !== KNOWLEDGE_TYPE.BASE && perm.knowledge.share.sync()"
                     v-model:loading="knowledgeOperationLoading"
-                    label="同步"
+                    :label="t('knowledge.actions.sync')"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                   />
                   <!-- 向量化 -->
                   <EmbeddingKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
-                    label="向量化"
+                    :label="t('knowledge.actions.generateEmbeddings')"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                     v-if="perm.knowledge.share.vector()"
@@ -120,7 +128,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                   <!-- 生成问题 -->
                   <GenerateQuestionsAction
                     v-model:loading="knowledgeOperationLoading"
-                    label="生成问题"
+                    :label="t('knowledge.actions.generateQuestions')"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                     v-if="perm.knowledge.share.generate()"
@@ -128,12 +136,12 @@ function handleSearchChange(query?: Dict<unknown>) {
                   <!-- 设置 -->
                   <MkDropdownItem v-if="perm.knowledge.share.settingRead()" @click.stop="handleOpenKnowledgeSetting(knowledge)">
                     <template #icon><MkIcon name="icon_setting" /></template>
-                    设置
+                    {{ t('common.labels.settings') }}
                   </MkDropdownItem>
                   <!-- 分词索引 -->
                   <KeywordIndexKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
-                    label="分词索引"
+                    :label="t('knowledge.actions.buildKeywordIndex')"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                     v-if="perm.knowledge.share.token()"
@@ -141,21 +149,31 @@ function handleSearchChange(query?: Dict<unknown>) {
                   <!-- MCP 服务配置 -->
                   <McpConfigKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
-                    label="MCP 服务配置"
+                    :label="t('resource.mcpConfig.title')"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                     v-if="perm.knowledge.share.mcpConfig()"
                   />
 
                   <!-- 授权工作空间 -->
-                  <AuthorizedWorkspaceAction v-if="perm.knowledge.share.authToWorkspace()" label="授权工作空间" :resource="knowledge" :resource-type="RESOURCE_TYPE.KNOWLEDGE" />
+                  <AuthorizedWorkspaceAction
+                    v-if="perm.knowledge.share.authToWorkspace()"
+                    :label="t('resource.workspaceAuthorization.title')"
+                    :resource="knowledge"
+                    :resource-type="RESOURCE_TYPE.KNOWLEDGE"
+                  />
 
                   <!-- 查看关联资源 -->
-                  <RelatedResourcesKnowledgeAction v-if="perm.knowledge.share.relateMap()" label="查看关联资源" :api="SystemSharedRelatedResourcesApi" :knowledge="knowledge" />
+                  <RelatedResourcesKnowledgeAction
+                    v-if="perm.knowledge.share.relateMap()"
+                    :label="t('resource.relations.title')"
+                    :api="SystemSharedRelatedResourcesApi"
+                    :knowledge="knowledge"
+                  />
                   <!-- 导出共享知识库 -->
                   <ExportKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
-                    label="导出"
+                    :label="t('common.actions.export')"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                     v-if="perm.knowledge.share.export()"
@@ -163,7 +181,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                   <!-- 删除共享知识库 -->
                   <DeleteKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
-                    label="删除"
+                    :label="t('common.actions.delete')"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                     @delete="refreshKnowledge"

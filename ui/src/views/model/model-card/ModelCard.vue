@@ -69,7 +69,7 @@ function handleClick(event: MouseEvent) {
       </MkTooltip>
     </template>
     <template #tag>
-      <el-tag v-if="props.shared" size="small" type="info">{{ t('resource.states.shared') }}</el-tag>
+      <el-tag v-if="props.shared" size="small" type="info">{{ t('resource.shared') }}</el-tag>
     </template>
 
     <ul class="space-y-2">

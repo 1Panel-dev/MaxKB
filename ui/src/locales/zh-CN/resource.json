@@ -8,14 +8,18 @@
   "workspaceAuthorization": {
     "title": "授权工作空间"
   },
-  "states": {
-    "shared": "共享"
-  },
+  "shared": "共享",
   "mcpConfig": {
     "title": "MCP 服务配置"
   },
   "triggers": {
     "title": "触发器"
+  },
+  "templateStore": {
+    "title": "模板中心",
+    "searchResults": "找到 {count} 个相关模板",
+    "apply": "应用",
+    "missingDownloadUrl": "模板缺少下载地址，无法使用"
   },
   "actions": {
     "viewExecutionRecords": "查看执行记录"

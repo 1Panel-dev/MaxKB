@@ -14,7 +14,7 @@
     "datePicker": "Date",
     "uploadInput": "File upload",
     "model": "Model",
-    "knowledge": "Knowledge base",
+    "knowledge": "Knowledge",
     "treeSelect": "Tree select"
   },
   "tabs": {
@@ -96,17 +96,16 @@
       "notFoundMessage": "Variable reference not found"
     },
     "model": {
-      "requiredMessage": "Select a model",
-      "placeholder": "Select a model"
+      "requiredMessage": "Select a model"
     },
     "knowledge": {
-      "requiredMessage": "Select a knowledge base",
-      "placeholder": "Select a knowledge base"
+      "requiredMessage": "Select knowledge",
+      "placeholder": "Select knowledge"
     },
     "availableKnowledge": {
-      "requiredMessage": "Select available knowledge bases",
-      "label": "Available knowledge bases",
-      "placeholder": "Select available knowledge bases"
+      "requiredMessage": "Select available knowledge",
+      "label": "Available knowledge",
+      "placeholder": "Select available knowledge"
     },
     "variable": {
       "requiredMessage": "Select a variable",
@@ -127,7 +126,7 @@
       "label": "Options"
     },
     "defaultKnowledge": {
-      "label": "Default knowledge base"
+      "label": "Default knowledge"
     },
     "availableModels": {
       "label": "Available models"

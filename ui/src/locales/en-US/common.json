@@ -8,7 +8,8 @@
     "all": "All",
     "details": "Details",
     "basicInfo": "Basic information",
-    "type": "Type"
+    "type": "Type",
+    "settings": "Settings"
   },
   "name": {
     "label": "Name",
@@ -36,12 +37,14 @@
     "emptyFileMessage": "Cannot upload an empty file."
   },
   "actions": {
+    "manage": "Manage",
     "edit": "Edit",
     "delete": "Delete",
     "cancel": "Cancel",
     "save": "Save",
     "add": "Add",
     "previous": "Previous",
+    "next": "Next",
     "uploadFiles": "Upload files",
     "create": "Create",
     "createFromImport": "Create from file",
@@ -74,7 +77,10 @@
     "exportFailed": "Export failed: {reason}",
     "copied": "Copied",
     "connectionSuccess": "Connection successful",
-    "replaceSuccess": "Replaced successfully"
+    "replaceSuccess": "Replaced successfully",
+    "submitSuccess": "Submitted successfully",
+    "taskSubmitted": "Task submitted",
+    "operationSuccess": "Operation successful"
   },
   "placeholders": {
     "input": "Please enter",
@@ -90,6 +96,7 @@
   },
   "empty": {
     "default": "No data",
-    "search": "No results found"
+    "search": "No results found",
+    "noDetails": "No details available"
   }
 }

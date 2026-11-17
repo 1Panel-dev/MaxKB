@@ -85,11 +85,11 @@
     },
     "searchResults": "找到 {count} 个相关工具",
     "apply": "应用",
-    "addTitle": "添加工具",
-    "noDetails": "暂无详细说明"
+    "addTitle": "添加工具"
   },
-  "parameters": {
-    "shownWhenUsed": "使用工具时显示"
+  "help": {
+    "shownWhenUsed": "使用工具时显示",
+    "hiddenWhenUsed": "使用工具时不显示"
   },
   "initParams": {
     "title": "启动参数"
@@ -111,7 +111,6 @@
   },
   "pythonCode": {
     "title": "工具内容（Python）",
-    "description": "使用工具时不显示",
     "generate": {
       "title": "生成 Python 代码",
       "placeholder": "请描述这个工具的功能",

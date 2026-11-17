@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { RelatedQuestionsConfig } from '@/api/types'
 import type { DocumentParagraphApi } from '@/views/document-detail/context'
 import GenerateQuestionsDialog from '@/components/business/generate-questions/index.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'BatchGenerateQuestionsAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: DocumentParagraphApi
   knowledgeId: string
@@ -44,7 +46,7 @@ function handleSubmit(config: RelatedQuestionsConfig) {
         paragraph_id_list: [...targetParagraphIds.value],
       })
       .then(() => {
-        MsgSuccess('操作成功')
+        MsgSuccess(t('common.messages.operationSuccess'))
         refreshOnClosed.value = true
         dialogRef.value?.close()
       })
@@ -71,7 +73,7 @@ function handleClosed() {
 
 <template>
   <!-- 批量生成分段关联问题 -->
-  <el-button type="primary" plain :disabled="disabled || loading" @click="handleOpenDialog">生成问题</el-button>
+  <el-button type="primary" plain :disabled="disabled || loading" @click="handleOpenDialog">{{ t('knowledge.actions.generateQuestions') }}</el-button>
   <GenerateQuestionsDialog
     v-if="dialogMounted"
     ref="dialogRef"

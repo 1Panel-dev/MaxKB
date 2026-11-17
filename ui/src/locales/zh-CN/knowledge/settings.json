@@ -1,0 +1,85 @@
+{
+  "baseSettings": {
+    "title": "基础设置"
+  },
+  "documentStrategy": {
+    "title": "文档处理策略",
+    "splitRules": "分段规则",
+    "smart": {
+      "label": "智能分段（推荐）",
+      "description": "不了解如何设置分段规则时推荐使用智能分段"
+    },
+    "advanced": {
+      "label": "高级分段",
+      "description": "用户可根据文档规范自行设置分段标识符、分段长度以及清洗规则"
+    },
+    "delimiter": {
+      "label": "分段标识",
+      "placeholder": "请选择分段标识",
+      "description": "按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。"
+    },
+    "delimiterOptions": {
+      "space": "空格",
+      "semicolon": "分号",
+      "comma": "逗号",
+      "period": "句号",
+      "newline": "回车",
+      "blankLine": "空行"
+    },
+    "paragraphLength": "分段长度",
+    "childChunkLength": {
+      "label": "子块长度",
+      "description": "子块长度仅用于向量检索，命中后将回溯显示其所在分段"
+    },
+    "autoClean": {
+      "label": "自动清洗",
+      "description": "（去掉重复多余符号空格、空行、制表符）"
+    },
+    "imageProcessing": "图片处理",
+    "visualEnhancement": {
+      "label": "视觉增强",
+      "description": "识别文档中图片，将图片按照策略发给模型或工具处理，并将返回内容写入图片的描述中"
+    },
+    "enhancementMethod": {
+      "label": "增强策略",
+      "model": "模型增强",
+      "tool": "工具增强"
+    },
+    "visionModel": {
+      "placeholder": "请选择视觉模型",
+      "requiredMessage": "请选择视觉模型"
+    },
+    "enhancementTool": {
+      "label": "增强工具",
+      "placeholder": "请选择增强工具",
+      "requiredMessage": "请选择增强工具"
+    },
+    "indexEnhancement": "索引增强",
+    "titleAsQuestion": {
+      "label": "分段标题设置为问题索引",
+      "description": "开启后会将分段标题自动添加为关联问题"
+    }
+  },
+  "scheduledSync": {
+    "title": "定时同步"
+  },
+  "sync": {
+    "title": "同步知识库",
+    "method": "同步方式",
+    "incremental": {
+      "label": "增量同步",
+      "description": "跳过未更新的文档，更新有变化的文档，并清理来源中已不存在的文档"
+    },
+    "replace": {
+      "label": "替换同步",
+      "description": "重新获取来源文档并替换匹配的文档，保留未匹配的旧文档"
+    },
+    "complete": {
+      "label": "完整同步",
+      "description": "重新获取来源文档并重建该来源的文档，保留其他来源的文档"
+    },
+    "incrementalWarning": "注意：增量同步会跳过内容无更新的文档，内容有更新时会更新文档的分段，请谨慎操作。",
+    "rebuildWarning": "注意：同步会删除已有数据重新获取新数据，请谨慎操作。",
+    "taskSubmitted": "同步任务发送成功"
+  }
+}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { Dict, KnowledgeItem, OptionItem } from '@/api/types'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import SystemCommonApi from '@/api/admin/system/common'
@@ -24,6 +25,8 @@ import { toOrderBy } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission'
 
+const { t } = useI18n({ useScope: 'global' })
+
 const { auth } = useStore()
 const router = useRouter()
 
@@ -42,7 +45,7 @@ function handleOpenKnowledgeSetting(knowledge: KnowledgeItem) {
   })
 }
 
-/* 工具分页与筛选 */
+/* 知识库分页与筛选 */
 const loading = ref(false)
 const knowledgeOperationLoading = ref(false)
 const knowledgeData = ref<KnowledgeItem[]>([])
@@ -53,15 +56,15 @@ const creatorOptions = ref<OptionItem<string>[]>([])
 const workspaceOptions = ref<OptionItem<string>[]>([])
 const selectedWorkspaceIds = ref<string[]>([])
 const searchFields = computed(() => [
-  { label: '名称', value: 'name' },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.name.label'), value: 'name' },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 const selectedType = ref<number | null>(null)
 const typeOptions = computed(() => [
-  { value: KNOWLEDGE_TYPE.BASE, label: '通用知识库' },
-  { value: KNOWLEDGE_TYPE.WEB, label: 'Web 知识库' },
-  { value: KNOWLEDGE_TYPE.LARK, label: '飞书知识库' },
-  { value: KNOWLEDGE_TYPE.WORKFLOW, label: '工作流知识库' },
+  { value: KNOWLEDGE_TYPE.BASE, label: t('knowledge.base.label') },
+  { value: KNOWLEDGE_TYPE.WEB, label: t('knowledge.web.label') },
+  { value: KNOWLEDGE_TYPE.LARK, label: t('knowledge.lark.label') },
+  { value: KNOWLEDGE_TYPE.WORKFLOW, label: t('knowledge.workflow.label') },
 ])
 
 function loadCreatorOptions(keyword: string) {
@@ -85,19 +88,6 @@ function loadKnowledgePage() {
     .finally(() => {
       loading.value = false
     })
-}
-
-function getKnowledgeType(knowledge: KnowledgeItem) {
-  switch (knowledge.type) {
-    case KNOWLEDGE_TYPE.WEB:
-      return 'Web 知识库'
-    case KNOWLEDGE_TYPE.LARK:
-      return '飞书知识库'
-    case KNOWLEDGE_TYPE.WORKFLOW:
-      return '工作流知识库'
-    default:
-      return '通用知识库'
-  }
 }
 
 function handleSearchChange(query?: Dict<unknown>) {
@@ -127,7 +117,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout>
+  <MkViewLayout :title="t('knowledge.title')">
     <template #default="{ Header, title }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -143,7 +133,7 @@ onMounted(() => {
         @sort-change="handleSortChange"
         resizable
       >
-        <el-table-column prop="name" label="名称" min-width="200" show-overflow-tooltip>
+        <el-table-column prop="name" :label="t('common.name.label')" min-width="200" show-overflow-tooltip>
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <KnowledgeIcon :type="row.type" :size="20" class="shrink-0" />
@@ -151,12 +141,18 @@ onMounted(() => {
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="类型" width="150">
+        <el-table-column prop="type" :label="t('common.labels.type')" width="150">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedType" label="类型" :options="typeOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedType"
+              :label="t('common.labels.type')"
+              :options="typeOptions"
+              @change="handleFilterChange"
+            />
           </template>
           <template #default="{ row }">
-            {{ getKnowledgeType(row) }}
+            {{ typeOptions.find((option) => option.value === row.type)?.label ?? t('knowledge.base.label') }}
           </template>
         </el-table-column>
         <el-table-column v-if="auth.isEE" prop="workspace_name" min-width="160" show-overflow-tooltip>
@@ -164,25 +160,25 @@ onMounted(() => {
             <MkTableFilter
               mode="multiple"
               v-model="selectedWorkspaceIds"
-              label="工作空间"
+              :label="t('workspace.title')"
               filterable
               :options="workspaceOptions"
               @change="handleFilterChange"
             />
           </template>
         </el-table-column>
-        <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="update_time" label="更新时间" width="180" sortable>
+        <el-table-column prop="nick_name" :label="t('common.labels.creator')" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="update_time" :label="t('common.labels.updatedAt')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
         </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
+        <el-table-column prop="create_time" :label="t('common.labels.createdAt')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="120" fixed="right">
+        <el-table-column :label="t('common.labels.operation')" width="120" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 进入知识库详情 -->
-              <MkTooltip v-if="perm.knowledge.system.edit()" content="管理">
+              <MkTooltip v-if="perm.knowledge.system.edit()" :content="t('common.actions.manage')">
                 <el-button text type="primary" @click="handleOpenKnowledge(row)">
                   <MkIcon name="icon_admin_outlined" />
                 </el-button>
@@ -191,7 +187,7 @@ onMounted(() => {
               <EmbeddingKnowledgeAction
                 v-model:loading="knowledgeOperationLoading"
                 display="button"
-                label="向量化"
+                :label="t('knowledge.actions.generateEmbeddings')"
                 :api="SystemResourceKnowledgeApi"
                 :knowledge="row"
                 v-if="perm.knowledge.system.vector()"
@@ -201,14 +197,14 @@ onMounted(() => {
                 <SyncKnowledgeAction
                   v-if="row.type !== KNOWLEDGE_TYPE.BASE && perm.knowledge.system.sync()"
                   v-model:loading="knowledgeOperationLoading"
-                  label="同步"
+                  :label="t('knowledge.actions.sync')"
                   :api="SystemResourceKnowledgeApi"
                   :knowledge="row"
                 />
                 <!-- 生成问题 -->
                 <GenerateQuestionsAction
                   v-model:loading="knowledgeOperationLoading"
-                  label="生成问题"
+                  :label="t('knowledge.actions.generateQuestions')"
                   :api="SystemResourceKnowledgeApi"
                   :knowledge="row"
                   v-if="perm.knowledge.system.generate()"
@@ -216,12 +212,12 @@ onMounted(() => {
                 <!-- 设置 -->
                 <MkDropdownItem v-if="perm.knowledge.system.settingRead()" @click.stop="handleOpenKnowledgeSetting(row)">
                   <template #icon><MkIcon name="icon_setting" /></template>
-                  设置
+                  {{ t('common.labels.settings') }}
                 </MkDropdownItem>
                 <!-- 分词索引 -->
                 <KeywordIndexKnowledgeAction
                   v-model:loading="knowledgeOperationLoading"
-                  label="分词索引"
+                  :label="t('knowledge.actions.buildKeywordIndex')"
                   :api="SystemResourceKnowledgeApi"
                   :knowledge="row"
                   v-if="perm.knowledge.system.token()"
@@ -229,21 +225,32 @@ onMounted(() => {
                 <!-- MCP 服务配置 -->
                 <McpConfigKnowledgeAction
                   v-model:loading="knowledgeOperationLoading"
-                  label="MCP 服务配置"
+                  :label="t('resource.mcpConfig.title')"
                   :api="SystemResourceKnowledgeApi"
                   :knowledge="row"
                   v-if="perm.knowledge.system.mcpConfig()"
                 />
                 <!-- 资源授权 -->
-                <AuthorizeKnowledgeAction v-if="perm.knowledge.system.auth()" label="资源授权" :knowledge="row" />
+                <AuthorizeKnowledgeAction v-if="perm.knowledge.system.auth()" :label="t('resource.authorization.title')" :knowledge="row" />
                 <!-- 查看关联资源 -->
-                <RelatedResourcesKnowledgeAction v-if="perm.knowledge.system.relateMap()" label="查看关联资源" :api="SystemRelatedResourcesApi" :knowledge="row" />
+                <RelatedResourcesKnowledgeAction
+                  v-if="perm.knowledge.system.relateMap()"
+                  :label="t('resource.relations.title')"
+                  :api="SystemRelatedResourcesApi"
+                  :knowledge="row"
+                />
                 <!-- 导出 -->
-                <ExportKnowledgeAction v-if="perm.knowledge.system.export()" v-model:loading="knowledgeOperationLoading" label="导出" :api="SystemResourceKnowledgeApi" :knowledge="row" />
+                <ExportKnowledgeAction
+                  v-if="perm.knowledge.system.export()"
+                  v-model:loading="knowledgeOperationLoading"
+                  :label="t('common.actions.export')"
+                  :api="SystemResourceKnowledgeApi"
+                  :knowledge="row"
+                />
                 <!-- 删除 -->
                 <DeleteKnowledgeAction
                   v-model:loading="knowledgeOperationLoading"
-                  label="删除"
+                  :label="t('common.actions.delete')"
                   :api="SystemResourceKnowledgeApi"
                   :knowledge="row"
                   @delete="loadKnowledgePage"

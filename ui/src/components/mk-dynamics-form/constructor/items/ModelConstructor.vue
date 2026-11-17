@@ -210,7 +210,6 @@ defineExpose({ getData, render })
       teleported
       multiple
       v-model="selectedIds"
-      :placeholder="t('dynamicForm.fields.model.placeholder')"
       :options="rawModelOptions"
       :provider-options="providerOptions"
       :model-type="formValue.model_type"
@@ -227,7 +226,6 @@ defineExpose({ getData, render })
       v-model="defaultModelId"
       v-model:model-params="defaultModelParams"
       can-edit-params
-      :placeholder="t('dynamicForm.fields.model.placeholder')"
       :options="selectedModelsOptions"
       :provider-options="providerOptions"
       teleported

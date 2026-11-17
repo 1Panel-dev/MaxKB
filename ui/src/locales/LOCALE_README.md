@@ -6,7 +6,7 @@
 ## 分类
 
 按“业务域 → 对象或场景 → 文案用途”组织；文件按业务域划分，不对应组件目录。
-业务包按需创建，在每个语言目录放置同名 JSON 文件。
+各语言使用相同的业务文件或目录结构。
 
 | 业务域      | 内容                                             |
 | ----------- | ------------------------------------------------ |
@@ -44,7 +44,7 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 common.status 维护状态标签 label 和通用启停选项 enabled、disabled。
 “请输入模型名称”等指明业务对象的提示，以及发布状态、执行状态等业务选项归对应业务域。
 通用操作结果归 common.messages，通用对话框标题归 common.dialogs；业务专属确认句仍留在所属业务域。
-用户内容、提示词、协议枚举和已保存节点名称不进入语言包。
+用户内容、用户保存的提示词、协议枚举和已保存节点名称保留原文。
 
 ## JSON 键顺序
 
@@ -55,7 +55,7 @@ common.status 维护状态标签 label 和通用启停选项 enabled、disabled�
 ## 使用约定
 
 - key 使用表达业务含义的英文 camelCase，不使用中文、数字序号或 misc 等模糊分类。
-- 每个语言目录直属的 JSON 文件由 Vite 自动收集。文件名去掉扩展名并转为 camelCase，作为命名空间，例如 `dynamic-form.json` 对应 `dynamicForm`。JSON 内容直接从业务字段开始。
+- Vite 自动收集语言目录下的 JSON。单文件业务使用文件名作为命名空间，如 `dynamic-form.json` 对应 `dynamicForm`。分文件的业务使用第一级目录名，如 `knowledge/library.json` 归入 `knowledge`。分文件直接写各自负责的业务字段，同一业务的顶层字段只在一个文件中定义。
 - 完整句子整体翻译，动态内容使用命名参数；不用片段拼接句子。
 - 英文界面采用简洁、明确的表达。通用输入、选择占位分别使用 Please enter、Please select，
   不使用省略号；明确对象时使用 Enter a model name、Select a model 等完整短语，不统一添加 Please。
@@ -63,10 +63,11 @@ common.status 维护状态标签 label 和通用启停选项 enabled、disabled�
   按钮使用 Save 等动作词，成功提示使用 Saved successfully。短标签和占位提示使用句首大写，
   通常不加句号；占位与校验仍保留独立 key。
 - 组件显式导入 useI18n，并使用全局作用域的 t；不使用自动注入的 $t。
+- 国际化改动优先直接使用现有的 `t` 和翻译键。需要新增方法、函数或修改已有函数实现时，先向用户说明涉及的函数、原因和影响，取得明确同意后再实施。
 - 依赖语言的选项和校验规则在 computed 或执行时翻译，不在模块初始化时固化翻译结果。
 - 不为语言切换添加重新校验表单的 watch；已有错误提示在下次正常校验时更新。
   响应式规则变化不自动触发校验，表单使用 :validate-on-rule-change="false"。
-- 开发和构建时根据简体中文目录自动生成 `schema.generated.d.ts`，供编辑器补全。新增业务包只需在三个语言目录放置同名文件。`npm run type-check` 会检查各语言的文件、key 和字段类型是否一致。翻译文案使用相同的命名插值参数。
+- 三种语言使用相同的文件路径、翻译键、字段类型和命名插值参数。
 - 入口完成国际化初始化后，普通 TS 工具可从 `@/locales` 导入 `t`，在函数执行时翻译。
 
 ## 语言状态
@@ -128,9 +129,24 @@ Skill 表单的标题、名称提示和 ZIP 文件要求归 `tool.skill`。文�
 MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 `tool.mcp`。配置字段复用 `resource.mcpConfig.title`，JSON 示例与用户填写的配置保留原文。
 数据源工具的表单标题、名称提示和代码必填提示归 `tool.dataSource`。Python 模板和用户编辑的代码作为表单数据原样提交。
 工具表单的启动参数、输入参数、输出参数和 Python 代码区分别归 `tool.initParams`、`tool.inputParams`、`tool.outputParams` 和 `tool.pythonCode`。
-输入和输出参数共用 `tool.parameters.shownWhenUsed`。输出变量 `{result}` 作为命名参数传给译文。
+工具使用时的可见性说明归 `tool.help`：输入和输出参数共用 `shownWhenUsed`，Python 代码区使用 `hiddenWhenUsed`。输出变量 `{result}` 作为命名参数传给译文。
 参数表头及提示说明复用 `dynamicForm.fields`，模型和工具共用 `common.parameters.add`、`common.parameters.edit`。
 参数来源只翻译选项标签，`reference`、`custom` 和数据类型沿用协议值。
+
+## 知识库列表
+
+英文界面将“知识库”统一译为 `knowledge`，独立标题写作 `Knowledge`，例如“全部知识库”为 `All knowledge`。
+工作空间、系统资源管理和系统共享资源的知识库菜单与列表标题共用 `knowledge.title`。四类知识库分别归 `knowledge.base`、`knowledge.web`、`knowledge.lark` 和 `knowledge.workflow`。类型筛选、类型列和创建菜单共用各组的 `label`，菜单说明使用 `description`，创建弹窗标题使用 `createTitle`。筛选请求沿用数字类型值。
+卡片的文档数、字符数和图片数使用 `knowledge.stats`，按实际数量选择单复数。同步、向量化、生成问题和分词索引归 `knowledge.actions`。
+跨资源的模板中心文案归 `resource.templateStore`。模板名称、描述和 README 展示接口原文；缺少说明时与工具商店共用 `common.empty.noDetails`。
+手动同步、定时同步及日志共用 `knowledge.sync` 中的同步方式。生成问题弹窗的字段、校验、分段范围和内置默认提示词归 `knowledge.generateQuestions`。无已保存配置时按打开弹窗时的语言填入默认提示词，保留 `{data}` 与 `<question></question>`。提交时使用编辑框中的原文。
+导出格式与源文件说明归 `knowledge.export`，单个及批量删除的确认标题归 `knowledge.delete`。
+Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传、导入和设置共用的分段规则、图片处理与索引增强文案归 `knowledge.documentStrategy`。
+
+## 知识库详情
+
+`knowledge/index.json` 维护列表、知识库类型与创建等文案。`library.json` 维护资料库、文档、图片和标签；`retrieval.json` 维护召回测试、问题与自定义分词；`integration.json` 维护对话用户和外部检索服务；`settings.json` 维护基础设置、文档处理策略和同步；生成问题弹窗归 `generate-questions.json`。
+四种资源范围的详情菜单和页面标题共用业务分组的 `title`，例如 `knowledge.document.title` 和 `knowledge.documentStrategy.title`。“设置”复用 `common.labels.settings`。
 
 ## 文件夹
 

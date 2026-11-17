@@ -5,14 +5,17 @@ import type { Locale } from './config'
 import type { DefaultLocaleMessageSchema } from 'vue-i18n'
 import { DEFAULT_LOCALE, LANGUAGE_STORAGE_KEY, LOCALE_OPTIONS, getLocaleNamespace, normalizeLocale } from './config'
 
-const localeFiles = import.meta.glob('./*/*.json', { eager: true, import: 'default' })
+const localeFiles = import.meta.glob<Record<string, unknown>>('./*/**/*.json', { eager: true, import: 'default' })
 
 function loadMessages(locale: Locale) {
   const prefix = `./${locale}/`
-  const domains = Object.entries(localeFiles)
-    .filter(([path]) => path.startsWith(prefix))
-    .map(([path, messages]) => [getLocaleNamespace(path.slice(prefix.length)), messages])
-  return Object.fromEntries(domains)
+  const domains: Record<string, Record<string, unknown>> = {}
+  for (const [path, messages] of Object.entries(localeFiles)) {
+    if (!path.startsWith(prefix)) continue
+    const domain = getLocaleNamespace(path.slice(prefix.length))
+    Object.assign((domains[domain] ??= {}), messages)
+  }
+  return domains
 }
 
 interface LanguageState {

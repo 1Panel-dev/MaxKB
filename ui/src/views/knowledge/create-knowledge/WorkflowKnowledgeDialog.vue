@@ -2,6 +2,7 @@
 import { nextTick, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type { KnowledgeWorkflowTemplate, WorkflowStoreTemplate } from '@/api/types'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
@@ -12,6 +13,7 @@ import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CreateWorkflowKnowledgeDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi; folderId: string }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 const { auth } = useStore()
@@ -65,7 +67,7 @@ function submit() {
         })
         .then((knowledge) => {
           return auth.loadAuthBaseProfile().then(() => {
-            MsgSuccess('创建成功')
+            MsgSuccess(t('common.messages.createSuccess'))
             dialogVisible.value = false
             emit('refresh')
             return router.push({
@@ -84,13 +86,13 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建工作流知识库" @closed="handleClosed">
+  <MkDialog v-model="dialogVisible" :title="t('knowledge.workflow.createTitle')" @closed="handleClosed">
     <KnowledgeBaseForm ref="baseFormRef" v-loading="loading" />
     <template #footer>
       <!-- 取消创建 -->
-      <el-button plain :disabled="loading" @click="dialogVisible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 创建知识库 -->
-      <el-button type="primary" :loading="loading" @click="submit">创建</el-button>
+      <el-button type="primary" :loading="loading" @click="submit">{{ t('common.actions.create') }}</el-button>
     </template>
   </MkDialog>
 </template>

@@ -8,7 +8,8 @@
     "all": "全部",
     "details": "详情",
     "basicInfo": "基本信息",
-    "type": "类型"
+    "type": "类型",
+    "settings": "设置"
   },
   "name": {
     "label": "名称",
@@ -36,12 +37,14 @@
     "emptyFileMessage": "不能上传空文件"
   },
   "actions": {
+    "manage": "管理",
     "edit": "编辑",
     "delete": "删除",
     "cancel": "取消",
     "save": "保存",
     "add": "添加",
     "previous": "上一步",
+    "next": "下一步",
     "uploadFiles": "上传文件",
     "create": "创建",
     "createFromImport": "导入创建",
@@ -74,7 +77,10 @@
     "exportFailed": "导出失败：{reason}",
     "copied": "已复制",
     "connectionSuccess": "连接成功",
-    "replaceSuccess": "替换成功"
+    "replaceSuccess": "替换成功",
+    "submitSuccess": "提交成功",
+    "taskSubmitted": "任务已提交",
+    "operationSuccess": "操作成功"
   },
   "placeholders": {
     "input": "请输入",
@@ -90,6 +96,7 @@
   },
   "empty": {
     "default": "暂无数据",
-    "search": "没有找到相关内容"
+    "search": "没有找到相关内容",
+    "noDetails": "暂无详细说明"
   }
 }

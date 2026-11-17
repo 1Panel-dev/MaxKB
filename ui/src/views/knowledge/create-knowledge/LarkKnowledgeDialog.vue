@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reactive, ref, useTemplateRef } from 'vue'
+import { computed, reactive, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type SystemSharedKnowledgeApi from '@/api/admin/system/shared-resources/knowledge/knowledge'
 import type { FormInstance, FormRules } from 'element-plus'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
@@ -11,6 +12,7 @@ import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CreateLarkKnowledgeDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ api: typeof KnowledgeApi | typeof SystemSharedKnowledgeApi; folderId: string }>()
 const emit = defineEmits<{ refresh: [] }>()
 const { auth } = useStore()
@@ -23,11 +25,23 @@ const dialogVisible = ref(false)
 const loading = ref(false)
 const knowledgeFormRef = ref<FormInstance>()
 const knowledgeForm = reactive({ app_id: '', app_secret: '', folder_token: '' })
-const knowledgeFormRules: FormRules<typeof knowledgeForm> = {
-  app_id: [{ required: true, whitespace: true, message: '请输入 App ID', trigger: 'blur' }],
-  app_secret: [{ required: true, whitespace: true, message: '请输入 App Secret', trigger: 'blur' }],
-  folder_token: [{ required: true, whitespace: true, message: '请输入 Folder Token', trigger: 'blur' }],
-}
+const larkFieldLabels = { app_id: 'App ID', app_secret: 'App Secret', folder_token: 'Folder Token' } as const
+const knowledgeFormRules = computed<FormRules<typeof knowledgeForm>>(() => ({
+  app_id: [
+    { required: true, whitespace: true, message: t('common.validation.inputFieldRequired', { label: larkFieldLabels.app_id }), trigger: 'blur' },
+  ],
+  app_secret: [
+    { required: true, whitespace: true, message: t('common.validation.inputFieldRequired', { label: larkFieldLabels.app_secret }), trigger: 'blur' },
+  ],
+  folder_token: [
+    {
+      required: true,
+      whitespace: true,
+      message: t('common.validation.inputFieldRequired', { label: larkFieldLabels.folder_token }),
+      trigger: 'blur',
+    },
+  ],
+}))
 
 function resetData() {
   baseFormRef.value?.reset()
@@ -61,7 +75,7 @@ function submit() {
         })
         .then((knowledge) => {
           return auth.loadAuthBaseProfile().then(() => {
-            MsgSuccess('创建成功')
+            MsgSuccess(t('common.messages.createSuccess'))
             dialogVisible.value = false
             emit('refresh')
             return router.push({
@@ -80,37 +94,48 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建飞书知识库" @closed="resetData">
+  <MkDialog v-model="dialogVisible" :title="t('knowledge.lark.createTitle')" @closed="resetData">
     <KnowledgeBaseForm ref="baseFormRef" v-loading="loading" />
     <el-form
       class="mt-4"
       ref="knowledgeFormRef"
       :model="knowledgeForm"
       :rules="knowledgeFormRules"
+      :validate-on-rule-change="false"
       v-loading="loading"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="App ID" prop="app_id">
-        <el-input v-model="knowledgeForm.app_id" placeholder="请输入 App ID" @blur="knowledgeForm.app_id = knowledgeForm.app_id.trim()" />
+      <el-form-item :label="larkFieldLabels.app_id" prop="app_id">
+        <el-input
+          v-model="knowledgeForm.app_id"
+          :placeholder="t('common.placeholders.inputField', { label: larkFieldLabels.app_id })"
+          @blur="knowledgeForm.app_id = knowledgeForm.app_id.trim()"
+        />
       </el-form-item>
-      <el-form-item label="App Secret" prop="app_secret">
-        <el-input v-model="knowledgeForm.app_secret" placeholder="请输入 App Secret" type="password" autocomplete="new-password" show-password />
+      <el-form-item :label="larkFieldLabels.app_secret" prop="app_secret">
+        <el-input
+          v-model="knowledgeForm.app_secret"
+          :placeholder="t('common.placeholders.inputField', { label: larkFieldLabels.app_secret })"
+          type="password"
+          autocomplete="new-password"
+          show-password
+        />
       </el-form-item>
-      <el-form-item label="Folder Token" prop="folder_token">
+      <el-form-item :label="larkFieldLabels.folder_token" prop="folder_token">
         <el-input
           v-model="knowledgeForm.folder_token"
-          placeholder="请输入 Folder Token"
+          :placeholder="t('common.placeholders.inputField', { label: larkFieldLabels.folder_token })"
           @blur="knowledgeForm.folder_token = knowledgeForm.folder_token.trim()"
         />
       </el-form-item>
     </el-form>
     <template #footer>
       <!-- 取消创建 -->
-      <el-button plain :disabled="loading" @click="dialogVisible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 创建知识库 -->
-      <el-button type="primary" :loading="loading" @click="submit">创建</el-button>
+      <el-button type="primary" :loading="loading" @click="submit">{{ t('common.actions.create') }}</el-button>
     </template>
   </MkDialog>
 </template>

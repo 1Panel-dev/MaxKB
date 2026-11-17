@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="Multiple extends boolean = false">
 import { computed, useTemplateRef } from 'vue'
 import { groupBy } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { SelectInstance } from 'element-plus'
 import { MODEL_STATUS } from '@/api/enums'
@@ -13,6 +14,7 @@ import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@
 import { perm } from '@/permission'
 
 defineOptions({ name: 'SelectModel', inheritAttrs: false })
+const { t } = useI18n({ useScope: 'global' })
 
 // 创建模型权限：随当前资源范围选择对应模型的创建权限
 const canCreateModel = computed(() => {
@@ -97,7 +99,7 @@ function getProviderIcon(modelId: unknown) {
 
 // 创建模型：根据当前资源范围传入完整 API，创建后由调用方刷新选项。
 const selectRef = useTemplateRef<SelectInstance>('selectRef')
-const allModelProvider: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
+const allModelProvider = computed<ModelProviderItem>(() => ({ icon: '', name: t('model.categories.all'), provider: 'all' }))
 const requestApi = computed(() => {
   if (isWorkspaceResource()) return ModelApi
   if (isSystemResource()) return SystemModelApi
@@ -135,7 +137,7 @@ function openModelParams() {
     <el-select
       ref="selectRef"
       v-model="selectedModelValue"
-      placeholder="请选择模型"
+      :placeholder="t('model.select.placeholder')"
       v-bind="$attrs"
       class="w-full"
       :disabled="disabled"
@@ -156,8 +158,8 @@ function openModelParams() {
           <div class="flex-align-center h-full gap-2">
             <span class="h-5 w-5 shrink-0" v-html="group.icon" />
             <span class="min-w-0 truncate" :title="model.name">{{ model.name }}</span>
-            <el-tag v-if="model.source === 'shared'" size="small" type="info">共享</el-tag>
-            <span v-if="model.status !== MODEL_STATUS.SUCCESS" class="text-danger">不可用</span>
+            <el-tag v-if="model.source === 'shared'" size="small" type="info">{{ t('resource.shared') }}</el-tag>
+            <span v-if="model.status !== MODEL_STATUS.SUCCESS" class="text-danger">{{ t('model.states.unavailable') }}</span>
           </div>
         </el-option>
       </el-option-group>
@@ -175,7 +177,7 @@ function openModelParams() {
             <template #default="{ open }">
               <el-button type="primary" link :disabled="disabled" @click.stop="handleOpenCreateModel(open)">
                 <MkIcon name="icon_add_outlined" />
-                <span>添加模型</span>
+                <span>{{ t('model.actions.add') }}</span>
               </el-button>
             </template>
           </ButtonAddModel>
@@ -184,7 +186,7 @@ function openModelParams() {
     </el-select>
     <div v-if="canEditModelParams" class="absolute inset-y-px right-3 flex-align-center gap-2">
       <el-divider direction="vertical" />
-      <MkTooltip content="模型参数设置" placement="top" :disabled="disabled || !modelValue">
+      <MkTooltip :content="t('model.actions.parameters')" placement="top" :disabled="disabled || !modelValue">
         <el-button text class="-mr-1" :disabled="disabled || !modelValue" @click.stop="openModelParams">
           <MkIcon name="icon_preferences_outlined" />
         </el-button>

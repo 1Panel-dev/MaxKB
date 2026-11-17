@@ -30,8 +30,8 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 `resource-authorization.ts` 的 `RESOURCE_PERMISSION_OPTIONS` 统一维护权限标签和说明；
 资源授权页面与资源用户授权抽屉按版本和根目录约束筛选选项。
 
-`knowledge.ts` 的 `KNOWLEDGE_SYNC_OPTIONS` 统一维护增量同步、替换同步和完整同步的值、文案及说明，
-手动同步弹窗与定时同步设置直接复用，日志同步方式标签也从这些选项读取。
+`knowledge.ts` 的 `KNOWLEDGE_SYNC_OPTIONS` 提供同步方式的协议值、`labelKey` 和 `descriptionKey`。
+手动同步、定时同步和同步日志在展示时翻译，提交时使用协议值。
 
 `knowledge.ts` 的 `KNOWLEDGE_SEARCH_MODE_OPTIONS` 统一维护向量、全文和混合检索的值、文案及说明，
 召回测试页与工作流知识库检索节点直接复用，选项值引用 `KNOWLEDGE_SEARCH_MODE`。
@@ -53,6 +53,7 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 `document.ts` 的 `DOCUMENT_HIT_HANDLING_LABELS` 维护文档命中处理方式的展示文案，
 映射键引用 API 枚举 `DOCUMENT_HIT_HANDLING`。
 `DOCUMENT_SPLIT_PATTERN_OPTIONS` 维护文档分段标识的完整选项与正则值，知识库文档策略表单和工作流分段节点共同引用。
+知识库表单优先用 `labelKey` 翻译有名称的分段标识，直接显示 `#` 等符号。工作流 Agent 使用 `label` 识别已有参数，提交分段策略时使用正则 `value`。
 
 `file-type.ts` 维护图片、文档、视频和音频的文件扩展名常量，扩展名统一使用大写。
 使用方判断文件类型时先将后缀转换为大写，再与对应常量匹配。

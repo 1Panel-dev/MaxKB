@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceScheduledSyncApi from '@/api/admin/system/resource-management/knowledge/scheduled-sync'
 import type SystemSharedScheduledSyncApi from '@/api/admin/system/shared-resources/knowledge/scheduled-sync'
 import type ScheduledSyncApi from '@/api/admin/workspace/knowledge/scheduled-sync'
@@ -11,6 +12,7 @@ import { KNOWLEDGE_SYNC_OPTIONS } from '@/constants/knowledge'
 import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'KnowledgeSyncLogTable' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   knowledgeId: string
   api: typeof ScheduledSyncApi | typeof SharedScheduledSyncApi | typeof SystemResourceScheduledSyncApi | typeof SystemSharedScheduledSyncApi
@@ -20,6 +22,7 @@ const props = defineProps<{
 const loading = ref(false)
 const syncLogs = ref<KnowledgeSyncLog[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
+const syncMethodLabels = computed(() => new Map(KNOWLEDGE_SYNC_OPTIONS.map(({ value, labelKey }) => [value, t(labelKey)])))
 const syncStatusOptions: Partial<Record<KnowledgeSyncStatus, StatusLabelOptions>> = {
   [KNOWLEDGE_SYNC_STATUS.RUNNING]: { type: 'loading', label: '同步中' },
   [KNOWLEDGE_SYNC_STATUS.SUCCESS]: { type: 'success', label: '成功' },
@@ -87,9 +90,9 @@ watch(
           </MkTooltip>
         </template>
       </el-table-column>
-      <el-table-column label="同步方式" width="140">
+      <el-table-column :label="t('knowledge.sync.method')" width="140">
         <template #default="{ row }">
-          {{ KNOWLEDGE_SYNC_OPTIONS.find((option) => option.value === row.sync_type)?.label ?? row.sync_type }}
+          {{ syncMethodLabels.get(row.sync_type) ?? row.sync_type }}
         </template>
       </el-table-column>
       <el-table-column label="同步状态" width="120">

@@ -9,6 +9,7 @@ export interface ResourceDetailPageProps {
 <script setup lang="ts">
 import { computed, shallowRef } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { LayoutMenuItem } from './types'
 import ResourceDetailMenu from './sidebar/ResourceDetailMenu.vue'
 import { getMatchedChildRouteList } from '@/router/admin/utils'
@@ -23,12 +24,16 @@ defineSlots<{ 'resource-header': () => unknown }>()
 
 const route = useRoute()
 const router = useRouter()
-const detailMenuItems = computed(() => getMatchedChildRouteList(route))
+const { t, te } = useI18n({ useScope: 'global' })
+const detailMenuItems = computed(() => getMatchedChildRouteList(route, (title) => (te(title) ? t(title) : title)))
 const activeDetailMenuName = computed(() => route.meta.detailActiveMenu ?? String(route.name ?? ''))
 
 /* 提供整个标题栏的挂载位置和当前路由标题。 */
 const headerTarget = shallowRef<HTMLElement | null>(null)
-const title = computed(() => route.meta.title ?? '')
+const title = computed(() => {
+  const routeTitle = route.meta.title ?? ''
+  return te(routeTitle) ? t(routeTitle) : routeTitle
+})
 const detailPageRef = shallowRef<{ customHeader?: boolean; hideHeader?: boolean } | null>(null)
 
 function navigateBack() {

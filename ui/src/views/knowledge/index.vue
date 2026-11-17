@@ -80,18 +80,18 @@ const knowledgeData = ref<KnowledgeItem[]>([])
 const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
-  { label: '名称', value: 'name' },
+  { label: t('common.name.label'), value: 'name' },
   {
-    label: '类型',
+    label: t('common.labels.type'),
     value: 'type',
     options: [
-      { value: KNOWLEDGE_TYPE.BASE, label: '通用知识库' },
-      { value: KNOWLEDGE_TYPE.WEB, label: 'Web 知识库' },
-      { value: KNOWLEDGE_TYPE.LARK, label: '飞书知识库' },
-      { value: KNOWLEDGE_TYPE.WORKFLOW, label: '工作流知识库' },
+      { value: KNOWLEDGE_TYPE.BASE, label: t('knowledge.base.label') },
+      { value: KNOWLEDGE_TYPE.WEB, label: t('knowledge.web.label') },
+      { value: KNOWLEDGE_TYPE.LARK, label: t('knowledge.lark.label') },
+      { value: KNOWLEDGE_TYPE.WORKFLOW, label: t('knowledge.workflow.label') },
     ],
   },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 const knowledgeQuery = ref<Dict<unknown>>()
 
@@ -170,7 +170,7 @@ function handleBatchMove(targetFolderId: string) {
   knowledgeOperationLoading.value = true
   return KnowledgeApi.putBatchMoveKnowledge(knowledgeIds, targetFolderId)
     .then(() => {
-      MsgSuccess('移动成功')
+      MsgSuccess(t('common.messages.moveSuccess'))
       batchMoveToDialogRef.value?.close()
       cancelBatchSelection()
       return refreshKnowledge()
@@ -185,11 +185,11 @@ function handleBatchDelete() {
   if (isShared.value || knowledgeOperationLoading.value || !selectedKnowledgeCount.value) return
   const knowledgeIds = [...selectedKnowledgeIds.value]
 
-  MsgConfirm(`是否批量删除 ${knowledgeIds.length} 个知识库？`, '删除后无法恢复，请谨慎操作。')
+  MsgConfirm(t('knowledge.delete.batchTitle', { count: knowledgeIds.length }, knowledgeIds.length), t('common.dialogs.deleteWarning'))
     .then(() => {
       knowledgeOperationLoading.value = true
       return KnowledgeApi.putBatchDeleteKnowledge(knowledgeIds).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         cancelBatchSelection()
         return refreshKnowledge()
       })
@@ -202,7 +202,7 @@ function handleBatchDelete() {
 </script>
 
 <template>
-  <MkViewLayout class="workspace-knowledge-view" collapsible resizable>
+  <MkViewLayout :title="t('knowledge.title')" class="workspace-knowledge-view" collapsible resizable>
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -231,9 +231,15 @@ function handleBatchDelete() {
           <template v-if="!isShared">
             <span>
               <!-- 批量选择 -->
-              <el-button v-if="perm.knowledge.workspace.batchDelete() || perm.knowledge.workspace.batchMove()" :type="batchSelectionMode ? 'primary' : undefined" :disabled="!knowledgeData.length" plain @click="toggleBatchSelection">
+              <el-button
+                v-if="perm.knowledge.workspace.batchDelete() || perm.knowledge.workspace.batchMove()"
+                :type="batchSelectionMode ? 'primary' : undefined"
+                :disabled="!knowledgeData.length"
+                plain
+                @click="toggleBatchSelection"
+              >
                 <MkIcon name="icon_Batch_outlined" />
-                <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
+                <span>{{ batchSelectionMode ? t('common.actions.cancelSelection') : t('common.actions.batchSelect') }}</span>
               </el-button>
             </span>
             <template v-if="!batchSelectionMode">
@@ -264,24 +270,36 @@ function handleBatchDelete() {
                   <SyncKnowledgeAction
                     v-if="knowledge.type === KNOWLEDGE_TYPE.WEB && perm.knowledge.workspace.sync(knowledge.id)"
                     v-model:loading="knowledgeOperationLoading"
-                    label="同步"
+                    :label="t('knowledge.actions.sync')"
                     :api="KnowledgeApi"
                     :knowledge="knowledge"
                   />
                   <!-- 向量化 -->
-                  <EmbeddingKnowledgeAction v-if="perm.knowledge.workspace.vector(knowledge.id)" v-model:loading="knowledgeOperationLoading" label="向量化" :api="KnowledgeApi" :knowledge="knowledge" />
+                  <EmbeddingKnowledgeAction
+                    v-if="perm.knowledge.workspace.vector(knowledge.id)"
+                    v-model:loading="knowledgeOperationLoading"
+                    :label="t('knowledge.actions.generateEmbeddings')"
+                    :api="KnowledgeApi"
+                    :knowledge="knowledge"
+                  />
                   <!-- 生成问题 -->
-                  <GenerateQuestionsAction v-if="perm.knowledge.workspace.generate(knowledge.id)" v-model:loading="knowledgeOperationLoading" label="生成问题" :api="KnowledgeApi" :knowledge="knowledge" />
+                  <GenerateQuestionsAction
+                    v-if="perm.knowledge.workspace.generate(knowledge.id)"
+                    v-model:loading="knowledgeOperationLoading"
+                    :label="t('knowledge.actions.generateQuestions')"
+                    :api="KnowledgeApi"
+                    :knowledge="knowledge"
+                  />
 
                   <!-- 设置 -->
                   <MkDropdownItem v-if="perm.knowledge.workspace.settingRead(knowledge.id)" @click.stop="handleOpenKnowledgeSetting(knowledge)">
                     <template #icon><MkIcon name="icon_setting" /></template>
-                    设置
+                    {{ t('common.labels.settings') }}
                   </MkDropdownItem>
                   <!-- 分词索引 -->
                   <KeywordIndexKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
-                    label="分词索引"
+                    :label="t('knowledge.actions.buildKeywordIndex')"
                     :api="KnowledgeApi"
                     :knowledge="knowledge"
                     v-if="perm.knowledge.workspace.token(knowledge.id)"
@@ -289,16 +307,25 @@ function handleBatchDelete() {
                   <!-- MCP 服务配置 -->
                   <McpConfigKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
-                    label="MCP 服务配置"
+                    :label="t('resource.mcpConfig.title')"
                     :api="KnowledgeApi"
                     :knowledge="knowledge"
                     v-if="perm.knowledge.workspace.mcpConfig(knowledge.id)"
                   />
                   <!-- 资源授权 -->
-                  <AuthorizeKnowledgeAction v-if="perm.knowledge.workspace.auth(knowledge.id)" label="资源授权" :knowledge="knowledge" />
+                  <AuthorizeKnowledgeAction
+                    v-if="perm.knowledge.workspace.auth(knowledge.id)"
+                    :label="t('resource.authorization.title')"
+                    :knowledge="knowledge"
+                  />
 
                   <!-- 查看关联资源 -->
-                  <RelatedResourcesKnowledgeAction v-if="perm.knowledge.workspace.relateMap(knowledge.id)" label="查看关联资源" :api="RelatedResourcesApi" :knowledge="knowledge" />
+                  <RelatedResourcesKnowledgeAction
+                    v-if="perm.knowledge.workspace.relateMap(knowledge.id)"
+                    :label="t('resource.relations.title')"
+                    :api="RelatedResourcesApi"
+                    :knowledge="knowledge"
+                  />
                   <!-- 移动到 -->
                   <MoveKnowledgeAction
                     v-if="perm.knowledge.workspace.move(knowledge.id)"
@@ -312,11 +339,17 @@ function handleBatchDelete() {
                   />
 
                   <!-- 导出 -->
-                  <ExportKnowledgeAction v-if="perm.knowledge.workspace.export(knowledge.id)" v-model:loading="knowledgeOperationLoading" label="导出" :api="KnowledgeApi" :knowledge="knowledge" />
+                  <ExportKnowledgeAction
+                    v-if="perm.knowledge.workspace.export(knowledge.id)"
+                    v-model:loading="knowledgeOperationLoading"
+                    :label="t('common.actions.export')"
+                    :api="KnowledgeApi"
+                    :knowledge="knowledge"
+                  />
                   <!-- 删除 -->
                   <DeleteKnowledgeAction
                     v-model:loading="knowledgeOperationLoading"
-                    label="删除"
+                    :label="t('common.actions.delete')"
                     :api="KnowledgeApi"
                     :knowledge="knowledge"
                     @delete="handleDeleteKnowledge"
@@ -339,10 +372,24 @@ function handleBatchDelete() {
         @batch-cancel="cancelBatchSelection"
       >
         <template #footer-batch-actions>
-          <el-button type="primary" v-if="perm.knowledge.workspace.batchMove()" plain :disabled="knowledgeOperationLoading || !selectedKnowledgeCount" @click="handleOpenBatchMove">
+          <el-button
+            type="primary"
+            v-if="perm.knowledge.workspace.batchMove()"
+            plain
+            :disabled="knowledgeOperationLoading || !selectedKnowledgeCount"
+            @click="handleOpenBatchMove"
+          >
             {{ t('folder.actions.moveTo') }}
           </el-button>
-          <el-button type="danger" v-if="perm.knowledge.workspace.batchDelete()" plain :disabled="knowledgeOperationLoading || !selectedKnowledgeCount" @click="handleBatchDelete">删除</el-button>
+          <el-button
+            type="danger"
+            v-if="perm.knowledge.workspace.batchDelete()"
+            plain
+            :disabled="knowledgeOperationLoading || !selectedKnowledgeCount"
+            @click="handleBatchDelete"
+          >
+            {{ t('common.actions.delete') }}
+          </el-button>
         </template>
       </component>
     </template>

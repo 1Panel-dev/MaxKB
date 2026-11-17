@@ -1,0 +1,80 @@
+{
+  "title": "知識庫",
+  "categories": {
+    "all": "全部知識庫",
+    "shared": "共用知識庫"
+  },
+  "base": {
+    "label": "通用知識庫",
+    "createTitle": "建立通用知識庫",
+    "description": "上傳檔案或手動輸入內容來建立知識庫"
+  },
+  "web": {
+    "label": "Web 知識庫",
+    "createTitle": "建立 Web 知識庫",
+    "description": "透過網站連結建立知識庫"
+  },
+  "lark": {
+    "label": "飛書知識庫",
+    "createTitle": "建立飛書知識庫",
+    "description": "透過飛書文件建立知識庫"
+  },
+  "workflow": {
+    "title": "工作流程",
+    "label": "工作流程知識庫",
+    "createTitle": "建立工作流程知識庫",
+    "description": "透過自訂工作流程建立知識庫"
+  },
+  "fields": {
+    "name": {
+      "placeholder": "請輸入知識庫名稱",
+      "requiredMessage": "請輸入知識庫名稱"
+    },
+    "description": {
+      "placeholder": "請輸入知識庫描述",
+      "requiredMessage": "請輸入知識庫描述"
+    },
+    "embeddingModel": {
+      "placeholder": "請選擇向量模型",
+      "requiredMessage": "請選擇向量模型"
+    },
+    "webRootUrl": {
+      "label": "網站根網址",
+      "placeholder": "請輸入網站根網址",
+      "requiredMessage": "請輸入網站根網址"
+    },
+    "selector": {
+      "label": "選擇器",
+      "placeholder": "預設為 body，可輸入 .classname、#idname 或 tagname"
+    }
+  },
+  "stats": {
+    "documents": "{count} 文件",
+    "characters": "{count} 字元",
+    "images": "{count} 圖片"
+  },
+  "actions": {
+    "sync": "同步",
+    "generateEmbeddings": "向量化",
+    "generateQuestions": "產生問題",
+    "cancelGenerateQuestions": "取消產生問題",
+    "buildKeywordIndex": "分詞索引"
+  },
+  "import": {
+    "embeddingNotice": "已成功匯入並建立知識庫。文件尚未向量化，請先在知識庫設定中選擇向量模型，再將文件向量化。"
+  },
+  "export": {
+    "title": "匯出知識庫",
+    "documentsExcel": "匯出文件為 Excel",
+    "documentsZip": "匯出文件為 ZIP",
+    "includeSourceFiles": "同時匯出來源檔案",
+    "sourceFilesDescription": "勾選後，原始檔案會一併打包至 ZIP，匯入時可自動還原檔案關聯。若未勾選，則只匯出文字內容。"
+  },
+  "delete": {
+    "title": "確定刪除知識庫「{name}」？",
+    "batchTitle": "確定批次刪除 {count} 個知識庫？"
+  },
+  "messages": {
+    "missingWorkspace": "知識庫缺少所屬工作空間資訊"
+  }
+}

@@ -56,7 +56,7 @@ defineExpose({ open })
         <p class="mt-3 text-N600">{{ toolDetail.desc }}</p>
       </div>
 
-      <MdPreview :modelValue="detailContent || t('tool.store.noDetails')" />
+      <MdPreview :modelValue="detailContent || t('common.empty.noDetails')" />
     </template>
   </MkDrawer>
 </template>

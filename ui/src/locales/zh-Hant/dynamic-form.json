@@ -96,8 +96,7 @@
       "notFoundMessage": "找不到參照變量"
     },
     "model": {
-      "requiredMessage": "請選擇模型",
-      "placeholder": "請選擇模型"
+      "requiredMessage": "請選擇模型"
     },
     "knowledge": {
       "requiredMessage": "請選擇知識庫",

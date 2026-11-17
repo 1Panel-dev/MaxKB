@@ -6,6 +6,9 @@
     "public": "公有模型",
     "private": "私有模型"
   },
+  "select": {
+    "placeholder": "請選擇模型"
+  },
   "provider": {
     "label": "供應商",
     "placeholder": "選擇供應商",
@@ -75,6 +78,7 @@
     "fetchModels": "取得模型"
   },
   "states": {
+    "unavailable": "無法使用",
     "downloading": "下載中"
   },
   "messages": {

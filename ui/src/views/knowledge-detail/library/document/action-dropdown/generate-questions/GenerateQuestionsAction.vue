@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentItem, DocumentTaskState, RelatedQuestionsConfig } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { DOCUMENT_TASK_TYPE } from '@/api/enums'
@@ -8,6 +9,7 @@ import { isDocumentTaskRunning } from '../../status'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'GenerateQuestionsAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -43,7 +45,7 @@ function handleCancelQuestions() {
     props.api
       .putCancelTask?.(props.knowledgeId, props.document.id, DOCUMENT_TASK_TYPE.GENERATE_PROBLEM)
       .then(() => {
-        MsgSuccess('操作成功')
+        MsgSuccess(t('common.messages.operationSuccess'))
         emit('refresh')
       })
       .catch(() => {}) ?? Promise.resolve()
@@ -64,7 +66,7 @@ function handleSubmit(config: RelatedQuestionsConfig, stateList: DocumentTaskSta
         state_list: stateList,
       })
       .then(() => {
-        MsgSuccess('操作成功')
+        MsgSuccess(t('common.messages.operationSuccess'))
         dialogRef.value?.close()
         emit('refresh')
       })
@@ -85,7 +87,7 @@ function handleClosed() {
   <!-- 单个文档生成或取消生成问题 -->
   <MkAction
     :display="display ?? 'menu'"
-    :label="running ? '取消生成问题' : '生成问题'"
+    :label="running ? t('knowledge.actions.cancelGenerateQuestions') : t('knowledge.actions.generateQuestions')"
     :icon="running ? 'icon_close_outlined' : 'icon_link-record_outlined'"
     :disabled="disabled || loading"
     @click="running ? handleCancelQuestions() : handleOpenDialog()"

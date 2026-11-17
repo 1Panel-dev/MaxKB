@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { DocumentTaskType } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'BatchCancelTaskAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -25,7 +27,7 @@ function handleCancelTask() {
     props.api
       .putBatchCancelDocumentTask?.(props.knowledgeId, ids, props.taskType)
       .then(() => {
-        MsgSuccess('操作成功')
+        MsgSuccess(t('common.messages.operationSuccess'))
         emit('refresh')
       })
       .catch(() => {}) ?? Promise.resolve()

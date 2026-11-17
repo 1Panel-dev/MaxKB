@@ -1,0 +1,14 @@
+{
+  "library": {
+    "title": "资料库"
+  },
+  "document": {
+    "title": "文档"
+  },
+  "image": {
+    "title": "图片"
+  },
+  "tags": {
+    "title": "标签管理"
+  }
+}

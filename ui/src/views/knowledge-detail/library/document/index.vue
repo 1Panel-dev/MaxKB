@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
@@ -71,6 +72,7 @@ function knowledgeDocPermission(method: KnowledgeDocPermissionMethod): boolean {
 }
 
 defineOptions({ name: 'DocumentListView' })
+const { t } = useI18n({ useScope: 'global' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 
@@ -730,7 +732,7 @@ onBeforeUnmount(() => {
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
               :task-type="DOCUMENT_TASK_TYPE.GENERATE_PROBLEM"
-              label="取消生成"
+              :label="t('knowledge.actions.cancelGenerateQuestions')"
               @refresh="refreshAfterOperation"
             />
             <!-- 批量删除文档 -->

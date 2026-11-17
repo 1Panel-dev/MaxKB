@@ -235,7 +235,7 @@ defineExpose({ open })
       <section>
         <div class="mb-4 flex-align-center gap-2">
           <h4 class="mk-title-decoration">{{ t('tool.outputParams.title') }}</h4>
-          <span class="text-N600">{{ t('tool.parameters.shownWhenUsed') }}</span>
+          <span class="text-N600">{{ t('tool.help.shownWhenUsed') }}</span>
         </div>
         <div class="mk-gray-card-sm rounded-md!">{{ t('tool.outputParams.result', { variable: '{result}' }) }}</div>
       </section>
