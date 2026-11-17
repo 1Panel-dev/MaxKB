@@ -37,6 +37,8 @@ async function handleShareConversation(conversation: Conversation) {
 
 // 历史时间优先使用更新时间，缺少时间的记录不显示占位文案。
 const conversationTime = (conversation: Conversation) => relativeTimeFormat(conversation.update_time || conversation.create_time)
+// 智能体显示设置关闭「显示历史记录」时隐藏历史列表。
+const historyEnabled = computed(() => appInfo.value?.show_history !== false)
 // 会话维护沿用调试历史记录的确认与请求流程。
 const clearing = ref(false)
 
@@ -86,16 +88,17 @@ function handleClearConversations() {
         <span>新建对话</span>
       </MkListItem>
     </MkTooltip>
-    <div class="flex-between pl-2 mt-4">
-      <h6 class="text-N600">历史对话</h6>
+    <template v-if="historyEnabled">
+      <div class="flex-between pl-2 mt-4">
+        <h6 class="text-N600">历史对话</h6>
 
-      <MkTooltip content="清空">
-        <!-- 批量清空历史对话 -->
-        <el-button text :loading="clearing" :disabled="!conversations.length" @click="handleClearConversations">
-          <MkIcon name="icon_delete-trash_outlined" />
-        </el-button>
-      </MkTooltip>
-    </div>
+        <MkTooltip content="清空">
+          <!-- 批量清空历史对话 -->
+          <el-button text :loading="clearing" :disabled="!conversations.length" @click="handleClearConversations">
+            <MkIcon name="icon_delete-trash_outlined" />
+          </el-button>
+        </MkTooltip>
+      </div>
 
     <!-- 历史列表独立滚动，应用信息和新建入口保持固定。 -->
     <el-scrollbar class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
@@ -148,6 +151,9 @@ function handleClearConversations() {
         </template>
       </div>
     </el-scrollbar>
+  </template>
+  <!-- 关闭历史记录时保留弹性占位，账户入口仍吸底。 -->
+  <div v-else class="min-h-0 flex-1" />
     <!-- 账户入口固定在侧栏底部，不随历史列表滚动。 -->
     <div class="mt-3 shrink-0" v-if="SHOW_PROFILE.includes(viewType)">
       <AccountMenu />
