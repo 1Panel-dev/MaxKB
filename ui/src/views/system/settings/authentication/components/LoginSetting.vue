@@ -192,15 +192,7 @@ onActivated(() => {
       <div class="w-full mk-gray-card-lg">
         <div class="flex-align-center gap-2">
           <span>登录失败</span>
-          <el-input-number
-            v-model="form.max_attempts"
-            class="w-40!"
-            :max="10"
-            :min="-1"
-            :step="1"
-            :value-on-clear="-1"
-            @change="form.max_attempts = normalizeNonZeroNumber($event)"
-          />
+          <el-input-number v-model="form.max_attempts" class="w-40!" :max="10" :min="-1" :step="1" :value-on-clear="-1" />
           <span>次显示验证码</span>
           <span class="text-N500">(值为-1时，不显示验证码)</span>
         </div>
