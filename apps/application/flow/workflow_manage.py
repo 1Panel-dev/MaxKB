@@ -310,7 +310,7 @@ class WorkflowManage:
             return parent.get_resource_user_id()
         chat_info = getattr(self.work_flow_post_handler, 'chat_info', None)
         if chat_info is not None:
-            return chat_info.application.user_id
+            return chat_info.get_resource_user_id()
         return self.params.get('user_id')
 
     def is_run(self, timeout=0.5):

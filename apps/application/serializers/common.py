@@ -188,6 +188,12 @@ class ChatInfo:
         self.application = application
         return application
 
+    def get_resource_user_id(self):
+        if self.debug:
+            return self.chat_user_id if self.chat_user_type == ChatUserType.PLATFORM_USER.value else None
+        # 发布时校验的是发布者的资源权限，旧版本未记录发布者时沿用创建者。
+        return getattr(self.application, 'publish_user_id', None) or self.application.user_id
+
     def get_chat_user(self, asker=None):
         if self.chat_user:
             return self.chat_user

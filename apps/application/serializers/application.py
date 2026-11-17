@@ -349,7 +349,7 @@ def validate_bound_application_permissions(user_id: str, workspace_id: str, inst
 
 
 def validate_application_resource_permissions(user_id, application):
-    """校验实际保存或执行的应用配置;发布后的聊天使用应用所属用户的资源授权。"""
+    """按调用方确定的执行用户校验实际保存或执行的应用配置。"""
     instance = {
         key: getattr(application, key) for key in (
             "work_flow", "tool_ids", "skill_tool_ids", "mcp_tool_ids", "application_ids"
