@@ -79,10 +79,10 @@ defineExpose({ open })
           @blur="inputFieldForm.desc = inputFieldForm.desc?.trim()"
         />
       </el-form-item>
-      <el-form-item :label="t('tool.inputParams.source.label')">
+      <el-form-item :label="t('tool.source.label')">
         <el-select v-model="inputFieldForm.source" class="w-full">
-          <el-option :label="t('tool.inputParams.source.reference')" value="reference" />
-          <el-option :label="t('tool.inputParams.source.custom')" value="custom" />
+          <el-option :label="t('tool.source.reference')" value="reference" />
+          <el-option :label="t('tool.source.custom')" value="custom" />
         </el-select>
       </el-form-item>
       <el-form-item :label="t('dynamicForm.fields.required.label')" @click.prevent><el-switch v-model="inputFieldForm.is_required" /></el-form-item>

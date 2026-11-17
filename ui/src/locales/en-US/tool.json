@@ -7,6 +7,11 @@
     "all": "All tools",
     "shared": "Shared tools"
   },
+  "source": {
+    "label": "Source",
+    "reference": "Parameter reference",
+    "custom": "Custom"
+  },
   "fields": {
     "name": {
       "placeholder": "Enter a tool name",
@@ -98,11 +103,6 @@
     },
     "dataType": {
       "label": "Data type"
-    },
-    "source": {
-      "label": "Source",
-      "reference": "Parameter reference",
-      "custom": "Custom"
     }
   },
   "outputParams": {
@@ -129,6 +129,7 @@
   },
   "delete": {
     "title": "Delete tool “{name}”?",
+    "description": "{count} resource uses this tool and will fail to run if you delete it. | {count} resources use this tool and will fail to run if you delete it.",
     "batchTitle": "Delete {count} tool? | Delete {count} tools?"
   },
   "disable": {

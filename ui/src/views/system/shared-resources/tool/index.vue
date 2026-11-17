@@ -38,16 +38,16 @@ const toolType = ref<ToolType | ''>('')
 const creatorOptions = ref<OptionItem<string>[]>([])
 const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const searchFields = computed(() => [
-  { label: '名称', value: 'name' },
+  { label: t('common.name.label'), value: 'name' },
   {
-    label: '状态',
+    label: t('common.status.label'),
     value: 'is_active',
     options: [
-      { value: true, label: '已启用' },
-      { value: false, label: '已禁用' },
+      { value: true, label: t('common.status.enabled') },
+      { value: false, label: t('common.status.disabled') },
     ],
   },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 
 function loadCreatorOptions(keyword: string) {
@@ -106,11 +106,11 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
 </script>
 
 <template>
-  <MkViewLayout class="shared-tool-view">
+  <MkViewLayout :title="t('tool.title')" class="shared-tool-view">
     <template #default="{ Header }">
       <component :is="Header">
         <div class="flex-align-center gap-4">
-          <h4>全部工具</h4>
+          <h4>{{ t('tool.categories.all') }}</h4>
           <el-divider direction="vertical" />
           <el-select v-model="toolType" class="w-30!" :empty-values="[null, undefined]" @change="refreshTools">
             <el-option v-for="option in TOOL_TYPE_OPTIONS" :key="option.value" :label="t(option.labelKey)" :value="option.value" />
@@ -139,7 +139,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                 <template #actions>
                   <!-- 修改工具状态 -->
                   <ToolStatusSwitch
-                    v-if="perm.tool.share.switch()"
+                    :disabled="!perm.tool.share.switch()"
                     v-model:loading="toolOperationLoading"
                     :api="SystemSharedToolApi"
                     :tool="tool"
@@ -149,12 +149,17 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                 </template>
                 <template #action-dropdown>
                   <!-- 编辑共享工具 -->
-                  <MkAction v-if="perm.tool.share.edit()" label="编辑" icon="icon_edit_outlined" @click="handleOpenEditTool(tool)" />
+                  <MkAction
+                    v-if="perm.tool.share.edit()"
+                    :label="t('common.actions.edit')"
+                    icon="icon_edit_outlined"
+                    @click="handleOpenEditTool(tool)"
+                  />
                   <!-- 复制 -->
                   <CopyToolAction
                     v-if="perm.tool.share.copy()"
                     v-model:loading="toolOperationLoading"
-                    label="复制"
+                    :label="t('common.actions.duplicate')"
                     :api="SystemSharedToolApi"
                     :tool="tool"
                     @refresh="refreshTools"
@@ -162,13 +167,13 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   <!-- 工作流 -->
                   <MkDropdownItem v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" @click="handleOpenWorkflow(tool, $event)">
                     <template #icon><MkIcon name="icon_setting" /></template>
-                    工作流
+                    {{ t('tool.workflow.label') }}
                   </MkDropdownItem>
                   <!-- 启动参数 -->
                   <InitParamAction
                     v-if="(tool.init_field_list?.length ?? 0) > 0"
                     v-model:loading="toolOperationLoading"
-                    label="启动参数"
+                    :label="t('tool.initParams.title')"
                     :api="SystemSharedToolApi"
                     :tool="tool"
                     @update="handleToolUpdate"
@@ -177,14 +182,14 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   <McpConfigAction
                     v-if="tool.tool_type === TOOL_TYPE.MCP"
                     v-model:loading="toolOperationLoading"
-                    label="MCP 服务配置"
+                    :label="t('resource.mcpConfig.title')"
                     :api="SystemSharedToolApi"
                     :tool="tool"
                   />
                   <!-- 授权工作空间 -->
                   <AuthorizedWorkspaceAction
                     v-if="perm.tool.share.authToWorkspace()"
-                    label="授权工作空间"
+                    :label="t('resource.workspaceAuthorization.title')"
                     :resource="tool"
                     :resource-type="RESOURCE_TYPE.TOOL"
                   />
@@ -192,14 +197,14 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   <!-- 查看关联资源 -->
                   <RelatedResourcesToolAction
                     v-if="perm.tool.share.relateMap()"
-                    label="查看关联资源"
+                    :label="t('resource.relations.title')"
                     :api="SystemSharedRelatedResourcesApi"
                     :tool="tool"
                   />
                   <!-- 查看执行记录 -->
                   <ExecutionRecordToolAction
                     v-if="(tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW) && perm.tool.share.record()"
-                    label="查看执行记录"
+                    :label="t('resource.actions.viewExecutionRecords')"
                     :api="SystemSharedToolWorkflowApi"
                     :tool="tool"
                   />
@@ -207,7 +212,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   <ExportToolAction
                     v-if="!tool.template_id && perm.tool.share.export()"
                     v-model:loading="toolOperationLoading"
-                    label="导出"
+                    :label="t('common.actions.export')"
                     :api="SystemSharedToolApi"
                     :tool="tool"
                   />
@@ -215,7 +220,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   <DeleteToolAction
                     v-if="perm.tool.share.delete()"
                     v-model:loading="toolOperationLoading"
-                    label="删除"
+                    :label="t('common.actions.delete')"
                     :api="SystemSharedToolApi"
                     :tool="tool"
                     @delete="refreshTools"
