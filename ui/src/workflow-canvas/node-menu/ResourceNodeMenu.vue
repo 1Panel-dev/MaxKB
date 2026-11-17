@@ -162,7 +162,7 @@ onMounted(() => {
             <el-popover placement="right" :width="280" :show-after="TOOLTIP_SHOW_DELAY" :persistent="false">
               <template #reference>
                 <el-card
-                  class="small cursor-pointer"
+                  class="small cursor-pointer hover:border-primary!"
                   shadow="never"
                   @click="emit('select', resource.node)"
                   @pointerdown="handleNodeDragStart($event, resource.node)"

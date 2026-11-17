@@ -27,6 +27,7 @@ const props = withDefaults(
     resizable?: boolean // 非指定表格禁止开启
     size?: 'small'
     rowKey?: string | ((row: T) => string | number)
+    rowClassName?: string | ((data: { row: T; rowIndex: number }) => string)
     /** 同组记录联动选择；不传时保持逐行选择。 */
     selectionGroupKey?: string | ((row: T) => string | number | null | undefined)
     sortable?: boolean
@@ -184,8 +185,21 @@ function updateTableHeight() {
 
 /** 选择操作栏 */
 const selectedRows = ref<unknown[]>([])
+const selectedRowKeys = computed(() => new Set((selectedRows.value as T[]).map(getRowKey)))
 const isAllRowsSelected = computed(() => tableRef.value?.store.states.isAllSelected.value ?? false)
 let groupSelectionPending = false
+
+function getRowKey(row: T): unknown {
+  return typeof props.rowKey === 'function' ? props.rowKey(row) : get(row, props.rowKey)
+}
+
+/** 按实际选择状态高亮，合并后没有复选框的行也保持选中底色。 */
+function getRowClassName(data: { row: T; rowIndex: number }) {
+  const customClass = typeof props.rowClassName === 'function' ? props.rowClassName(data) : props.rowClassName
+  const rowKey = getRowKey(data.row)
+  const selected = rowKey == null ? selectedRows.value.includes(data.row) : selectedRowKeys.value.has(rowKey)
+  return [customClass, selected ? 'mk-table__row--selected' : ''].filter(Boolean).join(' ')
+}
 
 function getSelectionGroupKey(row: T): unknown {
   const key = props.selectionGroupKey
@@ -275,6 +289,7 @@ defineExpose({ clearSelection, tableRef })
       :max-height="tableHeight"
       :row-key="props.rowKey"
       v-bind="$attrs"
+      :row-class-name="getRowClassName"
       :border="props.resizable"
       :allow-drag-last-column="false"
       @select="handleSelect"

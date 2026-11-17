@@ -136,9 +136,9 @@ defineExpose({ validate })
         <component :is="iconComponent(`${selectedNodeField.type}-icon`)" :size="20" :item="selectedNodeField" class="small" />
       </template>
       <template #default="{ data }">
-        <span class="flex-align-center gap-1" @wheel="handleNodeWheel">
-          <component :is="iconComponent(`${data.type}-icon`)" :size="16" :item="data" class="small" />
-          <span>{{ data.label }}</span>
+        <span class="flex-align-center min-w-0 gap-1" @wheel="handleNodeWheel">
+          <component :is="iconComponent(`${data.type}-icon`)" :size="16" :item="data" class="small shrink-0" />
+          <span class="truncate" :title="data.label">{{ data.label }}</span>
         </span>
       </template>
     </el-cascader>
