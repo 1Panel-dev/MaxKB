@@ -88,7 +88,7 @@
       <div class="text-center mt-16">
         <template v-for="item in modeList">
           <el-button
-            v-if="item !== '' && loginMode !== item && item !== 'QR_CODE'"
+            v-if="item !== '' && loginMode !== item && item !== 'QR_CODE' && (item !== 'LOCAL' || loginMode !== '')"
             circle
             :key="item"
             class="login-button-circle color-secondary"
@@ -256,55 +256,60 @@ onBeforeMount(() => {
           }
         }
         const params = route.query
-        if (params.login_mode !== 'manual') {
-          if (authSetting.value?.login_methods) {
-            modeList.value = authSetting.value?.login_methods
-            if (modeList.value.includes('LOCAL')) {
-              modeList.value = ['LOCAL', ...modeList.value.filter((item) => item !== 'LOCAL')]
-            } else if (modeList.value.includes('LDAP')) {
-              modeList.value = ['LDAP', ...modeList.value.filter((item) => item !== 'LDAP')]
-            }
-            loginMode.value = modeList.value[0] || 'LOCAL'
-            if (!modeList.value.includes('LOCAL') && !modeList.value.includes('LDAP')) {
-              loginMode.value = ''
-            }
-            if (
-              modeList.value.length == 1 &&
-              ['CAS', 'OIDC', 'OAuth2', 'SAML2'].includes(modeList.value[0])
-            ) {
-              redirectAuth(modeList.value[0])
-            }
-            // 这里的modeList 是oauth2 cas ldap oidc 这四个 还会有 lark wecom dingtalk
-            // 获取到的 modeList中除'CAS', 'OIDC', 'OAuth2' LOCAL之外的登录方式
-            QrList.value = modeList.value.filter(
-              (item) => !['CAS', 'OIDC', 'OAuth2', 'LOCAL', 'LDAP', 'SAML2'].includes(item),
-            )
-            // modeList需要去掉lark wecom dingtalk
-            modeList.value = modeList.value.filter(
-              (item) => !['lark', 'wecom', 'dingtalk'].includes(item),
-            )
-            if (QrList.value.length > 0) {
-              QrList.value.forEach((item) => {
-                orgOptions.value.push({
-                  key: item,
-                  value:
-                    item === 'wecom'
-                      ? t('views.system.authentication.scanTheQRCode.wecom')
-                      : item === 'dingtalk'
-                        ? t('views.system.authentication.scanTheQRCode.dingtalk')
-                        : t('views.system.authentication.scanTheQRCode.lark'),
-                })
+        const isManual = params.login_mode === 'manual'
+        // 登录方式初始化：manual 模式下同样执行，并保证 LOCAL 可用，方便管理员通过账号密码登录
+        if (authSetting.value?.login_methods) {
+          modeList.value = authSetting.value?.login_methods
+          if (isManual) {
+            modeList.value = ['LOCAL', ...modeList.value.filter((item) => item !== 'LOCAL')]
+          }
+          if (modeList.value.includes('LOCAL')) {
+            modeList.value = ['LOCAL', ...modeList.value.filter((item) => item !== 'LOCAL')]
+          } else if (modeList.value.includes('LDAP')) {
+            modeList.value = ['LDAP', ...modeList.value.filter((item) => item !== 'LDAP')]
+          }
+          loginMode.value = modeList.value[0] || 'LOCAL'
+          if (!modeList.value.includes('LOCAL') && !modeList.value.includes('LDAP')) {
+            loginMode.value = ''
+          }
+          if (
+            modeList.value.length == 1 &&
+            ['CAS', 'OIDC', 'OAuth2', 'SAML2'].includes(modeList.value[0])
+          ) {
+            redirectAuth(modeList.value[0])
+          }
+          // 这里的modeList 是oauth2 cas ldap oidc 这四个 还会有 lark wecom dingtalk
+          // 获取到的 modeList中除'CAS', 'OIDC', 'OAuth2' LOCAL之外的登录方式
+          QrList.value = modeList.value.filter(
+            (item) => !['CAS', 'OIDC', 'OAuth2', 'LOCAL', 'LDAP', 'SAML2'].includes(item),
+          )
+          // modeList需要去掉lark wecom dingtalk
+          modeList.value = modeList.value.filter(
+            (item) => !['lark', 'wecom', 'dingtalk'].includes(item),
+          )
+          if (QrList.value.length > 0) {
+            QrList.value.forEach((item) => {
+              orgOptions.value.push({
+                key: item,
+                value:
+                  item === 'wecom'
+                    ? t('views.system.authentication.scanTheQRCode.wecom')
+                    : item === 'dingtalk'
+                      ? t('views.system.authentication.scanTheQRCode.dingtalk')
+                      : t('views.system.authentication.scanTheQRCode.lark'),
               })
-              if (!modeList.value.includes('LOCAL') && !modeList.value.includes('LDAP')) {
-                showQrCodeTab.value = true
-              }
-              modeList.value = ['QR_CODE', ...modeList.value]
+            })
+            if (!modeList.value.includes('LOCAL') && !modeList.value.includes('LDAP')) {
+              showQrCodeTab.value = true
             }
+            modeList.value = ['QR_CODE', ...modeList.value]
           }
-          // 如果modeList 只包含了LOCAL 就可以置空
-          if (modeList.value.length === 1 && modeList.value[0] === 'LOCAL') {
-            modeList.value = []
-          }
+        }
+        // 如果modeList 只包含了LOCAL 就可以置空
+        if (modeList.value.length === 1 && modeList.value[0] === 'LOCAL') {
+          modeList.value = []
+        }
+        if (!isManual) {
           const defaultMode = authSetting.value.default_value
           if (['lark', 'wecom', 'dingtalk'].includes(defaultMode)) {
             changeMode('QR_CODE', false)
@@ -312,6 +317,9 @@ onBeforeMount(() => {
           } else {
             changeMode(defaultMode, false)
           }
+        } else {
+          // manual 模式：默认展示 LOCAL 账号密码登录，不执行 defaultMode 的自动选中/跳转
+          changeMode('LOCAL', false)
         }
       })
     } else {
