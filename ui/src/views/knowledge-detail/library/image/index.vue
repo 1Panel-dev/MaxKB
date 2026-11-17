@@ -7,7 +7,6 @@ import type { CascaderOption, TableColumnCtx } from 'element-plus'
 import { DOCUMENT_RESOURCE_TYPE, DOCUMENT_TASK_TYPE } from '@/api/enums'
 import CommonSystemApi from '@/api/admin/system/common'
 import CommonApi from '@/api/admin/workspace/common'
-import MkEditName from '@/components/mk-edit-name/index.vue'
 import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import {

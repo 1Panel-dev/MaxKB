@@ -26,7 +26,7 @@ import {
   RelatedResourcesKnowledgeAction,
   SyncKnowledgeAction,
 } from './knowledge-card/action-dropdown'
-import { FOLDER_ENTRY_ID, getFolderEntry } from '@/constants/folder'
+import { FOLDER_ENTRY_ID } from '@/constants/folder'
 import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { perm } from '@/permission'
@@ -52,23 +52,19 @@ function handleOpenKnowledgeSetting(knowledge: KnowledgeItem) {
 }
 
 /* 当前文件夹 */
-const allKnowledgeFolder = computed(() => getFolderEntry(RESOURCE_TYPE.KNOWLEDGE, 'all', t))
 const currentFolderId = ref<string>(FOLDER_ENTRY_ID.ALL)
-const currentFolder = ref<FolderItem>(allKnowledgeFolder.value)
+const selectedFolder = ref<FolderItem>()
+const currentFolder = computed<FolderItem>(() => selectedFolder.value ?? { id: FOLDER_ENTRY_ID.ALL, name: t('knowledge.categories.all') })
 const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARED)
 
-function handleFolderSelect(folder: FolderItem) {
-  const folderChanged = folder.id !== currentFolder.value.id
-  currentFolderId.value = folder.id
-  currentFolder.value = folder
-  if (folderChanged) {
+function handleFolderSelect(folder?: FolderItem) {
+  const previousFolderId = currentFolder.value.id
+  selectedFolder.value = folder
+  currentFolderId.value = currentFolder.value.id
+  if (previousFolderId !== currentFolderId.value) {
     cancelBatchSelection()
     refreshKnowledge()
   }
-}
-
-function handleFolderLoaded(folder?: FolderItem) {
-  handleFolderSelect(folder ?? allKnowledgeFolder.value)
 }
 
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
@@ -222,7 +218,7 @@ function handleBatchDelete() {
         v-model="currentFolderId"
         :source="RESOURCE_TYPE.KNOWLEDGE"
         draggable
-        @loaded="handleFolderLoaded"
+        @loaded="handleFolderSelect"
         @select="handleFolderSelect"
       />
     </template>

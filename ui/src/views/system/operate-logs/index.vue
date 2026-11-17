@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import type { Dict, OperateLog, OptionItem } from '@/api/types'
-import type { MkDateRangeValue } from '@/components/mk-date-range/types'
+import type { MkDateRangeValue } from '@/components/global/mk-date-range/types'
 import OperateLogApi from '@/api/admin/system/operate-log'
 import WorkspaceApi from '@/api/admin/system/workspace'
-import MkDateRange from '@/components/mk-date-range/index.vue'
 import ButtonCleanStrategy from './clean-strategy/ButtonCleanStrategy.vue'
 import OperateLogDetailDialog from './dialog/OperateLogDetailDialog.vue'
 import { useStore } from '@/stores'

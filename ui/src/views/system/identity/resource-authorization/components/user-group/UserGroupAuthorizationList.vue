@@ -2,7 +2,6 @@
 import { useTemplateRef } from 'vue'
 import type { SystemUserGroup } from '@/api/types'
 import UserGroupMembersDrawer from '@/components/business/resource-authorization-drawer/user-group/UserGroupMembersDrawer.vue'
-import MkSearchList from '@/components/mk-search-list/index.vue'
 
 defineOptions({ name: 'UserGroupAuthorizationList' })
 
