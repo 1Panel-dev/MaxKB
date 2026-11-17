@@ -58,6 +58,8 @@ OSS 文件接口。前端业务接口需要可用的后端服务。
 | `npm run preview -- --mode chat` | 预览 Chat 构建产物              |
 | `npm run format`                 | 使用 Prettier 格式化 `src/`     |
 
+类型检查会先校验各语言包的文件与字段，再生成翻译类型。详见 [LOCALE_README.md](src/locales/LOCALE_README.md)。
+
 `npm run lint` 当前仅配置了 `run-s "lint:*"`，但尚未定义任何 `lint:*` 子脚本，不能作为已执行
 ESLint 检查的依据。需要检查代码时，可运行 `npx eslint <待检查的文件或目录>`。
 导入顺序由项目 ESLint 规则检查，使用 `npx eslint <文件或目录> --fix` 自动整理；

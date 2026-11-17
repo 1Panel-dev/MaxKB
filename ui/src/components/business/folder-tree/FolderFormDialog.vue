@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { reactive, ref, useTemplateRef } from 'vue'
+import { computed, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { FolderItem, FolderSource } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import FolderApi from '@/api/admin/workspace/folder'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'FolderFormDialog' })
 
@@ -19,7 +22,9 @@ const visible = ref(false)
 const editId = ref('')
 const folderForm = reactive({ desc: '', name: '', parent_id: '' })
 
-const rules: FormRules<typeof folderForm> = { name: [{ message: '请输入文件夹名称', whitespace: true, required: true, trigger: 'blur' }] }
+const rules = computed<FormRules<typeof folderForm>>(() => ({
+  name: [{ message: t('common.name.requiredMessage'), whitespace: true, required: true, trigger: 'blur' }],
+}))
 
 const loading = ref(false)
 function handleSubmit() {
@@ -33,7 +38,7 @@ function handleSubmit() {
       .then((folder) => {
         const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
         return refreshCurrentUser.then(() => {
-          MsgSuccess(isEdit ? '保存成功' : '创建成功')
+          MsgSuccess(isEdit ? t('common.messages.saveSuccess') : t('common.messages.createSuccess'))
           visible.value = false
           emit('refresh', folder, isEdit)
         })
@@ -72,20 +77,28 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="visible" :title="title" @closed="resetData">
-    <el-form ref="folderFormRef" :model="folderForm" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="名称" prop="name">
+    <el-form
+      ref="folderFormRef"
+      :model="folderForm"
+      :rules="rules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('common.name.label')" prop="name">
         <el-input
           v-model="folderForm.name"
           maxlength="64"
-          placeholder="请输入名称"
+          :placeholder="t('common.name.placeholder')"
           show-word-limit
           @blur="folderForm.name = folderForm.name.trim()"
         />
       </el-form-item>
-      <el-form-item label="描述" prop="desc">
+      <el-form-item :label="t('common.description.label')" prop="desc">
         <el-input
           v-model="folderForm.desc"
-          placeholder="请输入描述"
+          :placeholder="t('common.description.placeholder')"
           maxlength="128"
           show-word-limit
           :autosize="{ minRows: 3 }"
@@ -96,9 +109,9 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <el-button type="primary" :loading="loading" @click="handleSubmit">
-        {{ editId ? '保存' : '创建' }}
+        {{ editId ? t('common.actions.save') : t('common.actions.create') }}
       </el-button>
     </template>
   </MkDialog>

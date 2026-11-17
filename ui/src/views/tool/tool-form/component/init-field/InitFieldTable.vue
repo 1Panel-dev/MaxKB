@@ -44,37 +44,40 @@ function getTypeLabel(inputType: string) {
 <template>
   <section>
     <div class="mb-4 flex-between">
-      <h4 class="mk-title-decoration">启动参数</h4>
+      <h4 class="mk-title-decoration">{{ t('tool.initParams.title') }}</h4>
+      <!-- 添加启动参数 -->
       <el-button text type="primary" @click="handleOpenInitField()">
         <MkIcon name="icon_add_outlined" />
       </el-button>
     </div>
     <MkTable :data="initFields" size="small">
-      <el-table-column label="参数" prop="field" min-width="140" />
-      <el-table-column label="显示名称" min-width="130" show-overflow-tooltip>
+      <el-table-column :label="t('dynamicForm.fields.field.label')" prop="field" min-width="140" />
+      <el-table-column :label="t('dynamicForm.fields.label.label')" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">
           <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{ row.label.label }}</span>
           <span v-else>{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="组件类型" min-width="100">
+      <el-table-column :label="t('dynamicForm.fields.inputType.label')" min-width="100">
         <template #default="{ row }">
           <el-tag size="small" type="info">
             {{ getTypeLabel(row.input_type) }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="默认值" prop="default_value" show-overflow-tooltip></el-table-column>
-      <el-table-column label="必填" width="80">
+      <el-table-column :label="t('dynamicForm.fields.defaultValue.label')" prop="default_value" show-overflow-tooltip></el-table-column>
+      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" min-width="80">
         <template #default="{ row }">
           <el-switch v-model="row.required" size="small" disabled />
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="100">
+      <el-table-column :label="t('common.labels.operation')" width="100">
         <template #default="{ row, $index }">
+          <!-- 编辑启动参数 -->
           <el-button text type="primary" @click="handleOpenInitField(row, $index)">
             <MkIcon name="icon_edit_outlined" />
           </el-button>
+          <!-- 删除启动参数 -->
           <el-button text type="primary" @click="handleDeleteInitField($index)">
             <MkIcon name="icon_delete-trash_outlined" />
           </el-button>

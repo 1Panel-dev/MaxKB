@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FolderItem, KnowledgeItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import SystemKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
@@ -11,8 +12,10 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
 import KnowledgeCard from '@/views/knowledge/knowledge-card/KnowledgeCard.vue'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
+import { FOLDER_ENTRY_ID, getFolderEntry } from '@/constants/folder'
 import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'SelectKnowledgeDialog' })
 
@@ -21,7 +24,7 @@ const visible = ref(false)
 const loading = ref(false)
 const searchKeyword = ref('')
 const appliedSearchKeyword = ref('')
-const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.KNOWLEDGE].all })
+const currentFolder = ref<FolderItem>(getFolderEntry(RESOURCE_TYPE.KNOWLEDGE, 'all', t))
 const knowledgeOptions = ref<KnowledgeItem[]>([])
 const selectedKnowledge = ref<(Partial<KnowledgeItem> & { id: string })[]>([])
 const knowledgeLayoutRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>('knowledgeLayoutRef')
@@ -101,7 +104,7 @@ function resetData() {
   loading.value = false
   searchKeyword.value = ''
   appliedSearchKeyword.value = ''
-  currentFolder.value = { ...FOLDER_ENTRIES[RESOURCE_TYPE.KNOWLEDGE].all }
+  currentFolder.value = getFolderEntry(RESOURCE_TYPE.KNOWLEDGE, 'all', t)
   knowledgeOptions.value = []
   selectedKnowledge.value = []
 }

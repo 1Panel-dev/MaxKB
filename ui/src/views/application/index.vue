@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDetail, Dict, FolderItem, OptionItem } from '@/api/types'
 import { APPLICATION_TYPE, RESOURCE_TYPE } from '@/api/enums'
 import ApplicationApi from '@/api/admin/workspace/application/application'
@@ -25,17 +26,19 @@ import {
 import ButtonBatchCleanStrategy from './components/ButtonBatchCleanStrategy.vue'
 import ButtonCreateApplication from './components/ButtonCreateApplication.vue'
 import ButtonTemplateStore from './components/ButtonTemplateStore.vue'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
+import { FOLDER_ENTRY_ID, getFolderEntry } from '@/constants/folder'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const route = useRoute()
 const router = useRouter()
 
 /* 当前文件夹 */
-const allApplicationsFolder = FOLDER_ENTRIES[RESOURCE_TYPE.APPLICATION].all
+const allApplicationsFolder = computed(() => getFolderEntry(RESOURCE_TYPE.APPLICATION, 'all', t))
 const currentFolderId = ref<string>(FOLDER_ENTRY_ID.ALL)
-const currentFolder = ref<FolderItem>({ ...allApplicationsFolder })
+const currentFolder = ref<FolderItem>(allApplicationsFolder.value)
 
 function handleFolderSelect(folder: FolderItem) {
   const folderChanged = folder.id !== currentFolder.value.id
@@ -48,7 +51,7 @@ function handleFolderSelect(folder: FolderItem) {
 }
 
 function handleFolderLoaded(folder?: FolderItem) {
-  handleFolderSelect(folder ?? allApplicationsFolder)
+  handleFolderSelect(folder ?? allApplicationsFolder.value)
 }
 
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
@@ -200,7 +203,7 @@ function handleBatchDelete() {
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <MkTooltip v-if="perm.application.workspace.folderCreateWorkspace()" content="创建文件夹" placement="top">
+        <MkTooltip v-if="perm.application.workspace.folderCreateWorkspace()" :content="t('folder.actions.create')" placement="top">
           <el-button @click="handleCreateFolder" text type="primary" class="-mr-1">
             <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>
@@ -295,7 +298,7 @@ function handleBatchDelete() {
                   <MoveApplicationAction
                     v-if="perm.application.workspace.move(application.id)"
                     v-model:loading="applicationOperationLoading"
-                    label="移动到"
+                    :label="t('folder.actions.moveTo')"
                     :api="ApplicationApi"
                     :application="application"
                     :current-folder-id="currentFolder.id"
@@ -351,7 +354,7 @@ function handleBatchDelete() {
             :disabled="!selectedApplicationCount"
             @click="handleOpenBatchMove"
           >
-            移动到
+            {{ t('folder.actions.moveTo') }}
           </el-button>
           <!-- 批量设置清除策略 -->
           <ButtonBatchCleanStrategy

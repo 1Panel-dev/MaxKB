@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ToolInputField } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'InputFieldDialog' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ refresh: [field: ToolInputField, index?: number] }>()
 
@@ -13,7 +16,9 @@ const formRef = ref<FormInstance>()
 const visible = ref(false)
 const isEdit = ref(false)
 const inputFieldForm = reactive<ToolInputField>({ desc: '', is_required: true, name: '', source: 'reference', type: 'string' })
-const formRules: FormRules<ToolInputField> = { name: [{ whitespace: true, required: true, message: '请输入参数名称', trigger: 'blur' }] }
+const formRules = computed<FormRules<ToolInputField>>(() => ({
+  name: [{ whitespace: true, required: true, message: t('tool.inputParams.name.requiredMessage'), trigger: 'blur' }],
+}))
 
 function open(field?: ToolInputField) {
   if (field) {
@@ -42,41 +47,49 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog :align-center="false" v-model="visible" :title="isEdit ? '编辑参数' : '添加参数'" @closed="resetData">
-    <el-form ref="formRef" :model="inputFieldForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="参数名称" prop="name">
+  <MkDialog :align-center="false" v-model="visible" :title="isEdit ? t('common.parameters.edit') : t('common.parameters.add')" @closed="resetData">
+    <el-form
+      ref="formRef"
+      :model="inputFieldForm"
+      :rules="formRules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('tool.inputParams.name.label')" prop="name">
         <el-input
           v-model="inputFieldForm.name"
           maxlength="64"
-          placeholder="请输入参数名称"
+          :placeholder="t('tool.inputParams.name.placeholder')"
           @blur="inputFieldForm.name = inputFieldForm.name.trim()"
         />
       </el-form-item>
-      <el-form-item label="数据类型">
+      <el-form-item :label="t('tool.inputParams.dataType.label')">
         <el-select v-model="inputFieldForm.type" class="w-full">
           <el-option v-for="type in inputFieldTypeOptions" :key="type" :label="type" :value="type" />
         </el-select>
       </el-form-item>
-      <el-form-item label="参数提示说明">
+      <el-form-item :label="t('dynamicForm.fields.tooltip.label')">
         <el-input
           v-model="inputFieldForm.desc"
           maxlength="128"
           show-word-limit
-          placeholder="请输入参数提示说明"
+          :placeholder="t('dynamicForm.fields.tooltip.placeholder')"
           @blur="inputFieldForm.desc = inputFieldForm.desc?.trim()"
         />
       </el-form-item>
-      <el-form-item label="来源">
+      <el-form-item :label="t('tool.inputParams.source.label')">
         <el-select v-model="inputFieldForm.source" class="w-full">
-          <el-option label="引用参数" value="reference" />
-          <el-option label="自定义" value="custom" />
+          <el-option :label="t('tool.inputParams.source.reference')" value="reference" />
+          <el-option :label="t('tool.inputParams.source.custom')" value="custom" />
         </el-select>
       </el-form-item>
-      <el-form-item label="是否必填" @click.prevent><el-switch v-model="inputFieldForm.is_required" /></el-form-item>
+      <el-form-item :label="t('dynamicForm.fields.required.label')" @click.prevent><el-switch v-model="inputFieldForm.is_required" /></el-form-item>
     </el-form>
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="handleSubmit">{{ isEdit ? '保存' : '添加' }}</el-button>
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <el-button type="primary" @click="handleSubmit">{{ isEdit ? t('common.actions.save') : t('common.actions.add') }}</el-button>
     </template>
   </MkDialog>
 </template>

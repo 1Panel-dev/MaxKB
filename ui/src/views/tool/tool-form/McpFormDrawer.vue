@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
@@ -14,6 +15,7 @@ import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'McpFormDrawer' })
 
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 
 const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; folderId: string; title: string }>()
@@ -40,10 +42,10 @@ const formLoading = ref(false)
 const editId = ref<string>()
 const originalForm = ref('')
 const mcpForm = reactive<McpFormModel>({ code: '', desc: '', icon: '', name: '' })
-const formRules: FormRules<McpFormModel> = {
-  code: [{ whitespace: true, required: true, message: '请输入 MCP Server Config', trigger: 'blur' }],
-  name: [{ whitespace: true, required: true, message: '请输入 MCP 名称', trigger: 'blur' }],
-}
+const formRules = computed<FormRules<McpFormModel>>(() => ({
+  code: [{ whitespace: true, required: true, message: t('tool.mcp.config.requiredMessage'), trigger: 'blur' }],
+  name: [{ whitespace: true, required: true, message: t('tool.mcp.name.requiredMessage'), trigger: 'blur' }],
+}))
 
 // 暂存确认后的头像文件，恢复默认时清空。
 const iconFile = ref<File | null>(null)
@@ -57,7 +59,7 @@ function isValidConfig() {
     if (!config || typeof config !== 'object' || Array.isArray(config)) throw new Error()
     return true
   } catch {
-    MsgError('请输入正确的 MCP Server Config')
+    MsgError(t('tool.mcp.config.invalidMessage'))
     return false
   }
 }
@@ -84,12 +86,12 @@ function handleSubmit() {
           ? props.api.putTool(currentEditId, payload)
           : 'postTool' in props.api
             ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
-            : Promise.reject(new Error('资源管理不支持创建工具'))
+            : Promise.reject(new Error(t('tool.messages.createUnsupported')))
 
         return request.then((savedTool) => {
           const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
           return refreshCurrentUser.then(() => {
-            MsgSuccess(isEdit ? '保存成功' : '创建成功')
+            MsgSuccess(isEdit ? t('common.messages.saveSuccess') : t('common.messages.createSuccess'))
             visible.value = false
             if (isEdit) emit('update', savedTool)
             else emit('refresh')
@@ -109,7 +111,7 @@ function handleTestConnection() {
     loading.value = true
     props.api
       .postToolTestConnection({ code: mcpForm.code })
-      .then(() => MsgSuccess('连接成功'))
+      .then(() => MsgSuccess(t('common.messages.connectionSuccess')))
       .finally(() => {
         loading.value = false
       })
@@ -151,7 +153,10 @@ function handleBeforeClose() {
     visible.value = false
     return
   }
-  MsgConfirm('提示', '当前的更改尚未保存，确认退出吗？', { confirmButtonText: '确认', confirmButtonType: 'primary' })
+  MsgConfirm(t('common.dialogs.notice'), t('common.dialogs.unsavedChanges'), {
+    confirmButtonText: t('common.actions.confirm'),
+    confirmButtonType: 'primary',
+  })
     .then(() => {
       visible.value = false
     })
@@ -183,12 +188,13 @@ defineExpose({ open })
       v-loading="formLoading || loading"
       :model="mcpForm"
       :rules="formRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <h4 class="mk-title-decoration mb-4">基本信息</h4>
-      <el-form-item class="mk-form-item-with-avatar" label="名称" prop="name">
+      <h4 class="mk-title-decoration mb-4">{{ t('common.labels.basicInfo') }}</h4>
+      <el-form-item class="mk-form-item-with-avatar" :label="t('common.name.label')" prop="name">
         <div class="flex-align-center w-full gap-3">
           <!-- 设置工具头像 -->
           <MkEditAvatar v-model="mcpForm.icon" @change="handleIconChange">
@@ -196,37 +202,42 @@ defineExpose({ open })
               <ToolIcon :icon="icon" :type="TOOL_TYPE.MCP" />
             </template>
           </MkEditAvatar>
-          <el-input v-model="mcpForm.name" maxlength="64" placeholder="请输入 MCP 名称" show-word-limit @blur="mcpForm.name = mcpForm.name.trim()" />
+          <el-input
+            v-model="mcpForm.name"
+            maxlength="64"
+            :placeholder="t('tool.mcp.name.placeholder')"
+            show-word-limit
+            @blur="mcpForm.name = mcpForm.name.trim()"
+          />
         </div>
       </el-form-item>
-      <el-form-item label="描述">
+      <el-form-item :label="t('common.description.label')">
         <el-input
           v-model="mcpForm.desc"
           :autosize="{ minRows: 3 }"
           maxlength="128"
-          placeholder="请输入"
+          :placeholder="t('common.placeholders.input')"
           show-word-limit
           type="textarea"
           @blur="mcpForm.desc = mcpForm.desc.trim()"
         />
       </el-form-item>
 
-      <h4 class="mk-title-decoration mb-4">MCP 服务</h4>
+      <h4 class="mk-title-decoration mb-4">{{ t('tool.mcp.serviceTitle') }}</h4>
       <el-form-item prop="code" class="mk-hide-asterisk">
         <template #label>
-          <span class="mk-required"> MCP Server Config </span>
-
-          <span class="text-N600"> （仅支持 SSE、Streamable HTTP 调用方式）</span>
+          <span class="mk-required">{{ t('resource.mcpConfig.title') }}</span>
+          <span class="ml-1 text-N600">{{ t('tool.mcp.config.description') }}</span>
         </template>
         <el-input v-model="mcpForm.code" :autosize="{ minRows: 8 }" :placeholder="mcpServerExample" type="textarea" />
       </el-form-item>
     </el-form>
 
     <template #footer>
-      <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose">取消</el-button>
-      <el-button plain :disabled="loading || formLoading" @click="handleTestConnection"> 测试连接 </el-button>
+      <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose">{{ t('common.actions.cancel') }}</el-button>
+      <el-button plain :disabled="loading || formLoading" @click="handleTestConnection">{{ t('common.actions.testConnection') }}</el-button>
       <el-button type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
-        {{ editId ? '保存' : '创建' }}
+        {{ editId ? t('common.actions.save') : t('common.actions.create') }}
       </el-button>
     </template>
   </MkDrawer>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
@@ -16,6 +17,7 @@ import { isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'WorkflowFormDialog' })
 
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 const route = useRoute()
 const router = useRouter()
@@ -37,7 +39,9 @@ const loading = ref(false)
 const formLoading = ref(false)
 const editId = ref<string>()
 const workflowForm = reactive<WorkflowFormModel>({ desc: '', icon: '', name: '', work_flow: {} })
-const formRules: FormRules<WorkflowFormModel> = { name: [{ whitespace: true, required: true, message: '请输入工作流名称', trigger: 'blur' }] }
+const formRules = computed<FormRules<WorkflowFormModel>>(() => ({
+  name: [{ whitespace: true, required: true, message: t('tool.workflow.name.requiredMessage'), trigger: 'blur' }],
+}))
 
 // 暂存确认后的头像文件，恢复默认时清空。
 const iconFile = ref<File | null>(null)
@@ -67,12 +71,12 @@ function handleSubmit() {
           ? props.api.putTool(currentEditId, payload)
           : 'postTool' in props.api
             ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
-            : Promise.reject(new Error('资源管理不支持创建工具'))
+            : Promise.reject(new Error(t('tool.messages.createUnsupported')))
 
         return request.then((savedTool) => {
           const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
           return refreshCurrentUser.then(() => {
-            MsgSuccess(isEdit ? '保存成功' : '创建成功')
+            MsgSuccess(isEdit ? t('common.messages.saveSuccess') : t('common.messages.createSuccess'))
             visible.value = false
             if (isEdit) {
               emit('update', savedTool)
@@ -144,11 +148,12 @@ defineExpose({ open })
       v-loading="formLoading || loading"
       :model="workflowForm"
       :rules="formRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item class="mk-form-item-with-avatar" label="名称" prop="name">
+      <el-form-item class="mk-form-item-with-avatar" :label="t('common.name.label')" prop="name">
         <div class="flex-align-center w-full gap-3">
           <!-- 设置工具头像 -->
           <MkEditAvatar v-model="workflowForm.icon" @change="handleIconChange">
@@ -159,18 +164,18 @@ defineExpose({ open })
           <el-input
             v-model="workflowForm.name"
             maxlength="64"
-            placeholder="请输入工作流名称"
+            :placeholder="t('tool.workflow.name.placeholder')"
             show-word-limit
             @blur="workflowForm.name = workflowForm.name.trim()"
           />
         </div>
       </el-form-item>
-      <el-form-item label="描述">
+      <el-form-item :label="t('common.description.label')">
         <el-input
           v-model="workflowForm.desc"
           :autosize="{ minRows: 3 }"
           maxlength="128"
-          placeholder="请输入"
+          :placeholder="t('common.placeholders.input')"
           show-word-limit
           type="textarea"
           @blur="workflowForm.desc = workflowForm.desc.trim()"
@@ -179,9 +184,9 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain :disabled="loading || formLoading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading || formLoading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <el-button type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
-        {{ editId ? '保存' : '创建' }}
+        {{ editId ? t('common.actions.save') : t('common.actions.create') }}
       </el-button>
     </template>
   </MkDialog>

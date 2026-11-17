@@ -11,20 +11,18 @@ export const FOLDER_ENTRY_ID = {
   SHARED: 'shared',
 } as const
 
-function createFolderEntries(resourceName: string) {
+const folderEntryKeys = {
+  [RESOURCE_TYPE.APPLICATION]: { all: 'application.categories.all', shared: 'application.categories.shared' },
+  [RESOURCE_TYPE.KNOWLEDGE]: { all: 'knowledge.categories.all', shared: 'knowledge.categories.shared' },
+  [RESOURCE_TYPE.TOOL]: { all: 'tool.categories.all', shared: 'tool.categories.shared' },
+} as const satisfies Record<FolderSource, { all: string; shared: string }>
+
+/** 选中的内置目录保留其 ID，页面读取名称时跟随当前语言。 */
+export function getFolderEntry(source: FolderSource, entry: 'all' | 'shared', t: (key: string) => string): FolderItem {
   return {
-    all: {
-      get id() {
-        return FOLDER_ENTRY_ID.ALL
-      },
-      name: `全部${resourceName}`,
+    id: entry === 'all' ? FOLDER_ENTRY_ID.ALL : FOLDER_ENTRY_ID.SHARED,
+    get name() {
+      return t(folderEntryKeys[source][entry])
     },
-    shared: { id: FOLDER_ENTRY_ID.SHARED, name: `共享${resourceName}` },
   }
 }
-
-export const FOLDER_ENTRIES = {
-  [RESOURCE_TYPE.APPLICATION]: createFolderEntries('智能体'),
-  [RESOURCE_TYPE.KNOWLEDGE]: createFolderEntries('知识库'),
-  [RESOURCE_TYPE.TOOL]: createFolderEntries('工具'),
-} satisfies Record<FolderSource, { all: FolderItem; shared: FolderItem }>

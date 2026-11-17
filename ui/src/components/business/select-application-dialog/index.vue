@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDetail, FolderItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import SystemApplicationApi from '@/api/admin/system/resource-management/application/application'
@@ -8,8 +9,10 @@ import ApplicationApi from '@/api/admin/workspace/application/application'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
-import { FOLDER_ENTRIES } from '@/constants/folder'
+import { getFolderEntry } from '@/constants/folder'
 import { isSystemResource, isWorkspaceResource } from '@/utils/resource-context'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'SelectApplicationDialog' })
 
@@ -20,7 +23,7 @@ const visible = ref(false)
 const loading = ref(false)
 const searchKeyword = ref('')
 const appliedSearchKeyword = ref('')
-const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.APPLICATION].all })
+const currentFolder = ref<FolderItem>(getFolderEntry(RESOURCE_TYPE.APPLICATION, 'all', t))
 const applicationOptions = ref<ApplicationDetail[]>([])
 const selectedApplication = ref<(Partial<ApplicationDetail> & { id: string })[]>([])
 const applicationLayoutRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>('applicationLayoutRef')
@@ -87,7 +90,7 @@ function resetData() {
   loading.value = false
   searchKeyword.value = ''
   appliedSearchKeyword.value = ''
-  currentFolder.value = { ...FOLDER_ENTRIES[RESOURCE_TYPE.APPLICATION].all }
+  currentFolder.value = getFolderEntry(RESOURCE_TYPE.APPLICATION, 'all', t)
   applicationOptions.value = []
   selectedApplication.value = []
 }

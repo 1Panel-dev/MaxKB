@@ -65,13 +65,13 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="editing ? '编辑参数' : '添加参数'" @closed="resetData">
+  <MkDialog v-model="visible" :title="editing ? t('common.parameters.edit') : t('common.parameters.add')" @closed="resetData">
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" :field-type-options="initFieldTypeOptions" />
 
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <el-button type="primary" @click="handleSubmit">
-        {{ editing ? '保存' : '添加' }}
+        {{ editing ? t('common.actions.save') : t('common.actions.add') }}
       </el-button>
     </template>
   </MkDialog>

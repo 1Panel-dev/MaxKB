@@ -6,7 +6,7 @@
 ## 分类
 
 按“业务域 → 对象或场景 → 文案用途”组织；文件按业务域划分，不对应组件目录。
-当前建立实际使用的 auth、model、tool、common、resource、dynamicForm、workspace 语言包；其他业务包按需创建，不保留空包。
+业务包按需创建，在每个语言目录放置同名 JSON 文件。
 
 | 业务域      | 内容                                             |
 | ----------- | ------------------------------------------------ |
@@ -16,14 +16,15 @@
 | knowledge   | 知识库、文档、分段、问题、标签、检索             |
 | model       | 模型、供应商、模型参数与连接测试                 |
 | dynamicForm | 动态表单控件类型及配置器的固定界面文案           |
-| resource    | 跨资源授权、关联关系及文件夹等公共业务           |
+| resource    | 跨资源授权、关联关系及共享状态等公共业务         |
+| folder      | 文件夹操作、排序、表单提示和删除确认             |
 | tool        | 工具、MCP、Skill 管理                            |
 | workflow    | 画布、节点、变量、调试与执行展示                 |
 | chat        | 对话输入、消息操作、历史会话与对话状态           |
 | workspace   | 工作空间、成员、空间级设置                       |
 | system      | 用户、角色、系统配置、许可证                     |
 
-翻译 key 最多四层，包含业务域命名空间。共用字段使用 `<业务域>.fields.<字段>.<用途>`，
+翻译 key 最多四层，包含业务域命名空间。业务域内部的共用字段使用 `<业务域>.fields.<字段>.<用途>`，
 场景专属字段使用 `<业务域>.<场景>.<字段>.<用途>`；不同时叠加场景、fields 和 validation。
 字段文案使用 label、placeholder、description，以及同级的 requiredMessage、invalidMessage、
 lengthMessage、mismatchMessage 等校验提示，不再建立字段内的 validation 层。
@@ -38,14 +39,23 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 归属以业务含义判断：知识库检索模式归 knowledge，知识库检索节点归 workflow。
 系统资源管理复用原业务域，不复制到 system。多处使用不等于通用；相同中文但业务语义
 不同可以使用不同 key。通用添加、编辑、删除、取消、保存和上传文件操作归 common.actions，
-通用展示标签归 common.labels，不为简单标签再嵌套 label；
+仅有展示文案的通用标签归 common.labels，例如“创建者”和“操作”。名称与描述直接归 common.name 和 common.description，
+字段的 label、placeholder 和实际使用的 requiredMessage 放在一起，表单、表头和筛选器共用 label。
+common.status 维护状态标签 label 和通用启停选项 enabled、disabled。
+“请输入模型名称”等指明业务对象的提示，以及发布状态、执行状态等业务选项归对应业务域。
 通用操作结果归 common.messages，通用对话框标题归 common.dialogs；业务专属确认句仍留在所属业务域。
 用户内容、提示词、协议枚举和已保存节点名称不进入语言包。
+
+## JSON 键顺序
+
+- 同一语言包的键按含义分组，简体、繁体和英文采用相同的排列顺序，方便逐项对照。
+- `common.json` 的顶层顺序为 `labels` → `name` → `description` → `status` → `parameters` → `upload` → `actions` → `dialogs` → `messages` → `placeholders` → `validation` → `empty`。
+- 字段内先放 `label`，再放 `placeholder`，最后放 `requiredMessage` 等校验提示。状态组先放 `label`，再放 `enabled`、`disabled`。其他组沿用现有顺序。
 
 ## 使用约定
 
 - key 使用表达业务含义的英文 camelCase，不使用中文、数字序号或 misc 等模糊分类。
-- JSON 文件不重复包裹业务域，由 index.ts 挂载命名空间；各语言保持相同 key 与插值参数。
+- 每个语言目录直属的 JSON 文件由 Vite 自动收集。文件名去掉扩展名并转为 camelCase，作为命名空间，例如 `dynamic-form.json` 对应 `dynamicForm`。JSON 内容直接从业务字段开始。
 - 完整句子整体翻译，动态内容使用命名参数；不用片段拼接句子。
 - 英文界面采用简洁、明确的表达。通用输入、选择占位分别使用 Please enter、Please select，
   不使用省略号；明确对象时使用 Enter a model name、Select a model 等完整短语，不统一添加 Please。
@@ -56,12 +66,12 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 - 依赖语言的选项和校验规则在 computed 或执行时翻译，不在模块初始化时固化翻译结果。
 - 不为语言切换添加重新校验表单的 watch；已有错误提示在下次正常校验时更新。
   响应式规则变化不自动触发校验，表单使用 :validate-on-rule-change="false"。
-- 新增业务包时更新 index.ts 的所有语言及 MessageSchema，以中文结构约束翻译 key。
-- 非组件代码通过调用方传入翻译能力，不依赖某个入口的全局国际化单例。
+- 开发和构建时根据简体中文目录自动生成 `schema.generated.d.ts`，供编辑器补全。新增业务包只需在三个语言目录放置同名文件。`npm run type-check` 会检查各语言的文件、key 和字段类型是否一致。翻译文案使用相同的命名插值参数。
+- 入口完成国际化初始化后，普通 TS 工具可从 `@/locales` 导入 `t`，在函数执行时翻译。
 
 ## 语言状态
 
-Admin 和 Chat 分别调用 createAppI18n，连接自己的 User Store；该模块不导入任何 Store。
+Admin 和 Chat 各自在独立页面调用 `createAppI18n` 创建实例并连接自己的 User Store。模块导出的 `t` 来自当前页面创建的实例。
 Store 是语言状态来源，通过 setLanguage 更新，不能直接修改 Vue I18n 的 locale。
 App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、zh-tw 日期语言包；
 英文使用内置 en。日期组件按当前 Element Plus 语言读取日期文案，不修改时区及原始值。
@@ -103,10 +113,30 @@ MkResourceCard、MkComplexSearch、MkEmpty 的默认创建信息、占位和空�
 
 ## 工具列表
 
-工作空间的工具菜单和列表标题共用 tool.title。内置目录用 tool.categories，按文件夹 ID 选择译文；
-自建文件夹名称、工具名称和描述直接展示接口值。工具类型复用 tool.types，筛选和请求始终使用原协议值。
+工作空间的工具菜单、列表标题和普通工具类型名称共用 `tool.title`。Skill、工作流、MCP 和数据源的类型名称使用各自分组的 `label`，与表单文案一起维护在 `tool.json` 中。
+内置目录用 tool.categories，按文件夹 ID 选择译文。自建文件夹名称、工具名称和描述直接展示接口值，类型筛选和请求使用原协议值。
 启停、删除和版本更新的工具专属提示归 tool；通用操作、启停状态和操作结果归 common。
-资源共享标签、文件夹操作、MCP 服务配置、触发器及执行记录入口归 resource。
+资源共享标签、MCP 服务配置、触发器及执行记录入口归 resource。
+工具商店的内置分类、搜索结果计数和应用工具文案归 `tool.store`。工具名称的专属占位和校验归 `tool.fields.name`。
+商店自定义分类、工具名称、描述和 README 使用接口原文。
+普通工具的创建、编辑、复制标题使用 `tool.createTitle`、`tool.editTitle`、`tool.duplicateTitle`，代码必填提示归 `tool.fields.code`。调试入口、运行状态和缺省错误提示归 `tool.debug`。
+调试参数的占位与必填提示分别使用 `common.placeholders.inputField` 和 `common.validation.inputFieldRequired`，通过 `{label}` 传入参数名。执行输出和接口错误详情按原文展示。
+Skill 表单的标题、名称提示和 ZIP 文件要求归 `tool.skill`。文件大小提示通过 `{size}` 读取校验上限，拖入、选择、更换文件和空文件提示复用 `common.upload`。
+工作流工具的创建、编辑、复制标题及工作流名称提示归 `tool.workflow`。复制工具时用 `common.name.copyTemplate` 填入可编辑的初始名称。
+MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 `tool.mcp`。配置字段复用 `resource.mcpConfig.title`，JSON 示例与用户填写的配置保留原文。
+数据源工具的表单标题、名称提示和代码必填提示归 `tool.dataSource`。Python 模板和用户编辑的代码作为表单数据原样提交。
+工具表单的启动参数、输入参数、输出参数和 Python 代码区分别归 `tool.initParams`、`tool.inputParams`、`tool.outputParams` 和 `tool.pythonCode`。
+输入和输出参数共用 `tool.parameters.shownWhenUsed`。输出变量 `{result}` 作为命名参数传给译文。
+参数表头及提示说明复用 `dynamicForm.fields`，模型和工具共用 `common.parameters.add`、`common.parameters.edit`。
+参数来源只翻译选项标签，`reference`、`custom` 和数据类型沿用协议值。
+
+## 文件夹
+
+`folder.json` 的 actions 维护创建文件夹、创建子文件夹、编辑文件夹等操作。将文件夹或资源移动到目标文件夹时，菜单、批量操作和弹窗标题统一使用 `folder.actions.moveTo`。
+sort 维护目录树排序选项，
+delete 维护删除确认。名称与描述的表单提示、通用按钮、字段标签、搜索占位和成功提示复用 common，
+资源授权入口复用 resource。目录树与列表标题复用 application、knowledge 或 tool 的 categories.all / shared，
+每个分类名称按完整短语翻译；用户创建的文件夹名称和描述按原值展示。
 
 ## 动态表单
 

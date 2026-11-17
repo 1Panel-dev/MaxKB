@@ -63,7 +63,10 @@ Store 内部协调状态时可直接引用同入口的具体 Store，避免聚�
 
 ## Import 顺序
 
-所有 Vue / TypeScript 文件按以下顺序排列导入，组间不加空行：
+`src/main.ts` 和 `src/chat.ts` 两个入口的现有顺序必须始终保留，包括 import、样式加载、
+初始化和插件注册。新增代码也须保留已有语句的相对顺序，手工修改及自动修复均不得重排。
+
+其余 Vue / TypeScript 文件按以下顺序排列导入，组间不加空行：
 
 1. 框架与第三方依赖；`vue`、`vue-router`、`pinia` 固定优先，其他按路径排序。
 2. 所有来源的 `import type` 集中排列，然后是 `@/api/enums` 枚举，最后是 API。

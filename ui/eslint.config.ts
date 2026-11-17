@@ -32,4 +32,8 @@ export default defineConfigWithVueTs(
       'vue/multi-word-component-names': ['error', { ignores: ['index'] }],
     },
   },
+  {
+    files: ['src/main.ts', 'src/chat.ts'],
+    rules: { 'project/import-order': 'off' },
+  },
 )

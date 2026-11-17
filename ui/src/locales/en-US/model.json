@@ -88,8 +88,6 @@
   },
   "parameters": {
     "title": "Model parameters",
-    "add": "Add parameter",
-    "edit": "Edit parameter",
     "duplicateField": "Parameter “{name}” already exists",
     "duplicateLabel": "Display name “{name}” already exists"
   },

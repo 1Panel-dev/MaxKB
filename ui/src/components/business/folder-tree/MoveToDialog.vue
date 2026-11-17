@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { FolderSource } from '@/api/types'
 import FolderTree from './index.vue'
 import { FOLDER_ENTRY_ID } from '@/constants'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'MoveToDialog' })
 
@@ -43,7 +46,7 @@ defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" class="move-to-dialog" content-class="move-to-dialog__content" title="移动到" @closed="resetData">
+  <MkDialog v-model="visible" class="move-to-dialog" content-class="move-to-dialog__content" :title="t('folder.actions.moveTo')" @closed="resetData">
     <FolderTree
       v-model="selectedTargetId"
       class="move-to-dialog__folder-tree"
@@ -54,8 +57,8 @@ defineExpose({ close, open })
     />
 
     <template #footer>
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
-      <el-button type="primary" :disabled="!canSubmit" :loading="loading" @click="handleSubmit">确定</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <el-button type="primary" :disabled="!canSubmit" :loading="loading" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

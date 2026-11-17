@@ -1,21 +1,131 @@
 {
   "title": "工具",
+  "createTitle": "创建工具",
+  "editTitle": "编辑工具",
+  "duplicateTitle": "复制工具",
   "categories": {
     "all": "全部工具",
     "shared": "共享工具"
   },
-  "types": {
-    "custom": "工具",
-    "skill": "Skills",
-    "workflow": "工作流",
-    "mcp": "MCP",
-    "dataSource": "数据源"
+  "fields": {
+    "name": {
+      "placeholder": "请输入工具名称",
+      "requiredMessage": "请输入工具名称"
+    },
+    "code": {
+      "requiredMessage": "请输入工具内容"
+    }
+  },
+  "skill": {
+    "label": "Skills",
+    "createTitle": "创建 Skill",
+    "editTitle": "编辑 Skill",
+    "duplicateTitle": "复制 Skill",
+    "name": {
+      "placeholder": "请输入 Skill 名称",
+      "requiredMessage": "请输入 Skill 名称"
+    },
+    "file": {
+      "label": "Skill 文件",
+      "description": "支持 ZIP 文件，大小须小于 {size} MB",
+      "requiredMessage": "请上传 Skill ZIP 文件",
+      "sizeLimitMessage": "文件大小须小于 {size} MB"
+    }
+  },
+  "workflow": {
+    "label": "工作流",
+    "createTitle": "创建工作流",
+    "editTitle": "编辑工作流",
+    "duplicateTitle": "复制工作流",
+    "name": {
+      "placeholder": "请输入工作流名称",
+      "requiredMessage": "请输入工作流名称"
+    }
+  },
+  "mcp": {
+    "label": "MCP",
+    "createTitle": "创建 MCP",
+    "editTitle": "编辑 MCP",
+    "duplicateTitle": "复制 MCP",
+    "serviceTitle": "MCP 服务",
+    "name": {
+      "placeholder": "请输入 MCP 名称",
+      "requiredMessage": "请输入 MCP 名称"
+    },
+    "config": {
+      "description": "（仅支持 SSE、Streamable HTTP 调用方式）",
+      "requiredMessage": "请输入 MCP 服务配置",
+      "invalidMessage": "请输入有效的 JSON 对象作为 MCP 服务配置"
+    }
+  },
+  "dataSource": {
+    "label": "数据源",
+    "createTitle": "创建数据源",
+    "editTitle": "编辑数据源",
+    "duplicateTitle": "复制数据源",
+    "name": {
+      "placeholder": "请输入数据源名称",
+      "requiredMessage": "请输入数据源名称"
+    },
+    "code": {
+      "requiredMessage": "请输入数据源内容"
+    }
   },
   "store": {
-    "title": "工具商店"
+    "title": "工具商店",
+    "categories": {
+      "webSearch": "联网搜索",
+      "databaseSearch": "数据库查询",
+      "other": "其他"
+    },
+    "searchResults": "找到 {count} 个相关工具",
+    "apply": "应用",
+    "addTitle": "添加工具",
+    "noDetails": "暂无详细说明"
+  },
+  "parameters": {
+    "shownWhenUsed": "使用工具时显示"
   },
   "initParams": {
     "title": "启动参数"
+  },
+  "inputParams": {
+    "title": "输入参数",
+    "name": {
+      "label": "参数名称",
+      "placeholder": "请输入参数名称",
+      "requiredMessage": "请输入参数名称"
+    },
+    "dataType": {
+      "label": "数据类型"
+    },
+    "source": {
+      "label": "来源",
+      "reference": "引用参数",
+      "custom": "自定义"
+    }
+  },
+  "outputParams": {
+    "title": "输出参数",
+    "result": "结果 {variable}"
+  },
+  "pythonCode": {
+    "title": "工具内容（Python）",
+    "description": "使用工具时不显示",
+    "generate": {
+      "title": "生成 Python 代码",
+      "placeholder": "请描述这个工具的功能",
+      "empty": "Python 代码显示在这里"
+    }
+  },
+  "debug": {
+    "title": "调试",
+    "run": "运行",
+    "resultTitle": "运行结果",
+    "runSuccess": "运行成功",
+    "runFailed": "运行失败",
+    "output": "输出",
+    "failureMessage": "工具运行失败"
   },
   "delete": {
     "title": "确认删除工具：{name}？",
@@ -26,7 +136,8 @@
     "description": "禁用后，引用了该工具的资源执行会报错，请谨慎操作。"
   },
   "messages": {
-    "publishBeforeEnabling": "无法启用，请先发布工作流"
+    "publishBeforeEnabling": "无法启用，请先发布工作流",
+    "createUnsupported": "资源管理不支持创建工具"
   },
   "updateVersion": {
     "action": "更新版本",

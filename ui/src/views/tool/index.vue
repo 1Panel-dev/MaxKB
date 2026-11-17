@@ -32,7 +32,8 @@ import {
   ToolWorkflowAction,
   TriggerToolAction,
 } from './tool-card/action-dropdown'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID, TOOL_TYPE_OPTIONS } from '@/constants'
+import { FOLDER_ENTRY_ID, getFolderEntry } from '@/constants/folder'
+import { TOOL_TYPE_OPTIONS } from '@/constants/tool'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
@@ -40,14 +41,8 @@ const { t } = useI18n({ useScope: 'global' })
 
 /* 当前文件夹 */
 
-const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.TOOL].all })
+const currentFolder = ref<FolderItem>(getFolderEntry(RESOURCE_TYPE.TOOL, 'all', t))
 const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARED)
-
-const currentFolderName = computed(() => {
-  if (isShared.value) return t('tool.categories.shared')
-  if (currentFolder.value.id === FOLDER_ENTRY_ID.ALL) return t('tool.categories.all')
-  return currentFolder.value.name
-})
 
 function handleFolderSelect(folder: FolderItem) {
   const folderChanged = folder.id !== currentFolder.value.id
@@ -68,13 +63,13 @@ const toolsData = ref<ToolItem[]>([])
 const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
-  { label: t('common.labels.name'), value: 'name' },
+  { label: t('common.name.label'), value: 'name' },
   {
-    label: t('common.labels.status'),
+    label: t('common.status.label'),
     value: 'is_active',
     options: [
-      { value: true, label: t('common.states.enabled') },
-      { value: false, label: t('common.states.disabled') },
+      { value: true, label: t('common.status.enabled') },
+      { value: false, label: t('common.status.disabled') },
     ],
   },
   { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
@@ -234,26 +229,20 @@ onMounted(() => {
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <MkTooltip v-if="perm.tool.workspace.folderCreateWorkspace()" :content="t('resource.folder.create')" placement="top">
+        <MkTooltip v-if="perm.tool.workspace.folderCreateWorkspace()" :content="t('folder.actions.create')" placement="top">
           <el-button @click="handleCreateFolder" text type="primary" class="-mr-1">
             <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>
         </MkTooltip>
       </component>
 
-      <FolderTree
-        ref="folderTreeRef"
-        :root-label="t('tool.categories.all')"
-        :source="RESOURCE_TYPE.TOOL"
-        @select="handleFolderSelect"
-        draggable
-      ></FolderTree>
+      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.TOOL" @select="handleFolderSelect" draggable></FolderTree>
     </template>
 
     <template #default="{ Footer, Header }">
       <component :is="Header">
         <div class="flex-align-center min-w-0 flex-1 gap-4">
-          <h4 class="min-w-0 truncate" :title="currentFolderName">{{ currentFolderName }}</h4>
+          <h4 class="min-w-0 truncate" :title="currentFolder.name">{{ currentFolder.name }}</h4>
           <el-divider direction="vertical" />
           <el-select v-model="toolType" class="w-30!" :empty-values="[null, undefined]" :value-on-clear="null" @change="refreshTool">
             <el-option v-for="option in TOOL_TYPE_OPTIONS" :key="option.value" :label="t(option.labelKey)" :value="option.value" />
@@ -320,7 +309,7 @@ onMounted(() => {
                     icon="icon_edit_outlined"
                     @click="handleOpenEditTool(tool)"
                   />
-                  <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" :label="t('tool.types.workflow')" :tool="tool" />
+                  <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" :label="t('tool.workflow.label')" :tool="tool" />
                   <!-- 复制 -->
                   <CopyToolAction
                     v-if="perm.tool.workspace.copy(tool.id)"
@@ -374,7 +363,7 @@ onMounted(() => {
                   <MoveToolAction
                     v-if="perm.tool.workspace.move(tool.id)"
                     v-model:loading="toolOperationLoading"
-                    :label="t('common.actions.moveTo')"
+                    :label="t('folder.actions.moveTo')"
                     :api="ToolApi"
                     :current-folder-id="currentFolder.id"
                     :tool="tool"
@@ -416,7 +405,7 @@ onMounted(() => {
       >
         <template #footer-batch-actions>
           <el-button v-if="perm.tool.workspace.batchMove()" type="primary" plain :disabled="!selectedToolCount" @click="handleOpenBatchMove">
-            {{ t('common.actions.moveTo') }}
+            {{ t('folder.actions.moveTo') }}
           </el-button>
           <el-button v-if="perm.tool.workspace.batchDelete()" type="danger" plain :disabled="!selectedToolCount" @click="handleBatchDelete">
             {{ t('common.actions.delete') }}

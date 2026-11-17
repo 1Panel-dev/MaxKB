@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FolderItem, ToolItem, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
@@ -9,8 +10,10 @@ import ToolApi from '@/api/admin/workspace/tool/tool'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import MkCardCheckbox from '@/components/mk-card-checkbox/index.vue'
-import { FOLDER_ENTRIES } from '@/constants/folder'
+import { getFolderEntry } from '@/constants/folder'
 import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'SelectToolDialog' })
 
@@ -25,7 +28,7 @@ const visible = ref(false)
 const loading = ref(false)
 const searchKeyword = ref('')
 const appliedSearchKeyword = ref('')
-const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.TOOL].all })
+const currentFolder = ref<FolderItem>(getFolderEntry(RESOURCE_TYPE.TOOL, 'all', t))
 const toolOptions = ref<ToolItem[]>([])
 const selectedTool = ref<(Partial<ToolItem> & { id: string })[]>([])
 const toolLayoutRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>('toolLayoutRef')
@@ -104,7 +107,7 @@ function resetData() {
   loading.value = false
   searchKeyword.value = ''
   appliedSearchKeyword.value = ''
-  currentFolder.value = { ...FOLDER_ENTRIES[RESOURCE_TYPE.TOOL].all }
+  currentFolder.value = getFolderEntry(RESOURCE_TYPE.TOOL, 'all', t)
   toolOptions.value = []
   selectedTool.value = []
 }

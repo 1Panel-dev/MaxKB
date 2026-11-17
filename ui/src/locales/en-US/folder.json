@@ -1,0 +1,19 @@
+{
+  "actions": {
+    "create": "Create folder",
+    "createChild": "Create subfolder",
+    "edit": "Edit folder",
+    "moveTo": "Move to"
+  },
+  "sort": {
+    "createdAtAsc": "Oldest first",
+    "createdAtDesc": "Newest first",
+    "nameAsc": "Name (A–Z)",
+    "nameDesc": "Name (Z–A)",
+    "custom": "Drag to reorder"
+  },
+  "delete": {
+    "title": "Delete folder “{name}”?",
+    "description": "All resources in this folder will also be deleted."
+  }
+}

@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ToolInputField } from '@/api/types'
 import InputFieldDialog from './InputFieldDialog.vue'
 
 defineOptions({ name: 'InputFieldTable' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const inputFields = defineModel<ToolInputField[]>({ required: true })
 const currentIndex = ref<number>()
@@ -32,33 +35,38 @@ function handleDeleteInputField(index: number) {
   <section>
     <div class="mb-4 flex-between">
       <div class="flex-align-center gap-2">
-        <h4 class="mk-title-decoration">输入参数</h4>
-        <span class="text-N600">使用工具时显示</span>
+        <h4 class="mk-title-decoration">{{ t('tool.inputParams.title') }}</h4>
+        <span class="text-N600">{{ t('tool.parameters.shownWhenUsed') }}</span>
       </div>
+      <!-- 添加输入参数 -->
       <el-button text type="primary" @click="handleOpenInputField()">
         <MkIcon name="icon_add_outlined" />
       </el-button>
     </div>
     <MkTable :data="inputFields" size="small">
-      <el-table-column label="参数" prop="name" min-width="140" />
-      <el-table-column label="数据类型" prop="type" min-width="100">
+      <el-table-column :label="t('dynamicForm.fields.field.label')" prop="name" min-width="140" />
+      <el-table-column :label="t('tool.inputParams.dataType.label')" prop="type" min-width="100">
         <template #default="{ row }">
           <el-tag size="small" type="info">{{ row.type }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="来源" min-width="100">
-        <template #default="{ row }">{{ row.source === 'custom' ? '自定义' : '引用参数' }}</template>
+      <el-table-column :label="t('tool.inputParams.source.label')" min-width="100">
+        <template #default="{ row }">
+          {{ row.source === 'custom' ? t('tool.inputParams.source.custom') : t('tool.inputParams.source.reference') }}
+        </template>
       </el-table-column>
-      <el-table-column label="必填" width="80">
+      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" min-width="80">
         <template #default="{ row }">
           <el-switch v-model="row.is_required" size="small" />
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="100">
+      <el-table-column :label="t('common.labels.operation')" width="100">
         <template #default="{ row, $index }">
+          <!-- 编辑输入参数 -->
           <el-button text type="primary" @click="handleOpenInputField(row, $index)">
             <MkIcon name="icon_edit_outlined" />
           </el-button>
+          <!-- 删除输入参数 -->
           <el-button text type="primary" @click="handleDeleteInputField($index)">
             <MkIcon name="icon_delete-trash_outlined" />
           </el-button>

@@ -103,8 +103,9 @@ isWorkspaceResource 仅匹配 workspace，不包含 workspace-shared；未配置
 不要在业务代码和请求层直接调用 `ElMessage`。
 消息默认显示关闭按钮、在 `3000ms` 后关闭，并通过 `grouping: true` 合并相同内容的消息；
 调用方无需重复传入。特殊场景通过第二个参数覆盖 Element Plus 消息选项，包括 `grouping: false`。
-确认操作统一按需导入 `MsgConfirm(title, message, options?)`，默认提供确认、取消按钮和
-warning 类型；输入和普通警告弹窗继续直接使用 `ElMessageBox`。
+确认操作统一按需导入 `MsgConfirm(title, message, options?)`。普通取消按钮由 Element Plus 按当前语言显示。
+删除、禁用等操作通过 `options.confirmButtonText` 指定动作译文。省略该选项时默认显示“删除”，使用危险操作样式。
+取消按钮执行“直接退出”等业务动作时，通过 `options.cancelButtonText` 指定文案。输入和普通警告弹窗继续直接使用 `ElMessageBox`。
 
 ## 文件类型与图标
 

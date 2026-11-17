@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
@@ -17,6 +18,7 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DataSourceFormDrawer' })
 
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 
 const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; folderId: string; title: string }>()
@@ -53,10 +55,10 @@ const formLoading = ref(false)
 const editId = ref<string>()
 const originalForm = ref('')
 const dataSourceForm = reactive<DataSourceFormModel>({ code: codeTemplate, desc: '', icon: '', init_field_list: [], input_field_list: [], name: '' })
-const formRules: FormRules<DataSourceFormModel> = {
-  code: [{ whitespace: true, required: true, message: '请输入数据源内容', trigger: 'blur' }],
-  name: [{ whitespace: true, required: true, message: '请输入数据源名称', trigger: 'blur' }],
-}
+const formRules = computed<FormRules<DataSourceFormModel>>(() => ({
+  code: [{ whitespace: true, required: true, message: t('tool.dataSource.code.requiredMessage'), trigger: 'blur' }],
+  name: [{ whitespace: true, required: true, message: t('tool.dataSource.name.requiredMessage'), trigger: 'blur' }],
+}))
 
 // 暂存确认后的头像文件，恢复默认时清空。
 const iconFile = ref<File | null>(null)
@@ -86,12 +88,12 @@ function handleSubmit() {
           ? props.api.putTool(currentEditId, payload)
           : 'postTool' in props.api
             ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
-            : Promise.reject(new Error('资源管理不支持创建工具'))
+            : Promise.reject(new Error(t('tool.messages.createUnsupported')))
 
         return request.then((savedTool) => {
           const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
           return refreshCurrentUser.then(() => {
-            MsgSuccess(isEdit ? '保存成功' : '创建成功')
+            MsgSuccess(isEdit ? t('common.messages.saveSuccess') : t('common.messages.createSuccess'))
             visible.value = false
             if (isEdit) emit('update', savedTool)
             else emit('refresh')
@@ -146,7 +148,10 @@ function handleBeforeClose() {
     visible.value = false
     return
   }
-  MsgConfirm('提示', '当前的更改尚未保存，确认退出吗？', { confirmButtonText: '确认', confirmButtonType: 'primary' })
+  MsgConfirm(t('common.dialogs.notice'), t('common.dialogs.unsavedChanges'), {
+    confirmButtonText: t('common.actions.confirm'),
+    confirmButtonType: 'primary',
+  })
     .then(() => {
       visible.value = false
     })
@@ -178,12 +183,13 @@ defineExpose({ open })
       v-loading="formLoading || loading"
       :model="dataSourceForm"
       :rules="formRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <h4 class="mk-title-decoration mb-4">基本信息</h4>
-      <el-form-item class="mk-form-item-with-avatar" label="名称" prop="name">
+      <h4 class="mk-title-decoration mb-4">{{ t('common.labels.basicInfo') }}</h4>
+      <el-form-item class="mk-form-item-with-avatar" :label="t('common.name.label')" prop="name">
         <div class="flex-align-center w-full gap-3">
           <!-- 设置工具头像 -->
           <MkEditAvatar v-model="dataSourceForm.icon" @change="handleIconChange">
@@ -194,18 +200,18 @@ defineExpose({ open })
           <el-input
             v-model="dataSourceForm.name"
             maxlength="64"
-            placeholder="请输入数据源名称"
+            :placeholder="t('tool.dataSource.name.placeholder')"
             show-word-limit
             @blur="dataSourceForm.name = dataSourceForm.name.trim()"
           />
         </div>
       </el-form-item>
-      <el-form-item label="描述">
+      <el-form-item :label="t('common.description.label')">
         <el-input
           v-model="dataSourceForm.desc"
           :autosize="{ minRows: 3 }"
           maxlength="128"
-          placeholder="请输入"
+          :placeholder="t('common.placeholders.input')"
           show-word-limit
           type="textarea"
           @blur="dataSourceForm.desc = dataSourceForm.desc.trim()"
@@ -218,9 +224,9 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose">取消</el-button>
+      <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose">{{ t('common.actions.cancel') }}</el-button>
       <el-button type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
-        {{ editId ? '保存' : '创建' }}
+        {{ editId ? t('common.actions.save') : t('common.actions.create') }}
       </el-button>
     </template>
   </MkDrawer>

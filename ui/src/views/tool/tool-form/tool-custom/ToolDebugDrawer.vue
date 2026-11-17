@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
+import { isAxiosError } from 'axios'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
@@ -10,6 +12,7 @@ import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'ToolDebugDrawer' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi }>()
 
 const formRef = ref<FormInstance>()
@@ -27,7 +30,9 @@ const formRules = computed<FormRules>(() => {
 
   debugForm.debug_field_list.forEach((field, index) => {
     if (field.is_required) {
-      rules[`debug_field_list.${index}.value`] = [{ required: true, message: `请输入${field.name}`, trigger: 'blur' }]
+      rules[`debug_field_list.${index}.value`] = [
+        { required: true, message: t('common.validation.inputFieldRequired', { label: field.name }), trigger: 'blur' },
+      ]
     }
   })
   return rules
@@ -35,7 +40,7 @@ const formRules = computed<FormRules>(() => {
 
 const formattedResult = computed(() => {
   if (debugResult.value === undefined || debugResult.value === null || debugResult.value === '') {
-    return '-'
+    return debugSucceeded.value ? '-' : t('tool.debug.failureMessage')
   }
   if (typeof debugResult.value === 'string') return debugResult.value
 
@@ -58,10 +63,13 @@ function open(tool: ToolPayload) {
 }
 
 function getErrorMessage(error: unknown) {
-  if (typeof error === 'object' && error && 'message' in error) {
-    return String(error.message)
+  if (isAxiosError<{ message?: string } | string>(error)) {
+    const data = error.response?.data
+    const detail = typeof data === 'string' ? data : data?.message
+    if (typeof detail === 'string' && detail.trim()) return detail
   }
-  return '工具运行失败'
+  const message = typeof error === 'object' && error && 'message' in error ? error.message : error
+  return typeof message === 'string' && message.trim() ? message : undefined
 }
 
 function handleRun() {
@@ -109,27 +117,29 @@ defineExpose({ open })
   <MkDrawer v-model="visible" append-to-body class="tool-debug-drawer" :modal="false" :show-close="false" size="60%" @closed="resetData">
     <template #header>
       <div class="-ml-2 flex-align-center">
+        <!-- 返回工具表单 -->
         <el-button class="mr-1" text @click="visible = false">
           <MkIcon name="icon_arrow-left_outlined" :size="20" />
         </el-button>
-        <h4>调试</h4>
+        <h4>{{ t('tool.debug.title') }}</h4>
       </div>
     </template>
 
     <section v-if="debugForm.init_field_list.length" class="mb-6">
-      <h4 class="mk-title-decoration mb-4">启动参数</h4>
+      <h4 class="mk-title-decoration mb-4">{{ t('tool.initParams.title') }}</h4>
 
       <MkDynamicsForm ref="dynamicsFormRef" v-model="debugForm.init_params" :render-data="debugForm.init_field_list" />
     </section>
 
     <section v-if="debugForm.debug_field_list.length" class="mb-6">
-      <h4 class="mk-title-decoration mb-4">输入参数</h4>
+      <h4 class="mk-title-decoration mb-4">{{ t('tool.inputParams.title') }}</h4>
 
       <el-form
         ref="formRef"
         v-loading="loading"
         :model="debugForm"
         :rules="formRules"
+        :validate-on-rule-change="false"
         hide-required-asterisk
         label-position="top"
         require-asterisk-position="right"
@@ -144,23 +154,24 @@ defineExpose({ open })
               <el-tag size="small" type="info">{{ field.type }}</el-tag>
             </span>
           </template>
-          <el-input v-model="field.value" :placeholder="`请输入 ${field.name}`" />
+          <el-input v-model="field.value" :placeholder="t('common.placeholders.inputField', { label: field.name })" />
         </el-form-item>
       </el-form>
     </section>
 
-    <el-button type="primary" :loading="loading" @click="handleRun">运行</el-button>
+    <!-- 运行工具 -->
+    <el-button type="primary" :loading="loading" @click="handleRun">{{ t('tool.debug.run') }}</el-button>
 
     <section v-if="showResult" class="mt-4">
-      <h4 class="mk-title-decoration mb-4">运行结果</h4>
+      <h4 class="mk-title-decoration mb-4">{{ t('tool.debug.resultTitle') }}</h4>
       <el-alert
         :closable="false"
-        :title="debugSucceeded ? '运行成功' : '运行失败'"
+        :title="debugSucceeded ? t('tool.debug.runSuccess') : t('tool.debug.runFailed')"
         :type="debugSucceeded ? 'success' : 'error'"
         class="mb-4!"
         show-icon
       />
-      <p class="mb-2">输出</p>
+      <p class="mb-2">{{ t('tool.debug.output') }}</p>
 
       <el-card class="small whitespace-pre-wrap" shadow="never" :class="{ 'border-danger': !debugSucceeded }">
         {{ formattedResult }}

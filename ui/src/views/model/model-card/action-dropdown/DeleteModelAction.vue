@@ -17,6 +17,7 @@ function handleDeleteModel() {
   return MsgConfirm(
     t('model.delete.title', { name: props.model.name }),
     props.model.resource_count ? t('model.delete.description', { count: props.model.resource_count }, props.model.resource_count) : '',
+    { confirmButtonText: t('common.actions.delete') },
   )
     .then(() => {
       return props.api.deleteModel(props.model.id).then(() => {

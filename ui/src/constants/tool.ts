@@ -4,9 +4,9 @@ import { TOOL_TYPE } from '@/api/enums'
 
 export const TOOL_TYPE_OPTIONS = [
   { labelKey: 'common.labels.all', value: '' },
-  { labelKey: 'tool.types.custom', value: TOOL_TYPE.CUSTOM },
-  { labelKey: 'tool.types.skill', value: TOOL_TYPE.SKILL },
-  { labelKey: 'tool.types.workflow', value: TOOL_TYPE.WORKFLOW },
-  { labelKey: 'tool.types.mcp', value: TOOL_TYPE.MCP },
-  { labelKey: 'tool.types.dataSource', value: TOOL_TYPE.DATA_SOURCE },
+  { labelKey: 'tool.title', value: TOOL_TYPE.CUSTOM },
+  { labelKey: 'tool.skill.label', value: TOOL_TYPE.SKILL },
+  { labelKey: 'tool.workflow.label', value: TOOL_TYPE.WORKFLOW },
+  { labelKey: 'tool.mcp.label', value: TOOL_TYPE.MCP },
+  { labelKey: 'tool.dataSource.label', value: TOOL_TYPE.DATA_SOURCE },
 ] satisfies { labelKey: string; value: ToolType | '' }[]

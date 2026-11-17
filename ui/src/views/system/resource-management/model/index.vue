@@ -89,6 +89,7 @@ function handleDeleteModel(model: ModelItem) {
   return MsgConfirm(
     t('model.delete.title', { name: model.name }),
     model.resource_count ? t('model.delete.description', { count: model.resource_count }, model.resource_count) : '',
+    { confirmButtonText: t('common.actions.delete') },
   )
     .then(() => {
       loading.value = true
@@ -134,7 +135,7 @@ onMounted(() => {
         @sort-change="handleSortChange"
         resizable
       >
-        <el-table-column prop="name" :label="t('common.labels.name')" min-width="220" show-overflow-tooltip>
+        <el-table-column prop="name" :label="t('common.name.label')" min-width="220" show-overflow-tooltip>
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <span v-if="getProvider(row).icon" class="h-5 w-5 shrink-0" v-html="getProvider(row).icon" />

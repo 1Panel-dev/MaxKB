@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { FolderSort } from './types'
 import type { FolderItem, FolderSource } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
@@ -9,11 +10,13 @@ import ResourceAuthorizationDrawer from '@/components/business/resource-authoriz
 import FolderFormDialog from './FolderFormDialog.vue'
 import VirtualizedTree from './VirtualizedTree.vue'
 import { FOLDER_SORT } from './types'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
+import { FOLDER_ENTRY_ID, getFolderEntry } from '@/constants/folder'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { getWorkspaceId } from '@/utils/resource-context'
 import { perm } from '@/permission'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const folderPermission = computed(() => {
   switch (props.source) {
@@ -51,8 +54,16 @@ if (props.showAll && typeof routeFolderId === 'string' && routeFolderId) current
 
 const emit = defineEmits<{ loaded: [folder?: FolderItem]; select: [folder: FolderItem] }>()
 
-const folderEntries = computed(() => FOLDER_ENTRIES[props.source])
-const rootFolderEntry = computed(() => ({ ...folderEntries.value.all, name: props.rootLabel || folderEntries.value.all.name }))
+const rootFolderEntry = computed(() => {
+  const entry = getFolderEntry(props.source, 'all', t)
+  return {
+    id: entry.id,
+    get name() {
+      return props.rootLabel || entry.name
+    },
+  }
+})
+const sharedFolderEntry = computed(() => getFolderEntry(props.source, 'shared', t))
 
 interface SelectableFolderItem extends Omit<FolderItem, 'children'> {
   children?: SelectableFolderItem[]
@@ -91,12 +102,12 @@ const workspaceId = getWorkspaceId()
 const CUSTOM_FOLDER_SORT = `${user.userInfo?.id}-${workspaceId}-${props.source}-folder-custom-sort`
 const FOLDER_SORT_TYPE = `${user.userInfo?.id}-${workspaceId}-${props.source}-folder-sort-type`
 
-const sortOptions: { label: string; value: FolderSort; divided?: boolean }[] = [
-  { label: '按创建时间升序', value: FOLDER_SORT.CREATE_TIME_ASC },
-  { label: '按创建时间降序', value: FOLDER_SORT.CREATE_TIME_DESC },
-  { label: '按名称升序', value: FOLDER_SORT.NAME_ASC, divided: true },
-  { label: '按名称降序', value: FOLDER_SORT.NAME_DESC },
-  { label: '按拖拽排序', value: FOLDER_SORT.CUSTOM, divided: true },
+const sortOptions: { labelKey: string; value: FolderSort; divided?: boolean }[] = [
+  { labelKey: 'folder.sort.createdAtAsc', value: FOLDER_SORT.CREATE_TIME_ASC },
+  { labelKey: 'folder.sort.createdAtDesc', value: FOLDER_SORT.CREATE_TIME_DESC },
+  { labelKey: 'folder.sort.nameAsc', value: FOLDER_SORT.NAME_ASC, divided: true },
+  { labelKey: 'folder.sort.nameDesc', value: FOLDER_SORT.NAME_DESC },
+  { labelKey: 'folder.sort.custom', value: FOLDER_SORT.CUSTOM, divided: true },
 ]
 
 const currentSort = ref<FolderSort>(FOLDER_SORT.CREATE_TIME_DESC)
@@ -208,7 +219,7 @@ function handleFolderDrop(draggingFolder: FolderItem, targetFolder: FolderItem, 
   loading.value = true
   return FolderApi.putFolder(draggingFolder.id, props.source, { parent_id: targetParentId })
     .then(() => {
-      MsgSuccess('移动成功')
+      MsgSuccess(t('common.messages.moveSuccess'))
       return loadFolders()
     })
     .catch(() => loadFolders())
@@ -219,20 +230,20 @@ function handleFolderDrop(draggingFolder: FolderItem, targetFolder: FolderItem, 
 
 /* 文件夹表单 */
 const folderFormDialogRef = useTemplateRef<InstanceType<typeof FolderFormDialog>>('folderFormDialogRef')
-const formTitle = ref('')
+const formTitleKey = ref('folder.actions.create')
 
 function handleOpenCreateFolder() {
-  formTitle.value = '创建文件夹'
-  folderFormDialogRef.value?.open(workspaceId ?? folderEntries.value.all.id)
+  formTitleKey.value = 'folder.actions.create'
+  folderFormDialogRef.value?.open(workspaceId ?? rootFolderEntry.value.id)
 }
 
 function handleOpenCreateChildFolder(folder: FolderItem) {
-  formTitle.value = '创建子文件夹'
+  formTitleKey.value = 'folder.actions.createChild'
   folderFormDialogRef.value?.open(folder.id)
 }
 
 function handleOpenEditFolder(folder: FolderItem) {
-  formTitle.value = '编辑文件夹'
+  formTitleKey.value = 'folder.actions.edit'
   folderFormDialogRef.value?.open(folder.id, folder)
 }
 
@@ -257,13 +268,16 @@ function handleFolderRefresh(folder: FolderItem, isEdit: boolean) {
 /* 删除文件夹：当前选择不受影响时只刷新树。 */
 
 function handleDeleteFolder(folder: FolderItem) {
-  MsgConfirm(`确认删除文件夹：${folder.name}？`, '文件夹下的资源会被删除，请谨慎操作。')
+  MsgConfirm(t('folder.delete.title', { name: folder.name }), t('folder.delete.description'), {
+    cancelButtonText: t('common.actions.cancel'),
+    confirmButtonText: t('common.actions.delete'),
+  })
     .then(() => {
       loading.value = true
       const { positionCache, targetFolder } = getFolderDeleteContext(folder)
       return FolderApi.deleteFolder(folder.id, props.source).then(() => {
         writeCustomPositions(positionCache)
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
 
         // 树重建前先更新激活 ID，让 statHandler 展开目标文件夹的祖先链。
         if (targetFolder) currentNodeKey.value = targetFolder.id
@@ -291,7 +305,7 @@ function findFolderById(folders: FolderItem[], folderId: string): FolderItem | u
 
 function resolveCurrentFolder() {
   if (currentNodeKey.value === FOLDER_ENTRY_ID.ALL && props.showAll) return rootFolderEntry.value
-  if (currentNodeKey.value === FOLDER_ENTRY_ID.SHARED && props.showShared) return folderEntries.value.shared
+  if (currentNodeKey.value === FOLDER_ENTRY_ID.SHARED && props.showShared) return sharedFolderEntry.value
 
   return findFolderById(folderTreeData.value, currentNodeKey.value) ?? (props.showAll ? rootFolderEntry.value : sortTreeData.value[0])
 }
@@ -313,7 +327,7 @@ function getFolderDeleteContext(folder: FolderItem) {
 
   if (!findFolderById([deletedFolder], currentNodeKey.value)) return { positionCache }
   if (parentId !== FOLDER_ENTRY_ID.ALL) {
-    const targetFolder = findFolderById(folderTreeData.value, parentId) ?? folderEntries.value.all
+    const targetFolder = findFolderById(folderTreeData.value, parentId) ?? rootFolderEntry.value
     return { positionCache, targetFolder }
   }
 
@@ -321,7 +335,7 @@ function getFolderDeleteContext(folder: FolderItem) {
   const siblingFolders = sortTreeData.value
   const folderIndex = siblingFolders.findIndex(({ id }) => id === deletedFolder.id)
   const targetFolder =
-    folderIndex < 0 ? folderEntries.value.all : (siblingFolders[folderIndex + 1] ?? siblingFolders[folderIndex - 1] ?? folderEntries.value.all)
+    folderIndex < 0 ? rootFolderEntry.value : (siblingFolders[folderIndex + 1] ?? siblingFolders[folderIndex - 1] ?? rootFolderEntry.value)
   return { positionCache, targetFolder }
 }
 
@@ -341,7 +355,7 @@ function handleMoveFolder(targetFolderId: string) {
   moveSubmitting.value = true
   return FolderApi.putFolder(folder.id, props.source, { parent_id: targetFolderId })
     .then((updatedFolder) => {
-      MsgSuccess('移动成功')
+      MsgSuccess(t('common.messages.moveSuccess'))
       moveToDialogRef.value?.close()
       movingFolder.value = undefined
       return loadFolders().then(() => {
@@ -373,7 +387,7 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
 <template>
   <div v-loading="loading" class="flex-column min-h-0 flex-1">
     <div class="flex-align-center shrink-0 gap-2 px-4 pb-2">
-      <MkSearchInput v-model="searchKeyword" class="min-w-0 flex-1" />
+      <MkSearchInput v-model="searchKeyword" :placeholder="t('common.placeholders.search')" class="min-w-0 flex-1" />
       <MkDropdown trigger="click" placement="bottom-end">
         <!-- 选择文件夹排序方式 -->
         <el-button plain class="shrink-0 min-w-8! w-8!">
@@ -389,7 +403,7 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
               @click="handleSortSelect(option.value)"
               :divided="option.divided"
             >
-              {{ option.label }}
+              {{ t(option.labelKey) }}
             </MkDropdownItem>
           </MkDropdownMenu>
         </template>
@@ -398,9 +412,9 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
 
     <div v-if="showShared || showAll" class="px-4 mb-1">
       <div v-if="showShared">
-        <MkListItem :active="currentNodeKey === folderEntries.shared.id" @click="handleFolderClick(folderEntries.shared)">
-          <MkIcon :name="currentNodeKey === folderEntries.shared.id ? 'icon_folder-share_filled' : 'icon_folder_outlined'" :size="18" class="mr-2" />
-          <span>{{ folderEntries.shared.name }}</span>
+        <MkListItem :active="currentNodeKey === sharedFolderEntry.id" @click="handleFolderClick(sharedFolderEntry)">
+          <MkIcon :name="currentNodeKey === sharedFolderEntry.id ? 'icon_folder-share_filled' : 'icon_folder_outlined'" :size="18" class="mr-2" />
+          <span>{{ sharedFolderEntry.name }}</span>
         </MkListItem>
 
         <el-divider class="my-1!" />
@@ -432,29 +446,29 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
         <template v-if="canEdit" #action-dropdown="{ row }">
           <MkDropdownItem v-if="folderPermission.folderCreate(row.id)" @click="handleOpenCreateChildFolder(row)">
             <template #icon><MkIcon name="icon_add-folder_outlined" /></template>
-            <span>创建子文件夹</span>
+            <span>{{ t('folder.actions.createChild') }}</span>
           </MkDropdownItem>
           <MkDropdownItem v-if="folderPermission.folderEdit(row.id)" @click="handleOpenEditFolder(row)">
             <template #icon><MkIcon name="icon_edit_outlined" /></template>
-            <span>编辑</span>
+            <span>{{ t('common.actions.edit') }}</span>
           </MkDropdownItem>
           <MkDropdownItem v-if="folderPermission.folderEdit(row.id)" @click="handleOpenMoveFolder(row)">
             <template #icon><MkIcon name="icon_move2_outlined" /></template>
-            <span>移动到</span>
+            <span>{{ t('folder.actions.moveTo') }}</span>
           </MkDropdownItem>
           <MkDropdownItem v-if="folderPermission.folderAuth(row.id)" @click="handleOpenResourceAuthorization(row)">
             <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
-            <span>资源授权</span>
+            <span>{{ t('resource.authorization.title') }}</span>
           </MkDropdownItem>
           <MkDropdownItem v-if="folderPermission.folderDelete(row.id)" divided @click="handleDeleteFolder(row)">
             <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-            <span>删除</span>
+            <span>{{ t('common.actions.delete') }}</span>
           </MkDropdownItem>
         </template>
       </VirtualizedTree>
     </div>
 
-    <FolderFormDialog ref="folderFormDialogRef" :title="formTitle" :source="props.source" @refresh="handleFolderRefresh" />
+    <FolderFormDialog ref="folderFormDialogRef" :title="t(formTitleKey)" :source="props.source" @refresh="handleFolderRefresh" />
     <MoveToDialog v-if="canEdit" ref="moveToDialogRef" :loading="moveSubmitting" :source="props.source" @submit="handleMoveFolder" />
     <ResourceAuthorizationDrawer
       v-if="canEdit"

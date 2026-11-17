@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { nextTick, ref, useTemplateRef } from 'vue'
-import { computed } from 'vue'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
@@ -14,6 +14,7 @@ import ToolFormDrawer from '@/views/tool/tool-form/tool-custom/ToolFormDrawer.vu
 import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 import perm from '@/permission/index.ts'
 
+const { t } = useI18n({ useScope: 'global' })
 const canEdit = computed(() => {
   const id = tool.value?.id
   if (!id) return false
@@ -65,7 +66,7 @@ defineExpose({ open })
     <DataSourceFormDrawer
       v-if="tool.tool_type === TOOL_TYPE.DATA_SOURCE"
       ref="dataSourceFormDrawerRef"
-      title="编辑数据源"
+      :title="t('tool.dataSource.editTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -74,7 +75,7 @@ defineExpose({ open })
     <McpFormDrawer
       v-else-if="tool.tool_type === TOOL_TYPE.MCP"
       ref="mcpFormDrawerRef"
-      title="编辑 MCP"
+      :title="t('tool.mcp.editTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -83,7 +84,7 @@ defineExpose({ open })
     <SkillToolFormDrawer
       v-else-if="tool.tool_type === TOOL_TYPE.SKILL"
       ref="skillToolFormDrawerRef"
-      title="编辑 Skill"
+      :title="t('tool.skill.editTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -92,7 +93,7 @@ defineExpose({ open })
     <WorkflowFormDialog
       v-else-if="tool.tool_type === TOOL_TYPE.WORKFLOW"
       ref="workflowFormDialogRef"
-      title="编辑工作流"
+      :title="t('tool.workflow.editTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -101,7 +102,7 @@ defineExpose({ open })
     <ToolFormDrawer
       v-else
       ref="toolFormDrawerRef"
-      title="编辑工具"
+      :title="t('tool.editTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"

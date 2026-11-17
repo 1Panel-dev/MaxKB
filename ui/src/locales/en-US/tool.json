@@ -1,21 +1,131 @@
 {
   "title": "Tools",
+  "createTitle": "Create tool",
+  "editTitle": "Edit tool",
+  "duplicateTitle": "Duplicate tool",
   "categories": {
     "all": "All tools",
     "shared": "Shared tools"
   },
-  "types": {
-    "custom": "Tool",
-    "skill": "Skills",
-    "workflow": "Workflow",
-    "mcp": "MCP",
-    "dataSource": "Data source"
+  "fields": {
+    "name": {
+      "placeholder": "Enter a tool name",
+      "requiredMessage": "Enter a tool name"
+    },
+    "code": {
+      "requiredMessage": "Enter the Python code for this tool"
+    }
+  },
+  "skill": {
+    "label": "Skills",
+    "createTitle": "Create skill",
+    "editTitle": "Edit skill",
+    "duplicateTitle": "Duplicate skill",
+    "name": {
+      "placeholder": "Enter a skill name",
+      "requiredMessage": "Enter a skill name"
+    },
+    "file": {
+      "label": "Skill file",
+      "description": "Upload a ZIP file smaller than {size} MB.",
+      "requiredMessage": "Upload a skill ZIP file",
+      "sizeLimitMessage": "The file must be smaller than {size} MB."
+    }
+  },
+  "workflow": {
+    "label": "Workflow",
+    "createTitle": "Create workflow",
+    "editTitle": "Edit workflow",
+    "duplicateTitle": "Duplicate workflow",
+    "name": {
+      "placeholder": "Enter a workflow name",
+      "requiredMessage": "Enter a workflow name"
+    }
+  },
+  "mcp": {
+    "label": "MCP",
+    "createTitle": "Create MCP tool",
+    "editTitle": "Edit MCP tool",
+    "duplicateTitle": "Duplicate MCP tool",
+    "serviceTitle": "MCP server",
+    "name": {
+      "placeholder": "Enter an MCP tool name",
+      "requiredMessage": "Enter an MCP tool name"
+    },
+    "config": {
+      "description": "(Only SSE and Streamable HTTP are supported)",
+      "requiredMessage": "Enter the MCP server configuration",
+      "invalidMessage": "Enter the MCP server configuration as a valid JSON object."
+    }
+  },
+  "dataSource": {
+    "label": "Data source",
+    "createTitle": "Create data source",
+    "editTitle": "Edit data source",
+    "duplicateTitle": "Duplicate data source",
+    "name": {
+      "placeholder": "Enter a data source name",
+      "requiredMessage": "Enter a data source name"
+    },
+    "code": {
+      "requiredMessage": "Enter the Python code for this data source"
+    }
   },
   "store": {
-    "title": "Tool store"
+    "title": "Tool store",
+    "categories": {
+      "webSearch": "Web search",
+      "databaseSearch": "Database queries",
+      "other": "Other"
+    },
+    "searchResults": "{count} matching tool | {count} matching tools",
+    "apply": "Use tool",
+    "addTitle": "Add tool",
+    "noDetails": "No details available"
+  },
+  "parameters": {
+    "shownWhenUsed": "Shown when using the tool"
   },
   "initParams": {
     "title": "Startup parameters"
+  },
+  "inputParams": {
+    "title": "Input parameters",
+    "name": {
+      "label": "Parameter name",
+      "placeholder": "Enter a parameter name",
+      "requiredMessage": "Enter a parameter name"
+    },
+    "dataType": {
+      "label": "Data type"
+    },
+    "source": {
+      "label": "Source",
+      "reference": "Parameter reference",
+      "custom": "Custom"
+    }
+  },
+  "outputParams": {
+    "title": "Output parameters",
+    "result": "Result {variable}"
+  },
+  "pythonCode": {
+    "title": "Tool code (Python)",
+    "description": "Hidden when using the tool",
+    "generate": {
+      "title": "Generate Python code",
+      "placeholder": "Describe what the tool should do",
+      "empty": "Generated Python code will appear here"
+    }
+  },
+  "debug": {
+    "title": "Debug",
+    "run": "Run",
+    "resultTitle": "Run result",
+    "runSuccess": "Run succeeded",
+    "runFailed": "Run failed",
+    "output": "Output",
+    "failureMessage": "The tool failed to run."
   },
   "delete": {
     "title": "Delete tool “{name}”?",
@@ -26,7 +136,8 @@
     "description": "Resources that use this tool will fail when they run."
   },
   "messages": {
-    "publishBeforeEnabling": "Publish the workflow before enabling this tool."
+    "publishBeforeEnabling": "Publish the workflow before enabling this tool.",
+    "createUnsupported": "Tools cannot be created in resource management."
   },
   "updateVersion": {
     "action": "Update version",
