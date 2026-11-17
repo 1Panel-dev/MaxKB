@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ToolItem, ToolStoreItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { TOOL_TYPE } from '@/api/enums'
@@ -14,6 +15,7 @@ import { isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'StoreToolFormDialog' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = withDefaults(
   defineProps<{
     folderId: string
@@ -34,7 +36,9 @@ const visible = ref(false)
 const loading = ref(false)
 const currentTool = ref<ToolStoreItem>()
 const storeToolForm = reactive<StoreToolForm>({ name: '' })
-const formRules: FormRules<StoreToolForm> = { name: [{ whitespace: true, required: true, message: '请输入工具名称', trigger: 'blur' }] }
+const formRules = computed<FormRules<StoreToolForm>>(() => ({
+  name: [{ whitespace: true, required: true, message: t('tool.fields.name.requiredMessage'), trigger: 'blur' }],
+}))
 
 function handleSubmit() {
   formRef.value?.validate((valid) => {
@@ -68,7 +72,7 @@ function handleSubmit() {
         await auth.loadAuthBaseProfile()
       })
       .then(() => {
-        MsgSuccess('添加成功')
+        MsgSuccess(t('common.messages.addSuccess'))
         visible.value = false
         emit('refresh')
       })
@@ -88,13 +92,21 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="添加工具" @closed="emit('closed')">
-    <el-form ref="formRef" :model="storeToolForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="名称" prop="name">
+  <MkDialog v-model="visible" :title="t('tool.store.addTitle')" @closed="emit('closed')">
+    <el-form
+      ref="formRef"
+      :model="storeToolForm"
+      :rules="formRules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('common.name.label')" prop="name">
         <el-input
           v-model="storeToolForm.name"
           maxlength="64"
-          placeholder="请输入工具名称"
+          :placeholder="t('tool.fields.name.placeholder')"
           show-word-limit
           @blur="storeToolForm.name = storeToolForm.name.trim()"
         />
@@ -102,8 +114,8 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button :disabled="loading" plain @click="visible = false">取消</el-button>
-      <el-button type="primary" :loading="loading" @click="handleSubmit">添加</el-button>
+      <el-button :disabled="loading" plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.add') }}</el-button>
     </template>
   </MkDialog>
 </template>

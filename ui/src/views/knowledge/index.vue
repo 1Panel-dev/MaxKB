@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { Dict, FolderItem, KnowledgeItem, OptionItem } from '@/api/types'
 import { KNOWLEDGE_TYPE, RESOURCE_TYPE } from '@/api/enums'
 import CommonSystemApi from '@/api/admin/system/common'
@@ -25,10 +26,12 @@ import {
   RelatedResourcesKnowledgeAction,
   SyncKnowledgeAction,
 } from './knowledge-card/action-dropdown'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
+import { FOLDER_ENTRY_ID, getFolderEntry } from '@/constants/folder'
 import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { perm } from '@/permission'
+
+const { t } = useI18n({ useScope: 'global' })
 
 /* 知识库详情入口 */
 const route = useRoute()
@@ -49,9 +52,9 @@ function handleOpenKnowledgeSetting(knowledge: KnowledgeItem) {
 }
 
 /* 当前文件夹 */
-const allKnowledgeFolder = FOLDER_ENTRIES[RESOURCE_TYPE.KNOWLEDGE].all
+const allKnowledgeFolder = computed(() => getFolderEntry(RESOURCE_TYPE.KNOWLEDGE, 'all', t))
 const currentFolderId = ref<string>(FOLDER_ENTRY_ID.ALL)
-const currentFolder = ref<FolderItem>({ ...allKnowledgeFolder })
+const currentFolder = ref<FolderItem>(allKnowledgeFolder.value)
 const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARED)
 
 function handleFolderSelect(folder: FolderItem) {
@@ -65,7 +68,7 @@ function handleFolderSelect(folder: FolderItem) {
 }
 
 function handleFolderLoaded(folder?: FolderItem) {
-  handleFolderSelect(folder ?? allKnowledgeFolder)
+  handleFolderSelect(folder ?? allKnowledgeFolder.value)
 }
 
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
@@ -207,7 +210,7 @@ function handleBatchDelete() {
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <MkTooltip v-if="perm.knowledge.workspace.folderCreateWorkspace()" content="创建文件夹" placement="top">
+        <MkTooltip v-if="perm.knowledge.workspace.folderCreateWorkspace()" :content="t('folder.actions.create')" placement="top">
           <el-button text type="primary" class="-mr-1" @click="handleCreateFolder">
             <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>
@@ -304,7 +307,7 @@ function handleBatchDelete() {
                   <MoveKnowledgeAction
                     v-if="perm.knowledge.workspace.move(knowledge.id)"
                     v-model:loading="knowledgeOperationLoading"
-                    label="移动到"
+                    :label="t('folder.actions.moveTo')"
                     :api="KnowledgeApi"
                     :knowledge="knowledge"
                     :current-folder-id="currentFolder.id"
@@ -341,7 +344,7 @@ function handleBatchDelete() {
       >
         <template #footer-batch-actions>
           <el-button type="primary" v-if="perm.knowledge.workspace.batchMove()" plain :disabled="knowledgeOperationLoading || !selectedKnowledgeCount" @click="handleOpenBatchMove">
-            移动到
+            {{ t('folder.actions.moveTo') }}
           </el-button>
           <el-button type="danger" v-if="perm.knowledge.workspace.batchDelete()" plain :disabled="knowledgeOperationLoading || !selectedKnowledgeCount" @click="handleBatchDelete">删除</el-button>
         </template>

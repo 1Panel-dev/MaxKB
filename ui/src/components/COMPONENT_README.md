@@ -839,6 +839,10 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 新 ID 写入路由，但会清除已有的 `folderId`，避免刷新页面后恢复到旧文件夹。隐藏“全部”入口的
 移动目录树继续以调用方传入的 `v-model` 为准。
 
+文件夹操作和排序使用 folder 语言包，名称与描述的表单提示复用 common.name 和 common.description，分类归属见 [国际化规则](../locales/LOCALE_README.md#文件夹)。
+内置入口通过 `loaded` 和 `select` 返回的 FolderItem 在读取 `name` 时使用当前语言；
+调用方保留该对象即可同步目录标题。自定义 `rootLabel` 和接口返回的文件夹名称原样展示。
+
 可编辑文件夹的菜单提供“资源授权”，根据对应资源模块的 `folderAuth(folder.id)` 控制入口。
 点击后复用 `ResourceAuthorizationDrawer`，传入当前 `source`，通过 `workspaceId` Prop 传入文件夹的 `workspace_id`，调用 `open(folder.id, folder)` 传入
 原始完整文件夹子树；搜索过滤不缩减子资源授权范围。只读选择场景不挂载授权抽屉。

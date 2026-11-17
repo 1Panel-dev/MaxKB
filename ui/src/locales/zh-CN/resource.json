@@ -8,9 +8,6 @@
   "workspaceAuthorization": {
     "title": "授权工作空间"
   },
-  "folder": {
-    "create": "创建文件夹"
-  },
   "states": {
     "shared": "共享"
   },

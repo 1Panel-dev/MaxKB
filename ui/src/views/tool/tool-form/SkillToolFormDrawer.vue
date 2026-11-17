@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reactive, ref, useTemplateRef } from 'vue'
+import { computed, reactive, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
@@ -16,6 +17,7 @@ import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'SkillToolFormDrawer' })
 
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 
 const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; folderId: string; title: string }>()
@@ -40,10 +42,10 @@ const formLoading = ref(false)
 const editId = ref<string>()
 const originalForm = ref('')
 const skillForm = reactive<SkillFormModel>({ code: '', desc: '', fileList: [], icon: '', init_field_list: [], name: '' })
-const formRules: FormRules<SkillFormModel> = {
-  fileList: [{ required: true, message: '请上传 Skill ZIP 文件', trigger: 'change' }],
-  name: [{ whitespace: true, required: true, message: '请输入 Skill 名称', trigger: 'blur' }],
-}
+const formRules = computed<FormRules<SkillFormModel>>(() => ({
+  fileList: [{ required: true, message: t('tool.skill.file.requiredMessage'), trigger: 'change' }],
+  name: [{ whitespace: true, required: true, message: t('tool.skill.name.requiredMessage'), trigger: 'blur' }],
+}))
 
 // 暂存确认后的头像文件，恢复默认时清空。
 const iconFile = ref<File | null>(null)
@@ -59,12 +61,12 @@ function removeUploadFile(file: UploadFile, fileList: UploadFiles) {
 function handleFileChange(file: UploadFile, fileList: UploadFiles) {
   if (!file.raw) return
   if (!file.size) {
-    MsgError('不能上传空文件')
+    MsgError(t('common.upload.emptyFileMessage'))
     removeUploadFile(file, fileList)
     return
   }
   if (file.size / 1024 / 1024 >= maxFileSizeMb) {
-    MsgError(`文件大小不能超过 ${maxFileSizeMb} MB`)
+    MsgError(t('tool.skill.file.sizeLimitMessage', { size: maxFileSizeMb }))
     removeUploadFile(file, fileList)
     return
   }
@@ -129,12 +131,12 @@ function handleSubmit() {
           ? props.api.putTool(currentEditId, payload)
           : 'postTool' in props.api
             ? props.api.postTool({ ...payload, folder_id: props.folderId || null })
-            : Promise.reject(new Error('资源管理不支持创建工具'))
+            : Promise.reject(new Error(t('tool.messages.createUnsupported')))
 
         return request.then((savedTool) => {
           const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
           return refreshCurrentUser.then(() => {
-            MsgSuccess(isEdit ? '保存成功' : '创建成功')
+            MsgSuccess(isEdit ? t('common.messages.saveSuccess') : t('common.messages.createSuccess'))
             visible.value = false
             if (isEdit) emit('update', savedTool)
             else emit('refresh')
@@ -189,7 +191,10 @@ function handleBeforeClose() {
     visible.value = false
     return
   }
-  MsgConfirm('提示', '当前的更改尚未保存，确认退出吗？', { confirmButtonText: '确认', confirmButtonType: 'primary' })
+  MsgConfirm(t('common.dialogs.notice'), t('common.dialogs.unsavedChanges'), {
+    confirmButtonText: t('common.actions.confirm'),
+    confirmButtonType: 'primary',
+  })
     .then(() => {
       visible.value = false
     })
@@ -222,12 +227,13 @@ defineExpose({ open })
       v-loading="formLoading || loading"
       :model="skillForm"
       :rules="formRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <h4 class="mk-title-decoration mb-4">基本信息</h4>
-      <el-form-item class="mk-form-item-with-avatar" label="名称" prop="name">
+      <h4 class="mk-title-decoration mb-4">{{ t('common.labels.basicInfo') }}</h4>
+      <el-form-item class="mk-form-item-with-avatar" :label="t('common.name.label')" prop="name">
         <div class="flex-align-center w-full gap-3">
           <!-- 设置工具头像 -->
           <MkEditAvatar v-model="skillForm.icon" @change="handleIconChange">
@@ -238,18 +244,18 @@ defineExpose({ open })
           <el-input
             v-model="skillForm.name"
             maxlength="64"
-            placeholder="请输入 Skill 名称"
+            :placeholder="t('tool.skill.name.placeholder')"
             show-word-limit
             @blur="skillForm.name = skillForm.name.trim()"
           />
         </div>
       </el-form-item>
-      <el-form-item label="描述">
+      <el-form-item :label="t('common.description.label')">
         <el-input
           v-model="skillForm.desc"
           :autosize="{ minRows: 3 }"
           maxlength="128"
-          placeholder="请输入"
+          :placeholder="t('common.placeholders.input')"
           show-word-limit
           type="textarea"
           @blur="skillForm.desc = skillForm.desc.trim()"
@@ -259,18 +265,22 @@ defineExpose({ open })
       <InitFieldTable v-model="skillForm.init_field_list" class="mb-6" />
 
       <section>
-        <h4 class="mk-title-decoration mk-required mb-4">Skill 文件</h4>
+        <h4 class="mk-title-decoration mk-required mb-4">{{ t('tool.skill.file.label') }}</h4>
         <el-form-item prop="fileList">
           <MkDragUpload
             ref="uploadRef"
             v-model="skillForm.fileList"
             accept=".zip"
-            :tip-text="`支持格式：ZIP，大小不超过 ${maxFileSizeMb} MB`"
+            :drag-text="t('common.upload.dropHint')"
+            :select-text="t('common.upload.selectFile')"
+            :replace-text="t('common.upload.replaceFile')"
+            :tip-text="t('tool.skill.file.description', { size: maxFileSizeMb })"
             @change="handleFileChange"
             @remove="handleRemoveFile"
           >
             <template #download>
-              <el-button v-if="editId" :disabled="loading" link @click="handleDownload">
+              <!-- 下载 Skill 文件 -->
+              <el-button v-if="editId" :disabled="loading" text @click="handleDownload">
                 <MkIcon name="icon_download_outlined" class="text-N600" />
               </el-button>
             </template>
@@ -280,9 +290,11 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose">取消</el-button>
+      <!-- 取消编辑 -->
+      <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存或创建 Skill -->
       <el-button type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
-        {{ editId ? '保存' : '创建' }}
+        {{ editId ? t('common.actions.save') : t('common.actions.create') }}
       </el-button>
     </template>
   </MkDrawer>

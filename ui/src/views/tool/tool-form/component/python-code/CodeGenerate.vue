@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, provide, ref } from 'vue'
 import { cloneDeep, groupBy } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type {
   DynamicFormField,
   ModelItem,
@@ -24,6 +25,8 @@ import { MsgSuccess } from '@/utils/message'
 import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'ToolCodeGenerate' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(
   defineProps<{
@@ -150,7 +153,7 @@ function handleReplaceCode(value: string, replaceCode?: (value: string) => void)
   } else {
     code.value = nextCode
   }
-  MsgSuccess('替换成功')
+  MsgSuccess(t('common.messages.replaceSuccess'))
 }
 </script>
 
@@ -158,15 +161,15 @@ function handleReplaceCode(value: string, replaceCode?: (value: string) => void)
   <section>
     <div class="mb-4 flex-between">
       <div class="flex-align-center gap-2">
-        <h4 class="mk-title-decoration mk-required">工具内容（Python）</h4>
-        <span class="text-N600">使用工具时不显示</span>
+        <h4 class="mk-title-decoration mk-required">{{ t('tool.pythonCode.title') }}</h4>
+        <span class="text-N600">{{ t('tool.pythonCode.description') }}</span>
       </div>
       <!-- 生成工具代码 -->
       <GenerateContent
         v-if="showGenerate && props.toolForm"
-        title="生成 Python 代码"
-        placeholder="请描述这个工具的功能"
-        empty-text="Python 代码显示在这里"
+        :title="t('tool.pythonCode.generate.title')"
+        :placeholder="t('tool.pythonCode.generate.placeholder')"
+        :empty-text="t('tool.pythonCode.generate.empty')"
         :generate-disabled="generateDisabled"
         v-model:model-id="activeModelId"
         v-model:model-params="modelParams"
@@ -184,13 +187,13 @@ function handleReplaceCode(value: string, replaceCode?: (value: string) => void)
     </div>
 
     <el-form-item prop="code">
-      <PythonCodeEditor v-model="code" title="工具内容（Python）">
+      <PythonCodeEditor v-model="code" :title="t('tool.pythonCode.title')">
         <template v-if="showGenerate && props.toolForm" #header-extra="{ replaceCode }">
           <!-- 在放大的编辑器中生成工具代码 -->
           <GenerateContent
-            title="生成 Python 代码"
-            placeholder="请描述这个工具的功能"
-            empty-text="Python 代码显示在这里"
+            :title="t('tool.pythonCode.generate.title')"
+            :placeholder="t('tool.pythonCode.generate.placeholder')"
+            :empty-text="t('tool.pythonCode.generate.empty')"
             :generate-disabled="generateDisabled"
             v-model:model-id="activeModelId"
             v-model:model-params="modelParams"

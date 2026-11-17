@@ -1,13 +1,38 @@
 {
   "labels": {
-    "name": "名稱",
     "creator": "建立者",
     "operation": "操作",
     "createdOn": "建立於",
     "createdAt": "建立時間",
     "updatedAt": "更新時間",
     "all": "全部",
-    "status": "狀態"
+    "details": "詳情",
+    "basicInfo": "基本資訊"
+  },
+  "name": {
+    "label": "名稱",
+    "placeholder": "請輸入名稱",
+    "requiredMessage": "請輸入名稱",
+    "copyTemplate": "{name} 副本"
+  },
+  "description": {
+    "label": "描述",
+    "placeholder": "請輸入描述"
+  },
+  "status": {
+    "label": "狀態",
+    "enabled": "已啟用",
+    "disabled": "已停用"
+  },
+  "parameters": {
+    "add": "新增參數",
+    "edit": "編輯參數"
+  },
+  "upload": {
+    "dropHint": "將檔案拖曳到此處。",
+    "selectFile": "選擇檔案上傳",
+    "replaceFile": "更換檔案",
+    "emptyFileMessage": "無法上傳空檔案"
   },
   "actions": {
     "edit": "編輯",
@@ -21,22 +46,24 @@
     "createFromImport": "匯入建立",
     "duplicate": "複製",
     "export": "匯出",
-    "moveTo": "移動到",
     "batchSelect": "批次選取",
     "cancelSelection": "取消選取",
     "disable": "停用",
     "saveAndEnable": "儲存並啟用",
-    "confirm": "確認"
+    "confirm": "確認",
+    "testConnection": "測試連線"
   },
   "dialogs": {
     "notice": "提示",
-    "deleteWarning": "刪除後無法復原，請謹慎操作。"
+    "deleteWarning": "刪除後無法復原，請謹慎操作。",
+    "unsavedChanges": "目前的變更尚未儲存，確定要離開嗎？"
   },
   "messages": {
     "saveSuccess": "儲存成功",
     "deleteSuccess": "刪除成功",
     "deleteFailed": "刪除失敗",
     "createSuccess": "建立成功",
+    "addSuccess": "新增成功",
     "fetchSuccess": "取得成功",
     "updateSuccess": "修改成功",
     "moveSuccess": "移動成功",
@@ -44,11 +71,15 @@
     "enableSuccess": "啟用成功",
     "disableSuccess": "停用成功",
     "exportFailed": "匯出失敗：{reason}",
-    "copied": "已複製"
+    "copied": "已複製",
+    "connectionSuccess": "連線成功",
+    "replaceSuccess": "取代成功"
   },
   "placeholders": {
     "input": "請輸入",
-    "select": "請選擇"
+    "inputField": "請輸入 {label}",
+    "select": "請選擇",
+    "search": "搜尋"
   },
   "validation": {
     "inputRequired": "請輸入",
@@ -59,9 +90,5 @@
   "empty": {
     "default": "暫無資料",
     "search": "沒有找到相關內容"
-  },
-  "states": {
-    "enabled": "已啟用",
-    "disabled": "已停用"
   }
 }

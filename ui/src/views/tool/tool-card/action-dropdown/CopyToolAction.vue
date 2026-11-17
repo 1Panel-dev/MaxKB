@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ToolItem } from '@/api/types'
@@ -13,6 +14,7 @@ import ToolFormDrawer from '@/views/tool/tool-form/tool-custom/ToolFormDrawer.vu
 
 defineOptions({ name: 'CopyToolAction' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi; label: string; tool: ToolItem }>()
 
 const loading = defineModel<boolean>('loading', { default: false })
@@ -32,7 +34,7 @@ function handleCopyTool() {
     .getToolDetail(props.tool.id)
     .then((toolDetail) => {
       const copiedTool = cloneDeep(toolDetail)
-      copiedTool.name = `${copiedTool.name}  副本`
+      copiedTool.name = t('common.name.copyTemplate', { name: copiedTool.name })
       formMounted.value = true
 
       return nextTick(() => {
@@ -70,7 +72,7 @@ function handleFormClosed() {
     <ToolFormDrawer
       v-if="tool.tool_type === TOOL_TYPE.CUSTOM"
       ref="toolFormDrawerRef"
-      title="复制工具"
+      :title="t('tool.duplicateTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -79,7 +81,7 @@ function handleFormClosed() {
     <DataSourceFormDrawer
       v-else-if="tool.tool_type === TOOL_TYPE.DATA_SOURCE"
       ref="dataSourceFormDrawerRef"
-      title="复制数据源"
+      :title="t('tool.dataSource.duplicateTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -88,7 +90,7 @@ function handleFormClosed() {
     <McpFormDrawer
       v-else-if="tool.tool_type === TOOL_TYPE.MCP"
       ref="mcpFormDrawerRef"
-      title="复制 MCP"
+      :title="t('tool.mcp.duplicateTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -97,7 +99,7 @@ function handleFormClosed() {
     <SkillToolFormDrawer
       v-else-if="tool.tool_type === TOOL_TYPE.SKILL"
       ref="skillToolFormDrawerRef"
-      title="复制 Skill"
+      :title="t('tool.skill.duplicateTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -106,7 +108,7 @@ function handleFormClosed() {
     <WorkflowFormDialog
       v-else-if="tool.tool_type === TOOL_TYPE.WORKFLOW"
       ref="workflowFormDialogRef"
-      title="复制工作流"
+      :title="t('tool.workflow.duplicateTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"

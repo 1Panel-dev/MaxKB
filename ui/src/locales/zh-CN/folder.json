@@ -1,0 +1,19 @@
+{
+  "actions": {
+    "create": "创建文件夹",
+    "createChild": "创建子文件夹",
+    "edit": "编辑文件夹",
+    "moveTo": "移动到"
+  },
+  "sort": {
+    "createdAtAsc": "按创建时间升序",
+    "createdAtDesc": "按创建时间降序",
+    "nameAsc": "按名称升序",
+    "nameDesc": "按名称降序",
+    "custom": "按拖拽排序"
+  },
+  "delete": {
+    "title": "确认删除文件夹：{name}？",
+    "description": "文件夹下的资源会被删除，请谨慎操作。"
+  }
+}

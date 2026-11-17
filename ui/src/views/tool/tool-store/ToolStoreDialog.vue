@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, shallowRef, useTemplateRef } from 'vue'
+import { I18nT, useI18n } from 'vue-i18n'
 import type { ToolStoreItem, ToolStoreTag, ToolType } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
 import StoreApi from '@/api/admin/store.ts'
@@ -9,6 +10,7 @@ import { FOLDER_ENTRY_ID } from '@/constants/folder'
 
 defineOptions({ name: 'ToolStoreDialog' })
 
+const { t } = useI18n({ useScope: 'global' })
 const emit = defineEmits<{ refresh: [] }>()
 
 interface ToolStoreCategory {
@@ -17,7 +19,6 @@ interface ToolStoreCategory {
   tools: ToolStoreItem[]
 }
 
-const DEFAULT_CATEGORY_TITLES: Record<string, string> = { database_search: '数据库查询', other: '其他', web_search: '联网搜索' }
 const DEFAULT_CATEGORY_IDS = ['web_search', 'database_search']
 const TOOL_STORE_CATEGORY_ANCHOR_PREFIX = '#tool-store-category-'
 
@@ -31,9 +32,16 @@ const storeTools = ref<ToolStoreItem[]>([])
 const storeTags = ref<ToolStoreTag[]>([])
 const hasSearchKeyword = computed(() => Boolean(appliedSearchKeyword.value))
 
-const categoryTitles = computed(() => {
-  return storeTags.value.reduce<Record<string, string>>((titles, tag) => ({ ...titles, [tag.key]: tag.name }), { ...DEFAULT_CATEGORY_TITLES })
-})
+const categoryTitles = computed<Record<string, string>>(() => ({
+  ...Object.fromEntries(storeTags.value.map(({ key, name }) => [key, name])),
+  web_search: t('tool.store.categories.webSearch'),
+  database_search: t('tool.store.categories.databaseSearch'),
+  other: t('tool.store.categories.other'),
+}))
+
+function getCategoryTitle(categoryId: string) {
+  return categoryTitles.value[categoryId] ?? categoryId
+}
 
 const toolStoreCategories = computed<ToolStoreCategory[]>(() => {
   const categoryMap = new Map<string, ToolStoreItem[]>()
@@ -48,7 +56,7 @@ const toolStoreCategories = computed<ToolStoreCategory[]>(() => {
 
   return categoryIds.flatMap((id) => {
     const tools = categoryMap.get(id)
-    return tools?.length ? [{ id, title: categoryTitles.value[id] ?? id, tools }] : []
+    return tools?.length ? [{ id, title: getCategoryTitle(id), tools }] : []
   })
 })
 
@@ -133,11 +141,16 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" class="mk-aside-content-dialog" title="工具商店" width="1200" @closed="handleClosed">
+  <MkDialog v-model="visible" class="mk-aside-content-dialog" :title="t('tool.store.title')" width="1200" @closed="handleClosed">
     <template #header="{ titleId }">
       <div class="relative flex-align-center">
-        <h4 :id="titleId">工具商店</h4>
-        <MkSearchInput v-model="searchKeyword" class="absolute left-1/2 w-80! -translate-x-3/4" placeholder="搜索" @change="loadStoreTools" />
+        <h4 :id="titleId">{{ t('tool.store.title') }}</h4>
+        <MkSearchInput
+          v-model="searchKeyword"
+          class="absolute left-1/2 w-80! -translate-x-3/4"
+          :placeholder="t('common.placeholders.search')"
+          @change="loadStoreTools"
+        />
       </div>
     </template>
 
@@ -166,15 +179,15 @@ defineExpose({ open })
       <div class="pt-4">
         <!-- 搜索之后的 -->
         <template v-if="hasSearchKeyword && !loading">
-          <div class="mb-4 font-semibold">
-            找到
-            <span class="text-primary">{{ storeTools.length }}</span>
-            个相关工具
-          </div>
+          <I18nT keypath="tool.store.searchResults" tag="div" scope="global" :plural="storeTools.length" class="mb-4 font-semibold">
+            <template #count>
+              <span class="text-primary">{{ storeTools.length }}</span>
+            </template>
+          </I18nT>
 
           <div class="mk-resource-card-grid-sm">
             <template v-for="tool in storeTools" :key="tool.id">
-              <ToolStoreCard :category-title="categoryTitles[tool.label || 'other'] ?? tool.label ?? '其他'" :tool="tool" @apply="handleApplyTool" />
+              <ToolStoreCard :category-title="getCategoryTitle(tool.label || 'other')" :tool="tool" @apply="handleApplyTool" />
             </template>
           </div>
           <MkEmpty v-if="!storeTools.length" type="search" />

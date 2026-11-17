@@ -154,27 +154,27 @@ function handleRefresh() {
         <!-- 创建工具 -->
         <MkDropdownItem class="py-2!" @click="handleOpenToolForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.CUSTOM" /></template>
-          <span>{{ t('tool.types.custom') }}</span>
+          <span>{{ t('tool.title') }}</span>
         </MkDropdownItem>
         <!-- 创建工作流工具 -->
         <MkDropdownItem class="py-2!" @click="handleOpenWorkflowForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.WORKFLOW" /></template>
-          <span>{{ t('tool.types.workflow') }}</span>
+          <span>{{ t('tool.workflow.label') }}</span>
         </MkDropdownItem>
         <!-- 创建 Skill -->
         <MkDropdownItem class="py-2!" @click="handleOpenSkillForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.SKILL" /></template>
-          <span>{{ t('tool.types.skill') }}</span>
+          <span>{{ t('tool.skill.label') }}</span>
         </MkDropdownItem>
         <!-- 创建 MCP -->
         <MkDropdownItem class="py-2!" @click="handleOpenMcpForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.MCP" /></template>
-          <span>{{ t('tool.types.mcp') }}</span>
+          <span>{{ t('tool.mcp.label') }}</span>
         </MkDropdownItem>
         <!-- 创建数据源 -->
         <MkDropdownItem class="py-2!" @click="handleOpenDataSourceForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.DATA_SOURCE" /></template>
-          <span>{{ t('tool.types.dataSource') }}</span>
+          <span>{{ t('tool.dataSource.label') }}</span>
         </MkDropdownItem>
         <!-- 导入创建 -->
         <el-upload
@@ -202,7 +202,7 @@ function handleRefresh() {
   <ToolFormDrawer
     v-if="activeFormType === TOOL_TYPE.CUSTOM"
     ref="toolFormDrawerRef"
-    title="创建工具"
+    :title="t('tool.createTitle')"
     :api="api"
     :folder-id="folderId"
     @refresh="handleRefresh"
@@ -211,7 +211,7 @@ function handleRefresh() {
   <WorkflowFormDialog
     v-if="activeFormType === TOOL_TYPE.WORKFLOW"
     ref="workflowFormDialogRef"
-    title="创建工作流"
+    :title="t('tool.workflow.createTitle')"
     :api="api"
     :folder-id="folderId"
     @refresh="handleRefresh"
@@ -220,7 +220,7 @@ function handleRefresh() {
   <SkillToolFormDrawer
     v-if="activeFormType === TOOL_TYPE.SKILL"
     ref="skillToolFormDrawerRef"
-    title="创建 Skill"
+    :title="t('tool.skill.createTitle')"
     :api="api"
     :folder-id="folderId"
     @refresh="handleRefresh"
@@ -229,7 +229,7 @@ function handleRefresh() {
   <McpFormDrawer
     v-if="activeFormType === TOOL_TYPE.MCP"
     ref="mcpFormDrawerRef"
-    title="创建 MCP"
+    :title="t('tool.mcp.createTitle')"
     :api="api"
     :folder-id="folderId"
     @refresh="handleRefresh"
@@ -238,7 +238,7 @@ function handleRefresh() {
   <DataSourceFormDrawer
     v-if="activeFormType === TOOL_TYPE.DATA_SOURCE"
     ref="dataSourceFormDrawerRef"
-    title="创建数据源"
+    :title="t('tool.dataSource.createTitle')"
     :api="api"
     :folder-id="folderId"
     @refresh="handleRefresh"

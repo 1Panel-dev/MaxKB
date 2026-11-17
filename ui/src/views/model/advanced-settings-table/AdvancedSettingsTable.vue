@@ -60,7 +60,7 @@ function handleDeleteParam(index: number) {
 <template>
   <div class="flex-between mb-2">
     <span>{{ t('model.parameters.title') }}</span>
-    <MkTooltip :content="t('model.parameters.add')" placement="top">
+    <MkTooltip :content="t('common.parameters.add')" placement="top">
       <el-button text type="primary" @click.stop="handleOpenParamDialog()">
         <MkIcon name="icon_add_outlined" />
       </el-button>

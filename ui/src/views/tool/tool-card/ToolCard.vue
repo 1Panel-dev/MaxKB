@@ -65,8 +65,8 @@ function handleClick(event: MouseEvent) {
     <template #footer="{ Action, ActionDropdown }">
       <MkStatusLabel
         :active="tool.is_active"
-        :active-text="t('common.states.enabled')"
-        :inactive-text="t('common.states.disabled')"
+        :active-text="t('common.status.enabled')"
+        :inactive-text="t('common.status.disabled')"
         class="text-N600!"
       />
       <component :is="Action" v-if="!disabled">

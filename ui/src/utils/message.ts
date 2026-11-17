@@ -2,6 +2,7 @@
 
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { ElMessageBoxOptions, MessageOptions, MessageType } from 'element-plus'
+import { t } from '@/locales'
 
 type MessageContent = MessageOptions['message']
 type MessageOverrides = Omit<Partial<MessageOptions>, 'message' | 'type'>
@@ -37,8 +38,7 @@ export function MsgError(message: MessageContent, options?: MessageOverrides) {
 /** 显示确认对话框，确认时 resolve，取消或关闭时 reject。 */
 export function MsgConfirm(title: string, message?: ConfirmContent, options?: ConfirmOverrides) {
   return ElMessageBox.confirm(message, title, {
-    cancelButtonText: '取消',
-    confirmButtonText: '删除',
+    confirmButtonText: t('common.actions.delete'),
     cancelButtonClass: 'is-plain',
     confirmButtonType: 'danger',
     showCancelButton: true,

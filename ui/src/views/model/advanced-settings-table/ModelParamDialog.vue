@@ -46,7 +46,7 @@ defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="editing ? t('model.parameters.edit') : t('model.parameters.add')" @closed="resetData">
+  <MkDialog v-model="visible" :title="editing ? t('common.parameters.edit') : t('common.parameters.add')" @closed="resetData">
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" />
 
     <template #footer>

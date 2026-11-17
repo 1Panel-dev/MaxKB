@@ -8,9 +8,6 @@
   "workspaceAuthorization": {
     "title": "Authorize workspaces"
   },
-  "folder": {
-    "create": "Create folder"
-  },
   "states": {
     "shared": "Shared"
   },

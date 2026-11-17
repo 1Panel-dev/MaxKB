@@ -1,26 +1,21 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ToolStoreItem } from '@/api/types'
 import ToolStoreDetailDrawer from '../ToolStoreDetailDrawer.vue'
+import { TOOL_TYPE_OPTIONS } from '@/constants/tool'
 import { numberFormat } from '@/utils/number'
 
 defineOptions({ name: 'ToolStoreCard' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ categoryTitle: string; tool: ToolStoreItem }>()
 
 const emit = defineEmits<{ apply: [tool: ToolStoreItem] }>()
 
 const toolTypeLabel = computed(() => {
-  switch (props.tool.label) {
-    case 'data_source':
-      return '数据源'
-    case 'skill':
-      return 'Skills'
-    case 'workflow_template':
-      return '工作流'
-    default:
-      return '工具'
-  }
+  const option = TOOL_TYPE_OPTIONS.find(({ value }) => value === props.tool.tool_type)
+  return t(option?.labelKey ?? 'tool.title')
 })
 
 /* 商店详情 */
@@ -63,9 +58,9 @@ function handleApply(tool = props.tool) {
       <component :is="Action" class="flex-1!">
         <div class="flex min-w-0 flex-1" @click.stop>
           <!-- 查看工具详情 -->
-          <el-button class="flex-1!" plain @click="openDetailDrawer()">详情</el-button>
+          <el-button class="flex-1!" plain @click="openDetailDrawer()">{{ t('common.labels.details') }}</el-button>
           <!-- 应用工具 -->
-          <el-button class="flex-1!" type="primary" @click="handleApply()">应用</el-button>
+          <el-button class="flex-1!" type="primary" @click="handleApply()">{{ t('tool.store.apply') }}</el-button>
         </div>
       </component>
     </template>

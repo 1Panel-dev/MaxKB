@@ -88,8 +88,6 @@
   },
   "parameters": {
     "title": "模型参数",
-    "add": "添加参数",
-    "edit": "编辑参数",
     "duplicateField": "参数“{name}”已存在",
     "duplicateLabel": "显示名称“{name}”已存在"
   },

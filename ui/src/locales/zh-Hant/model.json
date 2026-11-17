@@ -88,8 +88,6 @@
   },
   "parameters": {
     "title": "模型參數",
-    "add": "新增參數",
-    "edit": "編輯參數",
     "duplicateField": "參數「{name}」已存在",
     "duplicateLabel": "顯示名稱「{name}」已存在"
   },

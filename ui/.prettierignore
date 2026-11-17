@@ -1,2 +1,3 @@
 src/assets/iconfont.js
 src/components.d.ts
+src/locales/schema.generated.d.ts
