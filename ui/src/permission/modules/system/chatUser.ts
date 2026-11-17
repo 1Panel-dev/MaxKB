@@ -1,7 +1,7 @@
 /** 系统「对话用户」按钮权限。$perm.chatUser.* */
-
-import { Compare, PermissionConstants as P, RoleConstants, hasPermission } from '../../core'
+import { Compare, PermissionConstants as P, RoleConstants, hasEdition, hasPermission } from '../../core'
 import { canSys } from '../../policy'
+import { Edition } from '@/permission/core/common'
 
 export default {
   /**
@@ -31,5 +31,5 @@ export default {
     /**
    * 系统「对话用户」配额设置权限
    */
-  quotaSetting: () => canSys(P.CHAT_USER_QUOTA_SETTING),
+  quotaSetting: () => canSys(P.CHAT_USER_QUOTA_SETTING) && (hasEdition(Edition.PE) || hasEdition(Edition.EE)),
 }
