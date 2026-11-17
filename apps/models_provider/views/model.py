@@ -78,7 +78,7 @@ class ModelSetting(APIView):
     )
     @has_permissions(
         PermissionConstants.MODEL_CREATE.get_workspace_permission(),
-        PermissionConstants.MODEL_EDIT.get_workspace_permission_workspace_manage_role(),
+        PermissionConstants.MODEL_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         RoleConstants.USER.get_workspace_role(),
     )
