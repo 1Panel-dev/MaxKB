@@ -19,7 +19,8 @@
   },
   "tabs": {
     "basic": "基本資訊",
-    "visibility": "顯隱設定"
+    "visibility": "顯隱設定",
+    "numbered": "頁籤 {index}"
   },
   "fields": {
     "field": {
@@ -90,7 +91,6 @@
       "placeholder": "請選擇格式"
     },
     "reference": {
-      "requiredMessage": "請輸入參照變量",
       "selectRequiredMessage": "請選擇參照變量",
       "invalidMessage": "參照變量格式錯誤",
       "notFoundMessage": "找不到參照變量"
@@ -115,7 +115,8 @@
     "comparisonValue": {
       "placeholder": "請輸入比較值",
       "selectPlaceholder": "請選擇比較值",
-      "requiredMessage": "請輸入比較值"
+      "requiredMessage": "請輸入比較值",
+      "selectRequiredMessage": "請選擇比較值"
     },
     "fileTypes": {
       "requiredMessage": "檔案類型必填",

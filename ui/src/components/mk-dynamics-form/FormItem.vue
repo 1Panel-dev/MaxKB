@@ -8,6 +8,7 @@ import type { FormItemRule } from 'element-plus'
 import type { Component, Ref } from 'vue'
 import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
 import FormItemLabel from './FormItemLabel.vue'
+import { isSelectionFieldType } from './constant'
 import bus from '@/utils/bus'
 
 defineOptions({ name: 'MkDynamicsFormItem' })
@@ -99,7 +100,10 @@ const errorMessage = computed(() => {
     return fieldProps.value.err_msg
   }
   const label = isString(props.formField.label) ? props.formField.label : props.formField.label?.label
-  return t('common.validation.inputFieldRequired', { label: label || props.formField.field })
+  const messageKey = isSelectionFieldType(props.formField.input_type)
+    ? 'common.validation.selectFieldRequired'
+    : 'common.validation.inputFieldRequired'
+  return t(messageKey, { label: label || props.formField.field })
 })
 
 function deserializeRule(rule: SerializedFormRule): FormItemRule {

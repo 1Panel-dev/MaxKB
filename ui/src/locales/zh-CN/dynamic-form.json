@@ -19,7 +19,8 @@
   },
   "tabs": {
     "basic": "基本信息",
-    "visibility": "显隐设置"
+    "visibility": "显隐设置",
+    "numbered": "页签 {index}"
   },
   "fields": {
     "field": {
@@ -90,7 +91,6 @@
       "placeholder": "请选择格式"
     },
     "reference": {
-      "requiredMessage": "请输入引用变量",
       "selectRequiredMessage": "请选择引用变量",
       "invalidMessage": "引用变量格式错误",
       "notFoundMessage": "未找到引用变量"
@@ -115,7 +115,8 @@
     "comparisonValue": {
       "placeholder": "请输入比较值",
       "selectPlaceholder": "请选择比较值",
-      "requiredMessage": "请输入比较值"
+      "requiredMessage": "请输入比较值",
+      "selectRequiredMessage": "请选择比较值"
     },
     "fileTypes": {
       "requiredMessage": "文件类型必填",

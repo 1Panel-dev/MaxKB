@@ -34,7 +34,8 @@
   "validation": {
     "inputRequired": "请输入",
     "inputFieldRequired": "请输入 {label}",
-    "selectRequired": "请选择"
+    "selectRequired": "请选择",
+    "selectFieldRequired": "请选择 {label}"
   },
   "empty": {
     "default": "暂无数据",

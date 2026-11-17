@@ -34,7 +34,8 @@
   "validation": {
     "inputRequired": "請輸入",
     "inputFieldRequired": "請輸入 {label}",
-    "selectRequired": "請選擇"
+    "selectRequired": "請選擇",
+    "selectFieldRequired": "請選擇 {label}"
   },
   "empty": {
     "default": "暫無資料",

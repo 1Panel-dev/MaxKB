@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DynamicFormValue } from '../../type'
 import type { DynamicFormResponse, FormField } from '../../type'
 import type { TabPaneName } from 'element-plus'
 import DynamicsForm from '../../index.vue'
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   modelValue?: DynamicFormValue[]
   formValue?: DynamicFormValue
@@ -42,9 +44,9 @@ const fieldProps = computed(() => {
   return props.formField.props_info ? props.formField.props_info : {}
 })
 
-const tabsLabel = computed(() => {
-  return fieldProps.value.tabs_label ? fieldProps.value.tabs_label : 'label'
-})
+function getTabLabel(index: number) {
+  return fieldProps.value.tabs_label ? fieldProps.value.tabs_label + index : t('dynamicForm.tabs.numbered', { index })
+}
 /**
  * 组件样式
  */
@@ -90,7 +92,7 @@ defineExpose({ validate, field: props.field })
 <template v-loading="_loading">
   <div style="width: 100%">
     <el-tabs v-model="activeTab" editable @edit="handleTabsEdit" type="card">
-      <el-tab-pane v-for="(item, index) in localValue" :key="index" :label="tabsLabel + (index + 1)" :name="index">
+      <el-tab-pane v-for="(item, index) in localValue" :key="index" :label="getTabLabel(index + 1)" :name="index">
         <template v-if="formField.children">
           <el-card :style="style">
             <DynamicsForm

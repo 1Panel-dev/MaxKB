@@ -34,7 +34,8 @@
   "validation": {
     "inputRequired": "This field is required",
     "inputFieldRequired": "Enter {label}",
-    "selectRequired": "This field is required"
+    "selectRequired": "This field is required",
+    "selectFieldRequired": "Select {label}"
   },
   "empty": {
     "default": "No data",

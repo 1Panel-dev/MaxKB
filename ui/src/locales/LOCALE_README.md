@@ -106,7 +106,8 @@ MkResourceCard、MkComplexSearch、MkEmpty 的默认创建信息、占位和空�
 `dynamic-form.json` 挂载为 `dynamicForm`，维护配置器基本信息、控件类型、选项配置、显隐条件、
 固定帮助文案，以及运行时控件的缺省提示；通用操作、结果提示和对话框标题复用 common。
 同一字段的标签、占位和校验集中到 fields；通用占位提示复用 common.placeholders，
-通用输入校验复用 common.validation，占位与校验分别定义 key。模型类型复用 model.fields.type；
+缺省必填提示根据实际控件使用 common.validation 中带字段名的输入或选择提示。
+显隐条件的比较值也按输入框或选择框区分提示，占位与校验分别定义 key。模型类型复用 model.fields.type；
 模型参数表的参数、显示名称、组件类型和默认值复用 dynamicForm.fields。控件类型使用 types，
 条件比较方式使用 operators，上传与树形配置的专属文案分别使用 upload、tree；仍遵守四层上限。
 控件类型定义统一来自 DYNAMIC_FORM_TYPES，由调用方翻译 labelKey；下拉选项响应式生成，
