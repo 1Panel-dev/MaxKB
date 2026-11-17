@@ -10,7 +10,6 @@
 import json
 import os
 
-from django.core.cache import cache
 from django.db import models
 from django.db.models import QuerySet, Q, TextField
 from django.db.models.functions import Cast
@@ -18,12 +17,12 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import Application
-from common.constants.cache_version import Cache_Version
 from common.auth.constants.role_constants import RoleConstants
 from common.db.search import native_search, native_page_search, get_dynamics_model
 from common.db.sql_execute import select_list
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
+from common.utils.cache_util import clear_user_permission_cache
 from knowledge.models import Knowledge
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
@@ -253,12 +252,10 @@ class UserGroupResourcePermissionSerializer(serializers.Serializer):
         ) if len(update_list) > 0 else None
         # 批量插入
         QuerySet(WorkspaceUserGroupResourcePermission).bulk_create(save_list) if len(save_list) > 0 else None
-        version = Cache_Version.PERMISSION_LIST.get_version()
         member_user_ids = (
             QuerySet(SystemUserGroupRelation).filter(group_id=user_group_id).values_list("user_id", flat=True)
         )
-        for user_id in member_user_ids:
-            cache.delete(Cache_Version.PERMISSION_LIST.get_key(user_id=user_id), version=version)
+        clear_user_permission_cache(member_user_ids)
         return instance
 
 
@@ -460,11 +457,10 @@ class ResourceUserGroupPermissionSerializer(serializers.Serializer):
         if save_list:
             QuerySet(WorkspaceUserGroupResourcePermission).bulk_create(save_list)
 
-        version = Cache_Version.PERMISSION_LIST.get_version()
+        member_user_ids = set()
         for user_group_id in user_group_ids:
-            member_user_ids = (
+            member_user_ids.update(
                 QuerySet(SystemUserGroupRelation).filter(group_id=user_group_id).values_list("user_id", flat=True)
             )
-            for user_id in member_user_ids:
-                cache.delete(Cache_Version.PERMISSION_LIST.get_key(user_id=user_id), version=version)
+        clear_user_permission_cache(member_user_ids)
         return instance

@@ -1,12 +1,14 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎
-    @file： cache_util.py
-    @date：2024/7/24 19:23
-    @desc:
+@project: MaxKB
+@Author：虎
+@file： cache_util.py
+@date：2024/7/24 19:23
+@desc:
 """
+
 from django.core.cache import cache
+from common.constants.cache_version import Cache_Version
 
 
 def get_data_by_default_cache(key: str, get_data, cache_instance=cache, version=None, kwargs=None):
@@ -64,3 +66,49 @@ def del_cache(cache_key, cache_instance=cache, version=None):
         return run
 
     return inner
+
+
+def _normalize_user_ids(user_ids):
+    """将用户ID可迭代对象规整为字符串列表，剔除空值。"""
+    if isinstance(user_ids, (str, bytes)):
+        user_ids = [user_ids]
+    try:
+        iterator = iter(user_ids)
+    except TypeError:
+        iterator = iter([user_ids])
+    normalized = []
+    for user_id in iterator:
+        if user_id is None:
+            continue
+        normalized.append(str(user_id))
+    return normalized
+
+
+def _delete_user_cache(user_ids, cache_item):
+    user_ids = _normalize_user_ids(user_ids)
+    if not user_ids:
+        return
+    version, get_key = cache_item.value
+    cache.delete_many([get_key(user_id) for user_id in user_ids], version=version)
+
+
+def clear_user_permission_cache(user_ids):
+    """
+    清理指定用户的权限缓存(PERMISSION_LIST)。
+    @param user_ids: 用户ID的可迭代对象
+    """
+    _delete_user_cache(user_ids, Cache_Version.PERMISSION_LIST)
+
+
+def clear_user_role_cache(user_ids):
+    """
+    清理指定用户的角色缓存(ROLE_LIST)。
+    @param user_ids: 用户ID的可迭代对象
+    """
+    _delete_user_cache(user_ids, Cache_Version.ROLE_LIST)
+
+
+def clear_user_permission_and_role_cache(user_ids):
+    """同时清理指定用户的权限缓存与角色缓存。"""
+    clear_user_permission_cache(user_ids)
+    clear_user_role_cache(user_ids)

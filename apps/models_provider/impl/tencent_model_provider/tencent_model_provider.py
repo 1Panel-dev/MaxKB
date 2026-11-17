@@ -243,6 +243,10 @@ class TencentModelProvider(IModelProvider):
         model_id = str(model_id).lower()
         if "yt-video" in model_id:
             return ModelTypeConst.ITV
+        if "hy-video" in model_id:
+            # Hunyuan HY-Video 为图生视频模型，与内置 ITV 列表（hy-video-1.5）保持一致；
+            # 避免因 id 含 "video" 被 base 分类器误判为 TTV 而漏出 ITV 列表。
+            return ModelTypeConst.ITV
         if "vision" in model_id and not any(k in model_id for k in ("video", "t2v", "i2v")):
             return ModelTypeConst.IMAGE
         return classify_dynamic_model_id(model_id)
