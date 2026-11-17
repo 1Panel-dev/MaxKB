@@ -403,6 +403,8 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `footer-batch-actions` 插槽，当前选择通过 `selection-change` 返回。组件暴露 `tableRef` 和
 `clearSelection()`。操作栏与 `MkViewLayout` 复用 `LayoutBatchFooter`，统一全选、半选、数量和
 取消行为；它在主内容滚动区域内吸附于页面底部，不随表格内容滚出可视区域。
+选中行按实际选择状态统一高亮，包括合并后没有复选框的行和固定列；业务传入的
+`row-class-name` 字符串或函数会与内部选中行 class 合并。
 分页表格暂不支持跨页勾选，翻页或切换每页条数时统一清空选择。
 有轮询刷新的表格选择列配置 `reserve-selection`，按 `row-key` 保留同一页刷新后的勾选；
 其他分页表格不配置该属性，不自行实现轮询选择恢复。

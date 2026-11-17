@@ -326,6 +326,7 @@
   --el-cascader-menu-text-color: var(--el-text-color-primary);
 }
 .el-cascader-menu {
+  max-width: 320px;
   &__list {
     padding: 4px;
   }
@@ -335,6 +336,7 @@
   padding: 0 calc(var(--spacing) * 8) 0 calc(var(--spacing) * 2);
 
   &__label {
+    min-width: 0;
     padding: 0;
   }
 
@@ -347,7 +349,6 @@
     color: var(--mk-N500);
   }
   &.in-active-path {
-    color: var(--el-text-color-primary);
     font-weight: 400;
   }
   &.is-active {
@@ -1171,8 +1172,8 @@
     line-height: var(--mk-line-height-base);
     padding: calc(var(--spacing) * 3);
   }
-  // 多选列勾选后，整行（含固定列）保持选中底色。
-  .el-table__row:has(> .el-table-column--selection .el-checkbox.is-checked) > .el-table__cell {
+  // 按实际选择状态高亮整行，覆盖合并行及固定列。
+  .el-table__row.mk-table__row--selected > .el-table__cell {
     background-color: var(--el-color-primary-light-9);
   }
   &.small {

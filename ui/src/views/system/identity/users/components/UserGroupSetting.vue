@@ -72,6 +72,7 @@ watch([() => props.workspaceIds, () => props.workspaceOptions], refreshUserGroup
       clearable
       filterable
       placeholder="请选择用户组"
+      fit-input-width
     />
   </el-form-item>
 </template>
