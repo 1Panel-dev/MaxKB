@@ -27,7 +27,7 @@ import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 import { getResourceScope, isSystemResource } from '@/utils/resource-context.ts'
 import perm from '@/permission/index.ts'
 
-type ApplicationWorkflowPermissionMethod = 'publish'
+type ApplicationWorkflowPermissionMethod = 'publish' | 'edit'
 function applicationWorkflowPermission(method: ApplicationWorkflowPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.application.system[method]())
   return Boolean(perm.application.workspace[method](applicationId))
@@ -372,7 +372,7 @@ onBeforeUnmount(() => stopAutoSave())
       />
 
       <!-- 保存 -->
-      <MkTooltip content="保存" placement="bottom">
+      <MkTooltip content="保存" placement="bottom" v-if="applicationWorkflowPermission('edit')">
         <el-button plain :disabled="loading" @click="handleSave()" class="w-8! min-w-8!">
           <MkIcon name="icon_save_outlined" />
         </el-button>
