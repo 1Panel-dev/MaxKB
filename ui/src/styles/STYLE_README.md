@@ -387,6 +387,11 @@ Tailwind v4 的 `border` 只设置边框宽度和样式，不提供 `--tw-border
 所有 `el-button` 的 `:active` 和 `.is-active` 视觉统一复用各自的 hover 样式，不额外加深背景、
 边框或文字颜色；普通、plain、text、link、circle 及各语义类型按钮均遵循该规则。
 
+密码输入框保留 `show-password`，由 `element-plus.scss` 统一替换右侧显隐图标：密文使用
+`icon_invisible_outlined`，明文使用 `icon_visible_outlined`。CSS mask 使用 `src/assets/` 下对应的
+独立 SVG（来源于同名 iconfont Symbol）；更新这两个 Symbol 时同步 SVG。显隐状态由原生 input
+的 `type` 匹配，点击和焦点仍由 Element Plus 处理；升级组件库时核对 `.el-input__password` 结构。
+
 圆形按钮统一使用 `circle`，通过 `size="small"`、默认尺寸、`size="large"` 分别选择
 24px、32px、40px，不在业务样式或工具类中重复设置对应的宽高。全局保留
 `.el-button.is-circle` 的 `height: var(--el-button-size, var(--el-component-size))`，抵消普通按钮的
