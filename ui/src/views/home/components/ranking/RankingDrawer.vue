@@ -13,9 +13,7 @@ const route = useRoute()
 const isSystemHome = computed(() => route.meta.scope === 'system')
 
 /* 排行榜导出权限：系统概览走系统首页权限，工作空间概览走概览权限 */
-const canExport = computed(() =>
-  isSystemHome.value ? Boolean(perm.system.homepage.export()) : Boolean(perm.homepage.homepage.export()),
-)
+const canExport = computed(() => (isSystemHome.value ? Boolean(perm.system.homepage.export()) : Boolean(perm.homepage.homepage.export())))
 
 const props = defineProps<{ api: typeof HomepageApi; workspaceId: string; initialKind: HomeRankingKind; initialRange: HomeDateRange }>()
 
@@ -134,14 +132,13 @@ onMounted(() => loadRanking())
       <el-table-column v-if="activeKind === 'tokens' || activeKind === 'userTokens'" label="Tokens 消耗" min-width="125">
         <template #default="{ row }">{{ formatTokenNumber(row.total_tokens ?? 0) }}</template>
       </el-table-column>
+      <el-table-column label="对话次数" min-width="100">
+        <template #default="{ row }">{{ numberFormat(row.chat_record_count) }}</template>
+      </el-table-column>
       <el-table-column label="占比" min-width="150">
         <template #default="{ row }">
           <el-progress :percentage="getRankingRatio(getRankingValue(activeKind, row), aggregateTotal)" />
         </template>
-      </el-table-column>
-
-      <el-table-column label="对话次数" min-width="100">
-        <template #default="{ row }">{{ numberFormat(row.chat_record_count) }}</template>
       </el-table-column>
       <el-table-column v-if="activeKind === 'tokens' || activeKind === 'questions'" label="活跃用户" min-width="100">
         <template #default="{ row }">{{ numberFormat(row.chat_user_count) }}</template>

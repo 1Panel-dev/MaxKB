@@ -147,15 +147,15 @@ onMounted(loadRanking)
           {{ formatRankingValue(row) }}
         </template>
       </el-table-column>
+      <el-table-column :label="activeKind === 'userTokens' ? '对话次数' : 'Tokens 消耗'" min-width="125">
+        <template #default="{ row }">
+          {{ formatRankingValue(row, activeKind === 'userTokens' ? 'questions' : 'userTokens') }}
+        </template>
+      </el-table-column>
       <el-table-column label="占比" min-width="150">
         <template #default="{ row }">
           <el-progress v-if="aggregateTotal != null && getRankingValue(row) != null" :percentage="getRankingRatio(row)" />
           <span v-else>—</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="activeKind === 'userTokens' ? '对话次数' : 'Tokens 消耗'" min-width="125">
-        <template #default="{ row }">
-          {{ formatRankingValue(row, activeKind === 'userTokens' ? 'questions' : 'userTokens') }}
         </template>
       </el-table-column>
       <el-table-column label="均 Tokens/次" min-width="125">
