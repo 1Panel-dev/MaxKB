@@ -15732,3 +15732,114 @@ msgstr "Folder does not exist in this workspace"
 
 msgid "Use the move API to change the folder"
 msgstr "Use the move API to change the folder"
+
+msgid "System"
+msgstr ""
+
+msgid "Paragraph"
+msgstr ""
+
+msgid "Chat User API Key"
+msgstr "Chat User API Key"
+
+msgid "Chat User/logout"
+msgstr "Chat User/logout"
+
+msgid "License"
+msgstr "License"
+
+msgid "Shared Knowledge/Document"
+msgstr "Shared Knowledge/Document"
+
+msgid "Add ApiKey"
+msgstr "Add ApiKey"
+
+msgid "Add chat user API key"
+msgstr "Add chat user API key"
+
+msgid "Add member to user group"
+msgstr "Add member to user group"
+
+msgid "Add personal system API_KEY"
+msgstr "Add personal system API_KEY"
+
+msgid "Add user"
+msgstr "Add user"
+
+msgid "Batch add user to group"
+msgstr "Batch add user to group"
+
+msgid "Batch set quota"
+msgstr "Batch set quota"
+
+msgid "Batch sync lark documents"
+msgstr "Batch sync lark documents"
+
+msgid "Create a knowledge tag"
+msgstr "Create a knowledge tag"
+
+msgid "Create a web site knowledge base"
+msgstr "Create a web site knowledge base"
+
+msgid "Create or update user group"
+msgstr "Create or update user group"
+
+msgid "Delete knowledge base"
+msgstr "Delete knowledge base"
+
+msgid "Delete personal system API_KEY"
+msgstr "Delete personal system API_KEY"
+
+msgid "Delete the source point trigger"
+msgstr "Delete the source point trigger"
+
+msgid "Delete user group"
+msgstr "Delete user group"
+
+msgid "Edit folder"
+msgstr "Edit folder"
+
+msgid "Enable/Disable application API Key"
+msgstr "Enable/Disable application API Key"
+
+msgid "Export multiple document"
+msgstr "Export multiple document"
+
+msgid "Generate related documents"
+msgstr "Generate related documents"
+
+msgid "Get chat user API key"
+msgstr "Get chat user API key"
+
+msgid "Modify application access token"
+msgstr "Modify application access token"
+
+msgid "Modify external retrieval service"
+msgstr "Modify external retrieval service"
+
+msgid "Modify knowledge base information"
+msgstr "Modify knowledge base information"
+
+msgid "Modify knowledge workflow"
+msgstr "Modify knowledge workflow"
+
+msgid "Modify the source point trigger"
+msgstr "Modify the source point trigger"
+
+msgid "Modify tool workflow"
+msgstr "Modify tool workflow"
+
+msgid "Remove member from user group"
+msgstr "Remove member from user group"
+
+msgid "Set quota"
+msgstr "Set quota"
+
+msgid "Update personal system API_KEY"
+msgstr "Update personal system API_KEY"
+
+msgid "trial listening"
+msgstr "trial listening"
+
+msgid "User sync"
+msgstr "User sync"
