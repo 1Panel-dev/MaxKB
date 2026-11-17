@@ -37,11 +37,7 @@ const formValue = computed({
 const referenceVariableRule = {
   required: true,
   validator: (_rule: unknown, value: DynamicFormValue, callback: DynamicFormValidatorCallback) => {
-    if (!(Array.isArray(value) && value.length > 1)) {
-      callback(t('dynamicForm.fields.reference.requiredMessage'))
-    }
-
-    return true
+    callback(Array.isArray(value) && value.length > 1 ? undefined : t('dynamicForm.fields.reference.selectRequiredMessage'))
   },
   trigger: 'blur',
 }
@@ -178,7 +174,7 @@ onMounted(() => {
     v-if="formValue.assignment_method === 'custom'"
     :required="formValue.required"
     prop="default_value"
-    :rules="formValue.required ? [{ required: true, message: t('dynamicForm.fields.defaultValue.requiredMessage') }] : []"
+    :rules="formValue.required ? [{ required: true, message: t('dynamicForm.fields.defaultValue.selectRequiredMessage') }] : []"
   >
     <template #label>
       <div class="flex-between">

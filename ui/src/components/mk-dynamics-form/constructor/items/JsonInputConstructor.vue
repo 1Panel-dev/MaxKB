@@ -34,6 +34,19 @@ const formValue = computed({
   },
 })
 const jsonInputRef = ref<InstanceType<typeof JsonInput>>()
+
+// 自定义 JSON 和引用路径分别保留编辑值，当前方式的值参与校验和保存。
+type AssignmentMethod = 'custom' | 'ref_variables'
+const defaultValueDrafts: Record<AssignmentMethod, DynamicFormValue> = { custom: {}, ref_variables: [] }
+const assignmentMethod = computed<AssignmentMethod>({
+  get: () => formValue.value.default_value_assignment_method || 'custom',
+  set: (method) => {
+    defaultValueDrafts[assignmentMethod.value] = formValue.value.default_value
+    formValue.value.default_value_assignment_method = method
+    formValue.value.default_value = defaultValueDrafts[method]
+  },
+})
+
 const getData = () => {
   return {
     input_type: 'JsonInput',
@@ -52,7 +65,7 @@ const getData = () => {
     },
     default_value: formValue.value.default_value,
     show_default_value: formValue.value.show_default_value,
-    default_value_assignment_method: formValue.value.default_value_assignment_method || 'custom',
+    default_value_assignment_method: assignmentMethod.value,
   }
 }
 
@@ -64,21 +77,23 @@ const defaultValueRule = {
   },
   trigger: 'blur',
 }
+function isReferencePath(value: unknown): value is string[] {
+  return Array.isArray(value) && value.length >= 2 && value.every((part) => typeof part === 'string' && part.length > 0)
+}
+
 const referenceVariableRule = {
   required: true,
   validator: (_rule: unknown, value: DynamicFormValue, callback: DynamicFormValidatorCallback) => {
-    if (!(Array.isArray(value) && value.length > 1)) {
-      callback(t('dynamicForm.fields.reference.requiredMessage'))
-    }
-
-    return true
+    callback(isReferencePath(value) ? undefined : t('dynamicForm.fields.reference.selectRequiredMessage'))
   },
   trigger: 'blur',
 }
 
 const render = (formData: DynamicFormValue) => {
-  formValue.value.default_value = formData.default_value
+  defaultValueDrafts.custom = {}
+  defaultValueDrafts.ref_variables = []
   formValue.value.default_value_assignment_method = formData.default_value_assignment_method || 'custom'
+  formValue.value.default_value = assignmentMethod.value === 'ref_variables' && !isReferencePath(formData.default_value) ? [] : formData.default_value
 }
 defineExpose({ getData, render })
 onMounted(() => {
@@ -92,7 +107,7 @@ onMounted(() => {
 
 <template>
   <el-form-item v-if="getModel" :label="t('dynamicForm.fields.assignment.label')">
-    <el-radio-group v-model="formValue.default_value_assignment_method">
+    <el-radio-group v-model="assignmentMethod">
       <el-radio :value="item.value" v-for="(item, index) in assignmentMethodOptions" :key="index">
         <span class="flex-align-center gap-1">
           {{ item.label }}
@@ -105,24 +120,19 @@ onMounted(() => {
       </el-radio>
     </el-radio-group>
   </el-form-item>
-  <el-form-item
-    v-if="formValue.default_value_assignment_method === 'ref_variables'"
-    :required="true"
-    prop="default_value"
-    :rules="[referenceVariableRule]"
-  >
+  <el-form-item v-if="assignmentMethod === 'ref_variables'" :required="true" prop="default_value" :rules="[referenceVariableRule]">
     <NodeCascader
       ref="nodeCascaderRef"
       :nodeModel="model"
       :placeholder="t('dynamicForm.fields.variable.placeholder')"
-      v-model="formValue.option_list"
+      v-model="formValue.default_value"
     />
   </el-form-item>
 
   <el-form-item
     class="mk-hide-asterisk"
     :required="formValue.required"
-    v-if="formValue.default_value_assignment_method === 'custom'"
+    v-if="assignmentMethod === 'custom'"
     prop="default_value"
     :rules="[defaultValueRule]"
   >

@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { computed, provide, ref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FormField } from '../../type'
 import type { Dict, ModelConfig, ModelItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
 import SelectModel from '@/components/business/select-model/index.vue'
-import { providerList } from './provider-data'
+import { getProviderOptions } from './provider-data'
 
 defineOptions({ name: 'DynamicFormModel', inheritAttrs: false })
+const { t } = useI18n({ useScope: 'global' })
+const providerOptions = computed(() => getProviderOptions(t('model.provider.local')))
 
 interface ConfiguredModelOption {
   model_id: string
@@ -90,7 +93,7 @@ function handleModelChange(modelId: string) {
     :model-params="props.modelValue?.model_params_setting ?? {}"
     :can-edit-params="canEditParams"
     :options="modelOptions"
-    :provider-options="providerList"
+    :provider-options="providerOptions"
     @update:model-value="handleModelChange"
     @update:model-params="handleModelParamsChange"
   />

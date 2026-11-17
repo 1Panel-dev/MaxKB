@@ -4,7 +4,7 @@ import { I18nT, useI18n } from 'vue-i18n'
 import type { VisibilityConditionState, VisibilityFieldOption, VisibilityRules } from '../../type'
 import { compareList } from '@/workflow-canvas/config/constants'
 import ConditionRow from './ConditionRow.vue'
-import { getAllowedOps, getFieldConfig, inferFieldType } from './utils'
+import { getAllowedOps, getComparisonValueControl, getFieldConfig, inferFieldType } from './utils'
 import { randomId } from '@/utils/common'
 const { t } = useI18n({ useScope: 'global' })
 
@@ -49,7 +49,10 @@ function validate(): Promise<void> {
     }
     const isEmpty = Array.isArray(cond.value) ? cond.value.length === 0 : !cond.value && cond.value !== 0
     if (!['is_true', 'is_not_true'].includes(cond.compare) && isEmpty) {
-      cond._valueError = t('dynamicForm.fields.comparisonValue.requiredMessage')
+      cond._valueError =
+        getComparisonValueControl(cond._fieldType) === 'input'
+          ? t('dynamicForm.fields.comparisonValue.requiredMessage')
+          : t('dynamicForm.fields.comparisonValue.selectRequiredMessage')
       hasError = true
     }
   }

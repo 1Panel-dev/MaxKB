@@ -8,7 +8,8 @@
   },
   "provider": {
     "label": "供应商",
-    "placeholder": "选择供应商"
+    "placeholder": "选择供应商",
+    "local": "本地模型"
   },
   "fields": {
     "name": {

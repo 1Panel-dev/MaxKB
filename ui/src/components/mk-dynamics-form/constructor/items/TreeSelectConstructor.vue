@@ -258,7 +258,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
     class="mk-hide-asterisk"
     :required="formValue.required"
     prop="default_value"
-    :rules="formValue.required ? [{ required: true, message: t('dynamicForm.fields.defaultValue.requiredMessage') }] : []"
+    :rules="formValue.required ? [{ required: true, message: t('dynamicForm.fields.defaultValue.selectRequiredMessage') }] : []"
   >
     <template #label>
       <div class="flex-between">

@@ -8,7 +8,8 @@
   },
   "provider": {
     "label": "供應商",
-    "placeholder": "選擇供應商"
+    "placeholder": "選擇供應商",
+    "local": "本機模型"
   },
   "fields": {
     "name": {

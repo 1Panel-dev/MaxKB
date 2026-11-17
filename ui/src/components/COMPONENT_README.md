@@ -733,6 +733,8 @@ DynamicFormInputType 与 DynamicFormTypeOption 从该定义派生。调用方通
 保留在表单内，仅两项都填写且非纯空白的选项进入默认值选择区和 `getData()` 返回的 `option_list`。
 初始化、空配置回填和切回自定义赋值时保留一行空白选项。卡片单选仅在存在完整选项时显示默认值卡片区。
 引用变量模式继续保留变量路径，不应用自定义选项过滤。
+JSON 控件的自定义值和引用路径都通过 `default_value` 校验、保存和回填，
+由 `default_value_assignment_method` 区分。编辑时切换赋值方式可恢复各自的草稿。
 MultiRow、RadioRow 的配置器与运行时复用字段组件，分别使用复选按钮组、单选按钮组，保留原生
 禁用、键盘和校验行为；仅展示完整选项，输出仍为 `MultiRow`、`RadioRow`。
 

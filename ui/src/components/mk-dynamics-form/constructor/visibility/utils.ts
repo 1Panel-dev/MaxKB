@@ -2,6 +2,21 @@ import type { VisibilityFieldOption } from '../../type'
 
 export type InferredFieldType = string | undefined
 
+export function getComparisonValueControl(fieldType?: string) {
+  switch (fieldType) {
+    case 'SingleSelect':
+    case 'RadioCard':
+    case 'RadioRow':
+      return 'singleSelect'
+    case 'MultiSelect':
+      return 'multiSelect'
+    case 'TreeSelect':
+      return 'treeSelect'
+    default:
+      return 'input'
+  }
+}
+
 export function inferFieldType(fieldPath: [string, string] | string[], leftOptions?: VisibilityFieldOption[]): InferredFieldType {
   return getFieldConfig(fieldPath, leftOptions)?.input_type
 }

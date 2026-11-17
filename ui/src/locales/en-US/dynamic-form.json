@@ -19,7 +19,8 @@
   },
   "tabs": {
     "basic": "Basic information",
-    "visibility": "Visibility settings"
+    "visibility": "Visibility settings",
+    "numbered": "Tab {index}"
   },
   "fields": {
     "field": {
@@ -90,7 +91,6 @@
       "placeholder": "Select a format"
     },
     "reference": {
-      "requiredMessage": "Enter a variable reference",
       "selectRequiredMessage": "Select a variable reference",
       "invalidMessage": "Invalid variable reference format",
       "notFoundMessage": "Variable reference not found"
@@ -115,7 +115,8 @@
     "comparisonValue": {
       "placeholder": "Enter a comparison value",
       "selectPlaceholder": "Select a comparison value",
-      "requiredMessage": "Enter a comparison value"
+      "requiredMessage": "Enter a comparison value",
+      "selectRequiredMessage": "Select a comparison value"
     },
     "fileTypes": {
       "requiredMessage": "File types are required",

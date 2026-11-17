@@ -5,9 +5,10 @@ import { useI18n } from 'vue-i18n'
 import type { DynamicFormValue } from '../../type'
 import type { ModelItem } from '@/api/types'
 import SelectModel from '@/components/business/select-model/index.vue'
-import { providerList as providerOptions } from '../../items/model/provider-data'
+import { getProviderOptions } from '../../items/model/provider-data'
 import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
 const { t } = useI18n({ useScope: 'global' })
+const providerOptions = computed(() => getProviderOptions(t('model.provider.local')))
 
 const getSelectModelList = inject<(params: { model_type: string }) => Promise<ModelItem[]>>('getSelectModelList')
 const getModelParamsForm = inject<(modelId: string) => Promise<DynamicFormValue>>('getModelParamsForm')

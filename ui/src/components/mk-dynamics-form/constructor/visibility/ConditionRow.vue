@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { VisibilityConditionState, VisibilityFieldOption } from '../../type'
 import { compareList } from '@/workflow-canvas/config/constants'
 import FieldSelector from './FieldSelector.vue'
-import { getAllowedOps, getFieldConfig, inferFieldType } from './utils'
+import { getAllowedOps, getComparisonValueControl, getFieldConfig, inferFieldType } from './utils'
 const { t } = useI18n({ useScope: 'global' })
 
 const condition = defineModel<VisibilityConditionState>({ required: true })
+const comparisonControl = computed(() => getComparisonValueControl(condition.value._fieldType))
 
 const props = defineProps<{ leftOptions?: VisibilityFieldOption[] }>()
 
@@ -57,7 +59,7 @@ function handleFieldChange() {
 
   <el-form-item v-if="!['is_true', 'is_not_true'].includes(condition.compare)" class="small min-w-0 flex-6" :error="condition._valueError">
     <el-select
-      v-if="['SingleSelect', 'RadioCard', 'RadioRow'].includes(condition._fieldType || '')"
+      v-if="comparisonControl === 'singleSelect'"
       v-model="condition.value"
       clearable
       :placeholder="t('dynamicForm.fields.comparisonValue.selectPlaceholder')"
@@ -67,7 +69,7 @@ function handleFieldChange() {
     </el-select>
 
     <el-select
-      v-else-if="condition._fieldType === 'MultiSelect'"
+      v-else-if="comparisonControl === 'multiSelect'"
       v-model="condition.value"
       clearable
       multiple
@@ -78,7 +80,7 @@ function handleFieldChange() {
     </el-select>
 
     <el-tree-select
-      v-else-if="condition._fieldType === 'TreeSelect'"
+      v-else-if="comparisonControl === 'treeSelect'"
       v-model="condition.value"
       :data="condition._treeData || []"
       :multiple="condition._treeMultiple"

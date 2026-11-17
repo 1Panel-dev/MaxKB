@@ -19,9 +19,9 @@ const formValue = computed({
 
 const render = (formData: DynamicFormValue) => {
   formValue.value.default_value = []
-  formValue.value.limit = formData.attrs.limit || 3
-  formValue.value.max_file_size = formData.max_file_size || 10
-  formValue.value.accept = formData.attrs.accept ? formData.attrs.accept.split(',').map((item: string) => item.substring(1)) : ['jpg']
+  formValue.value.limit = formData.attrs?.limit ?? 3
+  formValue.value.max_file_size = formData.max_file_size ?? 10
+  formValue.value.accept = formData.attrs?.accept ? formData.attrs.accept.split(',').map((item: string) => item.substring(1)) : ['jpg']
 }
 const getData = () => {
   return {
