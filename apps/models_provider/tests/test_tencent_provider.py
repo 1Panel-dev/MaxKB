@@ -44,6 +44,11 @@ class TencentModelProviderTests(SimpleTestCase):
     def test_dynamic_classify_yt_video_as_itv(self):
         self.assertEqual(TencentModelProvider.classify_dynamic_model("yt-video-humanactor"), ModelTypeConst.ITV)
 
+    def test_dynamic_classify_hy_video_as_itv(self):
+        # HY-Video 为图生视频模型，应与内置 ITV 列表（hy-video-1.5）保持一致，
+        # 避免因 id 含 "video" 被 base 分类器误判为 TTV 而漏出 ITV 列表。
+        self.assertEqual(TencentModelProvider.classify_dynamic_model("hy-video-v1.5"), ModelTypeConst.ITV)
+
     def test_dynamic_classify_vision_video_stays_ttv(self):
         # 带 video 的视觉模型仍是视频生成任务，不应被误判为视觉模型。
         self.assertEqual(

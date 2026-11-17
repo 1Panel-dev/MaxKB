@@ -34,6 +34,7 @@ from common.database_model_manage.database_model_manage import DatabaseModelMana
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import password_encrypt, password_verify
+from common.utils.cache_util import clear_user_permission_cache, clear_user_permission_and_role_cache
 from common.utils.rsa_util import decrypt
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
@@ -823,6 +824,7 @@ def update_user_role(instance, user, user_id=None):
                 workspace_user_role_mapping_model.objects.create(
                     id=uuid.uuid7(), user_id=user.id, role_id=RoleConstants.USER.name, workspace_id="default"
                 )
+                clear_user_permission_and_role_cache([user.id])
             return
 
         is_admin = workspace_user_role_mapping_model.objects.filter(
@@ -872,10 +874,7 @@ def update_user_role(instance, user, user_id=None):
             workspace_user_role_mapping_model.objects.create(
                 id=uuid.uuid7(), role_id=role_id, workspace_id=workspace_id, user_id=user.id
             )
-        permission_version, permission_get_key = Cache_Version.PERMISSION_LIST.value
-        cache.delete(permission_get_key(str(user.id)), version=permission_version)
-        role_version, role_get_key = Cache_Version.ROLE_LIST.value
-        cache.delete(role_get_key(str(user.id)), version=role_version)
+        clear_user_permission_and_role_cache([user.id])
 
 
 def set_user_groups(user_id, instance):
@@ -897,8 +896,7 @@ def set_user_groups(user_id, instance):
             for group_id in user_group_ids
         )
 
-    version = Cache_Version.PERMISSION_LIST.get_version()
-    cache.delete(Cache_Version.PERMISSION_LIST.get_key(user_id=user_id), version=version)
+    clear_user_permission_cache([user_id])
 
     return None
 

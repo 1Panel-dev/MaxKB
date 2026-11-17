@@ -2,17 +2,16 @@
 
 import uuid_utils.compat as uuid
 from collections import defaultdict
-from django.core.cache import cache
 from django.db import transaction
 from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.auth.constants.role_constants import RoleConstants
-from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException, NotFound404
+from common.utils.cache_util import clear_user_permission_cache
 from system_manage.models import UserGroup, UserGroupRelation
 from users.models.user_group import SystemUserGroup, SystemUserGroupRelation
 
@@ -21,9 +20,7 @@ def _clear_permission_cache(user_ids):
     """Invalidate the cached permission list for users whose group membership changed."""
     if not user_ids:
         return
-    version = Cache_Version.PERMISSION_LIST.get_version()
-    for user_id in user_ids:
-        cache.delete(Cache_Version.PERMISSION_LIST.get_key(user_id=user_id), version=version)
+    clear_user_permission_cache(user_ids)
 
 
 @transaction.atomic
