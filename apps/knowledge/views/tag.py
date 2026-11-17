@@ -5,10 +5,8 @@ from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 from common.result import result
 from knowledge.api.tag import TagCreateAPI, TagDeleteAPI, TagEditAPI
@@ -25,23 +23,24 @@ class KnowledgeTagView(APIView):
         parameters=TagCreateAPI.get_parameters(),
         request=TagCreateAPI.get_request(),
         responses=TagCreateAPI.get_response(),
-        tags=[_('Knowledge Base/Tag')]  # type: ignore
+        tags=[_("Knowledge Base/Tag")],  # type: ignore
     )
     @has_permissions(
         PermissionConstants.KNOWLEDGE_TAG_CREATE.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_TAG_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission([RoleConstants.USER.get_workspace_role()],
-                       [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
     )
     @log(
-        menu='tag', operate="Create a knowledge tag",
-        get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id'))
+        menu="tag",
+        operate="Create a knowledge tag",
+        get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get("knowledge_id")),
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
-        return result.success(TagSerializers.Create(
-            data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'tags': request.data}
-        ).insert())
+        return result.success(
+            TagSerializers.Create(
+                data={"workspace_id": workspace_id, "knowledge_id": knowledge_id, "tags": request.data}
+            ).insert()
+        )
 
     @extend_schema(
         summary=_("Get Knowledge Tag"),
@@ -49,25 +48,28 @@ class KnowledgeTagView(APIView):
         parameters=TagCreateAPI.get_parameters(),
         request=TagCreateAPI.get_request(),
         responses=TagCreateAPI.get_response(),
-        tags=[_('Knowledge Base/Tag')]  # type: ignore
+        tags=[_("Knowledge Base/Tag")],  # type: ignore
     )
     @has_permissions(
         PermissionConstants.KNOWLEDGE_TAG_READ.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_TAG_READ.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission([RoleConstants.USER.get_workspace_role()],
-                       [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
     )
     @log(
-        menu='tag', operate="Create a knowledge tag",
-        get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id'))
+        menu="tag",
+        operate="Create a knowledge tag",
+        get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get("knowledge_id")),
     )
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
-        return result.success(TagSerializers.Query(data={
-            'workspace_id': workspace_id,
-            'knowledge_id': knowledge_id,
-            'name': request.query_params.get('name')
-        }).list())
+        return result.success(
+            TagSerializers.Query(
+                data={
+                    "workspace_id": workspace_id,
+                    "knowledge_id": knowledge_id,
+                    "name": request.query_params.get("name"),
+                }
+            ).list()
+        )
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
@@ -78,23 +80,24 @@ class KnowledgeTagView(APIView):
             parameters=TagEditAPI.get_parameters(),
             request=TagEditAPI.get_request(),
             responses=TagEditAPI.get_response(),
-            tags=[_('Knowledge Base/Tag')]  # type: ignore
+            tags=[_("Knowledge Base/Tag")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_TAG_EDIT.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_TAG_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
-            menu='tag', operate="Update a knowledge tag",
-            get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id'))
+            menu="tag",
+            operate="Update a knowledge tag",
+            get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get("knowledge_id")),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, tag_id: str):
-            return result.success(TagSerializers.Operate(
-                data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'tag_id': tag_id}
-            ).edit(request.data))
+            return result.success(
+                TagSerializers.Operate(
+                    data={"workspace_id": workspace_id, "knowledge_id": knowledge_id, "tag_id": tag_id}
+                ).edit(request.data)
+            )
 
     class Delete(APIView):
         authentication_classes = [TokenAuth]
@@ -105,23 +108,24 @@ class KnowledgeTagView(APIView):
             parameters=TagDeleteAPI.get_parameters(),
             request=TagDeleteAPI.get_request(),
             responses=TagDeleteAPI.get_response(),
-            tags=[_('Knowledge Base/Tag')]  # type: ignore
+            tags=[_("Knowledge Base/Tag")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_TAG_DELETE.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_TAG_DELETE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
-            menu='tag', operate="Delete a knowledge tag",
-            get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id'))
+            menu="tag",
+            operate="Delete a knowledge tag",
+            get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get("knowledge_id")),
         )
         def delete(self, request: Request, workspace_id: str, knowledge_id: str, tag_id: str, delete_type: str):
-            return result.success(TagSerializers.Operate(
-                data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'tag_id': tag_id}
-            ).delete(delete_type))
+            return result.success(
+                TagSerializers.Operate(
+                    data={"workspace_id": workspace_id, "knowledge_id": knowledge_id, "tag_id": tag_id}
+                ).delete(delete_type)
+            )
 
     class BatchDelete(APIView):
         authentication_classes = [TokenAuth]
@@ -132,20 +136,21 @@ class KnowledgeTagView(APIView):
             parameters=TagDeleteAPI.get_parameters(),
             request=TagDeleteAPI.get_request(),
             responses=TagDeleteAPI.get_response(),
-            tags=[_('Knowledge Base/Tag')]  # type: ignore
+            tags=[_("Knowledge Base/Tag")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_TAG_DELETE.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_TAG_DELETE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
-            menu='tag', operate="Batch Delete knowledge tag",
-            get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id'))
+            menu="tag",
+            operate="Batch Delete knowledge tag",
+            get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get("knowledge_id")),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
-            return result.success(TagSerializers.BatchDelete(
-                data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'tag_ids': request.data}
-            ).batch_delete())
+            return result.success(
+                TagSerializers.BatchDelete(
+                    data={"workspace_id": workspace_id, "knowledge_id": knowledge_id, "tag_ids": request.data}
+                ).batch_delete()
+            )

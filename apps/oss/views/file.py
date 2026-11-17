@@ -9,10 +9,8 @@ from application.models import Application
 from common.auth import TokenAuth, AllTokenAuth
 from common.auth.authentication import get_is_permissions
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
-from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
 from common.constants.authentication_type import UserType
 from common.exception.app_exception import AppUnauthorizedFailed
 from common.log.log import log
@@ -122,11 +120,6 @@ class GetUrlView(APIView):
             if not is_permissions(
                 PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
                 PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-                ViewPermission(
-                    [RoleConstants.USER.get_workspace_role()],
-                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                    compare=CompareConstants.AND,
-                ),
                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ):
                 raise AppUnauthorizedFailed(403, _("No permission to access"))

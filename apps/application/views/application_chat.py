@@ -30,14 +30,12 @@ from chat.api.chat_authentication_api import ChatOpenAPI
 from chat.serializers.chat import DebugChatSerializers, OpenChatSerializers, ResumeSerializers
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
+from common.bus import emit
 from common.log.log import _get_ip_address
 from common.result import result
 from common.utils.common import query_params_to_single_dict
-from common.bus import emit
 
 
 def get_application_operation_object(application_id):
@@ -63,11 +61,6 @@ class ApplicationChat(APIView):
     @has_permissions(
         PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_application_permission(),
         PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def get(self, request: Request, workspace_id: str, application_id: str):
@@ -97,11 +90,6 @@ class ApplicationChat(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
@@ -131,11 +119,6 @@ class ApplicationChat(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_CHAT_LOG_EXPORT.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_CHAT_LOG_EXPORT.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def post(self, request: Request, workspace_id: str, application_id: str):
@@ -163,11 +146,6 @@ class OpenView(APIView):
     @has_permissions(
         PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
         PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def get(self, request: Request, workspace_id: str, application_id: str):
@@ -203,11 +181,6 @@ class ChatView(APIView):
     @has_permissions(
         PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
         PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def post(self, request: Request, workspace_id: str, application_id: str, chat_id: str):
@@ -238,11 +211,6 @@ class CancelWorkflowView(APIView):
     @has_permissions(
         PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
         PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def post(self, request: Request, workspace_id: str, application_id: str, chat_id: str):
@@ -263,11 +231,6 @@ class ResumeStreamView(APIView):
     @has_permissions(
         PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
         PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def post(self, request: Request, workspace_id: str, application_id: str, chat_id: str, chat_record_id: str):
@@ -292,11 +255,6 @@ class DebugHistoricalConversation(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
@@ -326,11 +284,6 @@ class DebugHistoricalConversation(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(
@@ -368,11 +321,6 @@ class DebugHistoricalConversation(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def post(self, request: Request, workspace_id: str, application_id: str, chat_id: str, chat_record_id: str):

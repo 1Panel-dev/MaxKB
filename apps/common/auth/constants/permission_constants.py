@@ -104,35 +104,6 @@ class PermissionConstants(Enum):
         ),
     )
 
-    # ==================== 资源主分组（无子分组） ====================
-    KNOWLEDGE = (
-        Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.SELF, bit_index=0),
-        PermissionMeta(
-            role_list=[],
-            category=Category.RESOURCE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
-        ),
-    )
-
-    APPLICATION = (
-        Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.SELF, bit_index=0),
-        PermissionMeta(
-            role_list=[],
-            category=Category.RESOURCE,
-            scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
-        ),
-    )
-
-    MODEL = (
-        Permission(group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.SELF, bit_index=0),
-        PermissionMeta(role_list=[], category=Category.RESOURCE),
-    )
-
-    TOOL = (
-        Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.SELF, bit_index=0),
-        PermissionMeta(role_list=[], category=Category.RESOURCE),
-    )
-
     # ==================== 用户管理 ====================
     USER_READ = (
         Permission(group=Group.USER, sub_group=Group.USER, operate=Operate.READ, bit_index=0),

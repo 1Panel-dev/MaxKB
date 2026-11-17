@@ -1,16 +1,14 @@
-from common.auth import TokenAuth
-from common.auth.authentication import has_permissions
-from common.auth.constants.compare_constants import CompareConstants
-from common.auth.constants.permission_constants import PermissionConstants
-from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
-from common.log.log import log
-from common.result import result
-from common.utils.common import query_params_to_single_dict
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.views import APIView, Request
 
+from common.auth import TokenAuth
+from common.auth.authentication import has_permissions
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.log.log import log
+from common.result import result
+from common.utils.common import query_params_to_single_dict
 from knowledge.api.termbase import (
     BatchDeleteAPI,
     TermbaseBatchCreateAPI,
@@ -39,11 +37,6 @@ class TermbaseView(APIView):
         PermissionConstants.KNOWLEDGE_TERMBASE_READ.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_TERMBASE_READ.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
     )
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
         q = TermbaseSerializers.Query(
@@ -70,11 +63,6 @@ class TermbaseView(APIView):
         PermissionConstants.KNOWLEDGE_TERMBASE_CREATE.get_workspace_knowledge_permission(),
         PermissionConstants.KNOWLEDGE_TERMBASE_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            compare=CompareConstants.AND,
-        ),
     )
     @log(
         menu="termbase",
@@ -105,11 +93,6 @@ class TermbaseView(APIView):
             PermissionConstants.KNOWLEDGE_TERMBASE_EDIT.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_TERMBASE_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="termbase",
@@ -140,11 +123,6 @@ class TermbaseView(APIView):
             PermissionConstants.KNOWLEDGE_TERMBASE_EDIT.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_TERMBASE_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="termbase",
@@ -174,11 +152,6 @@ class TermbaseView(APIView):
             PermissionConstants.KNOWLEDGE_TERMBASE_DELETE.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_TERMBASE_DELETE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="termbase",
@@ -211,11 +184,6 @@ class TermbaseView(APIView):
             PermissionConstants.KNOWLEDGE_TERMBASE_EDIT.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_TERMBASE_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="termbase",
@@ -251,11 +219,6 @@ class TermbaseView(APIView):
             PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page, page_size):
             d = TermbaseSerializers.Query(

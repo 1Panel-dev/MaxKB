@@ -1,6 +1,3 @@
-from knowledge.permissions import (
-    document_permission,
-)
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.views import APIView
@@ -8,10 +5,8 @@ from rest_framework.views import Request
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 from common.result import result
 from common.utils.common import query_params_to_single_dict
@@ -28,6 +23,9 @@ from knowledge.api.paragraph import (
     ParagraphBatchGenerateRelatedAPI,
     ParagraphMigrateAPI,
     ParagraphAdjustOrderAPI,
+)
+from knowledge.permissions import (
+    document_permission,
 )
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.paragraph import ParagraphSerializers
@@ -358,11 +356,6 @@ class ParagraphView(APIView):
             PermissionConstants.KNOWLEDGE_PROBLEM_RELATE.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_PROBLEM_RELATE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="Paragraph",
@@ -402,11 +395,6 @@ class ParagraphView(APIView):
             PermissionConstants.KNOWLEDGE_PROBLEM_RELATE.get_workspace_knowledge_permission(),
             PermissionConstants.KNOWLEDGE_PROBLEM_RELATE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            ),
         )
         @log(
             menu="Paragraph",

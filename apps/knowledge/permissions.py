@@ -20,13 +20,6 @@ def knowledge_permission(permission):
             permission.get_workspace_knowledge_permission(),
             permission.get_workspace_permission_workspace_manage_role(),
         ],
-        aggregatePermissions=[
-            AggregatePermission(
-                roles=[RoleConstants.USER.get_workspace_role()],
-                permissions=[PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                compare=CompareConstants.AND,
-            )
-        ],
     )
 
 

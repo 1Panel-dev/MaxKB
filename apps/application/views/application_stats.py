@@ -7,6 +7,7 @@
 @desc:
 """
 
+from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -15,13 +16,9 @@ from application.api.application_stats import ApplicationStatsAPI
 from application.serializers.application_stats import ApplicationStatisticsSerializer
 from common import result
 from common.auth import TokenAuth
-from django.utils.translation import gettext_lazy as _
-
 from common.auth.authentication import has_permissions
-from common.auth.constants.compare_constants import CompareConstants
 from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
 
 
 class ApplicationStats(APIView):
@@ -39,11 +36,6 @@ class ApplicationStats(APIView):
     @has_permissions(
         PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
         PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            compare=CompareConstants.AND,
-        ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def get(self, request: Request, workspace_id: str, application_id: str):
@@ -74,11 +66,6 @@ class ApplicationStats(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, application_id: str):
@@ -109,11 +96,6 @@ class ApplicationStats(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, application_id: str):
@@ -144,11 +126,6 @@ class ApplicationStats(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
@@ -180,11 +157,6 @@ class ApplicationStats(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
@@ -216,11 +188,6 @@ class ApplicationStats(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, application_id: str):
@@ -251,11 +218,6 @@ class ApplicationStats(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, application_id: str):
@@ -286,11 +248,6 @@ class ApplicationStats(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_OVERVIEW_EXPORT.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_OVERVIEW_EXPORT.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, application_id: str):
@@ -320,11 +277,6 @@ class ApplicationStats(APIView):
         @has_permissions(
             PermissionConstants.APPLICATION_OVERVIEW_EXPORT.get_workspace_application_permission(),
             PermissionConstants.APPLICATION_OVERVIEW_EXPORT.get_workspace_permission_workspace_manage_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                compare=CompareConstants.AND,
-            ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, application_id: str):

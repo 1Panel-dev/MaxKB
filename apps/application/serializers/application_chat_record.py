@@ -11,30 +11,29 @@ from functools import reduce
 from typing import Dict
 
 import uuid_utils.compat as uuid
-from application.models import Application, ApplicationAccessToken, ChatRecord, Chat
-from application.serializers.application_chat import ChatCountSerializer
-from application.serializers.common import ChatInfo
-from common.auth.authentication import get_is_permissions
-from common.chunk import text_to_chunk
-from common.auth.constants.compare_constants import CompareConstants
-from common.auth.constants.permission_constants import PermissionConstants
-from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.aggregate_permission import ViewPermission
-from common.db.search import page_search
-from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
-from common.utils.common import post
 from django.db import transaction
 from django.db.models import QuerySet
 from django.db.models.aggregates import Max
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
+from rest_framework.utils.formatting import lazy_format
+
+from application.models import Application, ApplicationAccessToken, ChatRecord, Chat
+from application.serializers.application_chat import ChatCountSerializer
+from application.serializers.common import ChatInfo
+from common.auth.authentication import get_is_permissions
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.chunk import text_to_chunk
+from common.db.search import page_search
+from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
+from common.utils.common import post
 from knowledge.models import Document, Knowledge, Paragraph, Problem, ProblemParagraphMapping
 from knowledge.serializers.common import get_embedding_model_id_by_knowledge_id, update_document_char_length
 from knowledge.serializers.paragraph import ParagraphSerializers
 from knowledge.services.multimodal_retrieval import enrich_paragraph_sources
 from knowledge.task.embedding import embedding_by_paragraph, embedding_by_paragraph_list
-from rest_framework import serializers
-from rest_framework.utils.formatting import lazy_format
 
 
 class ChatRecordSerializerModel(serializers.ModelSerializer):
@@ -366,11 +365,6 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
                 PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
                 PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-                ViewPermission(
-                    [RoleConstants.USER.get_workspace_role()],
-                    [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                    compare=CompareConstants.AND,
-                ),
             )
         else:
             is_permission = get_is_permissions(
@@ -507,11 +501,6 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
                 PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
                 PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-                ViewPermission(
-                    [RoleConstants.USER.get_workspace_role()],
-                    [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                    compare=CompareConstants.AND,
-                ),
             )
         else:
             is_permission = get_is_permissions(
@@ -588,11 +577,6 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
                         PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
                         PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-                        ViewPermission(
-                            [RoleConstants.USER.get_workspace_role()],
-                            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                            compare=CompareConstants.AND,
-                        ),
                     )
                 else:
                     is_permission = get_is_permissions(
