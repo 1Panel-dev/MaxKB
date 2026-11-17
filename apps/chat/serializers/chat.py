@@ -509,6 +509,7 @@ class ChatSerializers(serializers.Serializer):
         validate_application_resource_permissions(
             chat_info.get_resource_user_id(), chat_info.application,
             published_knowledge_ids=chat_info.get_published_knowledge_ids(),
+            allow_missing_knowledge=True,
         )
         if chat_info.application.type == ApplicationTypeChoices.SIMPLE:
             self.is_valid_application_simple(raise_exception=True, chat_info=chat_info)

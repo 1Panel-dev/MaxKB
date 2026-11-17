@@ -310,7 +310,8 @@ def get_authorized_application_ids(user_id: str, workspace_id: str, application_
     return [app_id for app_id in application_ids if app_id in granted_application_ids]
 
 
-def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: Dict, published_knowledge_ids=None):
+def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: Dict, published_knowledge_ids=None,
+                                    *, allow_missing_knowledge=False):
     """
     校验应用/工作流中绑定的工具、知识库和子应用,当前用户是否都有权限使用,防止低权限成员
     绑定自己被禁止访问的资源,并通过应用/工作流执行绕过单独授权控制。
@@ -327,6 +328,11 @@ def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: D
             raise AppApiException(403, str(message))
 
     knowledge_ids = get_bound_knowledge_ids(instance)
+    if allow_missing_knowledge and knowledge_ids:
+        # 历史工作流可能保留已删除的知识库；对话跳过失效引用，仍校验所有存在的资源。
+        knowledge_ids = [str(value) for value in QuerySet(Knowledge).filter(
+            id__in=knowledge_ids
+        ).values_list("id", flat=True)]
     authorized_knowledge_ids = set(filter_authorized_ids(
         "knowledge", knowledge_ids, workspace_id, user_id=user_id, published_knowledge_ids=published_knowledge_ids,
     ))
@@ -351,7 +357,8 @@ def validate_bound_application_permissions(user_id: str, workspace_id: str, inst
             raise AppApiException(403, str(message))
 
 
-def validate_application_resource_permissions(user_id, application, published_knowledge_ids=None):
+def validate_application_resource_permissions(user_id, application, published_knowledge_ids=None,
+                                             *, allow_missing_knowledge=False):
     """按调用方确定的执行用户校验实际保存或执行的应用配置。"""
     instance = {
         key: getattr(application, key) for key in (
@@ -359,7 +366,8 @@ def validate_application_resource_permissions(user_id, application, published_kn
         )
     }
     instance["knowledge_id_list"] = getattr(application, "knowledge_ids", [])
-    validate_bound_tool_permissions(user_id, application.workspace_id, instance, published_knowledge_ids)
+    validate_bound_tool_permissions(user_id, application.workspace_id, instance, published_knowledge_ids,
+                                    allow_missing_knowledge=allow_missing_knowledge)
 
 
 def validate_import_resource_permissions(user_id, workspace_id, resources, created_tool_ids):
