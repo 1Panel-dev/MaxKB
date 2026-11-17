@@ -217,13 +217,12 @@ onMounted(() => loadChatUserGroups())
             <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
             <!-- 设置用户组自动授权 -->
             <div class="flex-align-center shrink-0 gap-2">
-              <span v-if="knowledgeChatUserPermission('knowledgeChatUserEdit')">自动授权</span>
+              <span>自动授权</span>
               <el-switch
-                :disabled="isWorkspaceSharedResource()"
+                :disabled="isWorkspaceSharedResource() || !knowledgeChatUserPermission('knowledgeChatUserEdit')"
                 :model-value="currentGroup.is_auth"
                 size="small"
                 @change="handleAutoAuthorizationChange"
-                v-if="knowledgeChatUserPermission('knowledgeChatUserEdit')"
               />
             </div>
           </div>
