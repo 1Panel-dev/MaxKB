@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { KnowledgeItem } from '@/api/types'
+import { KNOWLEDGE_TYPE } from '@/api/enums'
 import { numberFormat } from '@/utils/number'
 
 defineOptions({ name: 'KnowledgeCard' })
@@ -53,6 +54,13 @@ function handleOpen() {
         <strong class="mr-1 font-semibold">{{ numberFormat(knowledge.char_length) }}</strong>
         <span class="text-N600">字符</span>
       </span>
+      <template v-if="knowledge.type === KNOWLEDGE_TYPE.BASE || knowledge.type === KNOWLEDGE_TYPE.WORKFLOW">
+        <el-divider direction="vertical" />
+        <span>
+          <span class="mr-1 font-semibold">{{ numberFormat(knowledge.image_count ?? 0) }}</span>
+          <span class="text-N600">图片</span>
+        </span>
+      </template>
 
       <component :is="Action" v-if="!disabled">
         <component :is="ActionDropdown">
