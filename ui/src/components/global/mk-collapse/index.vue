@@ -39,7 +39,6 @@ const expanded = computed({
           type="button"
           class="flex-center shrink-0 cursor-pointer border-0 bg-transparent p-0"
           :class="{ 'order-last': indicatorPosition === 'after' }"
-          :title="expanded ? '收起' : '展开'"
           :aria-expanded="expanded"
           @click.stop="expanded = !expanded"
         >

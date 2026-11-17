@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentImportParagraph, DocumentSplitResult } from '@/api/types'
 import EditParagraphDialog from '../upload-document/EditParagraphDialog.vue'
 import { getFileUrl } from '@/utils/common'
@@ -7,6 +8,7 @@ import { getFileIconUrl } from '@/utils/icon'
 import { MsgConfirm, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'DocumentImportPreview' })
+const { t } = useI18n({ useScope: 'global' })
 defineProps<{ knowledgeId: string }>()
 const documents = defineModel<DocumentSplitResult[]>({ required: true })
 const selectedDocumentIndex = ref(0)
@@ -45,7 +47,7 @@ function handleEditDialogClosed() {
 
 function validate() {
   if (editingParagraphIndex.value !== undefined) {
-    MsgWarning('请先保存或取消分段编辑')
+    MsgWarning(t('knowledge.document.preview.finishEditingMessage'))
     return false
   }
   return true
@@ -56,8 +58,7 @@ defineExpose({ validate })
 function handleDeleteParagraph(index: number) {
   const document = selectedDocument.value
   if (!document) return
-  const resourceName = document.source_file_id && document.resource_type === 'image' ? '图片' : '文档'
-  return MsgConfirm(`是否删除${resourceName}：${document.name}？`)
+  return MsgConfirm(t('knowledge.document.preview.deleteParagraphConfirm'))
     .then(() => {
       document.content.splice(index, 1)
     })
@@ -68,7 +69,9 @@ function handleDeleteParagraph(index: number) {
 <template>
   <MkViewLayout title="">
     <template #aside="{ Header }">
-      <component :is="Header"><h4 class="mk-title-decoration">预览</h4></component>
+      <component :is="Header">
+        <h4 class="mk-title-decoration">{{ t('knowledge.document.preview.title') }}</h4>
+      </component>
       <el-scrollbar class="min-h-0 flex-1" view-class="px-4 pb-4">
         <div class="space-y-3">
           <template v-for="(document, index) in documents" :key="index">
@@ -98,7 +101,7 @@ function handleDeleteParagraph(index: number) {
     </template>
     <template #default="{ Header }">
       <component :is="Header">
-        <p class="text-N600">{{ selectedDocument?.content.length ?? 0 }} 分段</p>
+        <p class="text-N600">{{ t('knowledge.stats.paragraphs', { count: selectedDocument?.content.length ?? 0 }) }}</p>
       </component>
       <template v-if="selectedDocument">
         <div class="space-y-3">
@@ -126,13 +129,13 @@ function handleDeleteParagraph(index: number) {
 
               <h4 v-if="paragraph.title" class="mb-2 pr-20">{{ paragraph.title }}</h4>
               <MdPreview :model-value="paragraph.content" />
-              <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
+              <p class="mt-2 text-sm text-N600">{{ t('knowledge.stats.characters', { count: paragraph.content.length }) }}</p>
             </el-card>
           </template>
         </div>
-        <MkEmpty v-if="!selectedDocument.content.length" description="暂无分段" />
+        <MkEmpty v-if="!selectedDocument.content.length" :description="t('knowledge.document.preview.emptyParagraphs')" />
       </template>
-      <MkEmpty v-else description="暂无预览文档" />
+      <MkEmpty v-else :description="t('knowledge.document.preview.emptyDocuments')" />
     </template>
   </MkViewLayout>
   <EditParagraphDialog

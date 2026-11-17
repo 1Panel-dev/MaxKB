@@ -21,7 +21,8 @@
     "apply": "Use template",
     "missingDownloadUrl": "This template cannot be used because its download URL is missing."
   },
-  "actions": {
-    "viewExecutionRecords": "View execution history"
+  "executionRecords": {
+    "title": "Execution history",
+    "view": "View execution history"
   }
 }

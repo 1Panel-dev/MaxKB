@@ -38,6 +38,11 @@
       "placeholder": "請選擇向量模型",
       "requiredMessage": "請選擇向量模型"
     },
+    "targetKnowledge": {
+      "label": "選擇知識庫",
+      "placeholder": "請選擇知識庫",
+      "requiredMessage": "請選擇知識庫"
+    },
     "webRootUrl": {
       "label": "網站根網址",
       "placeholder": "請輸入網站根網址",
@@ -50,6 +55,7 @@
   },
   "stats": {
     "documents": "{count} 文件",
+    "paragraphs": "{count} 分段",
     "characters": "{count} 字元",
     "images": "{count} 圖片"
   },
@@ -58,7 +64,14 @@
     "generateEmbeddings": "向量化",
     "generateQuestions": "產生問題",
     "cancelGenerateQuestions": "取消產生問題",
-    "buildKeywordIndex": "分詞索引"
+    "buildKeywordIndex": "分詞索引",
+    "cancelEmbeddings": "取消向量化",
+    "cancelKeywordIndex": "取消分詞索引"
+  },
+  "paragraphScope": {
+    "label": "選擇分段",
+    "unsuccessful": "僅處理尚未成功的分段",
+    "all": "全部分段"
   },
   "import": {
     "embeddingNotice": "已成功匯入並建立知識庫。文件尚未向量化，請先在知識庫設定中選擇向量模型，再將文件向量化。"
@@ -75,6 +88,7 @@
     "batchTitle": "確定批次刪除 {count} 個知識庫？"
   },
   "messages": {
-    "missingWorkspace": "知識庫缺少所屬工作空間資訊"
+    "missingWorkspace": "知識庫缺少所屬工作空間資訊",
+    "migrateSuccess": "遷移成功"
   }
 }

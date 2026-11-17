@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentResourceType, DocumentTaskState } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import DocumentEmbeddingDialog from './DocumentEmbeddingDialog.vue'
 
 defineOptions({ name: 'BatchEmbeddingAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = withDefaults(
   defineProps<{
     api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
@@ -50,6 +52,6 @@ function handleSubmit(stateList: DocumentTaskState[]) {
 
 <template>
   <!-- 批量向量化 -->
-  <el-button plain type="primary" :disabled="loading" @click="handleOpen">向量化</el-button>
+  <el-button plain type="primary" :disabled="loading" @click="handleOpen">{{ t('knowledge.actions.generateEmbeddings') }}</el-button>
   <DocumentEmbeddingDialog v-model="visible" :loading="loading" @submit="handleSubmit" />
 </template>

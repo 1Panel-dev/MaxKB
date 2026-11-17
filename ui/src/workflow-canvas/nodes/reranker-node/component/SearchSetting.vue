@@ -29,7 +29,7 @@ function submit() {
 </script>
 
 <template>
-  <el-button text type="primary" title="参数设置" @click="open">
+  <el-button text type="primary" @click="open">
     <MkIcon name="icon_setting" :size="20" />
   </el-button>
   <MkDialog v-model="visible" title="参数设置" @closed="resetData">

@@ -18,14 +18,6 @@
       "placeholder": "请选择分段标识",
       "description": "按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。"
     },
-    "delimiterOptions": {
-      "space": "空格",
-      "semicolon": "分号",
-      "comma": "逗号",
-      "period": "句号",
-      "newline": "回车",
-      "blankLine": "空行"
-    },
     "paragraphLength": "分段长度",
     "childChunkLength": {
       "label": "子块长度",

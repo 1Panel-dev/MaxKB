@@ -2,13 +2,8 @@
   "library": {
     "title": "資料庫"
   },
-  "document": {
-    "title": "文件"
-  },
   "image": {
-    "title": "圖片"
-  },
-  "tags": {
-    "title": "標籤管理"
+    "title": "圖片",
+    "unsupportedFormatMessage": "僅支援 {formats} 格式的圖片"
   }
 }

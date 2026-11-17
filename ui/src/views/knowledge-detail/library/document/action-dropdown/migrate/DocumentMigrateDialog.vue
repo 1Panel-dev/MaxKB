@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentResourceType, KnowledgeItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
@@ -7,6 +8,7 @@ import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DocumentMigrateDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -21,9 +23,9 @@ const knowledgeOptions = ref<KnowledgeItem[]>([])
 const knowledgeById = computed(() => new Map(knowledgeOptions.value.map((knowledge) => [knowledge.id, knowledge])))
 const migrateFormRef = useTemplateRef<FormInstance>('migrateFormRef')
 const migrateForm = reactive({ targetKnowledgeId: '' })
-const migrateRules: FormRules<typeof migrateForm> = {
-  targetKnowledgeId: [{ required: true, message: '请选择知识库', trigger: 'change' }],
-}
+const migrateRules = computed<FormRules<typeof migrateForm>>(() => ({
+  targetKnowledgeId: [{ required: true, message: t('knowledge.fields.targetKnowledge.requiredMessage'), trigger: 'change' }],
+}))
 const targetDocumentIds = ref<string[]>([])
 
 // 打开迁移弹窗，固定本次文档并查询目标知识库。
@@ -57,7 +59,7 @@ async function handleSubmit() {
     props.api
       .putMigrateDocuments?.(props.knowledgeId, migrateForm.targetKnowledgeId, targetDocumentIds.value)
       .then(() => {
-        MsgSuccess('迁移成功')
+        MsgSuccess(t('knowledge.messages.migrateSuccess'))
         visible.value = false
         emit('refresh')
       })
@@ -73,10 +75,24 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="迁移至" @closed="emit('closed')">
-    <el-form ref="migrateFormRef" :model="migrateForm" :rules="migrateRules" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="选择知识库" prop="targetKnowledgeId">
-        <el-select v-model="migrateForm.targetKnowledgeId" fit-input-width filterable placeholder="请选择知识库" :loading="optionLoading">
+  <MkDialog v-model="visible" :title="t('knowledge.document.actions.migrateTo')" @closed="emit('closed')">
+    <el-form
+      ref="migrateFormRef"
+      :model="migrateForm"
+      :rules="migrateRules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('knowledge.fields.targetKnowledge.label')" prop="targetKnowledgeId">
+        <el-select
+          v-model="migrateForm.targetKnowledgeId"
+          fit-input-width
+          filterable
+          :placeholder="t('knowledge.fields.targetKnowledge.placeholder')"
+          :loading="optionLoading"
+        >
           <template v-for="target in knowledgeOptions" :key="target.id">
             <el-option :label="target.name" :value="target.id">
               <div class="flex-align-center min-w-0 gap-2">
@@ -96,9 +112,9 @@ defineExpose({ open })
     </el-form>
     <template #footer>
       <!-- 取消文档迁移 -->
-      <el-button plain :disabled="loading || optionLoading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading || optionLoading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 确认迁移文档 -->
-      <el-button type="primary" :loading="loading" :disabled="optionLoading" @click="handleSubmit">确认</el-button>
+      <el-button type="primary" :loading="loading" :disabled="optionLoading" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

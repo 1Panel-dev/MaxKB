@@ -82,7 +82,7 @@ defineExpose({ zoom })
           <h4 class="truncate break-all" :title="String(model.properties.stepName ?? '')">{{ model.properties.stepName }}</h4>
         </div>
         <div class="flex-align-center gap-1" @pointerdown.stop @mousedown.stop @keydown.stop @click.stop>
-          <el-button text :title="enlarge ? '还原' : '放大'" @click="enlargeHandle">
+          <el-button text @click="enlargeHandle">
             <MkIcon name="icon_magnify_outlined" :size="20" />
           </el-button>
           <!-- 展开或收起节点 -->

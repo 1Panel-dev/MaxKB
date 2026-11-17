@@ -20,8 +20,7 @@ defineExpose({ customHeader: true })
 /**
  * 知识库「标签管理」权限判断
  */
-type KnowledgeTagPermissionMethod =
-  | 'tagRead' | 'tagCreate' | 'tagEdit' | 'tagDelete'
+type KnowledgeTagPermissionMethod = 'tagRead' | 'tagCreate' | 'tagEdit' | 'tagDelete'
 
 function knowledgeTagPermission(method: KnowledgeTagPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
@@ -195,7 +194,13 @@ onMounted(() => {
       <div class="flex-align-center">
         <MkSearchInput v-model="searchText" class="mr-3 w-60!" @change="handleSearchChange" />
         <!-- 导入标签，成功后刷新列表 -->
-        <ButtonImportTags v-if="knowledgeTagPermission('tagCreate')" :api="resourceApi.tags" :knowledge-id="knowledgeId" :disabled="loading || operationLoading" @refresh="loadTags" />
+        <ButtonImportTags
+          v-if="knowledgeTagPermission('tagCreate')"
+          :api="resourceApi.tags"
+          :knowledge-id="knowledgeId"
+          :disabled="loading || operationLoading"
+          @refresh="loadTags"
+        />
         <!-- 创建标签 -->
         <el-button v-if="knowledgeTagPermission('tagCreate')" type="primary" :disabled="loading || operationLoading" @click="handleOpenCreateTag">
           <MkIcon name="icon_add_outlined" />
@@ -254,7 +259,7 @@ onMounted(() => {
         </el-button>
       </template>
     </el-table-column>
-    <el-table-column label="操作" width="100" fixed="right" v-if="!isWorkspaceSharedResource()">
+    <el-table-column label="操作" width="130" fixed="right" v-if="!isWorkspaceSharedResource()">
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center">
           <!-- 编辑标签值 -->
@@ -274,7 +279,9 @@ onMounted(() => {
     </el-table-column>
     <template #footer-batch-actions>
       <!-- 批量删除标签 -->
-      <el-button v-if="knowledgeTagPermission('tagDelete')" type="danger" plain :loading="operationLoading" @click="handleBatchDelete">删除</el-button>
+      <el-button v-if="knowledgeTagPermission('tagDelete')" type="danger" plain :loading="operationLoading" @click="handleBatchDelete">
+        删除
+      </el-button>
     </template>
   </MkTable>
   <CreateTagDialog ref="createTagRef" :api="resourceApi.tags" :knowledge-id="knowledgeId" @refresh="loadTags" />

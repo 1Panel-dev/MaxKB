@@ -9,11 +9,6 @@
       "description": "執行時，系統會將提示詞中的 {data} 替換為分段內容，再傳送給 AI 模型。\n請要求模型將每個產生的問題放在 {questionTags} 標籤中，系統會自動將問題關聯至分段。\n您可以調整提示詞或選擇其他模型，以改善產生的結果。",
       "requiredMessage": "請輸入提示詞",
       "defaultValue": "內容：{data}\n\n請摘要上述內容，並根據摘要產生 5 個問題。\n輸出要求：\n- 請只輸出問題。\n- 請將每個問題放在 {questionTags} 標籤中。"
-    },
-    "scope": {
-      "label": "選擇分段",
-      "unsuccessful": "僅處理尚未成功的分段",
-      "all": "全部分段"
     }
   }
 }

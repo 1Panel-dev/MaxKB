@@ -29,9 +29,9 @@ import {
 } from '../document/action-dropdown'
 import DocumentStatus from '../document/components/DocumentStatus.vue'
 import DocumentTags from '../document/components/DocumentTags.vue'
-import { DOCUMENT_STATUS_FILTER_OPTIONS } from '../document/status'
+import { DOCUMENT_STATUS_FILTER_OPTIONS, DOCUMENT_STATUS_OPTIONS } from '../document/status'
 import ButtonUploadImage from './upload-image/ButtonUploadImage.vue'
-import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
+import { DOCUMENT_HIT_HANDLING_MESSAGE_KEYS } from '@/constants/document'
 import { getFileUrl } from '@/utils/common'
 import { MsgSuccess } from '@/utils/message'
 import { numberFormat } from '@/utils/number'
@@ -135,6 +135,9 @@ function loadCreatorOptions(keyword: string) {
 /* 过滤项 */
 // 文档状态
 const selectedDocumentStatus = ref<string | null>(null)
+const documentStatusOptions = computed(() =>
+  DOCUMENT_STATUS_FILTER_OPTIONS.map(({ value }) => ({ value, label: t(DOCUMENT_STATUS_OPTIONS[value].labelKey) })),
+)
 const documentStatusFilter = computed(() => DOCUMENT_STATUS_FILTER_OPTIONS.find(({ value }) => value === selectedDocumentStatus.value))
 
 // 启用状态
@@ -145,7 +148,9 @@ const documentActiveOptions = [
 const selectedDocumentActive = ref<boolean | null>(null)
 
 // 召回处理
-const documentHitHandlingOptions = Object.entries(DOCUMENT_HIT_HANDLING_LABELS).map(([value, label]) => ({ value, label }))
+const documentHitHandlingOptions = computed(() =>
+  Object.entries(DOCUMENT_HIT_HANDLING_MESSAGE_KEYS).map(([value, key]) => ({ value, label: t(key) })),
+)
 const selectedDocumentHitHandling = ref<DocumentHitHandling | null>(null)
 
 // 标签
@@ -355,7 +360,7 @@ onBeforeUnmount(() => {
           v-model="selectedDocumentStatus"
           mode="single"
           label="文件状态"
-          :options="DOCUMENT_STATUS_FILTER_OPTIONS"
+          :options="documentStatusOptions"
           @change="handleDocumentFilterChange"
         />
       </template>
@@ -416,7 +421,7 @@ onBeforeUnmount(() => {
         />
       </template>
       <template #default="{ row }: { row: DocumentItem }">
-        {{ DOCUMENT_HIT_HANDLING_LABELS[row.hit_handling_method] }}
+        {{ documentHitHandlingOptions.find((option) => option.value === row.hit_handling_method)?.label }}
       </template>
     </el-table-column>
     <el-table-column prop="hit_num" label="召回次数">
@@ -480,7 +485,7 @@ onBeforeUnmount(() => {
               <!-- 设置当前文档的标签 -->
               <DocumentTagsAction
                 v-if="canImage('tag')"
-                label="标签设置"
+                :label="t('knowledge.tags.settings')"
                 icon="icon_tag"
                 :api="resourceApi.tags"
                 :knowledge-id="knowledgeId"
@@ -513,7 +518,7 @@ onBeforeUnmount(() => {
               <!-- 迁移文档 -->
               <MigrateDocumentAction
                 v-if="canImage('migrate')"
-                label="迁移"
+                :label="t('knowledge.document.actions.migrate')"
                 icon="icon_move2_outlined"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
@@ -590,7 +595,7 @@ onBeforeUnmount(() => {
       <!-- 为选中文档批量添加标签 -->
       <BatchDocumentTagsAction
         v-if="canImage('tag')"
-        label="标签设置"
+        :label="t('knowledge.tags.settings')"
         :api="resourceApi.tags"
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
@@ -609,7 +614,7 @@ onBeforeUnmount(() => {
             <!-- 批量迁移文档 -->
             <MigrateDocumentAction
               v-if="canImage('migrate')"
-              label="迁移至"
+              :label="t('knowledge.document.actions.migrateTo')"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
               :document-ids="selectedDocumentIds"
@@ -626,7 +631,7 @@ onBeforeUnmount(() => {
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
               :task-type="DOCUMENT_TASK_TYPE.EMBEDDING"
-              label="取消向量化"
+              :label="t('knowledge.actions.cancelEmbeddings')"
               @refresh="refreshAfterOperation"
             />
             <!-- 批量取消生成问题 -->

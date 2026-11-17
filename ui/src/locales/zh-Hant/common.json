@@ -33,14 +33,33 @@
   "upload": {
     "dropHint": "將檔案拖曳到此處。",
     "selectFile": "選擇檔案上傳",
+    "selectFiles": "選擇檔案",
+    "selectFolder": "選擇資料夾",
     "replaceFile": "更換檔案",
-    "emptyFileMessage": "無法上傳空檔案"
+    "retryUpload": "重新上傳",
+    "limits": "每次最多上傳 {count} 個檔案，每個檔案不超過 {size} MB",
+    "formats": "支援格式：{formats}",
+    "emptyFileMessage": "無法上傳空檔案",
+    "sizeLimitMessage": "檔案大小超過上限",
+    "unsupportedFormatMessage": "不支援此檔案格式",
+    "countLimitMessage": "每次最多上傳 {count} 個檔案",
+    "networkErrorMessage": "網路連線失敗",
+    "uploadInProgressMessage": "檔案正在上傳，請稍候",
+    "noSuccessfulFilesMessage": "沒有成功上傳的檔案，請重新上傳",
+    "fileError": "{name}：{reason}",
+    "status": {
+      "completed": "已完成 {completed}/{total}",
+      "uploading": "上傳中",
+      "failed": "失敗 {count} 個",
+      "allSucceeded": "全部成功"
+    }
   },
   "actions": {
     "manage": "管理",
     "edit": "編輯",
     "delete": "刪除",
     "cancel": "取消",
+    "retry": "重試",
     "save": "儲存",
     "add": "新增",
     "previous": "上一步",
@@ -55,6 +74,7 @@
     "disable": "停用",
     "saveAndEnable": "儲存並啟用",
     "confirm": "確認",
+    "submit": "提交",
     "testConnection": "測試連線"
   },
   "dialogs": {
@@ -68,6 +88,7 @@
     "deleteFailed": "刪除失敗",
     "createSuccess": "建立成功",
     "addSuccess": "新增成功",
+    "removeSuccess": "移除成功",
     "fetchSuccess": "取得成功",
     "updateSuccess": "修改成功",
     "moveSuccess": "移動成功",

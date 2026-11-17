@@ -2,10 +2,12 @@
 import { inject } from 'vue'
 import { useRoute } from 'vue-router'
 import { DROPDOWN_INJECTION_KEY } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import type { DocumentItem } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 
 defineOptions({ name: 'ExportDocumentAction' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']; document: DocumentItem; label: string }>()
 const route = useRoute()
@@ -16,8 +18,8 @@ const parentDropdown = inject(DROPDOWN_INJECTION_KEY, undefined)
 
 /* 文档导出菜单 */
 const exportOptions = [
-  { label: '导出文档 Excel', method: 'exportDocument' },
-  { label: '导出文档 ZIP', method: 'exportDocumentZip' },
+  { labelKey: 'knowledge.export.documentsExcel', method: 'exportDocument' },
+  { labelKey: 'knowledge.export.documentsZip', method: 'exportDocumentZip' },
 ] as const
 
 // 导出当前文档，保留列表状态。
@@ -48,7 +50,7 @@ function handleExportDocument(method: (typeof exportOptions)[number]['method']) 
           <template v-for="exportOption in exportOptions" :key="exportOption.method">
             <!-- 按所选格式导出文档 -->
             <MkDropdownItem :disabled="loading" @click="handleExportDocument(exportOption.method)">
-              {{ exportOption.label }}
+              {{ t(exportOption.labelKey) }}
             </MkDropdownItem>
           </template>
         </MkDropdownMenu>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ParagraphQuestionDraft } from '../types'
 import type { ParagraphProblem } from '@/api/types'
 import type { SelectInstance } from 'element-plus'
@@ -11,7 +12,7 @@ import { perm } from '@/permission'
 /**
  * 知识库「问题」权限判断
  */
-type KnowledgeQuestionPermissionMethod =| 'problemRead' | 'problemEdit'
+type KnowledgeQuestionPermissionMethod = 'problemRead' | 'problemEdit'
 
 function knowledgeQuestionPermission(method: KnowledgeQuestionPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
@@ -21,6 +22,7 @@ function knowledgeQuestionPermission(method: KnowledgeQuestionPermissionMethod):
 }
 
 defineOptions({ name: 'ParagraphQuestions' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   knowledgeId: string
   documentId: string
@@ -29,6 +31,7 @@ const props = defineProps<{
 }>()
 const { resourceApi } = useDocumentDetailContext()
 const relatedProblems = defineModel<ParagraphQuestionDraft[]>({ required: true })
+const questionMaxLength = 256
 const loading = ref(false)
 const problemAdding = ref(false)
 const problemSelectRef = ref<SelectInstance>()
@@ -50,7 +53,7 @@ function loadProblemOptions(query = '') {
 }
 
 onMounted(() => {
-  if ( knowledgeQuestionPermission('problemRead') && !props.readonly && !isWorkspaceSharedResource()) void loadProblemOptions()
+  if (knowledgeQuestionPermission('problemRead') && !props.readonly && !isWorkspaceSharedResource()) void loadProblemOptions()
 })
 
 /* 新增分段维护本地草稿；已有分段创建或关联问题后刷新关联列表。 */
@@ -80,8 +83,12 @@ function handleSelectProblem(value: string) {
   if (props.readonly || loading.value || isWorkspaceSharedResource()) return
   const existingProblem = problemOptions.value.find(({ id }) => id === value)
   const content = (existingProblem?.content ?? value).trim()
-  if (!content || content.length > 256) {
-    MsgWarning(content ? '问题最多 256 字符' : '请输入关联问题')
+  if (!content || content.length > questionMaxLength) {
+    MsgWarning(
+      content
+        ? t('knowledge.paragraph.relatedQuestions.lengthMessage', { max: questionMaxLength })
+        : t('knowledge.paragraph.relatedQuestions.requiredMessage'),
+    )
     problemValue.value = ''
     return
   }
@@ -137,9 +144,14 @@ function handleRemoveProblem(index: number) {
 <template>
   <aside v-if="knowledgeQuestionPermission('problemRead')" v-loading="loading" class="mk-gray-card-lg flex-column w-60 shrink-0">
     <div class="mb-4 flex-between shrink-0 gap-3">
-      <h4>关联问题</h4>
+      <h4>{{ t('knowledge.paragraph.relatedQuestions.label') }}</h4>
       <!-- 添加关联问题 -->
-      <el-button v-if="!props.readonly && !isWorkspaceSharedResource() && knowledgeQuestionPermission('problemEdit')" text :disabled="loading || problemAdding" @click="handleAddProblem">
+      <el-button
+        v-if="!props.readonly && !isWorkspaceSharedResource() && knowledgeQuestionPermission('problemEdit')"
+        text
+        :disabled="loading || problemAdding"
+        @click="handleAddProblem"
+      >
         <MkIcon name="icon_add_outlined" :size="16" />
       </el-button>
     </div>
@@ -158,7 +170,7 @@ function handleRemoveProblem(index: number) {
             remote
             :remote-method="loadProblemOptions"
             :loading="optionLoading"
-            placeholder="请输入"
+            :placeholder="t('common.placeholders.input')"
             @change="handleSelectProblem"
             @blur="handleCancelProblem"
           >
@@ -171,7 +183,12 @@ function handleRemoveProblem(index: number) {
               <div class="flex-between gap-2">
                 <span class="min-w-0 flex-1 truncate" :title="problem.content">{{ problem.content }}</span>
                 <!-- 解除问题关联 -->
-                <el-button v-if="!props.readonly && !isWorkspaceSharedResource() && knowledgeQuestionPermission('problemEdit')" text :disabled="loading" @click="handleRemoveProblem(index)">
+                <el-button
+                  v-if="!props.readonly && !isWorkspaceSharedResource() && knowledgeQuestionPermission('problemEdit')"
+                  text
+                  :disabled="loading"
+                  @click="handleRemoveProblem(index)"
+                >
                   <MkIcon name="icon_close_outlined" :size="16" />
                 </el-button>
               </div>

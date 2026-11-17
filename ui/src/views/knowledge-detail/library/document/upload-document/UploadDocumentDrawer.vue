@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, provide, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentUploadMode } from './constants'
 import type { DocumentSplitResult } from '@/api/types'
 import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
@@ -14,6 +15,7 @@ import { DOCUMENT_UPLOAD_OPTIONS } from './constants'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'UploadDocumentDrawer' })
+const { locale, t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -73,7 +75,7 @@ function handleGeneratePreview() {
   if (!validateImportFiles() || !strategyRef.value) return
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
   if (fileIds.length !== successfulFiles.value.length) {
-    MsgWarning('没有上传成功的文件，请重新上传')
+    MsgWarning(t('common.upload.noSuccessfulFilesMessage'))
     return
   }
   loading.value = true
@@ -106,7 +108,7 @@ async function handleSubmit() {
   if (!validateImportFiles() || (previewVisible.value && !previewRef.value?.validate())) return
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
   if (!previewVisible.value && fileIds.length !== successfulFiles.value.length) {
-    MsgWarning('没有上传成功的文件，请重新上传')
+    MsgWarning(t('common.upload.noSuccessfulFilesMessage'))
     return
   }
 
@@ -130,7 +132,7 @@ async function handleSubmit() {
     // 当前范围未提供接口时不提示成功，也不关闭或刷新。
     if (!importRequest) return
     await importRequest
-    MsgSuccess('导入成功')
+    MsgSuccess(t('common.messages.importSuccess'))
     visible.value = false
     emit('refresh')
   } catch {
@@ -147,10 +149,10 @@ defineExpose({ open })
   <MkDrawer v-model="visible" direction="btt" size="100%" :content-class="previewVisible ? 'h-full p-0!' : undefined" @closed="emit('closed')">
     <template #header>
       <div class="flex w-full">
-        <h4>{{ uploadOption.title }}</h4>
+        <h4>{{ t(uploadOption.titleKey) }}</h4>
         <el-steps v-if="mode === 'text'" :active="activeStep" finish-status="success" class="absolute-center w-85!">
-          <el-step title="上传文档" />
-          <el-step title="文档处理策略" />
+          <el-step :title="t('knowledge.document.upload.title')" />
+          <el-step :title="t('knowledge.documentStrategy.title')" />
         </el-steps>
       </div>
     </template>
@@ -159,26 +161,30 @@ defineExpose({ open })
       <DocumentImportPreview v-if="previewVisible" ref="previewRef" v-model="previewDocuments" :knowledge-id="knowledgeId" />
       <div v-show="!previewVisible" class="mx-auto w-full max-w-200">
         <section v-show="activeStep === 0">
-          <h4 v-if="mode === 'text'" class="mb-4 mk-title-decoration">上传文档</h4>
+          <h4 v-if="mode === 'text'" class="mb-4 mk-title-decoration">{{ t('knowledge.document.upload.title') }}</h4>
           <el-alert type="primary" :closable="false" show-icon class="mb-4!">
             <template #icon><MkIcon name="icon_info_filled" /></template>
 
             <ol class="list-inside list-decimal space-y-1">
-              <li v-if="mode === 'text'">文件上传前，建议规范文件的分段标识</li>
+              <li v-if="mode === 'text'">{{ t('knowledge.document.upload.delimiterHint') }}</li>
               <template v-else>
                 <li>
                   <div class="inline-flex flex-wrap items-center gap-2">
-                    <span>点击下载对应模板并完善信息：</span>
+                    <span>{{ t('knowledge.document.upload.templateHint') }}</span>
                     <!-- 下载 Excel 模板 -->
-                    <el-button link type="primary" @click="handleDownloadTemplate('excel')">下载 Excel 模板</el-button>
+                    <el-button link type="primary" @click="handleDownloadTemplate('excel')">
+                      {{ t('knowledge.document.upload.downloadTemplate', { format: 'Excel' }) }}
+                    </el-button>
                     <!-- 下载 CSV 模板 -->
-                    <el-button link type="primary" @click="handleDownloadTemplate('csv')">下载 CSV 模板</el-button>
+                    <el-button link type="primary" @click="handleDownloadTemplate('csv')">
+                      {{ t('knowledge.document.upload.downloadTemplate', { format: 'CSV' }) }}
+                    </el-button>
                   </div>
                 </li>
-                <li v-if="mode === 'table'">第一行必须是列标题，且列标题必须是有意义的术语，表中每条记录将作为一个分段</li>
-                <li>上传的表格文件中每个 sheet 会作为一个文档，sheet 名称为文档名称</li>
+                <li v-if="mode === 'table'">{{ t('knowledge.document.upload.columnHeaderHint') }}</li>
+                <li>{{ t('knowledge.document.upload.sheetHint') }}</li>
               </template>
-              <li>每次最多上传 {{ countLimit }} 个文件，每个文件不超过 {{ sizeLimit }} MB</li>
+              <li>{{ t('common.upload.limits', { count: countLimit, size: sizeLimit }) }}</li>
             </ol>
           </el-alert>
           <MkDragUpload
@@ -188,11 +194,13 @@ defineExpose({ open })
             :accept="uploadOption.accept"
             :limit="countLimit"
             :size-limit="sizeLimit"
-            :tip-text="`支持格式：${uploadOption.formats}`"
-          ></MkDragUpload>
+            :drag-text="t('common.upload.dropHint')"
+            :select-text="t('common.upload.selectFile')"
+            :tip-text="t('common.upload.formats', { formats: uploadOption.formats.join(locale === 'en-US' ? ', ' : '、') })"
+          />
         </section>
         <section v-if="mode === 'text' && strategyMounted" v-show="activeStep === 1">
-          <h4 class="mb-4 mk-title-decoration">文档处理策略</h4>
+          <h4 class="mb-4 mk-title-decoration">{{ t('knowledge.documentStrategy.title') }}</h4>
           <DocumentStrategyForm ref="strategyRef" />
         </section>
       </div>
@@ -200,12 +208,12 @@ defineExpose({ open })
 
     <template #footer>
       <!-- 取消上传 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 返回上传步骤 -->
-      <el-button v-if="activeStep === 1" plain :disabled="loading" @click="handlePrevious">上一步</el-button>
+      <el-button v-if="activeStep === 1" plain :disabled="loading" @click="handlePrevious">{{ t('common.actions.previous') }}</el-button>
       <!-- 进入文档处理策略 -->
       <el-button v-if="mode === 'text' && activeStep === 0" type="primary" :disabled="loading || uploadComponentUploading" @click="handleNext">
-        下一步
+        {{ t('common.actions.next') }}
       </el-button>
       <!-- 生成文本分段预览 -->
       <el-button
@@ -215,7 +223,7 @@ defineExpose({ open })
         :disabled="uploadComponentUploading"
         @click="handleGeneratePreview"
       >
-        生成预览
+        {{ t('knowledge.document.actions.generatePreview') }}
       </el-button>
       <!-- 开始导入文档 -->
       <el-button
@@ -225,7 +233,7 @@ defineExpose({ open })
         :loading="loading"
         @click="handleSubmit"
       >
-        开始导入
+        {{ t('knowledge.document.import.start') }}
       </el-button>
     </template>
   </MkDrawer>

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict } from '@/api/types'
 import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'KnowledgeBase' })
+const { t } = useI18n({ useScope: 'global' })
 
 interface WorkflowNode {
   id: string
@@ -22,7 +24,7 @@ const dynamicsFormRef = ref<InstanceType<typeof MkDynamicsForm>>()
 const formData = ref<Dict<DynamicFormValue>>({})
 
 const knowledgeBaseNode = computed(() => props.workflow?.nodes?.find((node) => node.type === WorkflowNodeType.KnowledgeBase))
-const chatTitle = computed(() => knowledgeBaseNode.value?.properties.user_input_config?.title || '用户输入')
+const chatTitle = computed(() => knowledgeBaseNode.value?.properties.user_input_config?.title || t('workflow.userInput.title'))
 const baseFormList = computed<FormField[]>(() => knowledgeBaseNode.value?.properties.user_input_field_list ?? [])
 
 function validate() {

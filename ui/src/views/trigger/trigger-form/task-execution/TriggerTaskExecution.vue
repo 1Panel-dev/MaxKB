@@ -121,7 +121,7 @@ defineExpose({ validate, reset })
               <span v-if="group.tasks.length">（{{ group.tasks.length }}）</span>
             </span>
             <!-- 添加该分组的执行任务 -->
-            <el-button text type="primary" :disabled="disabled" :title="`添加${group.label}`" @click.stop="handleOpenTaskDialog(group.type)">
+            <el-button text type="primary" :disabled="disabled" @click.stop="handleOpenTaskDialog(group.type)">
               <MkIcon name="icon_add_outlined" />
             </el-button>
           </div>

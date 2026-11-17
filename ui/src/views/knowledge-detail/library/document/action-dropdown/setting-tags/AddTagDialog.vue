@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeTagGroup } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type { FormInstance } from 'element-plus'
@@ -7,6 +8,7 @@ import CreateTagDialog from '@/views/knowledge-detail/library/tags/components/Cr
 import { MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'AddTagDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   knowledgeId: string
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags']
@@ -80,14 +82,14 @@ function handleSubmit() {
     if (!valid || loading.value || createTagMounted.value || !tagForm.tags.length) return
     const invalidTag = tagForm.tags.some((tag) => !getTagValues(tag.key).some(({ id }) => id === tag.tagId))
     if (invalidTag) {
-      MsgError('标签值已存在')
+      MsgError(t('knowledge.tags.value.unavailableMessage'))
       return
     }
     const tagIds = tagForm.tags.map(({ tagId }) => tagId)
     loading.value = true
     return (
       props.api.postBatchAddDocumentTags?.(targetKnowledgeId.value, targetDocumentIds.value, tagIds).then(() => {
-        MsgSuccess('添加成功')
+        MsgSuccess(t('common.messages.addSuccess'))
         visible.value = false
         emit('refresh')
       }) ?? Promise.resolve()
@@ -101,40 +103,60 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="添加标签" @closed="emit('closed')">
-    <el-form ref="formRef" v-loading="loading" :model="tagForm" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <MkFormList v-model="tagForm.tags" :default-item="{ key: '', tagId: '' }" @update:model-value="handleRowsChange">
+  <MkDialog v-model="visible" :title="t('knowledge.tags.actions.add')" @closed="emit('closed')">
+    <el-form
+      ref="formRef"
+      v-loading="loading"
+      :model="tagForm"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <MkFormList
+        v-model="tagForm.tags"
+        :add-text="t('common.actions.add')"
+        :default-item="{ key: '', tagId: '' }"
+        @update:model-value="handleRowsChange"
+      >
         <template #default="{ index, item: tag }">
           <el-form-item
             class="min-w-0 flex-1 small"
-            :label="index === 0 ? '标签' : ''"
+            :label="index === 0 ? t('knowledge.tags.key.label') : ''"
             :prop="`tags.${index}.key`"
-            :rules="{ required: true, message: '请选择标签', trigger: 'change' }"
+            :rules="{ required: true, message: t('knowledge.tags.key.selectRequiredMessage'), trigger: 'change' }"
           >
-            <el-select v-model="tag.key" :loading="queryLoading" filterable clearable placeholder="请选择标签" @change="handleTagKeyChange(index)">
+            <el-select
+              v-model="tag.key"
+              :loading="queryLoading"
+              filterable
+              clearable
+              :placeholder="t('knowledge.tags.key.selectPlaceholder')"
+              @change="handleTagKeyChange(index)"
+            >
               <el-option v-for="group in tagGroups" :key="group.key" :label="group.key" :value="group.key" />
               <template #footer>
                 <!-- 创建新标签 -->
                 <el-button type="primary" link :disabled="queryLoading" @click.stop="handleOpenCreateTag(index, 'key')">
                   <MkIcon name="icon_add_outlined" />
-                  <span>创建标签</span>
+                  <span>{{ t('knowledge.tags.actions.create') }}</span>
                 </el-button>
               </template>
             </el-select>
           </el-form-item>
           <el-form-item
             class="min-w-0 flex-1 small"
-            :label="index === 0 ? '标签值' : ''"
+            :label="index === 0 ? t('knowledge.tags.value.label') : ''"
             :prop="`tags.${index}.tagId`"
-            :rules="{ required: true, message: '请选择标签值', trigger: 'change' }"
+            :rules="{ required: true, message: t('knowledge.tags.value.selectRequiredMessage'), trigger: 'change' }"
           >
-            <el-select v-model="tag.tagId" :loading="queryLoading" filterable clearable placeholder="请选择标签值">
+            <el-select v-model="tag.tagId" :loading="queryLoading" filterable clearable :placeholder="t('knowledge.tags.value.selectPlaceholder')">
               <el-option v-for="value in getTagValues(tag.key)" :key="value.id" :label="value.value" :value="value.id" />
               <template #footer>
                 <!-- 已选标签时新增值，未选标签时创建标签 -->
                 <el-button type="primary" link :disabled="queryLoading" @click.stop="handleOpenCreateTag(index, 'value')">
                   <MkIcon name="icon_add_outlined" />
-                  <span>创建标签值</span>
+                  <span>{{ t('knowledge.tags.actions.createValue') }}</span>
                 </el-button>
               </template>
             </el-select>
@@ -144,9 +166,9 @@ defineExpose({ open })
     </el-form>
     <template #footer>
       <!-- 取消添加 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 添加所选标签到目标文档 -->
-      <el-button type="primary" :loading="loading" @click="handleSubmit">添加</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.add') }}</el-button>
     </template>
   </MkDialog>
   <CreateTagDialog

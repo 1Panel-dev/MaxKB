@@ -411,7 +411,7 @@ onMounted(() => {
                           <span class="truncate" :title="knowledge.name || knowledge.id">{{ knowledge.name || knowledge.id }}</span>
                         </span>
                         <!-- 移除知识库 -->
-                        <el-button text title="移除知识库" @click="removeKnowledge(knowledge.id)"><MkIcon name="icon_close_outlined" /></el-button>
+                        <el-button text @click="removeKnowledge(knowledge.id)"><MkIcon name="icon_close_outlined" /></el-button>
                       </div>
                     </el-card>
                   </template>

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'BatchSyncDocumentAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   label: string
@@ -22,9 +24,9 @@ function handleSync() {
   const knowledgeId = props.knowledgeId
   const documentIds = [...props.documentIds]
   const isLark = knowledgeType.value === KNOWLEDGE_TYPE_KEY.LARK
-  return MsgConfirm(`是否同步选中的 ${documentIds.length} 个文档?`, '文档内容无更新时跳过，有更新时会使用新内容更新旧分段内容。', {
-    cancelButtonText: '取消',
-    confirmButtonText: '同步',
+  return MsgConfirm(t('knowledge.document.sync.batchTitle', documentIds.length), t('knowledge.document.sync.description'), {
+    cancelButtonText: t('common.actions.cancel'),
+    confirmButtonText: t('knowledge.actions.sync'),
     confirmButtonType: 'primary',
   })
     .then(() => {
@@ -33,7 +35,7 @@ function handleSync() {
       const request = isLark ? props.api.putMulLarkSyncDocument?.(knowledgeId, documentIds) : props.api.putMulSyncDocument?.(knowledgeId, documentIds)
       return (
         request?.then(() => {
-          MsgSuccess('操作成功')
+          MsgSuccess(t('common.messages.operationSuccess'))
           emit('refresh')
         }) ?? Promise.resolve()
       ).finally(() => {

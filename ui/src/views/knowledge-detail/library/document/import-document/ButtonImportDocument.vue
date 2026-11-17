@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeWorkflowApi } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import type LogicFlow from '@logicflow/core'
@@ -9,6 +10,7 @@ import WorkflowImportDocumentDrawer from './WorkflowImportDocumentDrawer.vue'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 
 defineOptions({ name: 'ButtonImportDocument' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   workflowApi?: KnowledgeWorkflowApi
@@ -48,7 +50,7 @@ function handleOpenImport() {
   <!-- 导入文档 -->
   <el-button type="primary" @click="handleOpenImport">
     <MkIcon name="icon_import_outlined" />
-    <span>导入文档</span>
+    <span>{{ t('knowledge.document.import.title') }}</span>
   </el-button>
   <WebImportDocumentDrawer
     v-if="webDrawerMounted"

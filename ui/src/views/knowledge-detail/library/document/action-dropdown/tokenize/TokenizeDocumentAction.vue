@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentItem } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE } from '@/api/enums'
 import { isDocumentTaskRunning } from '../../status'
 
 defineOptions({ name: 'TokenizeDocumentAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -38,7 +40,7 @@ function handleTokenize() {
   <!-- 分词索引或取消分词索引 -->
   <MkAction
     display="button"
-    :label="running ? '取消分词索引' : '分词索引'"
+    :label="running ? t('knowledge.actions.cancelKeywordIndex') : t('knowledge.actions.buildKeywordIndex')"
     :icon="running ? 'icon_close_outlined' : 'icon_external_outlined'"
     :disabled="loading"
     @click="handleTokenize"

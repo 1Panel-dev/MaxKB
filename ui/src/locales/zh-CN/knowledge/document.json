@@ -1,0 +1,92 @@
+{
+  "document": {
+    "title": "文档",
+    "name": {
+      "label": "文档名称",
+      "placeholder": "请输入文档名称"
+    },
+    "sourceUrl": {
+      "label": "文档地址",
+      "placeholder": "请输入文档地址，一行一个，地址不正确文档会导入失败。",
+      "requiredMessage": "请输入文档地址"
+    },
+    "labels": {
+      "activeStatus": "启用状态",
+      "characters": "字符数",
+      "paragraphs": "分段",
+      "retrievalCount": "召回次数",
+      "lastRetrievedAt": "最后一次召回时间"
+    },
+    "hitHandling": {
+      "label": "召回处理",
+      "optimization": "模型优化",
+      "directlyReturn": "直接回答"
+    },
+    "status": {
+      "label": "文件状态",
+      "pending": "排队中",
+      "started": "执行中",
+      "embedding": "索引中",
+      "generate": "生成中",
+      "sync": "同步中",
+      "tokenize": "分词索引中",
+      "success": "成功",
+      "failure": "失败",
+      "canceling": "取消中",
+      "canceled": "已取消",
+      "progress": "完成 {completed}/{total}"
+    },
+    "actions": {
+      "quickCreate": "快速创建空白文档",
+      "generatePreview": "生成预览",
+      "migrate": "迁移",
+      "migrateTo": "迁移至",
+      "downloadOriginal": "下载原文档",
+      "replaceOriginal": "替换原文档"
+    },
+    "delete": {
+      "title": "确认删除文档：{name}？",
+      "description": "此文档下的 {count} 个分段都会被删除，请谨慎操作。",
+      "batchTitle": "是否删除选中的 {count} 个文档？",
+      "batchDescription": "所选文档中的分段会跟随删除，请谨慎操作。"
+    },
+    "sync": {
+      "title": "是否同步：{name}？",
+      "batchTitle": "是否同步选中的 {count} 个文档？",
+      "description": "文档内容无更新时跳过，有更新时会使用新内容更新旧分段内容。",
+      "workflowDescription": "将按知识库工作流的提取、分段配置同步当前 Web 文档，其他文档保持不变。",
+      "missingUrlMessage": "无法同步，请先去设置文档 URL 地址"
+    },
+    "upload": {
+      "title": "上传文档",
+      "textLabel": "文本文件",
+      "textTitle": "上传文本文件",
+      "tableLabel": "表格",
+      "tableTitle": "上传表格",
+      "qaLabel": "QA 问答对",
+      "qaTitle": "上传 QA 问答对",
+      "delimiterHint": "文件上传前，建议规范文件的分段标识",
+      "templateHint": "点击下载对应模板并完善信息：",
+      "downloadTemplate": "下载 {format} 模板",
+      "columnHeaderHint": "第一行必须是列标题，且列标题必须是有意义的术语，表中每条记录将作为一个分段",
+      "sheetHint": "上传的表格文件中每个 sheet 会作为一个文档，sheet 名称为文档名称"
+    },
+    "import": {
+      "title": "导入文档",
+      "start": "开始导入",
+      "continue": "继续导入",
+      "goToDocuments": "前往文档",
+      "allDocuments": "全部文档",
+      "selectionRequiredMessage": "请选择文档",
+      "larkFormatsHint": "支持文档和表格类型，包含 {formats} 格式",
+      "delimiterHint": "导入文档前，建议规范文档的分段标识。"
+    },
+    "preview": {
+      "title": "预览",
+      "emptyParagraphs": "暂无分段",
+      "emptyDocuments": "暂无预览文档",
+      "finishEditingMessage": "请先保存或取消分段编辑",
+      "deleteParagraphConfirm": "确定删除此分段？"
+    }
+  }
+}

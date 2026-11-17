@@ -1,0 +1,19 @@
+{
+  "paragraph": {
+    "heading": {
+      "label": "标题",
+      "placeholder": "请输入标题"
+    },
+    "content": {
+      "label": "内容",
+      "placeholder": "请输入内容",
+      "requiredMessage": "请输入内容",
+      "lengthMessage": "内容最多 {max} 字符"
+    },
+    "relatedQuestions": {
+      "label": "关联问题",
+      "requiredMessage": "请输入关联问题",
+      "lengthMessage": "问题最多 {max} 字符"
+    }
+  }
+}

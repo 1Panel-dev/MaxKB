@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DragUploadFile, DragUploadHandler, DragUploadMode } from './types'
 import type { UploadFile, UploadFiles, UploadInstance, UploadRawFile, UploadUserFile } from 'element-plus'
 import FileApi from '@/api/admin/file'
@@ -9,6 +10,7 @@ import ImageUploadCard from './ImageUploadCard.vue'
 import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'MultipleFileUpload' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(
   defineProps<{
@@ -26,8 +28,6 @@ const props = withDefaults(
     accept: '',
     disabled: false,
     sizeLimit: 100,
-    dragText: '将文件拖拽至此区域或',
-    selectText: '选择文件',
     tipText: '',
   },
 )
@@ -94,7 +94,7 @@ function validateFile(file: DragUploadFile) {
   if (file.raw.size > props.sizeLimit * 1024 * 1024) {
     file.status = 'fail'
     file.percentage = 0
-    file.errMsg = `大小超限`
+    file.errMsg = t('common.upload.sizeLimitMessage')
     return false
   }
   const acceptedTypes = props.accept
@@ -108,12 +108,12 @@ function validateFile(file: DragUploadFile) {
     type.startsWith('.') ? filename.endsWith(type) : type.endsWith('/*') ? mimeType.startsWith(type.slice(0, -1)) : mimeType === type,
   )
   if (acceptedTypes.length && !accepted) {
-    if (file.name !== '.DS_Store') MsgWarning('文件格式不支持')
+    if (file.name !== '.DS_Store') MsgWarning(t('common.upload.unsupportedFormatMessage'))
     handleRemove(file)
     return false
   }
   if (file.raw.size === 0) {
-    MsgWarning('文件不能为空')
+    MsgWarning(t('common.upload.emptyFileMessage'))
     handleRemove(file)
     return false
   }
@@ -147,7 +147,7 @@ function handleUpload(file: DragUploadFile) {
     .catch(() => {
       if (file.status !== 'uploading') return
       file.status = 'fail'
-      file.errMsg = '网络失败'
+      file.errMsg = t('common.upload.networkErrorMessage')
     })
     .finally(() => uploadRequests.delete(uid))
 }
@@ -165,7 +165,7 @@ onBeforeUnmount(() => {
 })
 
 function handleExceed(files: File[], selectedFiles: UploadUserFile[]) {
-  if (props.limit !== undefined) MsgWarning(`每次最多上传 ${props.limit} 个文件`)
+  if (props.limit !== undefined) MsgWarning(t('common.upload.countLimitMessage', { count: props.limit }))
   emit('exceed', files, selectedFiles)
 }
 
@@ -278,10 +278,10 @@ defineExpose({ clearFiles, handleRemove })
       </div>
       <div class="el-upload__text">
         <p class="flex-center gap-1">
-          {{ dragText }}
-          <em>{{ selectText }}</em>
+          {{ dragText ?? t('common.upload.dropHint') }}
+          <em>{{ selectText ?? t('common.upload.selectFiles') }}</em>
           <!-- 选择文件夹 -->
-          <el-button :disabled="disabled" link type="primary" @click.stop="handleOpenFolder">选择文件夹</el-button>
+          <el-button :disabled="disabled" link type="primary" @click.stop="handleOpenFolder">{{ t('common.upload.selectFolder') }}</el-button>
         </p>
         <p v-if="tipText" class="mt-1 text-N500">{{ tipText }}</p>
       </div>
@@ -290,19 +290,19 @@ defineExpose({ clearFiles, handleRemove })
 
     <template v-if="fileList.length">
       <div class="my-4 flex-between gap-3">
-        <p>已完成 {{ uploadSummary.completed }}/{{ fileList.length }}</p>
+        <p>{{ t('common.upload.status.completed', { completed: uploadSummary.completed, total: fileList.length }) }}</p>
 
         <div class="flex-align-center gap-4">
-          <MkStatusLabel v-if="mode === 'file' && uploadSummary.uploading" type="loading" label="上传中" />
+          <MkStatusLabel v-if="mode === 'file' && uploadSummary.uploading" type="loading" :label="t('common.upload.status.uploading')" />
           <template v-else-if="uploadSummary.error">
-            <MkStatusLabel type="failure" :label="`失败 ${uploadSummary.error} 个`" />
+            <MkStatusLabel type="failure" :label="t('common.upload.status.failed', { count: uploadSummary.error })" />
             <!-- 重试所有可重试的失败文件 -->
             <el-button v-if="retryFiles.length" :disabled="disabled" text @click="handleRetryAll">
               <MkIcon name="icon_refresh_outlined" />
-              <span>重试</span>
+              <span>{{ t('common.actions.retry') }}</span>
             </el-button>
           </template>
-          <MkStatusLabel v-else-if="uploadSummary.success === fileList.length" type="success" label="全部成功" />
+          <MkStatusLabel v-else-if="uploadSummary.success === fileList.length" type="success" :label="t('common.upload.status.allSucceeded')" />
         </div>
       </div>
       <div v-if="mode === 'image'" class="mt-4 flex flex-wrap gap-3">

@@ -33,14 +33,33 @@
   "upload": {
     "dropHint": "将文件拖至此区域。",
     "selectFile": "选择文件上传",
+    "selectFiles": "选择文件",
+    "selectFolder": "选择文件夹",
     "replaceFile": "更换文件",
-    "emptyFileMessage": "不能上传空文件"
+    "retryUpload": "重新上传",
+    "limits": "每次最多上传 {count} 个文件，每个文件不超过 {size} MB",
+    "formats": "支持格式：{formats}",
+    "emptyFileMessage": "不能上传空文件",
+    "sizeLimitMessage": "大小超限",
+    "unsupportedFormatMessage": "文件格式不支持",
+    "countLimitMessage": "每次最多上传 {count} 个文件",
+    "networkErrorMessage": "网络失败",
+    "uploadInProgressMessage": "文件正在上传，请稍候",
+    "noSuccessfulFilesMessage": "没有上传成功的文件，请重新上传",
+    "fileError": "{name}：{reason}",
+    "status": {
+      "completed": "已完成 {completed}/{total}",
+      "uploading": "上传中",
+      "failed": "失败 {count} 个",
+      "allSucceeded": "全部成功"
+    }
   },
   "actions": {
     "manage": "管理",
     "edit": "编辑",
     "delete": "删除",
     "cancel": "取消",
+    "retry": "重试",
     "save": "保存",
     "add": "添加",
     "previous": "上一步",
@@ -55,6 +74,7 @@
     "disable": "禁用",
     "saveAndEnable": "保存并启用",
     "confirm": "确认",
+    "submit": "提交",
     "testConnection": "测试连接"
   },
   "dialogs": {
@@ -68,6 +88,7 @@
     "deleteFailed": "删除失败",
     "createSuccess": "创建成功",
     "addSuccess": "添加成功",
+    "removeSuccess": "移除成功",
     "fetchSuccess": "获取成功",
     "updateSuccess": "修改成功",
     "moveSuccess": "移动成功",

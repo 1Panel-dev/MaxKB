@@ -1,0 +1,19 @@
+{
+  "paragraph": {
+    "heading": {
+      "label": "Title",
+      "placeholder": "Enter a title"
+    },
+    "content": {
+      "label": "Content",
+      "placeholder": "Enter paragraph content",
+      "requiredMessage": "Enter paragraph content",
+      "lengthMessage": "Content cannot exceed {max} characters."
+    },
+    "relatedQuestions": {
+      "label": "Related questions",
+      "requiredMessage": "Enter a related question",
+      "lengthMessage": "Questions cannot exceed {max} characters."
+    }
+  }
+}

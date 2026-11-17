@@ -42,6 +42,7 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 仅有展示文案的通用标签归 common.labels，例如“创建者”和“操作”。名称与描述直接归 common.name 和 common.description，
 字段的 label、placeholder 和实际使用的 requiredMessage 放在一起，表单、表头和筛选器共用 label。
 common.status 维护状态标签 label 和通用启停选项 enabled、disabled。
+通用文件选择、上传提示和校验归 `common.upload`，上传进度和结果汇总归 `common.upload.status`。业务模板、文件内容要求和导入说明归各自业务域。
 “请输入模型名称”等指明业务对象的提示，以及发布状态、执行状态等业务选项归对应业务域。
 通用操作结果归 common.messages，通用对话框标题归 common.dialogs；业务专属确认句仍留在所属业务域。
 用户内容、用户保存的提示词、协议枚举和已保存节点名称保留原文。
@@ -63,7 +64,8 @@ common.status 维护状态标签 label 和通用启停选项 enabled、disabled�
   按钮使用 Save 等动作词，成功提示使用 Saved successfully。短标签和占位提示使用句首大写，
   通常不加句号；占位与校验仍保留独立 key。
 - 组件显式导入 useI18n，并使用全局作用域的 t；不使用自动注入的 $t。
-- 国际化改动优先直接使用现有的 `t` 和翻译键。需要新增方法、函数或修改已有函数实现时，先向用户说明涉及的函数、原因和影响，取得明确同意后再实施。
+- 每批范围内的界面文案都在使用处直接调用 `t`，包括已有函数中的校验、确认和结果提示。直接替换文案无需单独确认。
+  不新增用于处理翻译的辅助函数。遇到无法直接使用 `t` 的场景，先向用户说明原因和方案，确认后再处理该处。
 - 依赖语言的选项和校验规则在 computed 或执行时翻译，不在模块初始化时固化翻译结果。
 - 不为语言切换添加重新校验表单的 watch；已有错误提示在下次正常校验时更新。
   响应式规则变化不自动触发校验，表单使用 :validate-on-rule-change="false"。
@@ -139,14 +141,16 @@ MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 
 工作空间、系统资源管理和系统共享资源的知识库菜单与列表标题共用 `knowledge.title`。四类知识库分别归 `knowledge.base`、`knowledge.web`、`knowledge.lark` 和 `knowledge.workflow`。类型筛选、类型列和创建菜单共用各组的 `label`，菜单说明使用 `description`，创建弹窗标题使用 `createTitle`。筛选请求沿用数字类型值。
 卡片的文档数、字符数和图片数使用 `knowledge.stats`，按实际数量选择单复数。同步、向量化、生成问题和分词索引归 `knowledge.actions`。
 跨资源的模板中心文案归 `resource.templateStore`。模板名称、描述和 README 展示接口原文；缺少说明时与工具商店共用 `common.empty.noDetails`。
-手动同步、定时同步及日志共用 `knowledge.sync` 中的同步方式。生成问题弹窗的字段、校验、分段范围和内置默认提示词归 `knowledge.generateQuestions`。无已保存配置时按打开弹窗时的语言填入默认提示词，保留 `{data}` 与 `<question></question>`。提交时使用编辑框中的原文。
+手动同步、定时同步及日志共用 `knowledge.sync` 中的同步方式。向量化和生成问题共用的分段范围在 `knowledge/index.json` 中维护，使用 `knowledge.paragraphScope`。生成问题弹窗的字段、校验和内置默认提示词归 `knowledge.generateQuestions`。无已保存配置时按打开弹窗时的语言填入默认提示词，保留 `{data}` 与 `<question></question>`。提交时使用编辑框中的原文。
 导出格式与源文件说明归 `knowledge.export`，单个及批量删除的确认标题归 `knowledge.delete`。
 Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传、导入和设置共用的分段规则、图片处理与索引增强文案归 `knowledge.documentStrategy`。
 
 ## 知识库详情
 
-`knowledge/index.json` 维护列表、知识库类型与创建等文案。`library.json` 维护资料库、文档、图片和标签；`retrieval.json` 维护召回测试、问题与自定义分词；`integration.json` 维护对话用户和外部检索服务；`settings.json` 维护基础设置、文档处理策略和同步；生成问题弹窗归 `generate-questions.json`。
+`knowledge/index.json` 维护列表、知识库类型与创建等文案。`library.json` 维护资料库和图片。`tag.json` 维护标签管理与文档标签设置，使用 `knowledge.tags`。`document.json` 维护文档列表、上传与预览，使用 `knowledge.document`。`paragraph.json` 维护分段字段、校验和关联问题，使用 `knowledge.paragraph`。`retrieval.json` 维护召回测试、问题与自定义分词，`integration.json` 维护对话用户和外部检索服务，`settings.json` 维护基础设置、文档处理策略和同步。生成问题弹窗归 `generate-questions.json`。
 四种资源范围的详情菜单和页面标题共用业务分组的 `title`，例如 `knowledge.document.title` 和 `knowledge.documentStrategy.title`。“设置”复用 `common.labels.settings`。
+文档列表的文件状态和进度归 `knowledge.document.status`，召回处理选项归 `knowledge.document.hitHandling`。筛选项和行内展示共用译文，接口接收原有状态、任务类型和召回处理值。
+工作流文档导入的操作归 `knowledge.document.import`。导入与调试共用的数据源、默认用户输入标题和执行结果归 `workflow.json`，分别使用 `workflow.dataSource`、`workflow.userInput` 和 `workflow.executionResult`。
 
 ## 文件夹
 

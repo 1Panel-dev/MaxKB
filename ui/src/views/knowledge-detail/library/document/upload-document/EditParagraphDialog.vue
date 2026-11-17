@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { DocumentImportParagraph, ParagraphUpdatePayload } from '@/api/types'
 import type { ParagraphQuestionDraft } from '@/views/document-detail/paragraph-dialog/types'
 import ParagraphForm from '@/views/document-detail/paragraph-dialog/components/ParagraphForm.vue'
 import ParagraphQuestions from '@/views/document-detail/paragraph-dialog/components/ParagraphQuestions.vue'
 
 defineOptions({ name: 'EditImportParagraphDialog' })
+const { t } = useI18n({ useScope: 'global' })
 defineProps<{ knowledgeId: string }>()
 const emit = defineEmits<{ submit: [paragraph: DocumentImportParagraph]; closed: [] }>()
 
@@ -60,7 +62,7 @@ defineExpose({ open, close })
 <template>
   <MkDialog
     v-model="visible"
-    title="编辑"
+    :title="t('common.actions.edit')"
     width="1000"
     content-class="max-h-[calc(100vh-300px)]!"
     :before-close="handleBeforeClose"
@@ -73,9 +75,9 @@ defineExpose({ open, close })
     </div>
     <template #footer>
       <!-- 取消分段编辑 -->
-      <el-button plain :disabled="loading" @click="close">取消</el-button>
+      <el-button plain :disabled="loading" @click="close">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存预览分段及关联问题 -->
-      <el-button type="primary" :loading="loading" @click="handleSubmit">保存</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

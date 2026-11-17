@@ -1,0 +1,17 @@
+{
+  "dataSource": {
+    "selectTitle": "选择数据源",
+    "typeLabel": "数据源类型",
+    "documentsUnavailableMessage": "当前知识库不支持数据源文件查询"
+  },
+  "userInput": {
+    "title": "用户输入"
+  },
+  "executionResult": {
+    "title": "执行结果",
+    "success": "执行成功",
+    "failure": "执行失败",
+    "canceled": "已取消",
+    "running": "执行中"
+  }
+}

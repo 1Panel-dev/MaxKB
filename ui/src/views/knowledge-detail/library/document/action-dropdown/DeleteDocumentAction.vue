@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { DocumentItem, DocumentResourceType } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DeleteDocumentAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = withDefaults(
   defineProps<{
     api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
@@ -25,8 +27,11 @@ function handleDelete() {
   const ids = [...(props.documentIds ?? [])]
   // 批量确认展示数量，单个确认展示文档名称；确认期间保留本次删除目标。
   const confirmation = batch
-    ? MsgConfirm(`是否删除选中的 ${ids.length} 个文档？`, '所选文档中的分段会跟随删除，请谨慎操作。')
-    : MsgConfirm(`确认删除文档：${document!.name}？`, `此文档下的 ${document!.paragraph_count} 个分段都会被删除，请谨慎操作。`)
+    ? MsgConfirm(t('knowledge.document.delete.batchTitle', ids.length), t('knowledge.document.delete.batchDescription'))
+    : MsgConfirm(
+        t('knowledge.document.delete.title', { name: document!.name }),
+        t('knowledge.document.delete.description', document!.paragraph_count),
+      )
   return confirmation
     .then(() => {
       loading.value = true
@@ -35,7 +40,7 @@ function handleDelete() {
         : props.api.deleteDocument?.(knowledgeId, document!.id)
       return (
         request?.then(() => {
-          MsgSuccess('删除成功')
+          MsgSuccess(t('common.messages.deleteSuccess'))
           emit('refresh')
         }) ?? Promise.resolve()
       ).finally(() => {
@@ -48,5 +53,5 @@ function handleDelete() {
 
 <template>
   <!-- 删除单个或选中文档 -->
-  <MkAction label="删除" @click="handleDelete" />
+  <MkAction :label="t('common.actions.delete')" @click="handleDelete" />
 </template>

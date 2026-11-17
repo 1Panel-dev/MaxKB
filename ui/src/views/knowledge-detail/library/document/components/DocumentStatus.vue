@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentStatusMeta, DocumentTaskState, DocumentTaskType } from '@/api/types'
 import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, STATE_TYPES } from '@/api/enums'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { DOCUMENT_STATUS_OPTIONS } from '../status'
 
 defineOptions({ name: 'DocumentStatus' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ status: string; statusMeta?: DocumentStatusMeta | null }>()
 
 const DOCUMENT_TASKS = [
-  { type: DOCUMENT_TASK_TYPE.EMBEDDING, label: '向量化', startedStatus: 'EMBEDDING' },
-  { type: DOCUMENT_TASK_TYPE.GENERATE_PROBLEM, label: '生成问题', startedStatus: 'GENERATE' },
-  { type: DOCUMENT_TASK_TYPE.SYNC, label: '同步', startedStatus: 'SYNC' },
-  { type: DOCUMENT_TASK_TYPE.TOKENIZE, label: '分词索引', startedStatus: 'TOKENIZE' },
+  { type: DOCUMENT_TASK_TYPE.EMBEDDING, label: 'knowledge.actions.generateEmbeddings', startedStatus: 'EMBEDDING' },
+  { type: DOCUMENT_TASK_TYPE.GENERATE_PROBLEM, label: 'knowledge.actions.generateQuestions', startedStatus: 'GENERATE' },
+  { type: DOCUMENT_TASK_TYPE.SYNC, label: 'knowledge.actions.sync', startedStatus: 'SYNC' },
+  { type: DOCUMENT_TASK_TYPE.TOKENIZE, label: 'knowledge.actions.buildKeywordIndex', startedStatus: 'TOKENIZE' },
 ] as const
 
 const DOCUMENT_STATUS_PRIORITY = [
@@ -103,16 +105,22 @@ const aggregateStatus = computed(() => getAggregateDocumentStatus(taskStatuses.v
   >
     <template #reference>
       <span class="inline-flex cursor-pointer">
-        <MkStatusLabel v-if="aggregateStatus" v-bind="DOCUMENT_STATUS_OPTIONS[aggregateStatus.displayStatus]" />
+        <MkStatusLabel
+          v-if="aggregateStatus"
+          :type="DOCUMENT_STATUS_OPTIONS[aggregateStatus.displayStatus].type"
+          :label="t(DOCUMENT_STATUS_OPTIONS[aggregateStatus.displayStatus].labelKey)"
+        />
         <span v-else>-</span>
       </span>
     </template>
     <div v-if="visible" class="space-y-2 p-3">
       <template v-for="task in taskStatuses" :key="task.type">
         <div class="flex-align-center gap-3 whitespace-nowrap">
-          <span>{{ task.label }}:</span>
-          <MkStatusLabel v-bind="DOCUMENT_STATUS_OPTIONS[task.displayStatus]" />
-          <span :class="task.failed ? 'text-danger' : ''">完成 {{ task.completed }}/{{ task.total }}</span>
+          <span>{{ t(task.label) }}:</span>
+          <MkStatusLabel :type="DOCUMENT_STATUS_OPTIONS[task.displayStatus].type" :label="t(DOCUMENT_STATUS_OPTIONS[task.displayStatus].labelKey)" />
+          <span :class="task.failed ? 'text-danger' : ''">
+            {{ t('knowledge.document.status.progress', { completed: task.completed, total: task.total }) }}
+          </span>
           <span v-if="task.time" class="text-N500">{{ task.time }}</span>
         </div>
       </template>
