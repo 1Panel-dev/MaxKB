@@ -80,9 +80,7 @@ const inputFieldList = ref<any[]>([])
 const inputFieldConfig = ref({ title: t('aiChat.userInput') })
 
 function openAddDialog(data?: any, index?: any) {
-  if (index !== undefined) {
-    currentIndex.value = index
-  }
+  currentIndex.value = index !== undefined ? index : null
   inputFieldFormDialogRef.value?.open(data)
 }
 
