@@ -67,7 +67,8 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
         for doc in file_list:
             get_buffer = FileBufferHandle().get_buffer
 
-            file_mem = bytes_to_uploaded_file(doc['content'].encode('utf-8'), doc['name'])
+            # 文档标题不是上传路径，分段后由 _process_split_result 恢复原始名称。
+            file_mem = bytes_to_uploaded_file(doc['content'].encode('utf-8'))
             if split_strategy == 'qa':
                 result = md_qa_split_handle.handle(file_mem, get_buffer, self._save_image)
             else:
