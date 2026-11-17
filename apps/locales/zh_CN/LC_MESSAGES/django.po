@@ -15504,3 +15504,114 @@ msgstr "文件夹不在当前工作空间或不存在"
 
 msgid "Use the move API to change the folder"
 msgstr "请使用移动接口修改文件夹"
+
+msgid "System"
+msgstr "系统"
+
+msgid "Paragraph"
+msgstr "段落"
+
+msgid "Chat User API Key"
+msgstr "对话用户 API Key"
+
+msgid "Chat User/logout"
+msgstr "对话用户/登出"
+
+msgid "License"
+msgstr "许可证"
+
+msgid "Shared Knowledge/Document"
+msgstr "共享知识库/文档"
+
+msgid "Add ApiKey"
+msgstr "添加 API 密钥"
+
+msgid "Add chat user API key"
+msgstr "添加对话用户 API 密钥"
+
+msgid "Add member to user group"
+msgstr "添加成员到用户组"
+
+msgid "Add personal system API_KEY"
+msgstr "添加个人系统 API 密钥"
+
+msgid "Add user"
+msgstr "添加用户"
+
+msgid "Batch add user to group"
+msgstr "批量添加用户到用户组"
+
+msgid "Batch set quota"
+msgstr "批量设置配额"
+
+msgid "Batch sync lark documents"
+msgstr "批量同步飞书文档"
+
+msgid "Create a knowledge tag"
+msgstr "创建知识库标签"
+
+msgid "Create a web site knowledge base"
+msgstr "创建网页知识库"
+
+msgid "Create or update user group"
+msgstr "创建或更新用户组"
+
+msgid "Delete knowledge base"
+msgstr "删除知识库"
+
+msgid "Delete personal system API_KEY"
+msgstr "删除个人系统 API 密钥"
+
+msgid "Delete the source point trigger"
+msgstr "删除源点触发器"
+
+msgid "Delete user group"
+msgstr "删除用户组"
+
+msgid "Edit folder"
+msgstr "编辑文件夹"
+
+msgid "Enable/Disable application API Key"
+msgstr "启用/禁用智能体 API 密钥"
+
+msgid "Export multiple document"
+msgstr "导出多个文档"
+
+msgid "Generate related documents"
+msgstr "生成相关文档"
+
+msgid "Get chat user API key"
+msgstr "获取对话用户 API 密钥"
+
+msgid "Modify application access token"
+msgstr "修改智能体访问令牌"
+
+msgid "Modify external retrieval service"
+msgstr "修改外部检索服务"
+
+msgid "Modify knowledge base information"
+msgstr "修改知识库信息"
+
+msgid "Modify knowledge workflow"
+msgstr "修改知识工作流"
+
+msgid "Modify the source point trigger"
+msgstr "修改源点触发器"
+
+msgid "Modify tool workflow"
+msgstr "修改工具工作流"
+
+msgid "Remove member from user group"
+msgstr "从用户组移除成员"
+
+msgid "Set quota"
+msgstr "设置配额"
+
+msgid "Update personal system API_KEY"
+msgstr "更新个人系统 API 密钥"
+
+msgid "trial listening"
+msgstr "试听"
+
+msgid "User sync"
+msgstr "用户同步"

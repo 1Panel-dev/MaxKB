@@ -15504,3 +15504,115 @@ msgstr "資料夾不在目前工作空間或不存在"
 
 msgid "Use the move API to change the folder"
 msgstr "請使用移動介面修改資料夾"
+
+
+msgid "System"
+msgstr "系統"
+
+msgid "Paragraph"
+msgstr "段落"
+
+msgid "Chat User API Key"
+msgstr "對話用戶 API Key"
+
+msgid "Chat User/logout"
+msgstr "對話用戶/登出"
+
+msgid "License"
+msgstr "許可證"
+
+msgid "Shared Knowledge/Document"
+msgstr "共享知識庫/文檔"
+
+msgid "Add ApiKey"
+msgstr "新增 API 密鑰"
+
+msgid "Add chat user API key"
+msgstr "新增對話用戶 API 密鑰"
+
+msgid "Add member to user group"
+msgstr "新增成員到使用者組"
+
+msgid "Add personal system API_KEY"
+msgstr "新增個人系統 API 密鑰"
+
+msgid "Add user"
+msgstr "新增用戶"
+
+msgid "Batch add user to group"
+msgstr "批量新增用戶到使用者組"
+
+msgid "Batch set quota"
+msgstr "批量設定配額"
+
+msgid "Batch sync lark documents"
+msgstr "批量同步飛書文檔"
+
+msgid "Create a knowledge tag"
+msgstr "建立知識庫標籤"
+
+msgid "Create a web site knowledge base"
+msgstr "建立網頁知識庫"
+
+msgid "Create or update user group"
+msgstr "建立或更新使用者組"
+
+msgid "Delete knowledge base"
+msgstr "刪除知識庫"
+
+msgid "Delete personal system API_KEY"
+msgstr "刪除個人系統 API 密鑰"
+
+msgid "Delete the source point trigger"
+msgstr "刪除源點觸發器"
+
+msgid "Delete user group"
+msgstr "刪除使用者組"
+
+msgid "Edit folder"
+msgstr "編輯文件夾"
+
+msgid "Enable/Disable application API Key"
+msgstr "啟用/停用智能體 API 密鑰"
+
+msgid "Export multiple document"
+msgstr "導出多個文檔"
+
+msgid "Generate related documents"
+msgstr "生成相關文檔"
+
+msgid "Get chat user API key"
+msgstr "獲取對話用戶 API 密鑰"
+
+msgid "Modify application access token"
+msgstr "修改智能體訪問令牌"
+
+msgid "Modify external retrieval service"
+msgstr "修改外部檢索服務"
+
+msgid "Modify knowledge base information"
+msgstr "修改知識庫資訊"
+
+msgid "Modify knowledge workflow"
+msgstr "修改知識工作流"
+
+msgid "Modify the source point trigger"
+msgstr "修改源點觸發器"
+
+msgid "Modify tool workflow"
+msgstr "修改工具工作流"
+
+msgid "Remove member from user group"
+msgstr "從使用者組移除成員"
+
+msgid "Set quota"
+msgstr "設定配額"
+
+msgid "Update personal system API_KEY"
+msgstr "更新個人系統 API 密鑰"
+
+msgid "trial listening"
+msgstr "試聽"
+
+msgid "User sync"
+msgstr "用戶同步"

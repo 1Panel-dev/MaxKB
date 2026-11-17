@@ -34,7 +34,7 @@ class XunFeiOpenAIEmbeddingCredential(BaseForm, BaseModelCredential):
                 ValidCode.valid_error.value, _("{model_type} Model type is not supported").format(model_type=model_type)
             )
 
-        for key in ["api_base", "api_key", "model_id"]:
+        for key in ["api_base", "api_key"]:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, gettext("{key}  is required").format(key=key))
@@ -63,4 +63,3 @@ class XunFeiOpenAIEmbeddingCredential(BaseForm, BaseModelCredential):
         "API URL", required=True, default_value="https://maas-api.cn-huabei-1.xf-yun.com/v2"
     )
     api_key = forms.PasswordInputField("API Key", required=True)
-    model_id = forms.TextInputField("Model ID", required=True)

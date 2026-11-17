@@ -133,8 +133,28 @@ class ProviderDefaultUrlTests(SimpleTestCase):
                 "api_base",
                 "https://ark.cn-beijing.volces.com/api/v3",
             ),
-            # Xunfei
-            ("model_xf_provider", "LLM", "general", "spark_api_url", "wss://spark-api.xf-yun.com/v3.5/chat"),
+            # Xunfei (OpenAI 兼容 MaaS)
+            (
+                "model_xf_provider",
+                "LLM",
+                "spark-x2.6",
+                "api_base",
+                "https://maas-api.cn-huabei-1.xf-yun.com/v2",
+            ),
+            (
+                "model_xf_provider",
+                "IMAGE",
+                "spark-x2.6",
+                "api_base",
+                "https://maas-api.cn-huabei-1.xf-yun.com/v2",
+            ),
+            (
+                "model_xf_provider",
+                "EMBEDDING",
+                "embedding",
+                "api_base",
+                "https://maas-api.cn-huabei-1.xf-yun.com/v2",
+            ),
             # Qianfan reranker
             ("model_qianfan_provider", "RERANKER", "bce-reranker-base", "api_url", "https://qianfan.baidubce.com/v2"),
         )
