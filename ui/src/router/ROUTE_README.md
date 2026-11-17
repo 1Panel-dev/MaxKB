@@ -176,10 +176,10 @@ Workspace 根据目标路由中的 workspaceId、knowledgeId 判断权限，权�
 
 ## 导航生成
 
-模型相关路由的 `meta.title` 使用 `model.title`，不在路由模块初始化时调用翻译。
+模型相关路由和工作空间工具列表的 `meta.title` 分别使用 `model.title` 和 `tool.title`。
 Workspace、System 侧栏在 computed 中生成菜单，并传入当前应用的标题翻译函数；仅翻译存在的 key，
 尚未迁移的中文标题原样展示。导航工具不依赖入口国际化单例，权限判断可省略翻译函数。
-页面通过显式传入已翻译的 title 展示模型标题；共用资源授权页按当前路由解析标题，其他业务文案保持原值。
+这些列表页将已翻译的 title 显式传入布局；共用资源授权页按当前路由解析标题。
 菜单 label 仅用于展示，不用作路由标识、排序或权限判断。
 
 `admin/utils.ts` 中的 `getChildRouteList(scope, translateTitle?)` 会：

@@ -1,0 +1,37 @@
+{
+  "title": "工具",
+  "categories": {
+    "all": "全部工具",
+    "shared": "共用工具"
+  },
+  "types": {
+    "custom": "工具",
+    "skill": "Skills",
+    "workflow": "工作流程",
+    "mcp": "MCP",
+    "dataSource": "資料來源"
+  },
+  "store": {
+    "title": "工具商店"
+  },
+  "initParams": {
+    "title": "啟動參數"
+  },
+  "delete": {
+    "title": "確定刪除工具「{name}」？",
+    "batchTitle": "確定批次刪除 {count} 個工具？"
+  },
+  "disable": {
+    "title": "確定停用工具「{name}」？",
+    "description": "停用後，使用此工具的資源將無法正常執行。"
+  },
+  "messages": {
+    "publishBeforeEnabling": "無法啟用，請先發佈工作流程"
+  },
+  "updateVersion": {
+    "action": "更新版本",
+    "title": "確定更新工具「{name}」？",
+    "description": "更新工具可能會影響正在使用此工具的資源，請謹慎操作。",
+    "success": "更新成功"
+  }
+}

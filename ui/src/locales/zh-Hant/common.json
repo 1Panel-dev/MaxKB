@@ -5,7 +5,9 @@
     "operation": "操作",
     "createdOn": "建立於",
     "createdAt": "建立時間",
-    "updatedAt": "更新時間"
+    "updatedAt": "更新時間",
+    "all": "全部",
+    "status": "狀態"
   },
   "actions": {
     "edit": "編輯",
@@ -14,10 +16,21 @@
     "save": "儲存",
     "add": "新增",
     "previous": "上一步",
-    "uploadFiles": "上傳檔案"
+    "uploadFiles": "上傳檔案",
+    "create": "建立",
+    "createFromImport": "匯入建立",
+    "duplicate": "複製",
+    "export": "匯出",
+    "moveTo": "移動到",
+    "batchSelect": "批次選取",
+    "cancelSelection": "取消選取",
+    "disable": "停用",
+    "saveAndEnable": "儲存並啟用",
+    "confirm": "確認"
   },
   "dialogs": {
-    "notice": "提示"
+    "notice": "提示",
+    "deleteWarning": "刪除後無法復原，請謹慎操作。"
   },
   "messages": {
     "saveSuccess": "儲存成功",
@@ -25,7 +38,13 @@
     "deleteFailed": "刪除失敗",
     "createSuccess": "建立成功",
     "fetchSuccess": "取得成功",
-    "updateSuccess": "修改成功"
+    "updateSuccess": "修改成功",
+    "moveSuccess": "移動成功",
+    "importSuccess": "匯入成功",
+    "enableSuccess": "啟用成功",
+    "disableSuccess": "停用成功",
+    "exportFailed": "匯出失敗：{reason}",
+    "copied": "已複製"
   },
   "placeholders": {
     "input": "請輸入",
@@ -40,5 +59,9 @@
   "empty": {
     "default": "暫無資料",
     "search": "沒有找到相關內容"
+  },
+  "states": {
+    "enabled": "已啟用",
+    "disabled": "已停用"
   }
 }

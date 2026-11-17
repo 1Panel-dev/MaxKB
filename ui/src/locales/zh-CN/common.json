@@ -5,7 +5,9 @@
     "operation": "操作",
     "createdOn": "创建于",
     "createdAt": "创建时间",
-    "updatedAt": "更新时间"
+    "updatedAt": "更新时间",
+    "all": "全部",
+    "status": "状态"
   },
   "actions": {
     "edit": "编辑",
@@ -14,10 +16,21 @@
     "save": "保存",
     "add": "添加",
     "previous": "上一步",
-    "uploadFiles": "上传文件"
+    "uploadFiles": "上传文件",
+    "create": "创建",
+    "createFromImport": "导入创建",
+    "duplicate": "复制",
+    "export": "导出",
+    "moveTo": "移动到",
+    "batchSelect": "批量选择",
+    "cancelSelection": "取消选择",
+    "disable": "禁用",
+    "saveAndEnable": "保存并启用",
+    "confirm": "确认"
   },
   "dialogs": {
-    "notice": "提示"
+    "notice": "提示",
+    "deleteWarning": "删除后无法恢复，请谨慎操作。"
   },
   "messages": {
     "saveSuccess": "保存成功",
@@ -25,7 +38,13 @@
     "deleteFailed": "删除失败",
     "createSuccess": "创建成功",
     "fetchSuccess": "获取成功",
-    "updateSuccess": "修改成功"
+    "updateSuccess": "修改成功",
+    "moveSuccess": "移动成功",
+    "importSuccess": "导入成功",
+    "enableSuccess": "启用成功",
+    "disableSuccess": "禁用成功",
+    "exportFailed": "导出失败：{reason}",
+    "copied": "已复制"
   },
   "placeholders": {
     "input": "请输入",
@@ -40,5 +59,9 @@
   "empty": {
     "default": "暂无数据",
     "search": "没有找到相关内容"
+  },
+  "states": {
+    "enabled": "已启用",
+    "disabled": "已禁用"
   }
 }

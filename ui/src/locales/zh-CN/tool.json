@@ -1,0 +1,37 @@
+{
+  "title": "工具",
+  "categories": {
+    "all": "全部工具",
+    "shared": "共享工具"
+  },
+  "types": {
+    "custom": "工具",
+    "skill": "Skills",
+    "workflow": "工作流",
+    "mcp": "MCP",
+    "dataSource": "数据源"
+  },
+  "store": {
+    "title": "工具商店"
+  },
+  "initParams": {
+    "title": "启动参数"
+  },
+  "delete": {
+    "title": "确认删除工具：{name}？",
+    "batchTitle": "是否批量删除 {count} 个工具？"
+  },
+  "disable": {
+    "title": "是否禁用工具：{name}？",
+    "description": "禁用后，引用了该工具的资源执行会报错，请谨慎操作。"
+  },
+  "messages": {
+    "publishBeforeEnabling": "无法启用，请先发布工作流"
+  },
+  "updateVersion": {
+    "action": "更新版本",
+    "title": "确认更新工具：{name}？",
+    "description": "更新工具可能会影响正在使用的资源，请谨慎操作。",
+    "success": "更新成功"
+  }
+}

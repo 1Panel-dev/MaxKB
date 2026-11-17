@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { ToolItem, ToolStoreResponse } from '@/api/types'
 import ButtonUpdateVersion from './ButtonUpdateVersion.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ToolCard' })
 
@@ -45,7 +48,7 @@ function handleClick(event: MouseEvent) {
     </template>
 
     <template #tag>
-      <el-tag v-if="shared" size="small" type="info">共享</el-tag>
+      <el-tag v-if="shared" size="small" type="info">{{ t('resource.states.shared') }}</el-tag>
       <ButtonUpdateVersion
         v-else-if="!selectable"
         v-model:loading="loading"
@@ -60,7 +63,12 @@ function handleClick(event: MouseEvent) {
     </p>
 
     <template #footer="{ Action, ActionDropdown }">
-      <MkStatusLabel :active="tool.is_active" class="text-N600!" />
+      <MkStatusLabel
+        :active="tool.is_active"
+        :active-text="t('common.states.enabled')"
+        :inactive-text="t('common.states.disabled')"
+        class="text-N600!"
+      />
       <component :is="Action" v-if="!disabled">
         <slot name="actions" />
         <component :is="ActionDropdown">

@@ -20,3 +20,28 @@ export const DYNAMIC_FORM_TYPES = [
 
 export type DynamicFormInputType = (typeof DYNAMIC_FORM_TYPES)[number]['value']
 export type DynamicFormTypeOption = (typeof DYNAMIC_FORM_TYPES)[number]
+
+const selectionFieldTypes = new Set(
+  [
+    'SingleSelect',
+    'MultiSelect',
+    'Radio',
+    'RadioCard',
+    'RadioRow',
+    'MultiRow',
+    'SwitchInput',
+    'TreeSelect',
+    'Tree',
+    'TableCheckbox',
+    'TableRadio',
+    'DatePicker',
+    'Model',
+    'Knowledge',
+    'UploadInput',
+  ].map((type) => type.toUpperCase()),
+)
+
+/** 必填提示按实际控件区分输入与选择，与运行时控件匹配一样忽略大小写。 */
+export function isSelectionFieldType(inputType: string) {
+  return selectionFieldTypes.has(inputType.toUpperCase())
+}

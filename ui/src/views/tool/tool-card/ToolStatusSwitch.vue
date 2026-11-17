@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
@@ -7,6 +8,8 @@ import type { ToolItem } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
 import InitParamDrawer from './InitParamDrawer.vue'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ToolStatusSwitch', inheritAttrs: false })
 
@@ -22,7 +25,10 @@ const initParamDrawerRef = useTemplateRef<InstanceType<typeof InitParamDrawer>>(
 function handleToolStatusChange() {
   if (loading.value) return false
   if (props.tool.is_active) {
-    return MsgConfirm(`是否禁用工具：${props.tool.name}？`, '禁用后，引用了该工具的资源执行会报错 ，请谨慎操作。', { confirmButtonText: '禁用' })
+    return MsgConfirm(t('tool.disable.title', { name: props.tool.name }), t('tool.disable.description'), {
+      cancelButtonText: t('common.actions.cancel'),
+      confirmButtonText: t('common.actions.disable'),
+    })
       .then(() => updateToolStatus(false))
       .catch(() => false)
   }
@@ -32,7 +38,7 @@ function handleToolStatusChange() {
     .getToolDetail(props.tool.id)
     .then((toolDetail) => {
       if (props.tool.tool_type === TOOL_TYPE.WORKFLOW && !toolDetail.is_publish) {
-        MsgError('无法启用，请先发布工作流')
+        MsgError(t('tool.messages.publishBeforeEnabling'))
         return false
       }
 
@@ -72,7 +78,7 @@ function updateToolStatus(active: boolean) {
     .putTool(props.tool.id, { is_active: active })
     .then((updatedTool) => {
       emit('update', updatedTool)
-      MsgSuccess(active ? '启用成功' : '禁用成功')
+      MsgSuccess(active ? t('common.messages.enableSuccess') : t('common.messages.disableSuccess'))
       return true
     })
     .catch(() => false)

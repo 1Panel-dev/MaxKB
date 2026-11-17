@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { Dict, FolderItem, OptionItem, ToolItem, ToolStoreResponse, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import StoreApi from '@/api/admin/store.ts'
@@ -35,10 +36,18 @@ import { FOLDER_ENTRIES, FOLDER_ENTRY_ID, TOOL_TYPE_OPTIONS } from '@/constants'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
+const { t } = useI18n({ useScope: 'global' })
+
 /* 当前文件夹 */
 
 const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.TOOL].all })
 const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARED)
+
+const currentFolderName = computed(() => {
+  if (isShared.value) return t('tool.categories.shared')
+  if (currentFolder.value.id === FOLDER_ENTRY_ID.ALL) return t('tool.categories.all')
+  return currentFolder.value.name
+})
 
 function handleFolderSelect(folder: FolderItem) {
   const folderChanged = folder.id !== currentFolder.value.id
@@ -59,16 +68,16 @@ const toolsData = ref<ToolItem[]>([])
 const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
-  { label: '名称', value: 'name' },
+  { label: t('common.labels.name'), value: 'name' },
   {
-    label: '状态',
+    label: t('common.labels.status'),
     value: 'is_active',
     options: [
-      { value: true, label: '已启用' },
-      { value: false, label: '已禁用' },
+      { value: true, label: t('common.states.enabled') },
+      { value: false, label: t('common.states.disabled') },
     ],
   },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 const toolQuery = ref<Dict<unknown>>()
 function loadCreatorOptions(keyword: string) {
@@ -107,7 +116,7 @@ const editToolFormRef = useTemplateRef<InstanceType<typeof EditToolForm>>('editT
 
 function handleOpenEditTool(tool: ToolItem) {
   if (!perm.tool.workspace.edit(tool.id)) return
-return editToolFormRef.value?.open(tool)
+  return editToolFormRef.value?.open(tool)
 }
 
 function handleOpenTool(tool: ToolItem, event: MouseEvent) {
@@ -182,7 +191,7 @@ function handleBatchMove(targetFolderId: string) {
   toolOperationLoading.value = true
   return ToolApi.putBatchMoveTools(toolIds, targetFolderId)
     .then(() => {
-      MsgSuccess('移动成功')
+      MsgSuccess(t('common.messages.moveSuccess'))
       batchMoveToDialogRef.value?.close()
       cancelBatchSelection()
       return refreshTool()
@@ -197,11 +206,14 @@ function handleBatchDelete() {
   if (!selectedToolCount.value) return
   const toolIds = [...selectedToolIds.value]
 
-  MsgConfirm(`是否批量删除 ${toolIds.length} 个工具？`, '删除后无法恢复，请谨慎操作。')
+  MsgConfirm(t('tool.delete.batchTitle', { count: toolIds.length }), t('common.dialogs.deleteWarning'), {
+    cancelButtonText: t('common.actions.cancel'),
+    confirmButtonText: t('common.actions.delete'),
+  })
     .then(() => {
       toolOperationLoading.value = true
       return ToolApi.putBatchDeleteTools(toolIds).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         cancelBatchSelection()
         return refreshTool()
       })
@@ -218,27 +230,33 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout class="workspace-tool-view" collapsible resizable>
+  <MkViewLayout :title="t('tool.title')" class="workspace-tool-view" collapsible resizable>
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <MkTooltip v-if="perm.tool.workspace.folderCreateWorkspace()" content="创建文件夹" placement="top">
+        <MkTooltip v-if="perm.tool.workspace.folderCreateWorkspace()" :content="t('resource.folder.create')" placement="top">
           <el-button @click="handleCreateFolder" text type="primary" class="-mr-1">
             <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>
         </MkTooltip>
       </component>
 
-      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.TOOL" @select="handleFolderSelect" draggable></FolderTree>
+      <FolderTree
+        ref="folderTreeRef"
+        :root-label="t('tool.categories.all')"
+        :source="RESOURCE_TYPE.TOOL"
+        @select="handleFolderSelect"
+        draggable
+      ></FolderTree>
     </template>
 
     <template #default="{ Footer, Header }">
       <component :is="Header">
         <div class="flex-align-center min-w-0 flex-1 gap-4">
-          <h4 class="min-w-0 truncate" :title="currentFolder?.name">{{ currentFolder?.name }}</h4>
+          <h4 class="min-w-0 truncate" :title="currentFolderName">{{ currentFolderName }}</h4>
           <el-divider direction="vertical" />
           <el-select v-model="toolType" class="w-30!" :empty-values="[null, undefined]" :value-on-clear="null" @change="refreshTool">
-            <el-option v-for="option in TOOL_TYPE_OPTIONS" :key="option.value" :label="option.label" :value="option.value" />
+            <el-option v-for="option in TOOL_TYPE_OPTIONS" :key="option.value" :label="t(option.labelKey)" :value="option.value" />
           </el-select>
         </div>
         <div class="flex-align-center gap-3">
@@ -254,7 +272,7 @@ onMounted(() => {
                 @click="toggleBatchSelection"
               >
                 <MkIcon name="icon_Batch_outlined" />
-                <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
+                <span>{{ batchSelectionMode ? t('common.actions.cancelSelection') : t('common.actions.batchSelect') }}</span>
               </el-button>
             </span>
 
@@ -296,13 +314,18 @@ onMounted(() => {
                 </template>
                 <template #action-dropdown>
                   <!-- 编辑工具 -->
-                  <MkAction v-if="perm.tool.workspace.edit(tool.id)" label="编辑" icon="icon_edit_outlined" @click="handleOpenEditTool(tool)" />
-                  <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" label="工作流" :tool="tool" />
+                  <MkAction
+                    v-if="perm.tool.workspace.edit(tool.id)"
+                    :label="t('common.actions.edit')"
+                    icon="icon_edit_outlined"
+                    @click="handleOpenEditTool(tool)"
+                  />
+                  <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" :label="t('tool.types.workflow')" :tool="tool" />
                   <!-- 复制 -->
                   <CopyToolAction
                     v-if="perm.tool.workspace.copy(tool.id)"
                     v-model:loading="toolOperationLoading"
-                    label="复制"
+                    :label="t('common.actions.duplicate')"
                     :api="ToolApi"
                     :tool="tool"
                     @refresh="refreshTool"
@@ -310,7 +333,7 @@ onMounted(() => {
                   <InitParamAction
                     v-if="(tool.init_field_list?.length ?? 0) > 0"
                     v-model:loading="toolOperationLoading"
-                    label="启动参数"
+                    :label="t('tool.initParams.title')"
                     :api="ToolApi"
                     :tool="tool"
                     @update="handleToolUpdate"
@@ -318,24 +341,24 @@ onMounted(() => {
                   <McpConfigAction
                     v-if="tool.tool_type === TOOL_TYPE.MCP"
                     v-model:loading="toolOperationLoading"
-                    label="MCP 服务配置"
+                    :label="t('resource.mcpConfig.title')"
                     :api="ToolApi"
                     :tool="tool"
                   />
                   <!-- 资源授权 -->
-                  <AuthorizeToolAction v-if="perm.tool.workspace.auth(tool.id)" label="资源授权" :tool="tool" />
+                  <AuthorizeToolAction v-if="perm.tool.workspace.auth(tool.id)" :label="t('resource.authorization.title')" :tool="tool" />
 
                   <!-- 工具触发器 -->
                   <TriggerToolAction
                     v-if="(tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW) && perm.tool.workspace.triggerRead(tool.id)"
-                    label="触发器"
+                    :label="t('resource.triggers.title')"
                     :api="ResourceTriggerApi"
                     :tool="tool"
                   />
                   <!-- 查看关联资源 -->
                   <RelatedResourcesToolAction
                     v-if="perm.tool.workspace.relateMap(tool.id)"
-                    label="查看关联资源"
+                    :label="t('resource.relations.title')"
                     :api="RelatedResourcesApi"
                     :tool="tool"
                   />
@@ -343,7 +366,7 @@ onMounted(() => {
                   <!-- 查看执行记录 -->
                   <ExecutionRecordToolAction
                     v-if="(tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW) && perm.tool.workspace.record(tool.id)"
-                    label="查看执行记录"
+                    :label="t('resource.actions.viewExecutionRecords')"
                     :api="WorkflowApi"
                     :tool="tool"
                   />
@@ -351,7 +374,7 @@ onMounted(() => {
                   <MoveToolAction
                     v-if="perm.tool.workspace.move(tool.id)"
                     v-model:loading="toolOperationLoading"
-                    label="移动到"
+                    :label="t('common.actions.moveTo')"
                     :api="ToolApi"
                     :current-folder-id="currentFolder.id"
                     :tool="tool"
@@ -361,7 +384,7 @@ onMounted(() => {
                   <ExportToolAction
                     v-if="!tool.template_id && perm.tool.workspace.export(tool.id)"
                     v-model:loading="toolOperationLoading"
-                    label="导出"
+                    :label="t('common.actions.export')"
                     :api="ToolApi"
                     :tool="tool"
                   />
@@ -369,7 +392,7 @@ onMounted(() => {
                   <DeleteToolAction
                     v-if="perm.tool.workspace.delete(tool.id)"
                     v-model:loading="toolOperationLoading"
-                    label="删除"
+                    :label="t('common.actions.delete')"
                     :api="ToolApi"
                     :tool="tool"
                     @delete="handleDeleteTool"
@@ -393,10 +416,10 @@ onMounted(() => {
       >
         <template #footer-batch-actions>
           <el-button v-if="perm.tool.workspace.batchMove()" type="primary" plain :disabled="!selectedToolCount" @click="handleOpenBatchMove">
-            移动到
+            {{ t('common.actions.moveTo') }}
           </el-button>
           <el-button v-if="perm.tool.workspace.batchDelete()" type="danger" plain :disabled="!selectedToolCount" @click="handleBatchDelete">
-            删除
+            {{ t('common.actions.delete') }}
           </el-button>
         </template>
       </component>

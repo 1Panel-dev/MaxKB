@@ -75,7 +75,6 @@
     "fetchModels": "取得模型"
   },
   "states": {
-    "shared": "共用",
     "downloading": "下載中"
   },
   "messages": {

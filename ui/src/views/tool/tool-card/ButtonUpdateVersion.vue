@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ToolItem, ToolStoreResponse } from '@/api/types'
 import WorkspaceToolStoreApi from '@/api/admin/workspace/tool/store'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ButtonUpdateVersion' })
 
@@ -20,9 +23,9 @@ function handleUpdateStoreTool() {
   const storeTool = availableStoreTool.value
   if (!storeTool) return Promise.resolve(false)
 
-  return MsgConfirm(`确认更新工具：${props.tool.name}？`, '更新工具可能会影响正在使用的资源，请谨慎操作。', {
-    cancelButtonText: '取消',
-    confirmButtonText: '确认',
+  return MsgConfirm(t('tool.updateVersion.title', { name: props.tool.name }), t('tool.updateVersion.description'), {
+    cancelButtonText: t('common.actions.cancel'),
+    confirmButtonText: t('common.actions.confirm'),
   })
     .then(() => {
       loading.value = true
@@ -35,7 +38,7 @@ function handleUpdateStoreTool() {
       })
         .then((updatedTool) => {
           emit('update', updatedTool)
-          MsgSuccess('更新成功')
+          MsgSuccess(t('tool.updateVersion.success'))
           return true
         })
         .finally(() => {
@@ -49,7 +52,7 @@ function handleUpdateStoreTool() {
 <template>
   <span v-if="availableStoreTool" class="group/update relative inline-flex h-[6px] w-[6px] shrink-0 items-center justify-center">
     <span class="mk-dot-success group-hover/update:opacity-0" />
-    <MkTooltip content="更新版本">
+    <MkTooltip :content="t('tool.updateVersion.action')">
       <el-button
         class="absolute-center invisible opacity-0 group-hover/update:visible group-hover/update:opacity-100"
         text
