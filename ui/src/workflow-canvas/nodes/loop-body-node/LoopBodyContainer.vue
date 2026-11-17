@@ -85,8 +85,9 @@ defineExpose({ zoom })
           <el-button text :title="enlarge ? '还原' : '放大'" @click="enlargeHandle">
             <MkIcon name="icon_magnify_outlined" :size="20" />
           </el-button>
+          <!-- 展开或收起节点 -->
           <el-button text @click="showNode = !showNode">
-            <MkIcon name="icon_down_outlined" :size="20" />
+            <MkIcon :name="showNode ? 'icon_up_outlined' : 'icon_down_outlined'" :size="20" />
           </el-button>
         </div>
       </div>

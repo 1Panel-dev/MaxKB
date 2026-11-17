@@ -20,7 +20,7 @@ import { useAgent } from '../impl'
 import { layoutCanvas } from '../tools/canvas'
 import { createActivity } from './activity'
 import { MsgError, MsgSuccess } from '@/utils/message'
-provide(VIEW_KEY,VIEW_TYPE.DEBUG)
+provide(VIEW_KEY, VIEW_TYPE.DEBUG)
 defineOptions({ name: 'WorkflowAiGeneratePanel' })
 const props = withDefaults(
   defineProps<{
@@ -137,11 +137,7 @@ function onEvent(event: AgentEvent) {
 
 /** 画布所属资源 id：按模式取路由上的应用 / 工具 / 知识库 id */
 function resourceIdOf(): string | undefined {
-  const key = props.workflowMode.startsWith('knowledge')
-    ? 'knowledgeId'
-    : props.workflowMode.startsWith('tool')
-      ? 'toolId'
-      : 'applicationId'
+  const key = props.workflowMode.startsWith('knowledge') ? 'knowledgeId' : props.workflowMode.startsWith('tool') ? 'toolId' : 'applicationId'
   return typeof route.params[key] === 'string' ? (route.params[key] as string) : undefined
 }
 
@@ -284,17 +280,18 @@ defineExpose({ open, close })
           @keydown="handleKeydown"
         />
         <div class="mt-4 flex-between">
-          <SelectModel
-            class="w-50!"
-            v-model="modelId"
-            v-model:model-params="modelParams"
-            can-edit-params
-            :can-add="false"
-            :options="modelOptions"
-            :provider-options="providerOptions"
-            :disabled="started"
-            teleported
-          />
+          <div class="w-50 shrink-0">
+            <SelectModel
+              v-model="modelId"
+              v-model:model-params="modelParams"
+              can-edit-params
+              :can-add="false"
+              :options="modelOptions"
+              :provider-options="providerOptions"
+              :disabled="started"
+              teleported
+            />
+          </div>
           <div>
             <!-- 停止生成 -->
             <el-button v-if="busy" circle type="primary" @click="stop">

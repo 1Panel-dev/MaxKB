@@ -121,7 +121,7 @@ defineExpose({ validate, getData })
           <template v-for="node in sourceNodeList" :key="node.id">
             <el-card
               shadow="never"
-              class="small min-w-0 cursor-pointer"
+              class="small min-w-0 cursor-pointer hover:border-primary!"
               :class="baseFormData.node_id === node.id ? 'border-primary!' : ''"
               @click="handleSourceChange(node.id)"
             >

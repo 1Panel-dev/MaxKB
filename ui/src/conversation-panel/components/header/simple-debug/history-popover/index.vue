@@ -57,7 +57,7 @@ function handleClearConversations() {
 </script>
 
 <template>
-  <el-popover v-model:visible="visible" trigger="click" placement="bottom-end" :width="280" popper-class="p-2! bg-N100!" @show="handleShow">
+  <el-popover v-model:visible="visible" trigger="click" placement="bottom-end" :width="280" popper-class="p-2!" @show="handleShow">
     <template #reference>
       <span class="inline-flex">
         <MkTooltip content="历史对话">

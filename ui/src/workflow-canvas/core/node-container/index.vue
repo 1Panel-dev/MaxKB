@@ -279,8 +279,9 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="flex-align-center shrink-0 gap-1" @pointerdown.stop @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
+            <!-- 展开或收起节点 -->
             <el-button text @click="showNode = !showNode">
-              <MkIcon name="icon_down_outlined" :size="20" />
+              <MkIcon :name="showNode ? 'icon_up_outlined' : 'icon_down_outlined'" :size="20" />
             </el-button>
             <NodeConditionDropdown
               :model="model"
