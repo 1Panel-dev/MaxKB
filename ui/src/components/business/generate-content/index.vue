@@ -173,13 +173,12 @@ onBeforeUnmount(stopGenerate)
           @paste.stop
         />
         <div class="flex-between gap-3 mt-3">
-          <div class="min-w-0">
+          <div class="min-w-0 w-60">
             <!-- 选择生成内容使用的模型及参数 -->
             <SelectModel
               v-if="modelOptions"
               v-model="modelId"
               v-model:model-params="modelParams"
-              class="w-60!"
               :options="modelOptions"
               :provider-options="providerOptions ?? []"
               :loading="modelLoading"
