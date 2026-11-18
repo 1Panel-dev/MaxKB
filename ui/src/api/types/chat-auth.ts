@@ -18,6 +18,8 @@ export interface AuthProfile<Meta = Record<string, never>> {
 export interface ApplicationAuthProfileMeta {
   application_id: string
   application_name: string
+  /** 应用是否已发布；未发布的应用不能对话。 */
+  is_publish: boolean
 }
 
 export interface PortalAuthProfileMeta {
