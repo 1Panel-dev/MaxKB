@@ -235,7 +235,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
   <SelectToolDialog
     ref="toolDialogRef"
     :workspace-id="resourceWorkspaceId"
-    :title="selectingSkills ? 'Skills' : '工具'"
+    :title="selectingSkills ? 'Skills' : undefined"
     :tool-types="selectingSkills ? [TOOL_TYPE.SKILL] : undefined"
     :excluded-ids="excludedToolIds"
     @submit="submitToolDialog"

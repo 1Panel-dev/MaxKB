@@ -232,7 +232,7 @@ onMounted(() => {
                 <!-- 智能体触发器 -->
                 <TriggerApplicationAction
                   v-if="perm.application.system.triggerRead()"
-                  :label="t('resource.triggers.title')"
+                  :label="t('trigger.title')"
                   :api="SystemResourceTriggerApi"
                   :application-api="SystemResourceApplicationApi"
                   :application="row"

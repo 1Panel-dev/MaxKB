@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, OptionItem, Trigger, TriggerType } from '@/api/types'
 import { TRIGGER_TYPE } from '@/api/enums'
 import CommonApi from '@/api/admin/workspace/common'
@@ -12,26 +13,28 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission/index.ts'
 
+const { t } = useI18n({ useScope: 'global' })
+
 /* 触发器筛选与分页查询 */
 const loading = ref(false)
 const triggerData = ref<Trigger[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const triggerSearchQuery = ref<Dict<unknown>>({})
 const orderBy = ref<string>()
-const triggerTypeLabels: Record<TriggerType, string> = {
-  [TRIGGER_TYPE.SCHEDULED]: '定时触发',
-  [TRIGGER_TYPE.EVENT]: '事件触发',
-}
-const triggerTypeOptions = Object.entries(triggerTypeLabels).map(([value, label]) => ({ value, label }))
-const triggerStatusOptions = [
-  { label: '已启用', value: true },
-  { label: '已禁用', value: false },
-]
+const triggerTypeLabels = computed<Record<TriggerType, string>>(() => ({
+  [TRIGGER_TYPE.SCHEDULED]: t('trigger.scheduled.label'),
+  [TRIGGER_TYPE.EVENT]: t('trigger.event.label'),
+}))
+const triggerTypeOptions = computed(() => Object.entries(triggerTypeLabels.value).map(([value, label]) => ({ value, label })))
+const triggerStatusOptions = computed(() => [
+  { label: t('common.status.enabled'), value: true },
+  { label: t('common.status.disabled'), value: false },
+])
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
-  { label: '名称', value: 'name' },
-  { label: '任务', value: 'task' },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.name.label'), value: 'name' },
+  { label: t('trigger.labels.task'), value: 'task' },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 const selectedTriggerType = ref<string | null>(null)
 const selectedStatus = ref<boolean | null>(null)
@@ -94,12 +97,12 @@ function handleOpenRecordDrawer(trigger: Trigger) {
 }
 
 function handleDeleteTrigger(trigger: Trigger) {
-  return MsgConfirm(`确定删除触发器“${trigger.name}”吗？`, '删除后将停止触发任务，并删除相关执行记录。')
+  return MsgConfirm(`${t('trigger.delete.title')}: ${trigger.name}?`, t('trigger.delete.description'))
     .then(() => {
       loading.value = true
       return TriggerApi.deleteTrigger(trigger.id)
         .then(() => {
-          MsgSuccess('删除成功')
+          MsgSuccess(t('common.messages.deleteSuccess'))
           tableRef.value?.clearSelection()
           return loadTriggers()
         })
@@ -117,7 +120,7 @@ function handleChangeStatus(trigger: Trigger) {
 
   return TriggerApi.putTrigger(trigger.id, { is_active: nextActive })
     .then(() => {
-      MsgSuccess(nextActive ? '启用成功' : '禁用成功')
+      MsgSuccess(nextActive ? t('common.messages.enableSuccess') : t('common.messages.disableSuccess'))
       return true
     })
     .catch(() => false)
@@ -132,7 +135,7 @@ function handleBatchActivate(isActive: boolean) {
   const triggerIds = selectedTriggers.value.map(({ id }) => id)
   return TriggerApi.putBatchActivateTrigger(triggerIds, isActive)
     .then(() => {
-      MsgSuccess(isActive ? '批量启用成功' : '批量禁用成功')
+      MsgSuccess(isActive ? t('common.messages.enableSuccess') : t('common.messages.disableSuccess'))
       tableRef.value?.clearSelection()
       return loadTriggers()
     })
@@ -143,12 +146,12 @@ function handleBatchActivate(isActive: boolean) {
 
 function handleBatchDelete() {
   const triggerIds = selectedTriggers.value.map(({ id }) => id)
-  return MsgConfirm(`是否删除选中的 ${triggerIds.length} 个触发器？`)
+  return MsgConfirm(`${t('trigger.delete.batchTitle', { count: triggerIds.length }, triggerIds.length)}?`)
     .then(() => {
       loading.value = true
       return TriggerApi.putBatchDeleteTrigger(triggerIds)
         .then(() => {
-          MsgSuccess('批量删除成功')
+          MsgSuccess(t('common.messages.deleteSuccess'))
           tableRef.value?.clearSelection()
           return loadTriggers()
         })
@@ -163,7 +166,7 @@ onMounted(() => loadTriggers())
 </script>
 
 <template>
-  <MkViewLayout :loading="loading">
+  <MkViewLayout :title="t('trigger.title')" :loading="loading">
     <template #default="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -172,7 +175,7 @@ onMounted(() => loadTriggers())
           <!-- 新建触发器 -->
           <el-button v-if="perm.trigger.create()" type="primary" @click="handleOpenTriggerDrawer()">
             <MkIcon name="icon_add_outlined" />
-            <span>创建</span>
+            <span>{{ t('common.actions.create') }}</span>
           </el-button>
         </div>
       </component>
@@ -189,7 +192,7 @@ onMounted(() => loadTriggers())
         resizable
       >
         <el-table-column type="selection" width="40" />
-        <el-table-column prop="name" label="名称" min-width="220" show-overflow-tooltip>
+        <el-table-column prop="name" :label="t('common.name.label')" min-width="220" show-overflow-tooltip>
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <TriggerIcon :type="row.trigger_type" :size="24" />
@@ -197,30 +200,42 @@ onMounted(() => loadTriggers())
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="trigger_type" label="类型" width="120">
+        <el-table-column prop="trigger_type" :label="t('common.labels.type')" width="120">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedTriggerType" label="类型" :options="triggerTypeOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedTriggerType"
+              :label="t('common.labels.type')"
+              :options="triggerTypeOptions"
+              @change="handleFilterChange"
+            />
           </template>
           <template #default="{ row }">{{ triggerTypeLabels[row.trigger_type as TriggerType] || row.trigger_type }}</template>
         </el-table-column>
-        <el-table-column prop="is_active" label="启用状态" width="120">
+        <el-table-column prop="is_active" :label="t('common.status.label')" width="120">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="triggerStatusOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedStatus"
+              :label="t('common.status.label')"
+              :options="triggerStatusOptions"
+              @change="handleFilterChange"
+            />
           </template>
           <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
         </el-table-column>
-        <el-table-column prop="desc" label="描述" min-width="170" show-overflow-tooltip />
-        <el-table-column prop="next_run_time" label="下次执行时间" width="180" sortable>
+        <el-table-column prop="desc" :label="t('common.description.label')" min-width="170" show-overflow-tooltip />
+        <el-table-column prop="next_run_time" :label="t('trigger.labels.nextRunTime')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.next_run_time) || '-' }}</template>
         </el-table-column>
-        <el-table-column label="任务" min-width="180">
+        <el-table-column :label="t('trigger.labels.task')" min-width="180">
           <template #default="{ row }"><TriggerTaskPopover :tasks="row.trigger_task" /></template>
         </el-table-column>
-        <el-table-column prop="create_user" label="创建者" width="130" show-overflow-tooltip />
-        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
+        <el-table-column prop="create_user" :label="t('common.labels.creator')" width="130" show-overflow-tooltip />
+        <el-table-column prop="create_time" :label="t('common.labels.createTime')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="160" fixed="right">
+        <el-table-column :label="t('common.labels.operation')" width="160" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 修改触发器状态 -->
@@ -230,21 +245,21 @@ onMounted(() => loadTriggers())
 
               <div class="flex">
                 <!-- 编辑当前触发器 -->
-                <MkTooltip content="编辑" placement="top">
+                <MkTooltip :content="t('common.actions.edit')" placement="top">
                   <el-button type="primary" text @click.stop="handleOpenTriggerDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
                 </MkTooltip>
 
                 <!-- 查看触发器执行记录 -->
-                <MkTooltip content="执行记录" placement="top" v-if="perm.trigger.record()">
+                <MkTooltip :content="t('resource.executionRecords.title')" placement="top" v-if="perm.trigger.record()">
                   <el-button type="primary" text @click.stop="handleOpenRecordDrawer(row)">
                     <MkIcon name="icon_schedule-report_outlined" />
                   </el-button>
                 </MkTooltip>
 
                 <!-- 删除当前触发器 -->
-                <MkTooltip content="删除" placement="top" v-if="perm.trigger.delete()">
+                <MkTooltip :content="t('common.actions.delete')" placement="top" v-if="perm.trigger.delete()">
                   <el-button type="primary" text @click.stop="handleDeleteTrigger(row)">
                     <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>
@@ -255,11 +270,11 @@ onMounted(() => loadTriggers())
         </el-table-column>
         <template #footer-batch-actions>
           <!-- 批量启用所选触发器 -->
-          <el-button v-if="perm.trigger.edit()" type="primary" plain @click="handleBatchActivate(true)">启用</el-button>
+          <el-button v-if="perm.trigger.edit()" type="primary" plain @click="handleBatchActivate(true)">{{ t('common.actions.enable') }}</el-button>
           <!-- 批量禁用所选触发器 -->
-          <el-button v-if="perm.trigger.edit()" type="primary" plain @click="handleBatchActivate(false)">禁用</el-button>
+          <el-button v-if="perm.trigger.edit()" type="primary" plain @click="handleBatchActivate(false)">{{ t('common.actions.disable') }}</el-button>
           <!-- 批量删除所选触发器 -->
-          <el-button v-if="perm.trigger.delete()" type="danger" plain @click="handleBatchDelete">删除</el-button>
+          <el-button v-if="perm.trigger.delete()" type="danger" plain @click="handleBatchDelete">{{ t('common.actions.delete') }}</el-button>
         </template>
       </MkTable>
     </template>

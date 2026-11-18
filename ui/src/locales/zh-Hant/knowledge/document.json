@@ -36,16 +36,10 @@
     },
     "status": {
       "label": "檔案狀態",
-      "pending": "排隊中",
-      "started": "執行中",
       "embedding": "索引中",
       "generate": "產生中",
       "sync": "同步中",
       "tokenize": "建立分詞索引中",
-      "success": "成功",
-      "failure": "失敗",
-      "canceling": "取消中",
-      "canceled": "已取消",
       "progress": "完成"
     },
     "actions": {

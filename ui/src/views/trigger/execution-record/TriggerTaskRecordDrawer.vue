@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, TriggerTaskRecord } from '@/api/types'
 import { RESOURCE_TYPE, STATE_TYPES } from '@/api/enums'
 import TriggerApi from '@/api/admin/workspace/trigger/trigger'
@@ -7,6 +8,8 @@ import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
 import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { toOrderBy } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
+
+const { t } = useI18n({ useScope: 'global' })
 
 /* 当前触发器记录查询 */
 const visible = ref(false)
@@ -16,26 +19,26 @@ const recordData = ref<TriggerTaskRecord[]>([])
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchQuery = ref<Dict<unknown>>()
 const orderBy = ref<string>()
-const searchFields = [
-  { label: '名称', value: 'name' },
+const searchFields = computed(() => [
+  { label: t('common.name.label'), value: 'name' },
   {
-    label: '状态',
+    label: t('common.status.label'),
     value: 'state',
     options: [
-      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.SUCCESS].label, value: STATE_TYPES.SUCCESS },
-      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.STARTED].label, value: STATE_TYPES.STARTED },
-      { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.FAILURE].label, value: STATE_TYPES.FAILURE },
+      { label: t(EXECUTION_STATUS_OPTIONS[STATE_TYPES.SUCCESS].labelKey), value: STATE_TYPES.SUCCESS },
+      { label: t(EXECUTION_STATUS_OPTIONS[STATE_TYPES.STARTED].labelKey), value: STATE_TYPES.STARTED },
+      { label: t(EXECUTION_STATUS_OPTIONS[STATE_TYPES.FAILURE].labelKey), value: STATE_TYPES.FAILURE },
     ],
   },
   {
-    label: '资源类型',
+    label: t('resource.executionRecords.resourceType'),
     value: 'source_type',
     options: [
-      { label: '智能体', value: RESOURCE_TYPE.APPLICATION },
-      { label: '工具', value: RESOURCE_TYPE.TOOL },
+      { label: t('application.title'), value: RESOURCE_TYPE.APPLICATION },
+      { label: t('tool.title'), value: RESOURCE_TYPE.TOOL },
     ],
   },
-]
+])
 function loadRecords(page = pagination.value.currentPage): Promise<TriggerTaskRecord[]> {
   loading.value = true
   return TriggerApi.getTriggerTaskRecordPage(
@@ -114,7 +117,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="执行记录" size="840" @close="closeDetails">
+  <MkDrawer v-model="visible" :title="t('resource.executionRecords.title')" size="840" @close="closeDetails">
     <div class="mb-4">
       <MkComplexSearch v-if="visible" :fields="searchFields" class="w-76!" @change="searchRecords" />
     </div>
@@ -128,7 +131,7 @@ defineExpose({ open })
       @size-change="loadRecords()"
       @sort-change="handleSortChange"
     >
-      <el-table-column label="触发任务" min-width="130" show-overflow-tooltip>
+      <el-table-column :label="t('trigger.executionRecords.task')" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">
           <div class="flex-align-center gap-2">
             <ApplicationIcon v-if="row.source_type === RESOURCE_TYPE.APPLICATION" :icon="row.source_icon" :size="20" />
@@ -137,25 +140,30 @@ defineExpose({ open })
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="类型" width="80">
-        <template #default="{ row }">{{ row.source_type === RESOURCE_TYPE.APPLICATION ? '智能体' : '工具' }}</template>
+      <el-table-column :label="t('common.labels.type')" width="80">
+        <template #default="{ row }">{{ row.source_type === RESOURCE_TYPE.APPLICATION ? t('application.title') : t('tool.title') }}</template>
       </el-table-column>
-      <el-table-column label="状态" width="100">
+      <el-table-column :label="t('common.status.label')" width="100">
         <template #default="{ row }: { row: TriggerTaskRecord }">
-          <MkStatusLabel v-if="EXECUTION_STATUS_OPTIONS[row.state]" v-bind="EXECUTION_STATUS_OPTIONS[row.state]" />
+          <MkStatusLabel
+            v-if="EXECUTION_STATUS_OPTIONS[row.state]"
+            :type="EXECUTION_STATUS_OPTIONS[row.state].type"
+            :label="t(EXECUTION_STATUS_OPTIONS[row.state].labelKey)"
+            :icon="EXECUTION_STATUS_OPTIONS[row.state].icon"
+          />
           <span v-else>{{ row.state }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="耗时" width="90">
+      <el-table-column :label="t('common.labels.duration')" width="90">
         <template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template>
       </el-table-column>
-      <el-table-column label="执行时间" prop="create_time" width="180" sortable>
+      <el-table-column :label="t('resource.executionRecords.executionTime')" prop="create_time" width="180" sortable>
         <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="70">
+      <el-table-column :label="t('common.labels.operation')" width="70">
         <template #default="{ row }">
           <!-- 查看执行详情 -->
-          <MkTooltip content="执行详情" placement="top">
+          <MkTooltip :content="t('resource.executionRecords.detailTitle')" placement="top">
             <el-button text type="primary" @click="showDetails(row)"><MkIcon name="icon_describe_outlined" /></el-button>
           </MkTooltip>
         </template>

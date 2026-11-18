@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
@@ -9,6 +10,8 @@ import TriggerFormDrawer from '@/views/trigger/trigger-form/TriggerFormDrawer.vu
 import { MsgSuccess } from '@/utils/message'
 import { isSystemResource } from '@/utils/resource-context'
 import perm from '@/permission'
+
+const { t } = useI18n({ useScope: 'global' })
 
 type ApplicationTriggerPermissionMethod = 'triggerCreate' | 'triggerEdit' | 'triggerDelete'
 function applicationTriggerPermission(method: ApplicationTriggerPermissionMethod): boolean {
@@ -54,15 +57,23 @@ function getScheduleLabel(setting: TriggerSetting) {
   const times = setting.time?.join('、') || '-'
   switch (setting.schedule_type) {
     case SCHEDULE_TYPE.DAILY:
-      return `每日/${times}`
+      return `${t('common.schedule.daily')} / ${times}`
     case SCHEDULE_TYPE.WEEKLY: {
-      const weekdays = ['日', '一', '二', '三', '四', '五', '六']
-      return `每周${setting.days?.map((day) => weekdays[Number(day) % 7]).join('、') || '-'}/${times}`
+      const weekdays = [
+        t('common.schedule.weekdays.sunday'),
+        t('common.schedule.weekdays.monday'),
+        t('common.schedule.weekdays.tuesday'),
+        t('common.schedule.weekdays.wednesday'),
+        t('common.schedule.weekdays.thursday'),
+        t('common.schedule.weekdays.friday'),
+        t('common.schedule.weekdays.saturday'),
+      ]
+      return `${t('common.schedule.weekly')} / ${setting.days?.map((day) => weekdays[Number(day) % 7]).join('、') || '-'} / ${times}`
     }
     case SCHEDULE_TYPE.MONTHLY:
-      return `每月${setting.days?.join('、') || '-'}日/${times}`
+      return `${t('common.schedule.monthly')} / ${setting.days?.join('、') || '-'} ${t('common.schedule.day')} / ${times}`
     case SCHEDULE_TYPE.INTERVAL:
-      return `每隔${setting.interval_value ?? '-'}${setting.interval_unit === 'hours' ? '小时' : '分钟'}`
+      return `${t('common.schedule.interval')} / ${setting.interval_value ?? '-'} ${setting.interval_unit === 'hours' ? t('common.schedule.units.hours') : t('common.schedule.units.minutes')}`
     case SCHEDULE_TYPE.CRON:
       return setting.cron_expression || '-'
     default:
@@ -87,7 +98,7 @@ function handleRemoveTrigger(trigger: ResourceTrigger) {
   return props.api
     .deleteResourceTrigger(resource.value, trigger.id)
     .then(() => {
-      MsgSuccess('移除成功')
+      MsgSuccess(t('common.messages.removeSuccess'))
       return loadTriggers()
     })
     .finally(() => {
@@ -101,12 +112,12 @@ defineExpose({ open })
   <MkDialog class="resource-trigger-dialog" v-model="visible" @closed="emit('closed')">
     <template #header>
       <div class="flex-between">
-        <h4>触发器</h4>
+        <h4>{{ t('trigger.title') }}</h4>
         <div class="flex-align-center">
           <!-- 添加触发器 -->
           <el-button v-if="applicationTriggerPermission('triggerCreate')" text :disabled="loading" @click="handleOpenForm()" class="text-N900!">
             <MkIcon name="icon_add_outlined" />
-            <span>添加</span>
+            <span>{{ t('common.actions.add') }}</span>
           </el-button>
           <el-divider direction="vertical" class="ml-3! mr-4!" />
         </div>

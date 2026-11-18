@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { TriggerTask } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(defineProps<{ tasks?: TriggerTask[] }>(), { tasks: () => [] })
 
 const taskGroups = computed(() =>
   [
-    { type: RESOURCE_TYPE.APPLICATION, label: '智能体' },
-    { type: RESOURCE_TYPE.TOOL, label: '工具' },
+    { type: RESOURCE_TYPE.APPLICATION, label: t('application.title') },
+    { type: RESOURCE_TYPE.TOOL, label: t('tool.title') },
   ]
     .map((group) => ({ ...group, tasks: props.tasks.filter((task) => task.type === group.type) }))
     .filter((group) => group.tasks.length > 0),

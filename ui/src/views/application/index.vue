@@ -264,7 +264,7 @@ function handleBatchDelete() {
                   <!-- 智能体触发器 -->
                   <TriggerApplicationAction
                     v-if="perm.application.workspace.triggerRead(application.id)"
-                    :label="t('resource.triggers.title')"
+                    :label="t('trigger.title')"
                     :api="ResourceTriggerApi"
                     :application-api="ApplicationApi"
                     :application="application"

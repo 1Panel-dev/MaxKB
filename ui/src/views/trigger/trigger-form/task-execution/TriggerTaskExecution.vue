@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDetail, ToolItem, TriggerBodyField, TriggerTaskPayload, TriggerTaskSource, TriggerType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import ApplicationApi from '@/api/admin/workspace/application/application'
@@ -8,6 +9,8 @@ import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import SelectApplicationDialog from '@/components/business/select-application-dialog/index.vue'
 import SelectToolDialog from '@/components/business/select-tool-dialog/index.vue'
 import TaskParameterForm from './components/TaskParameterForm.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   initialResources: Record<string, Partial<ApplicationDetail & ToolItem>>
@@ -28,8 +31,8 @@ const parameterRefs = ref<InstanceType<typeof TaskParameterForm>[]>([])
 const taskKey = (task: TriggerTaskPayload) => `${task.source_type}:${task.source_id}`
 const taskGroups = computed(() =>
   [
-    { type: RESOURCE_TYPE.APPLICATION, label: '智能体' },
-    { type: RESOURCE_TYPE.TOOL, label: '工具' },
+    { type: RESOURCE_TYPE.APPLICATION, label: t('application.title') },
+    { type: RESOURCE_TYPE.TOOL, label: t('tool.title') },
   ].map((group) => ({ ...group, tasks: tasks.value.filter((task) => task.source_type === group.type) })),
 )
 

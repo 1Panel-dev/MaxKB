@@ -341,7 +341,7 @@ onMounted(() => {
                   <!-- 工具触发器 -->
                   <TriggerToolAction
                     v-if="(tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW) && perm.tool.workspace.triggerRead(tool.id)"
-                    :label="t('resource.triggers.title')"
+                    :label="t('trigger.title')"
                     :api="ResourceTriggerApi"
                     :tool="tool"
                   />

@@ -9,6 +9,9 @@
     "all": "All knowledge",
     "shared": "Shared knowledge"
   },
+  "help": {
+    "embeddingModelHint": "Selected knowledge must use the same embedding model"
+  },
   "base": {
     "label": "General knowledge",
     "createTitle": "Create general knowledge",

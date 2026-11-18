@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, KnowledgeExecutionRecord, KnowledgeWorkflowApi } from '@/api/types'
 import { STATE_TYPES } from '@/api/enums'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
@@ -7,6 +8,8 @@ import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { toOrderBy } from '@/utils/common'
 import { MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ api: KnowledgeWorkflowApi; knowledgeId: string }>()
 const emit = defineEmits<{ closed: [] }>()
@@ -18,19 +21,19 @@ const recordData = ref<KnowledgeExecutionRecord[]>([])
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchQuery = ref<Dict<unknown>>()
 const orderBy = ref<string>()
-const searchFields = [
+const searchFields = computed(() => [
   { label: '发起人', value: 'user_name' },
   {
-    label: '状态',
+    label: t('common.status.label'),
     value: 'state',
     options: [STATE_TYPES.PENDING, STATE_TYPES.STARTED, STATE_TYPES.SUCCESS, STATE_TYPES.FAILURE, STATE_TYPES.REVOKE, STATE_TYPES.REVOKED].map(
       (state) => ({
-        label: EXECUTION_STATUS_OPTIONS[state].label,
+        label: t(EXECUTION_STATUS_OPTIONS[state].labelKey),
         value: state,
       }),
     ),
   },
-]
+])
 let pollingTimer: ReturnType<typeof setTimeout> | undefined
 function stopPolling() {
   clearTimeout(pollingTimer)
@@ -166,9 +169,14 @@ defineExpose({ open, close })
       <el-table-column label="发起人" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">{{ row.meta?.user_name || '-' }}</template>
       </el-table-column>
-      <el-table-column label="状态" width="100">
+      <el-table-column :label="t('common.status.label')" width="100">
         <template #default="{ row }: { row: KnowledgeExecutionRecord }">
-          <MkStatusLabel v-if="EXECUTION_STATUS_OPTIONS[row.state]" v-bind="EXECUTION_STATUS_OPTIONS[row.state]" />
+          <MkStatusLabel
+            v-if="EXECUTION_STATUS_OPTIONS[row.state]"
+            :type="EXECUTION_STATUS_OPTIONS[row.state].type"
+            :label="t(EXECUTION_STATUS_OPTIONS[row.state].labelKey)"
+            :icon="EXECUTION_STATUS_OPTIONS[row.state].icon"
+          />
           <span v-else>{{ row.state }}</span>
         </template>
       </el-table-column>

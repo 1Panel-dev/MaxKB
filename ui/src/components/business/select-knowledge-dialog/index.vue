@@ -113,12 +113,12 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" class="mk-aside-content-dialog" width="1200" @closed="resetData">
+  <MkDialog v-model="visible" class="mk-aside-content-dialog" :title="t('knowledge.title')" width="1200" @closed="resetData">
     <template #header="{ titleId }">
       <div class="flex-between pr-8">
         <div class="flex-align-center gap-2">
-          <h4 :id="titleId">知识库</h4>
-          <span class="text-N600!">所选知识库必须使用相同的 Embedding 模型</span>
+          <h4 :id="titleId">{{ t('knowledge.title') }}</h4>
+          <span class="text-N600!">{{ t('knowledge.help.embeddingModelHint') }}</span>
         </div>
 
         <!-- 刷新知识库 -->
@@ -180,12 +180,15 @@ defineExpose({ open })
     <template #footer>
       <div class="flex-between">
         <div class="flex-align-center gap-2">
-          <span class="text-N600">已选 {{ selectedKnowledge.length }}</span>
-          <el-button v-if="selectedKnowledge.length" link type="primary" @click="selectedKnowledge = []">清空</el-button>
+          <span class="text-N600">{{ t('common.labels.selected') }} {{ selectedKnowledge.length }}</span>
+          <!-- 清空已选知识库 -->
+          <el-button v-if="selectedKnowledge.length" link type="primary" @click="selectedKnowledge = []">{{ t('common.actions.clear') }}</el-button>
         </div>
         <div>
-          <el-button plain @click="visible = false">取消</el-button>
-          <el-button type="primary" @click="submit">确定</el-button>
+          <!-- 取消知识库选择 -->
+          <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+          <!-- 确认知识库选择 -->
+          <el-button type="primary" @click="submit">{{ t('common.actions.confirm') }}</el-button>
         </div>
       </div>
     </template>

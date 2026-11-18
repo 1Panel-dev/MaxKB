@@ -18,7 +18,6 @@ defineOptions({ name: 'SelectToolDialog' })
 
 const props = withDefaults(defineProps<{ excludedIds?: string[]; title?: string; toolTypes?: ToolType[]; workspaceId?: string | null }>(), {
   excludedIds: () => [],
-  title: '工具',
   toolTypes: () => [TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW, TOOL_TYPE.INTERNAL],
 })
 
@@ -116,11 +115,11 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" :title="title" width="1200" @closed="resetData">
+  <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" :title="title ?? t('tool.title')" width="1200" @closed="resetData">
     <template #header="{ titleId }">
       <div class="flex-between pr-8">
         <div class="flex-align-center gap-2">
-          <h4 :id="titleId">{{ title }}</h4>
+          <h4 :id="titleId">{{ title ?? t('tool.title') }}</h4>
         </div>
 
         <!-- 刷新工具 -->
@@ -182,12 +181,15 @@ defineExpose({ open })
     <template #footer>
       <div class="flex-between">
         <div class="flex-align-center gap-2">
-          <span class="text-N600">已选 {{ selectedTool.length }}</span>
-          <el-button v-if="selectedTool.length" link type="primary" @click="selectedTool = []">清空</el-button>
+          <span class="text-N600">{{ t('common.labels.selected') }} {{ selectedTool.length }}</span>
+          <!-- 清空已选工具 -->
+          <el-button v-if="selectedTool.length" link type="primary" @click="selectedTool = []">{{ t('common.actions.clear') }}</el-button>
         </div>
         <div>
-          <el-button plain @click="visible = false">取消</el-button>
-          <el-button type="primary" @click="submit">确定</el-button>
+          <!-- 取消工具选择 -->
+          <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+          <!-- 确认工具选择 -->
+          <el-button type="primary" @click="submit">{{ t('common.actions.confirm') }}</el-button>
         </div>
       </div>
     </template>

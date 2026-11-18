@@ -208,7 +208,7 @@ onMounted(() => {
             />
           </template>
           <template #default="{ row }">
-            <MkStatusLabel :active="row.is_active" :active-text="t('common.status.enabled')" :inactive-text="t('common.status.disabled')" />
+            <MkStatusLabel :active="row.is_active" />
           </template>
         </el-table-column>
         <el-table-column v-if="auth.isEE" prop="workspace_name" min-width="160" show-overflow-tooltip>
@@ -283,7 +283,7 @@ onMounted(() => {
                   :tool-api="SystemToolApi"
                   :tool-workflow-api="SystemToolWorkflowApi"
                   v-if="[TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW].includes(row.tool_type) && perm.tool.system.triggerRead()"
-                  :label="t('resource.triggers.title')"
+                  :label="t('trigger.title')"
                   :api="SystemResourceTriggerApi"
                   :tool="row"
                 />

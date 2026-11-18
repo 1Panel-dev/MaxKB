@@ -1,0 +1,79 @@
+{
+  "title": "觸發器",
+  "createTitle": "建立觸發器",
+  "editTitle": "編輯觸發器",
+  "fields": {
+    "name": {
+      "label": "觸發器名稱",
+      "placeholder": "請輸入觸發器名稱",
+      "requiredMessage": "請輸入觸發器名稱"
+    }
+  },
+  "scheduled": {
+    "label": "定時觸發",
+    "description": "到設定時間後執行任務",
+    "period": {
+      "label": "觸發週期",
+      "placeholder": "請選擇觸發週期",
+      "requiredMessage": "請選擇觸發週期"
+    }
+  },
+  "event": {
+    "label": "事件觸發",
+    "description": "當某個事件發生時執行任務",
+    "url": {
+      "label": "事件 URL"
+    },
+    "token": {
+      "requiredMessage": "請產生 Bearer Token"
+    }
+  },
+  "requestParameters": {
+    "title": "請求參數",
+    "addTitle": "新增請求參數",
+    "editTitle": "編輯請求參數",
+    "name": {
+      "label": "參數名稱",
+      "placeholder": "請輸入參數名稱",
+      "requiredMessage": "請輸入參數名稱",
+      "duplicateMessage": "參數名稱不能重複"
+    },
+    "dataType": {
+      "label": "資料類型",
+      "placeholder": "請選擇資料類型",
+      "requiredMessage": "請選擇資料類型"
+    }
+  },
+  "taskExecution": {
+    "label": "任務執行",
+    "requiredMessage": "請至少選擇一個執行任務"
+  },
+  "taskParameters": {
+    "question": "問題",
+    "files": {
+      "document": "文件",
+      "image": "圖片",
+      "audio": "音訊",
+      "video": "影片",
+      "other": "其他檔案"
+    },
+    "source": {
+      "reference": "引用",
+      "custom": "自訂",
+      "invalidMessage": "請選擇有效的事件請求參數，或切換為自訂"
+    }
+  },
+  "labels": {
+    "task": "任務",
+    "nextRunTime": "下次執行時間"
+  },
+  "delete": {
+    "title": "確定刪除觸發器",
+    "batchTitle": "是否刪除選取的 {count} 個觸發器",
+    "description": "刪除後將停止觸發任務，並刪除相關執行記錄。"
+  },
+  "executionRecords": {
+    "task": "觸發任務",
+    "input": "觸發器輸入參數"
+  }
+}

@@ -450,7 +450,7 @@ onBeforeUnmount(() => {
         />
       </template>
       <template #default="{ row }">
-        <MkStatusLabel :active="row.is_active" :active-text="t('common.status.enabled')" :inactive-text="t('common.status.disabled')" />
+        <MkStatusLabel :active="row.is_active" />
       </template>
     </el-table-column>
     <el-table-column prop="char_length" :label="t('knowledge.document.labels.characters')" min-width="120" sortable>

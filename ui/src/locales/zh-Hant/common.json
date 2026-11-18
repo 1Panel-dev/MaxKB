@@ -26,7 +26,13 @@
   "status": {
     "label": "狀態",
     "enabled": "已啟用",
-    "disabled": "已停用"
+    "disabled": "已停用",
+    "pending": "排隊中",
+    "running": "執行中",
+    "success": "成功",
+    "failure": "失敗",
+    "canceling": "取消中",
+    "canceled": "已取消"
   },
   "dateRange": {
     "lastDays": "過去 {days} 天",
@@ -73,6 +79,7 @@
     "cancel": "取消",
     "retry": "重試",
     "reload": "重新載入",
+    "clear": "清空",
     "reset": "重設",
     "save": "儲存",
     "add": "新增",
@@ -93,6 +100,7 @@
     "unrelate": "取消關聯",
     "batchSelect": "批次選取",
     "cancelSelection": "取消選取",
+    "enable": "啟用",
     "disable": "停用",
     "saveAndEnable": "儲存並啟用",
     "confirm": "確認",

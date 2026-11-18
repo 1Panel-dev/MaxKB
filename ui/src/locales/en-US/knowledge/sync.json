@@ -49,15 +49,9 @@
     "status": {
       "label": "Sync status",
       "running": "Syncing",
-      "success": "Success",
-      "failure": "Failed",
-      "skipped": "Skipped"
-    },
-    "counts": {
       "synced": "Synced",
       "skipped": "Skipped",
-      "deleted": "Deleted",
-      "failed": "Failed"
+      "deleted": "Deleted"
     },
     "messages": {
       "running": "Sync in progress",
