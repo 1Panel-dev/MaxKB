@@ -42,7 +42,7 @@ function handleWorkspaceSelect(workspace: WorkspaceItem) {
 
 /* 删除工作空间 */
 function handleWorkspaceDelete(workspace: WorkspaceItem) {
-  if (!workspace.id) return
+  if (!workspace.id || workspace.id === 'default') return
 
   WorkspaceApi.getWorkspaceDeleteCheck(workspace.id)
     .then(() =>
@@ -212,9 +212,9 @@ onMounted(() => loadWorkspaceOptions())
             <span>重命名</span>
           </MkDropdownItem>
           <!-- 删除工作空间 -->
-          <MkDropdownItem v-if="perm.system.workspace.delete()" @click="handleWorkspaceDelete(workspace)">
+          <MkDropdownItem v-if="perm.system.workspace.delete()" :disabled="workspace.id === 'default'" @click="handleWorkspaceDelete(workspace)">
             <template #icon>
-              <MkIcon name="icon_delete-trash_outlined" />
+              <MkIcon name="icon_delete-trash_outlined" :class="{ 'text-N400!': workspace.id === 'default' }" />
             </template>
             <span>删除</span>
           </MkDropdownItem>
