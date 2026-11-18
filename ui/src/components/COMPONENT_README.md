@@ -723,6 +723,9 @@ DynamicFormInputType 与 DynamicFormTypeOption 从该定义派生。调用方通
 继续追加 Constructor 后缀，保存字段的 input_type 使用原始 value；未知类型显示协议原值。
 `FormItem.vue`、`FormItemLabel.vue`、`items/` 和配置器子目录均为内部实现。
 
+字段与标签的 `attrs` 会透传到控件根元素，绑定前统一经 `safe-attrs.ts` 移除 `innerHTML` 等内容属性、
+`on*` 事件属性及 `javascript:` URL；字段配置不执行字符串脚本，需要渲染 HTML 的文本先经 DOMPurify 净化。
+
 `MkDynamicsForm` 的主要 Props 为 `modelValue`、`renderData`、`otherParams`、`view`、
 `defaultItemWidth` 和 `parentField`，公开 `validate()`、`render()`、`initDefaultData()` 与
 `ruleFormRef`。`MkDynamicsFormConstructor` 接收 `modelValue`、`fieldTypeOptions`、

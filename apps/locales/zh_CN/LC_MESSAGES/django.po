@@ -5684,6 +5684,9 @@ msgstr "知识库任务不存在"
 msgid "function_name"
 msgstr "函数名称"
 
+msgid "Invalid function name"
+msgstr "函数名称不合法"
+
 #: apps/knowledge/serializers/knowledge_workflow.py:965
 msgid "Only support transport=sse or transport=streamable_http"
 msgstr "仅支持 transport=sse 或 transport=streamable_http"

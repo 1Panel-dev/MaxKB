@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { get } from 'lodash'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { DynamicFormTriggerMap, DynamicFormTriggerSetting, DynamicFormValue, FormField, FormFieldLabel, SerializedFormRule } from './type'
+import type { DynamicFormValue, FormField, FormFieldLabel, SerializedFormRule } from './type'
 import type { Dict } from '@/api/types'
 import type { FormItemRule } from 'element-plus'
-import type { Component, Ref } from 'vue'
+import type { Component } from 'vue'
 import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
 import FormItemLabel from './FormItemLabel.vue'
 import { isSelectionFieldType } from './constant'
-import bus from '@/utils/bus'
+import { sanitizeFieldAttrs } from './safe-attrs'
 
 defineOptions({ name: 'MkDynamicsFormItem' })
 const { t } = useI18n({ useScope: 'global' })
 
 interface DynamicFieldComponent {
   validate?: () => Promise<unknown>
+  validateRules?: (rule: unknown, value: DynamicFormValue, callback: (error?: Error) => void) => void
 }
 
 const itemModules = import.meta.glob<{ default: Component }>('./items/**/*.vue', { eager: true })
@@ -37,13 +37,6 @@ const props = defineProps<{
   formField: FormField
   view: boolean
   otherParams: Dict<DynamicFormValue>
-  trigger: (
-    triggerField: string,
-    triggerValue: DynamicFormValue,
-    triggerSetting: DynamicFormTriggerSetting,
-    target: Dict<DynamicFormValue>,
-    loading: Ref<boolean>,
-  ) => void
   initDefaultData: (formField: FormField) => void
   defaultItemWidth: string
   formValue: Dict<DynamicFormValue>
@@ -53,9 +46,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{ change: [value: DynamicFormValue]; 'change-label': [value: DynamicFormValue] }>()
 
-const loading = ref(false)
 const componentFormRef = ref<DynamicFieldComponent>()
-const triggerSubscriptions: Array<{ event: string; handler: (value: unknown) => void }> = []
 
 function isString(value: unknown): value is string {
   return typeof value === 'string'
@@ -71,12 +62,9 @@ const labelValue = computed({
     return field ? props.formValue[field] : undefined
   },
   set: (value: DynamicFormValue) => {
-    const field = fieldLabel.value?.field
-    if (!field) {
-      return
+    if (fieldLabel.value?.field) {
+      emit('change-label', value)
     }
-    emit('change-label', value)
-    bus.emit(field, value)
   },
 })
 
@@ -84,16 +72,14 @@ const itemValue = computed({
   get: () => props.modelValue,
   set: (value: DynamicFormValue) => {
     emit('change', value)
-    const eventName = props.parentField ? `${props.parentField}.${props.formField.field}` : props.formField.field
-    bus.emit(eventName, value)
   },
 })
 
-const labelAttrs = computed(() => fieldLabel.value?.attrs ?? {})
+const labelAttrs = computed(() => sanitizeFieldAttrs(fieldLabel.value?.attrs))
 const fieldProps = computed(() => props.formField.props_info ?? {})
 const formItemStyle = computed(() => fieldProps.value.item_style ?? {})
 const componentStyle = computed(() => fieldProps.value.style ?? {})
-const fieldAttrs = computed(() => props.formField.attrs ?? {})
+const fieldAttrs = computed(() => sanitizeFieldAttrs(props.formField.attrs))
 
 const errorMessage = computed(() => {
   if (fieldProps.value.err_msg) {
@@ -106,15 +92,19 @@ const errorMessage = computed(() => {
   return t(messageKey, { label: label || props.formField.field })
 })
 
+const componentValidator: FormItemRule['validator'] = (rule, value, callback) => {
+  if (componentFormRef.value?.validateRules) {
+    return componentFormRef.value.validateRules(rule, value, callback)
+  }
+  callback()
+}
+
+// 字符串校验器不执行其内容，统一委托字段组件校验，避免存储型 XSS。
 function deserializeRule(rule: SerializedFormRule): FormItemRule {
   if (typeof rule.validator !== 'string') {
     return rule as FormItemRule
   }
-
-  let validator: FormItemRule['validator']
-  // 动态校验器来自受信任的服务端字段协议。
-  //eval(rule.validator)
-  return { ...rule, validator } as FormItemRule
+  return { ...rule, validator: componentValidator } as FormItemRule
 }
 
 const validationRules = computed<FormItemRule | FormItemRule[]>(() => {
@@ -143,50 +133,8 @@ const validationRules = computed<FormItemRule | FormItemRule[]>(() => {
   }
 })
 
-function executeInitialTriggers(target: Dict<DynamicFormValue>, triggerMap?: DynamicFormTriggerMap) {
-  if (!triggerMap) {
-    return
-  }
-
-  for (const [event, setting] of Object.entries(triggerMap)) {
-    const triggerValue = get(props.formValue, event)
-    if (!setting.values?.length || setting.values.includes(triggerValue)) {
-      props.trigger(event, triggerValue, setting, target, loading)
-    }
-  }
-}
-
-function subscribeToTriggers(target: Dict<DynamicFormValue>, triggerMap?: DynamicFormTriggerMap) {
-  if (!triggerMap) {
-    return
-  }
-
-  for (const [event, setting] of Object.entries(triggerMap)) {
-    const handler = (value: unknown) => {
-      if (!setting.values?.length || setting.values.includes(value)) {
-        props.trigger(event, value, setting, target, loading)
-      }
-    }
-    bus.on(event, handler)
-    triggerSubscriptions.push({ event, handler })
-  }
-}
-
 onMounted(() => {
   props.initDefaultData(props.formField)
-  executeInitialTriggers(props.formField, props.formField.relation_trigger_field_dict)
-  subscribeToTriggers(props.formField, props.formField.relation_trigger_field_dict)
-
-  if (fieldLabel.value) {
-    executeInitialTriggers(fieldLabel.value, fieldLabel.value.relation_trigger_field_dict)
-    subscribeToTriggers(fieldLabel.value, fieldLabel.value.relation_trigger_field_dict)
-  }
-})
-
-onBeforeUnmount(() => {
-  for (const { event, handler } of triggerSubscriptions) {
-    bus.off(event, handler)
-  }
 })
 
 function validate() {
@@ -201,7 +149,6 @@ defineExpose({ validate })
 
 <template>
   <el-form-item
-    v-loading="loading"
     :style="formItemStyle"
     :prop="formField.field"
     :rules="validationRules"

@@ -32,8 +32,6 @@ const selectionFieldTypes = new Set(
     'SwitchInput',
     'TreeSelect',
     'Tree',
-    'TableCheckbox',
-    'TableRadio',
     'DatePicker',
     'Model',
     'Knowledge',

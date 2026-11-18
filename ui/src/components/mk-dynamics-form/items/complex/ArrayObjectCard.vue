@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import type { DynamicFormValue } from '../../type'
 import type { DynamicFormResponse, FormField } from '../../type'
 import DynamicsForm from '../../index.vue'
+import { sanitizeFieldAttrs } from '../../safe-attrs'
 const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
@@ -63,12 +64,7 @@ const formStyle = computed(() => {
 const style = computed(() => {
   return fieldProps.value.style ? fieldProps.value.style : {}
 })
-const attr = computed(() => {
-  if (props.formField.attrs) {
-    return props.formField.attrs
-  }
-  return {}
-})
+const attr = computed(() => sanitizeFieldAttrs(props.formField.attrs))
 
 /**
  * 校验方法

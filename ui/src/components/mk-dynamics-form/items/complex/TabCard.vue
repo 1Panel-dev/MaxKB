@@ -5,6 +5,7 @@ import type { DynamicFormValue } from '../../type'
 import type { DynamicFormResponse, FormField } from '../../type'
 import type { TabPaneName } from 'element-plus'
 import DynamicsForm from '../../index.vue'
+import { sanitizeFieldAttrs } from '../../safe-attrs'
 
 const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
@@ -54,12 +55,7 @@ const formStyle = computed(() => {
   return fieldProps.value.form_style ? fieldProps.value.form_style : {}
 })
 
-const attr = computed(() => {
-  if (props.formField.attrs) {
-    return props.formField.attrs
-  }
-  return {}
-})
+const attr = computed(() => sanitizeFieldAttrs(props.formField.attrs))
 const activeTab = ref(0)
 
 /**
