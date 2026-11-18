@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import type { AuthProfile } from '@/api/types'
+import type { ApplicationAuthProfileMeta, AuthProfile } from '@/api/types'
 import type { RouteLocationNormalized } from 'vue-router'
 import { chatRoutes } from './routes'
 import { useStore } from '@/stores/chat'
@@ -53,6 +53,12 @@ chatRouter.beforeEach(async (to) => {
   try {
     authProfile = await auth.fetchAuthProfile(scope)
   } catch {
+    auth.unavailablePath = to.fullPath
+    return true
+  }
+
+  // 单应用未发布时不能对话，同样在原地址展示服务不可用页面
+  if (scope !== PORTAL_AUTH_SCOPE && (authProfile.meta as ApplicationAuthProfileMeta | undefined)?.is_publish === false) {
     auth.unavailablePath = to.fullPath
     return true
   }

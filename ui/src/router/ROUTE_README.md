@@ -130,6 +130,7 @@ Chat 导航守卫（`chat/index.ts`）：
 1. `/portal` 下未定义的子路径会被单应用路由匹配为 `accessToken = 'portal'`，重定向到 `portal-home`。
 2. 获取目标场景的认证前置配置（`AuthProfile`），与当前场景相同时复用。accessToken 无效、应用已停用或门户
    未开放导致获取失败时，记录失败地址并放行，由页面在原地址展示服务不可用；匿名认证失败时同样处理。
+   单应用认证前置配置的 `meta.is_publish` 为 false（应用未发布）时，同样在原地址展示服务不可用，登录页也不放行。
 3. 判断时只读取目标场景在本地存储中的 token，不切换 Store 的当前场景。
 4. 登录页始终放行：`enable_auth` 为 true 时必须登录；为 false 时匿名用户也可从账户菜单主动登录，
    登录成功后回到 `redirect` 记录的原地址。

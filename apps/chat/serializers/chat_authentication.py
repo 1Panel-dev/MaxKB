@@ -91,6 +91,7 @@ class ChatAuthProfileSerializer(serializers.Serializer):
             "meta": {
                 "application_name": application_access_token.application.name,
                 "application_id": str(application_access_token.application_id),
+                "is_publish": application_access_token.application.is_publish,
             },
         }
 
