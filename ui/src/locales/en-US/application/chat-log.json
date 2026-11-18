@@ -1,0 +1,40 @@
+{
+  "chatLog": {
+    "title": "Chat logs",
+    "labels": {
+      "abstract": "Summary",
+      "chatCount": "Chat count",
+      "annotations": "Annotations",
+      "user": "User",
+      "ipAddress": "IP address",
+      "lastChatTime": "Last chat time"
+    },
+    "feedback": {
+      "label": "User feedback",
+      "positive": "Like",
+      "negative": "Dislike"
+    },
+    "source": {
+      "label": "Source",
+      "online": "Web app",
+      "apiCall": "API call",
+      "enterpriseWechat": "WeCom",
+      "wechatPublicAccount": "WeChat Official Account",
+      "lark": "Lark",
+      "dingtalk": "DingTalk",
+      "enterpriseWechatRobot": "WeCom bot",
+      "trigger": "Trigger",
+      "slack": "Slack"
+    },
+    "cleanStrategy": {
+      "title": "Cleanup policy",
+      "recordsPrefix": "Delete chats older than",
+      "recordsSuffix": "day | days",
+      "attachmentsPrefix": "Delete attachments from chats older than",
+      "attachmentsSuffix": "day | days"
+    },
+    "addKnowledge": {
+      "title": "Add to knowledge"
+    }
+  }
+}

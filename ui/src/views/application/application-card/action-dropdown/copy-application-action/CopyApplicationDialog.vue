@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep, omit } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail, ApplicationFormPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -10,6 +11,7 @@ import { isWorkFlow } from '@/utils/common'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CopyApplicationDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ api: typeof ApplicationApi }>()
 const emit = defineEmits<{ closed: []; refresh: [] }>()
 const route = useRoute()
@@ -22,9 +24,9 @@ const submitting = ref(false)
 const applicationFormRef = ref<FormInstance>()
 const applicationForm = reactive({ name: '', desc: '' })
 const applicationPayload = ref<ApplicationFormPayload>({})
-const rules: FormRules<typeof applicationForm> = {
-  name: [{ required: true, whitespace: true, message: '请输入智能体名称', trigger: 'blur' }],
-}
+const rules = computed<FormRules<typeof applicationForm>>(() => ({
+  name: [{ required: true, whitespace: true, message: t('application.fields.name.requiredMessage'), trigger: 'blur' }],
+}))
 
 function open(application: ApplicationDetail, folderId: string) {
   applicationPayload.value = {
@@ -45,7 +47,8 @@ function open(application: ApplicationDetail, folderId: string) {
     model_id: application.model ?? application.model_id,
     folder_id: folderId,
   }
-  applicationForm.name = `${application.name.slice(0, 61)} 副本`
+  const copySuffix = t('common.name.copySuffix')
+  applicationForm.name = `${application.name.slice(0, 64 - copySuffix.length - 1)} ${copySuffix}`
   applicationForm.desc = application.desc ?? ''
   visible.value = true
 }
@@ -64,7 +67,7 @@ function submit() {
       })
       .then((application) => {
         visible.value = false
-        MsgSuccess('复制成功')
+        MsgSuccess(t('common.messages.duplicateSuccess'))
         emit('refresh')
         return user.loadCurrentUser().then(() =>
           router
@@ -89,28 +92,36 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="复制智能体" @closed="emit('closed')">
+  <MkDialog v-model="visible" :title="t('application.duplicate.title')" @closed="emit('closed')">
     <el-form
       ref="applicationFormRef"
       :model="applicationForm"
       :rules="rules"
+      :validate-on-rule-change="false"
       v-loading="submitting"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="名称" prop="name">
-        <el-input v-model="applicationForm.name" maxlength="64" placeholder="请输入智能体名称" show-word-limit />
+      <el-form-item :label="t('common.name.label')" prop="name">
+        <el-input v-model="applicationForm.name" maxlength="64" :placeholder="t('application.fields.name.placeholder')" show-word-limit />
       </el-form-item>
-      <el-form-item label="描述">
-        <el-input v-model="applicationForm.desc" type="textarea" :rows="3" maxlength="256" placeholder="请输入智能体描述" show-word-limit />
+      <el-form-item :label="t('common.description.label')">
+        <el-input
+          v-model="applicationForm.desc"
+          type="textarea"
+          :rows="3"
+          maxlength="256"
+          :placeholder="t('application.fields.description.placeholder')"
+          show-word-limit
+        />
       </el-form-item>
     </el-form>
     <template #footer>
       <!-- 取消复制 -->
-      <el-button plain :disabled="submitting" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="submitting" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 创建智能体副本 -->
-      <el-button type="primary" :loading="submitting" @click="submit">复制</el-button>
+      <el-button type="primary" :loading="submitting" @click="submit">{{ t('common.actions.duplicate') }}</el-button>
     </template>
   </MkDialog>
 </template>

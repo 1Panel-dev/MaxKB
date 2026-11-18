@@ -89,11 +89,6 @@
       z-index: inherit !important;
     }
 
-    img {
-      border: 0 !important;
-      max-width: calc(var(--spacing) * 90) !important;
-    }
-
     p {
       padding: 0 !important;
       margin: 0 !important;
@@ -149,11 +144,6 @@
 
     ul {
       list-style: circle;
-    }
-
-    video {
-      max-width: calc(var(--spacing) * 90) !important;
-      width: 100%;
     }
   }
 

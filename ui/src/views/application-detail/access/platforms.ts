@@ -10,35 +10,31 @@ import wechatLogo from '@/assets/logo/logo_wechat.svg'
 
 interface AccessField {
   key: string
-  label: string
+  label?: string
+  labelKey?: string
   secret?: boolean
   required?: boolean
 }
 
 interface AccessModeOption {
   value: string
-  label: string
-  tip: string
+  labelKey: string
+  tipKey: string
 }
 
 export interface AccessPlatformDefinition {
   key: ApplicationAccessPlatform
-  name: string
   logo: string
-  description: string
   fields: AccessField[]
   modeField?: { key: string; default: string; options: AccessModeOption[]; fields?: Record<string, AccessField[]> }
   consoleUrl?: string
-  consoleName?: string
-  callbackTip?: string
+  consoleNameKey?: string
 }
 
 export const accessPlatforms: AccessPlatformDefinition[] = [
   {
     key: APPLICATION_ACCESS_PLATFORM.WECOM_BOT,
-    name: '企业微信智能机器人',
     logo: wecomBotLogo,
-    description: '打造企业微信智能机器人',
     fields: [
       { key: 'token', label: 'Token' },
       { key: 'encoding_aes_key', label: 'EncodingAESKey' },
@@ -47,8 +43,8 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       key: 'mode',
       default: 'ws',
       options: [
-        { value: 'ws', label: '使用长连接', tip: '无需域名或 IP 即可接收消息并返回结果' },
-        { value: 'callback', label: '使用 URL 回调', tip: '通过配置回调地址接收消息并返回结果' },
+        { value: 'ws', labelKey: 'application.access.connection.longConnection', tipKey: 'application.access.wecomBot.longConnectionHint' },
+        { value: 'callback', labelKey: 'application.access.connection.callback', tipKey: 'application.access.connection.callbackHint' },
       ],
       fields: {
         ws: [
@@ -62,30 +58,24 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       },
     },
     consoleUrl: 'https://work.weixin.qq.com/wework_admin/frame#/manageTools',
-    consoleName: '企业微信后台',
-    callbackTip: '-智能专区-智能机器人-创建机器人-API模式创建的 "URL" 中',
+    consoleNameKey: 'application.access.consoles.wecom',
   },
   {
     key: APPLICATION_ACCESS_PLATFORM.WECOM,
-    name: '企业微信应用',
     logo: wecomLogo,
-    description: '打造企业微信智能体',
     fields: [
-      { key: 'app_id', label: '企业 ID' },
+      { key: 'app_id', labelKey: 'application.access.wecom.corporationId' },
       { key: 'agent_id', label: 'Agent ID' },
       { key: 'secret', label: 'Secret', secret: true },
       { key: 'token', label: 'Token' },
       { key: 'encoding_aes_key', label: 'EncodingAESKey' },
     ],
     consoleUrl: 'https://work.weixin.qq.com/wework_admin/frame#apps',
-    consoleName: '企业微信后台',
-    callbackTip: '-应用管理-自建-创建的应用-接收消息-设置 API 接收的 "URL" 中',
+    consoleNameKey: 'application.access.consoles.wecom',
   },
   {
     key: APPLICATION_ACCESS_PLATFORM.DINGTALK,
-    name: '钉钉应用',
     logo: dingtalkLogo,
-    description: '打造钉钉智能体',
     fields: [
       { key: 'client_id', label: 'Client ID' },
       { key: 'client_secret', label: 'Client Secret', secret: true },
@@ -94,8 +84,8 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       key: 'mode',
       default: 'stream',
       options: [
-        { value: 'stream', label: '使用长连接', tip: '使用钉钉 Stream 长连接，无需域名或 IP 即可接收消息并返回结果' },
-        { value: 'callback', label: '使用 URL 回调', tip: '通过配置回调地址接收消息并返回结果' },
+        { value: 'stream', labelKey: 'application.access.connection.longConnection', tipKey: 'application.access.dingtalk.longConnectionHint' },
+        { value: 'callback', labelKey: 'application.access.connection.callback', tipKey: 'application.access.connection.callbackHint' },
       ],
       fields: {
         stream: [
@@ -109,29 +99,23 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       },
     },
     consoleUrl: 'https://open-dev.dingtalk.com/fe/app?hash=%23%2Fcorp%2Fapp#/corp/app',
-    consoleName: '钉钉开放平台',
-    callbackTip: '-机器人页面，设置 "消息接收模式" 为 HTTP模式 ，并把上面 URL 填写到"消息接收地址"中',
+    consoleNameKey: 'application.access.consoles.dingtalk',
   },
   {
     key: APPLICATION_ACCESS_PLATFORM.WECHAT,
-    name: '公众号',
     logo: wechatLogo,
-    description: '打造公众号智能体',
     fields: [
-      { key: 'app_id', label: '开发者 ID (APP ID)' },
-      { key: 'app_secret', label: '开发者密钥 (APP SECRET)', secret: true },
-      { key: 'token', label: '令牌 (TOKEN)' },
-      { key: 'encoding_aes_key', label: '消息加解密密钥' },
+      { key: 'app_id', labelKey: 'application.access.wechat.developerId' },
+      { key: 'app_secret', labelKey: 'application.access.wechat.developerSecret', secret: true },
+      { key: 'token', labelKey: 'application.access.wechat.token' },
+      { key: 'encoding_aes_key', labelKey: 'application.access.wechat.encodingAesKey' },
     ],
     consoleUrl: 'https://mp.weixin.qq.com/advanced/advanced?action=dev&t=advanced/dev',
-    consoleName: '微信公众平台',
-    callbackTip: '-设置与开发-基本配置-服务器配置的 "服务器地址URL" 中',
+    consoleNameKey: 'application.access.consoles.wechat',
   },
   {
     key: APPLICATION_ACCESS_PLATFORM.LARK,
-    name: '飞书应用',
     logo: larkLogo,
-    description: '打造飞书智能体',
     fields: [
       { key: 'app_id', label: 'App ID' },
       { key: 'app_secret', label: 'App Secret', secret: true },
@@ -140,8 +124,8 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       key: 'mode',
       default: 'ws',
       options: [
-        { value: 'ws', label: '使用长连接', tip: '使用飞书 WebSocket 长连接，无需配置订阅地址即可接收消息并返回结果' },
-        { value: 'callback', label: '使用 URL 回调', tip: '通过配置事件订阅回调地址接收消息并返回结果' },
+        { value: 'ws', labelKey: 'application.access.connection.longConnection', tipKey: 'application.access.lark.longConnectionHint' },
+        { value: 'callback', labelKey: 'application.access.connection.callback', tipKey: 'application.access.lark.callbackHint' },
       ],
       fields: {
         ws: [
@@ -156,14 +140,11 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       },
     },
     consoleUrl: 'https://open.feishu.cn/app/',
-    consoleName: '飞书开放平台',
-    callbackTip: '-事件与回调-事件配置-配置订阅方式的 "请求地址" 中',
+    consoleNameKey: 'application.access.consoles.lark',
   },
   {
     key: APPLICATION_ACCESS_PLATFORM.SLACK,
-    name: 'Slack',
     logo: slackLogo,
-    description: '打造 Slack 智能体',
     fields: [
       { key: 'signing_secret', label: 'Signing Secret', secret: true },
       { key: 'bot_user_token', label: 'Bot User Token', secret: true },

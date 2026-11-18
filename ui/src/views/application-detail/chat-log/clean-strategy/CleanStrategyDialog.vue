@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationChatLogApi } from '../../context'
 import { useApplicationDetailContext } from '../../context'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ChatLogCleanStrategyDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ api: ApplicationChatLogApi; applicationId: string }>()
 const { application, refreshApplicationDetail } = useApplicationDetailContext()
 
@@ -37,7 +39,7 @@ function handleSubmit() {
     .putChatLogCleanTime(props.applicationId, days.value, Math.min(fileDays.value, days.value))
     .then(() => {
       return refreshApplicationDetail(false).then(() => {
-        MsgSuccess('保存成功')
+        MsgSuccess(t('common.messages.saveSuccess'))
         visible.value = false
       })
     })
@@ -55,10 +57,10 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="清除策略" @closed="resetData">
+  <MkDialog v-model="visible" :title="t('application.chatLog.cleanStrategy.title')" @closed="resetData">
     <div v-loading="loading" class="space-y-4">
       <div class="flex-align-center gap-2">
-        <span>删除</span>
+        <span>{{ t('application.chatLog.cleanStrategy.recordsPrefix') }}</span>
         <el-input-number
           v-model="days"
           class="w-40!"
@@ -69,10 +71,10 @@ defineExpose({ open })
           :value-on-clear="1"
           step-strictly
         />
-        <span>天之前的对话记录</span>
+        <span>{{ t('application.chatLog.cleanStrategy.recordsSuffix', days) }}</span>
       </div>
       <div class="flex-align-center gap-2">
-        <span>删除</span>
+        <span>{{ t('application.chatLog.cleanStrategy.attachmentsPrefix') }}</span>
         <el-input-number
           v-model="fileDays"
           class="w-40!"
@@ -83,14 +85,14 @@ defineExpose({ open })
           :value-on-clear="1"
           step-strictly
         />
-        <span>天之前的对话上传的附件</span>
+        <span>{{ t('application.chatLog.cleanStrategy.attachmentsSuffix', fileDays) }}</span>
       </div>
     </div>
     <template #footer>
       <!-- 取消清除策略设置 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存清除策略 -->
-      <el-button type="primary" :loading="loading" @click="handleSubmit">保存</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

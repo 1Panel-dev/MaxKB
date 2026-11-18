@@ -1,0 +1,67 @@
+{
+  "access": {
+    "title": "發布管道",
+    "configurationTitle": "{name}設定",
+    "actions": {
+      "configure": "設定"
+    },
+    "states": {
+      "unconfigured": "未設定"
+    },
+    "connection": {
+      "label": "連線方式",
+      "longConnection": "使用長連線",
+      "callback": "使用 URL 回呼",
+      "callbackHint": "透過設定回呼網址接收訊息並傳回結果"
+    },
+    "callback": {
+      "label": "回呼網址",
+      "pasteHint": "複製連結並填入"
+    },
+    "consoles": {
+      "wecom": "企業微信後台",
+      "dingtalk": "釘釘開放平台",
+      "wechat": "微信公眾平台",
+      "lark": "飛書開放平台"
+    },
+    "wecomBot": {
+      "label": "企業微信智慧機器人",
+      "description": "打造企業微信智慧機器人",
+      "longConnectionHint": "無需網域名稱或 IP 即可接收訊息並傳回結果",
+      "callbackTip": "-智慧專區-智慧機器人-建立機器人-API 模式建立的 \"URL\" 中"
+    },
+    "wecom": {
+      "label": "企業微信應用程式",
+      "description": "打造企業微信智慧體",
+      "corporationId": "企業 ID",
+      "callbackTip": "-應用程式管理-自建-建立的應用程式-接收訊息-設定 API 接收的 \"URL\" 中"
+    },
+    "dingtalk": {
+      "label": "釘釘應用程式",
+      "description": "打造釘釘智慧體",
+      "longConnectionHint": "使用釘釘 Stream 長連線，無需網域名稱或 IP 即可接收訊息並傳回結果",
+      "callbackTip": "-機器人頁面，設定 \"訊息接收模式\" 為 HTTP 模式，並將上方 URL 填入 \"訊息接收網址\" 中"
+    },
+    "wechat": {
+      "label": "公眾號",
+      "description": "打造公眾號智慧體",
+      "developerId": "開發者 ID (APP ID)",
+      "developerSecret": "開發者密鑰 (APP SECRET)",
+      "token": "權杖 (TOKEN)",
+      "encodingAesKey": "訊息加解密密鑰",
+      "certified": "驗證成功",
+      "callbackTip": "-設定與開發-基本設定-伺服器設定的 \"伺服器網址 URL\" 中"
+    },
+    "lark": {
+      "label": "飛書應用程式",
+      "description": "打造飛書智慧體",
+      "longConnectionHint": "使用飛書 WebSocket 長連線，無需設定訂閱網址即可接收訊息並傳回結果",
+      "callbackHint": "透過設定事件訂閱回呼網址接收訊息並傳回結果",
+      "callbackTip": "-事件與回呼-事件設定-設定訂閱方式的 \"請求網址\" 中"
+    },
+    "slack": {
+      "label": "Slack",
+      "description": "打造 Slack 智慧體"
+    }
+  }
+}

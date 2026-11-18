@@ -8,6 +8,19 @@
   "workspaceAuthorization": {
     "title": "授权工作空间"
   },
+  "chatUserAuthorization": {
+    "title": "对话用户",
+    "byGroup": "按用户组",
+    "name": "姓名",
+    "username": "用户名",
+    "source": {
+      "label": "用户来源",
+      "local": "本地创建"
+    },
+    "autoAuthorization": "自动授权",
+    "authorized": "已授权",
+    "authorize": "授权"
+  },
   "shared": "共享",
   "mcpConfig": {
     "title": "MCP 服务配置"
@@ -24,5 +37,8 @@
   "executionRecords": {
     "title": "执行记录",
     "view": "查看执行记录"
+  },
+  "messages": {
+    "unsupportedScope": "当前资源范围不支持此操作"
   }
 }

@@ -36,5 +36,19 @@
     "imageVector": "图片向量",
     "textVector": "文本向量",
     "test": "测试"
+  },
+  "externalRetrieval": {
+    "title": "外部检索服务",
+    "description": "第三方外部服务可通过 API / MCP 调用来检索当前知识库",
+    "apiService": {
+      "label": "API 服务",
+      "description": "开启后，允许对话用户通过 APIKey 调用 API 检索当前知识库"
+    },
+    "authentication": {
+      "label": "对话用户授权",
+      "description": "开启后，仅允许授权的对话用户通过 APIKey 检索当前知识库"
+    },
+    "apiExample": "API 调用示例",
+    "loadFailed": "外部检索服务加载失败"
   }
 }

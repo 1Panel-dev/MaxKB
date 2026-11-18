@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationFormPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { APPLICATION_TYPE } from '@/api/enums'
@@ -9,6 +10,8 @@ import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'SimpleCreateDialog' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const DEFAULT_PROLOGUE = '您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务'
 const DEFAULT_PROMPT = `已知信息：{data}
@@ -32,9 +35,9 @@ const dialogVisible = ref(false)
 const loading = ref(false)
 const applicationFormRef = ref<FormInstance>()
 const applicationForm = reactive<SimpleApplicationDraft>({ desc: '', name: '' })
-const applicationFormRules: FormRules<SimpleApplicationDraft> = {
-  name: [{ whitespace: true, required: true, message: '请输入智能体名称', trigger: 'blur' }],
-}
+const applicationFormRules = computed<FormRules<SimpleApplicationDraft>>(() => ({
+  name: [{ whitespace: true, required: true, message: t('application.fields.name.requiredMessage'), trigger: 'blur' }],
+}))
 const createDisabled = computed(() => !applicationForm.name.trim())
 
 function submit() {
@@ -69,7 +72,7 @@ function submit() {
     ApplicationApi.postApplication(payload)
       .then((application) => {
         return auth.loadAuthBaseProfile().then(() => {
-          MsgSuccess('创建成功')
+          MsgSuccess(t('common.messages.createSuccess'))
           dialogVisible.value = false
           return router.push({
             name: 'workspace-application-simple-setting',
@@ -97,30 +100,31 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建简易智能体" @closed="resetData">
+  <MkDialog v-model="dialogVisible" :title="t('application.simple.createTitle')" @closed="resetData">
     <el-form
       ref="applicationFormRef"
       :model="applicationForm"
       :rules="applicationFormRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="名称" prop="name">
+      <el-form-item :label="t('common.name.label')" prop="name">
         <el-input
           v-model="applicationForm.name"
           maxlength="64"
-          placeholder="请输入智能体名称"
+          :placeholder="t('application.fields.name.placeholder')"
           show-word-limit
           @blur="applicationForm.name = applicationForm.name.trim()"
         />
       </el-form-item>
 
-      <el-form-item label="描述">
+      <el-form-item :label="t('common.description.label')">
         <el-input
           v-model="applicationForm.desc"
           maxlength="256"
-          placeholder="描述该智能体的应用场景及用途，如：XXX 小助手回答用户提出的 XXX 产品使用问题"
+          :placeholder="t('application.fields.description.placeholder')"
           :rows="4"
           show-word-limit
           type="textarea"
@@ -130,8 +134,12 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button class="w-20!" plain :disabled="loading" @click="dialogVisible = false">取消</el-button>
-      <el-button class="w-20!" type="primary" :disabled="createDisabled" :loading="loading" @click="submit">创建</el-button>
+      <!-- 取消创建 -->
+      <el-button class="w-20!" plain :disabled="loading" @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 创建简易智能体 -->
+      <el-button class="w-20!" type="primary" :disabled="createDisabled" :loading="loading" @click="submit">
+        {{ t('common.actions.create') }}
+      </el-button>
     </template>
   </MkDialog>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeExternalRetrievalPayload, KnowledgeExternalRetrievalSetting } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
@@ -24,6 +25,7 @@ defineOptions({ name: 'ExternalRetrievalView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 
+const { t } = useI18n({ useScope: 'global' })
 const { knowledgeId, resourceApi } = useKnowledgeDetailContext()
 
 // 读取当前资源范围的真实配置，查询失败时展示重试入口。
@@ -53,7 +55,7 @@ async function handleSettingChange(field: keyof KnowledgeExternalRetrievalPayloa
     const result = await resourceApi.externalRetrieval.putKnowledgeExternalRetrieval?.(knowledgeId.value, { [field]: value === true })
     if (!result) return
     setting.value = result
-    MsgSuccess('保存成功')
+    MsgSuccess(t('common.messages.saveSuccess'))
   } catch {
     // 请求层统一提示错误，保留已保存的开关与示例，允许再次操作。
   } finally {
@@ -71,23 +73,23 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
   <Teleport v-if="headerTarget" :to="headerTarget">
     <div class="flex-align-center gap-2">
       <h4>{{ title }}</h4>
-      <MkTooltip placement="right" content="第三方外部服务可通过 API / MCP 调用来检索当前知识库">
+      <MkTooltip placement="right" :content="t('knowledge.externalRetrieval.description')">
         <MkIcon name="icon_info_outlined" class="text-N600!" />
       </MkTooltip>
     </div>
   </Teleport>
 
   <div v-loading="loading || saving" :inert="loading || saving" class="min-h-40 w-full max-w-200">
-    <MkEmpty v-if="loadFailed" description="外部检索服务加载失败">
+    <MkEmpty v-if="loadFailed" :description="t('knowledge.externalRetrieval.loadFailed')">
       <!-- 重新加载外部检索服务配置 -->
-      <el-button type="primary" @click="loadExternalRetrieval">重新加载</el-button>
+      <el-button type="primary" @click="loadExternalRetrieval">{{ t('common.actions.reload') }}</el-button>
     </MkEmpty>
     <div v-else-if="setting" class="space-y-4">
       <!-- TODO 两个开关等调试 -->
       <section>
         <div class="mb-2">
-          <span>API 服务</span>
-          <span class="text-N600"> (开启后，允许对话用户通过 APIKey 调用 API 检索当前知识库)</span>
+          <span>{{ t('knowledge.externalRetrieval.apiService.label') }}</span>
+          <span class="text-N600">（{{ t('knowledge.externalRetrieval.apiService.description') }}）</span>
         </div>
         <!-- 切换外部检索服务 -->
         <el-switch
@@ -98,8 +100,8 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
       </section>
       <section v-if="setting.enabled">
         <div class="mb-2">
-          <span>对话用户授权</span>
-          <span class="text-N600"> (开启后，仅允许授权的对话用户通过 APIKey 检索当前知识库)</span>
+          <span>{{ t('knowledge.externalRetrieval.authentication.label') }}</span>
+          <span class="text-N600">({{ t('knowledge.externalRetrieval.authentication.description') }})</span>
         </div>
         <!-- 切换对话用户授权 -->
         <el-switch
@@ -109,22 +111,32 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
         />
       </section>
       <section>
-        <div class="mb-2">API 调用示例</div>
+        <div class="mb-2">{{ t('knowledge.externalRetrieval.apiExample') }}</div>
         <div class="group relative">
           <el-input :model-value="apiExample" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
           <!-- 复制 API 调用示例 -->
-          <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle :disabled="!apiExample" @click="copyText(apiExample)">
+          <el-button
+            class="group-hover-visible absolute right-3 top-3 z-10 shadow-md"
+            circle
+            :disabled="!apiExample"
+            @click="copyText(apiExample, t('common.messages.copied'))"
+          >
             <MkIcon name="icon_copy_outlined" />
           </el-button>
         </div>
       </section>
 
       <section>
-        <div class="mb-2">MCP 服务配置</div>
+        <div class="mb-2">{{ t('resource.mcpConfig.title') }}</div>
         <div class="group relative">
           <el-input :model-value="mcpConfig" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
           <!-- 复制 MCP 配置 -->
-          <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle :disabled="!mcpConfig" @click="copyText(mcpConfig)">
+          <el-button
+            class="group-hover-visible absolute right-3 top-3 z-10 shadow-md"
+            circle
+            :disabled="!mcpConfig"
+            @click="copyText(mcpConfig, t('common.messages.copied'))"
+          >
             <MkIcon name="icon_copy_outlined" />
           </el-button>
         </div>

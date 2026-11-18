@@ -1,14 +1,15 @@
+/** 对话来源协议值对应的展示文案 key。 */
 import type { ChatLogSource } from '@/api/types'
 import { CHAT_LOG_SOURCE } from '@/api/enums'
 
-export const CHAT_LOG_SOURCE_LABELS: Record<ChatLogSource, string> = {
-  [CHAT_LOG_SOURCE.ONLINE]: '线上使用',
-  [CHAT_LOG_SOURCE.API_CALL]: 'API 调用',
-  [CHAT_LOG_SOURCE.ENTERPRISE_WECHAT]: '企业微信',
-  [CHAT_LOG_SOURCE.WECHAT_PUBLIC_ACCOUNT]: '微信公众号',
-  [CHAT_LOG_SOURCE.LARK]: '飞书',
-  [CHAT_LOG_SOURCE.DINGTALK]: '钉钉',
-  [CHAT_LOG_SOURCE.ENTERPRISE_WECHAT_ROBOT]: '企业微信机器人',
-  [CHAT_LOG_SOURCE.TRIGGER]: '触发器',
-  [CHAT_LOG_SOURCE.SLACK]: 'Slack',
+export const CHAT_LOG_SOURCE_MESSAGE_KEYS: Record<ChatLogSource, string> = {
+  [CHAT_LOG_SOURCE.ONLINE]: 'application.chatLog.source.online',
+  [CHAT_LOG_SOURCE.API_CALL]: 'application.chatLog.source.apiCall',
+  [CHAT_LOG_SOURCE.ENTERPRISE_WECHAT]: 'application.chatLog.source.enterpriseWechat',
+  [CHAT_LOG_SOURCE.WECHAT_PUBLIC_ACCOUNT]: 'application.chatLog.source.wechatPublicAccount',
+  [CHAT_LOG_SOURCE.LARK]: 'application.chatLog.source.lark',
+  [CHAT_LOG_SOURCE.DINGTALK]: 'application.chatLog.source.dingtalk',
+  [CHAT_LOG_SOURCE.ENTERPRISE_WECHAT_ROBOT]: 'application.chatLog.source.enterpriseWechatRobot',
+  [CHAT_LOG_SOURCE.TRIGGER]: 'application.chatLog.source.trigger',
+  [CHAT_LOG_SOURCE.SLACK]: 'application.chatLog.source.slack',
 }

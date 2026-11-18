@@ -1,6 +1,7 @@
 /** 知识库详情的资源范围、API 装配与详情数据共享。 */
 import { computed, inject, provide, reactive, watch, type ComputedRef, type InjectionKey } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeDetail } from '@/api/types'
 import type { ResourceScope } from '@/router/admin/types'
 import SystemResourceChatUserApi from '@/api/admin/system/resource-management/chat-user'
@@ -280,12 +281,13 @@ export function useKnowledgeDetailContext<const Scope extends ResourceScope = Re
 
   const router = useRouter()
   const route = useRoute()
+  const { t } = useI18n({ useScope: 'global' })
   // 消费方仅声明范围；不支持的来源由上下文提示并返回当前来源的文档页。
   watch(
     getResourceScope,
     (scope) => {
       if (!scope || resourceScopes.includes(scope)) return
-      MsgWarning('当前资源范围不支持此操作')
+      MsgWarning(t('resource.messages.unsupportedScope'))
       void router.replace({
         name: context.routeNames.value.document,
         params: { ...context.routeParams.value, type: route.params.type },

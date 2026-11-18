@@ -36,5 +36,19 @@
     "imageVector": "Image vector",
     "textVector": "Text vector",
     "test": "Test"
+  },
+  "externalRetrieval": {
+    "title": "External retrieval service",
+    "description": "Third-party services can search this knowledge via API / MCP.",
+    "apiService": {
+      "label": "API service",
+      "description": "When enabled, chat users can search this knowledge through the API using an API key."
+    },
+    "authentication": {
+      "label": "Chat user authorization",
+      "description": "When enabled, only authorized chat users can search this knowledge using an API key."
+    },
+    "apiExample": "API request example",
+    "loadFailed": "Failed to load the external retrieval service"
   }
 }

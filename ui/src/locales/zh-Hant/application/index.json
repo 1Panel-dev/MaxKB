@@ -1,0 +1,70 @@
+{
+  "title": "智慧體",
+  "categories": {
+    "all": "全部智慧體",
+    "shared": "共用智慧體"
+  },
+  "simple": {
+    "label": "簡易智慧體",
+    "shortLabel": "簡易",
+    "createTitle": "建立簡易智慧體",
+    "description": "透過表單設定方式，快速建立具備基本功能的智慧體"
+  },
+  "advanced": {
+    "label": "進階智慧體",
+    "shortLabel": "進階",
+    "createTitle": "建立進階智慧體",
+    "description": "使用低程式碼拖放方式，靈活編排邏輯複雜、功能豐富的智慧體"
+  },
+  "fields": {
+    "name": {
+      "placeholder": "請輸入智慧體名稱",
+      "requiredMessage": "請輸入智慧體名稱"
+    },
+    "description": {
+      "placeholder": "描述該智慧體的應用場景及用途，如：XXX 小助手回答使用者提出的 XXX 產品使用問題"
+    }
+  },
+  "template": {
+    "label": "範本",
+    "blank": "空白建立",
+    "assistant": {
+      "label": "知識庫問答助手",
+      "description": "將從知識庫中檢索到的知識作為已知資訊，回答使用者提出的問題。"
+    }
+  },
+  "duplicate": {
+    "title": "複製智慧體"
+  },
+  "status": {
+    "unpublished": "未發布",
+    "published": "已發布",
+    "onPortal": "已上架"
+  },
+  "publishTime": "發布時間",
+  "actions": {
+    "chat": "前往對話"
+  },
+  "portal": {
+    "add": "上架至入口網站",
+    "remove": "從入口網站下架",
+    "addSuccess": "上架成功",
+    "removeSuccess": "下架成功"
+  },
+  "export": {
+    "skills": "匯出為 Skills",
+    "agent": "匯出智慧體",
+    "baseUrl": {
+      "label": "填寫存取網址",
+      "description": "請填寫 Agent 存取 MaxKB 使用的網址，例如 http://192.168.1.10:8080",
+      "invalidMessage": "請填寫以 http:// 或 https:// 開頭的網址"
+    }
+  },
+  "delete": {
+    "title": "確認刪除智慧體",
+    "batchTitle": "是否批次刪除 {count} 個智慧體"
+  },
+  "messages": {
+    "missingWorkspace": "智慧體缺少所屬工作空間資訊"
+  }
+}

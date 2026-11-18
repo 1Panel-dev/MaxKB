@@ -2,6 +2,7 @@
 import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationFormPayload, ApplicationStoreTemplate } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { APPLICATION_TYPE } from '@/api/enums'
@@ -11,6 +12,8 @@ import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'AdvancedCreateDialog' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 type ApplicationTemplateType = 'blank' | 'assistant'
 
@@ -32,9 +35,9 @@ const loading = ref(false)
 const selectedTemplate = ref<ApplicationTemplateType>('blank')
 const applicationFormRef = ref<FormInstance>()
 const applicationForm = reactive<AdvancedApplicationDraft>({ desc: '', name: '' })
-const applicationFormRules: FormRules<typeof applicationForm> = {
-  name: [{ required: true, whitespace: true, message: '请输入智能体名称', trigger: 'blur' }],
-}
+const applicationFormRules = computed<FormRules<typeof applicationForm>>(() => ({
+  name: [{ required: true, whitespace: true, message: t('application.fields.name.requiredMessage'), trigger: 'blur' }],
+}))
 const createDisabled = computed(() => !applicationForm.name.trim())
 
 function handleTemplateSelect(template: ApplicationTemplateType) {
@@ -66,7 +69,7 @@ function submit() {
     ApplicationApi.postApplication(payload)
       .then((application) => {
         return auth.loadAuthBaseProfile().then(() => {
-          MsgSuccess('创建成功')
+          MsgSuccess(t('common.messages.createSuccess'))
           dialogVisible.value = false
           return router.push({
             name: 'workflow-application',
@@ -105,31 +108,32 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="创建高级智能体" @closed="handleClosed">
+  <MkDialog v-model="dialogVisible" :title="t('application.advanced.createTitle')" @closed="handleClosed">
     <el-form
       ref="applicationFormRef"
       :model="applicationForm"
       :rules="applicationFormRules"
+      :validate-on-rule-change="false"
       v-loading="loading"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="名称" prop="name">
+      <el-form-item :label="t('common.name.label')" prop="name">
         <el-input
           v-model="applicationForm.name"
           maxlength="64"
-          placeholder="请输入智能体名称"
+          :placeholder="t('application.fields.name.placeholder')"
           show-word-limit
           @blur="applicationForm.name = applicationForm.name.trim()"
         />
       </el-form-item>
 
-      <el-form-item label="描述">
+      <el-form-item :label="t('common.description.label')">
         <el-input
           v-model="applicationForm.desc"
           maxlength="256"
-          placeholder="描述该智能体的应用场景及用途，如：XXX 小助手回答用户提出的 XXX 产品使用问题"
+          :placeholder="t('application.fields.description.placeholder')"
           :rows="4"
           show-word-limit
           type="textarea"
@@ -137,7 +141,7 @@ defineExpose({ open })
         />
       </el-form-item>
 
-      <el-form-item v-if="!storeTemplate" label="模板">
+      <el-form-item v-if="!storeTemplate" :label="t('application.template.label')">
         <div class="grid w-full grid-cols-2 gap-4">
           <el-card
             :class="selectedTemplate === 'blank' ? 'border-primary! bg-primary/10!' : ''"
@@ -146,20 +150,20 @@ defineExpose({ open })
           >
             <div class="flex-align-center h-full justify-center gap-2">
               <MkIcon name="icon_add_outlined" />
-              <span>空白创建</span>
+              <span>{{ t('application.template.blank') }}</span>
             </div>
           </el-card>
 
           <MkResourceCard
             class="min-h-0!"
             :class="selectedTemplate === 'assistant' ? 'active' : ''"
-            title="知识库问答助手"
+            :title="t('application.template.assistant.label')"
             @click="handleTemplateSelect('assistant')"
           >
             <template #icon>
               <ApplicationIcon />
             </template>
-            <p>将从知识库中检索到的知识作为已知信息，回答用户提出的问题。</p>
+            <p>{{ t('application.template.assistant.description') }}</p>
           </MkResourceCard>
         </div>
       </el-form-item>
@@ -167,9 +171,9 @@ defineExpose({ open })
 
     <template #footer>
       <!-- 取消创建 -->
-      <el-button plain :disabled="loading" @click="dialogVisible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 创建高级智能体 -->
-      <el-button type="primary" :disabled="createDisabled" :loading="loading" @click="submit">创建</el-button>
+      <el-button type="primary" :disabled="createDisabled" :loading="loading" @click="submit">{{ t('common.actions.create') }}</el-button>
     </template>
   </MkDialog>
 </template>

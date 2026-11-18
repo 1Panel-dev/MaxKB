@@ -95,7 +95,7 @@ export const systemRoutes: RouteRecordRaw = {
               name: 'system-authorization-applications',
               component: () => import('@/views/system/identity/resource-authorization/index.vue'),
               meta: {
-                title: '智能体',
+                title: 'application.title',
                 order: 10,
                 resource: RESOURCE_TYPE.APPLICATION,
                 permission: perm.system.authorization.application.read,
@@ -163,7 +163,7 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'applications',
           name: 'system-resource-applications',
           component: () => import('@/views/system/resource-management/application/index.vue'),
-          meta: { title: '智能体', order: 10, permission: perm.application.system.read, next: 'system-resource-knowledge' },
+          meta: { title: 'application.title', order: 10, permission: perm.application.system.read, next: 'system-resource-knowledge' },
         },
         {
           path: 'knowledge',
