@@ -17,6 +17,14 @@
 - 依赖 Vue 响应式状态或生命周期的通用组合式函数可以使用 `use-*.ts` 命名。
 - 仅改变样式的响应式需求优先使用 Tailwind；只有需要改变组件状态时才使用响应式工具函数。
 
+## Element Plus 默认行为
+
+Admin 和 Chat 在创建应用前调用 `element-plus.ts` 的 `configureElementPlus()`，将
+`ElFormItem` 的 `for` 默认值设为空字符串，关闭标题与内部控件的自动关联；标题不再激活
+Input、Select 等控件，现有布局样式保留。显式传入非空 `for` 仍可建立关联。
+该配置调整组件 Props 默认值，依赖 Element Plus 的 `labelFor` 实现，升级组件库时须复核；
+无关联的标题由组件渲染为 `div`，不再具有原生 `label` 的自动标签语义。
+
 ## 工作流类型判断
 
 `common.ts` 的 `isWorkFlow(type)` 统一判断智能体的 `APPLICATION_TYPE.WORK_FLOW`、
