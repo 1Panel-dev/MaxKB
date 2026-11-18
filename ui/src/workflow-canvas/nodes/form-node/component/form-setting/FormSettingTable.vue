@@ -11,7 +11,7 @@ const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'WorkflowFormFieldTable' })
 
-const props = defineProps<{ upstreamFieldOptions: VisibilityFieldOption[]; nodeId: string; nodeName: string }>()
+const props = defineProps<{ getUpstreamFieldOptions: () => VisibilityFieldOption[]; nodeId: string; nodeName: string }>()
 const formFields = defineModel<FormField[]>({ required: true })
 const formFieldDialogRef = useTemplateRef<InstanceType<typeof FormFieldDialog>>('formFieldDialogRef')
 
@@ -116,7 +116,7 @@ function saveField(data: FormField, index?: number) {
     <FormFieldDialog
       ref="formFieldDialogRef"
       :form-fields="formFields"
-      :upstream-field-options="props.upstreamFieldOptions"
+      :get-upstream-field-options="props.getUpstreamFieldOptions"
       :node-id="props.nodeId"
       :node-name="props.nodeName"
       @submit="saveField"
