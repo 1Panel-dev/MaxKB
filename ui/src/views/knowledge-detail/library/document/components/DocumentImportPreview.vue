@@ -58,7 +58,7 @@ defineExpose({ validate })
 function handleDeleteParagraph(index: number) {
   const document = selectedDocument.value
   if (!document) return
-  return MsgConfirm(t('knowledge.document.preview.deleteParagraphConfirm'))
+  return MsgConfirm(`${t('knowledge.document.preview.deleteParagraphConfirm')}?`)
     .then(() => {
       document.content.splice(index, 1)
     })
@@ -101,7 +101,9 @@ function handleDeleteParagraph(index: number) {
     </template>
     <template #default="{ Header }">
       <component :is="Header">
-        <p class="text-N600">{{ t('knowledge.stats.paragraphs', { count: selectedDocument?.content.length ?? 0 }) }}</p>
+        <p class="text-N600">
+          {{ selectedDocument?.content.length ?? 0 }} {{ t('knowledge.stats.paragraphs', selectedDocument?.content.length ?? 0) }}
+        </p>
       </component>
       <template v-if="selectedDocument">
         <div class="space-y-3">
@@ -129,7 +131,7 @@ function handleDeleteParagraph(index: number) {
 
               <h4 v-if="paragraph.title" class="mb-2 pr-20">{{ paragraph.title }}</h4>
               <MdPreview :model-value="paragraph.content" />
-              <p class="mt-2 text-sm text-N600">{{ t('knowledge.stats.characters', { count: paragraph.content.length }) }}</p>
+              <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} {{ t('knowledge.stats.characters', paragraph.content.length) }}</p>
             </el-card>
           </template>
         </div>

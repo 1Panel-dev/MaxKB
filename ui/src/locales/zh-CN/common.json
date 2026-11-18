@@ -6,6 +6,7 @@
     "createdAt": "创建时间",
     "updatedAt": "更新时间",
     "all": "全部",
+    "selected": "已选",
     "details": "详情",
     "basicInfo": "基本信息",
     "type": "类型",
@@ -15,7 +16,7 @@
     "label": "名称",
     "placeholder": "请输入名称",
     "requiredMessage": "请输入名称",
-    "copyTemplate": "{name}  副本"
+    "copySuffix": "副本"
   },
   "description": {
     "label": "描述",
@@ -38,7 +39,7 @@
     "replaceFile": "更换文件",
     "retryUpload": "重新上传",
     "limits": "每次最多上传 {count} 个文件，每个文件不超过 {size} MB",
-    "formats": "支持格式：{formats}",
+    "formats": "支持格式",
     "emptyFileMessage": "不能上传空文件",
     "sizeLimitMessage": "大小超限",
     "unsupportedFormatMessage": "文件格式不支持",
@@ -46,11 +47,10 @@
     "networkErrorMessage": "网络失败",
     "uploadInProgressMessage": "文件正在上传，请稍候",
     "noSuccessfulFilesMessage": "没有上传成功的文件，请重新上传",
-    "fileError": "{name}：{reason}",
     "status": {
-      "completed": "已完成 {completed}/{total}",
+      "completed": "已完成",
       "uploading": "上传中",
-      "failed": "失败 {count} 个",
+      "failed": "失败",
       "allSucceeded": "全部成功"
     }
   },
@@ -80,7 +80,7 @@
   "dialogs": {
     "notice": "提示",
     "deleteWarning": "删除后无法恢复，请谨慎操作。",
-    "unsavedChanges": "当前的更改尚未保存，确认退出吗？"
+    "unsavedChanges": "当前的更改尚未保存，确认退出吗"
   },
   "messages": {
     "saveSuccess": "保存成功",
@@ -95,7 +95,7 @@
     "importSuccess": "导入成功",
     "enableSuccess": "启用成功",
     "disableSuccess": "禁用成功",
-    "exportFailed": "导出失败：{reason}",
+    "exportFailed": "导出失败",
     "copied": "已复制",
     "connectionSuccess": "连接成功",
     "replaceSuccess": "替换成功",

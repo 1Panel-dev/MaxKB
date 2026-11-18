@@ -87,7 +87,7 @@
     "baseModelsFallback": "未获取到官方模型列表，已展示内置常用模型"
   },
   "delete": {
-    "title": "是否删除模型：{name}？",
+    "title": "是否删除模型",
     "description": "此模型关联 {count} 个资源，删除后无法使用，请谨慎操作。"
   },
   "parameters": {
@@ -98,8 +98,5 @@
   "create": {
     "selectProvider": "选择供应商",
     "advancedSettings": "高级设置"
-  },
-  "edit": {
-    "title": "编辑 {provider}"
   }
 }

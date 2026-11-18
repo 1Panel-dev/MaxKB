@@ -26,8 +26,9 @@ const exportOptions = [
 function handleExportDocuments(method: (typeof exportOptions)[number]['method']) {
   loading.value = true
   return (
-    props.api[method]?.(String(route.params.knowledgeId ?? ''), [...props.documentIds], knowledge.value?.name || '文档').catch(() => {}) ??
-    Promise.resolve()
+    props.api[method]?.(String(route.params.knowledgeId ?? ''), [...props.documentIds], knowledge.value?.name || t('knowledge.document.title')).catch(
+      () => {},
+    ) ?? Promise.resolve()
   ).finally(() => {
     loading.value = false
   })

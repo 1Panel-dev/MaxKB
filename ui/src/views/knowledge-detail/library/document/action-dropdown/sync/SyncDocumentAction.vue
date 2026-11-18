@@ -40,7 +40,7 @@ function handleSync() {
   const documentId = document.id
   const isLark = knowledgeType.value === KNOWLEDGE_TYPE_KEY.LARK
   const message = isWorkflow ? t('knowledge.document.sync.workflowDescription') : t('knowledge.document.sync.description')
-  return MsgConfirm(t('knowledge.document.sync.title', { name: document.name }), message, {
+  return MsgConfirm(`${t('knowledge.document.sync.title')}: ${document.name}?`, message, {
     cancelButtonText: t('common.actions.cancel'),
     confirmButtonText: t('knowledge.actions.sync'),
     confirmButtonType: 'primary',

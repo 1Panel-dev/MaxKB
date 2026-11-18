@@ -23,7 +23,7 @@ function handleUpdateStoreTool() {
   const storeTool = availableStoreTool.value
   if (!storeTool) return Promise.resolve(false)
 
-  return MsgConfirm(t('tool.updateVersion.title', { name: props.tool.name }), t('tool.updateVersion.description'), {
+  return MsgConfirm(`${t('tool.updateVersion.title')}: ${props.tool.name}?`, t('tool.updateVersion.description'), {
     cancelButtonText: t('common.actions.cancel'),
     confirmButtonText: t('common.actions.confirm'),
   })

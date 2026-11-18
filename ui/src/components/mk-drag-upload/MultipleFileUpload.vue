@@ -290,12 +290,12 @@ defineExpose({ clearFiles, handleRemove })
 
     <template v-if="fileList.length">
       <div class="my-4 flex-between gap-3">
-        <p>{{ t('common.upload.status.completed', { completed: uploadSummary.completed, total: fileList.length }) }}</p>
+        <p>{{ t('common.upload.status.completed') }} {{ uploadSummary.completed }}/{{ fileList.length }}</p>
 
         <div class="flex-align-center gap-4">
           <MkStatusLabel v-if="mode === 'file' && uploadSummary.uploading" type="loading" :label="t('common.upload.status.uploading')" />
           <template v-else-if="uploadSummary.error">
-            <MkStatusLabel type="failure" :label="t('common.upload.status.failed', { count: uploadSummary.error })" />
+            <MkStatusLabel type="failure" :label="`${t('common.upload.status.failed')} ${uploadSummary.error}`" />
             <!-- 重试所有可重试的失败文件 -->
             <el-button v-if="retryFiles.length" :disabled="disabled" text @click="handleRetryAll">
               <MkIcon name="icon_refresh_outlined" />

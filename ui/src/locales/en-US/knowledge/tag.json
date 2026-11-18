@@ -2,6 +2,7 @@
   "tags": {
     "title": "Tag management",
     "label": "Tags",
+    "untagged": "No tags",
     "settings": "Tag settings",
     "key": {
       "label": "Tag name",
@@ -22,7 +23,17 @@
       "add": "Add tags",
       "create": "Create tag",
       "createValue": "Create tag value",
-      "addValue": "Add tag value"
+      "addValue": "Add tag value",
+      "edit": "Edit tag",
+      "editValue": "Edit tag value"
+    },
+    "documents": {
+      "linked": "Linked documents"
+    },
+    "delete": {
+      "title": "Delete tag",
+      "batchTitle": "Delete {count} selected tag | Delete {count} selected tags",
+      "description": "Deleting a tag also removes it from resources that use it. Proceed with caution."
     },
     "messages": {
       "duplicateTag": "This tag name and value are already in the list."

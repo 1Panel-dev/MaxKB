@@ -25,7 +25,7 @@ const initParamDrawerRef = useTemplateRef<InstanceType<typeof InitParamDrawer>>(
 function handleToolStatusChange() {
   if (loading.value) return false
   if (props.tool.is_active) {
-    return MsgConfirm(t('tool.disable.title', { name: props.tool.name }), t('tool.disable.description'), {
+    return MsgConfirm(`${t('tool.disable.title')}: ${props.tool.name}?`, t('tool.disable.description'), {
       cancelButtonText: t('common.actions.cancel'),
       confirmButtonText: t('common.actions.disable'),
     })

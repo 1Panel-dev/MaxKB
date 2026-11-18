@@ -3,7 +3,8 @@
     "title": "文档",
     "name": {
       "label": "文档名称",
-      "placeholder": "请输入文档名称"
+      "placeholder": "请输入文档名称",
+      "invalidCharactersMessage": "文件名称不能包含以下特殊字符"
     },
     "sourceUrl": {
       "label": "文档地址",
@@ -19,8 +20,14 @@
     },
     "hitHandling": {
       "label": "召回处理",
+      "description": "用户提问时，召回的分段按照设置进行处理。",
       "optimization": "模型优化",
       "directlyReturn": "直接回答"
+    },
+    "settings": {
+      "title": "文档设置",
+      "allowPreview": "允许在知识来源中预览",
+      "allowDownload": "允许在知识来源中下载"
     },
     "status": {
       "label": "文件状态",
@@ -34,7 +41,7 @@
       "failure": "失败",
       "canceling": "取消中",
       "canceled": "已取消",
-      "progress": "完成 {completed}/{total}"
+      "progress": "完成"
     },
     "actions": {
       "quickCreate": "快速创建空白文档",
@@ -45,14 +52,14 @@
       "replaceOriginal": "替换原文档"
     },
     "delete": {
-      "title": "确认删除文档：{name}？",
+      "title": "确认删除文档",
       "description": "此文档下的 {count} 个分段都会被删除，请谨慎操作。",
-      "batchTitle": "是否删除选中的 {count} 个文档？",
+      "batchTitle": "是否删除选中的 {count} 个文档",
       "batchDescription": "所选文档中的分段会跟随删除，请谨慎操作。"
     },
     "sync": {
-      "title": "是否同步：{name}？",
-      "batchTitle": "是否同步选中的 {count} 个文档？",
+      "title": "是否同步",
+      "batchTitle": "是否同步选中的 {count} 个文档",
       "description": "文档内容无更新时跳过，有更新时会使用新内容更新旧分段内容。",
       "workflowDescription": "将按知识库工作流的提取、分段配置同步当前 Web 文档，其他文档保持不变。",
       "missingUrlMessage": "无法同步，请先去设置文档 URL 地址"
@@ -66,7 +73,7 @@
       "qaLabel": "QA 问答对",
       "qaTitle": "上传 QA 问答对",
       "delimiterHint": "文件上传前，建议规范文件的分段标识",
-      "templateHint": "点击下载对应模板并完善信息：",
+      "templateHint": "点击下载对应模板并完善信息",
       "downloadTemplate": "下载 {format} 模板",
       "columnHeaderHint": "第一行必须是列标题，且列标题必须是有意义的术语，表中每条记录将作为一个分段",
       "sheetHint": "上传的表格文件中每个 sheet 会作为一个文档，sheet 名称为文档名称"
@@ -86,7 +93,7 @@
       "emptyParagraphs": "暂无分段",
       "emptyDocuments": "暂无预览文档",
       "finishEditingMessage": "请先保存或取消分段编辑",
-      "deleteParagraphConfirm": "确定删除此分段？"
+      "deleteParagraphConfirm": "确定删除此分段"
     }
   }
 }

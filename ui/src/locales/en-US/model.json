@@ -87,7 +87,7 @@
     "baseModelsFallback": "Could not fetch the official model list. Built-in common models are shown."
   },
   "delete": {
-    "title": "Delete model: {name}?",
+    "title": "Delete model",
     "description": "This model is linked to {count} resource. Deleting it will make it unavailable. Proceed with caution. | This model is linked to {count} resources. Deleting it will make it unavailable. Proceed with caution."
   },
   "parameters": {
@@ -98,8 +98,5 @@
   "create": {
     "selectProvider": "Select provider",
     "advancedSettings": "Advanced settings"
-  },
-  "edit": {
-    "title": "Edit {provider}"
   }
 }

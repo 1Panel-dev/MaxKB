@@ -48,7 +48,7 @@ const credentialFields = ref<FormField[]>([])
 const modelForm = reactive<ModelPayload>({ credential: {}, model_name: '', model_type: '', name: '', provider: '' })
 let credentialSnapshot = '{}'
 
-const drawerTitle = computed(() => t('model.edit.title', { provider: selectedProvider.value?.name ?? '' }))
+const drawerTitle = computed(() => `${t('common.actions.edit')} ${selectedProvider.value?.name ?? ''}`)
 
 const modelFormData = computed<Dict<DynamicFormValue>>({
   get: () => ({ ...modelForm.credential, model_name: modelForm.model_name, model_type: modelForm.model_type, name: modelForm.name }),

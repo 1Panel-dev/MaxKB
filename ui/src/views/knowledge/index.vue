@@ -185,7 +185,7 @@ function handleBatchDelete() {
   if (isShared.value || knowledgeOperationLoading.value || !selectedKnowledgeCount.value) return
   const knowledgeIds = [...selectedKnowledgeIds.value]
 
-  MsgConfirm(t('knowledge.delete.batchTitle', { count: knowledgeIds.length }, knowledgeIds.length), t('common.dialogs.deleteWarning'))
+  MsgConfirm(`${t('knowledge.delete.batchTitle')} (${knowledgeIds.length})?`, t('common.dialogs.deleteWarning'))
     .then(() => {
       knowledgeOperationLoading.value = true
       return KnowledgeApi.putBatchDeleteKnowledge(knowledgeIds).then(() => {

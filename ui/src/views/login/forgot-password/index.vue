@@ -147,7 +147,7 @@ onMounted(() => {
           <el-input v-model="forgotPasswordForm.verificationCode" :placeholder="t('auth.fields.verificationCode.placeholder')" />
           <!-- 发送邮箱验证码 -->
           <el-button plain class="min-w-35 shrink-0" :disabled="isSendCodeDisabled" :loading="isSendingCode" @click="handleSendCode">
-            {{ countdown > 0 ? t('auth.forgotPassword.actions.resendCode', { seconds: countdown }) : t('auth.forgotPassword.actions.sendCode') }}
+            {{ countdown > 0 ? `${t('auth.forgotPassword.actions.resendCode')} (${countdown}s)` : t('auth.forgotPassword.actions.sendCode') }}
           </el-button>
         </div>
       </el-form-item>

@@ -202,7 +202,7 @@ function handleBatchDelete() {
   if (!selectedToolCount.value) return
   const toolIds = [...selectedToolIds.value]
 
-  MsgConfirm(t('tool.delete.batchTitle', { count: toolIds.length }), t('common.dialogs.deleteWarning'), {
+  MsgConfirm(`${t('tool.delete.batchTitle', { count: toolIds.length })}?`, t('common.dialogs.deleteWarning'), {
     cancelButtonText: t('common.actions.cancel'),
     confirmButtonText: t('common.actions.delete'),
   })

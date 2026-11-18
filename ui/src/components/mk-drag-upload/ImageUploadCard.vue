@@ -43,13 +43,7 @@ const percentage = computed(() => props.percentage ?? props.file.percentage ?? 0
       <el-progress :percentage="file.status === 'uploading' ? percentage : 0" :stroke-width="4" :show-text="false" />
     </div>
     <div v-if="file.status === 'fail'" class="absolute-center flex-align-center gap-3">
-      <MkTooltip
-        v-if="showError"
-        :content="t('common.upload.fileError', { name: file.name, reason: file.errMsg })"
-        :disabled="!file.errMsg"
-        placement="top"
-        :offset="size / 2"
-      >
+      <MkTooltip v-if="showError" :content="`${file.name}: ${file.errMsg ?? ''}`" :disabled="!file.errMsg" placement="top" :offset="size / 2">
         <span class="flex-center"><MkIcon name="icon_warning_filled" class="text-danger!" :size="iconSize" /></span>
       </MkTooltip>
       <!-- 重新上传失败图片 -->

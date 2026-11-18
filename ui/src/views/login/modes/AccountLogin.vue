@@ -169,7 +169,7 @@ onMounted(() => {
       </el-form>
       <!-- 忘记密码 -->
       <el-button v-if="loginService.forgotPassword" size="default" class="mt-3" link type="primary" @click="loginService.forgotPassword()">
-        {{ t('auth.login.actions.forgotPassword') }}
+        {{ t('auth.login.actions.forgotPassword') }}?
       </el-button>
     </div>
     <div v-if="accountLoginMethods.length" class="third-login flex-col-center gap-4">

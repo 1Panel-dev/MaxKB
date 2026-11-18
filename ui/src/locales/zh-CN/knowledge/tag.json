@@ -2,6 +2,7 @@
   "tags": {
     "title": "标签管理",
     "label": "标签",
+    "untagged": "无标签",
     "settings": "标签设置",
     "key": {
       "label": "标签",
@@ -22,7 +23,17 @@
       "add": "添加标签",
       "create": "创建标签",
       "createValue": "创建标签值",
-      "addValue": "添加标签值"
+      "addValue": "添加标签值",
+      "edit": "编辑标签",
+      "editValue": "编辑标签值"
+    },
+    "documents": {
+      "linked": "已关联文档"
+    },
+    "delete": {
+      "title": "是否删除标签",
+      "batchTitle": "是否删除选中的 {count} 个标签",
+      "description": "删除后，使用该标签的资源将会删除该标签，请谨慎操作！"
     },
     "messages": {
       "duplicateTag": "标签已存在"

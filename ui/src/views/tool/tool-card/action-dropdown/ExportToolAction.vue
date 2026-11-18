@@ -21,7 +21,7 @@ function handleExportTool() {
     .catch((error: ExportError) => {
       if (error.response.status !== 403) {
         return error.response.data.text().then((response: string) => {
-          MsgError(t('common.messages.exportFailed', { reason: JSON.parse(response).message }))
+          MsgError(`${t('common.messages.exportFailed')}: ${JSON.parse(response).message}`)
         })
       }
     })

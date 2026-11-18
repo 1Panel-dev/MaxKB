@@ -281,7 +281,7 @@ function handleFolderRefresh(folder: FolderItem, isEdit: boolean) {
 /* 删除文件夹：当前选择不受影响时只刷新树。 */
 
 function handleDeleteFolder(folder: FolderItem) {
-  MsgConfirm(t('folder.delete.title', { name: folder.name }), t('folder.delete.description'), {
+  MsgConfirm(`${t('folder.delete.title')}: ${folder.name}?`, t('folder.delete.description'), {
     cancelButtonText: t('common.actions.cancel'),
     confirmButtonText: t('common.actions.delete'),
   })

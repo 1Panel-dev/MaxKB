@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import type { Dict, DocumentHitHandling, DocumentItem, OptionItem } from '@/api/types'
+import type { Dict, DocumentHitHandling, DocumentItem, KnowledgeTagGroup, OptionItem } from '@/api/types'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { CascaderOption, TableColumnCtx } from 'element-plus'
@@ -95,7 +95,7 @@ function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<Doc
 /* 文档名称编辑 */
 function validateDocumentName(name: string): string | undefined {
   if (/[:\\/?*\[\]]/.test(name)) {
-    return '文件名称不能包含以下特殊字符：: \\ / ? * [ ]'
+    return `${t('knowledge.document.name.invalidCharactersMessage')}: : \\ / ? * [ ]`
   }
 }
 
@@ -130,7 +130,7 @@ function handleCreateDocument(name: string) {
       .then(() => {
         // 创建成功即清理草稿，后续刷新失败不恢复为可重复提交的输入。
         quickCreateRef.value?.close()
-        MsgSuccess('创建成功')
+        MsgSuccess(t('common.messages.createSuccess'))
         clearDocumentSelection()
         paginationConfig.value.currentPage = 1
         return loadDocuments()
@@ -185,7 +185,19 @@ const selectedDocumentHitHandling = ref<DocumentHitHandling | null>(null)
 
 // 标签
 const selectedDocumentTags = ref<string[]>([])
-const documentTagOptions = ref<CascaderOption[]>([])
+const documentTagGroups = ref<KnowledgeTagGroup[]>()
+const documentTagOptions = computed<CascaderOption[]>(() =>
+  documentTagGroups.value
+    ? [
+        ...documentTagGroups.value.map((group) => ({
+          label: group.key,
+          value: `key:${group.key}`,
+          children: group.values.map((tag) => ({ label: tag.value, value: tag.id })),
+        })),
+        { label: t('knowledge.tags.untagged'), value: 'NO_TAG' },
+      ]
+    : [],
+)
 const documentTagLoading = ref(false)
 
 function loadDocumentTagOptions() {
@@ -194,14 +206,7 @@ function loadDocumentTagOptions() {
   return resourceApi.tags
     .getKnowledgeTags(knowledgeId.value)
     .then((groups) => {
-      documentTagOptions.value = [
-        ...groups.map((group) => ({
-          label: group.key,
-          value: `key:${group.key}`,
-          children: group.values.map((tag) => ({ label: tag.value, value: tag.id })),
-        })),
-        { label: '无标签', value: 'NO_TAG' },
-      ]
+      documentTagGroups.value = groups
     })
     .finally(() => {
       documentTagLoading.value = false
@@ -315,7 +320,7 @@ function handleChangeActive(document: DocumentItem) {
     resourceApi.document
       .putDocument?.(knowledgeId.value, document.id, { is_active: !document.is_active })
       .then(() => {
-        MsgSuccess('操作成功')
+        MsgSuccess(t('common.messages.operationSuccess'))
         return refreshAfterOperation().then(() => false)
       })
       .catch(() => false) ?? Promise.resolve(false)

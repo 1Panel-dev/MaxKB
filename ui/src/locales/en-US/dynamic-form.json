@@ -20,7 +20,7 @@
   "tabs": {
     "basic": "Basic information",
     "visibility": "Visibility settings",
-    "numbered": "Tab {index}"
+    "label": "Tab"
   },
   "fields": {
     "field": {
@@ -173,7 +173,7 @@
   "tree": {
     "addRoot": "Add root option",
     "addChild": "Add child option",
-    "deleteConfirm": "Delete “{label}”?"
+    "deleteConfirm": "Delete"
   },
   "visibility": {
     "show": "Show conditions",
@@ -188,7 +188,6 @@
     "segmentation": "Standardize paragraph delimiters before uploading files.",
     "duplicateName": "Duplicate file name",
     "limits": "Upload up to {count} files at a time, each no larger than {size} MB",
-    "formats": "Supported formats: {formats}",
     "sizeLimit": "File size cannot exceed {size}MB",
     "countLimit": "You can upload at most {count} files"
   },

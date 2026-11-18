@@ -34,7 +34,7 @@ function handleCopyTool() {
     .getToolDetail(props.tool.id)
     .then((toolDetail) => {
       const copiedTool = cloneDeep(toolDetail)
-      copiedTool.name = t('common.name.copyTemplate', { name: copiedTool.name })
+      copiedTool.name = `${copiedTool.name} ${t('common.name.copySuffix')}`
       formMounted.value = true
 
       return nextTick(() => {

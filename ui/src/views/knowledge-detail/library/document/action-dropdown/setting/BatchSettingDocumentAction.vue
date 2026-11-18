@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentSettingPayload } from '@/api/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import DocumentSettingDialog from './DocumentSettingDialog.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'BatchSettingDocumentAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -38,7 +40,7 @@ function handleSubmit(data: DocumentSettingPayload) {
     props.api
       .putBatchDocumentSetting?.(targetKnowledgeId.value, targetDocumentIds.value, data)
       .then(() => {
-        MsgSuccess('设置成功')
+        MsgSuccess(t('common.messages.saveSuccess'))
         settingDialogRef.value?.close()
         emit('refresh')
       })
