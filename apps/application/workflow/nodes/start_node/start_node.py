@@ -114,6 +114,17 @@ class StarNode(INode):
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
+        global_fields = []
+        for field in (self.node.properties.get("config") or {}).get("globalFields", []) or []:
+            key = field.get("value")
+            value = self.workflow_manage.get_context("global", key) or ""
+            global_fields.append(
+                {
+                    "label": field.get("label"),
+                    "key": key,
+                    "value": value,
+                }
+            )
         details.update(
             {
                 "question": self.get_context("question"),
@@ -121,6 +132,7 @@ class StarNode(INode):
                 "document": self.get_context("document"),
                 "audio": self.get_context("audio"),
                 "video": self.get_context("video"),
+                "global_fields": global_fields,
             }
         )
         return details
