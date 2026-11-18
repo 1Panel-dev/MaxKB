@@ -48,7 +48,7 @@ class SystemUserGroupModelSerializer(serializers.ModelSerializer):
 
 class SystemUserGroupCreateSerializer(serializers.Serializer):
     id = serializers.CharField(required=False, label="ID")
-    name = serializers.CharField(required=True, label="User Group Name")
+    name = serializers.CharField(required=True, max_length=128, label="User Group Name")
     workspace_id = serializers.CharField(required=True, label="Workspace ID")
 
     def validate(self, data):

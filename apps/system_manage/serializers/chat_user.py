@@ -455,7 +455,7 @@ class UserGroupModelSerializer(serializers.ModelSerializer):
 
 class UserGroupCreateSerializer(serializers.Serializer):
     id = serializers.CharField(required=False, label="ID")
-    name = serializers.CharField(required=True, label="User Group Name")
+    name = serializers.CharField(required=True, max_length=128, label="User Group Name")
 
     def validate(self, data):
         id = data.get("id")
