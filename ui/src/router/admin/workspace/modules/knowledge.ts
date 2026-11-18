@@ -200,7 +200,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.settingRead(String(params.knowledgeId)),
                   next: 'workspace-knowledge-document-strategy',
-                  title: 'knowledge.menu.baseSettings',
+                  title: 'knowledge.baseSettings.title',
                   order: 10,
                 },
               },
@@ -223,7 +223,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.scheduledSyncRead(String(params.knowledgeId)),
                   next: 'workspace-knowledge-document-list',
-                  title: 'knowledge.menu.scheduledSync',
+                  title: 'knowledge.scheduledSync.title',
                   order: 30,
                 },
               },

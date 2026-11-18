@@ -96,7 +96,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="t('knowledge.actions.generateQuestions')" @closed="emit('closed')">
+  <MkDialog v-model="visible" :title="t('knowledge.generateQuestions.title')" @closed="emit('closed')">
     <el-form
       ref="formRef"
       :model="form"

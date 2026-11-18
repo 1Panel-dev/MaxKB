@@ -1,5 +1,6 @@
 {
   "labels": {
+    "duration": "耗時",
     "creator": "建立者",
     "operation": "操作",
     "createdOn": "建立於",
@@ -33,6 +34,33 @@
     "custom": "自訂",
     "startDate": "開始日期",
     "endDate": "結束日期"
+  },
+  "schedule": {
+    "daily": "每日",
+    "weekly": "每週",
+    "monthly": "每月",
+    "interval": "按間隔",
+    "day": "日",
+    "weekdays": {
+      "monday": "週一",
+      "tuesday": "週二",
+      "wednesday": "週三",
+      "thursday": "週四",
+      "friday": "週五",
+      "saturday": "週六",
+      "sunday": "週日"
+    },
+    "units": {
+      "hours": "小時",
+      "minutes": "分鐘"
+    },
+    "cron": {
+      "label": "Cron 運算式",
+      "placeholder": "請輸入 Cron 運算式（例如：0 0 1 * *）",
+      "invalidMessage": "請輸入有效的 Cron 運算式（分鐘 小時 日期 月份 星期）"
+    },
+    "switchToPreset": "切換為週期設定",
+    "switchToCron": "切換為 Cron 運算式"
   },
   "parameters": {
     "add": "新增參數",

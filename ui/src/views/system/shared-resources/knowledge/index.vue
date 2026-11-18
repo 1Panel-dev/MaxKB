@@ -113,7 +113,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                   <SyncKnowledgeAction
                     v-if="knowledge.type !== KNOWLEDGE_TYPE.BASE && perm.knowledge.share.sync()"
                     v-model:loading="knowledgeOperationLoading"
-                    :label="t('knowledge.actions.sync')"
+                    :label="t('knowledge.sync.label')"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                   />
@@ -128,7 +128,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                   <!-- 生成问题 -->
                   <GenerateQuestionsAction
                     v-model:loading="knowledgeOperationLoading"
-                    :label="t('knowledge.actions.generateQuestions')"
+                    :label="t('knowledge.generateQuestions.title')"
                     :api="SystemSharedKnowledgeApi"
                     :knowledge="knowledge"
                     v-if="perm.knowledge.share.generate()"

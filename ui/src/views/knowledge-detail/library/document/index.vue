@@ -573,7 +573,7 @@ onBeforeUnmount(() => {
               <!-- 同步 -->
               <SyncDocumentAction
                 v-if="knowledgeType !== KNOWLEDGE_TYPE_KEY.BASE && knowledgeDocPermission('docSync')"
-                :label="t('knowledge.actions.sync')"
+                :label="t('knowledge.sync.label')"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
                 :document="row"
@@ -707,7 +707,7 @@ onBeforeUnmount(() => {
             <!-- 批量同步 -->
             <BatchSyncDocumentAction
               v-if="knowledgeType !== KNOWLEDGE_TYPE_KEY.BASE && knowledgeDocPermission('docSync')"
-              :label="t('knowledge.actions.sync')"
+              :label="t('knowledge.sync.label')"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
               v-model:loading="operationLoading"
@@ -750,7 +750,7 @@ onBeforeUnmount(() => {
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
               :task-type="DOCUMENT_TASK_TYPE.GENERATE_PROBLEM"
-              :label="t('knowledge.actions.cancelGenerateQuestions')"
+              :label="t('knowledge.generateQuestions.cancel')"
               @refresh="refreshAfterOperation"
             />
             <!-- 批量删除文档 -->

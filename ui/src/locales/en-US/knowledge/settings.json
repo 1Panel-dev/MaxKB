@@ -1,6 +1,24 @@
 {
+  "baseSettings": {
+    "title": "Basic settings",
+    "type": {
+      "label": "Knowledge type"
+    },
+    "otherSettings": "Other settings",
+    "fileCountLimit": {
+      "label": "Maximum files per upload"
+    },
+    "fileSizeLimit": {
+      "label": "Maximum size per uploaded document",
+      "description": "Set this limit according to your server capacity to avoid service crashes."
+    },
+    "embeddingModel": {
+      "changeConfirm": "Changing the embedding model requires regenerating embeddings for this knowledge. Continue saving"
+    }
+  },
   "documentStrategy": {
-    "title": "Document processing strategy",
+    "title": "Processing",
+    "syncHint": "New URLs found during knowledge sync are processed using this strategy. Changes take effect on the next sync.",
     "splitRules": "Paragraph splitting",
     "smart": {
       "label": "Smart splitting (recommended)",
@@ -56,24 +74,5 @@
       "label": "Index paragraph titles as questions",
       "description": "Automatically add each paragraph title as a related question."
     }
-  },
-  "sync": {
-    "title": "Sync knowledge",
-    "method": "Sync method",
-    "incremental": {
-      "label": "Incremental sync",
-      "description": "Skip unchanged documents, update changed documents, and remove documents that no longer exist in the source."
-    },
-    "replace": {
-      "label": "Replace matching documents",
-      "description": "Fetch documents from the source again and replace matching documents. Keep existing documents with no match."
-    },
-    "complete": {
-      "label": "Full sync",
-      "description": "Fetch and rebuild all documents from this source. Keep documents from other sources."
-    },
-    "incrementalWarning": "Incremental sync updates the paragraphs of changed documents and skips unchanged documents.",
-    "rebuildWarning": "Sync deletes existing data before fetching fresh data. Proceed with care.",
-    "taskSubmitted": "Sync task submitted"
   }
 }

@@ -42,7 +42,7 @@ function handleSync() {
   const message = isWorkflow ? t('knowledge.document.sync.workflowDescription') : t('knowledge.document.sync.description')
   return MsgConfirm(`${t('knowledge.document.sync.title')}: ${document.name}?`, message, {
     cancelButtonText: t('common.actions.cancel'),
-    confirmButtonText: t('knowledge.actions.sync'),
+    confirmButtonText: t('knowledge.sync.label'),
     confirmButtonType: 'primary',
   })
     .then(() => {

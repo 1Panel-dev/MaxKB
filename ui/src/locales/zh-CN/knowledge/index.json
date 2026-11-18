@@ -8,9 +8,7 @@
     "termbase": "自定义分词",
     "integration": "授权与集成",
     "chatUsers": "对话用户",
-    "externalRetrieval": "外部检索服务",
-    "baseSettings": "基础设置",
-    "scheduledSync": "定时同步"
+    "externalRetrieval": "外部检索服务"
   },
   "categories": {
     "all": "全部知识库",
@@ -77,10 +75,7 @@
   "actions": {
     "migrate": "迁移",
     "migrateTo": "迁移至",
-    "sync": "同步",
     "generateEmbeddings": "向量化",
-    "generateQuestions": "生成问题",
-    "cancelGenerateQuestions": "取消生成问题",
     "buildKeywordIndex": "分词索引",
     "cancelEmbeddings": "取消向量化",
     "cancelKeywordIndex": "取消分词索引"

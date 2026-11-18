@@ -1,0 +1,69 @@
+{
+  "sync": {
+    "title": "同步知识库",
+    "label": "同步",
+    "method": "同步方式",
+    "incremental": {
+      "label": "增量同步",
+      "description": "跳过未更新的文档，更新有变化的文档，并清理来源中已不存在的文档"
+    },
+    "replace": {
+      "label": "替换同步",
+      "description": "重新获取来源文档并替换匹配的文档，保留未匹配的旧文档"
+    },
+    "complete": {
+      "label": "完整同步",
+      "description": "重新获取来源文档并重建该来源的文档，保留其他来源的文档"
+    },
+    "incrementalWarning": "注意：增量同步会跳过内容无更新的文档，内容有更新时会更新文档的分段，请谨慎操作。",
+    "rebuildWarning": "注意：同步会删除已有数据重新获取新数据，请谨慎操作。",
+    "taskSubmitted": "同步任务发送成功"
+  },
+  "scheduledSync": {
+    "title": "定时同步",
+    "settings": "同步设置",
+    "enabled": {
+      "label": "启用定时同步",
+      "description": "（开启后，系统将按设定周期自动同步知识库中文档）"
+    },
+    "period": {
+      "label": "同步周期",
+      "placeholder": "请选择同步周期",
+      "requiredMessage": "请选择同步周期"
+    },
+    "time": {
+      "requiredMessage": "请选择同步时间"
+    },
+    "date": {
+      "requiredMessage": "请选择同步日期"
+    },
+    "interval": {
+      "minHoursMessage": "同步间隔不能小于 {count} 小时",
+      "minMinutesMessage": "同步间隔不能小于 {count} 分钟"
+    }
+  },
+  "syncLog": {
+    "title": "同步日志",
+    "time": "同步时间",
+    "content": "同步内容",
+    "status": {
+      "label": "同步状态",
+      "running": "同步中",
+      "success": "成功",
+      "failure": "失败",
+      "skipped": "跳过"
+    },
+    "counts": {
+      "synced": "已同步",
+      "skipped": "跳过",
+      "deleted": "删除",
+      "failed": "失败"
+    },
+    "messages": {
+      "running": "正在同步",
+      "taskInProgress": "有正在同步的任务，本次跳过",
+      "syncDisabled": "已关闭定时同步，本次跳过",
+      "skipped": "本次同步已跳过"
+    }
+  }
+}

@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeItem } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import KnowledgeBaseForm from '@/views/knowledge/create-knowledge/components/KnowledgeBaseForm.vue'
 import { useKnowledgeDetailContext } from '../../context'
-import { KNOWLEDGE_TYPE_LABELS, KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
+import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import { perm } from '@/permission'
@@ -24,6 +25,7 @@ function knowledgeSettingPermission(method: KnowledgeSettingPermissionMethod): b
 }
 
 defineOptions({ name: 'KnowledgeBaseSettingView' })
+const { t } = useI18n({ useScope: 'global' })
 
 const { knowledge, knowledgeId, replaceKnowledgeDetail, resourceApi } = useKnowledgeDetailContext()
 
@@ -31,7 +33,7 @@ const { knowledge, knowledgeId, replaceKnowledgeDetail, resourceApi } = useKnowl
 
 const baseFormRef = useTemplateRef<InstanceType<typeof KnowledgeBaseForm>>('baseFormRef')
 const saving = ref(false)
-const knowledgeTypeLabel = computed(() => (knowledge.value ? KNOWLEDGE_TYPE_LABELS[KNOWLEDGE_TYPE_MAP[knowledge.value.type]] : ''))
+const knowledgeTypeKey = computed(() => (knowledge.value ? KNOWLEDGE_TYPE_MAP[knowledge.value.type].toLowerCase() : ''))
 const originalEmbeddingModelId = ref('')
 
 /* 类型配置与校验 */
@@ -45,18 +47,14 @@ const settingForm = reactive({
   file_count_limit: 50,
   file_size_limit: 100,
 })
-const settingRules: FormRules<typeof settingForm> = {
-  source_url: [{ required: true, whitespace: true, message: '请输入 Web 站点 URL', trigger: 'blur' }],
-  app_id: [{ required: true, whitespace: true, message: '请输入 App ID', trigger: 'blur' }],
-  app_secret: [{ required: true, whitespace: true, message: '请输入 App Secret', trigger: 'blur' }],
-  folder_token: [{ required: true, whitespace: true, message: '请输入 Folder Token', trigger: 'blur' }],
-}
-const knowledgeTypeDescriptions = {
-  [KNOWLEDGE_TYPE.BASE]: '通过上传文件或手动录入构建知识库',
-  [KNOWLEDGE_TYPE.WEB]: '通过网站链接构建知识库',
-  [KNOWLEDGE_TYPE.LARK]: '通过飞书文档构建知识库',
-  [KNOWLEDGE_TYPE.WORKFLOW]: '通过自定义工作流方式构建知识库',
-}
+const settingRules = computed<FormRules<typeof settingForm>>(() => ({
+  source_url: [{ required: true, whitespace: true, message: t('knowledge.fields.webRootUrl.requiredMessage'), trigger: 'blur' }],
+  app_id: [{ required: true, whitespace: true, message: t('common.validation.inputFieldRequired', { label: 'App ID' }), trigger: 'blur' }],
+  app_secret: [{ required: true, whitespace: true, message: t('common.validation.inputFieldRequired', { label: 'App Secret' }), trigger: 'blur' }],
+  folder_token: [
+    { required: true, whitespace: true, message: t('common.validation.inputFieldRequired', { label: 'Folder Token' }), trigger: 'blur' },
+  ],
+}))
 
 // 等待异步详情与基本信息表单挂载完成后回填，不直接修改详情中的配置。
 watch(
@@ -118,8 +116,8 @@ function handleSave() {
 
       const embeddingModelChanged = originalEmbeddingModelId.value !== payload.embedding_model_id
       const confirmation = embeddingModelChanged
-        ? MsgConfirm('提示', '修改知识库向量模型后，需要对知识库向量化，是否继续保存？', {
-            confirmButtonText: '向量化',
+        ? MsgConfirm(t('common.dialogs.notice'), `${t('knowledge.baseSettings.embeddingModel.changeConfirm')}?`, {
+            confirmButtonText: t('knowledge.actions.generateEmbeddings'),
             confirmButtonType: 'primary',
           })
         : Promise.resolve()
@@ -132,7 +130,7 @@ function handleSave() {
           const embeddingRequest = embeddingModelChanged ? knowledgeApi.putReEmbeddingKnowledge(detail.id) : Promise.resolve()
           return embeddingRequest.then(() => {
             replaceKnowledgeDetail({ ...detail, ...savedKnowledge })
-            MsgSuccess('保存成功')
+            MsgSuccess(t('common.messages.saveSuccess'))
           })
         })
       })
@@ -155,60 +153,75 @@ defineProps<ResourceDetailPageProps>()
       ref="settingFormRef"
       :model="settingForm"
       :rules="settingRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="知识库类型" required>
+      <el-form-item :label="t('knowledge.baseSettings.type.label')" required>
         <el-card shadow="never" class="small w-full">
           <div class="flex-align-center gap-2">
             <KnowledgeIcon :type="knowledge.type" />
             <div>
-              <div>{{ knowledgeTypeLabel }}</div>
-              <div class="text-N600">{{ knowledgeTypeDescriptions[knowledge.type] }}</div>
+              <div>{{ t(`knowledge.${knowledgeTypeKey}.label`) }}</div>
+              <div class="text-N600">{{ t(`knowledge.${knowledgeTypeKey}.description`) }}</div>
             </div>
           </div>
         </el-card>
       </el-form-item>
       <template v-if="knowledge.type === KNOWLEDGE_TYPE.WEB">
-        <el-form-item label="Web 根地址" prop="source_url">
-          <el-input v-model="settingForm.source_url" placeholder="请输入 Web 根地址" @blur="settingForm.source_url = settingForm.source_url.trim()" />
+        <el-form-item :label="t('knowledge.fields.webRootUrl.label')" prop="source_url">
+          <el-input
+            v-model="settingForm.source_url"
+            :placeholder="t('knowledge.fields.webRootUrl.placeholder')"
+            @blur="settingForm.source_url = settingForm.source_url.trim()"
+          />
         </el-form-item>
-        <el-form-item label="选择器" prop="selector">
+        <el-form-item :label="t('knowledge.fields.selector.label')" prop="selector">
           <el-input
             v-model="settingForm.selector"
-            placeholder="默认为 body，可输入 .classname/#idname/tagname"
+            :placeholder="t('knowledge.fields.selector.placeholder')"
             @blur="settingForm.selector = settingForm.selector.trim()"
           />
         </el-form-item>
       </template>
       <template v-else-if="knowledge.type === KNOWLEDGE_TYPE.LARK">
         <el-form-item label="App ID" prop="app_id">
-          <el-input v-model="settingForm.app_id" placeholder="请输入 App ID" @blur="settingForm.app_id = settingForm.app_id.trim()" />
+          <el-input
+            v-model="settingForm.app_id"
+            :placeholder="t('common.placeholders.inputField', { label: 'App ID' })"
+            @blur="settingForm.app_id = settingForm.app_id.trim()"
+          />
         </el-form-item>
         <el-form-item label="App Secret" prop="app_secret">
-          <el-input v-model="settingForm.app_secret" type="password" autocomplete="new-password" show-password placeholder="请输入 App Secret" />
+          <el-input
+            v-model="settingForm.app_secret"
+            type="password"
+            autocomplete="new-password"
+            show-password
+            :placeholder="t('common.placeholders.inputField', { label: 'App Secret' })"
+          />
         </el-form-item>
         <el-form-item label="Folder Token" prop="folder_token">
           <el-input
             v-model="settingForm.folder_token"
-            placeholder="请输入 Folder Token"
+            :placeholder="t('common.placeholders.inputField', { label: 'Folder Token' })"
             @blur="settingForm.folder_token = settingForm.folder_token.trim()"
           />
         </el-form-item>
       </template>
       <MkCollapse v-else-if="knowledge.type === KNOWLEDGE_TYPE.BASE" indicator-position="after" trigger="indicator" trigger-class="mb-2">
         <template #label>
-          <h6>其他设置</h6>
+          <h6>{{ t('knowledge.baseSettings.otherSettings') }}</h6>
         </template>
-        <el-form-item label="每次上传最多文件数">
+        <el-form-item :label="t('knowledge.baseSettings.fileCountLimit.label')">
           <MkSlider v-model="settingForm.file_count_limit" show-input :min="1" :max="1000" />
         </el-form-item>
         <el-form-item>
           <template #label>
             <div class="flex-align-center gap-1">
-              <span>上传的每个文档最大 (MB)</span>
-              <MkTooltip content="建议根据服务器配置调整，否则可能会造成服务宕机" placement="right">
+              <span>{{ t('knowledge.baseSettings.fileSizeLimit.label') }} (MB)</span>
+              <MkTooltip :content="t('knowledge.baseSettings.fileSizeLimit.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </div>
@@ -219,6 +232,8 @@ defineProps<ResourceDetailPageProps>()
     </el-form>
 
     <!-- 保存知识库设置 -->
-    <el-button v-if="knowledgeSettingPermission('settingEdit')" class="mt-4" type="primary" :loading="saving" @click="handleSave">保存</el-button>
+    <el-button v-if="knowledgeSettingPermission('settingEdit')" class="mt-4" type="primary" :loading="saving" @click="handleSave">
+      {{ t('common.actions.save') }}
+    </el-button>
   </div>
 </template>

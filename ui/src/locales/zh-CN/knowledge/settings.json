@@ -1,6 +1,24 @@
 {
+  "baseSettings": {
+    "title": "基础设置",
+    "type": {
+      "label": "知识库类型"
+    },
+    "otherSettings": "其他设置",
+    "fileCountLimit": {
+      "label": "每次上传最多文件数"
+    },
+    "fileSizeLimit": {
+      "label": "上传的每个文档最大",
+      "description": "建议根据服务器配置调整，否则可能会造成服务宕机"
+    },
+    "embeddingModel": {
+      "changeConfirm": "修改知识库向量模型后，需要对知识库向量化，是否继续保存"
+    }
+  },
   "documentStrategy": {
     "title": "文档处理策略",
+    "syncHint": "同步知识库时若有新的 URL 按该策略执行，策略变更后下次同步知识库时生效",
     "splitRules": "分段规则",
     "smart": {
       "label": "智能分段（推荐）",
@@ -56,24 +74,5 @@
       "label": "分段标题设置为问题索引",
       "description": "开启后会将分段标题自动添加为关联问题"
     }
-  },
-  "sync": {
-    "title": "同步知识库",
-    "method": "同步方式",
-    "incremental": {
-      "label": "增量同步",
-      "description": "跳过未更新的文档，更新有变化的文档，并清理来源中已不存在的文档"
-    },
-    "replace": {
-      "label": "替换同步",
-      "description": "重新获取来源文档并替换匹配的文档，保留未匹配的旧文档"
-    },
-    "complete": {
-      "label": "完整同步",
-      "description": "重新获取来源文档并重建该来源的文档，保留其他来源的文档"
-    },
-    "incrementalWarning": "注意：增量同步会跳过内容无更新的文档，内容有更新时会更新文档的分段，请谨慎操作。",
-    "rebuildWarning": "注意：同步会删除已有数据重新获取新数据，请谨慎操作。",
-    "taskSubmitted": "同步任务发送成功"
   }
 }

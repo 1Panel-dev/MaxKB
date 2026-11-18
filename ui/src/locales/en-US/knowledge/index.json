@@ -6,11 +6,9 @@
     "hitTest": "Retrieval test",
     "questions": "Questions",
     "termbase": "Custom dictionary",
-    "integration": "Access and integrations",
+    "integration": "Access & integrations",
     "chatUsers": "Chat users",
-    "externalRetrieval": "External retrieval service",
-    "baseSettings": "Basic settings",
-    "scheduledSync": "Scheduled sync"
+    "externalRetrieval": "External retrieval service"
   },
   "categories": {
     "all": "All knowledge",
@@ -76,10 +74,7 @@
   "actions": {
     "migrate": "Migrate",
     "migrateTo": "Migrate to",
-    "sync": "Sync",
     "generateEmbeddings": "Generate embeddings",
-    "generateQuestions": "Generate questions",
-    "cancelGenerateQuestions": "Cancel question generation",
     "buildKeywordIndex": "Build keyword index",
     "cancelEmbeddings": "Cancel embedding generation",
     "cancelKeywordIndex": "Cancel keyword indexing"

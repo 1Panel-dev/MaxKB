@@ -1,5 +1,7 @@
 {
   "generateQuestions": {
+    "title": "生成问题",
+    "cancel": "取消生成问题",
     "model": {
       "label": "AI 模型",
       "requiredMessage": "请选择 AI 模型"

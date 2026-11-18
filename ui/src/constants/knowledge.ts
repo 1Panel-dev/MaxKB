@@ -22,14 +22,6 @@ export const KNOWLEDGE_TYPE_MAP = {
   [KNOWLEDGE_TYPE.WORKFLOW]: KNOWLEDGE_TYPE_KEY.WORKFLOW,
 } as const satisfies Record<KnowledgeType, keyof typeof KNOWLEDGE_TYPE>
 
-/** 前端语义标识对应的展示文案。 */
-export const KNOWLEDGE_TYPE_LABELS = {
-  [KNOWLEDGE_TYPE_KEY.BASE]: '通用类型',
-  [KNOWLEDGE_TYPE_KEY.WEB]: 'web站点类型',
-  [KNOWLEDGE_TYPE_KEY.LARK]: '飞书类型',
-  [KNOWLEDGE_TYPE_KEY.WORKFLOW]: '工作流类型',
-} as const satisfies Record<(typeof KNOWLEDGE_TYPE_MAP)[KnowledgeType], string>
-
 /** 手动同步与定时同步共用的同步方式选项。 */
 export const KNOWLEDGE_SYNC_OPTIONS = [
   {

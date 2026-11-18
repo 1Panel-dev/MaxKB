@@ -1,5 +1,7 @@
 {
   "generateQuestions": {
+    "title": "Generate questions",
+    "cancel": "Cancel question generation",
     "model": {
       "label": "AI model",
       "requiredMessage": "Select an AI model"
