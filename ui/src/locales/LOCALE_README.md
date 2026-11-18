@@ -57,7 +57,11 @@ common.status 维护状态标签 label 和通用启停选项 enabled、disabled�
 
 - key 使用表达业务含义的英文 camelCase，不使用中文、数字序号或 misc 等模糊分类。
 - Vite 自动收集语言目录下的 JSON。单文件业务使用文件名作为命名空间，如 `dynamic-form.json` 对应 `dynamicForm`。分文件的业务使用第一级目录名，如 `knowledge/library.json` 归入 `knowledge`。分文件直接写各自负责的业务字段，同一业务的顶层字段只在一个文件中定义。
-- 完整句子整体翻译，动态内容使用命名参数；不用片段拼接句子。
+- 纯标签、数量单位、固定比例、编号和倒计时只翻译文字，数字、名称及固定格式在使用处组合；
+  问号、作为分隔符的冒号不单独翻译，三种语言使用相同的显示格式。只有文件名和错误原因等数据的组合不建立翻译键。
+  例如“已选 3/10”只翻译“已选”；单项确认标题翻译操作文字，使用处追加 `: 名称?`。
+- 数量限制、校验说明等完整句子整体翻译，必要的动态内容保留命名参数；不机械拆散语句。
+  单复数按实际数量选择，展示的数字仍可由模板直接输出。代码示例和提示词协议中的花括号保留原有语义。
 - 英文界面采用简洁、明确的表达。通用输入、选择占位分别使用 Please enter、Please select，
   不使用省略号；明确对象时使用 Enter a model name、Select a model 等完整短语，不统一添加 Please。
   无具体对象的通用必填校验使用 This field is required；具体字段校验仍优先写明对象。
@@ -127,11 +131,11 @@ Skill、工作流、MCP 和数据源的类型名称使用各自分组的 `label`
 普通工具的创建、编辑、复制标题使用 `tool.createTitle`、`tool.editTitle`、`tool.duplicateTitle`，代码必填提示归 `tool.fields.code`。调试入口、运行状态和缺省错误提示归 `tool.debug`。
 调试参数的占位与必填提示分别使用 `common.placeholders.inputField` 和 `common.validation.inputFieldRequired`，通过 `{label}` 传入参数名。执行输出和接口错误详情按原文展示。
 Skill 表单的标题、名称提示和 ZIP 文件要求归 `tool.skill`。文件大小提示通过 `{size}` 读取校验上限，拖入、选择、更换文件和空文件提示复用 `common.upload`。
-工作流工具的创建、编辑、复制标题及工作流名称提示归 `tool.workflow`。复制工具时用 `common.name.copyTemplate` 填入可编辑的初始名称。
+工作流工具的创建、编辑、复制标题及工作流名称提示归 `tool.workflow`。复制工具时在原名称后追加 `common.name.copySuffix`，三语均使用“名称 + 空格 + 副本后缀”。
 MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 `tool.mcp`。配置字段复用 `resource.mcpConfig.title`，JSON 示例与用户填写的配置保留原文。
 数据源工具的表单标题、名称提示和代码必填提示归 `tool.dataSource`。Python 模板和用户编辑的代码作为表单数据原样提交。
 工具表单的启动参数、输入参数、输出参数和 Python 代码区分别归 `tool.initParams`、`tool.inputParams`、`tool.outputParams` 和 `tool.pythonCode`。
-工具使用时的可见性说明归 `tool.help`：输入和输出参数共用 `shownWhenUsed`，Python 代码区使用 `hiddenWhenUsed`。输出变量 `{result}` 作为命名参数传给译文。
+工具使用时的可见性说明归 `tool.help`：输入和输出参数共用 `shownWhenUsed`，Python 代码区使用 `hiddenWhenUsed`。输出结果标签使用 `tool.outputParams.result`，固定变量 `{result}` 直接在模板展示。
 参数表头及提示说明复用 `dynamicForm.fields`，模型和工具共用 `common.parameters.add`、`common.parameters.edit`。
 参数来源只翻译选项标签，`reference`、`custom` 和数据类型沿用协议值。
 

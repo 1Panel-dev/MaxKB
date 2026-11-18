@@ -54,10 +54,10 @@
     }
   },
   "stats": {
-    "documents": "{count} doc | {count} docs",
-    "paragraphs": "{count} paragraph | {count} paragraphs",
-    "characters": "{count} character | {count} characters",
-    "images": "{count} image | {count} images"
+    "documents": "doc | docs",
+    "paragraphs": "paragraph | paragraphs",
+    "characters": "character | characters",
+    "images": "image | images"
   },
   "actions": {
     "sync": "Sync",
@@ -84,8 +84,8 @@
     "sourceFilesDescription": "Include the original files in the ZIP to restore file associations automatically on import. Leave this unchecked to export only the text."
   },
   "delete": {
-    "title": "Delete knowledge “{name}”?",
-    "batchTitle": "Delete selected knowledge ({count})?"
+    "title": "Delete knowledge",
+    "batchTitle": "Delete selected knowledge"
   },
   "messages": {
     "missingWorkspace": "Workspace information is missing for this knowledge.",

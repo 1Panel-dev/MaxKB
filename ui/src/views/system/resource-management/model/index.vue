@@ -87,7 +87,7 @@ function getProvider(model: ModelItem): ModelProviderItem {
 /* 删除成功后保留筛选，末页删空时退回上一页。 */
 function handleDeleteModel(model: ModelItem) {
   return MsgConfirm(
-    t('model.delete.title', { name: model.name }),
+    `${t('model.delete.title')}: ${model.name}?`,
     model.resource_count ? t('model.delete.description', { count: model.resource_count }, model.resource_count) : '',
     { confirmButtonText: t('common.actions.delete') },
   )

@@ -24,7 +24,7 @@ function handleSync() {
   const knowledgeId = props.knowledgeId
   const documentIds = [...props.documentIds]
   const isLark = knowledgeType.value === KNOWLEDGE_TYPE_KEY.LARK
-  return MsgConfirm(t('knowledge.document.sync.batchTitle', documentIds.length), t('knowledge.document.sync.description'), {
+  return MsgConfirm(`${t('knowledge.document.sync.batchTitle', documentIds.length)}?`, t('knowledge.document.sync.description'), {
     cancelButtonText: t('common.actions.cancel'),
     confirmButtonText: t('knowledge.actions.sync'),
     confirmButtonType: 'primary',

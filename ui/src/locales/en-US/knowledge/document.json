@@ -3,7 +3,8 @@
     "title": "Documents",
     "name": {
       "label": "Document name",
-      "placeholder": "Enter a document name"
+      "placeholder": "Enter a document name",
+      "invalidCharactersMessage": "File names cannot contain these characters"
     },
     "sourceUrl": {
       "label": "Document URL",
@@ -19,8 +20,14 @@
     },
     "hitHandling": {
       "label": "Retrieval handling",
+      "description": "When a user asks a question, retrieved paragraphs are processed according to these settings.",
       "optimization": "Model optimization",
       "directlyReturn": "Direct answer"
+    },
+    "settings": {
+      "title": "Document settings",
+      "allowPreview": "Allow previewing in knowledge sources",
+      "allowDownload": "Allow downloading from knowledge sources"
     },
     "status": {
       "label": "File status",
@@ -34,7 +41,7 @@
       "failure": "Failed",
       "canceling": "Canceling",
       "canceled": "Canceled",
-      "progress": "{completed}/{total} completed"
+      "progress": "Completed"
     },
     "actions": {
       "quickCreate": "Create a blank document",
@@ -45,14 +52,14 @@
       "replaceOriginal": "Replace original document"
     },
     "delete": {
-      "title": "Delete document “{name}”?",
+      "title": "Delete document",
       "description": "This will also delete {count} paragraph in this document. | This will also delete {count} paragraphs in this document.",
-      "batchTitle": "Delete {count} selected document? | Delete {count} selected documents?",
+      "batchTitle": "Delete {count} selected document | Delete {count} selected documents",
       "batchDescription": "All paragraphs in the selected documents will also be deleted."
     },
     "sync": {
-      "title": "Sync “{name}”?",
-      "batchTitle": "Sync {count} selected document? | Sync {count} selected documents?",
+      "title": "Sync",
+      "batchTitle": "Sync {count} selected document | Sync {count} selected documents",
       "description": "Sync skips unchanged documents and updates existing paragraphs in documents that have changed.",
       "workflowDescription": "Only this web document will be synced, using the workflow’s extraction and splitting settings.",
       "missingUrlMessage": "Set the document URL before syncing."
@@ -66,7 +73,7 @@
       "qaLabel": "Q&A pairs",
       "qaTitle": "Upload Q&A pairs",
       "delimiterHint": "Use consistent paragraph delimiters before uploading your files.",
-      "templateHint": "Download a template and fill it in.",
+      "templateHint": "Download a template and fill it in",
       "downloadTemplate": "Download {format} template",
       "columnHeaderHint": "Use meaningful column headings in the first row. Each subsequent row becomes a paragraph.",
       "sheetHint": "Each worksheet becomes a separate document with the same name as the worksheet."
@@ -86,7 +93,7 @@
       "emptyParagraphs": "No paragraphs",
       "emptyDocuments": "No documents to preview",
       "finishEditingMessage": "Save or cancel your paragraph edits first.",
-      "deleteParagraphConfirm": "Delete this paragraph?"
+      "deleteParagraphConfirm": "Delete this paragraph"
     }
   }
 }

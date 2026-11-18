@@ -13,7 +13,7 @@
     "custom": "Drag to reorder"
   },
   "delete": {
-    "title": "Delete folder “{name}”?",
+    "title": "Delete folder",
     "description": "All resources in this folder will also be deleted."
   }
 }

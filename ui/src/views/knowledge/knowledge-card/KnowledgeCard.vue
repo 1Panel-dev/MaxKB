@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { I18nT, useI18n } from 'vue-i18n'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeItem } from '@/api/types'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import { numberFormat } from '@/utils/number'
@@ -50,24 +50,21 @@ function handleOpen() {
     </p>
 
     <template #footer="{ Action, ActionDropdown }">
-      <I18nT keypath="knowledge.stats.documents" tag="span" scope="global" :plural="documentCount" class="text-N600">
-        <template #count>
-          <span class="font-semibold text-N900">{{ documentCount }}</span>
-        </template>
-      </I18nT>
+      <span class="text-N600">
+        <span class="font-semibold text-N900">{{ documentCount }}</span>
+        {{ t('knowledge.stats.documents', documentCount) }}
+      </span>
       <el-divider direction="vertical" />
-      <I18nT keypath="knowledge.stats.characters" tag="span" scope="global" :plural="knowledge.char_length ?? 0" class="text-N600">
-        <template #count>
-          <span class="font-semibold text-N900">{{ numberFormat(knowledge.char_length) }}</span>
-        </template>
-      </I18nT>
+      <span class="text-N600">
+        <span class="font-semibold text-N900">{{ numberFormat(knowledge.char_length) }}</span>
+        {{ t('knowledge.stats.characters', knowledge.char_length ?? 0) }}
+      </span>
       <template v-if="knowledge.type === KNOWLEDGE_TYPE.BASE || knowledge.type === KNOWLEDGE_TYPE.WORKFLOW">
         <el-divider direction="vertical" />
-        <I18nT keypath="knowledge.stats.images" tag="span" scope="global" :plural="knowledge.image_count ?? 0" class="text-N600">
-          <template #count>
-            <span class="font-semibold text-N900">{{ numberFormat(knowledge.image_count ?? 0) }}</span>
-          </template>
-        </I18nT>
+        <span class="text-N600">
+          <span class="font-semibold text-N900">{{ numberFormat(knowledge.image_count ?? 0) }}</span>
+          {{ t('knowledge.stats.images', knowledge.image_count ?? 0) }}
+        </span>
       </template>
       <component :is="Action" v-if="!disabled">
         <component :is="ActionDropdown">

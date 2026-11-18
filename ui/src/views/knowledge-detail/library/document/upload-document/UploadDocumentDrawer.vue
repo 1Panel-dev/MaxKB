@@ -15,7 +15,7 @@ import { DOCUMENT_UPLOAD_OPTIONS } from './constants'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'UploadDocumentDrawer' })
-const { locale, t } = useI18n({ useScope: 'global' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -170,7 +170,7 @@ defineExpose({ open })
               <template v-else>
                 <li>
                   <div class="inline-flex flex-wrap items-center gap-2">
-                    <span>{{ t('knowledge.document.upload.templateHint') }}</span>
+                    <span>{{ t('knowledge.document.upload.templateHint') }}:</span>
                     <!-- 下载 Excel 模板 -->
                     <el-button link type="primary" @click="handleDownloadTemplate('excel')">
                       {{ t('knowledge.document.upload.downloadTemplate', { format: 'Excel' }) }}
@@ -196,7 +196,7 @@ defineExpose({ open })
             :size-limit="sizeLimit"
             :drag-text="t('common.upload.dropHint')"
             :select-text="t('common.upload.selectFile')"
-            :tip-text="t('common.upload.formats', { formats: uploadOption.formats.join(locale === 'en-US' ? ', ' : '、') })"
+            :tip-text="`${t('common.upload.formats')}: ${uploadOption.formats.join(', ')}`"
           />
         </section>
         <section v-if="mode === 'text' && strategyMounted" v-show="activeStep === 1">

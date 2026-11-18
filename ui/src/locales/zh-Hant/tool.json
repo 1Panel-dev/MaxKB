@@ -107,7 +107,7 @@
   },
   "outputParams": {
     "title": "輸出參數",
-    "result": "結果 {variable}"
+    "result": "結果"
   },
   "pythonCode": {
     "title": "工具內容（Python）",
@@ -127,12 +127,12 @@
     "failureMessage": "工具執行失敗"
   },
   "delete": {
-    "title": "確定刪除工具「{name}」？",
+    "title": "確定刪除工具",
     "description": "此工具已被 {count} 個資源引用，刪除後這些資源將無法正常執行，請謹慎操作。",
-    "batchTitle": "確定批次刪除 {count} 個工具？"
+    "batchTitle": "確定批次刪除 {count} 個工具"
   },
   "disable": {
-    "title": "確定停用工具「{name}」？",
+    "title": "確定停用工具",
     "description": "停用後，使用此工具的資源將無法正常執行。"
   },
   "messages": {
@@ -141,7 +141,7 @@
   },
   "updateVersion": {
     "action": "更新版本",
-    "title": "確定更新工具「{name}」？",
+    "title": "確定更新工具",
     "description": "更新工具可能會影響正在使用此工具的資源，請謹慎操作。",
     "success": "更新成功"
   }

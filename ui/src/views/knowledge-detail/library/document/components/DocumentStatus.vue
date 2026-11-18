@@ -118,9 +118,7 @@ const aggregateStatus = computed(() => getAggregateDocumentStatus(taskStatuses.v
         <div class="flex-align-center gap-3 whitespace-nowrap">
           <span>{{ t(task.label) }}:</span>
           <MkStatusLabel :type="DOCUMENT_STATUS_OPTIONS[task.displayStatus].type" :label="t(DOCUMENT_STATUS_OPTIONS[task.displayStatus].labelKey)" />
-          <span :class="task.failed ? 'text-danger' : ''">
-            {{ t('knowledge.document.status.progress', { completed: task.completed, total: task.total }) }}
-          </span>
+          <span :class="task.failed ? 'text-danger' : ''">{{ t('knowledge.document.status.progress') }} {{ task.completed }}/{{ task.total }}</span>
           <span v-if="task.time" class="text-N500">{{ task.time }}</span>
         </div>
       </template>

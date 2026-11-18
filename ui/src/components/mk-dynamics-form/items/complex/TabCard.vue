@@ -45,7 +45,7 @@ const fieldProps = computed(() => {
 })
 
 function getTabLabel(index: number) {
-  return fieldProps.value.tabs_label ? fieldProps.value.tabs_label + index : t('dynamicForm.tabs.numbered', { index })
+  return fieldProps.value.tabs_label ? fieldProps.value.tabs_label + index : `${t('dynamicForm.tabs.label')} ${index}`
 }
 /**
  * 组件样式

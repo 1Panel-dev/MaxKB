@@ -3,7 +3,8 @@
     "title": "文件",
     "name": {
       "label": "文件名稱",
-      "placeholder": "請輸入文件名稱"
+      "placeholder": "請輸入文件名稱",
+      "invalidCharactersMessage": "檔案名稱不能包含以下特殊字元"
     },
     "sourceUrl": {
       "label": "文件網址",
@@ -19,8 +20,14 @@
     },
     "hitHandling": {
       "label": "召回處理",
+      "description": "使用者提問時，召回的分段將依照設定進行處理。",
       "optimization": "模型最佳化",
       "directlyReturn": "直接回答"
+    },
+    "settings": {
+      "title": "文件設定",
+      "allowPreview": "允許在知識來源中預覽",
+      "allowDownload": "允許在知識來源中下載"
     },
     "status": {
       "label": "檔案狀態",
@@ -34,7 +41,7 @@
       "failure": "失敗",
       "canceling": "取消中",
       "canceled": "已取消",
-      "progress": "完成 {completed}/{total}"
+      "progress": "完成"
     },
     "actions": {
       "quickCreate": "快速建立空白文件",
@@ -45,14 +52,14 @@
       "replaceOriginal": "取代原始文件"
     },
     "delete": {
-      "title": "確定刪除文件「{name}」？",
+      "title": "確定刪除文件",
       "description": "此文件的 {count} 個分段都會一併刪除，請謹慎操作。",
-      "batchTitle": "確定刪除選取的 {count} 份文件？",
+      "batchTitle": "確定刪除選取的 {count} 份文件",
       "batchDescription": "所選文件中的分段會一併刪除，請謹慎操作。"
     },
     "sync": {
-      "title": "確定同步「{name}」？",
-      "batchTitle": "確定同步選取的 {count} 份文件？",
+      "title": "確定同步",
+      "batchTitle": "確定同步選取的 {count} 份文件",
       "description": "同步時會略過內容未變更的文件，並以新內容更新有變更文件的既有分段。",
       "workflowDescription": "本次同步只會更新目前的 Web 文件，並使用知識庫工作流程的擷取與分段設定。",
       "missingUrlMessage": "請先設定文件網址，再進行同步。"
@@ -66,7 +73,7 @@
       "qaLabel": "QA 問答對",
       "qaTitle": "上傳 QA 問答對",
       "delimiterHint": "上傳檔案前，建議統一檔案的分段標記",
-      "templateHint": "請下載對應的範本並填寫資料：",
+      "templateHint": "點選下載對應範本並填寫資訊",
       "downloadTemplate": "下載 {format} 範本",
       "columnHeaderHint": "第一列必須使用有意義的欄位名稱作為標題。其餘每筆資料會各自成為一個分段",
       "sheetHint": "每張工作表都會匯入為一份文件，文件名稱與工作表名稱相同"
@@ -86,7 +93,7 @@
       "emptyParagraphs": "暫無分段",
       "emptyDocuments": "暫無可預覽的文件",
       "finishEditingMessage": "請先儲存或取消分段編輯",
-      "deleteParagraphConfirm": "確定刪除此分段？"
+      "deleteParagraphConfirm": "確定刪除此分段"
     }
   }
 }

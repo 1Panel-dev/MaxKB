@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeTagGroup, KnowledgeTagUpdatePayload } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { TableColumnCtx } from 'element-plus'
@@ -14,6 +15,7 @@ import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } f
 import { perm } from '@/permission'
 
 defineOptions({ name: 'TagManagementView' })
+const { t } = useI18n({ useScope: 'global' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 
@@ -148,12 +150,12 @@ function handleOpenTagDocuments(row: TagTableRow) {
 // type：key 删除整个标签及其所有值；one 仅删除当前标签值。
 function handleDeleteTag(row: TagTableRow, type: 'key' | 'one') {
   const tagName = type === 'key' ? row.key : `${row.key}—${row.value}`
-  return MsgConfirm(`是否删除标签：${tagName}？`, '删除后，使用该标签的资源将会删除该标签，请谨慎操作！').then(
+  return MsgConfirm(`${t('knowledge.tags.delete.title')}: ${tagName}?`, t('knowledge.tags.delete.description')).then(
     () => {
       operationLoading.value = true
       return (
         resourceApi.tags.deleteKnowledgeTag?.(knowledgeId.value, row.id, type).then(() => {
-          MsgSuccess('删除成功')
+          MsgSuccess(t('common.messages.deleteSuccess'))
           return loadTags()
         }) ?? Promise.resolve()
       ).finally(() => {
@@ -166,12 +168,12 @@ function handleDeleteTag(row: TagTableRow, type: 'key' | 'one') {
 
 function handleBatchDelete() {
   const tagIds = selectedTags.value.map(({ id }) => id)
-  return MsgConfirm(`是否删除选中的 ${tagIds.length} 个标签？`, '删除后，使用该标签的资源将会删除该标签，请谨慎操作！').then(
+  return MsgConfirm(`${t('knowledge.tags.delete.batchTitle', tagIds.length)}?`, t('knowledge.tags.delete.description')).then(
     () => {
       operationLoading.value = true
       return (
         resourceApi.tags.putBatchDeleteKnowledgeTags?.(knowledgeId.value, tagIds).then(() => {
-          MsgSuccess('删除成功')
+          MsgSuccess(t('common.messages.deleteSuccess'))
           return loadTags()
         }) ?? Promise.resolve()
       ).finally(() => {
@@ -192,7 +194,7 @@ onMounted(() => {
     <div class="flex-between gap-4">
       <h4>{{ title }}</h4>
       <div class="flex-align-center">
-        <MkSearchInput v-model="searchText" class="mr-3 w-60!" @change="handleSearchChange" />
+        <MkSearchInput v-model="searchText" class="mr-3 w-60!" :placeholder="t('common.placeholders.search')" @change="handleSearchChange" />
         <!-- 导入标签，成功后刷新列表 -->
         <ButtonImportTags
           v-if="knowledgeTagPermission('tagCreate')"
@@ -204,7 +206,7 @@ onMounted(() => {
         <!-- 创建标签 -->
         <el-button v-if="knowledgeTagPermission('tagCreate')" type="primary" :disabled="loading || operationLoading" @click="handleOpenCreateTag">
           <MkIcon name="icon_add_outlined" />
-          <span>创建</span>
+          <span>{{ t('common.actions.create') }}</span>
         </el-button>
       </div>
     </div>
@@ -223,25 +225,25 @@ onMounted(() => {
     @cell-mouse-leave="handleCellLeave"
   >
     <el-table-column type="selection" width="40" v-if="!isWorkspaceSharedResource()" />
-    <el-table-column prop="key" label="标签">
+    <el-table-column prop="key" :label="t('knowledge.tags.key.label')">
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center gap-1">
           <span class="min-w-0 truncate" :title="row.key">{{ row.key }}</span>
           <div v-if="!isWorkspaceSharedResource()" class="flex-align-center shrink-0" :class="{ 'group-hover-visible': hoveredTagKey !== row.key }">
             <!-- 添加标签值 -->
-            <MkTooltip v-if="knowledgeTagPermission('tagEdit')" content="添加标签值" placement="top">
+            <MkTooltip v-if="knowledgeTagPermission('tagEdit')" :content="t('knowledge.tags.actions.addValue')" placement="top">
               <el-button type="primary" text @click="handleOpenAddTagValue(row)">
                 <MkIcon name="icon_add_outlined" />
               </el-button>
             </MkTooltip>
             <!-- 编辑标签 -->
-            <MkTooltip v-if="knowledgeTagPermission('tagEdit')" content="编辑标签" placement="top">
+            <MkTooltip v-if="knowledgeTagPermission('tagEdit')" :content="t('knowledge.tags.actions.edit')" placement="top">
               <el-button type="primary" text @click="handleOpenEditTag(row)">
                 <MkIcon name="icon_edit_outlined" />
               </el-button>
             </MkTooltip>
             <!-- 删除整个标签 -->
-            <MkTooltip v-if="knowledgeTagPermission('tagDelete')" content="删除" placement="top">
+            <MkTooltip v-if="knowledgeTagPermission('tagDelete')" :content="t('common.actions.delete')" placement="top">
               <el-button type="primary" text @click="handleDeleteTag(row, 'key')">
                 <MkIcon name="icon_delete-trash_outlined" />
               </el-button>
@@ -250,8 +252,8 @@ onMounted(() => {
         </div>
       </template>
     </el-table-column>
-    <el-table-column prop="value" label="标签值" class-name="border-l!" show-overflow-tooltip />
-    <el-table-column prop="doc_count" label="已关联文档" min-width="140">
+    <el-table-column prop="value" :label="t('knowledge.tags.value.label')" class-name="border-l!" show-overflow-tooltip />
+    <el-table-column prop="doc_count" :label="t('knowledge.tags.documents.linked')" min-width="140">
       <template #default="{ row }: { row: TagTableRow }">
         <!-- 查看标签关联文档 -->
         <el-button type="primary" link class="mk-link" @click="handleOpenTagDocuments(row)">
@@ -259,17 +261,17 @@ onMounted(() => {
         </el-button>
       </template>
     </el-table-column>
-    <el-table-column label="操作" width="130" fixed="right" v-if="!isWorkspaceSharedResource()">
+    <el-table-column :label="t('common.labels.operation')" width="130" fixed="right" v-if="!isWorkspaceSharedResource()">
       <template #default="{ row }: { row: TagTableRow }">
         <div class="flex-align-center">
           <!-- 编辑标签值 -->
-          <MkTooltip v-if="knowledgeTagPermission('tagEdit')" content="编辑标签值" placement="top">
+          <MkTooltip v-if="knowledgeTagPermission('tagEdit')" :content="t('knowledge.tags.actions.editValue')" placement="top">
             <el-button type="primary" text @click="handleOpenEditTagValue(row)">
               <MkIcon name="icon_edit_outlined" />
             </el-button>
           </MkTooltip>
           <!-- 删除标签值 -->
-          <MkTooltip v-if="knowledgeTagPermission('tagDelete')" content="删除" placement="top">
+          <MkTooltip v-if="knowledgeTagPermission('tagDelete')" :content="t('common.actions.delete')" placement="top">
             <el-button type="primary" text @click="handleDeleteTag(row, 'one')">
               <MkIcon name="icon_delete-trash_outlined" />
             </el-button>
@@ -280,7 +282,7 @@ onMounted(() => {
     <template #footer-batch-actions>
       <!-- 批量删除标签 -->
       <el-button v-if="knowledgeTagPermission('tagDelete')" type="danger" plain :loading="operationLoading" @click="handleBatchDelete">
-        删除
+        {{ t('common.actions.delete') }}
       </el-button>
     </template>
   </MkTable>

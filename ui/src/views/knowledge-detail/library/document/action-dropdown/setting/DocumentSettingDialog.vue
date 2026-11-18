@@ -65,19 +65,25 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="文档设置" @closed="emit('closed')">
-    <el-form ref="formRef" :model="form" label-position="top" require-asterisk-position="right" @submit.prevent>
+  <MkDialog v-model="visible" :title="t('knowledge.document.settings.title')" @closed="emit('closed')">
+    <el-form ref="formRef" :model="form" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" @submit.prevent>
       <template v-if="!batch && knowledgeType === KNOWLEDGE_TYPE_KEY.WEB">
-        <el-form-item label="文档地址" prop="source_url" :rules="[{ required: true, whitespace: true, message: '请输入文档地址', trigger: 'blur' }]">
+        <el-form-item
+          :label="t('knowledge.document.sourceUrl.label')"
+          prop="source_url"
+          :rules="[{ required: true, whitespace: true, message: t('knowledge.document.sourceUrl.requiredMessage'), trigger: 'blur' }]"
+        >
           <el-input v-model="form.source_url" />
         </el-form-item>
-        <el-form-item label="选择器"><el-input v-model="form.selector" placeholder="默认为 body，可输入 .classname/#idname/tagname" /></el-form-item>
+        <el-form-item :label="t('knowledge.fields.selector.label')">
+          <el-input v-model="form.selector" :placeholder="t('knowledge.fields.selector.placeholder')" />
+        </el-form-item>
       </template>
       <el-form-item>
         <template #label>
           <span class="flex-align-center gap-1">
-            <span>召回处理</span>
-            <MkTooltip placement="right" content="用户提问时，召回的分段按照设置进行处理。">
+            <span>{{ t('knowledge.document.hitHandling.label') }}</span>
+            <MkTooltip placement="right" :content="t('knowledge.document.hitHandling.description')">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>
@@ -109,14 +115,16 @@ defineExpose({ open, close })
         </div>
       </el-form-item>
       <el-checkbox v-model="form.allow_download">
-        {{ knowledgeType === KNOWLEDGE_TYPE_KEY.WEB ? '允许在知识来源中预览' : '允许在知识来源中下载' }}
+        {{
+          knowledgeType === KNOWLEDGE_TYPE_KEY.WEB ? t('knowledge.document.settings.allowPreview') : t('knowledge.document.settings.allowDownload')
+        }}
       </el-checkbox>
     </el-form>
     <template #footer>
       <!-- 取消文档设置 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存文档设置 -->
-      <el-button type="primary" :loading="loading" @click="handleSubmit">确认</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

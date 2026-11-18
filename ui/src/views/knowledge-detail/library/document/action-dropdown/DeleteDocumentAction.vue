@@ -27,11 +27,8 @@ function handleDelete() {
   const ids = [...(props.documentIds ?? [])]
   // 批量确认展示数量，单个确认展示文档名称；确认期间保留本次删除目标。
   const confirmation = batch
-    ? MsgConfirm(t('knowledge.document.delete.batchTitle', ids.length), t('knowledge.document.delete.batchDescription'))
-    : MsgConfirm(
-        t('knowledge.document.delete.title', { name: document!.name }),
-        t('knowledge.document.delete.description', document!.paragraph_count),
-      )
+    ? MsgConfirm(`${t('knowledge.document.delete.batchTitle', ids.length)}?`, t('knowledge.document.delete.batchDescription'))
+    : MsgConfirm(`${t('knowledge.document.delete.title')}: ${document!.name}?`, t('knowledge.document.delete.description', document!.paragraph_count))
   return confirmation
     .then(() => {
       loading.value = true

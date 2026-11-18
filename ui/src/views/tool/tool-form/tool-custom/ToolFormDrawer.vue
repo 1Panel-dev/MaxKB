@@ -156,7 +156,7 @@ function handleBeforeClose() {
     visible.value = false
     return
   }
-  MsgConfirm(t('common.dialogs.notice'), t('common.dialogs.unsavedChanges'), {
+  MsgConfirm(t('common.dialogs.notice'), `${t('common.dialogs.unsavedChanges')}?`, {
     confirmButtonText: t('common.actions.confirm'),
     confirmButtonType: 'primary',
   })
@@ -237,7 +237,7 @@ defineExpose({ open })
           <h4 class="mk-title-decoration">{{ t('tool.outputParams.title') }}</h4>
           <span class="text-N600">{{ t('tool.help.shownWhenUsed') }}</span>
         </div>
-        <div class="mk-gray-card-sm rounded-md!">{{ t('tool.outputParams.result', { variable: '{result}' }) }}</div>
+        <div class="mk-gray-card-sm rounded-md!">{{ t('tool.outputParams.result') }} {result}</div>
       </section>
     </el-form>
 

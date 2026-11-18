@@ -121,7 +121,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
 /* 删除后重新查询，保留筛选并处理末页删空。 */
 function handleDeleteTool(tool: ToolItem) {
   return MsgConfirm(
-    t('tool.delete.title', { name: tool.name }),
+    `${t('tool.delete.title')}: ${tool.name}?`,
     tool.resource_count ? t('tool.delete.description', { count: tool.resource_count }, tool.resource_count) : '',
   )
     .then(() => {

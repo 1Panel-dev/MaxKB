@@ -6,6 +6,7 @@
     "createdAt": "建立時間",
     "updatedAt": "更新時間",
     "all": "全部",
+    "selected": "已選",
     "details": "詳情",
     "basicInfo": "基本資訊",
     "type": "類型",
@@ -15,7 +16,7 @@
     "label": "名稱",
     "placeholder": "請輸入名稱",
     "requiredMessage": "請輸入名稱",
-    "copyTemplate": "{name} 副本"
+    "copySuffix": "副本"
   },
   "description": {
     "label": "描述",
@@ -38,7 +39,7 @@
     "replaceFile": "更換檔案",
     "retryUpload": "重新上傳",
     "limits": "每次最多上傳 {count} 個檔案，每個檔案不超過 {size} MB",
-    "formats": "支援格式：{formats}",
+    "formats": "支援格式",
     "emptyFileMessage": "無法上傳空檔案",
     "sizeLimitMessage": "檔案大小超過上限",
     "unsupportedFormatMessage": "不支援此檔案格式",
@@ -46,11 +47,10 @@
     "networkErrorMessage": "網路連線失敗",
     "uploadInProgressMessage": "檔案正在上傳，請稍候",
     "noSuccessfulFilesMessage": "沒有成功上傳的檔案，請重新上傳",
-    "fileError": "{name}：{reason}",
     "status": {
-      "completed": "已完成 {completed}/{total}",
+      "completed": "已完成",
       "uploading": "上傳中",
-      "failed": "失敗 {count} 個",
+      "failed": "失敗",
       "allSucceeded": "全部成功"
     }
   },
@@ -80,7 +80,7 @@
   "dialogs": {
     "notice": "提示",
     "deleteWarning": "刪除後無法復原，請謹慎操作。",
-    "unsavedChanges": "目前的變更尚未儲存，確定要離開嗎？"
+    "unsavedChanges": "目前的變更尚未儲存，確定要離開嗎"
   },
   "messages": {
     "saveSuccess": "儲存成功",
@@ -95,7 +95,7 @@
     "importSuccess": "匯入成功",
     "enableSuccess": "啟用成功",
     "disableSuccess": "停用成功",
-    "exportFailed": "匯出失敗：{reason}",
+    "exportFailed": "匯出失敗",
     "copied": "已複製",
     "connectionSuccess": "連線成功",
     "replaceSuccess": "取代成功",

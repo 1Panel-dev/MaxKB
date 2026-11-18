@@ -6,6 +6,7 @@
     "createdAt": "Created at",
     "updatedAt": "Updated at",
     "all": "All",
+    "selected": "Selected",
     "details": "Details",
     "basicInfo": "Basic information",
     "type": "Type",
@@ -15,7 +16,7 @@
     "label": "Name",
     "placeholder": "Enter a name",
     "requiredMessage": "Enter a name",
-    "copyTemplate": "Copy of {name}"
+    "copySuffix": "Copy"
   },
   "description": {
     "label": "Description",
@@ -38,7 +39,7 @@
     "replaceFile": "Replace file",
     "retryUpload": "Retry upload",
     "limits": "Upload up to {count} file at a time, no larger than {size} MB. | Upload up to {count} files at a time, each no larger than {size} MB.",
-    "formats": "Supported formats: {formats}",
+    "formats": "Supported formats",
     "emptyFileMessage": "Cannot upload an empty file.",
     "sizeLimitMessage": "File too large",
     "unsupportedFormatMessage": "Unsupported file format",
@@ -46,11 +47,10 @@
     "networkErrorMessage": "Network error",
     "uploadInProgressMessage": "Please wait for the upload to finish.",
     "noSuccessfulFilesMessage": "No files were uploaded successfully. Try uploading again.",
-    "fileError": "{name}: {reason}",
     "status": {
-      "completed": "{completed} of {total} completed",
+      "completed": "Completed",
       "uploading": "Uploading",
-      "failed": "{count} failed",
+      "failed": "Failed",
       "allSucceeded": "All files uploaded"
     }
   },
@@ -80,7 +80,7 @@
   "dialogs": {
     "notice": "Notice",
     "deleteWarning": "This action cannot be undone.",
-    "unsavedChanges": "Leave without saving your changes?"
+    "unsavedChanges": "Leave without saving your changes"
   },
   "messages": {
     "saveSuccess": "Saved successfully",
@@ -95,7 +95,7 @@
     "importSuccess": "Imported successfully",
     "enableSuccess": "Enabled successfully",
     "disableSuccess": "Disabled successfully",
-    "exportFailed": "Export failed: {reason}",
+    "exportFailed": "Export failed",
     "copied": "Copied",
     "connectionSuccess": "Connection successful",
     "replaceSuccess": "Replaced successfully",

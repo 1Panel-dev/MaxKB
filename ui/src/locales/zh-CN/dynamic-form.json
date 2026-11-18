@@ -20,7 +20,7 @@
   "tabs": {
     "basic": "基本信息",
     "visibility": "显隐设置",
-    "numbered": "页签 {index}"
+    "label": "页签"
   },
   "fields": {
     "field": {
@@ -173,7 +173,7 @@
   "tree": {
     "addRoot": "添加一级选项",
     "addChild": "添加子选项",
-    "deleteConfirm": "确定删除「{label}」吗？"
+    "deleteConfirm": "确定删除"
   },
   "visibility": {
     "show": "显示条件",
@@ -188,7 +188,6 @@
     "segmentation": "文件上传前，建议规范文件的分段标识",
     "duplicateName": "文件名重复",
     "limits": "每次最多上传 {count} 个文件，每个文件不超过 {size} MB",
-    "formats": "支持格式：{formats}",
     "sizeLimit": "文件大小不能超过 {size}MB",
     "countLimit": "最多只能上传 {count} 个文件"
   },

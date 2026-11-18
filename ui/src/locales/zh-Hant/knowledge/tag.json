@@ -2,6 +2,7 @@
   "tags": {
     "title": "標籤管理",
     "label": "標籤",
+    "untagged": "無標籤",
     "settings": "標籤設定",
     "key": {
       "label": "標籤",
@@ -22,7 +23,17 @@
       "add": "新增標籤",
       "create": "建立標籤",
       "createValue": "建立標籤值",
-      "addValue": "新增標籤值"
+      "addValue": "新增標籤值",
+      "edit": "編輯標籤",
+      "editValue": "編輯標籤值"
+    },
+    "documents": {
+      "linked": "已關聯文件"
+    },
+    "delete": {
+      "title": "確定刪除標籤",
+      "batchTitle": "確定刪除選取的 {count} 個標籤",
+      "description": "刪除標籤時，也會從使用該標籤的資源中移除它，請謹慎操作。"
     },
     "messages": {
       "duplicateTag": "標籤已存在"
