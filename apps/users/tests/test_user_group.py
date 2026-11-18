@@ -1,4 +1,6 @@
 # coding=utf-8
+from unittest.mock import patch
+
 import uuid_utils.compat as uuid
 
 from django.test import TestCase
@@ -8,7 +10,7 @@ from common.database_model_manage.database_model_manage import DatabaseModelMana
 from users.models import User
 from users.models.user_group import SystemUserGroup
 from users.models.user_group import SystemUserGroupRelation
-from users.serializers.user_group import UserGroupListPageSerializer
+from users.serializers.user_group import SystemUserGroupCreateSerializer, UserGroupListPageSerializer
 
 
 class SystemUserGroupWorkspaceIsolationTests(TestCase):
@@ -22,6 +24,33 @@ class SystemUserGroupWorkspaceIsolationTests(TestCase):
         SystemUserGroup.objects.create(id=uuid.uuid7(), name="test", workspace_id="default")
         with self.assertRaises(Exception):
             SystemUserGroup.objects.create(id=uuid.uuid7(), name="test", workspace_id="default")
+
+
+class SystemUserGroupDeleteTests(TestCase):
+    def test_permission_cache_is_cleared_only_after_transaction_commit(self):
+        group = SystemUserGroup.objects.create(name="test-group", workspace_id="workspace-1")
+        user = User.objects.create(
+            username="group-member",
+            nick_name="Group Member",
+            password="encrypted-password",
+            role=RoleConstants.USER.name,
+        )
+        SystemUserGroupRelation.objects.create(user=user, group=group)
+        serializer = SystemUserGroupCreateSerializer.UserGroupDeleteSerializer(
+            data={
+                "id": group.id,
+                "workspace_id": group.workspace_id,
+            }
+        )
+        serializer.group = group
+
+        with patch("users.serializers.user_group._clear_permission_cache") as clear_permission_cache:
+            with self.captureOnCommitCallbacks(execute=True):
+                serializer.delete(with_valid=False)
+                self.assertFalse(SystemUserGroup.objects.filter(id=group.id).exists())
+                clear_permission_cache.assert_not_called()
+
+        clear_permission_cache.assert_called_once_with([user.id])
 
 
 class SystemUserGroupMemberRoleFilterTests(TestCase):

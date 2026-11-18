@@ -111,7 +111,7 @@ class SystemUserGroupCreateSerializer(serializers.Serializer):
                 SystemUserGroupRelation.objects.filter(group_id=self.group.id).values_list("user_id", flat=True)
             )
             self.group.delete()
-            _clear_permission_cache(member_user_ids)
+            transaction.on_commit(lambda: _clear_permission_cache(member_user_ids))
             return True
 
     class Query(serializers.Serializer):
