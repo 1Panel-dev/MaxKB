@@ -8,6 +8,19 @@
   "workspaceAuthorization": {
     "title": "授權工作空間"
   },
+  "chatUserAuthorization": {
+    "title": "對話使用者",
+    "byGroup": "按使用者群組",
+    "name": "姓名",
+    "username": "使用者名稱",
+    "source": {
+      "label": "使用者來源",
+      "local": "本機建立"
+    },
+    "autoAuthorization": "自動授權",
+    "authorized": "已授權",
+    "authorize": "授權"
+  },
   "shared": "共用",
   "mcpConfig": {
     "title": "MCP 服務設定"
@@ -24,5 +37,8 @@
   "executionRecords": {
     "title": "執行記錄",
     "view": "查看執行記錄"
+  },
+  "messages": {
+    "unsupportedScope": "目前的資源範圍不支援此操作"
   }
 }
