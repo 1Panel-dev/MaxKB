@@ -3,9 +3,6 @@
   "menu": {
     "library": "Library",
     "retrieval": "Retrieval optimization",
-    "hitTest": "Retrieval test",
-    "questions": "Questions",
-    "termbase": "Custom dictionary",
     "integration": "Access & integrations",
     "chatUsers": "Chat users",
     "externalRetrieval": "External retrieval service"
@@ -65,7 +62,7 @@
   },
   "stats": {
     "documents": "doc | docs",
-    "paragraphs": "paragraph | paragraphs",
+    "paragraphs": "segment | segments",
     "characters": "character | characters",
     "images": "image | images",
     "retrievalCount": "Retrieval count",
@@ -80,9 +77,9 @@
     "cancelKeywordIndex": "Cancel keyword indexing"
   },
   "paragraphScope": {
-    "label": "Select paragraphs",
-    "unsuccessful": "Skip previously successful paragraphs",
-    "all": "All paragraphs"
+    "label": "Select segments",
+    "unsuccessful": "Skip previously successful segments",
+    "all": "All segments"
   },
   "import": {
     "embeddingNotice": "Knowledge imported successfully. The documents do not have embeddings yet. Select an embedding model in settings, then generate embeddings for the documents."

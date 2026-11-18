@@ -3,9 +3,6 @@
   "menu": {
     "library": "資料庫",
     "retrieval": "檢索最佳化",
-    "hitTest": "召回測試",
-    "questions": "問題",
-    "termbase": "自訂分詞",
     "integration": "授權與整合",
     "chatUsers": "對話使用者",
     "externalRetrieval": "外部檢索服務"

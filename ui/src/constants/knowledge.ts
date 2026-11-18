@@ -41,21 +41,21 @@ export const KNOWLEDGE_SYNC_OPTIONS = [
   },
 ] as const
 
-/** 召回测试与工作流知识库检索共用的模式选项。 */
+/** 召回测试、智能体设置与工作流知识库检索共用的模式选项。 */
 export const KNOWLEDGE_SEARCH_MODE_OPTIONS = [
   {
     value: KNOWLEDGE_SEARCH_MODE.EMBEDDING,
-    label: '向量检索',
-    description: '向量检索是一种基于向量相似度的检索方式，适用于知识库中的大数据量场景。',
+    labelKey: 'knowledge.retrieval.embedding.label',
+    descriptionKey: 'knowledge.retrieval.embedding.description',
   },
   {
     value: KNOWLEDGE_SEARCH_MODE.KEYWORDS,
-    label: '全文检索',
-    description: '全文检索是一种基于文本相似度的检索方式，适用于知识库中的小数据量场景。',
+    labelKey: 'knowledge.retrieval.keywords.label',
+    descriptionKey: 'knowledge.retrieval.keywords.description',
   },
   {
     value: KNOWLEDGE_SEARCH_MODE.BLEND,
-    label: '混合检索',
-    description: '混合检索是一种基于向量和文本相似度的检索方式，适用于知识库中的中等数据量场景。',
+    labelKey: 'knowledge.retrieval.blend.label',
+    descriptionKey: 'knowledge.retrieval.blend.description',
   },
 ] as const

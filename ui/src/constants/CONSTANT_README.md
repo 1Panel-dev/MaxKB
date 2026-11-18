@@ -34,8 +34,9 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 `knowledge.ts` 的 `KNOWLEDGE_SYNC_OPTIONS` 提供同步方式的协议值、`labelKey` 和 `descriptionKey`。
 手动同步、定时同步和同步日志在展示时翻译，提交时使用协议值。
 
-`knowledge.ts` 的 `KNOWLEDGE_SEARCH_MODE_OPTIONS` 统一维护向量、全文和混合检索的值、文案及说明，
-召回测试页与工作流知识库检索节点直接复用，选项值引用 `KNOWLEDGE_SEARCH_MODE`。
+`knowledge.ts` 的 `KNOWLEDGE_SEARCH_MODE_OPTIONS` 统一维护向量、全文和混合检索的 `value`、`labelKey` 和 `descriptionKey`，
+选项值引用 `KNOWLEDGE_SEARCH_MODE`。召回测试页、智能体设置与工作流知识库检索节点在模板或 computed 中通过 `t` 翻译；
+文案归 `knowledge.retrieval`，常量不保存中文或当前语言的译文。
 
 `knowledge.ts` 的 `KNOWLEDGE_IMAGE_EXTENSIONS` 维护知识库上传和召回测试支持的图片扩展名，
 `KNOWLEDGE_IMAGE_ACCEPT` 和 `KNOWLEDGE_IMAGE_TYPE_LABEL` 由它派生，供文件选择、校验与提示使用。

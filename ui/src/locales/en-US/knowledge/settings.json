@@ -19,19 +19,19 @@
   "documentStrategy": {
     "title": "Processing",
     "syncHint": "New URLs found during knowledge sync are processed using this strategy. Changes take effect on the next sync.",
-    "splitRules": "Paragraph splitting",
+    "splitRules": "Segment splitting",
     "smart": {
       "label": "Smart splitting (recommended)",
       "description": "Use smart splitting if you are unsure which rules to choose."
     },
     "advanced": {
       "label": "Advanced splitting",
-      "description": "Choose delimiters, paragraph length, and cleanup rules to suit the document format."
+      "description": "Choose delimiters, segment length, and cleanup rules to suit the document format."
     },
     "delimiter": {
-      "label": "Paragraph delimiters",
-      "placeholder": "Select paragraph delimiters",
-      "description": "The document is split recursively using the delimiters in the order you select. Paragraphs longer than the configured length are truncated."
+      "label": "Segment delimiters",
+      "placeholder": "Select segment delimiters",
+      "description": "The document is split recursively using the delimiters in the order you select. Segments longer than the configured length are truncated."
     },
     "splitPatterns": {
       "space": "Space",
@@ -41,10 +41,10 @@
       "lineBreak": "Line break",
       "blankLine": "Blank line"
     },
-    "paragraphLength": "Paragraph length",
+    "paragraphLength": "Segment length",
     "childChunkLength": {
       "label": "Child chunk length",
-      "description": "Vector search uses these smaller chunks. When a chunk matches, the full paragraph is shown."
+      "description": "Vector search uses these smaller chunks. When a chunk matches, the full segment is shown."
     },
     "autoClean": {
       "label": "Automatic cleanup",
@@ -71,8 +71,8 @@
     },
     "indexEnhancement": "Index enhancement",
     "titleAsQuestion": {
-      "label": "Index paragraph titles as questions",
-      "description": "Automatically add each paragraph title as a related question."
+      "label": "Index segment titles as questions",
+      "description": "Automatically add each segment title as a related question."
     }
   }
 }

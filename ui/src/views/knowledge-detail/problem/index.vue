@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ProblemItem } from '@/api/types'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
@@ -18,8 +19,7 @@ import { perm } from '@/permission'
 /**
  * 知识库「问题」权限判断
  */
-type KnowledgeProblemPermissionMethod =
-     'problemCreate' | 'problemEdit' | 'problemDelete' | 'problemRelate'
+type KnowledgeProblemPermissionMethod = 'problemCreate' | 'problemEdit' | 'problemDelete' | 'problemRelate'
 
 function knowledgeProblemPermission(method: KnowledgeProblemPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
@@ -32,6 +32,7 @@ defineOptions({ name: 'ProblemListView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 
+const { t } = useI18n({ useScope: 'global' })
 const { knowledgeId, resourceApi } = useKnowledgeDetailContext()
 const loading = ref(false)
 const operationLoading = ref(false)
@@ -107,7 +108,7 @@ function handleQuickCreate(content: string) {
   return (
     resourceApi.problem.postProblems?.(knowledgeId.value, [content]).then(() => {
       quickCreateRef.value?.close()
-      MsgSuccess('创建成功')
+      MsgSuccess(t('common.messages.createSuccess'))
       return handleSearchChange()
     }) ?? Promise.resolve()
   )
@@ -123,7 +124,7 @@ function handleSaveProblem(problem: ProblemItem, content: string): Promise<strin
   operationLoading.value = true
   return (
     resourceApi.problem.putProblem?.(knowledgeId.value, problem.id, content).then(() => {
-      MsgSuccess('修改成功')
+      MsgSuccess(t('common.messages.updateSuccess'))
       void loadProblems()
       return content
     }) ?? Promise.reject(new Error('Problem editing is unavailable'))
@@ -137,7 +138,7 @@ function handleDeleteProblem(problem: ProblemItem) {
   operationLoading.value = true
   return (
     resourceApi.problem.deleteProblem?.(knowledgeId.value, problem.id).then(() => {
-      MsgSuccess('删除成功')
+      MsgSuccess(t('common.messages.deleteSuccess'))
       clearSelection()
       return loadProblems()
     }) ?? Promise.resolve()
@@ -160,7 +161,7 @@ function handleBatchDeleteProblems() {
         selectedProblems.value.map(({ id }) => id),
       )
       .then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         clearSelection()
         return loadProblems()
       }) ?? Promise.resolve()
@@ -231,14 +232,14 @@ onMounted(() => loadProblems())
       <MkQuickCreate
         v-if="!isWorkspaceSharedResource() && knowledgeProblemPermission('problemCreate')"
         ref="quickCreateRef"
-        text="快速创建问题"
-        placeholder="请输入问题"
+        :text="t('knowledge.question.actions.quickCreate')"
+        :placeholder="t('knowledge.question.content.placeholder')"
         :loading="operationLoading"
         @create="handleQuickCreate"
       />
     </template>
     <el-table-column v-if="!isWorkspaceSharedResource()" type="selection" width="40" />
-    <el-table-column prop="content" label="问题" min-width="280">
+    <el-table-column prop="content" :label="t('knowledge.question.title')" min-width="280">
       <template #default="{ row }: { row: ProblemItem }">
         <MkEditName
           v-model="row.content"
@@ -249,30 +250,30 @@ onMounted(() => loadProblems())
         />
       </template>
     </el-table-column>
-    <el-table-column prop="paragraph_count" label="关联分段数" min-width="120" sortable />
-    <el-table-column prop="hit_num" label="召回次数" min-width="100" sortable>
+    <el-table-column prop="paragraph_count" :label="t('knowledge.question.paragraphs.count')" min-width="170" sortable />
+    <el-table-column prop="hit_num" :label="t('knowledge.stats.retrievalCount')" min-width="140" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ numberFormat(row.hit_num) }}</template>
     </el-table-column>
-    <el-table-column prop="last_hit_time" label="最近一次召回时间" width="200" sortable>
+    <el-table-column prop="last_hit_time" :label="t('knowledge.stats.lastRetrievedAt')" width="200" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ datetimeFormat(row.last_hit_time) || '-' }}</template>
     </el-table-column>
-    <el-table-column prop="create_time" label="创建时间" width="180" sortable>
+    <el-table-column prop="create_time" :label="t('common.labels.createTime')" width="180" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
-    <el-table-column prop="update_time" label="更新时间" width="180" sortable>
+    <el-table-column prop="update_time" :label="t('common.labels.updateTime')" width="180" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ datetimeFormat(row.update_time) }}</template>
     </el-table-column>
-    <el-table-column v-if="!isWorkspaceSharedResource()" label="操作" width="100" fixed="right">
+    <el-table-column v-if="!isWorkspaceSharedResource()" :label="t('common.labels.operation')" width="100" fixed="right">
       <template #default="{ row }: { row: ProblemItem }">
         <div @click.stop>
           <!-- 关联当前问题的分段 -->
-          <MkTooltip v-if="knowledgeProblemPermission('problemRelate')" content="关联分段" placement="top">
+          <MkTooltip v-if="knowledgeProblemPermission('problemRelate')" :content="t('knowledge.question.paragraphs.title')" placement="top">
             <el-button type="primary" text :disabled="operationLoading" @click="handleOpenAssociateParagraphs([row.id])">
               <MkIcon name="icon_link-record_outlined" />
             </el-button>
           </MkTooltip>
           <!-- 直接删除问题 -->
-          <MkTooltip v-if="knowledgeProblemPermission('problemDelete')" content="删除" placement="top">
+          <MkTooltip v-if="knowledgeProblemPermission('problemDelete')" :content="t('common.actions.delete')" placement="top">
             <el-button type="primary" text :disabled="operationLoading" @click="handleDeleteProblem(row)">
               <MkIcon name="icon_delete-trash_outlined" />
             </el-button>
@@ -282,11 +283,25 @@ onMounted(() => loadProblems())
     </el-table-column>
     <template v-if="!isWorkspaceSharedResource()" #footer-batch-actions>
       <!-- 批量关联所选问题的分段 -->
-      <el-button v-if="knowledgeProblemPermission('problemRelate')" type="primary" plain :disabled="operationLoading" @click="handleOpenAssociateParagraphs(selectedProblems.map(({ id }) => id))">
-        关联分段
+      <el-button
+        v-if="knowledgeProblemPermission('problemRelate')"
+        type="primary"
+        plain
+        :disabled="operationLoading"
+        @click="handleOpenAssociateParagraphs(selectedProblems.map(({ id }) => id))"
+      >
+        {{ t('knowledge.question.paragraphs.title') }}
       </el-button>
       <!-- 直接批量删除问题 -->
-      <el-button v-if="knowledgeProblemPermission('problemDelete')" type="danger" plain :disabled="operationLoading" @click="handleBatchDeleteProblems">删除</el-button>
+      <el-button
+        v-if="knowledgeProblemPermission('problemDelete')"
+        type="danger"
+        plain
+        :disabled="operationLoading"
+        @click="handleBatchDeleteProblems"
+      >
+        {{ t('common.actions.delete') }}
+      </el-button>
     </template>
   </MkTable>
   <ProblemDetailDrawer

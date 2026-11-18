@@ -185,7 +185,7 @@
     "referenceOptions": "The variable value must match:\n[\n  {'{'}\n    \"label\": \"xx\",\n    \"value\": \"xx\",\n    \"default\": false\n  {'}'}\n]\nlabel: required label\nvalue: required value\ndefault: whether this is the default option"
   },
   "upload": {
-    "segmentation": "Standardize paragraph delimiters before uploading files.",
+    "segmentation": "Standardize segment delimiters before uploading files.",
     "duplicateName": "Duplicate file name",
     "limits": "Upload up to {count} files at a time, each no larger than {size} MB",
     "sizeLimit": "File size cannot exceed {size}MB",

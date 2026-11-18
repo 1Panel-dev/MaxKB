@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeHitTestImage, KnowledgeHitTestPayload } from '@/api/types'
 import { FILE_SOURCE_TYPE } from '@/api/enums'
 import FileApi from '@/api/admin/file'
@@ -24,6 +25,7 @@ function knowledgeHitTestPermission(method: KnowledgeHitTestPermissionMethod): b
 
 defineOptions({ name: 'KnowledgeHitTestInput' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = withDefaults(
   defineProps<{
     knowledgeId: string
@@ -85,11 +87,11 @@ function submitTest() {
 function validateImage(file: File) {
   const filename = file.name.toUpperCase()
   if (!KNOWLEDGE_IMAGE_EXTENSIONS.some((extension) => filename.endsWith(`.${extension}`))) {
-    MsgWarning('文件格式不支持')
+    MsgWarning(t('upload.unsupportedFormatMessage'))
     return false
   }
   if (!file.size || file.size > sizeLimit.value * 1024 * 1024) {
-    MsgWarning(file.size ? '大小超限' : '文件不能为空')
+    MsgWarning(t(file.size ? 'upload.sizeLimitMessage' : 'upload.emptyFileMessage'))
     return false
   }
   return true
@@ -101,7 +103,7 @@ function addImages(files: FileList | File[]) {
 
   for (const file of Array.from(files)) {
     if (queryImages.value.length >= countLimit.value) {
-      MsgWarning(`每次最多上传 ${countLimit.value} 个文件`)
+      MsgWarning(t('upload.countLimitMessage', { count: countLimit.value }))
       break
     }
     if (!validateImage(file)) continue
@@ -146,7 +148,7 @@ function uploadImage(image: QueryImage) {
       // 保留原文件和缩略图，供重试或移除。
       if (image.status !== 'uploading') return
       image.status = 'fail'
-      image.errMsg = '上传失败'
+      image.errMsg = t('upload.status.failed')
     })
     .finally(() => uploadRequests.delete(image.id))
 }
@@ -204,7 +206,7 @@ onBeforeUnmount(() => {
       type="textarea"
       :autosize="{ minRows: 1, maxRows: 7 }"
       resize="none"
-      placeholder="请输入测试内容"
+      :placeholder="t('knowledge.hitTest.query.placeholder')"
       :maxlength="100000"
       @keydown.enter="handleKeydown"
     />
@@ -222,11 +224,11 @@ onBeforeUnmount(() => {
       <MkTooltip placement="top">
         <template #content>
           <div class="break-all whitespace-pre-wrap">
-            可拖拽到输入框内上传图片
+            {{ t('knowledge.hitTest.query.imageDropHint') }}
             <br />
-            上传图片：最多{{ countLimit }}张，每张不超过 {{ sizeLimit }}MB
+            {{ t('upload.limits', { count: countLimit, size: sizeLimit }) }}
             <br />
-            图片类型：{{ KNOWLEDGE_IMAGE_TYPE_LABEL }}
+            {{ t('upload.formats') }}: {{ KNOWLEDGE_IMAGE_TYPE_LABEL }}
           </div>
         </template>
         <!-- 上传图片 -->
@@ -239,6 +241,6 @@ onBeforeUnmount(() => {
   <!-- 执行召回测试 -->
   <el-button type="primary" class="mt-4 w-full" :loading="loading" :disabled="!canSubmit" @click="submitTest">
     <MkIcon v-if="knowledgeHitTestPermission('hitTest')" name="icon_play_outlined" />
-    <span>测试</span>
+    <span>{{ t('knowledge.hitTest.test') }}</span>
   </el-button>
 </template>

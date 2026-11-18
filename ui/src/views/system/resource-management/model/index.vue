@@ -188,10 +188,10 @@ onMounted(() => {
           </template>
         </el-table-column>
         <el-table-column prop="nick_name" :label="t('common.labels.creator')" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="update_time" :label="t('common.labels.updatedAt')" width="180" sortable>
+        <el-table-column prop="update_time" :label="t('common.labels.updateTime')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
         </el-table-column>
-        <el-table-column prop="create_time" :label="t('common.labels.createdAt')" width="180" sortable>
+        <el-table-column prop="create_time" :label="t('common.labels.createTime')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
         <el-table-column :label="t('common.labels.operation')" width="120" fixed="right">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ParamsPage } from '@/api/admin/core/types'
 import type { DocumentItem, DocumentResourceType, ParagraphItem, ProblemParagraphReference } from '@/api/types'
 import type MkViewLayout from '@/components/global/mk-view-layout/index.vue'
@@ -10,6 +11,7 @@ import { getFileIconUrl } from '@/utils/icon'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'AssociateParagraphDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const emit = defineEmits<{ success: [] }>()
 const { knowledgeId, resourceApi } = useKnowledgeDetailContext({ resourceScopes: ['workspace', 'system-resource', 'system-shared'] as const })
 
@@ -124,7 +126,7 @@ function handleSubmit() {
       }
     })
     .then(() => {
-      MsgSuccess('保存成功')
+      MsgSuccess(t('common.messages.saveSuccess'))
       visible.value = false
       emit('success')
     })
@@ -175,7 +177,7 @@ defineExpose({ open })
 <template>
   <MkDialog v-model="visible" class="mk-aside-content-dialog" width="1200" @closed="handleClosed">
     <template #header="{ titleId }">
-      <h4 :id="titleId">关联分段</h4>
+      <h4 :id="titleId">{{ t('knowledge.question.paragraphs.title') }}</h4>
     </template>
     <MkViewLayout ref="paragraphLayoutRef" title="">
       <template #aside>
@@ -187,8 +189,8 @@ defineExpose({ open })
             :before-leave="() => !documentLoading && !operationLoading"
             @tab-change="handleResourceTypeChange"
           >
-            <el-tab-pane label="文档" :name="DOCUMENT_RESOURCE_TYPE.DOCUMENT" />
-            <el-tab-pane label="图片" :name="DOCUMENT_RESOURCE_TYPE.IMAGE" />
+            <el-tab-pane :label="t('knowledge.document.title')" :name="DOCUMENT_RESOURCE_TYPE.DOCUMENT" />
+            <el-tab-pane :label="t('knowledge.image.title')" :name="DOCUMENT_RESOURCE_TYPE.IMAGE" />
           </el-tabs>
           <!-- 搜索并切换候选分段所在资源 -->
           <MkSearchList v-model="documentSearchText" :data="documentData" :default-active="selectedDocumentId" @click="handleSelectDocument">
@@ -253,26 +255,26 @@ defineExpose({ open })
 
                   <h4 class="mb-2">{{ paragraph.title || '-' }}</h4>
                   <MdPreview :model-value="paragraph.content" />
-                  <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
+                  <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} {{ t('knowledge.stats.characters', paragraph.content.length) }}</p>
                 </el-card>
               </template>
             </div>
             <template #empty>
-              <MkEmpty :type="paragraphSearchText ? 'search' : 'default'" description="暂无分段" />
+              <MkEmpty :type="paragraphSearchText ? 'search' : 'default'" :description="t('knowledge.paragraph.empty')" />
             </template>
           </MkInfiniteScroll>
-          <el-empty v-else-if="!documentLoading" class="flex-1" description="暂无数据" />
+          <el-empty v-else-if="!documentLoading" class="flex-1" :description="t('common.empty.default')" />
         </div>
       </template>
     </MkViewLayout>
     <template #footer>
       <div class="flex-between">
-        <div class="text-sm text-N600">已选择 {{ selectedParagraphs.length }}</div>
+        <div class="text-sm text-N600">{{ t('common.labels.selected') }} {{ selectedParagraphs.length }}</div>
         <div>
           <!-- 取消本次批量关联 -->
-          <el-button plain :disabled="operationLoading || documentLoading" @click="visible = false">取消</el-button>
+          <el-button plain :disabled="operationLoading || documentLoading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
           <!-- 确认批量关联所选分段 -->
-          <el-button type="primary" :loading="operationLoading" @click="handleSubmit">确认</el-button>
+          <el-button type="primary" :loading="operationLoading" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
         </div>
       </div>
     </template>

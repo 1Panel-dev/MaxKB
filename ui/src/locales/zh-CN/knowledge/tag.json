@@ -29,8 +29,8 @@
     },
     "documents": {
       "title": "关联文档",
-      "linked": "已关联文档",
-      "unlinked": "未关联文档"
+      "related": "已关联文档",
+      "unrelated": "未关联文档"
     },
     "import": {
       "title": "导入标签",

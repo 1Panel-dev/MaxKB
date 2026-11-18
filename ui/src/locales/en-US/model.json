@@ -44,7 +44,7 @@
     },
     "reranker": {
       "label": "Reranking model",
-      "description": "Reranking model: reorders candidate paragraphs retrieved through multiple paths in advanced agents."
+      "description": "Reranking model: reorders candidate segments retrieved through multiple paths in advanced agents."
     },
     "stt": {
       "label": "Speech recognition",
@@ -88,7 +88,7 @@
   },
   "delete": {
     "title": "Delete model",
-    "description": "This model is linked to {count} resource. Deleting it will make it unavailable. Proceed with caution. | This model is linked to {count} resources. Deleting it will make it unavailable. Proceed with caution."
+    "description": "This model is related to {count} resource. Deleting it will make it unavailable. Proceed with caution. | This model is related to {count} resources. Deleting it will make it unavailable. Proceed with caution."
   },
   "parameters": {
     "title": "Model parameters",

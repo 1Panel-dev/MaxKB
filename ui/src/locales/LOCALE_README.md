@@ -43,6 +43,8 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 仅有展示文案的通用标签归 common.labels，例如“创建者”和“操作”。名称与描述直接归 common.name 和 common.description，
 字段的 label、placeholder 和实际使用的 requiredMessage 放在一起，表单、表头和筛选器共用 label。
 common.status 维护状态标签 label 和通用启停选项 enabled、disabled。
+创建时间与更新时间使用 `common.labels.createTime` / `updateTime`，英文为 `Create time` / `Update time`；卡片中“创建于”的说明使用 `common.labels.createdOn`。
+流程步骤的“上一步／下一步”使用 `common.actions.previous` / `next`，记录切换的“上一个／下一个”使用 `common.actions.previousItem` / `nextItem`。
 通用日期范围预设及起止日期占位归 `common.dateRange`，音视频播放失败提示归 `common.messages`。
 通用周期、星期、间隔单位与 Cron 字段及校验归 `common.schedule`；日期数字、时刻及间隔数值在使用处组合。
 通用文件选择、上传提示和校验归 `upload.json`，上传进度和结果汇总归 `upload.status`。
@@ -50,6 +52,7 @@ common.status 维护状态标签 label 和通用启停选项 enabled、disabled�
 业务模板、文件内容要求和导入说明归各自业务域。
 “请输入模型名称”等指明业务对象的提示，以及发布状态、执行状态等业务选项归对应业务域。
 通用操作结果归 common.messages，通用对话框标题归 common.dialogs；业务专属确认句仍留在所属业务域。
+“关联”的英文和翻译 key 统一使用 `relate` 词族：关联操作使用 `Relate` / `relate`，取消关联使用 `Unrelate` / `unrelate`，已关联／未关联标签使用 `Related` / `related`、`Unrelated` / `unrelated`；成功提示使用 `Related successfully` / `Unrelated successfully`，对应 key 为 `relateSuccess` / `unrelateSuccess`。文件名保持不变；网页链接仍使用 `link`。
 用户内容、用户保存的提示词、协议枚举和已保存节点名称保留原文。
 
 ## JSON 键顺序
@@ -147,6 +150,7 @@ MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 
 ## 知识库列表
 
 英文界面将“知识库”统一译为 `knowledge`，独立标题写作 `Knowledge`，例如“全部知识库”为 `All knowledge`。
+“分段”的英文统一使用 `segment` / `segments`，按语境使用单复数和句首大写；文件名、翻译 key 及代码字段继续沿用 `paragraph`。用于向量检索的“子块”使用 `child chunk`，与完整分段区分。
 工作空间、系统资源管理和系统共享资源的知识库菜单与列表标题共用 `knowledge.title`。四类知识库分别归 `knowledge.base`、`knowledge.web`、`knowledge.lark` 和 `knowledge.workflow`。类型筛选、类型列和创建菜单共用各组的 `label`，菜单说明使用 `description`，创建弹窗标题使用 `createTitle`。筛选请求沿用数字类型值。
 卡片的文档数、字符数和图片数使用 `knowledge.stats`，按实际数量选择单复数。向量化和分词索引归 `knowledge.actions`；同步入口使用 `knowledge.sync.label`。
 跨资源的模板中心文案归 `resource.templateStore`。模板名称、描述和 README 展示接口原文；缺少说明时与工具商店共用 `common.empty.noDetails`。
@@ -162,6 +166,9 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 基础设置标题、上传限制和更换向量模型确认归 `knowledge.baseSettings`，四种资源范围的基础设置路由共用 `knowledge.baseSettings.title`；类型名称与说明复用知识库类型分组，Web 字段复用 `knowledge.fields`，飞书凭据的固定字段名使用通用输入占位与校验。文档策略的同步生效说明归 `knowledge.documentStrategy.syncHint`。
 同步入口、同步方式与共用提示归 `knowledge.sync`，`label` 用于“同步”按钮及任务标签，`title` 用于“同步知识库”弹窗；定时同步字段、开关说明和业务校验归 `knowledge.scheduledSync`，菜单共用其 `title`；日志表头、同步状态、计数标签和已知跳过原因归 `knowledge.syncLog`，均在 `knowledge/sync.json` 维护。统计按“文档: 数量 (已同步: 数量, …)”组合，各语言保持顺序和格式一致；接口返回的未知原因与错误详情保留原文。
 标签导入标题、模板和格式限制归 `knowledge.tags.import`，关联文档标题及页签归 `knowledge.tags.documents`；文档字段复用 `knowledge.document`，通用关联操作及结果提示复用 `common`，文件选择校验复用 `upload`。
+问题列表、创建、详情及问题与分段的关联文案归 `knowledge.question`，在 `knowledge/question.json` 维护；四种资源范围的菜单与列表共用 `title`，详情抽屉标题使用 `detailTitle`。输入占位、多行输入说明和长度校验归 `content`，关联分段入口、数量标签及无关联分段时的空状态归 `paragraphs`，创建按钮和弹窗共用 `actions.create`。关联弹窗的文档／图片页签和分段详情复用各自业务域；召回统计及字符单位复用 `knowledge.stats`，时间、通用操作、记录切换及成功提示复用 `common`。
+自定义分词的标题、用途说明、词语字段及创建入口归 `knowledge.termbase`，在 `knowledge/termbase.json` 维护；英文沿用 v2 的 `term` 用词，标题为 `Custom term`，创建入口为 `Create term`。四种资源范围的菜单与列表共用 `title`，创建按钮和弹窗共用 `actions.create`。词语标签、单行与多行输入占位归 `content`；时间、通用操作及创建／删除／导出成功提示复用 `common`。词语内容和导出文件名保持原值。
+检索参数、模式名称及说明归 `knowledge.retrieval`；召回测试标题、输入、结果及空状态归 `knowledge.hitTest`，两组在 `knowledge/retrieval.json` 维护。召回测试菜单与页面共用 `knowledge.hitTest.title`。召回测试、智能体设置与工作流知识库检索节点共用 `KNOWLEDGE_SEARCH_MODE_OPTIONS`，在模板或 computed 中直接通过 `t` 翻译 `labelKey` / `descriptionKey`，提交仍使用协议值。图片上传限制、格式标签、校验及失败状态复用 `upload`，结果分段详情标题复用 `knowledge.paragraph.detailTitle`；查询内容与接口返回的分段、文档名称保留原文。
 翻译按业务含义归属，不与页面目录一一对应：分段字段和操作归 `knowledge.paragraph`，文档字段、操作及流程说明归 `knowledge.document`，页面可交叉引用。
 导入预览删除分段使用 `knowledge.paragraph.delete.confirm`；继续导入前的编辑未完成提示保留在 `knowledge.document.preview`。文档召回处理和删除文档的影响说明仍归 `knowledge.document`。
 跨对象共用的召回次数、最后一次召回时间归 `knowledge.stats.retrievalCount` / `lastRetrievedAt`，文档列表和分段预览共用。

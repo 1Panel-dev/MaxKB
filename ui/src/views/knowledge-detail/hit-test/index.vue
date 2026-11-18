@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeHitTestPayload, KnowledgeHitTestResult, ParagraphItem } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { FormInstance } from 'element-plus'
@@ -18,6 +19,7 @@ defineOptions({ name: 'HitTestView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ hideHeader: true })
 
+const { t } = useI18n({ useScope: 'global' })
 const { knowledge, knowledgeId, resourceApi } = useKnowledgeDetailContext({ resourceScopes: ['workspace', 'system-resource', 'system-shared'] })
 
 // 检索参数与待测试内容，仅通用知识库支持查询图片。
@@ -110,21 +112,21 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
     <el-scrollbar class="min-h-0 min-w-0" view-class="px-6 pb-6">
       <header class="flex-align-center gap-2 py-4">
         <h4>{{ title }}</h4>
-        <MkTooltip content="针对用户提问召回匹配的知识内容，保障回答效果" placement="right">
+        <MkTooltip :content="t('knowledge.hitTest.description')" placement="right">
           <MkIcon name="icon_info_outlined" class="text-N600!" />
         </MkTooltip>
       </header>
       <el-card shadow="never" class="has-bottom-arrow mb-5">
-        <h4 class="mb-4">检索参数</h4>
+        <h4 class="mb-4">{{ t('knowledge.retrieval.parameters') }}</h4>
         <el-form ref="searchFormRef" :model="searchForm" label-position="top" require-asterisk-position="right" @submit.prevent>
-          <el-form-item label="检索模式">
+          <el-form-item :label="t('knowledge.retrieval.mode')">
             <!-- 选择检索模式 -->
             <el-radio-group v-model="searchForm.search_mode" @change="changeSearchMode" class="space-y-2">
               <template v-for="searchMode in KNOWLEDGE_SEARCH_MODE_OPTIONS" :key="searchMode.value">
                 <el-card shadow="never" class="w-full!" :class="{ 'border-primary!': searchForm.search_mode === searchMode.value }">
                   <el-radio :value="searchMode.value" class="mk-card-radio">
-                    <h6>{{ searchMode.label }}</h6>
-                    <span class="block text-sm text-N600">{{ searchMode.description }}</span>
+                    <h6>{{ t(searchMode.labelKey) }}</h6>
+                    <span class="block text-sm text-N600">{{ t(searchMode.descriptionKey) }}</span>
                   </el-radio>
                 </el-card>
               </template>
@@ -134,8 +136,10 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
             <el-form-item class="mb-0!">
               <template #label>
                 <span class="flex-align-center gap-1">
-                  相似度高于
-                  <MkTooltip content="相似度越高相关性越强。" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip>
+                  {{ t('knowledge.retrieval.similarity.label') }}
+                  <MkTooltip :content="t('knowledge.retrieval.similarity.description')" placement="right">
+                    <MkIcon name="icon_info_outlined" class="text-N600!" />
+                  </MkTooltip>
                 </span>
               </template>
               <!-- 设置相似度阈值 -->
@@ -151,7 +155,7 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
                 align="left"
               />
             </el-form-item>
-            <el-form-item label="召回分段数 TOP" class="mb-0!">
+            <el-form-item :label="t('knowledge.retrieval.topNumber')" class="mb-0!">
               <!-- 设置召回数量 -->
               <el-input-number
                 v-model="searchForm.top_number"
@@ -179,11 +183,11 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
     <section v-loading="loading" class="min-h-0 min-w-0 border-l">
       <el-scrollbar height="100%" view-class="flex-column min-h-full p-4">
         <div v-if="!hasTestResult" class="flex-center flex-1">
-          <MkEmpty :image="emptyHitTestImage" description="召回的知识显示在这里" :image-size="125" />
+          <MkEmpty :image="emptyHitTestImage" :description="t('knowledge.hitTest.results.initialEmpty')" :image-size="125" />
         </div>
         <template v-else>
           <section class="mb-6">
-            <h4 class="mb-2">本次查询</h4>
+            <h4 class="mb-2">{{ t('knowledge.hitTest.query.title') }}</h4>
             <div v-if="submittedQuery.image_list.length" class="flex flex-wrap gap-2">
               <template v-for="image in submittedQuery.image_list" :key="image.file_id">
                 <!-- 预览本次查询图片 -->
@@ -192,9 +196,9 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
             </div>
             <p v-if="submittedQuery.query_text" class="mt-2 whitespace-pre-wrap break-words">{{ submittedQuery.query_text }}</p>
           </section>
-          <h4 class="mb-3">查询结果</h4>
+          <h4 class="mb-3">{{ t('knowledge.hitTest.results.title') }}</h4>
           <div v-if="!resultParagraphs.length" class="flex-center flex-1">
-            <MkEmpty type="search" description="未召回相关知识，请调整检索参数内容" />
+            <MkEmpty type="search" :description="t('knowledge.hitTest.results.empty')" />
           </div>
           <div v-else class="space-y-3">
             <template v-for="(paragraph, paragraphIndex) in resultParagraphs" :key="paragraph.id">
@@ -210,7 +214,13 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
                 <template #tag>
                   <div class="flex-align-center gap-2">
                     <el-tag size="small" type="info">
-                      {{ paragraph.hit_unit_type === KNOWLEDGE_HIT_UNIT_TYPE.IMAGE ? '图片向量' : '文本向量' }}
+                      {{
+                        t(
+                          paragraph.hit_unit_type === KNOWLEDGE_HIT_UNIT_TYPE.IMAGE
+                            ? 'knowledge.hitTest.imageVector'
+                            : 'knowledge.hitTest.textVector',
+                        )
+                      }}
                     </el-tag>
                     <h6 class="shrink-0 text-primary">{{ paragraph.similarity.toFixed(3) }}</h6>
                   </div>
@@ -246,7 +256,7 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
     v-if="selectedParagraph"
     ref="paragraphDialogRef"
     :readonly="!canEditParagraph(selectedParagraph)"
-    title="分段详情"
+    :title="t('knowledge.paragraph.detailTitle')"
     :knowledge-id="selectedParagraph.knowledge_id"
     :document-id="selectedParagraph.document_id"
     :source-file-id="selectedParagraph.document_image_id || undefined"

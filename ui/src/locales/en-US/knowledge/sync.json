@@ -15,7 +15,7 @@
       "label": "Full sync",
       "description": "Fetch and rebuild all documents from this source. Keep documents from other sources."
     },
-    "incrementalWarning": "Incremental sync updates the paragraphs of changed documents and skips unchanged documents.",
+    "incrementalWarning": "Incremental sync updates the segments of changed documents and skips unchanged documents.",
     "rebuildWarning": "Sync deletes existing data before fetching fresh data. Proceed with care.",
     "taskSubmitted": "Sync task submitted"
   },

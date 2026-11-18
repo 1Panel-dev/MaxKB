@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ProblemItem, ProblemParagraph } from '@/api/types'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import ParagraphDialog from '@/views/document-detail/paragraph-dialog/ParagraphDialog.vue'
@@ -23,6 +24,7 @@ function knowledgeProblemPermission(method: KnowledgeProblemPermissionMethod): b
 }
 
 defineOptions({ name: 'ProblemDetailDrawer' })
+const { t } = useI18n({ useScope: 'global' })
 const problem = defineModel<ProblemItem>({ required: true })
 defineProps<{ hasPrevious: boolean; hasNext: boolean }>()
 const emit = defineEmits<{ previous: []; next: []; refresh: []; closed: []; associate: [] }>()
@@ -60,7 +62,7 @@ function handleSaveProblem(content: string): Promise<string> {
   return resourceApi.problem
     .putProblem(knowledgeId.value, problem.value.id, content)
     .then(() => {
-      MsgSuccess('修改成功')
+      MsgSuccess(t('common.messages.updateSuccess'))
       emit('refresh')
       return content
     })
@@ -75,7 +77,7 @@ function handleUnlinkParagraph(paragraph: ProblemParagraph) {
   return resourceApi.paragraph
     .putUnassociateParagraphProblem(knowledgeId.value, paragraph.document_id, paragraph.id, problem.value.id)
     .then(() => {
-      MsgSuccess('取消关联成功')
+      MsgSuccess(t('common.messages.unrelateSuccess'))
       emit('refresh')
       return loadParagraphs()
     })
@@ -116,13 +118,13 @@ defineExpose({ refresh: handleLoadParagraphs })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="问题详情" size="840" @closed="emit('closed')">
+  <MkDrawer v-model="visible" :title="t('knowledge.question.detailTitle')" size="840" @closed="emit('closed')">
     <div v-loading="loading">
       <div class="mb-4">
-        <div class="mb-2">问题</div>
+        <div class="mb-2">{{ t('knowledge.question.title') }}</div>
         <MkEditName :key="problem.id" v-model="problem.content" :maxlength="256" :save="handleSaveProblem" :title="problem.content" />
       </div>
-      <div class="mb-2">关联分段数（{{ problem.paragraph_count }}）</div>
+      <div class="mb-2">{{ t('knowledge.question.paragraphs.count') }} ({{ problem.paragraph_count }})</div>
       <div v-if="paragraphs.length" class="flex-column gap-3">
         <template v-for="paragraph in paragraphs" :key="paragraph.id">
           <!-- 查看关联分段详情 -->
@@ -134,7 +136,7 @@ defineExpose({ refresh: handleLoadParagraphs })
           >
             <!-- 取消当前问题与分段的关联，不删除分段 -->
             <div class="group-hover-visible sticky top-3 z-20 h-0" @click.stop>
-              <MkTooltip content="取消关联" placement="top">
+              <MkTooltip :content="t('common.actions.unrelate')" placement="top">
                 <el-button circle class="absolute top-0 right-0 shadow-md" :disabled="loading" @click.stop="handleUnlinkParagraph(paragraph)">
                   <MkIcon name="icon_unlink_outlined" />
                 </el-button>
@@ -153,7 +155,7 @@ defineExpose({ refresh: handleLoadParagraphs })
             <h4 class="mb-2">{{ paragraph.title || '-' }}</h4>
             <MdPreview :model-value="paragraph.content" />
             <div class="flex-align-center gap-2 text-sm text-N600">
-              <span class="shrink-0">{{ paragraph.content.length }} 字符</span>
+              <span class="shrink-0">{{ paragraph.content.length }} {{ t('knowledge.stats.characters', paragraph.content.length) }}</span>
               <el-divider direction="vertical" />
               <img
                 :src="
@@ -167,21 +169,23 @@ defineExpose({ refresh: handleLoadParagraphs })
           </el-card>
         </template>
       </div>
-      <MkEmpty v-else-if="!loading" description="暂无关联分段" />
+      <MkEmpty v-else-if="!loading" :description="t('knowledge.question.paragraphs.empty')" />
     </div>
     <template #footer>
       <!-- 关联当前问题的分段 -->
-      <el-button plain :disabled="loading" v-if="knowledgeProblemPermission('problemRelate')" @click="emit('associate')">关联分段</el-button>
+      <el-button plain :disabled="loading" v-if="knowledgeProblemPermission('problemRelate')" @click="emit('associate')">
+        {{ t('knowledge.question.paragraphs.title') }}
+      </el-button>
       <!-- 查看上一个问题 -->
-      <el-button plain :disabled="loading || !hasPrevious" @click="emit('previous')">上一个</el-button>
+      <el-button plain :disabled="loading || !hasPrevious" @click="emit('previous')">{{ t('common.actions.previousItem') }}</el-button>
       <!-- 查看下一个问题 -->
-      <el-button plain :disabled="loading || !hasNext" @click="emit('next')">下一个</el-button>
+      <el-button plain :disabled="loading || !hasNext" @click="emit('next')">{{ t('common.actions.nextItem') }}</el-button>
     </template>
   </MkDrawer>
   <ParagraphDialog
     v-if="selectedParagraph"
     ref="paragraphDialogRef"
-    title="分段详情"
+    :title="t('knowledge.paragraph.detailTitle')"
     :knowledge-id="knowledgeId"
     :document-id="selectedParagraph.document_id"
     :source-file-id="selectedParagraph.document_image_id ?? undefined"

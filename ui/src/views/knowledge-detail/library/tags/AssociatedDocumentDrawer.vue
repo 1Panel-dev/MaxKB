@@ -122,7 +122,7 @@ function handleLinkDocuments(documentIds: string[]) {
     : props.tagsApi.postBatchAddDocumentTags?.(props.knowledgeId, documentIds, [currentTag.value.id])
   return (
     request?.then(() => {
-      MsgSuccess(unlink ? t('common.messages.unlinkSuccess') : t('common.messages.linkSuccess'))
+      MsgSuccess(unlink ? t('common.messages.unrelateSuccess') : t('common.messages.relateSuccess'))
       emit('refresh')
       return loadDocuments()
     }) ?? Promise.resolve()
@@ -153,14 +153,14 @@ defineExpose({ open })
   <MkDrawer v-model="visible" :title="title" size="840" @closed="resetData">
     <div class="flex-column gap-4" :inert="loading">
       <el-tabs v-model="activeTab" :before-leave="() => !loading" @tab-change="handleTabChange">
-        <el-tab-pane :label="t('knowledge.tags.documents.linked')" name="linked" />
-        <el-tab-pane :label="t('knowledge.tags.documents.unlinked')" name="unlinked" />
+        <el-tab-pane :label="t('knowledge.tags.documents.related')" name="linked" />
+        <el-tab-pane :label="t('knowledge.tags.documents.unrelated')" name="unlinked" />
       </el-tabs>
       <div class="flex-between gap-3">
         <!-- 批量关联或取消关联文档 -->
         <el-button plain :disabled="!selectedDocuments.length || (loading && !knowledgeDocPermission('docEdit'))" @click="handleBatchLinkDocuments">
           <MkIcon :name="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'" />
-          <span>{{ activeTab === 'linked' ? t('common.actions.unlink') : t('common.actions.link') }}</span>
+          <span>{{ activeTab === 'linked' ? t('common.actions.unrelate') : t('common.actions.relate') }}</span>
         </el-button>
         <MkComplexSearch :key="activeTab" :fields="[{ label: t('common.name.label'), value: 'name' }]" @change="handleComplexSearchChange" />
       </div>
@@ -196,7 +196,7 @@ defineExpose({ open })
             <MkStatusLabel :active="row.is_active" />
           </template>
         </el-table-column>
-        <el-table-column prop="create_time" :label="t('common.labels.createdAt')" width="180">
+        <el-table-column prop="create_time" :label="t('common.labels.createTime')" width="180">
           <template #default="{ row }: { row: DocumentItem }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
         <el-table-column :label="t('common.labels.operation')" width="70" fixed="right">
@@ -204,7 +204,7 @@ defineExpose({ open })
             <!-- 关联或取消关联当前文档 -->
             <MkAction
               display="button"
-              :label="activeTab === 'linked' ? t('common.actions.unlink') : t('common.actions.link')"
+              :label="activeTab === 'linked' ? t('common.actions.unrelate') : t('common.actions.relate')"
               :icon="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'"
               :disabled="loading && !knowledgeDocPermission('docEdit')"
               @click="handleLinkDocuments([row.id])"

@@ -115,7 +115,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.hitTest(),
               next: 'system-resource-knowledge-problem',
-              title: 'knowledge.menu.hitTest',
+              title: 'knowledge.hitTest.title',
               order: 10,
             },
           },
@@ -126,7 +126,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.problemRead(),
               next: 'system-resource-knowledge-dictionary',
-              title: 'knowledge.menu.questions',
+              title: 'knowledge.question.title',
               order: 20,
             },
           },
@@ -137,7 +137,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.termbaseRead(),
               next: 'system-resource-knowledge-integration',
-              title: 'knowledge.menu.termbase',
+              title: 'knowledge.termbase.title',
               order: 30,
             },
           },

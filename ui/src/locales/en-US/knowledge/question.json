@@ -1,0 +1,20 @@
+{
+  "question": {
+    "title": "Questions",
+    "detailTitle": "Question details",
+    "content": {
+      "placeholder": "Enter a question",
+      "batchPlaceholder": "Enter questions, one per line",
+      "lengthMessage": "Each question cannot exceed {max} characters."
+    },
+    "paragraphs": {
+      "title": "Relate segments",
+      "count": "Related Segments",
+      "empty": "No related segments"
+    },
+    "actions": {
+      "create": "Create questions",
+      "quickCreate": "Quick create question"
+    }
+  }
+}

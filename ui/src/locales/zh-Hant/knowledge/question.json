@@ -1,0 +1,20 @@
+{
+  "question": {
+    "title": "問題",
+    "detailTitle": "問題詳情",
+    "content": {
+      "placeholder": "請輸入問題",
+      "batchPlaceholder": "請輸入問題，一行一個，支援輸入多個",
+      "lengthMessage": "每個問題最多輸入 {max} 個字元"
+    },
+    "paragraphs": {
+      "title": "關聯分段",
+      "count": "關聯分段數",
+      "empty": "暫無關聯分段"
+    },
+    "actions": {
+      "create": "建立問題",
+      "quickCreate": "快速建立問題"
+    }
+  }
+}

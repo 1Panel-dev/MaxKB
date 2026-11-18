@@ -1,0 +1,20 @@
+{
+  "question": {
+    "title": "问题",
+    "detailTitle": "问题详情",
+    "content": {
+      "placeholder": "请输入问题",
+      "batchPlaceholder": "请输入问题，一行一个，支持输入多个",
+      "lengthMessage": "每个问题最多输入 {max} 个字符"
+    },
+    "paragraphs": {
+      "title": "关联分段",
+      "count": "关联分段数",
+      "empty": "暂无关联分段"
+    },
+    "actions": {
+      "create": "创建问题",
+      "quickCreate": "快速创建问题"
+    }
+  }
+}

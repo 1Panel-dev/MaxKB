@@ -1,0 +1,40 @@
+{
+  "retrieval": {
+    "parameters": "檢索參數",
+    "mode": "檢索模式",
+    "embedding": {
+      "label": "向量檢索",
+      "description": "向量檢索是一種基於向量相似度的檢索方式，適用於知識庫中的大資料量場景。"
+    },
+    "keywords": {
+      "label": "全文檢索",
+      "description": "全文檢索是一種基於文字相似度的檢索方式，適用於知識庫中的小資料量場景。"
+    },
+    "blend": {
+      "label": "混合檢索",
+      "description": "混合檢索是一種基於向量和文字相似度的檢索方式，適用於知識庫中的中等資料量場景。"
+    },
+    "similarity": {
+      "label": "相似度高於",
+      "description": "相似度越高相關性越強。"
+    },
+    "topNumber": "召回分段數 TOP"
+  },
+  "hitTest": {
+    "title": "召回測試",
+    "description": "針對使用者提問召回匹配的知識內容，保障回答效果",
+    "query": {
+      "title": "本次查詢",
+      "placeholder": "請輸入測試內容",
+      "imageDropHint": "可拖曳到輸入框內上傳圖片"
+    },
+    "results": {
+      "title": "查詢結果",
+      "initialEmpty": "召回的知識顯示在這裡",
+      "empty": "未召回相關知識，請調整檢索參數內容"
+    },
+    "imageVector": "圖片向量",
+    "textVector": "文字向量",
+    "test": "測試"
+  }
+}
