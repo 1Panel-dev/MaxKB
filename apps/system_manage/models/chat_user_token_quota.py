@@ -6,7 +6,8 @@
 """
 
 import uuid_utils.compat as uuid
-from django.db import models
+from django.db import models, transaction
+from django.db.models import F
 
 from common.exception.app_exception import AppApiException
 from common.mixins.app_model_mixin import AppModelMixin
@@ -74,30 +75,31 @@ class ChatUserTokenQuota(AppModelMixin):
         """
         if amount <= 0:
             return
-        quota = cls.objects.filter(user_id=user_id).first()
-        if quota is None:
-            # 所有消费用户都创建统计行，匿名用户也累计使用量
-            quota, _created = cls.objects.get_or_create(
+        with transaction.atomic():
+            quota, created = cls.objects.get_or_create(
                 user_id=user_id,
                 defaults={"quota_type": QuotaType.UNLIMITED},
             )
-        quota.check_and_reset()
-        # 记录实际使用量：即使超出上限也如实累计，拦截交给下次对话前的 check_available
-        quota.used_tokens += amount
-        quota.total_tokens += amount
-        quota.save(update_fields=["used_tokens", "total_tokens"])
+            if not created:
+                quota = cls.objects.select_for_update().get(pk=quota.pk)
+            quota.check_and_reset()
+            cls.objects.filter(pk=quota.pk).update(
+                used_tokens=F("used_tokens") + amount,
+                total_tokens=F("total_tokens") + amount,
+            )
 
     @classmethod
     def check_available(cls, user_id):
         """对话前预校验：当前周期配额已用满或超限则抛 AppApiException，不写库。"""
-        quota = cls.objects.filter(user_id=user_id).first()
-        if quota is None:
-            return
-        if quota.quota_type == QuotaType.UNLIMITED:
-            return
-        quota.check_and_reset()
-        if quota.token_limit is not None and quota.used_tokens >= quota.token_limit:
-            raise AppApiException(
-                500,
-                _("The token quota for the current period has been exhausted. Please contact the administrator."),
-            )
+        with transaction.atomic():
+            quota = cls.objects.select_for_update().filter(user_id=user_id).first()
+            if quota is None:
+                return
+            if quota.quota_type == QuotaType.UNLIMITED:
+                return
+            quota.check_and_reset()
+            if quota.token_limit is not None and quota.used_tokens >= quota.token_limit:
+                raise AppApiException(
+                    500,
+                    _("The token quota for the current period has been exhausted. Please contact the administrator."),
+                )
