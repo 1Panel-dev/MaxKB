@@ -19,6 +19,12 @@ function requestSnapshot(iframe: HTMLIFrameElement): Promise<string> {
   })
 }
 
+// 单张图片加载失败（如 icon 接口 500）时以透明像素占位，避免整次导出失败。
+const IMAGE_FALLBACK_OPTIONS = {
+  imagePlaceholder: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+  onImageErrorHandler: () => undefined,
+}
+
 export async function captureMessages(element: HTMLElement): Promise<HTMLCanvasElement> {
   const { toCanvas } = await import('html-to-image')
   await document.fonts.ready
@@ -44,7 +50,7 @@ export async function captureMessages(element: HTMLElement): Promise<HTMLCanvasE
       const root = frame.contentDocument?.documentElement
       if (!root) throw new Error('无法读取快照')
       await frame.contentDocument?.fonts.ready
-      const canvas = await toCanvas(root, { pixelRatio: 2, width: iframe.offsetWidth, height: iframe.offsetHeight })
+      const canvas = await toCanvas(root, { ...IMAGE_FALLBACK_OPTIONS, pixelRatio: 2, width: iframe.offsetWidth, height: iframe.offsetHeight })
       const image = new Image()
       image.src = canvas.toDataURL()
       image.style.cssText = iframe.style.cssText
@@ -56,10 +62,18 @@ export async function captureMessages(element: HTMLElement): Promise<HTMLCanvasE
       iframe.style.display = 'none'
     }
     return await toCanvas(element, {
+      ...IMAGE_FALLBACK_OPTIONS,
       pixelRatio: 2,
       backgroundColor: '#ffffff',
+      // 克隆根节点会把居中的 margin-inline: auto 固化为像素值，导致内容右移并被裁切。
+      style: { margin: '0' },
+      // 过滤操作按钮；属于对话内容的按钮（如快捷问题）以 mk-conversation-export-include 保留。
       filter: (node) =>
-        !(node instanceof HTMLElement && (node.matches('button, .mk-conversation-export-exclude') || node.getAttribute('role') === 'button')),
+        !(
+          node instanceof HTMLElement &&
+          !node.matches('.mk-conversation-export-include') &&
+          (node.matches('button, .mk-conversation-export-exclude') || node.getAttribute('role') === 'button')
+        ),
     })
   } finally {
     replacements.forEach(({ iframe, image, display }) => {
