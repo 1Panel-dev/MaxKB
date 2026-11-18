@@ -61,25 +61,25 @@ const applicationData = ref<ApplicationDetail[]>([])
 const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
-  { label: '名称', value: 'name' },
+  { label: t('common.name.label'), value: 'name' },
   {
-    label: '状态',
+    label: t('common.status.label'),
     value: 'status',
     options: [
-      { label: '未发布', value: 'unpublished' },
-      { label: '已发布', value: 'published' },
-      { label: '已上架', value: 'on_portal' },
+      { label: t('application.status.unpublished'), value: 'unpublished' },
+      { label: t('application.status.published'), value: 'published' },
+      { label: t('application.status.onPortal'), value: 'on_portal' },
     ],
   },
   {
-    label: '类型',
+    label: t('common.labels.type'),
     value: 'type',
     options: [
-      { label: '简易', value: APPLICATION_TYPE.SIMPLE },
-      { label: '高级', value: APPLICATION_TYPE.WORK_FLOW },
+      { label: t('application.simple.shortLabel'), value: APPLICATION_TYPE.SIMPLE },
+      { label: t('application.advanced.shortLabel'), value: APPLICATION_TYPE.WORK_FLOW },
     ],
   },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 const applicationQuery = ref<Dict<unknown>>()
 
@@ -163,7 +163,7 @@ function handleBatchMove(targetFolderId: string) {
   applicationOperationLoading.value = true
   return ApplicationApi.putBatchMoveApplications(applicationIds, targetFolderId)
     .then(() => {
-      MsgSuccess('移动成功')
+      MsgSuccess(t('common.messages.moveSuccess'))
       batchMoveToDialogRef.value?.close()
       cancelBatchSelection()
       return refreshApplications()
@@ -178,11 +178,11 @@ function handleBatchDelete() {
   if (!selectedApplicationCount.value) return
   const applicationIds = [...selectedApplicationIds.value]
 
-  MsgConfirm(`是否批量删除 ${applicationIds.length} 个智能体？`, '删除后无法恢复，请谨慎操作。')
+  MsgConfirm(`${t('application.delete.batchTitle', { count: applicationIds.length })}?`, t('common.dialogs.deleteWarning'))
     .then(() => {
       applicationOperationLoading.value = true
       return ApplicationApi.putBatchDeleteApplications(applicationIds).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         cancelBatchSelection()
         return refreshApplications()
       })
@@ -195,7 +195,7 @@ function handleBatchDelete() {
 </script>
 
 <template>
-  <MkViewLayout class="workspace-application-view" collapsible resizable>
+  <MkViewLayout :title="t('application.title')" class="workspace-application-view" collapsible resizable>
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -230,7 +230,7 @@ function handleBatchDelete() {
           >
             <el-button :disabled="!applicationData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
               <MkIcon name="icon_Batch_outlined" />
-              <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
+              <span>{{ t(batchSelectionMode ? 'common.actions.cancelSelection' : 'common.actions.batchSelect') }}</span>
             </el-button>
           </span>
 
@@ -256,11 +256,15 @@ function handleBatchDelete() {
               >
                 <template #action-dropdown>
                   <!-- 设置 -->
-                  <SettingApplicationAction v-if="perm.application.workspace.edit(application.id)" label="设置" :application="application" />
+                  <SettingApplicationAction
+                    v-if="perm.application.workspace.edit(application.id)"
+                    :label="t('common.labels.settings')"
+                    :application="application"
+                  />
                   <!-- 智能体触发器 -->
                   <TriggerApplicationAction
                     v-if="perm.application.workspace.triggerRead(application.id)"
-                    label="触发器"
+                    :label="t('resource.triggers.title')"
                     :api="ResourceTriggerApi"
                     :application-api="ApplicationApi"
                     :application="application"
@@ -268,22 +272,26 @@ function handleBatchDelete() {
                   <!-- MCP 服务配置 -->
                   <McpConfigApplicationAction
                     v-if="perm.application.workspace.mcpConfig(application.id)"
-                    label="MCP 服务配置"
+                    :label="t('resource.mcpConfig.title')"
                     :application="application"
                   />
                   <!-- 资源授权 -->
-                  <AuthorizeApplicationAction v-if="perm.application.workspace.auth(application.id)" label="资源授权" :application="application" />
+                  <AuthorizeApplicationAction
+                    v-if="perm.application.workspace.auth(application.id)"
+                    :label="t('resource.authorization.title')"
+                    :application="application"
+                  />
                   <!-- 查看关联资源 -->
                   <RelatedResourcesApplicationAction
                     v-if="perm.application.workspace.relateMap(application.id)"
-                    label="查看关联资源"
+                    :label="t('resource.relations.title')"
                     :api="RelatedResourcesApi"
                     :application="application"
                   />
                   <!-- 复制 -->
                   <CopyApplicationAction
                     v-model:loading="applicationOperationLoading"
-                    label="复制"
+                    :label="t('common.actions.duplicate')"
                     :api="ApplicationApi"
                     :application="application"
                     :folder-id="currentFolder.id"
@@ -311,7 +319,7 @@ function handleBatchDelete() {
                   <!-- 导出 -->
                   <ExportApplicationAction
                     v-model:loading="applicationOperationLoading"
-                    label="导出"
+                    :label="t('common.actions.export')"
                     :api="ApplicationApi"
                     :application="application"
                     v-if="perm.application.workspace.export(application.id) || perm.application.workspace.exportSkills(application.id)"
@@ -319,7 +327,7 @@ function handleBatchDelete() {
                   <!-- 删除 -->
                   <DeleteApplicationAction
                     v-model:loading="applicationOperationLoading"
-                    label="删除"
+                    :label="t('common.actions.delete')"
                     :api="ApplicationApi"
                     :application="application"
                     @delete="handleDeleteApplication"
@@ -365,7 +373,7 @@ function handleBatchDelete() {
             :disabled="!selectedApplicationCount"
             @click="handleBatchDelete"
           >
-            删除
+            {{ t('common.actions.delete') }}
           </el-button>
         </template>
       </component>

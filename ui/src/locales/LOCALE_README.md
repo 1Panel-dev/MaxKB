@@ -147,6 +147,21 @@ MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 
 参数表头及提示说明复用 `dynamicForm.fields`，模型和工具共用 `common.parameters.add`、`common.parameters.edit`。
 参数来源只翻译选项标签，`reference`、`custom` 和数据类型沿用协议值。
 
+## 智能体
+
+`application/` 按业务场景拆分语言文件，合并为同一个 `application` 命名空间。`index.json` 维护列表、卡片、类型、创建与复制表单、发布状态及基础操作。
+工作空间列表、系统资源管理列表和资源授权分类共用 `application.title`，内置文件夹共用 `application.categories`；自建文件夹、智能体名称和描述展示原值。
+`application.simple` / `advanced` 的 `label` 用于创建菜单中的完整类型名称，`shortLabel` 用于筛选与卡片标签，`createTitle` 用于创建弹窗，`description` 用于类型说明；提交仍使用 `APPLICATION_TYPE` 的原协议值。
+创建与复制表单在 `application/index.json` 中维护：名称和描述提示归 `application.fields`，描述占位统一使用包含应用场景、用途和示例的完整说明；模板选项归 `application.template`，知识库问答助手的名称与说明归其 `assistant` 分组，复制标题归 `application.duplicate`。字段标签、通用按钮和成功提示复用 `common`；创建副本使用 `common.messages.duplicateSuccess`，复制到剪贴板使用 `common.messages.copied`。
+复制名称按“原名称 + 空格 + `common.name.copySuffix`”组合，并根据当前语言后缀的长度保留 64 字符限制。表单中的用户内容、模板中心返回的名称与描述、创建时写入的默认提示词和工作流模板配置保持原值。
+发布和门户上架状态归 `application.status`，发布时间归 `application.publishTime`，门户上下架操作及提示归 `application.portal`。名称、创建者、创建时间和通用操作复用 `common`，工作空间列复用 `workspace.title`。
+智能体导出入口及 Skills 访问地址提示归 `application.export`，删除确认归 `application.delete`；错误原因、导出文件名和 MCP 配置内容保留原值。
+MCP、资源授权、关联资源、触发器和模板中心入口复用 `resource`，文件夹移动入口复用 `folder`；保存、导入、删除、移动、复制和导出失败提示复用 `common`。
+对话日志的语言文件为 `application/chat-log.json`，使用 `application.chatLog`。工作空间和系统资源管理的日志路由与页面共用 `title`；表头归 `labels`，用户反馈筛选归 `feedback`，来源标签与选项归 `source`。来源通过常量维护协议值到翻译 key 的映射，在展示时统一调用 `t`，Slack 在三语中均保留品牌名；未知来源保留接口原值。
+单个和批量清除策略共用 `cleanStrategy`，标题使用 `title`，天数输入框前后的说明分别使用对应的 `Prefix` / `Suffix`，保留原交互顺序并按天数处理英文单复数。添加到知识库的按钮和弹窗共用 `addKnowledge.title`，知识库与目标文档字段复用 `knowledge.fields.targetKnowledge` / `knowledge.document.target`。通用操作、成功提示和详情翻页复用 `common`；摘要、用户名、知识库与文档名称展示原值。
+发布渠道使用 `application/access.json` 中的 `access` 分组，两种资源范围的菜单共用 `application.access.title`；渠道名称与说明分别归各渠道的 `label` / `description`，配置入口归 `actions`，未配置状态归 `states`，抽屉标题使用 `configurationTitle`。卡片和抽屉通过已有渠道标识 `platform.key` 统一调用 `t`，Slack 同样使用 `label`，三语文案均为品牌名；功能本地 `platforms.ts` 维护平台标识、图标、配置字段与后台链接，不重复维护渠道名称和说明。
+连接方式及共用说明归 `access.connection`，回调地址与填写引导归 `access.callback`，平台后台名称归 `access.consoles`；特定渠道的字段名、连接说明、认证状态和后台路径指引归对应渠道分组。固定英文参数名称直接使用 `label`，需要翻译的字段只提供 `labelKey`；抽屉在现有 computed 中通过 `t` 生成显示标签。连接选项使用 `labelKey` / `tipKey`，保留原有的 `ws`、`stream`、`callback` 协议值。输入占位与必填提示分别复用 `common.placeholders.inputField` / `common.validation.inputFieldRequired`，语言切换不主动触发表单校验。平台协议值、配置字段名、默认连接方式、必填条件、回调地址与外部链接保持原值；启停、保存和复制成功提示复用 `common.messages`。
+
 ## 知识库列表
 
 英文界面将“知识库”统一译为 `knowledge`，独立标题写作 `Knowledge`，例如“全部知识库”为 `All knowledge`。
@@ -170,7 +185,7 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 自定义分词的标题、用途说明、词语字段及创建入口归 `knowledge.termbase`，在 `knowledge/termbase.json` 维护；英文沿用 v2 的 `term` 用词，标题为 `Custom term`，创建入口为 `Create term`。四种资源范围的菜单与列表共用 `title`，创建按钮和弹窗共用 `actions.create`。词语标签、单行与多行输入占位归 `content`；时间、通用操作及创建／删除／导出成功提示复用 `common`。词语内容和导出文件名保持原值。
 检索参数、模式名称及说明归 `knowledge.retrieval`；召回测试标题、输入、结果及空状态归 `knowledge.hitTest`，两组在 `knowledge/retrieval.json` 维护。召回测试菜单与页面共用 `knowledge.hitTest.title`。召回测试、智能体设置与工作流知识库检索节点共用 `KNOWLEDGE_SEARCH_MODE_OPTIONS`，在模板或 computed 中直接通过 `t` 翻译 `labelKey` / `descriptionKey`，提交仍使用协议值。图片上传限制、格式标签、校验及失败状态复用 `upload`，结果分段详情标题复用 `knowledge.paragraph.detailTitle`；查询内容与接口返回的分段、文档名称保留原文。
 翻译按业务含义归属，不与页面目录一一对应：分段字段和操作归 `knowledge.paragraph`，文档字段、操作及流程说明归 `knowledge.document`，页面可交叉引用。
-对话用户授权属于跨资源业务，标题、用户组分组、用户字段、来源标签及授权状态归 `resource.chatUserAuthorization`。知识库四种资源范围的菜单共用其 `title`；保存按钮和成功提示复用 `common`，钉钉、飞书和企业微信名称复用 `auth.login.options`。搜索与来源筛选的选项在 computed 中生成；用户名、用户组名称和未知来源保留原文，筛选与授权请求使用原协议值。已授权人数在模板中按“已授权 数量”组合，不建立数量格式翻译键。
+对话用户授权属于跨资源业务，标题、用户组分组、用户字段、来源标签及授权状态归 `resource.chatUserAuthorization`。智能体的工作空间／系统资源管理菜单与知识库四种资源范围的菜单共用其 `title`；保存按钮和成功提示复用 `common`，钉钉、飞书和企业微信名称复用 `auth.login.options`。搜索与来源筛选的选项在 computed 中生成；用户名、用户组名称和未知来源保留原文，筛选与授权请求使用原协议值。已授权人数在模板中按“已授权 数量”组合，不建立数量格式翻译键。
 外部检索服务的标题、开关及说明、API 调用示例标签和加载失败提示归 `knowledge.externalRetrieval`，在 `knowledge/retrieval.json` 维护；四种资源范围的菜单共用 `title`。MCP 配置标题复用 `resource.mcpConfig.title`，重新加载、保存和复制成功提示复用 `common`。接口返回的 API 示例及 MCP 配置保持原文，只按既有规则对齐访问地址；调用复制工具时传入当前语言的成功提示。
 导入预览删除分段使用 `knowledge.paragraph.delete.confirm`；继续导入前的编辑未完成提示保留在 `knowledge.document.preview`。文档召回处理和删除文档的影响说明仍归 `knowledge.document`。
 跨对象共用的召回次数、最后一次召回时间归 `knowledge.stats.retrievalCount` / `lastRetrievedAt`，文档列表和分段预览共用。

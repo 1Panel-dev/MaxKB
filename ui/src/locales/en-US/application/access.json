@@ -1,0 +1,67 @@
+{
+  "access": {
+    "title": "Publishing channels",
+    "configurationTitle": "{name} configuration",
+    "actions": {
+      "configure": "Configure"
+    },
+    "states": {
+      "unconfigured": "Not configured"
+    },
+    "connection": {
+      "label": "Connection method",
+      "longConnection": "Use a persistent connection",
+      "callback": "Use a callback URL",
+      "callbackHint": "Receive messages and return results through a configured callback URL"
+    },
+    "callback": {
+      "label": "Callback URL",
+      "pasteHint": "Copy the URL into"
+    },
+    "consoles": {
+      "wecom": "WeCom admin console",
+      "dingtalk": "DingTalk Open Platform",
+      "wechat": "WeChat Official Accounts Platform",
+      "lark": "Lark Developer Console"
+    },
+    "wecomBot": {
+      "label": "WeCom AI bot",
+      "description": "Build a WeCom AI bot",
+      "longConnectionHint": "Receive messages and return results without a domain name or IP address",
+      "callbackTip": "- Smart Zone - AI bots - Create bot - API mode - \"URL\""
+    },
+    "wecom": {
+      "label": "WeCom app",
+      "description": "Build a WeCom agent",
+      "corporationId": "Corp ID",
+      "callbackTip": "- App management - Custom apps - Your app - Receive messages - API settings - \"URL\""
+    },
+    "dingtalk": {
+      "label": "DingTalk app",
+      "description": "Build a DingTalk agent",
+      "longConnectionHint": "Use a persistent DingTalk Stream connection to receive messages and return results without a domain name or IP address",
+      "callbackTip": "- On the bot page, set \"Message receiving mode\" to HTTP mode and paste the URL above into \"Message receiving URL\""
+    },
+    "wechat": {
+      "label": "WeChat Official Account",
+      "description": "Build a WeChat Official Account agent",
+      "developerId": "Developer ID (APP ID)",
+      "developerSecret": "Developer secret (APP SECRET)",
+      "token": "Token (TOKEN)",
+      "encodingAesKey": "Message encryption/decryption key",
+      "certified": "Verified",
+      "callbackTip": "- Settings and development - Basic configuration - Server configuration - \"Server URL\""
+    },
+    "lark": {
+      "label": "Lark app",
+      "description": "Build a Lark agent",
+      "longConnectionHint": "Use a persistent Lark WebSocket connection to receive messages and return results without configuring a subscription URL",
+      "callbackHint": "Receive messages and return results through a configured event subscription callback URL",
+      "callbackTip": "- Events and callbacks - Event configuration - Subscription method - \"Request URL\""
+    },
+    "slack": {
+      "label": "Slack",
+      "description": "Build a Slack agent"
+    }
+  }
+}

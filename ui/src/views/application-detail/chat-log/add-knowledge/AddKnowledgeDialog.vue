@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationChatLogApi } from '../../context'
 import type { DocumentItem, KnowledgeItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -12,6 +13,7 @@ import { MsgSuccess } from '@/utils/message'
 import { isSystemResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'AddKnowledgeDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ApplicationChatLogApi
   applicationId: string
@@ -32,10 +34,10 @@ const documentOptions = ref<DocumentItem[]>([])
 const knowledgeById = computed(() => new Map(knowledgeOptions.value.map((knowledge) => [knowledge.id, knowledge])))
 const formRef = useTemplateRef<FormInstance>('formRef')
 const knowledgeForm = reactive({ knowledge_id: '', document_id: '' })
-const rules: FormRules<typeof knowledgeForm> = {
-  knowledge_id: [{ required: true, message: '请选择知识库', trigger: 'change' }],
-  document_id: [{ required: true, message: '请选择文档', trigger: 'change' }],
-}
+const rules = computed<FormRules<typeof knowledgeForm>>(() => ({
+  knowledge_id: [{ required: true, message: t('knowledge.fields.targetKnowledge.requiredMessage'), trigger: 'change' }],
+  document_id: [{ required: true, message: t('knowledge.document.target.requiredMessage'), trigger: 'change' }],
+}))
 
 function open(chatIds: string[]) {
   if (visible.value || loading.value || optionLoading.value || !chatIds.length) return
@@ -84,7 +86,7 @@ async function handleSubmit() {
   return props.api
     .postChatLogAddKnowledge(props.applicationId, { ...knowledgeForm, chat_ids: [...targetChatIds.value] })
     .then(() => {
-      MsgSuccess('添加成功')
+      MsgSuccess(t('common.messages.addSuccess'))
       refreshOnClosed.value = true
       visible.value = false
     })
@@ -114,22 +116,23 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="添加到知识库" @closed="handleClosed">
+  <MkDialog v-model="visible" :title="t('application.chatLog.addKnowledge.title')" @closed="handleClosed">
     <el-form
       ref="formRef"
       v-loading="loading || optionLoading"
       :model="knowledgeForm"
       :rules="rules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="选择知识库" prop="knowledge_id">
+      <el-form-item :label="t('knowledge.fields.targetKnowledge.label')" prop="knowledge_id">
         <el-select
           v-model="knowledgeForm.knowledge_id"
           fit-input-width
           filterable
-          placeholder="请选择知识库"
+          :placeholder="t('knowledge.fields.targetKnowledge.placeholder')"
           :loading="knowledgeLoading"
           @change="handleKnowledgeChange"
         >
@@ -149,12 +152,12 @@ defineExpose({ open })
           </template>
         </el-select>
       </el-form-item>
-      <el-form-item label="保存到文档" prop="document_id">
+      <el-form-item :label="t('knowledge.document.target.label')" prop="document_id">
         <el-select
           v-model="knowledgeForm.document_id"
           fit-input-width
           filterable
-          placeholder="请选择文档"
+          :placeholder="t('knowledge.document.target.placeholder')"
           :loading="documentLoading"
           :disabled="!knowledgeForm.knowledge_id"
         >
@@ -177,9 +180,9 @@ defineExpose({ open })
     </el-form>
     <template #footer>
       <!-- 取消添加到知识库 -->
-      <el-button plain :disabled="loading || optionLoading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading || optionLoading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 确认添加到知识库 -->
-      <el-button type="primary" :loading="loading" :disabled="optionLoading" @click="handleSubmit">确认</el-button>
+      <el-button type="primary" :loading="loading" :disabled="optionLoading" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

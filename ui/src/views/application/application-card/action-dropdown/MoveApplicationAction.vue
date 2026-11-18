@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
@@ -8,6 +9,8 @@ import { FOLDER_ENTRY_ID } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'MoveApplicationAction' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ api: typeof ApplicationApi; application: ApplicationDetail; currentFolderId: string; label: string }>()
 
@@ -32,7 +35,7 @@ function handleMoveApplication(targetFolderId: string) {
       loading.value = false
     })
     .then(() => {
-      MsgSuccess('移动成功')
+      MsgSuccess(t('common.messages.moveSuccess'))
       moveToDialogRef.value?.close()
       if (props.currentFolderId !== FOLDER_ENTRY_ID.ALL) emit('delete', props.application.id)
     })

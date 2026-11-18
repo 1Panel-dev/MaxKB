@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatLog, ChatLogSource, Dict, OptionItem } from '@/api/types'
 import type { MkDateRangeValue } from '@/components/global/mk-date-range/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
@@ -8,7 +9,7 @@ import { useApplicationDetailContext } from '../context'
 import ChatLogDetailDrawer from './ChatLogDetailDrawer.vue'
 import ButtonAddKnowledge from './add-knowledge/ButtonAddKnowledge.vue'
 import ButtonCleanStrategy from './clean-strategy/ButtonCleanStrategy.vue'
-import { CHAT_LOG_SOURCE_LABELS } from './constants'
+import { CHAT_LOG_SOURCE_MESSAGE_KEYS } from './constants'
 import { toOrderBy } from '@/utils/common'
 import { isSystemResource } from '@/utils/resource-context.ts'
 import { beforeDay, datetimeFormat } from '@/utils/time'
@@ -18,10 +19,9 @@ defineOptions({ name: 'ApplicationChatLogView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 
-type ApplicationChatLogPermissionMethod =
-    | 'chatLogClear'
-    | 'chatLogExport'
-    | 'chatLogAddKnowledge'
+const { t } = useI18n({ useScope: 'global' })
+
+type ApplicationChatLogPermissionMethod = 'chatLogClear' | 'chatLogExport' | 'chatLogAddKnowledge'
 function applicationChatLogPermission(method: ApplicationChatLogPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.application.system[method]())
   return Boolean(perm.application.workspace[method](applicationId.value))
@@ -34,12 +34,14 @@ const loading = ref(false)
 const chatLogs = ref<ChatLog[]>([])
 const orderBy = ref<string>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
-const sourceOptions: OptionItem<string>[] = Object.entries(CHAT_LOG_SOURCE_LABELS).map(([value, label]) => ({ value, label }))
-const searchFields: OptionItem<string>[] = [
-  { label: '摘要', value: 'abstract' },
-  { label: '用户', value: 'username' },
-  { label: '来源', value: 'source', options: sourceOptions },
-]
+const sourceOptions = computed<OptionItem<string>[]>(() =>
+  Object.entries(CHAT_LOG_SOURCE_MESSAGE_KEYS).map(([value, key]) => ({ value, label: t(key) })),
+)
+const searchFields = computed<OptionItem<string>[]>(() => [
+  { label: t('application.chatLog.labels.abstract'), value: 'abstract' },
+  { label: t('application.chatLog.labels.user'), value: 'username' },
+  { label: t('application.chatLog.source.label'), value: 'source', options: sourceOptions.value },
+])
 const chatLogSearchQuery = ref<Dict<unknown>>()
 const chatLogDateQuery = ref({ start_time: beforeDay(7), end_time: beforeDay(0) })
 
@@ -57,10 +59,10 @@ function handleDateFilterChange({ startTime, endTime }: MkDateRangeValue) {
 
 // 表头用户反馈筛选，单选复用 min_star/min_trample 参数
 const selectedFeedback = ref<string | null>(null)
-const feedbackOptions: OptionItem<string>[] = [
-  { label: '赞同', value: 'star' },
-  { label: '反对', value: 'trample' },
-]
+const feedbackOptions = computed<OptionItem<string>[]>(() => [
+  { label: t('application.chatLog.feedback.positive'), value: 'star' },
+  { label: t('application.chatLog.feedback.negative'), value: 'trample' },
+])
 
 function handleFeedbackChange() {
   paginationConfig.value.currentPage = 1
@@ -108,7 +110,9 @@ function loadChatLogs(currentPage = paginationConfig.value.currentPage): Promise
 }
 
 function formatSource(source?: string) {
-  return source ? (CHAT_LOG_SOURCE_LABELS[source as ChatLogSource] ?? source) : '-'
+  if (!source) return '-'
+  const sourceKey = CHAT_LOG_SOURCE_MESSAGE_KEYS[source as ChatLogSource]
+  return sourceKey ? t(sourceKey) : source
 }
 
 // 对话详情的打开、关闭与跨页切换
@@ -172,7 +176,7 @@ function handleExport() {
   if (loading.value || exporting.value || !chatLogDateQuery.value.start_time) return
   exporting.value = true
   return resourceApi.chatLog
-    .postExportChatLog(applicationId.value, application.value?.name ?? '对话日志', chatLogQuery.value, {
+    .postExportChatLog(applicationId.value, application.value?.name ?? t('application.chatLog.title'), chatLogQuery.value, {
       select_ids: selectedChatLogs.value.map(({ id }) => id),
     })
     .finally(() => {
@@ -193,7 +197,7 @@ onMounted(() => loadChatLogs())
         <!-- 导出对话日志 -->
         <el-button v-if="applicationChatLogPermission('chatLogExport')" plain :loading="exporting" @click="handleExport">
           <MkIcon name="icon_export_outlined" />
-          <span>导出</span>
+          <span>{{ t('common.actions.export') }}</span>
         </el-button>
         <!-- 设置日志清除策略 -->
         <ButtonCleanStrategy v-if="applicationChatLogPermission('chatLogClear')" :api="resourceApi.chatLog" :application-id="applicationId" />
@@ -216,11 +220,17 @@ onMounted(() => loadChatLogs())
     resizable
   >
     <el-table-column type="selection" width="40" />
-    <el-table-column prop="abstract" label="摘要" min-width="220" show-overflow-tooltip />
-    <el-table-column prop="chat_record_count" label="对话次数" width="100" sortable />
-    <el-table-column width="140">
+    <el-table-column prop="abstract" :label="t('application.chatLog.labels.abstract')" min-width="220" show-overflow-tooltip />
+    <el-table-column prop="chat_record_count" :label="t('application.chatLog.labels.chatCount')" min-width="130" sortable />
+    <el-table-column min-width="150">
       <template #header>
-        <MkTableFilter v-model="selectedFeedback" mode="single" label="用户反馈" :options="feedbackOptions" @change="handleFeedbackChange" />
+        <MkTableFilter
+          v-model="selectedFeedback"
+          mode="single"
+          :label="t('application.chatLog.feedback.label')"
+          :options="feedbackOptions"
+          @change="handleFeedbackChange"
+        />
       </template>
       <template #default="{ row }">
         <span v-if="!row.star_num && !row.trample_num">-</span>
@@ -236,17 +246,17 @@ onMounted(() => loadChatLogs())
         </span>
       </template>
     </el-table-column>
-    <el-table-column prop="mark_sum" label="改进标注" width="100" />
-    <el-table-column prop="asker.username" label="用户" min-width="130" show-overflow-tooltip>
+    <el-table-column prop="mark_sum" :label="t('application.chatLog.labels.annotations')" min-width="120" />
+    <el-table-column prop="asker.username" :label="t('application.chatLog.labels.user')" min-width="130" show-overflow-tooltip>
       <template #default="{ row }">{{ row.asker?.username || '-' }}</template>
     </el-table-column>
-    <el-table-column label="IP 地址" width="140" show-overflow-tooltip>
+    <el-table-column :label="t('application.chatLog.labels.ipAddress')" width="140" show-overflow-tooltip>
       <template #default="{ row }">{{ row.ip_address || '-' }}</template>
     </el-table-column>
-    <el-table-column label="来源" min-width="140" show-overflow-tooltip>
+    <el-table-column :label="t('application.chatLog.source.label')" min-width="140" show-overflow-tooltip>
       <template #default="{ row }">{{ formatSource(row.source?.type) }}</template>
     </el-table-column>
-    <el-table-column prop="update_time" label="最近对话时间" width="180" sortable>
+    <el-table-column prop="update_time" :label="t('application.chatLog.labels.lastChatTime')" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
     </el-table-column>
     <template #footer-batch-actions>

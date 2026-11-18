@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationChatLogApi } from '../../context'
 import AddKnowledgeDialog from './AddKnowledgeDialog.vue'
 
 defineOptions({ name: 'ButtonAddKnowledge' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ApplicationChatLogApi
   applicationId: string
@@ -21,6 +23,8 @@ function handleOpenDialog() {
 
 <template>
   <!-- 批量添加对话到知识库 -->
-  <el-button type="primary" plain :disabled="disabled || !chatIds.length" @click="handleOpenDialog">添加到知识库</el-button>
+  <el-button type="primary" plain :disabled="disabled || !chatIds.length" @click="handleOpenDialog">
+    {{ t('application.chatLog.addKnowledge.title') }}
+  </el-button>
   <AddKnowledgeDialog ref="dialogRef" :api="api" :application-id="applicationId" @refresh="emit('refresh')" />
 </template>

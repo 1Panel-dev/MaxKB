@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, useTemplateRef } from 'vue'
 import { DROPDOWN_INJECTION_KEY, ElMessageBox } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail, ExportError } from '@/api/types'
@@ -8,6 +9,8 @@ import { MsgError } from '@/utils/message'
 import perm from '@/permission'
 
 defineOptions({ name: 'ExportApplicationAction' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ api: typeof ApplicationApi | typeof SystemResourceApplicationApi; application: ApplicationDetail; label: string }>()
 
@@ -33,12 +36,12 @@ const exportMenuContainer = computed(() => exportTriggerRef.value?.closest<HTMLE
 
 /** 让用户填写写入 Skills 的 MaxKB 访问地址。 */
 function promptSkillsBaseUrl(baseUrl: string) {
-  return ElMessageBox.prompt('请填写 Agent 访问 MaxKB 使用的地址，例如 http://192.168.1.10:8080', '填写访问地址', {
+  return ElMessageBox.prompt(t('application.export.baseUrl.description'), t('application.export.baseUrl.label'), {
     inputValue: baseUrl,
     inputPattern: /^https?:\/\/\S+$/,
-    inputErrorMessage: '请填写以 http:// 或 https:// 开头的地址',
-    confirmButtonText: '导出',
-    cancelButtonText: '取消',
+    inputErrorMessage: t('application.export.baseUrl.invalidMessage'),
+    confirmButtonText: t('common.actions.export'),
+    cancelButtonText: t('common.actions.cancel'),
   }).then(({ value }) => value.trim())
 }
 
@@ -49,7 +52,7 @@ function exportSkills(baseUrl: string): Promise<unknown> {
     if (status === 400) return promptSkillsBaseUrl(baseUrl).then(exportSkills)
     if (status && status !== 403) {
       return error.response.data.text().then((response: string) => {
-        MsgError(`导出失败：${JSON.parse(response).message}`)
+        MsgError(`${t('common.messages.exportFailed')}: ${JSON.parse(response).message}`)
       })
     }
   })
@@ -80,7 +83,7 @@ function handleExportApplication() {
     .catch((error: ExportError) => {
       if (error.response.status !== 403) {
         return error.response.data.text().then((response: string) => {
-          MsgError(`导出失败：${JSON.parse(response).message}`)
+          MsgError(`${t('common.messages.exportFailed')}: ${JSON.parse(response).message}`)
         })
       }
     })
@@ -104,9 +107,11 @@ function handleExportApplication() {
       <template #dropdown>
         <MkDropdownMenu>
           <!-- 导出为 Skills 压缩包 -->
-          <MkDropdownItem v-if="canExportSkills" :disabled="loading" @click="handleExportSkills">导出为 Skills</MkDropdownItem>
+          <MkDropdownItem v-if="canExportSkills" :disabled="loading" @click="handleExportSkills">{{ t('application.export.skills') }}</MkDropdownItem>
           <!-- 导出智能体文件 -->
-          <MkDropdownItem v-if="canExportApplication" :disabled="loading" @click="handleExportApplication">导出智能体</MkDropdownItem>
+          <MkDropdownItem v-if="canExportApplication" :disabled="loading" @click="handleExportApplication">
+            {{ t('application.export.agent') }}
+          </MkDropdownItem>
         </MkDropdownMenu>
       </template>
     </MkDropdown>

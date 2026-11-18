@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import type { CSSProperties } from 'vue'
 import ApplicationApi from '@/api/admin/workspace/application/application'
@@ -10,6 +11,8 @@ import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
 
 defineOptions({ name: 'CreateApplicationDropdown' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const { auth } = useStore()
 
@@ -65,7 +68,7 @@ function handleImportCreate(file: UploadFile) {
   ApplicationApi.postApplicationImport(file.raw, props.folderId)
     .then(() => {
       return auth.loadAuthBaseProfile().then(() => {
-        MsgSuccess('导入成功')
+        MsgSuccess(t('common.messages.importSuccess'))
         handleRefresh()
       })
     })
@@ -96,7 +99,7 @@ function handleRefresh() {
     </div>
     <!-- 创建智能体 -->
     <el-button v-else type="primary">
-      <span class="mr-1">创建</span>
+      <span class="mr-1">{{ t('common.actions.create') }}</span>
       <MkIcon name="icon_down_outlined" :size="14" />
     </el-button>
 
@@ -109,8 +112,8 @@ function handleRefresh() {
             </el-avatar>
           </template>
           <div class="min-w-0">
-            <p>简易智能体</p>
-            <p class="text-sm text-N600 whitespace-normal">通过表单设置方式，快速搭建基础功能的智能体</p>
+            <p>{{ t('application.simple.label') }}</p>
+            <p class="text-sm text-N600 whitespace-normal">{{ t('application.simple.description') }}</p>
           </div>
         </MkDropdownItem>
         <MkDropdownItem class="py-2! items-start!" @click="handleOpenAdvancedApplicationCreate">
@@ -120,8 +123,8 @@ function handleRefresh() {
             </el-avatar>
           </template>
           <div class="min-w-0">
-            <p class="leading-5">高级智能体</p>
-            <p class="text-sm text-N600 whitespace-normal">使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体</p>
+            <p class="leading-5">{{ t('application.advanced.label') }}</p>
+            <p class="text-sm text-N600 whitespace-normal">{{ t('application.advanced.description') }}</p>
           </div>
         </MkDropdownItem>
 
@@ -139,7 +142,7 @@ function handleRefresh() {
             <template #icon>
               <img class="size-7" src="@/assets/mk_icon_import.svg" alt="" />
             </template>
-            <span>导入创建</span>
+            <span>{{ t('common.actions.createFromImport') }}</span>
           </MkDropdownItem>
         </el-upload>
       </MkDropdownMenu>

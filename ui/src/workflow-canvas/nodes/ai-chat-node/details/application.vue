@@ -43,7 +43,7 @@ defineProps<{
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">本次对话</h6>
       <div class="whitespace-pre-wrap space-y-2">
-        <p class="mb-1 text-N600">图片：</p>
+        <p class="mb-1 text-N600" v-if="data?.image_list?.length > 0">图片：</p>
         <!-- 查看本次对话图片 -->
         <div v-if="data?.image_list?.length > 0" class="flex flex-wrap gap-2">
           <template v-for="(imageItem, qIndex) in data?.image_list" :key="qIndex">
@@ -56,7 +56,7 @@ defineProps<{
             />
           </template>
         </div>
-        <p class="mb-1 text-N600">视频：</p>
+        <p class="mb-1 text-N600" v-if="data?.video_list?.length > 0">视频：</p>
         <!-- 查看本次对话视频 -->
         <div v-if="data?.video_list?.length > 0" class="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <template v-for="(videoItem, qIndex) in data?.video_list" :key="qIndex">

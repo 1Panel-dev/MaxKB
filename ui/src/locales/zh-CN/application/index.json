@@ -1,0 +1,70 @@
+{
+  "title": "智能体",
+  "categories": {
+    "all": "全部智能体",
+    "shared": "共享智能体"
+  },
+  "simple": {
+    "label": "简易智能体",
+    "shortLabel": "简易",
+    "createTitle": "创建简易智能体",
+    "description": "通过表单设置方式，快速搭建基础功能的智能体"
+  },
+  "advanced": {
+    "label": "高级智能体",
+    "shortLabel": "高级",
+    "createTitle": "创建高级智能体",
+    "description": "使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体"
+  },
+  "fields": {
+    "name": {
+      "placeholder": "请输入智能体名称",
+      "requiredMessage": "请输入智能体名称"
+    },
+    "description": {
+      "placeholder": "描述该智能体的应用场景及用途，如：XXX 小助手回答用户提出的 XXX 产品使用问题"
+    }
+  },
+  "template": {
+    "label": "模板",
+    "blank": "空白创建",
+    "assistant": {
+      "label": "知识库问答助手",
+      "description": "将从知识库中检索到的知识作为已知信息，回答用户提出的问题。"
+    }
+  },
+  "duplicate": {
+    "title": "复制智能体"
+  },
+  "status": {
+    "unpublished": "未发布",
+    "published": "已发布",
+    "onPortal": "已上架"
+  },
+  "publishTime": "发布时间",
+  "actions": {
+    "chat": "去对话"
+  },
+  "portal": {
+    "add": "上架到门户",
+    "remove": "从门户下架",
+    "addSuccess": "上架成功",
+    "removeSuccess": "下架成功"
+  },
+  "export": {
+    "skills": "导出为 Skills",
+    "agent": "导出智能体",
+    "baseUrl": {
+      "label": "填写访问地址",
+      "description": "请填写 Agent 访问 MaxKB 使用的地址，例如 http://192.168.1.10:8080",
+      "invalidMessage": "请填写以 http:// 或 https:// 开头的地址"
+    }
+  },
+  "delete": {
+    "title": "确认删除智能体",
+    "batchTitle": "是否批量删除 {count} 个智能体"
+  },
+  "messages": {
+    "missingWorkspace": "智能体缺少所属工作空间信息"
+  }
+}

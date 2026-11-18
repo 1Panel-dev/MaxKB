@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatUserAuthorization, ChatUserAuthorizationGroup, ChatUserAuthorizationResource, Dict, LoginMethod, OptionItem } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { CheckboxValueType } from 'element-plus'
@@ -13,6 +14,8 @@ import perm from '@/permission'
 defineOptions({ name: 'ApplicationChatUserListView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ hideHeader: true })
+
+const { t } = useI18n({ useScope: 'global' })
 
 type ApplicationChatUserPermissionMethod = 'chatUserEdit'
 function applicationchatUserPermission(method: ApplicationChatUserPermissionMethod): boolean {
@@ -70,25 +73,27 @@ const chatUsers = ref<ChatUserAuthorization[]>([])
 const savedAuthorization = ref<Record<string, boolean>>({})
 const chatUserSearchQuery = ref<Dict<unknown>>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
-const searchFields: OptionItem<string>[] = [
-  { label: '姓名', value: 'nick_name' },
-  { label: '用户名', value: 'username' },
-]
+const searchFields = computed<OptionItem<string>[]>(() => [
+  { label: t('resource.chatUserAuthorization.name'), value: 'nick_name' },
+  { label: t('resource.chatUserAuthorization.username'), value: 'username' },
+])
 
 // 表头用户来源筛选
 const selectedSource = ref<string | null>(null)
-const sourceOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
-  label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label,
-  value,
-}))
+const sourceOptions = computed<OptionItem<string>[]>(() =>
+  Object.keys(LOGIN_METHOD_LABELS).map((value) => ({ label: formatUserSource(value), value })),
+)
 const chatUserQuery = computed<Dict<unknown>>(() => ({
   ...chatUserSearchQuery.value,
   ...(selectedSource.value !== null ? { source: selectedSource.value } : {}),
 }))
 
 function formatUserSource(source: string) {
-  if (source === LOGIN_METHOD.LOCAL) return '本地创建'
+  if (source === LOGIN_METHOD.LOCAL) return t('resource.chatUserAuthorization.source.local')
   if (source === 'OAUTH2') return LOGIN_METHOD_LABELS[LOGIN_METHOD.OAUTH2]
+  if (source === LOGIN_METHOD.DINGTALK || source === LOGIN_METHOD.LARK || source === LOGIN_METHOD.WECOM) {
+    return t(`auth.login.options.${source}`)
+  }
   return LOGIN_METHOD_LABELS[source as LoginMethod] ?? source
 }
 
@@ -148,7 +153,7 @@ function handleSave() {
     .then(() => {
       // 先记住已保存结果，列表刷新失败时不重复提示未保存。
       savedAuthorization.value = Object.fromEntries(payload.map(({ chat_user_id, is_auth }) => [chat_user_id, is_auth]))
-      MsgSuccess('保存成功')
+      MsgSuccess(t('common.messages.saveSuccess'))
       return loadChatUsers().then(refreshChatUserGroups)
     })
     .finally(() => {
@@ -168,7 +173,7 @@ function handleAutoAuthorizationChange(value: string | number | boolean) {
       group.is_auth = isAuth
       chatUsers.value = []
       savedAuthorization.value = {}
-      MsgSuccess('保存成功')
+      MsgSuccess(t('common.messages.saveSuccess'))
       return loadChatUsers().then(refreshChatUserGroups)
     })
     .finally(() => {
@@ -183,14 +188,18 @@ onMounted(() => loadChatUserGroups())
   <div v-loading="loading" :inert="loading" class="-mx-6 -mb-6 flex min-h-0 flex-1">
     <aside class="flex-column h-layout-content w-sidebar-expanded shrink-0 border-r">
       <div class="shrink-0 p-4">
-        <h4>按用户组</h4>
+        <h4>{{ t('resource.chatUserAuthorization.byGroup') }}</h4>
       </div>
       <!-- 搜索并切换用户组 -->
       <MkSearchList :data="chatUserGroups" :default-active="currentGroup?.id" @click="handleSelectGroup">
         <template #default="{ row }">
           <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>
           <span class="shrink-0 font-normal text-N500">
-            {{ row.is_auth ? '（自动授权）' : `（已授权 ${row.authorized_count ?? 0}）` }}
+            （{{
+              row.is_auth
+                ? t('resource.chatUserAuthorization.autoAuthorization')
+                : `${t('resource.chatUserAuthorization.authorized')} ${row.authorized_count ?? 0}`
+            }}）
           </span>
         </template>
       </MkSearchList>
@@ -213,12 +222,24 @@ onMounted(() => loadChatUserGroups())
             <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
             <!-- 设置用户组自动授权 -->
             <div class="flex-align-center shrink-0 gap-2">
-              <span>自动授权</span>
-              <el-switch :disabled="!applicationchatUserPermission('chatUserEdit')" :model-value="currentGroup.is_auth" size="small" @change="handleAutoAuthorizationChange" />
+              <span>{{ t('resource.chatUserAuthorization.autoAuthorization') }}</span>
+              <el-switch
+                :disabled="!applicationchatUserPermission('chatUserEdit')"
+                :model-value="currentGroup.is_auth"
+                size="small"
+                @change="handleAutoAuthorizationChange"
+              />
             </div>
           </div>
           <!-- 保存对话用户授权 -->
-          <el-button v-if="!currentGroup.is_auth && applicationchatUserPermission('chatUserEdit')" type="primary" :disabled="saveDisabled" @click="handleSave">保存</el-button>
+          <el-button
+            v-if="!currentGroup.is_auth && applicationchatUserPermission('chatUserEdit')"
+            type="primary"
+            :disabled="saveDisabled"
+            @click="handleSave"
+          >
+            {{ t('common.actions.save') }}
+          </el-button>
         </div>
 
         <MkTable
@@ -228,11 +249,17 @@ onMounted(() => loadChatUserGroups())
           @size-change="refreshChatUsers"
           @current-change="refreshChatUsers"
         >
-          <el-table-column prop="nick_name" label="姓名" show-overflow-tooltip />
-          <el-table-column prop="username" label="用户名" show-overflow-tooltip />
-          <el-table-column prop="source" label="用户来源" show-overflow-tooltip>
+          <el-table-column prop="nick_name" :label="t('resource.chatUserAuthorization.name')" show-overflow-tooltip />
+          <el-table-column prop="username" :label="t('resource.chatUserAuthorization.username')" show-overflow-tooltip />
+          <el-table-column prop="source" :label="t('resource.chatUserAuthorization.source.label')" show-overflow-tooltip>
             <template #header>
-              <MkTableFilter mode="single" v-model="selectedSource" label="用户来源" :options="sourceOptions" @change="handleSourceChange" />
+              <MkTableFilter
+                mode="single"
+                v-model="selectedSource"
+                :label="t('resource.chatUserAuthorization.source.label')"
+                :options="sourceOptions"
+                @change="handleSourceChange"
+              />
             </template>
             <template #default="{ row }">{{ formatUserSource(row.source) }}</template>
           </el-table-column>
@@ -245,7 +272,7 @@ onMounted(() => loadChatUserGroups())
                 :disabled="authorizationDisabled || !applicationchatUserPermission('chatUserEdit')"
                 @change="handleCheckAll"
               >
-                授权
+                {{ t('resource.chatUserAuthorization.authorize') }}
               </el-checkbox>
             </template>
             <template #default="{ row }">
