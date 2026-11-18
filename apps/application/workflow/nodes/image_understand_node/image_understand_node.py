@@ -95,7 +95,7 @@ class ImageUnderstandNode(INode):
                 "reasoning_content_end": "</think>",
                 "reasoning_content_start": "<think>",
             }
-        self.write_context("model_setting", model_setting)
+        self.data["model_setting"] = model_setting
 
         if model_id_type == "reference" and model_id_reference:
             reference_data = self.workflow_manage.get_reference_field(
@@ -122,26 +122,23 @@ class ImageUnderstandNode(INode):
         chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id, **(model_params_setting or {}))
 
         history_message_for_details = self._get_history_message_for_details(history_chat_record, dialogue_number)
-        self.write_context(
-            "history_message",
-            [{"content": message.content, "role": message.type} for message in (history_message_for_details or [])],
-        )
+        self.data["history_message"] = [
+            {"content": message.content, "role": message.type} for message in (history_message_for_details or [])
+        ]
 
         question = self.workflow_manage.generate_prompt(prompt)
-        self.write_context("question", question)
+        self.data["question"] = question
 
         system = self.workflow_manage.generate_prompt(system)
-        self.write_context("system", system)
+        self.data["system"] = system
 
         history_message = self._get_history_message(history_chat_record, dialogue_number)
         message_list = self._generate_message_list(chat_model, system, prompt, history_message, image)
-        self.write_context(
-            "message_list",
-            [{"content": m.content, "role": m.type} for m in message_list],
-        )
+
+        self.data["message_list"] = [{"content": m.content, "role": m.type} for m in message_list]
 
         self._generate_context_image(image)
-        self.write_context("dialogue_type", dialogue_type)
+        self.data["dialogue_type"] = dialogue_type
 
         reasoning_content_id = str(uuid.uuid7())
         text_content_id = str(uuid.uuid7())
@@ -271,17 +268,16 @@ class ImageUnderstandNode(INode):
             if self.async_runner.cancel_event.is_set()
             else (chat_model.get_num_tokens_from_messages(message_list), chat_model.get_num_tokens(answer))
         )
-        self.write_context("message_tokens", message_tokens)
-        self.write_context("answer_tokens", answer_tokens)
+        self.data["message_tokens"] = message_tokens
+        self.data["answer_tokens"] = answer_tokens
+        self.data["reasoning_content"] = reasoning_content
         self.write_context("answer", answer)
-        self.write_context("question", question)
-        self.write_context("reasoning_content", reasoning_content)
 
     def _generate_context_image(self, image):
         if isinstance(image, str) and image.startswith("http"):
-            self.write_context("image_list", [{"url": image}])
+            self.data["image_list"] = [{"url": image}]
         elif image is not None and len(image) > 0:
-            self.write_context("image_list", image)
+            self.data["image_list"] = image
 
     def _get_history_message_for_details(self, history_chat_record, dialogue_number):
         start_index = len(history_chat_record) - dialogue_number
@@ -419,12 +415,13 @@ class ImageUnderstandNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "question": self.get_context("question"),
+                "question": self.data.get("question"),
                 "answer": self.get_context("answer"),
-                "image_list": self.get_context("image_list"),
-                "reasoning_content": self.get_context("reasoning_content"),
-                "message_tokens": self.get_context("message_tokens"),
-                "answer_tokens": self.get_context("answer_tokens"),
+                "image_list": self.data.get("image_list"),
+                "reasoning_content": self.data.get("reasoning_content"),
+                "message_tokens": self.data.get("message_tokens"),
+                "answer_tokens": self.data.get("answer_tokens"),
+                "system": self.data.get("system"),
             }
         )
         return details
