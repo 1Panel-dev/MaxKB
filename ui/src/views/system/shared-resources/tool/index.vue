@@ -165,13 +165,13 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                     @refresh="refreshTools"
                   />
                   <!-- 工作流 -->
-                  <MkDropdownItem v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" @click="handleOpenWorkflow(tool, $event)">
+                  <MkDropdownItem v-if="tool.tool_type === TOOL_TYPE.WORKFLOW && perm.tool.share.edit()" @click="handleOpenWorkflow(tool, $event)">
                     <template #icon><MkIcon name="icon_setting" /></template>
                     {{ t('tool.workflow.label') }}
                   </MkDropdownItem>
                   <!-- 启动参数 -->
                   <InitParamAction
-                    v-if="(tool.init_field_list?.length ?? 0) > 0"
+                    v-if="(tool.init_field_list?.length ?? 0) > 0 && perm.tool.share.edit()"
                     v-model:loading="toolOperationLoading"
                     :label="t('tool.initParams.title')"
                     :api="SystemSharedToolApi"

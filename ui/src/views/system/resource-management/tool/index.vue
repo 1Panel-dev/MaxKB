@@ -254,13 +254,13 @@ onMounted(() => {
               <!-- 更多工具操作 -->
               <MkTableMoreDropdown>
                 <!-- 打开工具工作流 -->
-                <MkDropdownItem v-if="row.tool_type === TOOL_TYPE.WORKFLOW" @click="handleOpenWorkflow(row, $event)">
+                <MkDropdownItem v-if="row.tool_type === TOOL_TYPE.WORKFLOW && perm.tool.system.edit()" @click="handleOpenWorkflow(row, $event)">
                   <template #icon><MkIcon name="icon_setting" /></template>
                   {{ t('tool.workflow.label') }}
                 </MkDropdownItem>
                 <!-- 启动参数 -->
                 <InitParamAction
-                  v-if="row.init_field_list?.length"
+                  v-if="row.init_field_list?.length && perm.tool.system.edit()"
                   v-model:loading="operationLoading"
                   :label="t('tool.initParams.title')"
                   :api="SystemToolApi"
