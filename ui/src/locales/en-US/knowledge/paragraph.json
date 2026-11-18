@@ -1,14 +1,14 @@
 {
   "paragraph": {
-    "detailTitle": "Paragraph details",
+    "detailTitle": "Segment details",
     "heading": {
       "label": "Title",
       "placeholder": "Enter a title"
     },
     "content": {
       "label": "Content",
-      "placeholder": "Enter paragraph content",
-      "requiredMessage": "Enter paragraph content",
+      "placeholder": "Enter segment content",
+      "requiredMessage": "Enter segment content",
       "lengthMessage": "Content cannot exceed {max} characters."
     },
     "relatedQuestions": {
@@ -17,8 +17,8 @@
       "lengthMessage": "Questions cannot exceed {max} characters."
     },
     "actions": {
-      "add": "Add paragraph",
-      "insertAbove": "Insert paragraph above",
+      "add": "Add segment",
+      "insertAbove": "Insert segment above",
       "movePosition": "Move position"
     },
     "position": {
@@ -28,10 +28,10 @@
       "bottom": "Move to bottom"
     },
     "delete": {
-      "title": "Delete paragraph",
-      "confirm": "Delete this paragraph",
-      "batchTitle": "Delete {count} selected paragraph | Delete {count} selected paragraphs"
+      "title": "Delete segment",
+      "confirm": "Delete this segment",
+      "batchTitle": "Delete {count} selected segment | Delete {count} selected segments"
     },
-    "empty": "No paragraphs"
+    "empty": "No segments"
   }
 }

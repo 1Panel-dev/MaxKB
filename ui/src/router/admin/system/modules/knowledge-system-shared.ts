@@ -89,7 +89,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.hitTest(),
               next: 'system-shared-knowledge-problem',
-              title: 'knowledge.menu.hitTest',
+              title: 'knowledge.hitTest.title',
               order: 10,
             },
           },
@@ -100,7 +100,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.problemRead(),
               next: 'system-shared-knowledge-dictionary',
-              title: 'knowledge.menu.questions',
+              title: 'knowledge.question.title',
               order: 20,
             },
           },
@@ -111,7 +111,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.termbaseRead(),
               next: 'system-shared-knowledge-integration',
-              title: 'knowledge.menu.termbase',
+              title: 'knowledge.termbase.title',
               order: 30,
             },
           },

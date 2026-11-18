@@ -1,0 +1,40 @@
+{
+  "retrieval": {
+    "parameters": "Retrieval parameters",
+    "mode": "Retrieval mode",
+    "embedding": {
+      "label": "Vector search",
+      "description": "Vector search retrieves results based on vector similarity and is suitable for large volumes of knowledge."
+    },
+    "keywords": {
+      "label": "Full-text search",
+      "description": "Full-text search retrieves results based on text similarity and is suitable for small volumes of knowledge."
+    },
+    "blend": {
+      "label": "Hybrid search",
+      "description": "Hybrid search retrieves results based on both vector and text similarity and is suitable for medium volumes of knowledge."
+    },
+    "similarity": {
+      "label": "Similarity higher than",
+      "description": "The higher the similarity, the stronger the relevance."
+    },
+    "topNumber": "Top segments"
+  },
+  "hitTest": {
+    "title": "Retrieval testing",
+    "description": "Retrieve knowledge that matches users' questions to improve answer quality.",
+    "query": {
+      "title": "This query",
+      "placeholder": "Enter test content",
+      "imageDropHint": "Drag images into the input box to upload them"
+    },
+    "results": {
+      "title": "Query results",
+      "initialEmpty": "Retrieved knowledge will appear here",
+      "empty": "No relevant knowledge retrieved. Adjust the retrieval parameters."
+    },
+    "imageVector": "Image vector",
+    "textVector": "Text vector",
+    "test": "Test"
+  }
+}

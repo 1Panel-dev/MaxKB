@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { TermbaseItem } from '@/api/types'
 import type MkQuickCreate from '@/components/global/mk-table/MkQuickCreate.vue'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
@@ -27,6 +28,7 @@ defineOptions({ name: 'TermbaseView' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
 
+const { t } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const knowledgeId = computed(() => String(route.params.knowledgeId ?? ''))
 const { resourceApi } = useKnowledgeDetailContext()
@@ -98,7 +100,7 @@ function handleQuickCreate(content: string) {
   return (
     resourceApi.termbase.postTermbases?.(knowledgeId.value, [content]).then(() => {
       quickCreateRef.value?.close()
-      MsgSuccess('创建成功')
+      MsgSuccess(t('common.messages.createSuccess'))
       return handleTermbasesCreated()
     }) ?? Promise.resolve()
   )
@@ -116,7 +118,7 @@ function handleDeleteTermbase(termbase: TermbaseItem) {
   operationLoading.value = true
   return (
     resourceApi.termbase.deleteTermbase?.(knowledgeId.value, termbase.id).then(() => {
-      MsgSuccess('删除成功')
+      MsgSuccess(t('common.messages.deleteSuccess'))
       clearSelection()
       return loadTermbases()
     }) ?? Promise.resolve()
@@ -136,7 +138,7 @@ function handleBatchDeleteTermbases() {
   operationLoading.value = true
   return (
     resourceApi.termbase.putBatchDeleteTermbases?.(knowledgeId.value, termbaseIds).then(() => {
-      MsgSuccess('删除成功')
+      MsgSuccess(t('common.messages.deleteSuccess'))
       clearSelection()
       return loadTermbases()
     }) ?? Promise.resolve()
@@ -162,7 +164,7 @@ function handleExportTermbases() {
       link.download = 'termbase_export.txt'
       link.click()
       URL.revokeObjectURL(url)
-      MsgSuccess('导出成功')
+      MsgSuccess(t('common.messages.exportSuccess'))
     }) ?? Promise.resolve()
   )
     .catch(() => {
@@ -183,7 +185,7 @@ onMounted(() => {
     <div class="flex-between gap-4">
       <div class="flex-align-center gap-2">
         <h4>{{ title }}</h4>
-        <MkTooltip placement="right" content="避免专业术语被拆分，提升全文检索的精准度与召回率">
+        <MkTooltip placement="right" :content="t('knowledge.termbase.description')">
           <MkIcon name="icon_info_outlined" class="text-N600!" />
         </MkTooltip>
       </div>
@@ -207,14 +209,14 @@ onMounted(() => {
       <MkQuickCreate
         v-if="!isWorkspaceSharedResource() && knowledgeTermbasePermission('termbaseCreate')"
         ref="quickCreateRef"
-        text="快速创建词语"
-        placeholder="请输入词语"
+        :text="t('knowledge.termbase.actions.quickCreate')"
+        :placeholder="t('knowledge.termbase.content.placeholder')"
         :loading="operationLoading"
         @create="handleQuickCreate"
       />
     </template>
     <el-table-column type="selection" width="40" />
-    <el-table-column prop="content" label="词语" show-overflow-tooltip>
+    <el-table-column prop="content" :label="t('knowledge.termbase.content.label')" show-overflow-tooltip>
       <template #default="{ row }: { row: TermbaseItem }">
         <!-- 编辑分词 -->
         <MkEditName
@@ -226,20 +228,20 @@ onMounted(() => {
         />
       </template>
     </el-table-column>
-    <el-table-column prop="create_time" label="创建时间" width="180">
+    <el-table-column prop="create_time" :label="t('common.labels.createTime')" width="180">
       <template #default="{ row }: { row: TermbaseItem }">
         {{ datetimeFormat(row.create_time) }}
       </template>
     </el-table-column>
-    <el-table-column prop="update_time" label="更新时间" width="180">
+    <el-table-column prop="update_time" :label="t('common.labels.updateTime')" width="180">
       <template #default="{ row }: { row: TermbaseItem }">
         {{ datetimeFormat(row.update_time) }}
       </template>
     </el-table-column>
-    <el-table-column label="操作" width="64">
+    <el-table-column :label="t('common.labels.operation')" width="80">
       <template #default="{ row }: { row: TermbaseItem }">
         <!-- 删除词语 -->
-        <MkTooltip v-if="knowledgeTermbasePermission('termbaseDelete')" content="删除" placement="top">
+        <MkTooltip v-if="knowledgeTermbasePermission('termbaseDelete')" :content="t('common.actions.delete')" placement="top">
           <el-button type="primary" text :disabled="operationLoading" @click="handleDeleteTermbase(row)">
             <MkIcon name="icon_delete-trash_outlined" />
           </el-button>
@@ -255,7 +257,7 @@ onMounted(() => {
         :disabled="operationLoading"
         @click="handleExportTermbases"
       >
-        导出
+        {{ t('common.actions.export') }}
       </el-button>
       <!-- 批量删除词语 -->
       <el-button
@@ -265,7 +267,7 @@ onMounted(() => {
         :loading="operationLoading"
         @click="handleBatchDeleteTermbases"
       >
-        删除
+        {{ t('common.actions.delete') }}
       </el-button>
     </template>
   </MkTable>

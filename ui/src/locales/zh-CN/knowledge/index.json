@@ -3,9 +3,6 @@
   "menu": {
     "library": "资料库",
     "retrieval": "检索优化",
-    "hitTest": "召回测试",
-    "questions": "问题",
-    "termbase": "自定义分词",
     "integration": "授权与集成",
     "chatUsers": "对话用户",
     "externalRetrieval": "外部检索服务"

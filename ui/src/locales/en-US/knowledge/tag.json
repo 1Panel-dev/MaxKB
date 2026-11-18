@@ -28,9 +28,9 @@
       "editValue": "Edit tag value"
     },
     "documents": {
-      "title": "Link documents",
-      "linked": "Linked documents",
-      "unlinked": "Unlinked documents"
+      "title": "Relate documents",
+      "related": "Related documents",
+      "unrelated": "Unrelated documents"
     },
     "import": {
       "title": "Import tags",

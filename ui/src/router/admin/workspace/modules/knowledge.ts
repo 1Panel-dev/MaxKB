@@ -108,7 +108,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.hitTest(String(params.knowledgeId)),
                   next: 'workspace-knowledge-problem',
-                  title: 'knowledge.menu.hitTest',
+                  title: 'knowledge.hitTest.title',
                   order: 10,
                 },
               },
@@ -119,7 +119,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.problemRead(String(params.knowledgeId)),
                   next: 'workspace-knowledge-dictionary',
-                  title: 'knowledge.menu.questions',
+                  title: 'knowledge.question.title',
                   order: 20,
                 },
               },
@@ -130,7 +130,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.termbaseRead(String(params.knowledgeId)),
                   next: 'workspace-knowledge-chat-user',
-                  title: 'knowledge.menu.termbase',
+                  title: 'knowledge.termbase.title',
                   order: 30,
                 },
               },

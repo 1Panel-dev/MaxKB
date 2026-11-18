@@ -19,15 +19,15 @@
     "labels": {
       "activeStatus": "Activation status",
       "characters": "Characters",
-      "paragraphs": "Paragraphs"
+      "paragraphs": "Segments"
     },
     "hitHandling": {
       "label": "Retrieval handling",
-      "description": "When a user asks a question, retrieved paragraphs are processed according to these settings.",
+      "description": "When a user asks a question, retrieved segments are processed according to these settings.",
       "optimization": "Model optimization",
       "directlyReturn": "Direct answer",
       "similarityAbove": "When similarity exceeds",
-      "returnParagraphContent": "return paragraph content directly"
+      "returnParagraphContent": "return segment content directly"
     },
     "settings": {
       "title": "Document settings",
@@ -56,14 +56,14 @@
     },
     "delete": {
       "title": "Delete document",
-      "description": "This will also delete {count} paragraph in this document. | This will also delete {count} paragraphs in this document.",
+      "description": "This will also delete {count} segment in this document. | This will also delete {count} segments in this document.",
       "batchTitle": "Delete {count} selected document | Delete {count} selected documents",
-      "batchDescription": "All paragraphs in the selected documents will also be deleted."
+      "batchDescription": "All segments in the selected documents will also be deleted."
     },
     "sync": {
       "title": "Sync",
       "batchTitle": "Sync {count} selected document | Sync {count} selected documents",
-      "description": "Sync skips unchanged documents and updates existing paragraphs in documents that have changed.",
+      "description": "Sync skips unchanged documents and updates existing segments in documents that have changed.",
       "workflowDescription": "Only this web document will be synced, using the workflow’s extraction and splitting settings.",
       "missingUrlMessage": "Set the document URL before syncing."
     },
@@ -75,10 +75,10 @@
       "tableTitle": "Upload spreadsheets",
       "qaLabel": "Q&A pairs",
       "qaTitle": "Upload Q&A pairs",
-      "delimiterHint": "Use consistent paragraph delimiters before uploading your files.",
+      "delimiterHint": "Use consistent segment delimiters before uploading your files.",
       "templateHint": "Download a template and fill it in",
       "downloadTemplate": "Download {format} template",
-      "columnHeaderHint": "Use meaningful column headings in the first row. Each subsequent row becomes a paragraph.",
+      "columnHeaderHint": "Use meaningful column headings in the first row. Each subsequent row becomes a segment.",
       "sheetHint": "Each worksheet becomes a separate document with the same name as the worksheet."
     },
     "import": {
@@ -89,12 +89,12 @@
       "allDocuments": "All documents",
       "selectionRequiredMessage": "Select at least one document.",
       "larkFormatsHint": "Supported document and spreadsheet formats: {formats}.",
-      "delimiterHint": "Use consistent paragraph delimiters before importing documents."
+      "delimiterHint": "Use consistent segment delimiters before importing documents."
     },
     "preview": {
       "title": "Preview",
       "emptyDocuments": "No documents to preview",
-      "finishEditingMessage": "Save or cancel your paragraph edits first."
+      "finishEditingMessage": "Save or cancel your segment edits first."
     }
   },
   "image": {
@@ -107,7 +107,7 @@
       "title": "Upload images"
     },
     "preview": {
-      "emptyMessage": "The image preview has no paragraphs. Go back and generate the preview again."
+      "emptyMessage": "The image preview has no segments. Go back and generate the preview again."
     },
     "unsupportedFormatMessage": "Supported image formats: {formats}."
   }

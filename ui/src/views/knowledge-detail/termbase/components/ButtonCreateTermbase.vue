@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { MsgSuccess } from '@/utils/message'
 import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
@@ -18,6 +19,7 @@ function knowledgeTermbasePermission(method: KnowledgeTermbasePermissionMethod):
 }
 
 defineOptions({ name: 'ButtonCreateTermbase' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ knowledgeId: string }>()
 const emit = defineEmits<{ refresh: [] }>()
@@ -43,7 +45,7 @@ function handleCreateTermbase() {
   loading.value = true
   return (
     resourceApi.termbase.postTermbases?.(props.knowledgeId, termbases.value).then(() => {
-      MsgSuccess('创建成功')
+      MsgSuccess(t('common.messages.createSuccess'))
       visible.value = false
       emit('refresh')
     }) ?? Promise.resolve()
@@ -65,17 +67,19 @@ function resetData() {
   <!-- 创建词语 -->
   <el-button v-if="knowledgeTermbasePermission('termbaseCreate')" type="primary" @click="handleOpenCreateTermbase">
     <MkIcon name="icon_add_outlined" />
-    <span>创建词语</span>
+    <span>{{ t('knowledge.termbase.actions.create') }}</span>
   </el-button>
-  <MkDialog v-model="visible" title="创建词语" @closed="resetData">
+  <MkDialog v-model="visible" :title="t('knowledge.termbase.actions.create')" @closed="resetData">
     <el-form @submit.prevent>
-      <el-input v-model="content" type="textarea" :rows="7" placeholder="请输入需要保留的专业术语/专属词汇，一行一个，支持输入多个" />
+      <el-input v-model="content" type="textarea" :rows="7" :placeholder="t('knowledge.termbase.content.batchPlaceholder')" />
     </el-form>
     <template #footer>
       <!-- 取消创建词语 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 提交创建词语 -->
-      <el-button type="primary" :loading="loading" :disabled="!termbases.length" @click="handleCreateTermbase">创建</el-button>
+      <el-button type="primary" :loading="loading" :disabled="!termbases.length" @click="handleCreateTermbase">
+        {{ t('common.actions.create') }}
+      </el-button>
     </template>
   </MkDialog>
 </template>

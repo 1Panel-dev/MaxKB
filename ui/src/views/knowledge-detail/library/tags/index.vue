@@ -253,7 +253,7 @@ onMounted(() => {
       </template>
     </el-table-column>
     <el-table-column prop="value" :label="t('knowledge.tags.value.label')" class-name="border-l!" show-overflow-tooltip />
-    <el-table-column prop="doc_count" :label="t('knowledge.tags.documents.linked')" min-width="140">
+    <el-table-column prop="doc_count" :label="t('knowledge.tags.documents.related')" min-width="140">
       <template #default="{ row }: { row: TagTableRow }">
         <!-- 查看标签关联文档 -->
         <el-button type="primary" link class="mk-link" @click="handleOpenTagDocuments(row)">

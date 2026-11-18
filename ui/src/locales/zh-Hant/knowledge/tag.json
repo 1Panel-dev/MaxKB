@@ -29,8 +29,8 @@
     },
     "documents": {
       "title": "關聯文件",
-      "linked": "已關聯文件",
-      "unlinked": "未關聯文件"
+      "related": "已關聯文件",
+      "unrelated": "未關聯文件"
     },
     "import": {
       "title": "匯入標籤",

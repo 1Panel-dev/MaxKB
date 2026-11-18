@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { SearchKnowledgeNodeForm } from './types'
 import type { KnowledgeItem } from '@/api/types'
 import type { NodeSearchScopeData } from '@/workflow-canvas/component/node-search-scope/types'
@@ -15,6 +16,7 @@ import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 
 defineOptions({ name: 'WorkflowSearchKnowledgeNode' })
 
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const model = getModel()
 const formRef = useTemplateRef<FormInstance>('formRef')
@@ -69,17 +71,18 @@ function updateSearchScope(patch: Partial<NodeSearchScopeData>) {
 }
 
 // 检索参数由弹窗编辑，确认后统一写回。
-const settingRows = computed(() => [
-  {
-    label: '检索模式',
-    value:
-      KNOWLEDGE_SEARCH_MODE_OPTIONS.find(({ value }) => value === formData.value.knowledge_setting.search_mode)?.label ??
-      formData.value.knowledge_setting.search_mode,
-  },
-  { label: '相似度高于', value: formData.value.knowledge_setting.similarity.toFixed(3) },
-  { label: '召回分段数 TOP', value: formData.value.knowledge_setting.top_n },
-  { label: '最多引用字符数', value: formData.value.knowledge_setting.max_paragraph_char_number },
-])
+const settingRows = computed(() => {
+  const searchMode = KNOWLEDGE_SEARCH_MODE_OPTIONS.find(({ value }) => value === formData.value.knowledge_setting.search_mode)
+  return [
+    {
+      label: '检索模式',
+      value: searchMode ? t(searchMode.labelKey) : formData.value.knowledge_setting.search_mode,
+    },
+    { label: '相似度高于', value: formData.value.knowledge_setting.similarity.toFixed(3) },
+    { label: '召回分段数 TOP', value: formData.value.knowledge_setting.top_n },
+    { label: '最多引用字符数', value: formData.value.knowledge_setting.max_paragraph_char_number },
+  ]
+})
 
 // 检索范围由组件加入表单校验，检索问题保留原有引用有效性检查。
 async function validate() {

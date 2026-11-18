@@ -1,0 +1,15 @@
+{
+  "termbase": {
+    "title": "自定义分词",
+    "description": "避免专业术语被拆分，提升全文检索的精准度与召回率",
+    "content": {
+      "label": "词语",
+      "placeholder": "请输入词语",
+      "batchPlaceholder": "请输入需要保留的专业术语/专属词汇，一行一个，支持输入多个"
+    },
+    "actions": {
+      "create": "创建词语",
+      "quickCreate": "快速创建词语"
+    }
+  }
+}

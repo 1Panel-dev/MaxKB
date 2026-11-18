@@ -1,0 +1,15 @@
+{
+  "termbase": {
+    "title": "自訂分詞",
+    "description": "避免專業術語被拆分，提升全文檢索的精準度與召回率",
+    "content": {
+      "label": "詞語",
+      "placeholder": "請輸入詞語",
+      "batchPlaceholder": "請輸入需要保留的專業術語/專屬詞彙，一行一個，支援輸入多個"
+    },
+    "actions": {
+      "create": "建立詞語",
+      "quickCreate": "快速建立詞語"
+    }
+  }
+}

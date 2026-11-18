@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationSettings } from '../settings'
 import type { FormInstance } from 'element-plus'
 import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
@@ -9,6 +10,7 @@ import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 
 defineOptions({ name: 'ButtonKnowledgeSetting' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ setting: ApplicationSettings }>()
 const emit = defineEmits<{ submit: [settings: Partial<ApplicationSettings>] }>()
 const visible = ref(false)
@@ -65,8 +67,8 @@ function resetData() {
           <template v-for="mode in KNOWLEDGE_SEARCH_MODE_OPTIONS" :key="mode.value">
             <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': formData.knowledge_setting.search_mode === mode.value }">
               <el-radio :value="mode.value" class="mk-card-radio">
-                <h6>{{ mode.label }}</h6>
-                <span class="block text-sm text-N600">{{ mode.description }}</span>
+                <h6>{{ t(mode.labelKey) }}</h6>
+                <span class="block text-sm text-N600">{{ t(mode.descriptionKey) }}</span>
               </el-radio>
             </el-card>
           </template>
