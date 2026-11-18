@@ -20,6 +20,7 @@
 | resource    | 跨资源授权、关联关系及共享状态等公共业务         |
 | folder      | 文件夹操作、排序、表单提示和删除确认             |
 | tool        | 工具、MCP、Skill 管理                            |
+| trigger     | 触发器、定时与事件配置、执行任务                 |
 | workflow    | 画布、节点、变量、调试与执行展示                 |
 | chat        | 对话输入、消息操作、历史会话与对话状态           |
 | workspace   | 工作空间、成员、空间级设置                       |
@@ -42,7 +43,9 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 不同可以使用不同 key。通用添加、编辑、删除、取消、保存和上传文件操作归 common.actions，
 仅有展示文案的通用标签归 common.labels，例如“创建者”和“操作”。名称与描述直接归 common.name 和 common.description，
 字段的 label、placeholder 和实际使用的 requiredMessage 放在一起，表单、表头和筛选器共用 label。
-common.status 维护状态标签 label 和通用启停选项 enabled、disabled。
+`common.status` 维护状态标签 `label`、通用启停选项 `enabled` / `disabled`，以及排队、执行、成功、失败、取消中和已取消等通用状态。
+文档、同步日志和执行记录复用这些状态文案；索引中、生成中、同步中、触发失败等专属文案保留在所属业务。
+“执行成功／执行失败”等完整结果提示保留业务含义，不替换为“成功／失败”。
 创建时间与更新时间使用 `common.labels.createTime` / `updateTime`，英文为 `Create time` / `Update time`；卡片中“创建于”的说明使用 `common.labels.createdOn`。
 流程步骤的“上一步／下一步”使用 `common.actions.previous` / `next`，记录切换的“上一个／下一个”使用 `common.actions.previousItem` / `nextItem`。
 通用日期范围预设及起止日期占位归 `common.dateRange`，音视频播放失败提示归 `common.messages`。
@@ -50,7 +53,7 @@ common.status 维护状态标签 label 和通用启停选项 enabled、disabled�
 通用文件选择、上传提示和校验归 `upload.json`，上传进度和结果汇总归 `upload.status`。
 头像设置、图片上传说明及校验归 `upload.avatar`；文件后缀编辑的操作和提示归 `upload.extension`。
 业务模板、文件内容要求和导入说明归各自业务域。
-“请输入模型名称”等指明业务对象的提示，以及发布状态、执行状态等业务选项归对应业务域。
+“请输入模型名称”等指明业务对象的提示，以及发布状态、任务处理阶段等业务选项归对应业务域。
 通用操作结果归 common.messages，通用对话框标题归 common.dialogs；业务专属确认句仍留在所属业务域。
 “关联”的英文和翻译 key 统一使用 `relate` 词族：关联操作使用 `Relate` / `relate`，取消关联使用 `Unrelate` / `unrelate`，已关联／未关联标签使用 `Related` / `related`、`Unrelated` / `unrelated`；成功提示使用 `Related successfully` / `Unrelated successfully`，对应 key 为 `relateSuccess` / `unrelateSuccess`。文件名保持不变；网页链接仍使用 `link`。
 用户内容、用户保存的提示词、协议枚举和已保存节点名称保留原文。
@@ -106,6 +109,13 @@ Admin 登录与找回密码页面支持三语切换，错误页暂不接入翻�
 外观预览；平台配置的品牌文案保持原值，第三方扫码界面由 SDK 提供。Element Plus 日期组件及 Markdown 编辑器、预览已接入三语。其余界面、路由标题及业务日期格式
 按模块接入，允许过渡期保留原中文。每批完成后等待用户检查，未经确认不扩展下一批。
 
+## 资源选择弹窗
+
+智能体、工具和知识库选择弹窗的标题分别复用 `application.title`、`tool.title` 和 `knowledge.title`。
+“已选”复用 `common.labels.selected`，数量直接在模板中展示；清空、取消和确定复用 `common.actions`。
+知识库选择中的 Embedding 模型一致性提示归 `knowledge.help.embeddingModelHint`，在 `knowledge/index.json` 维护。
+工具弹窗的自定义 `title` 由调用方提供最终展示文字，未传入时直接使用 `t('tool.title')`；文件夹和资源名称保留原有展示规则。
+
 ## 模型列表
 
 模型列表分类使用 model.categories，供应商字段使用 model.provider.label / placeholder；
@@ -133,7 +143,7 @@ Skill、工作流、MCP 和数据源的类型名称使用各自分组的 `label`
 内置目录用 tool.categories，按文件夹 ID 选择译文。自建文件夹名称、工具名称和描述直接展示接口值，类型筛选和请求使用原协议值。
 工具列表和输入参数共用 `tool.source.label`、`tool.source.custom`。工具列表的“工具商店”复用 `tool.store.title`，输入参数的“引用参数”使用 `tool.source.reference`。
 启停、删除和版本更新的工具专属提示归 tool；通用操作、启停状态和操作结果归 common。
-资源共享标签、MCP 服务配置、触发器及执行记录入口归 resource。
+资源共享标签、MCP 服务配置及执行记录入口归 resource，触发器入口复用 `trigger.title`。
 工具商店的内置分类、搜索结果计数和应用工具文案归 `tool.store`。工具名称的专属占位和校验归 `tool.fields.name`。
 商店自定义分类、工具名称、描述和 README 使用接口原文。
 普通工具的创建、编辑、复制标题使用 `tool.createTitle`、`tool.editTitle`、`tool.duplicateTitle`，代码必填提示归 `tool.fields.code`。调试入口、运行状态和缺省错误提示归 `tool.debug`。
@@ -156,11 +166,26 @@ MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 
 复制名称按“原名称 + 空格 + `common.name.copySuffix`”组合，并根据当前语言后缀的长度保留 64 字符限制。表单中的用户内容、模板中心返回的名称与描述、创建时写入的默认提示词和工作流模板配置保持原值。
 发布和门户上架状态归 `application.status`，发布时间归 `application.publishTime`，门户上下架操作及提示归 `application.portal`。名称、创建者、创建时间和通用操作复用 `common`，工作空间列复用 `workspace.title`。
 智能体导出入口及 Skills 访问地址提示归 `application.export`，删除确认归 `application.delete`；错误原因、导出文件名和 MCP 配置内容保留原值。
-MCP、资源授权、关联资源、触发器和模板中心入口复用 `resource`，文件夹移动入口复用 `folder`；保存、导入、删除、移动、复制和导出失败提示复用 `common`。
+MCP、资源授权、关联资源和模板中心入口复用 `resource`，触发器入口复用 `trigger.title`，文件夹移动入口复用 `folder`；保存、导入、删除、移动、复制和导出失败提示复用 `common`。
 对话日志的语言文件为 `application/chat-log.json`，使用 `application.chatLog`。工作空间和系统资源管理的日志路由与页面共用 `title`；表头归 `labels`，用户反馈筛选归 `feedback`，来源标签与选项归 `source`。来源通过常量维护协议值到翻译 key 的映射，在展示时统一调用 `t`，Slack 在三语中均保留品牌名；未知来源保留接口原值。
 单个和批量清除策略共用 `cleanStrategy`，标题使用 `title`，天数输入框前后的说明分别使用对应的 `Prefix` / `Suffix`，保留原交互顺序并按天数处理英文单复数。添加到知识库的按钮和弹窗共用 `addKnowledge.title`，知识库与目标文档字段复用 `knowledge.fields.targetKnowledge` / `knowledge.document.target`。通用操作、成功提示和详情翻页复用 `common`；摘要、用户名、知识库与文档名称展示原值。
 发布渠道使用 `application/access.json` 中的 `access` 分组，两种资源范围的菜单共用 `application.access.title`；渠道名称与说明分别归各渠道的 `label` / `description`，配置入口归 `actions`，未配置状态归 `states`，抽屉标题使用 `configurationTitle`。卡片和抽屉通过已有渠道标识 `platform.key` 统一调用 `t`，Slack 同样使用 `label`，三语文案均为品牌名；功能本地 `platforms.ts` 维护平台标识、图标、配置字段与后台链接，不重复维护渠道名称和说明。
 连接方式及共用说明归 `access.connection`，回调地址与填写引导归 `access.callback`，平台后台名称归 `access.consoles`；特定渠道的字段名、连接说明、认证状态和后台路径指引归对应渠道分组。固定英文参数名称直接使用 `label`，需要翻译的字段只提供 `labelKey`；抽屉在现有 computed 中通过 `t` 生成显示标签。连接选项使用 `labelKey` / `tipKey`，保留原有的 `ws`、`stream`、`callback` 协议值。输入占位与必填提示分别复用 `common.placeholders.inputField` / `common.validation.inputFieldRequired`，语言切换不主动触发表单校验。平台协议值、配置字段名、默认连接方式、必填条件、回调地址与外部链接保持原值；启停、保存和复制成功提示复用 `common.messages`。
+
+## 触发器
+
+`trigger.json` 维护触发器业务，管理列表、工作空间和系统资源管理中的智能体／工具入口及资源触发器弹窗共用 `trigger.title`。
+定时与事件类型分别归 `scheduled` / `event`，名称使用 `label`；任务、下次执行时间等展示标签归 `labels`，删除确认与影响说明归 `delete`。
+名称、描述、创建信息、启停状态、通用操作和成功提示复用 `common`；任务分组名称复用 `application.title` / `tool.title`，执行记录入口复用 `resource.executionRecords.title`。
+资源触发器的周期摘要复用 `common.schedule`，只翻译周期、星期和单位，日期数字、时刻和间隔值在使用处组合；Cron 表达式、触发器名称和描述保持原值。
+类型和状态选项响应当前语言，筛选与启停请求仍使用原有协议值；已有周期摘要函数在执行时直接调用 `t`。
+创建／编辑标题使用 `createTitle` / `editTitle`，名称字段归 `fields.name`；触发周期归 `scheduled.period`，事件地址与令牌校验归 `event`。
+请求参数的标题、名称、数据类型及校验归 `requestParameters`，参数与必填表头复用 `dynamicForm.fields`；任务执行标签和必选提示归 `taskExecution`，内置问题、文件类型及参数来源归 `taskParameters`。
+周期级联选项在 computed 中翻译 `SCHEDULE_OPTION` 的 `labelKey`，不改写共享常量；Cron 字段与校验复用 `common.schedule.cron`。输入占位与必填提示分别使用 `common.placeholders.inputField` / `common.validation.inputFieldRequired`。
+任务参数只翻译内置展示标签；用户定义的参数名、`body` 路径、数据类型、引用来源值和默认值保持原样。语言切换不初始化任务参数，不自动触发表单校验。
+执行记录与详情标题、资源类型、执行时间、错误信息归 `resource.executionRecords`，触发失败使用 `resource.executionRecords.status.triggerFailed`；触发任务和触发器入参归 `trigger.executionRecords`。
+触发器、工具和知识库工作流执行记录的状态筛选与展示通过 `EXECUTION_STATUS_OPTIONS` 的 `labelKey` 调用 `t`，通用状态复用 `common.status`；名称、状态表头、耗时、操作和记录翻页复用 `common`，资源类型名称复用 `application.title` / `tool.title`。
+查询、排序和跨页浏览使用原协议值，未知状态及接口返回的任务名称、入参和错误内容保留原文；节点内部详情文案随工作流节点批次接入。
 
 ## 知识库列表
 
@@ -179,7 +204,7 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 `knowledge/index.json` 维护列表、知识库类型、创建、共用文案及尚未独立分文件的业务文案。仅有菜单名称、尚未形成独立业务分组的功能集中在 `knowledge.menu`，按菜单显示顺序排列，使用 `knowledge.menu.<名称>`。
 `tag.json` 维护标签管理与文档标签设置，使用 `knowledge.tags`。`document.json` 维护文档列表、上传与预览，使用 `knowledge.document`；图片列表、上传、详情及校验文案同文件存放，使用与 `document` 平级的 `image` 分组，引用为 `knowledge.image`。`paragraph.json` 维护分段字段、校验、关联问题、列表操作及删除确认，使用 `knowledge.paragraph`；分段列表与导入预览共用 `knowledge.paragraph.empty`，数量单位复用 `knowledge.stats`。`settings.json` 维护基础设置与文档处理策略；`sync.json` 按 `sync`、`scheduledSync`、`syncLog` 的顺序维护同步方式、定时同步与同步日志。生成问题弹窗归 `generate-questions.json`。
 基础设置标题、上传限制和更换向量模型确认归 `knowledge.baseSettings`，四种资源范围的基础设置路由共用 `knowledge.baseSettings.title`；类型名称与说明复用知识库类型分组，Web 字段复用 `knowledge.fields`，飞书凭据的固定字段名使用通用输入占位与校验。文档策略的同步生效说明归 `knowledge.documentStrategy.syncHint`。
-同步入口、同步方式与共用提示归 `knowledge.sync`，`label` 用于“同步”按钮及任务标签，`title` 用于“同步知识库”弹窗；定时同步字段、开关说明和业务校验归 `knowledge.scheduledSync`，菜单共用其 `title`；日志表头、同步状态、计数标签和已知跳过原因归 `knowledge.syncLog`，均在 `knowledge/sync.json` 维护。统计按“文档: 数量 (已同步: 数量, …)”组合，各语言保持顺序和格式一致；接口返回的未知原因与错误详情保留原文。
+同步入口、同步方式与共用提示归 `knowledge.sync`，`label` 用于“同步”按钮及任务标签，`title` 用于“同步知识库”弹窗；定时同步字段、开关说明和业务校验归 `knowledge.scheduledSync`，菜单共用其 `title`；日志表头和已知跳过原因归 `knowledge.syncLog`，同步专属状态与结果计数标签共用 `knowledge.syncLog.status`，均在 `knowledge/sync.json` 维护，成功／失败状态及失败计数标签复用 `common.status`。统计按“文档: 数量 (已同步: 数量, …)”组合，各语言保持顺序和格式一致；接口返回的未知原因与错误详情保留原文。
 标签导入标题、模板和格式限制归 `knowledge.tags.import`，关联文档标题及页签归 `knowledge.tags.documents`；文档字段复用 `knowledge.document`，通用关联操作及结果提示复用 `common`，文件选择校验复用 `upload`。
 问题列表、创建、详情及问题与分段的关联文案归 `knowledge.question`，在 `knowledge/question.json` 维护；四种资源范围的菜单与列表共用 `title`，详情抽屉标题使用 `detailTitle`。输入占位、多行输入说明和长度校验归 `content`，关联分段入口、数量标签及无关联分段时的空状态归 `paragraphs`，创建按钮和弹窗共用 `actions.create`。关联弹窗的文档／图片页签和分段详情复用各自业务域；召回统计及字符单位复用 `knowledge.stats`，时间、通用操作、记录切换及成功提示复用 `common`。
 自定义分词的标题、用途说明、词语字段及创建入口归 `knowledge.termbase`，在 `knowledge/termbase.json` 维护；英文沿用 v2 的 `term` 用词，标题为 `Custom term`，创建入口为 `Create term`。四种资源范围的菜单与列表共用 `title`，创建按钮和弹窗共用 `actions.create`。词语标签、单行与多行输入占位归 `content`；时间、通用操作及创建／删除／导出成功提示复用 `common`。词语内容和导出文件名保持原值。
@@ -191,9 +216,9 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 跨对象共用的召回次数、最后一次召回时间归 `knowledge.stats.retrievalCount` / `lastRetrievedAt`，文档列表和分段预览共用。
 文档、图片与分段的迁移入口共用 `knowledge.actions.migrate` / `migrateTo`，成功提示共用 `knowledge.messages.migrateSuccess`。迁移目标知识库使用 `knowledge.fields.targetKnowledge`，目标文档使用 `knowledge.document.target`，占位与必填提示分别维护。分段位置菜单归 `knowledge.paragraph.position`；新增、保存和移动成功提示复用 `common.messages`。
 四种资源范围的详情菜单和页面标题共用路由中的翻译 key：已整理的业务引用所属分组的 `title`，例如 `knowledge.document.title`、`knowledge.tags.title` 和 `knowledge.documentStrategy.title`；仅有菜单名称的功能引用 `knowledge.menu`，不重复定义标题。“设置”复用 `common.labels.settings`。
-文档列表的文件状态和进度归 `knowledge.document.status`，召回处理选项归 `knowledge.document.hitHandling`。筛选项和行内展示共用译文，接口接收原有状态、任务类型和召回处理值。
+文档列表的文件状态标题、专属处理阶段和进度归 `knowledge.document.status`，通用状态复用 `common.status`；召回处理选项归 `knowledge.document.hitHandling`。筛选项和行内展示共用译文，接口接收原有状态、任务类型和召回处理值。
 图片菜单与页面标题共用 `knowledge.image.title`。图片处理配置复用 `knowledge.documentStrategy`，上传限制、格式说明和上传校验复用 `upload`；文档状态、召回处理及共用文档操作继续引用 `knowledge.document`，统计字段引用 `knowledge.stats`。接口返回的图片名称、标签、模型和工具名称保留原文。
-工作流文档导入的操作归 `knowledge.document.import`。导入与调试共用的数据源、默认用户输入标题和执行结果归 `workflow.json`，分别使用 `workflow.dataSource`、`workflow.userInput` 和 `workflow.executionResult`。
+工作流文档导入的操作归 `knowledge.document.import`。导入与调试共用的数据源、默认用户输入标题和执行结果专属文案归 `workflow.json`，分别使用 `workflow.dataSource`、`workflow.userInput` 和 `workflow.executionResult`；执行中和已取消复用 `common.status`。
 
 ## 文件夹
 

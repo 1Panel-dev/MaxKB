@@ -10,8 +10,6 @@
   "executionResult": {
     "title": "執行結果",
     "success": "執行成功",
-    "failure": "執行失敗",
-    "canceled": "已取消",
-    "running": "執行中"
+    "failure": "執行失敗"
   }
 }

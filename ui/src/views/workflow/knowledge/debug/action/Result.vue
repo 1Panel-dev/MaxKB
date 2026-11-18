@@ -65,12 +65,12 @@ onUnmounted(stopPolling)
       <el-alert v-else-if="state === 'FAILURE'" :title="t('workflow.executionResult.failure')" type="error" show-icon :closable="false" />
       <el-alert
         v-else-if="state === 'REVOKE' || state === 'REVOKED'"
-        :title="t('workflow.executionResult.canceled')"
+        :title="t('common.status.canceled')"
         type="warning"
         show-icon
         :closable="false"
       />
-      <el-alert v-else :title="t('workflow.executionResult.running')" type="info" show-icon :closable="false" />
+      <el-alert v-else :title="t('common.status.running')" type="info" show-icon :closable="false" />
     </div>
     <ExecutionDetailContent :detail="detail" :workflow-mode="WorkflowMode.Knowledge" />
   </div>

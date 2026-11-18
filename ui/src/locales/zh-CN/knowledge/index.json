@@ -9,6 +9,9 @@
     "all": "全部知识库",
     "shared": "共享知识库"
   },
+  "help": {
+    "embeddingModelHint": "所选知识库必须使用相同的 Embedding 模型"
+  },
   "base": {
     "label": "通用知识库",
     "createTitle": "创建通用知识库",

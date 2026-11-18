@@ -36,16 +36,10 @@
     },
     "status": {
       "label": "File status",
-      "pending": "Queued",
-      "started": "Running",
       "embedding": "Indexing",
       "generate": "Generating questions",
       "sync": "Syncing",
       "tokenize": "Building keyword index",
-      "success": "Succeeded",
-      "failure": "Failed",
-      "canceling": "Canceling",
-      "canceled": "Canceled",
       "progress": "Completed"
     },
     "actions": {

@@ -49,15 +49,9 @@
     "status": {
       "label": "同步狀態",
       "running": "同步中",
-      "success": "成功",
-      "failure": "失敗",
-      "skipped": "略過"
-    },
-    "counts": {
       "synced": "已同步",
       "skipped": "略過",
-      "deleted": "刪除",
-      "failed": "失敗"
+      "deleted": "刪除"
     },
     "messages": {
       "running": "正在同步",

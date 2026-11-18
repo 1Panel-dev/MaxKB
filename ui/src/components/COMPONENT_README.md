@@ -890,6 +890,7 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 仅普通工作空间显示只读 `FolderTree`，包含共享目录；选中共享目录时调用 Workspace Shared API 的
 `getAllKnowledge`，不传文件夹参数；其他范围不显示或查询文件夹。
 支持名称搜索和跨目录保留选择，调用方维护最终关联 ID 与快照。
+三个资源选择弹窗的文案归属见 [国际化规则](../locales/LOCALE_README.md#资源选择弹窗)。
 
 ### SelectApplicationDialog、SelectToolDialog
 
@@ -907,6 +908,7 @@ System 资源管理中的工具选择必须传入资源详情所属空间 `works
 仅普通工作空间显示或查询文件夹；仅展示启用资源。`toolTypes` 默认包含自定义、工作流和内置工具，
 Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两者支持 `excludedIds`，
 供调用方排除当前智能体或工具，避免直接自引用。弹窗不使用滚动分页。
+`SelectToolDialog` 未传入 `title` 时使用随语言更新的默认工具标题；传入时按原文展示，由调用方负责翻译。
 
 ### SelectModel
 

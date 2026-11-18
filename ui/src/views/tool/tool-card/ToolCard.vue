@@ -63,12 +63,7 @@ function handleClick(event: MouseEvent) {
     </p>
 
     <template #footer="{ Action, ActionDropdown }">
-      <MkStatusLabel
-        :active="tool.is_active"
-        :active-text="t('common.status.enabled')"
-        :inactive-text="t('common.status.disabled')"
-        class="text-N600!"
-      />
+      <MkStatusLabel :active="tool.is_active" class="text-N600!" />
       <component :is="Action" v-if="!disabled">
         <slot name="actions" />
         <component :is="ActionDropdown">

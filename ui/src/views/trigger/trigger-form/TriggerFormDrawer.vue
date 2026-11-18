@@ -2,6 +2,7 @@
 import { computed, nextTick, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import { v7 as uuidv7 } from 'uuid'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type { ApplicationDetail, ResourceTriggerResource, ToolItem, TriggerDetail, TriggerPayload, TriggerSetting } from '@/api/types'
@@ -21,6 +22,8 @@ import { SCHEDULE_OPTION } from '@/constants/schedule'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
 
+const { t } = useI18n({ useScope: 'global' })
+
 const props = withDefaults(
   defineProps<{
     resource?: ResourceTriggerResource
@@ -30,7 +33,13 @@ const props = withDefaults(
     toolWorkflowApi?: typeof WorkflowApi
     canEdit?: boolean
   }>(),
-  { resourceApi: () => ResourceTriggerApi, applicationApi: () => ApplicationApi, toolApi: () => ToolApi, toolWorkflowApi: () => WorkflowApi, canEdit: true },
+  {
+    resourceApi: () => ResourceTriggerApi,
+    applicationApi: () => ApplicationApi,
+    toolApi: () => ToolApi,
+    toolWorkflowApi: () => WorkflowApi,
+    canEdit: true,
+  },
 )
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 /* 抽屉生命周期与详情 */
@@ -152,6 +161,21 @@ function open(triggerId?: string) {
 }
 
 /* 触发周期及事件参数 */
+const scheduleOptions = computed(() =>
+  SCHEDULE_OPTION.map((period) => ({
+    ...period,
+    label: typeof period.labelKey === 'string' ? t(period.labelKey) : period.label,
+    children: period.children?.map((option) => ({
+      ...option,
+      label:
+        period.value === SCHEDULE_TYPE.MONTHLY
+          ? `${option.value} ${t('common.schedule.day')}`
+          : typeof option.labelKey === 'string'
+            ? t(option.labelKey)
+            : option.label,
+    })),
+  })),
+)
 const scheduleValue = computed<Array<number | string>>({
   get: () => {
     const setting = form.value.trigger_setting
@@ -193,10 +217,10 @@ function handleSwitchScheduleMode() {
   formRef.value?.clearValidate('trigger_setting')
 }
 
-const triggerTypeOptions = [
-  { value: TRIGGER_TYPE.SCHEDULED, label: '定时触发', description: '到设定时间后执行任务' },
-  { value: TRIGGER_TYPE.EVENT, label: '事件触发', description: '当某个事件发生时执行任务' },
-]
+const triggerTypeOptions = computed(() => [
+  { value: TRIGGER_TYPE.SCHEDULED, label: t('trigger.scheduled.label'), description: t('trigger.scheduled.description') },
+  { value: TRIGGER_TYPE.EVENT, label: t('trigger.event.label'), description: t('trigger.event.description') },
+])
 function handleSelectTriggerType(type: TriggerPayload['trigger_type']) {
   if (saving.value || loading.value) return
   form.value.trigger_type = type
@@ -206,9 +230,9 @@ function handleRefreshToken() {
   form.value.trigger_setting.token = uuidv7().replaceAll('-', '')
 }
 
-const rules: FormRules<TriggerPayload> = {
-  name: [{ required: true, whitespace: true, message: '请输入触发器名称', trigger: 'blur' }],
-  trigger_task: [{ type: 'array', required: true, min: 1, message: '请至少选择一个执行任务', trigger: 'change' }],
+const rules = computed<FormRules<TriggerPayload>>(() => ({
+  name: [{ required: true, whitespace: true, message: t('trigger.fields.name.requiredMessage'), trigger: 'blur' }],
+  trigger_task: [{ type: 'array', required: true, min: 1, message: t('trigger.taskExecution.requiredMessage'), trigger: 'change' }],
   trigger_setting: [
     {
       validator: (_rule, _value, callback) => {
@@ -216,26 +240,27 @@ const rules: FormRules<TriggerPayload> = {
         let error = ''
         if (form.value.trigger_type === TRIGGER_TYPE.EVENT) {
           const body = setting.body ?? []
-          if (!setting.token?.trim()) error = '请生成 Bearer Token'
-          else if (body.some(({ field }) => !field.trim())) error = '请填写请求参数名称'
-          else if (new Set(body.map(({ field }) => field.trim())).size !== body.length) error = '请求参数名称不能重复'
+          if (!setting.token?.trim()) error = t('trigger.event.token.requiredMessage')
+          else if (body.some(({ field }) => !field.trim())) error = t('trigger.requestParameters.name.requiredMessage')
+          else if (new Set(body.map(({ field }) => field.trim())).size !== body.length) error = t('trigger.requestParameters.name.duplicateMessage')
         } else if (!setting.schedule_type) {
-          error = '请选择触发周期'
+          error = t('trigger.scheduled.period.requiredMessage')
         } else if (setting.schedule_type === SCHEDULE_TYPE.CRON) {
-          if (setting.cron_expression?.trim().split(/\s+/).length !== 5) error = '请输入有效的Cron 表达式'
+          if (setting.cron_expression?.trim().split(/\s+/).length !== 5) error = t('common.schedule.cron.invalidMessage')
         } else if (setting.schedule_type === SCHEDULE_TYPE.INTERVAL) {
-          if (!Number.isInteger(setting.interval_value) || (setting.interval_value ?? 0) < 1) error = '请选择触发周期'
+          if (!Number.isInteger(setting.interval_value) || (setting.interval_value ?? 0) < 1) error = t('trigger.scheduled.period.requiredMessage')
         } else {
-          if (!setting.time?.length || setting.time.some((time) => !/^([01]\d|2[0-3]):[0-5]\d$/.test(time))) error = '请选择触发周期'
+          if (!setting.time?.length || setting.time.some((time) => !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)))
+            error = t('trigger.scheduled.period.requiredMessage')
           if ([SCHEDULE_TYPE.WEEKLY, SCHEDULE_TYPE.MONTHLY].some((type) => type === setting.schedule_type) && !setting.days?.length)
-            error = '请选择触发周期'
+            error = t('trigger.scheduled.period.requiredMessage')
         }
         callback(error ? new Error(error) : undefined)
       },
       trigger: 'change',
     },
   ],
-}
+}))
 
 /* 表单校验及保存 */
 function handleSave() {
@@ -278,7 +303,7 @@ function handleSave() {
           ? TriggerApi.putTrigger(editingId.value, payload)
           : TriggerApi.postTrigger(payload)
       return request.then(() => {
-        MsgSuccess(editingId.value ? '保存成功' : '创建成功')
+        MsgSuccess(editingId.value ? t('common.messages.saveSuccess') : t('common.messages.createSuccess'))
         visible.value = false
         emit('refresh')
       })
@@ -309,16 +334,24 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" :title="editingId ? '编辑触发器' : '创建触发器'" @closed="handleClosed">
+  <MkDrawer v-model="visible" :title="editingId ? t('trigger.editTitle') : t('trigger.createTitle')" @closed="handleClosed">
     <div v-loading="loading || saving">
-      <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item label="触发器名称" prop="name">
-          <el-input v-model="form.name" maxlength="64" show-word-limit placeholder="请输入触发器名称" />
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
+        <el-form-item :label="t('trigger.fields.name.label')" prop="name">
+          <el-input v-model="form.name" maxlength="64" show-word-limit :placeholder="t('trigger.fields.name.placeholder')" />
         </el-form-item>
-        <el-form-item label="描述" prop="desc">
-          <el-input v-model="form.desc" type="textarea" :rows="3" maxlength="200" show-word-limit placeholder="请输入" />
+        <el-form-item :label="t('common.description.label')" prop="desc">
+          <el-input v-model="form.desc" type="textarea" :rows="3" maxlength="200" show-word-limit :placeholder="t('common.placeholders.input')" />
         </el-form-item>
-        <el-form-item label="类型" required>
+        <el-form-item :label="t('common.labels.type')" required>
           <div class="w-full space-y-2">
             <MkResourceCard
               v-for="option in triggerTypeOptions"
@@ -340,11 +373,19 @@ defineExpose({ open })
                     <template v-if="option.value === TRIGGER_TYPE.SCHEDULED">
                       <div class="flex-between mb-2">
                         <span class="mk-required">
-                          {{ form.trigger_setting.schedule_type === SCHEDULE_TYPE.CRON ? 'Cron 表达式' : '触发周期' }}
+                          {{
+                            form.trigger_setting.schedule_type === SCHEDULE_TYPE.CRON
+                              ? t('common.schedule.cron.label')
+                              : t('trigger.scheduled.period.label')
+                          }}
                         </span>
                         <!-- 切换周期设置与 Cron 表达式 -->
                         <MkTooltip
-                          :content="form.trigger_setting.schedule_type === SCHEDULE_TYPE.CRON ? '切换为周期设置' : '切换为 Cron 表达式'"
+                          :content="
+                            form.trigger_setting.schedule_type === SCHEDULE_TYPE.CRON
+                              ? t('common.schedule.switchToPreset')
+                              : t('common.schedule.switchToCron')
+                          "
                           placement="top"
                         >
                           <el-button text type="primary" @click="handleSwitchScheduleMode">
@@ -355,20 +396,21 @@ defineExpose({ open })
                       <el-cascader
                         v-if="form.trigger_setting.schedule_type !== SCHEDULE_TYPE.CRON"
                         v-model="scheduleValue"
-                        :options="SCHEDULE_OPTION"
+                        :options="scheduleOptions"
                         :teleported="false"
                         class="w-full"
                         clearable
-                        placeholder="请选择触发周期"
+                        :placeholder="t('trigger.scheduled.period.placeholder')"
                       />
-                      <el-input v-else v-model="form.trigger_setting.cron_expression" placeholder="请输入Cron表达式（如：0 0 1 * *）" />
+                      <el-input v-else v-model="form.trigger_setting.cron_expression" :placeholder="t('common.schedule.cron.placeholder')" />
                     </template>
                     <!-- 事件触发 -->
                     <template v-else>
-                      <p class="mb-2">事件 URL</p>
+                      <p class="mb-2">{{ t('trigger.event.url.label') }}</p>
                       <el-input v-model="eventUrl" readonly>
                         <template #suffix>
-                          <el-button text @click="copyText(eventUrl)" class="-mr-1">
+                          <!-- 复制事件回调地址 -->
+                          <el-button text @click="copyText(eventUrl, t('common.messages.copied'))" class="-mr-1">
                             <MkIcon name="icon_copy_outlined" />
                           </el-button>
                         </template>
@@ -378,7 +420,8 @@ defineExpose({ open })
 
                       <el-input v-model="form.trigger_setting.token" readonly>
                         <template #suffix>
-                          <el-button text @click="copyText(form.trigger_setting.token)">
+                          <!-- 复制事件认证令牌 -->
+                          <el-button text @click="copyText(form.trigger_setting.token, t('common.messages.copied'))">
                             <MkIcon name="icon_copy_outlined" />
                           </el-button>
                           <!-- 刷新Token -->
@@ -397,7 +440,7 @@ defineExpose({ open })
           </div>
         </el-form-item>
         <!-- 任务执行 -->
-        <el-form-item label="任务执行" prop="trigger_task">
+        <el-form-item :label="t('trigger.taskExecution.label')" prop="trigger_task">
           <div class="mk-gray-card-lg w-full">
             <TriggerTaskExecution
               v-if="!resource"
@@ -431,10 +474,10 @@ defineExpose({ open })
     </div>
     <template #footer>
       <!-- 取消触发器编辑 -->
-      <el-button plain :disabled="saving" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="saving" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存触发器配置 -->
       <el-button v-if="canEdit" type="primary" :loading="saving" :disabled="loading || detailFailed" @click="handleSave">
-        {{ editingId ? '保存' : '创建' }}
+        {{ editingId ? t('common.actions.save') : t('common.actions.create') }}
       </el-button>
     </template>
   </MkDrawer>

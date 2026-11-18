@@ -1,0 +1,79 @@
+{
+  "title": "触发器",
+  "createTitle": "创建触发器",
+  "editTitle": "编辑触发器",
+  "fields": {
+    "name": {
+      "label": "触发器名称",
+      "placeholder": "请输入触发器名称",
+      "requiredMessage": "请输入触发器名称"
+    }
+  },
+  "scheduled": {
+    "label": "定时触发",
+    "description": "到设定时间后执行任务",
+    "period": {
+      "label": "触发周期",
+      "placeholder": "请选择触发周期",
+      "requiredMessage": "请选择触发周期"
+    }
+  },
+  "event": {
+    "label": "事件触发",
+    "description": "当某个事件发生时执行任务",
+    "url": {
+      "label": "事件 URL"
+    },
+    "token": {
+      "requiredMessage": "请生成 Bearer Token"
+    }
+  },
+  "requestParameters": {
+    "title": "请求参数",
+    "addTitle": "添加请求参数",
+    "editTitle": "编辑请求参数",
+    "name": {
+      "label": "参数名",
+      "placeholder": "请输入参数名",
+      "requiredMessage": "请输入参数名",
+      "duplicateMessage": "参数名称不能重复"
+    },
+    "dataType": {
+      "label": "数据类型",
+      "placeholder": "请选择数据类型",
+      "requiredMessage": "请选择数据类型"
+    }
+  },
+  "taskExecution": {
+    "label": "任务执行",
+    "requiredMessage": "请至少选择一个执行任务"
+  },
+  "taskParameters": {
+    "question": "问题",
+    "files": {
+      "document": "文档",
+      "image": "图片",
+      "audio": "音频",
+      "video": "视频",
+      "other": "其他文件"
+    },
+    "source": {
+      "reference": "引用",
+      "custom": "自定义",
+      "invalidMessage": "请选择有效的事件请求参数，或切换为自定义"
+    }
+  },
+  "labels": {
+    "task": "任务",
+    "nextRunTime": "下次执行时间"
+  },
+  "delete": {
+    "title": "确定删除触发器",
+    "batchTitle": "是否删除选中的 {count} 个触发器",
+    "description": "删除后将停止触发任务，并删除相关执行记录。"
+  },
+  "executionRecords": {
+    "task": "触发任务",
+    "input": "触发器入参"
+  }
+}

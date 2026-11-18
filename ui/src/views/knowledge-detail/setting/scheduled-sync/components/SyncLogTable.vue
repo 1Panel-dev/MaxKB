@@ -25,8 +25,8 @@ const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const syncMethodLabels = computed(() => new Map(KNOWLEDGE_SYNC_OPTIONS.map(({ value, labelKey }) => [value, t(labelKey)])))
 const syncStatusOptions = computed<Partial<Record<KnowledgeSyncStatus, StatusLabelOptions>>>(() => ({
   [KNOWLEDGE_SYNC_STATUS.RUNNING]: { type: 'loading', label: t('knowledge.syncLog.status.running') },
-  [KNOWLEDGE_SYNC_STATUS.SUCCESS]: { type: 'success', label: t('knowledge.syncLog.status.success') },
-  [KNOWLEDGE_SYNC_STATUS.FAILURE]: { type: 'failure', label: t('knowledge.syncLog.status.failure') },
+  [KNOWLEDGE_SYNC_STATUS.SUCCESS]: { type: 'success', label: t('common.status.success') },
+  [KNOWLEDGE_SYNC_STATUS.FAILURE]: { type: 'failure', label: t('common.status.failure') },
   [KNOWLEDGE_SYNC_STATUS.SKIPPED]: { type: 'disabled', label: t('knowledge.syncLog.status.skipped'), icon: 'icon_skip_filled' },
 }))
 
@@ -37,10 +37,10 @@ function getSyncContent(log: KnowledgeSyncLog) {
     if (log.message === 'Scheduled synchronization is disabled') return t('knowledge.syncLog.messages.syncDisabled')
     return log.message || t('knowledge.syncLog.messages.skipped')
   }
-  const counts = [`${t('knowledge.syncLog.counts.synced')}: ${log.synced_count}`]
-  if (log.skipped_count) counts.push(`${t('knowledge.syncLog.counts.skipped')}: ${log.skipped_count}`)
-  if (log.deleted_count) counts.push(`${t('knowledge.syncLog.counts.deleted')}: ${log.deleted_count}`)
-  if (log.failed_count) counts.push(`${t('knowledge.syncLog.counts.failed')}: ${log.failed_count}`)
+  const counts = [`${t('knowledge.syncLog.status.synced')}: ${log.synced_count}`]
+  if (log.skipped_count) counts.push(`${t('knowledge.syncLog.status.skipped')}: ${log.skipped_count}`)
+  if (log.deleted_count) counts.push(`${t('knowledge.syncLog.status.deleted')}: ${log.deleted_count}`)
+  if (log.failed_count) counts.push(`${t('common.status.failure')}: ${log.failed_count}`)
   return `${t('knowledge.stats.documents', log.total_count)}: ${log.total_count} (${counts.join(', ')})`
 }
 function loadSyncLogs() {

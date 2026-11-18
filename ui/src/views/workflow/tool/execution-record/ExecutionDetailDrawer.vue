@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import type { ToolExecutionRecord, ToolExecutionRecordDetail } from '@/api/types'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
@@ -9,6 +10,8 @@ import { WorkflowMode } from '@/workflow-canvas/types'
 import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { isSystemSharedResource } from '@/utils/resource-context'
 import { datetimeFormat } from '@/utils/time'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   api: typeof WorkflowApi
@@ -79,10 +82,12 @@ watch(
             {{ record?.workspace_name || '-' }}
           </div>
           <div>
-            <p class="mb-1 text-N600">状态</p>
+            <p class="mb-1 text-N600">{{ t('common.status.label') }}</p>
             <MkStatusLabel
               v-if="EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state]"
-              v-bind="EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state]"
+              :type="EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state].type"
+              :label="t(EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state].labelKey)"
+              :icon="EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state].icon"
             />
             <span v-else>{{ detail?.state ?? record.state }}</span>
           </div>

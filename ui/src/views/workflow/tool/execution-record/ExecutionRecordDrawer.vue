@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import type { Dict, ToolExecutionRecord } from '@/api/types'
 import { KNOWLEDGE_TYPE, STATE_TYPES, TOOL_RECORD_SOURCE } from '@/api/enums'
@@ -8,6 +9,8 @@ import { EXECUTION_STATUS_OPTIONS } from '@/constants/state'
 import { toOrderBy } from '@/utils/common'
 import { isSystemSharedResource } from '@/utils/resource-context'
 import { datetimeFormat } from '@/utils/time'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ api: typeof WorkflowApi; toolId: string }>()
 const emit = defineEmits<{ closed: [] }>()
@@ -31,11 +34,11 @@ const sourceTypeOptions = [
   { label: sourceLabels[TOOL_RECORD_SOURCE.TOOL], value: TOOL_RECORD_SOURCE.TOOL },
   { label: sourceLabels[TOOL_RECORD_SOURCE.TRIGGER], value: TOOL_RECORD_SOURCE.TRIGGER },
 ]
-const stateOptions = [
-  { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.SUCCESS].label, value: STATE_TYPES.SUCCESS },
-  { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.STARTED].label, value: STATE_TYPES.STARTED },
-  { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.FAILURE].label, value: STATE_TYPES.FAILURE },
-]
+const stateOptions = computed(() => [
+  { label: t(EXECUTION_STATUS_OPTIONS[STATE_TYPES.SUCCESS].labelKey), value: STATE_TYPES.SUCCESS },
+  { label: t(EXECUTION_STATUS_OPTIONS[STATE_TYPES.STARTED].labelKey), value: STATE_TYPES.STARTED },
+  { label: t(EXECUTION_STATUS_OPTIONS[STATE_TYPES.FAILURE].labelKey), value: STATE_TYPES.FAILURE },
+])
 const searchFields = [{ label: '触发来源', value: 'source_name' }]
 const selectedSourceType = ref<string | null>(null)
 const selectedState = ref<string | null>(null)
@@ -164,12 +167,23 @@ defineExpose({ open })
         </template>
         <template #default="{ row }">{{ sourceLabels[row.source_type as keyof typeof sourceLabels] || '-' }}</template>
       </el-table-column>
-      <el-table-column label="状态" width="100">
+      <el-table-column :label="t('common.status.label')" width="100">
         <template #header>
-          <MkTableFilter mode="single" v-model="selectedState" label="状态" :options="stateOptions" @change="handleFilterChange" />
+          <MkTableFilter
+            mode="single"
+            v-model="selectedState"
+            :label="t('common.status.label')"
+            :options="stateOptions"
+            @change="handleFilterChange"
+          />
         </template>
         <template #default="{ row }: { row: ToolExecutionRecord }">
-          <MkStatusLabel v-if="EXECUTION_STATUS_OPTIONS[row.state]" v-bind="EXECUTION_STATUS_OPTIONS[row.state]" />
+          <MkStatusLabel
+            v-if="EXECUTION_STATUS_OPTIONS[row.state]"
+            :type="EXECUTION_STATUS_OPTIONS[row.state].type"
+            :label="t(EXECUTION_STATUS_OPTIONS[row.state].labelKey)"
+            :icon="EXECUTION_STATUS_OPTIONS[row.state].icon"
+          />
           <span v-else>{{ row.state }}</span>
         </template>
       </el-table-column>

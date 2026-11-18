@@ -25,9 +25,6 @@
   "mcpConfig": {
     "title": "MCP 服务配置"
   },
-  "triggers": {
-    "title": "触发器"
-  },
   "templateStore": {
     "title": "模板中心",
     "searchResults": "找到 {count} 个相关模板",
@@ -36,7 +33,14 @@
   },
   "executionRecords": {
     "title": "执行记录",
-    "view": "查看执行记录"
+    "detailTitle": "执行详情",
+    "view": "查看执行记录",
+    "resourceType": "资源类型",
+    "executionTime": "执行时间",
+    "errorMessage": "错误信息",
+    "status": {
+      "triggerFailed": "触发失败"
+    }
   },
   "messages": {
     "unsupportedScope": "当前资源范围不支持此操作"

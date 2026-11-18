@@ -5,16 +5,16 @@ import type { StatusLabelType } from '@/components/global/mk-status-label/types'
 
 // 文档展示阶段独立于执行记录接口状态，筛选值不直接提交给后端。
 export const DOCUMENT_STATUS_OPTIONS = {
-  [STATE_TYPES.PENDING]: { type: 'loading', labelKey: 'knowledge.document.status.pending' },
-  [STATE_TYPES.STARTED]: { type: 'loading', labelKey: 'knowledge.document.status.started' },
+  [STATE_TYPES.PENDING]: { type: 'loading', labelKey: 'common.status.pending' },
+  [STATE_TYPES.STARTED]: { type: 'loading', labelKey: 'common.status.running' },
   EMBEDDING: { type: 'loading', labelKey: 'knowledge.document.status.embedding' },
   GENERATE: { type: 'loading', labelKey: 'knowledge.document.status.generate' },
   SYNC: { type: 'loading', labelKey: 'knowledge.document.status.sync' },
   TOKENIZE: { type: 'loading', labelKey: 'knowledge.document.status.tokenize' },
-  [STATE_TYPES.SUCCESS]: { type: 'success', labelKey: 'knowledge.document.status.success' },
-  [STATE_TYPES.FAILURE]: { type: 'failure', labelKey: 'knowledge.document.status.failure' },
-  [STATE_TYPES.REVOKE]: { type: 'loading', labelKey: 'knowledge.document.status.canceling' },
-  [STATE_TYPES.REVOKED]: { type: 'failure', labelKey: 'knowledge.document.status.canceled' },
+  [STATE_TYPES.SUCCESS]: { type: 'success', labelKey: 'common.status.success' },
+  [STATE_TYPES.FAILURE]: { type: 'failure', labelKey: 'common.status.failure' },
+  [STATE_TYPES.REVOKE]: { type: 'loading', labelKey: 'common.status.canceling' },
+  [STATE_TYPES.REVOKED]: { type: 'failure', labelKey: 'common.status.canceled' },
 } satisfies Record<string, { type: StatusLabelType; labelKey: string }>
 
 interface DocumentStatusFilter {

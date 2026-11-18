@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { get, set } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDetail, ToolItem, TriggerBodyField, TriggerParameters, TriggerType } from '@/api/types'
 import type { TriggerParameter } from '@/api/types'
 import type { FormInstance, FormItemRule } from 'element-plus'
@@ -16,6 +17,8 @@ type TaskResource =
   | { type: typeof RESOURCE_TYPE.APPLICATION; data?: Partial<ApplicationDetail> }
   | { type: typeof RESOURCE_TYPE.TOOL; data?: Partial<ToolItem> }
 
+const { t } = useI18n({ useScope: 'global' })
+
 const props = defineProps<{
   disabled?: boolean
   resource: TaskResource
@@ -23,11 +26,17 @@ const props = defineProps<{
   body: TriggerBodyField[]
 }>()
 function getApplicationFields(application?: Partial<ApplicationDetail>): TaskParameterField[] {
-  const fields: TaskParameterField[] = [{ path: ['question'], label: 'Question', required: true, defaultValue: '' }]
+  const fields: TaskParameterField[] = [{ path: ['question'], label: t('trigger.taskParameters.question'), required: true, defaultValue: '' }]
   const properties = application?.work_flow?.nodes?.find((node) => node.type === 'base-node')?.properties ?? {}
   const nodeData = properties.node_data ?? {}
   if (nodeData.file_upload_enable) {
-    const fileLabels = { document: '文档', image: '图片', audio: '音频', video: '视频', other: '其他文件' }
+    const fileLabels = {
+      document: t('trigger.taskParameters.files.document'),
+      image: t('trigger.taskParameters.files.image'),
+      audio: t('trigger.taskParameters.files.audio'),
+      video: t('trigger.taskParameters.files.video'),
+      other: t('trigger.taskParameters.files.other'),
+    }
     Object.entries(fileLabels).forEach(([type, label]) => {
       if (nodeData.file_upload_setting?.[type]) fields.push({ path: [`${type}_list`], label, required: true, defaultValue: '[]' })
     })
@@ -124,7 +133,14 @@ function resetUnavailableReferences(parameters: TriggerParameters, fields: TaskP
 function getParameterRules(field: TaskParameterField): FormItemRule[] {
   return [
     ...(getTaskParameter(parameters.value, field).source === 'custom'
-      ? [{ whitespace: true, required: field.required, message: `请输入${field.label}`, trigger: 'change' }]
+      ? [
+          {
+            whitespace: true,
+            required: field.required,
+            message: t('common.validation.inputFieldRequired', { label: field.label }),
+            trigger: 'change',
+          },
+        ]
       : []),
     {
       validator: (_rule, _value, callback) => {
@@ -138,9 +154,9 @@ function getParameterRules(field: TaskParameterField): FormItemRule[] {
             value[0] !== 'body' ||
             !props.body.some(({ field }) => field === value[1]))
         ) {
-          callback(new Error('请选择有效的事件请求参数，或切换为自定义'))
+          callback(new Error(t('trigger.taskParameters.source.invalidMessage')))
         } else if (field.required && (Array.isArray(value) ? !value.length : !value?.trim())) {
-          callback(new Error(`请输入${field.label}`))
+          callback(new Error(t('common.validation.inputFieldRequired', { label: field.label })))
         } else callback()
       },
       trigger: 'change',
@@ -160,6 +176,7 @@ defineExpose({ validate })
     ref="formRef"
     :model="parameters"
     :disabled="disabled"
+    :validate-on-rule-change="false"
     label-position="top"
     require-asterisk-position="right"
     @submit.prevent
@@ -177,6 +194,7 @@ defineExpose({ validate })
           <span :class="field.required ? 'mk-required' : ''">
             {{ field.label }}
           </span>
+          <!-- 选择任务参数来源 -->
           <el-select
             v-if="showSource"
             v-model="getTaskParameter(parameters, field).source"
@@ -185,8 +203,8 @@ defineExpose({ validate })
             class="w-24!"
             @change="getTaskParameter(parameters, field).value = getTaskParameter(parameters, field).source === 'reference' ? [] : field.defaultValue"
           >
-            <el-option label="引用" value="reference" />
-            <el-option label="自定义" value="custom" />
+            <el-option :label="t('trigger.taskParameters.source.reference')" value="reference" />
+            <el-option :label="t('trigger.taskParameters.source.custom')" value="custom" />
           </el-select>
         </div>
       </template>
@@ -195,9 +213,13 @@ defineExpose({ validate })
         v-model="getTaskParameter(parameters, field).value"
         :options="referenceOptions"
         class="w-full"
-        placeholder="请选择"
+        :placeholder="t('common.placeholders.select')"
       />
-      <el-input v-else v-model="getTaskParameter(parameters, field).value" :placeholder="`请输入${field.label}`" />
+      <el-input
+        v-else
+        v-model="getTaskParameter(parameters, field).value"
+        :placeholder="t('common.placeholders.inputField', { label: field.label })"
+      />
     </el-form-item>
   </el-form>
 </template>

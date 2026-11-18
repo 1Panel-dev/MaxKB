@@ -26,7 +26,13 @@
   "status": {
     "label": "状态",
     "enabled": "已启用",
-    "disabled": "已禁用"
+    "disabled": "已禁用",
+    "pending": "排队中",
+    "running": "执行中",
+    "success": "成功",
+    "failure": "失败",
+    "canceling": "取消中",
+    "canceled": "已取消"
   },
   "dateRange": {
     "lastDays": "过去 {days} 天",
@@ -73,6 +79,7 @@
     "cancel": "取消",
     "retry": "重试",
     "reload": "重新加载",
+    "clear": "清空",
     "reset": "重置",
     "save": "保存",
     "add": "添加",
@@ -93,6 +100,7 @@
     "unrelate": "取消关联",
     "batchSelect": "批量选择",
     "cancelSelection": "取消选择",
+    "enable": "启用",
     "disable": "禁用",
     "saveAndEnable": "保存并启用",
     "confirm": "确认",

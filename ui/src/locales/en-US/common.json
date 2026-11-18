@@ -26,7 +26,13 @@
   "status": {
     "label": "Status",
     "enabled": "Enabled",
-    "disabled": "Disabled"
+    "disabled": "Disabled",
+    "pending": "Queued",
+    "running": "Running",
+    "success": "Succeeded",
+    "failure": "Failed",
+    "canceling": "Canceling",
+    "canceled": "Canceled"
   },
   "dateRange": {
     "lastDays": "Past {days} days",
@@ -73,6 +79,7 @@
     "cancel": "Cancel",
     "retry": "Retry",
     "reload": "Reload",
+    "clear": "Clear",
     "reset": "Reset",
     "save": "Save",
     "add": "Add",
@@ -93,6 +100,7 @@
     "unrelate": "Unrelate",
     "batchSelect": "Select multiple",
     "cancelSelection": "Cancel selection",
+    "enable": "Enable",
     "disable": "Disable",
     "saveAndEnable": "Save and enable",
     "confirm": "Confirm",

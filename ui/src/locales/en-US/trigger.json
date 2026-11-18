@@ -1,0 +1,79 @@
+{
+  "title": "Triggers",
+  "createTitle": "Create trigger",
+  "editTitle": "Edit trigger",
+  "fields": {
+    "name": {
+      "label": "Trigger name",
+      "placeholder": "Enter a trigger name",
+      "requiredMessage": "Enter a trigger name"
+    }
+  },
+  "scheduled": {
+    "label": "Scheduled trigger",
+    "description": "Run tasks at the scheduled time",
+    "period": {
+      "label": "Trigger schedule",
+      "placeholder": "Select a trigger schedule",
+      "requiredMessage": "Select a trigger schedule"
+    }
+  },
+  "event": {
+    "label": "Event trigger",
+    "description": "Run tasks when an event occurs",
+    "url": {
+      "label": "Event URL"
+    },
+    "token": {
+      "requiredMessage": "Generate a Bearer Token"
+    }
+  },
+  "requestParameters": {
+    "title": "Request parameters",
+    "addTitle": "Add request parameter",
+    "editTitle": "Edit request parameter",
+    "name": {
+      "label": "Parameter name",
+      "placeholder": "Enter a parameter name",
+      "requiredMessage": "Enter a parameter name",
+      "duplicateMessage": "Parameter names must be unique"
+    },
+    "dataType": {
+      "label": "Data type",
+      "placeholder": "Select a data type",
+      "requiredMessage": "Select a data type"
+    }
+  },
+  "taskExecution": {
+    "label": "Task execution",
+    "requiredMessage": "Select at least one task to run"
+  },
+  "taskParameters": {
+    "question": "Question",
+    "files": {
+      "document": "Document",
+      "image": "Image",
+      "audio": "Audio",
+      "video": "Video",
+      "other": "Other files"
+    },
+    "source": {
+      "reference": "Reference",
+      "custom": "Custom",
+      "invalidMessage": "Select a valid event request parameter or switch to Custom"
+    }
+  },
+  "labels": {
+    "task": "Tasks",
+    "nextRunTime": "Next run time"
+  },
+  "delete": {
+    "title": "Delete trigger",
+    "batchTitle": "Delete the {count} selected trigger | Delete the {count} selected triggers",
+    "description": "Deleting this trigger will stop its tasks and delete the related execution records."
+  },
+  "executionRecords": {
+    "task": "Triggered task",
+    "input": "Trigger input"
+  }
+}

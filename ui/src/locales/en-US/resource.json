@@ -25,9 +25,6 @@
   "mcpConfig": {
     "title": "MCP server configuration"
   },
-  "triggers": {
-    "title": "Triggers"
-  },
   "templateStore": {
     "title": "Template library",
     "searchResults": "{count} matching template | {count} matching templates",
@@ -36,7 +33,14 @@
   },
   "executionRecords": {
     "title": "Execution history",
-    "view": "View execution history"
+    "detailTitle": "Execution details",
+    "view": "View execution history",
+    "resourceType": "Resource type",
+    "executionTime": "Execution time",
+    "errorMessage": "Error message",
+    "status": {
+      "triggerFailed": "Trigger failed"
+    }
   },
   "messages": {
     "unsupportedScope": "This operation is not supported in the current resource scope."

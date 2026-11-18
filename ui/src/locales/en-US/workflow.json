@@ -10,8 +10,6 @@
   "executionResult": {
     "title": "Execution result",
     "success": "Execution succeeded",
-    "failure": "Execution failed",
-    "canceled": "Canceled",
-    "running": "Running"
+    "failure": "Execution failed"
   }
 }
