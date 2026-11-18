@@ -90,6 +90,24 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       { key: 'client_id', label: 'Client ID' },
       { key: 'client_secret', label: 'Client Secret', secret: true },
     ],
+    modeField: {
+      key: 'mode',
+      default: 'stream',
+      options: [
+        { value: 'stream', label: '使用长连接', tip: '使用钉钉 Stream 长连接，无需域名或 IP 即可接收消息并返回结果' },
+        { value: 'callback', label: '使用 URL 回调', tip: '通过配置回调地址接收消息并返回结果' },
+      ],
+      fields: {
+        stream: [
+          { key: 'client_id', label: 'Client ID' },
+          { key: 'client_secret', label: 'Client Secret', secret: true },
+        ],
+        callback: [
+          { key: 'client_id', label: 'Client ID' },
+          { key: 'client_secret', label: 'Client Secret', secret: true },
+        ],
+      },
+    },
     consoleUrl: 'https://open-dev.dingtalk.com/fe/app?hash=%23%2Fcorp%2Fapp#/corp/app',
     consoleName: '钉钉开放平台',
     callbackTip: '-机器人页面，设置 "消息接收模式" 为 HTTP模式 ，并把上面 URL 填写到"消息接收地址"中',
@@ -117,8 +135,26 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
     fields: [
       { key: 'app_id', label: 'App ID' },
       { key: 'app_secret', label: 'App Secret', secret: true },
-      { key: 'verification_token', label: 'Verification Token', required: false },
     ],
+    modeField: {
+      key: 'mode',
+      default: 'ws',
+      options: [
+        { value: 'ws', label: '使用长连接', tip: '使用飞书 WebSocket 长连接，无需配置订阅地址即可接收消息并返回结果' },
+        { value: 'callback', label: '使用 URL 回调', tip: '通过配置事件订阅回调地址接收消息并返回结果' },
+      ],
+      fields: {
+        ws: [
+          { key: 'app_id', label: 'App ID' },
+          { key: 'app_secret', label: 'App Secret', secret: true },
+        ],
+        callback: [
+          { key: 'app_id', label: 'App ID' },
+          { key: 'app_secret', label: 'App Secret', secret: true },
+          { key: 'verification_token', label: 'Verification Token', required: true },
+        ],
+      },
+    },
     consoleUrl: 'https://open.feishu.cn/app/',
     consoleName: '飞书开放平台',
     callbackTip: '-事件与回调-事件配置-配置订阅方式的 "请求地址" 中',
