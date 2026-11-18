@@ -150,7 +150,8 @@
     "inputFieldRequired": "請輸入 {label}",
     "selectRequired": "請選擇",
     "selectFieldRequired": "請選擇 {label}",
-    "jsonFormat": "請輸入正確的 JSON 格式"
+    "jsonFormat": "請輸入正確的 JSON 格式",
+    "lengthRange": "長度應為 {min}-{max} 個字元"
   },
   "empty": {
     "default": "暫無資料",

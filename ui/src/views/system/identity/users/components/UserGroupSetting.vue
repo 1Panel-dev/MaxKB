@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ListItem } from '@/api/types'
 import type { CascaderNode, CascaderOption, CascaderProps } from 'element-plus'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 
 defineOptions({ name: 'UserGroupSetting' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ workspaceIds: string[]; workspaceOptions: ListItem[] }>()
 
@@ -71,7 +74,7 @@ watch([() => props.workspaceIds, () => props.workspaceOptions], refreshUserGroup
       :show-all-levels="false"
       clearable
       filterable
-      placeholder="请选择用户组"
+      :placeholder="t('system.user.userGroup.placeholder')"
       fit-input-width
     />
   </el-form-item>

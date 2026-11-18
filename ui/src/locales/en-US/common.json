@@ -150,7 +150,8 @@
     "inputFieldRequired": "Enter {label}",
     "selectRequired": "This field is required",
     "selectFieldRequired": "Select {label}",
-    "jsonFormat": "Enter valid JSON"
+    "jsonFormat": "Enter valid JSON",
+    "lengthRange": "Length must be {min}-{max} characters"
   },
   "empty": {
     "default": "No data",

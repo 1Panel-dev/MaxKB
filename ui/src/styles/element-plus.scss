@@ -653,6 +653,7 @@
 
   // 密码显隐图标统一使用项目图标，保留 Element Plus 的点击和焦点处理。
   &__password {
+    font-size: 16px !important;
     > svg {
       display: none;
     }

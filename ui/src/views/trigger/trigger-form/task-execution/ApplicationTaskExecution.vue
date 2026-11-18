@@ -28,15 +28,16 @@ defineExpose({ validate })
           <span class="truncate" :title="props.application?.name || task.source_id">{{ props.application?.name || task.source_id }}</span>
         </div>
       </template>
-      <TaskParameterForm
-        ref="parameterRef"
-        v-model="task.parameter"
-        class="mt-2"
-        :resource="{ type: RESOURCE_TYPE.APPLICATION, data: props.application }"
-        :trigger-type="triggerType"
-        :body="body"
-        :disabled="disabled"
-      />
+      <div class="my-2">
+        <TaskParameterForm
+          ref="parameterRef"
+          v-model="task.parameter"
+          :resource="{ type: RESOURCE_TYPE.APPLICATION, data: props.application }"
+          :trigger-type="triggerType"
+          :body="body"
+          :disabled="disabled"
+        />
+      </div>
     </MkCollapse>
   </el-card>
 </template>

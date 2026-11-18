@@ -67,7 +67,7 @@ onMounted(() =>
                 <h6>创建智能体</h6>
                 <p class="text-sm text-N600">手动搭建、AI 生成或导入创建</p>
               </div>
-              <MkIcon name="icon_down_outlined" class="text-N600!" />
+              <MkIcon name="icon_down_outlined" class="text-N600! transition-transform duration-200 in-aria-expanded:rotate-180" />
             </div>
           </el-card>
         </template>
@@ -89,7 +89,7 @@ onMounted(() =>
                 <h6>创建知识库</h6>
                 <p class="text-sm text-N600">从本地文档、web网站等多来源创建</p>
               </div>
-              <MkIcon name="icon_down_outlined" />
+              <MkIcon name="icon_down_outlined" class="transition-transform duration-200 in-aria-expanded:rotate-180" />
             </div>
           </el-card>
         </template>
@@ -111,7 +111,7 @@ onMounted(() =>
                 <h6>创建工具</h6>
                 <p class="text-sm text-N600">创建或接入脚本、工作流、MCP 等工具</p>
               </div>
-              <MkIcon name="icon_down_outlined" />
+              <MkIcon name="icon_down_outlined" class="transition-transform duration-200 in-aria-expanded:rotate-180" />
             </div>
           </el-card>
         </template>

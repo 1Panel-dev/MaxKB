@@ -28,11 +28,12 @@ export default defineComponent({
         actions.map((action) =>
           cloneVNode(action, {
             display,
+            type: '',
             class: ['[&.is-disabled_.mk-icon]:text-N400!', display === 'button' ? (action.props?.disabled ? 'text-N400!' : 'text-N900!') : ''],
           }),
         )
 
-      if (display === 'button') return h(Fragment, renderActions())
+      if (display === 'button') return h('div', { class: 'flex-align-center gap-2 [&>.el-button]:ml-0!' }, renderActions())
       // 更多入口统一收纳所有可见操作。
       return h(
         MkDropdown,

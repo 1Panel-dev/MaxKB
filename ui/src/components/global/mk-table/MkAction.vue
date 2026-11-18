@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import type { ButtonProps } from 'element-plus'
+
 defineOptions({ name: 'MkAction', inheritAttrs: false })
-withDefaults(defineProps<{ display?: 'menu' | 'button'; label: string; icon?: string; disabled?: boolean; divided?: boolean }>(), { display: 'menu' })
+withDefaults(
+  defineProps<{ display?: 'menu' | 'button'; label: string; icon?: string; disabled?: boolean; divided?: boolean; type?: ButtonProps['type'] }>(),
+  { display: 'menu', type: 'primary' },
+)
 const emit = defineEmits<{ click: [event: MouseEvent] }>()
 </script>
 
@@ -12,7 +17,7 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   </MkDropdownItem>
   <MkTooltip v-else :content="label" placement="top">
     <!-- 图标操作 -->
-    <el-button v-bind="$attrs" text type="primary" :disabled="disabled" @click.stop="emit('click', $event)">
+    <el-button v-bind="$attrs" text :type="type" :disabled="disabled" @click.stop="emit('click', $event)">
       <MkIcon :name="icon" />
     </el-button>
   </MkTooltip>

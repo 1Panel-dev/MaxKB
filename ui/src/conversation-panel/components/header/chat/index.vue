@@ -45,7 +45,7 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
         display="button"
         label="新建对话"
         icon="icon_new-chat_outlined"
-        class="text-N900!"
+        class="text-N900! mr-1"
         @click="handleNewConversation"
       />
       <HeaderActions :collapse="deviceType === DEVICE_TYPE.MOBILE">

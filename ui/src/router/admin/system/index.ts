@@ -51,7 +51,7 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'users',
           name: 'system-users',
           component: () => import('@/views/system/identity/users/index.vue'),
-          meta: { title: '用户管理', order: 10, permission: perm.system.user.read, next: 'system-roles' },
+          meta: { title: 'system.user.title', order: 10, permission: perm.system.user.read, next: 'system-roles' },
         },
         {
           path: 'workspace',
