@@ -3,9 +3,7 @@
   "menu": {
     "library": "资料库",
     "retrieval": "检索优化",
-    "integration": "授权与集成",
-    "chatUsers": "对话用户",
-    "externalRetrieval": "外部检索服务"
+    "integration": "授权与集成"
   },
   "categories": {
     "all": "全部知识库",

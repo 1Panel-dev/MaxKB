@@ -72,6 +72,7 @@
     "delete": "Delete",
     "cancel": "Cancel",
     "retry": "Retry",
+    "reload": "Reload",
     "reset": "Reset",
     "save": "Save",
     "add": "Add",

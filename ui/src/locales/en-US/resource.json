@@ -8,6 +8,19 @@
   "workspaceAuthorization": {
     "title": "Authorize workspaces"
   },
+  "chatUserAuthorization": {
+    "title": "Chat users",
+    "byGroup": "By user group",
+    "name": "Name",
+    "username": "Username",
+    "source": {
+      "label": "User source",
+      "local": "Created locally"
+    },
+    "autoAuthorization": "Auto authorization",
+    "authorized": "Authorized",
+    "authorize": "Authorize"
+  },
   "shared": "Shared",
   "mcpConfig": {
     "title": "MCP server configuration"
@@ -24,5 +37,8 @@
   "executionRecords": {
     "title": "Execution history",
     "view": "View execution history"
+  },
+  "messages": {
+    "unsupportedScope": "This operation is not supported in the current resource scope."
   }
 }

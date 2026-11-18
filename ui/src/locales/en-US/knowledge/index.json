@@ -3,9 +3,7 @@
   "menu": {
     "library": "Library",
     "retrieval": "Retrieval optimization",
-    "integration": "Access & integrations",
-    "chatUsers": "Chat users",
-    "externalRetrieval": "External retrieval service"
+    "integration": "Access & integrations"
   },
   "categories": {
     "all": "All knowledge",
