@@ -74,7 +74,9 @@ class PortalApplicationAuthMixin:
 
     @staticmethod
     def get_authorized_application_ids(user_id):
-        public_apps = ApplicationAccessToken.objects.filter(application_id=OuterRef("id"), authentication=False)
+        public_apps = ApplicationAccessToken.objects.filter(
+            application_id=OuterRef("id"), authentication=False, is_active=True
+        )
         if not ChatUser.objects.filter(id=user_id).exists():
             return (
                 Application.objects.filter(is_publish=True, is_portal=True)
