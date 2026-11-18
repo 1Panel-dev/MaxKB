@@ -310,7 +310,7 @@ onMounted(() => {
                     icon="icon_edit_outlined"
                     @click="handleOpenEditTool(tool)"
                   />
-                  <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" :label="t('tool.workflow.label')" :tool="tool" />
+                  <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW && perm.tool.workspace.edit(tool.id)" :label="t('tool.workflow.label')" :tool="tool" />
                   <!-- 复制 -->
                   <CopyToolAction
                     v-if="perm.tool.workspace.copy(tool.id)"
@@ -321,7 +321,7 @@ onMounted(() => {
                     @refresh="refreshTool"
                   />
                   <InitParamAction
-                    v-if="(tool.init_field_list?.length ?? 0) > 0"
+                    v-if="(tool.init_field_list?.length ?? 0) > 0 && perm.tool.workspace.edit(tool.id)"
                     v-model:loading="toolOperationLoading"
                     :label="t('tool.initParams.title')"
                     :api="ToolApi"
