@@ -160,13 +160,17 @@ onMounted(() => {
               <template #suffix>
                 <div class="-mr-1">
                   <!-- 复制访问链接 -->
-                  <el-button text :disabled="!accessUrl" @click="copyText(accessUrl)">
-                    <MkIcon name="icon_copy_outlined" />
-                  </el-button>
+                  <MkTooltip content="复制" placement="top">
+                    <el-button text :disabled="!accessUrl" @click="copyText(accessUrl)">
+                      <MkIcon name="icon_copy_outlined" />
+                    </el-button>
+                  </MkTooltip>
                   <!-- 重置访问链接 -->
-                  <el-button v-if="applicationOverviewPermission('overviewPublic')" text :loading="loading" @click="handleResetAccessToken">
-                    <MkIcon name="icon_refresh_outlined" />
-                  </el-button>
+                  <MkTooltip v-if="applicationOverviewPermission('overviewPublic')" content="重新生成" placement="top">
+                    <el-button text :loading="loading" @click="handleResetAccessToken">
+                      <MkIcon name="icon_refresh_outlined" />
+                    </el-button>
+                  </MkTooltip>
                 </div>
               </template>
             </el-input>
@@ -205,9 +209,11 @@ onMounted(() => {
             <el-input :model-value="apiDocUrl" readonly>
               <template #suffix>
                 <!-- 复制 API 文档地址 -->
-                <el-button text @click="copyText(apiDocUrl)" class="-mr-1">
-                  <MkIcon name="icon_copy_outlined" />
-                </el-button>
+                <MkTooltip content="复制" placement="top">
+                  <el-button text @click="copyText(apiDocUrl)" class="-mr-1">
+                    <MkIcon name="icon_copy_outlined" />
+                  </el-button>
+                </MkTooltip>
               </template>
             </el-input>
           </div>
