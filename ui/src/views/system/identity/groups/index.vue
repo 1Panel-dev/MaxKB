@@ -93,14 +93,14 @@ function deleteGroup(group: SystemUserGroup) {
 
 /* 加载成员列表 */
 function loadUserGroupMembers(reset = false) {
-  if (!currentGroup.value) return
+  if (!currentGroup.value) return Promise.resolve()
   if (reset) {
     paginationConfig.value.currentPage = 1
   }
 
   const { currentPage, pageSize } = paginationConfig.value
   loadingMembers.value = true
-  UserGroupsApi.getSystemUserGroupMembers(selectedWorkspaceId.value, currentGroup.value.id, { currentPage, pageSize }, memberListQuery.value)
+  return UserGroupsApi.getSystemUserGroupMembers(selectedWorkspaceId.value, currentGroup.value.id, { currentPage, pageSize }, memberListQuery.value)
     .then(({ total, records }) => {
       userGroupMembers.value = records
       paginationConfig.value.total = total
@@ -112,6 +112,7 @@ function loadUserGroupMembers(reset = false) {
 
 /* 成员列表相关 */
 const loadingMembers = ref(false)
+const memberTableRef = useTemplateRef('memberTableRef')
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
@@ -161,22 +162,22 @@ function handleRemoveMembers(member?: SystemUserGroupMember) {
   const title = member ? `是否移除用户：${targetName}？` : `是否移除选中的 ${members.length} 个用户？`
   MsgConfirm(title, '成员移除后，通过该用户组继承的资源权限将被回收，请谨慎操作。', { confirmButtonText: '移除' })
     .then(() => {
+      loadingMembers.value = true
       return UserGroupsApi.postRemoveSystemUserGroupMembers(
         selectedWorkspaceId.value,
         group.id,
         members.map(({ system_user_group_relation_id }) => system_user_group_relation_id),
-      ).then(() => {
+      ).then(async () => {
         MsgSuccess('移除成功')
-        const removedRelationIds = new Set(members.map(({ system_user_group_relation_id }) => system_user_group_relation_id))
-        userGroupMembers.value = userGroupMembers.value.filter(
-          ({ system_user_group_relation_id }) => !removedRelationIds.has(system_user_group_relation_id),
-        )
-        paginationConfig.value.total = userGroupMembers.value.length
-        selectedGroupMembers.value = []
-        loadUserGroups()
+        await loadUserGroupMembers()
+        memberTableRef.value?.clearSelection()
+        return loadUserGroups()
       })
     })
     .catch(() => {})
+    .finally(() => {
+      loadingMembers.value = false
+    })
 }
 
 onMounted(() => {
@@ -248,6 +249,7 @@ onMounted(() => {
         </div>
 
         <MkTable
+          ref="memberTableRef"
           v-loading="loadingMembers"
           :max-table-height="280"
           v-model:pagination-config="paginationConfig"
