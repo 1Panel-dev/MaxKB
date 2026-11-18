@@ -14,13 +14,17 @@ defineOptions({ name: 'AccountLogin' })
 const props = withDefaults(defineProps<{ loginConfig?: LoginConfig; loginService: LoginService; preview?: boolean }>(), { preview: false })
 
 const route = useRoute()
+const isManualLogin = route.query.login_mode === 'manual'
 const { t } = useI18n({ useScope: 'global' })
 const isSubmitting = ref(false)
 const identifyCode = ref('')
-const loginMethod = ref<LoginMethod>(props.loginConfig?.default_value ?? LOGIN_METHOD.LOCAL)
+const loginMethod = ref<LoginMethod>(isManualLogin ? LOGIN_METHOD.LOCAL : (props.loginConfig?.default_value ?? LOGIN_METHOD.LOCAL))
 
 const accountLoginMethods = computed(() => {
   let loginMethods = [...(props.loginConfig?.login_methods ?? [])]
+  if (isManualLogin && !loginMethods.includes(LOGIN_METHOD.LOCAL)) {
+    loginMethods.unshift(LOGIN_METHOD.LOCAL)
+  }
   if (loginMethods.includes(LOGIN_METHOD.LOCAL)) {
     loginMethods = [LOGIN_METHOD.LOCAL, ...loginMethods.filter((method) => method !== LOGIN_METHOD.LOCAL)]
   } else if (loginMethods.includes(LOGIN_METHOD.LDAP)) {
@@ -103,7 +107,7 @@ const redirectExternalLogin = async (method: LoginMethod) => {
 
 onMounted(() => {
   if (props.preview) return
-  if (route.query.login_mode !== 'manual') {
+  if (!isManualLogin) {
     const defaultLoginMethod = loginMethod.value
     if ([LOGIN_METHOD.CAS, LOGIN_METHOD.OIDC, LOGIN_METHOD.OAUTH2, LOGIN_METHOD.SAML2].some((authType) => authType === defaultLoginMethod)) {
       void redirectExternalLogin(defaultLoginMethod)
