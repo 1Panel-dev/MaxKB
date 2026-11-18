@@ -45,9 +45,6 @@ config({
     mermaid: {
       instance: mermaid,
     },
-    echarts: {
-      parseOption: (option: string) => JSON.parse(option),
-    },
   },
   markdownItPlugins(plugins) {
     return [
