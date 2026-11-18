@@ -5,6 +5,8 @@
     --el-scrollbar-hover-bg-color: var(--el-text-color-secondary);
     --el-scrollbar-hover-opacity: 0.5;
     --el-scrollbar-opacity: 0.3;
+    // 背景放在编辑器外层，避免遮挡内容下方的选区高亮。
+    background: var(--el-bg-color);
     border: var(--el-border);
     border-radius: var(--el-border-radius-base);
     overflow: hidden;
@@ -49,8 +51,5 @@
   :deep(.cm-editor::-webkit-scrollbar-thumb:hover) {
     background-color: var(--el-scrollbar-hover-bg-color);
     opacity: var(--el-scrollbar-hover-opacity);
-  }
-  :deep(.cm-content) {
-    background: white;
   }
 }
