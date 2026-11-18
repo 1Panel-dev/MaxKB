@@ -7,10 +7,13 @@ import router from '@/router/admin'
 import { pinia, useStore } from '@/stores/admin'
 import { createAppI18n } from '@/locales'
 import permission from '@/permission/install'
+import { configureElementPlus } from '@/utils/element-plus'
 import '@/styles/tailwind.css'
 import '@/styles/index.scss'
 
 configureMarkdownEditor()
+
+configureElementPlus()
 
 const app = createApp(App)
 

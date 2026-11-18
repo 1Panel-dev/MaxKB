@@ -5,11 +5,14 @@ import App from './App.vue'
 import { createAppI18n } from '@/locales'
 import router from '@/router/chat'
 import { pinia, useStore } from '@/stores/chat'
+import { configureElementPlus } from '@/utils/element-plus'
 import 'element-plus/dist/index.css'
 import '@/styles/tailwind.css'
 import '@/styles/index.scss'
 
 configureMarkdownEditor()
+
+configureElementPlus()
 
 const app = createApp(App)
 

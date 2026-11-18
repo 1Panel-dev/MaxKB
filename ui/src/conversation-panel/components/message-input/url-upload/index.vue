@@ -52,7 +52,7 @@ function localUpload() {
       <div class="flex-between mb-2">
         <span>URL 地址</span>
         <!-- 选择 URL 文件类型 -->
-        <el-select v-model="selectedType" :disabled="urlUploading" size="small" class="w-15!">
+        <el-select v-model="selectedType" :disabled="urlUploading" :teleported="false" size="small" class="w-15!">
           <el-option v-for="type in urlUploadTypes" :key="type.value" :label="type.label" :value="type.value" />
         </el-select>
       </div>
