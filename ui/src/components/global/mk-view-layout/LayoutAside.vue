@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { Fragment, computed, h, isVNode, onBeforeUnmount, ref, useSlots, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { FunctionalComponent, VNode } from 'vue'
 
 defineOptions({ name: 'LayoutAside' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(
   defineProps<{ collapsible?: boolean; resizable?: boolean; minLeftWidth?: number; maxLeftWidth?: number; title?: string }>(),
@@ -114,7 +117,7 @@ function toggleAside(event: MouseEvent) {
     <!-- 拖动调整侧栏宽度 -->
     <div v-if="props.resizable && !asideCollapsed" class="aside-resize-handle" :class="{ 'is-resizing': isResizing }" @mousedown="startResizing" />
     <!-- 展开或收起侧栏 -->
-    <MkTooltip v-if="props.collapsible" :content="asideCollapsed ? '展开' : '收起'" placement="right">
+    <MkTooltip v-if="props.collapsible" :content="asideCollapsed ? t('common.actions.expand') : t('common.actions.collapse')" placement="right">
       <button
         type="button"
         class="absolute top-15 z-10 cursor-pointer border bg-white shadow-md h-6 transition-all duration-200 hover:text-primary"

@@ -98,7 +98,7 @@ defineExpose({ open, close })
       <el-form-item class="-mt-3" v-if="form.hit_handling_method === DOCUMENT_HIT_HANDLING.DIRECTLY_RETURN">
         <div class="w-full mk-gray-card-lg">
           <div class="flex-align-center gap-2">
-            <span>相似度高于</span>
+            <span>{{ t('knowledge.document.hitHandling.similarityAbove') }}</span>
             <el-input-number
               v-model="form.directly_return_similarity"
               :min="0"
@@ -110,7 +110,7 @@ defineExpose({ open, close })
               align="left"
               class="w-40!"
             />
-            <span>直接返回分段内容</span>
+            <span>{{ t('knowledge.document.hitHandling.returnParagraphContent') }}</span>
           </div>
         </div>
       </el-form-item>

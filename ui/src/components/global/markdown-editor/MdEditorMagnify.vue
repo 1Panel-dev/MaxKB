@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
 import { useFormItem } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import type { Footers } from 'md-editor-v3'
 
 defineOptions({ name: 'MdEditorMagnify', inheritAttrs: false })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const modelValue = defineModel<string>({ required: true })
 const props = withDefaults(defineProps<{ title: string; validateEvent?: boolean }>(), { validateEvent: true })
@@ -69,7 +72,8 @@ async function submitEditorDialog() {
     />
 
     <template #footer>
-      <el-button type="primary" @click="submitEditorDialog">确定</el-button>
+      <!-- 确认编辑内容 -->
+      <el-button type="primary" @click="submitEditorDialog">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

@@ -1,5 +1,6 @@
 {
   "paragraph": {
+    "detailTitle": "分段詳情",
     "heading": {
       "label": "標題",
       "placeholder": "請輸入標題"
@@ -14,6 +15,23 @@
       "label": "關聯問題",
       "requiredMessage": "請輸入關聯問題",
       "lengthMessage": "問題最多 {max} 個字元"
-    }
+    },
+    "actions": {
+      "add": "新增分段",
+      "insertAbove": "在上方插入分段",
+      "movePosition": "移動位置"
+    },
+    "position": {
+      "top": "置於頂部",
+      "up": "上移",
+      "down": "下移",
+      "bottom": "置於底部"
+    },
+    "delete": {
+      "title": "是否刪除分段",
+      "confirm": "確定刪除此分段",
+      "batchTitle": "確認刪除選取的 {count} 個分段"
+    },
+    "empty": "暫無分段"
   }
 }

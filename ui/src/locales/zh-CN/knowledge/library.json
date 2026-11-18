@@ -1,9 +1,0 @@
-{
-  "library": {
-    "title": "资料库"
-  },
-  "image": {
-    "title": "图片",
-    "unsupportedFormatMessage": "仅支持 {formats} 格式的图片"
-  }
-}

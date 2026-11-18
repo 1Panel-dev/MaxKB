@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { InputInstance } from 'element-plus'
 import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'MkEditName' })
+const { t } = useI18n({ useScope: 'global' })
 
 const name = defineModel<string>({ required: true })
 const props = defineProps<{
@@ -55,7 +57,7 @@ async function saveName() {
   try {
     const nextName = draftName.value.trim()
     if (!nextName) {
-      MsgWarning('请输入名称')
+      MsgWarning(t('common.name.requiredMessage'))
       return
     }
 
@@ -122,7 +124,7 @@ function handleCompositionEnd() {
       ref="inputRef"
       v-model="draftName"
       class="min-w-0 w-full"
-      placeholder="请输入名称"
+      :placeholder="t('common.name.placeholder')"
       :maxlength="maxlength"
       :readonly="saving"
       :validate-event="false"

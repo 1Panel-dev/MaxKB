@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ParagraphQuestionDraft } from './types.ts'
 import type { ParagraphDetail, ParagraphItem, ParagraphUpdatePayload } from '@/api/types'
 import { useDocumentDetailContext } from '@/views/document-detail/context'
@@ -13,8 +14,7 @@ import { perm } from '@/permission'
 /**
  * 知识库「文档」权限判断
  */
-type KnowledgeDocPermissionMethod =
-  | 'docCreate' | 'docEdit' | 'docDelete' | 'docGenerate' | 'docMigrate'
+type KnowledgeDocPermissionMethod = 'docCreate' | 'docEdit' | 'docDelete' | 'docGenerate' | 'docMigrate'
 
 function knowledgeDocPermission(method: KnowledgeDocPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
@@ -24,6 +24,7 @@ function knowledgeDocPermission(method: KnowledgeDocPermissionMethod): boolean {
 }
 
 defineOptions({ name: 'EditParagraphDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   knowledgeId: string
   documentId: string
@@ -105,7 +106,7 @@ function handleSubmit() {
             // 问题由独立接口更新，正文保存响应不回填问题列表，避免覆盖并行操作结果。
             paragraphDetail.value = { ...paragraph, source_file_id: props.sourceFileId }
             mode.value = 'detail'
-            MsgSuccess('保存成功')
+            MsgSuccess(t('common.messages.saveSuccess'))
             emit('success', paragraph)
           }) ?? Promise.resolve()
       ).finally(() => {
@@ -144,9 +145,9 @@ defineExpose({ open, close })
           </el-scrollbar>
           <div class="mt-4 shrink-0 text-right">
             <!-- 取消编辑并返回分段详情 -->
-            <el-button plain :disabled="loading" @click="handleCancelEdit">取消</el-button>
+            <el-button plain :disabled="loading" @click="handleCancelEdit">{{ t('common.actions.cancel') }}</el-button>
             <!-- 保存分段标题和内容 -->
-            <el-button type="primary" :loading="loading" @click="handleSubmit">保存</el-button>
+            <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.save') }}</el-button>
           </div>
         </div>
         <!-- 关联问题 -->

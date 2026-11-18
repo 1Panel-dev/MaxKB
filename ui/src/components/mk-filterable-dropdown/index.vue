@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="TOption extends object">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 /**
  * 带搜索过滤和滚动列表的下拉选择组件。
@@ -7,6 +8,8 @@ import { computed, ref } from 'vue'
  * 触发器由默认插槽定义，菜单项内容由 option 插槽定义。
  */
 defineOptions({ name: 'MkFilterableDropdown' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const componentProps = withDefaults(
   defineProps<{
@@ -17,7 +20,7 @@ const componentProps = withDefaults(
     /** 没有匹配结果时显示的文字 */
     emptyText?: string
   }>(),
-  { emptyText: '暂无匹配结果', props: () => ({}) },
+  { props: () => ({}) },
 )
 
 /** 当前选中菜单项的 value */
@@ -91,7 +94,7 @@ function handleItemClick(option: TOption) {
               </MkDropdownItem>
 
               <MkDropdownItem v-if="filteredOptions.length === 0" disabled>
-                <span class="text-N600">{{ emptyText }}</span>
+                <span class="text-N600">{{ componentProps.emptyText ?? t('common.empty.search') }}</span>
               </MkDropdownItem>
             </MkDropdownMenu>
           </div>

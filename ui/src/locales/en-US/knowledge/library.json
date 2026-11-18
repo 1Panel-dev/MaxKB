@@ -1,9 +1,0 @@
-{
-  "library": {
-    "title": "Library"
-  },
-  "image": {
-    "title": "Images",
-    "unsupportedFormatMessage": "Supported image formats: {formats}."
-  }
-}

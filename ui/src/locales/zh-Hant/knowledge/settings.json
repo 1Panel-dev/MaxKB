@@ -1,7 +1,4 @@
 {
-  "baseSettings": {
-    "title": "基本設定"
-  },
   "documentStrategy": {
     "title": "文件處理策略",
     "splitRules": "分段規則",
@@ -17,6 +14,14 @@
       "label": "分段符號",
       "placeholder": "請選擇分段符號",
       "description": "依照所選符號的順序遞迴分割內容。超過設定長度的分段會截短至該長度。"
+    },
+    "splitPatterns": {
+      "space": "空格",
+      "semicolon": "分號",
+      "comma": "逗號",
+      "period": "句號",
+      "lineBreak": "換行",
+      "blankLine": "空白行"
     },
     "paragraphLength": "分段長度",
     "childChunkLength": {
@@ -51,9 +56,6 @@
       "label": "將分段標題設為問題索引",
       "description": "啟用後，系統會自動將分段標題新增為關聯問題。"
     }
-  },
-  "scheduledSync": {
-    "title": "排程同步"
   },
   "sync": {
     "title": "同步知識庫",

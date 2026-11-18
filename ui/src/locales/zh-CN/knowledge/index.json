@@ -1,5 +1,17 @@
 {
   "title": "知识库",
+  "menu": {
+    "library": "资料库",
+    "retrieval": "检索优化",
+    "hitTest": "召回测试",
+    "questions": "问题",
+    "termbase": "自定义分词",
+    "integration": "授权与集成",
+    "chatUsers": "对话用户",
+    "externalRetrieval": "外部检索服务",
+    "baseSettings": "基础设置",
+    "scheduledSync": "定时同步"
+  },
   "categories": {
     "all": "全部知识库",
     "shared": "共享知识库"
@@ -25,6 +37,7 @@
     "createTitle": "创建工作流知识库",
     "description": "通过自定义工作流方式构建知识库"
   },
+
   "fields": {
     "name": {
       "placeholder": "请输入知识库名称",
@@ -57,9 +70,13 @@
     "documents": "文档",
     "paragraphs": "分段",
     "characters": "字符",
-    "images": "图片"
+    "images": "图片",
+    "retrievalCount": "召回次数",
+    "lastRetrievedAt": "最后一次召回时间"
   },
   "actions": {
+    "migrate": "迁移",
+    "migrateTo": "迁移至",
     "sync": "同步",
     "generateEmbeddings": "向量化",
     "generateQuestions": "生成问题",

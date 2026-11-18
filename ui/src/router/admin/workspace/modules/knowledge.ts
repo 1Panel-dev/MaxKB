@@ -35,7 +35,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             path: '',
             name: 'workspace-knowledge-library',
             redirect: { name: 'workspace-knowledge-document-list' },
-            meta: { title: 'knowledge.library.title', icon: 'icon-draft', order: 10 },
+            meta: { title: 'knowledge.menu.library', icon: 'icon-draft', order: 10 },
             children: [
               {
                 path: 'document',
@@ -99,7 +99,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             path: '',
             name: 'workspace-knowledge-retrieval',
             redirect: { name: 'workspace-knowledge-hit-test' },
-            meta: { title: 'knowledge.retrieval.title', icon: 'icon_trace_outlined', order: 30 },
+            meta: { title: 'knowledge.menu.retrieval', icon: 'icon_trace_outlined', order: 30 },
             children: [
               {
                 path: 'hit-test',
@@ -108,7 +108,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.hitTest(String(params.knowledgeId)),
                   next: 'workspace-knowledge-problem',
-                  title: 'knowledge.hitTest.title',
+                  title: 'knowledge.menu.hitTest',
                   order: 10,
                 },
               },
@@ -119,7 +119,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.problemRead(String(params.knowledgeId)),
                   next: 'workspace-knowledge-dictionary',
-                  title: 'knowledge.questions.title',
+                  title: 'knowledge.menu.questions',
                   order: 20,
                 },
               },
@@ -130,7 +130,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.termbaseRead(String(params.knowledgeId)),
                   next: 'workspace-knowledge-chat-user',
-                  title: 'knowledge.termbase.title',
+                  title: 'knowledge.menu.termbase',
                   order: 30,
                 },
               },
@@ -140,7 +140,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             path: '',
             name: 'workspace-knowledge-integration',
             redirect: { name: 'workspace-knowledge-chat-user' },
-            meta: { title: 'knowledge.integration.title', icon: 'icon_personal-privacy_outlined', order: 40 },
+            meta: { title: 'knowledge.menu.integration', icon: 'icon_personal-privacy_outlined', order: 40 },
             children: [
               {
                 path: 'chat-user',
@@ -149,7 +149,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.knowledgeChatUserRead(String(params.knowledgeId)),
                   next: 'workspace-knowledge-external-retrieval',
-                  title: 'knowledge.chatUsers.title',
+                  title: 'knowledge.menu.chatUsers',
                   order: 10,
                 },
               },
@@ -160,7 +160,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.externalServiceRead(String(params.knowledgeId)),
                   next: 'workspace-knowledge-setting',
-                  title: 'knowledge.externalRetrieval.title',
+                  title: 'knowledge.menu.externalRetrieval',
                   order: 20,
                 },
               },
@@ -200,7 +200,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.settingRead(String(params.knowledgeId)),
                   next: 'workspace-knowledge-document-strategy',
-                  title: 'knowledge.baseSettings.title',
+                  title: 'knowledge.menu.baseSettings',
                   order: 10,
                 },
               },
@@ -223,7 +223,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.scheduledSyncRead(String(params.knowledgeId)),
                   next: 'workspace-knowledge-document-list',
-                  title: 'knowledge.scheduledSync.title',
+                  title: 'knowledge.menu.scheduledSync',
                   order: 30,
                 },
               },

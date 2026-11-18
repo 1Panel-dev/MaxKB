@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentStrategy, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
 import type { FormInstance } from 'element-plus'
 import ProviderApi from '@/api/admin/model-provider'
@@ -13,6 +14,7 @@ import SelectModel from '@/components/business/select-model/index.vue'
 import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'ImageProcessingForm' })
+const { t } = useI18n({ useScope: 'global' })
 
 /* 文档处理策略 */
 const formRef = ref<FormInstance>()
@@ -100,28 +102,28 @@ defineExpose({ validate, getStrategy })
 </script>
 
 <template>
-  <el-form ref="formRef" :model="strategy" label-position="top" require-asterisk-position="right" @submit.prevent>
+  <el-form ref="formRef" :model="strategy" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" @submit.prevent>
     <el-card shadow="never" class="w-full">
       <div class="flex-between gap-4">
         <div>
-          <h6>视觉增强</h6>
-          <p class="mt-1 text-N600 text-sm">识别文档中图片，将图片按照策略发给模型或工具处理，并将返回内容写入图片的描述中</p>
+          <h6>{{ t('knowledge.documentStrategy.visualEnhancement.label') }}</h6>
+          <p class="mt-1 text-N600 text-sm">{{ t('knowledge.documentStrategy.visualEnhancement.description') }}</p>
         </div>
         <!-- 启用图片视觉增强 -->
         <el-switch v-model="strategy.visual.enabled" @change="handleVisualChange" />
       </div>
       <div v-if="strategy.visual.enabled" class="mk-gray-card-lg mt-4">
-        <el-form-item label="增强策略" required>
+        <el-form-item :label="t('knowledge.documentStrategy.enhancementMethod.label')" required>
           <el-radio-group v-model="strategy.visual.strategy" @change="handleVisualChange">
-            <el-radio value="model">模型增强</el-radio>
-            <el-radio value="tool">工具增强</el-radio>
+            <el-radio value="model">{{ t('knowledge.documentStrategy.enhancementMethod.model') }}</el-radio>
+            <el-radio value="tool">{{ t('knowledge.documentStrategy.enhancementMethod.tool') }}</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item
           v-if="strategy.visual.strategy === 'model'"
-          label="视觉模型"
+          :label="t('model.types.image.label')"
           prop="visual.model_id"
-          :rules="{ required: true, message: '请选择视觉模型', trigger: 'change' }"
+          :rules="{ required: true, message: t('knowledge.documentStrategy.visionModel.requiredMessage'), trigger: 'change' }"
           class="mb-0! mt-4"
         >
           <SelectModel
@@ -129,7 +131,7 @@ defineExpose({ validate, getStrategy })
             :options="modelOptions"
             :provider-options="providerOptions"
             :loading="modelOptionsLoading"
-            placeholder="请选择视觉模型"
+            :placeholder="t('knowledge.documentStrategy.visionModel.placeholder')"
             teleported
             can-add
             @refresh="loadModelOptions"
@@ -137,12 +139,19 @@ defineExpose({ validate, getStrategy })
         </el-form-item>
         <el-form-item
           v-else
-          label="增强工具"
+          :label="t('knowledge.documentStrategy.enhancementTool.label')"
           prop="visual.tool_id"
-          :rules="{ required: true, message: '请选择增强工具', trigger: 'change' }"
+          :rules="{ required: true, message: t('knowledge.documentStrategy.enhancementTool.requiredMessage'), trigger: 'change' }"
           class="mb-0! mt-4"
         >
-          <el-select v-model="strategy.visual.tool_id" :loading="toolOptionsLoading" placeholder="请选择增强工具" filterable clearable class="w-full">
+          <el-select
+            v-model="strategy.visual.tool_id"
+            :loading="toolOptionsLoading"
+            :placeholder="t('knowledge.documentStrategy.enhancementTool.placeholder')"
+            filterable
+            clearable
+            class="w-full"
+          >
             <template #label="{ label }">
               <div class="flex-align-center gap-2">
                 <ToolIcon

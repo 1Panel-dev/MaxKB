@@ -83,8 +83,8 @@ defineExpose({ clearFiles, handleRemove })
       </div>
       <div class="el-upload__text">
         <p>
-          {{ dragText ?? t('common.upload.dropHint') }}
-          <em>{{ selectText ?? t('common.upload.selectFile') }}</em>
+          {{ dragText ?? t('upload.dropHint') }}
+          <em>{{ selectText ?? t('upload.selectFile') }}</em>
         </p>
         <p v-if="tipText" class="mt-1 text-N500">{{ tipText }}</p>
       </div>
@@ -123,7 +123,7 @@ defineExpose({ clearFiles, handleRemove })
         :show-file-list="false"
       >
         <!-- 更换文件 -->
-        <el-button :disabled="disabled" link type="primary">{{ replaceText ?? t('common.upload.replaceFile') }}</el-button>
+        <el-button :disabled="disabled" link type="primary">{{ replaceText ?? t('upload.replaceFile') }}</el-button>
       </el-upload>
     </div>
   </div>

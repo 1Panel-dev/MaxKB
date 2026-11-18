@@ -73,7 +73,7 @@ function getActionData() {
     const successfulFiles = data.file_list.filter((file) => file.file_id && (!file.status || file.status === 'success'))
     data.file_list = successfulFiles
     if (!successfulFiles.length) {
-      MsgWarning(t('common.upload.noSuccessfulFilesMessage'))
+      MsgWarning(t('upload.noSuccessfulFilesMessage'))
       return undefined
     }
   }

@@ -1,10 +1,13 @@
 <script setup lang="ts" generic="T">
 import { computed, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { SortableChange } from '@/utils/use-sortable'
 import { useSortable } from '@/utils/use-sortable'
 
 defineOptions({ name: 'MkFormList' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(
   defineProps<{
@@ -17,7 +20,6 @@ const props = withDefaults(
     itemKey?: keyof T | ((item: T) => string | number)
   }>(),
   {
-    addText: '添加',
     firstRowHasLabel: true,
     minRows: 1,
     showAddButton: true,
@@ -94,8 +96,9 @@ function removeRow(index: number) {
     </template>
   </div>
 
+  <!-- 添加表单行 -->
   <el-button v-if="showAddButton" class="-mt-1" link type="primary" @click="addRow">
     <MkIcon name="icon_add_outlined" />
-    <span>{{ addText }}</span>
+    <span>{{ props.addText ?? t('common.actions.add') }}</span>
   </el-button>
 </template>

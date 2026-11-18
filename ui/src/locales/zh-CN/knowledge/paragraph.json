@@ -1,5 +1,6 @@
 {
   "paragraph": {
+    "detailTitle": "分段详情",
     "heading": {
       "label": "标题",
       "placeholder": "请输入标题"
@@ -14,6 +15,23 @@
       "label": "关联问题",
       "requiredMessage": "请输入关联问题",
       "lengthMessage": "问题最多 {max} 字符"
-    }
+    },
+    "actions": {
+      "add": "添加分段",
+      "insertAbove": "上方插入分段",
+      "movePosition": "移动位置"
+    },
+    "position": {
+      "top": "置于顶部",
+      "up": "上移",
+      "down": "下移",
+      "bottom": "置于底部"
+    },
+    "delete": {
+      "title": "是否删除分段",
+      "confirm": "确定删除此分段",
+      "batchTitle": "确认删除选中的 {count} 个分段"
+    },
+    "empty": "暂无分段"
   }
 }

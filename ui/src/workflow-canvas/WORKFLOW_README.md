@@ -391,9 +391,10 @@ AI 对话、图片理解和视频理解统一复用 `component/ThinkingSetting.v
 三种策略。保留 `referencing` 来源协议、子分块长度默认 256、分段长度默认 4096，以及高级策略和
 问答对策略下的字段显隐。文档与当前可见的配置引用仅在表单项声明数组必填规则，
 由 `NodeCascader` 触发表单项校验，节点统一调用 `formRef.validate()`，不维护引用组件校验 Ref；
-切换来源或策略保留字段值并清理校验和浮层保护。`constant.ts` 保存与后端
-`DocumentSerializers.SplitPattern` 一致的固定标识选项，不依赖旧知识库路由或旧版动态 API，
-仍支持按选择顺序递归分割和添加自定义标识。
+切换来源或策略保留字段值并清理校验和浮层保护。分段标识选项共用 `@/constants/document` 的
+`DOCUMENT_SPLIT_PATTERN_OPTIONS`，文字标签在展示时通过 `t` 翻译，纯符号及提交的正则值保持原样；
+Agent 使用固定的 `label` 识别参数。选项与后端 `DocumentSerializers.SplitPattern` 保持一致，
+支持按选择顺序递归分割和添加自定义标识；定义与使用约定见 [CONSTANT_README.md](../constants/CONSTANT_README.md)。
 
 #### 循环画布与导出
 

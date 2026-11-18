@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { TableFilterOption } from './types'
 
 defineOptions({ name: 'TableFilterSingle' })
+const { t } = useI18n({ useScope: 'global' })
 
 defineProps<{
   modelValue: TableFilterOption['value'] | null | undefined
@@ -22,7 +24,8 @@ function handleVisibleChange(visible: boolean) {
     <slot />
     <template #dropdown>
       <MkDropdownMenu :style="{ width: typeof width === 'number' ? `${width}px` : width }">
-        <MkDropdownItem selectable :selected="!active" @click="emit('select', null)">全部</MkDropdownItem>
+        <!-- 清除单项筛选 -->
+        <MkDropdownItem selectable :selected="!active" @click="emit('select', null)">{{ t('common.labels.all') }}</MkDropdownItem>
         <template v-for="option in options" :key="`${typeof option.value}:${option.value}`">
           <MkDropdownItem
             selectable

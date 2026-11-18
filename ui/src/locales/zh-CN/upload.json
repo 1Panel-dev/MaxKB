@@ -1,0 +1,37 @@
+{
+  "dropHint": "将文件拖至此区域。",
+  "selectFile": "选择文件上传",
+  "selectFiles": "选择文件",
+  "selectFolder": "选择文件夹",
+  "replaceFile": "更换文件",
+  "retryUpload": "重新上传",
+  "limits": "每次最多上传 {count} 个文件，每个文件不超过 {size} MB",
+  "formats": "支持格式",
+  "extension": {
+    "add": "添加后缀名",
+    "duplicateMessage": "文件后缀已存在"
+  },
+  "requiredMessage": "请上传文件",
+  "reselectFileMessage": "请重新选择上传文件",
+  "emptyFileMessage": "不能上传空文件",
+  "sizeLimitMessage": "大小超限",
+  "unsupportedFormatMessage": "文件格式不支持",
+  "countLimitMessage": "每次最多上传 {count} 个文件",
+  "networkErrorMessage": "网络失败",
+  "uploadInProgressMessage": "文件正在上传，请稍候",
+  "noSuccessfulFilesMessage": "没有上传成功的文件，请重新上传",
+  "status": {
+    "completed": "已完成",
+    "uploading": "上传中",
+    "failed": "失败",
+    "allSucceeded": "全部成功"
+  },
+  "avatar": {
+    "title": "头像设置",
+    "default": "默认头像",
+    "customUpload": "自定义上传",
+    "uploadHint": "支持 JPG、PNG、GIF，文件大小不超过 {size} MB",
+    "formatMessage": "仅支持 JPG、PNG、GIF 格式的图片",
+    "sizeLimitMessage": "文件大小不能超过 {size} MB"
+  }
+}

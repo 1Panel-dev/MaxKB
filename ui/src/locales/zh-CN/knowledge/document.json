@@ -11,18 +11,23 @@
       "placeholder": "请输入文档地址，一行一个，地址不正确文档会导入失败。",
       "requiredMessage": "请输入文档地址"
     },
+    "target": {
+      "label": "保存到文档",
+      "placeholder": "请选择文档",
+      "requiredMessage": "请选择文档"
+    },
     "labels": {
       "activeStatus": "启用状态",
       "characters": "字符数",
-      "paragraphs": "分段",
-      "retrievalCount": "召回次数",
-      "lastRetrievedAt": "最后一次召回时间"
+      "paragraphs": "分段"
     },
     "hitHandling": {
       "label": "召回处理",
       "description": "用户提问时，召回的分段按照设置进行处理。",
       "optimization": "模型优化",
-      "directlyReturn": "直接回答"
+      "directlyReturn": "直接回答",
+      "similarityAbove": "相似度高于",
+      "returnParagraphContent": "直接返回分段内容"
     },
     "settings": {
       "title": "文档设置",
@@ -46,8 +51,6 @@
     "actions": {
       "quickCreate": "快速创建空白文档",
       "generatePreview": "生成预览",
-      "migrate": "迁移",
-      "migrateTo": "迁移至",
       "downloadOriginal": "下载原文档",
       "replaceOriginal": "替换原文档"
     },
@@ -90,10 +93,22 @@
     },
     "preview": {
       "title": "预览",
-      "emptyParagraphs": "暂无分段",
       "emptyDocuments": "暂无预览文档",
-      "finishEditingMessage": "请先保存或取消分段编辑",
-      "deleteParagraphConfirm": "确定删除此分段"
+      "finishEditingMessage": "请先保存或取消分段编辑"
     }
+  },
+  "image": {
+    "title": "图片",
+    "detailTitle": "图片详情",
+    "name": {
+      "label": "图片名称"
+    },
+    "upload": {
+      "title": "上传图片"
+    },
+    "preview": {
+      "emptyMessage": "图片预览没有分段，请返回重新生成预览"
+    },
+    "unsupportedFormatMessage": "仅支持 {formats} 格式的图片"
   }
 }

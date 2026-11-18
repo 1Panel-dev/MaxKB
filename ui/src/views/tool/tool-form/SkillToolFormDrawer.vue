@@ -61,7 +61,7 @@ function removeUploadFile(file: UploadFile, fileList: UploadFiles) {
 function handleFileChange(file: UploadFile, fileList: UploadFiles) {
   if (!file.raw) return
   if (!file.size) {
-    MsgError(t('common.upload.emptyFileMessage'))
+    MsgError(t('upload.emptyFileMessage'))
     removeUploadFile(file, fileList)
     return
   }
@@ -271,9 +271,9 @@ defineExpose({ open })
             ref="uploadRef"
             v-model="skillForm.fileList"
             accept=".zip"
-            :drag-text="t('common.upload.dropHint')"
-            :select-text="t('common.upload.selectFile')"
-            :replace-text="t('common.upload.replaceFile')"
+            :drag-text="t('upload.dropHint')"
+            :select-text="t('upload.selectFile')"
+            :replace-text="t('upload.replaceFile')"
             :tip-text="t('tool.skill.file.description', { size: maxFileSizeMb })"
             @change="handleFileChange"
             @remove="handleRemoveFile"

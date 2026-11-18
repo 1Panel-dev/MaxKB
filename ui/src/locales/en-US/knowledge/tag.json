@@ -28,7 +28,14 @@
       "editValue": "Edit tag value"
     },
     "documents": {
-      "linked": "Linked documents"
+      "title": "Link documents",
+      "linked": "Linked documents",
+      "unlinked": "Unlinked documents"
+    },
+    "import": {
+      "title": "Import tags",
+      "downloadTemplate": "Download template",
+      "unsupportedFormatMessage": "Only XLS and XLSX files are supported."
     },
     "delete": {
       "title": "Delete tag",

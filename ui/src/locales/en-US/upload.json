@@ -1,0 +1,37 @@
+{
+  "dropHint": "Drag and drop here.",
+  "selectFile": "Choose a file to upload",
+  "selectFiles": "Choose files",
+  "selectFolder": "Choose folder",
+  "replaceFile": "Replace file",
+  "retryUpload": "Retry upload",
+  "limits": "Upload up to {count} file at a time, no larger than {size} MB. | Upload up to {count} files at a time, each no larger than {size} MB.",
+  "formats": "Supported formats",
+  "extension": {
+    "add": "Add extension",
+    "duplicateMessage": "File extension already exists"
+  },
+  "requiredMessage": "Upload a file",
+  "reselectFileMessage": "Select the file to upload again",
+  "emptyFileMessage": "Cannot upload an empty file.",
+  "sizeLimitMessage": "File too large",
+  "unsupportedFormatMessage": "Unsupported file format",
+  "countLimitMessage": "You can upload up to {count} file at a time. | You can upload up to {count} files at a time.",
+  "networkErrorMessage": "Network error",
+  "uploadInProgressMessage": "Please wait for the upload to finish.",
+  "noSuccessfulFilesMessage": "No files were uploaded successfully. Try uploading again.",
+  "status": {
+    "completed": "Completed",
+    "uploading": "Uploading",
+    "failed": "Failed",
+    "allSucceeded": "All files uploaded"
+  },
+  "avatar": {
+    "title": "Avatar settings",
+    "default": "Default avatar",
+    "customUpload": "Upload custom avatar",
+    "uploadHint": "Supports JPG, PNG and GIF files up to {size} MB.",
+    "formatMessage": "Only JPG, PNG and GIF images are supported.",
+    "sizeLimitMessage": "File size must not exceed {size} MB."
+  }
+}

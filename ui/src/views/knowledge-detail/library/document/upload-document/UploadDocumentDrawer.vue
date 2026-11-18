@@ -75,7 +75,7 @@ function handleGeneratePreview() {
   if (!validateImportFiles() || !strategyRef.value) return
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
   if (fileIds.length !== successfulFiles.value.length) {
-    MsgWarning(t('common.upload.noSuccessfulFilesMessage'))
+    MsgWarning(t('upload.noSuccessfulFilesMessage'))
     return
   }
   loading.value = true
@@ -108,7 +108,7 @@ async function handleSubmit() {
   if (!validateImportFiles() || (previewVisible.value && !previewRef.value?.validate())) return
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
   if (!previewVisible.value && fileIds.length !== successfulFiles.value.length) {
-    MsgWarning(t('common.upload.noSuccessfulFilesMessage'))
+    MsgWarning(t('upload.noSuccessfulFilesMessage'))
     return
   }
 
@@ -184,7 +184,7 @@ defineExpose({ open })
                 <li v-if="mode === 'table'">{{ t('knowledge.document.upload.columnHeaderHint') }}</li>
                 <li>{{ t('knowledge.document.upload.sheetHint') }}</li>
               </template>
-              <li>{{ t('common.upload.limits', { count: countLimit, size: sizeLimit }) }}</li>
+              <li>{{ t('upload.limits', { count: countLimit, size: sizeLimit }) }}</li>
             </ol>
           </el-alert>
           <MkDragUpload
@@ -194,9 +194,9 @@ defineExpose({ open })
             :accept="uploadOption.accept"
             :limit="countLimit"
             :size-limit="sizeLimit"
-            :drag-text="t('common.upload.dropHint')"
-            :select-text="t('common.upload.selectFile')"
-            :tip-text="`${t('common.upload.formats')}: ${uploadOption.formats.join(', ')}`"
+            :drag-text="t('upload.dropHint')"
+            :select-text="t('upload.selectFile')"
+            :tip-text="`${t('upload.formats')}: ${uploadOption.formats.join(', ')}`"
           />
         </section>
         <section v-if="mode === 'text' && strategyMounted" v-show="activeStep === 1">

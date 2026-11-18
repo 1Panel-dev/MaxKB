@@ -11,18 +11,23 @@
       "placeholder": "請輸入文件網址，每行一個。網址有誤的文件將無法匯入。",
       "requiredMessage": "請輸入文件網址"
     },
+    "target": {
+      "label": "儲存至文件",
+      "placeholder": "請選擇文件",
+      "requiredMessage": "請選擇文件"
+    },
     "labels": {
       "activeStatus": "啟用狀態",
       "characters": "字元數",
-      "paragraphs": "分段",
-      "retrievalCount": "召回次數",
-      "lastRetrievedAt": "最後一次召回時間"
+      "paragraphs": "分段"
     },
     "hitHandling": {
       "label": "召回處理",
       "description": "使用者提問時，召回的分段將依照設定進行處理。",
       "optimization": "模型最佳化",
-      "directlyReturn": "直接回答"
+      "directlyReturn": "直接回答",
+      "similarityAbove": "相似度高於",
+      "returnParagraphContent": "直接返回分段內容"
     },
     "settings": {
       "title": "文件設定",
@@ -46,8 +51,6 @@
     "actions": {
       "quickCreate": "快速建立空白文件",
       "generatePreview": "產生預覽",
-      "migrate": "遷移",
-      "migrateTo": "遷移至",
       "downloadOriginal": "下載原始文件",
       "replaceOriginal": "取代原始文件"
     },
@@ -90,10 +93,22 @@
     },
     "preview": {
       "title": "預覽",
-      "emptyParagraphs": "暫無分段",
       "emptyDocuments": "暫無可預覽的文件",
-      "finishEditingMessage": "請先儲存或取消分段編輯",
-      "deleteParagraphConfirm": "確定刪除此分段"
+      "finishEditingMessage": "請先儲存或取消分段編輯"
     }
+  },
+  "image": {
+    "title": "圖片",
+    "detailTitle": "圖片詳情",
+    "name": {
+      "label": "圖片名稱"
+    },
+    "upload": {
+      "title": "上傳圖片"
+    },
+    "preview": {
+      "emptyMessage": "圖片預覽沒有分段，請返回重新產生預覽"
+    },
+    "unsupportedFormatMessage": "僅支援 {formats} 格式的圖片"
   }
 }

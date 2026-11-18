@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, provide, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentSplitResult, ImageDocumentImportPayload, ImageDocumentPreview } from '@/api/types'
 import type { DragUploadFile, DragUploadHandler } from '@/components/mk-drag-upload/types'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
@@ -9,10 +10,11 @@ import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import { getUploadValidationMessage } from '@/components/mk-drag-upload/validation'
 import DocumentImportPreview from '../../document/components/DocumentImportPreview.vue'
 import ImageProcessingForm from './ImageProcessingForm.vue'
-import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_TYPE_LABEL } from '@/constants/knowledge'
+import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_EXTENSIONS } from '@/constants/knowledge'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'UploadImageDrawer' })
+const { locale, t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['image']
   knowledgeId: string
@@ -72,7 +74,7 @@ function handleGeneratePreview() {
   if (!validateFiles() || !processingRef.value) return
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
   if (fileIds.length !== successfulFiles.value.length) {
-    MsgWarning('没有上传成功的文件，请重新上传')
+    MsgWarning(t('upload.noSuccessfulFilesMessage'))
     return
   }
   loading.value = true
@@ -97,12 +99,12 @@ function handleGeneratePreview() {
 async function handleSubmit() {
   if (!validateFiles() || (previewVisible.value && !previewRef.value?.validate())) return
   if (!canImport.value) {
-    MsgWarning('图片预览没有分段，请返回重新生成预览')
+    MsgWarning(t('knowledge.image.preview.emptyMessage'))
     return
   }
   const fileIds = successfulFiles.value.flatMap((file) => (file.file_id ? [file.file_id] : []))
   if (!previewVisible.value && fileIds.length !== successfulFiles.value.length) {
-    MsgWarning('没有上传成功的文件，请重新上传')
+    MsgWarning(t('upload.noSuccessfulFilesMessage'))
     return
   }
 
@@ -123,7 +125,7 @@ async function handleSubmit() {
     const importRequest = props.api?.putBatchCreateImageDocuments(props.knowledgeId, payload)
     if (!importRequest) return
     await importRequest
-    MsgSuccess('导入成功')
+    MsgSuccess(t('common.messages.importSuccess'))
     visible.value = false
     emit('refresh')
   } catch {
@@ -140,10 +142,10 @@ defineExpose({ open })
   <MkDrawer v-model="visible" direction="btt" size="100%" :content-class="previewVisible ? 'h-full p-0!' : undefined" @closed="emit('closed')">
     <template #header>
       <div class="flex w-full">
-        <h4>上传图片</h4>
+        <h4>{{ t('knowledge.image.upload.title') }}</h4>
         <el-steps :active="activeStep" finish-status="success" class="absolute-center w-85!">
-          <el-step title="上传图片" />
-          <el-step title="图片处理" />
+          <el-step :title="t('knowledge.image.upload.title')" />
+          <el-step :title="t('knowledge.documentStrategy.imageProcessing')" />
         </el-steps>
       </div>
     </template>
@@ -151,11 +153,11 @@ defineExpose({ open })
       <DocumentImportPreview v-if="previewVisible" ref="previewRef" v-model="previewDocuments" :knowledge-id="knowledgeId" />
       <div v-show="!previewVisible" class="mx-auto w-full max-w-200">
         <section v-show="activeStep === 0">
-          <h4 class="mb-4 mk-title-decoration">上传图片</h4>
+          <h4 class="mb-4 mk-title-decoration">{{ t('knowledge.image.upload.title') }}</h4>
           <el-alert type="primary" :closable="false" show-icon class="mb-4!">
             <template #icon><MkIcon name="icon_info_filled" /></template>
             <ol class="list-inside list-decimal">
-              <li>每次最多上传 {{ countLimit }} 个文件，每个文件不超过 {{ sizeLimit }} MB</li>
+              <li>{{ t('upload.limits', { count: countLimit, size: sizeLimit }) }}</li>
             </ol>
           </el-alert>
           <MkDragUpload
@@ -166,26 +168,32 @@ defineExpose({ open })
             :accept="KNOWLEDGE_IMAGE_ACCEPT"
             :limit="countLimit"
             :size-limit="sizeLimit"
-            :tip-text="`支持格式：${KNOWLEDGE_IMAGE_TYPE_LABEL}`"
+            :tip-text="`${t('upload.formats')}: ${KNOWLEDGE_IMAGE_EXTENSIONS.join(locale === 'en-US' ? ', ' : '、')}`"
           />
         </section>
         <section v-if="processingMounted" v-show="activeStep === 1 && !previewVisible">
-          <h4 class="mb-4 mk-title-decoration">图片处理</h4>
+          <h4 class="mb-4 mk-title-decoration">{{ t('knowledge.documentStrategy.imageProcessing') }}</h4>
           <ImageProcessingForm ref="processingRef" />
         </section>
       </div>
     </div>
     <template #footer>
       <!-- 取消上传图片 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 返回上传步骤或图片处理设置 -->
-      <el-button v-if="activeStep === 1" plain :disabled="loading" @click="handlePrevious">上一步</el-button>
+      <el-button v-if="activeStep === 1" plain :disabled="loading" @click="handlePrevious">{{ t('common.actions.previous') }}</el-button>
       <!-- 进入图片处理步骤 -->
-      <el-button v-if="activeStep === 0" type="primary" :disabled="loading || uploading" @click="handleNext">下一步</el-button>
+      <el-button v-if="activeStep === 0" type="primary" :disabled="loading || uploading" @click="handleNext">
+        {{ t('common.actions.next') }}
+      </el-button>
       <!-- 按图片处理策略生成预览 -->
-      <el-button v-if="activeStep === 1 && !previewVisible" plain :loading="loading" @click="handleGeneratePreview">生成预览</el-button>
+      <el-button v-if="activeStep === 1 && !previewVisible" plain :loading="loading" @click="handleGeneratePreview">
+        {{ t('knowledge.document.actions.generatePreview') }}
+      </el-button>
       <!-- 导入处理后的图片 -->
-      <el-button v-if="activeStep === 1" type="primary" :loading="loading" :disabled="!canImport" @click="handleSubmit">开始导入</el-button>
+      <el-button v-if="activeStep === 1" type="primary" :loading="loading" :disabled="!canImport" @click="handleSubmit">
+        {{ t('knowledge.document.import.start') }}
+      </el-button>
     </template>
   </MkDrawer>
 </template>

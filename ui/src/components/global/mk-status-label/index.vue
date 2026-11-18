@@ -1,23 +1,29 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { StatusLabelType } from './types'
 
 defineOptions({ name: 'MkStatusLabel' })
 
-const props = withDefaults(
-  defineProps<{
-    type?: StatusLabelType
-    label?: string
-    active?: boolean
-    activeText?: string
-    inactiveText?: string
-    icon?: string
-  }>(),
-  { activeText: '已启用', inactiveText: '已禁用' },
-)
+const { t } = useI18n({ useScope: 'global' })
+
+const props = defineProps<{
+  type?: StatusLabelType
+  label?: string
+  active?: boolean
+  activeText?: string
+  inactiveText?: string
+  icon?: string
+}>()
 
 const displayType = computed(() => props.type ?? (props.active ? 'success' : 'disabled'))
-const displayLabel = computed(() => (props.type !== undefined ? props.label : props.active ? props.activeText : props.inactiveText))
+const displayLabel = computed(() =>
+  props.type !== undefined
+    ? props.label
+    : props.active
+      ? (props.activeText ?? t('common.status.enabled'))
+      : (props.inactiveText ?? t('common.status.disabled')),
+)
 const iconName = computed(() => {
   if (props.icon) return props.icon
   if (displayType.value === 'custom') return undefined

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { TableFilterCustomValue } from './types'
 
 defineOptions({ name: 'TableFilterCustom' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   modelValue: TableFilterCustomValue
   resetValue: TableFilterCustomValue
@@ -44,10 +46,10 @@ function handleConfirm() {
     </el-scrollbar>
 
     <div class="p-3 text-right">
-      <!-- 清除多选筛选 -->
-      <el-button plain class="min-w-12! w-12!" size="small" @click="handleReset">重置</el-button>
-      <!-- 确认多选筛选 -->
-      <el-button class="min-w-12! w-12!" size="small" type="primary" @click="handleConfirm">确定</el-button>
+      <!-- 重置自定义筛选 -->
+      <el-button plain class="min-w-12!" size="small" @click="handleReset">{{ t('common.actions.reset') }}</el-button>
+      <!-- 确认自定义筛选 -->
+      <el-button class="min-w-12!" size="small" type="primary" @click="handleConfirm">{{ t('common.actions.confirm') }}</el-button>
     </div>
   </el-popover>
 </template>

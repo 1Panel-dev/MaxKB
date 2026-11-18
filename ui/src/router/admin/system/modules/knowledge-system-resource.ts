@@ -42,7 +42,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
         path: '',
         name: 'system-resource-knowledge-library',
         redirect: { name: 'system-resource-knowledge-document-list' },
-        meta: { title: 'knowledge.library.title', icon: 'icon-draft', order: 10 },
+        meta: { title: 'knowledge.menu.library', icon: 'icon-draft', order: 10 },
         children: [
           {
             path: 'document',
@@ -106,7 +106,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
         path: 'retrieval',
         name: 'system-resource-knowledge-retrieval',
         redirect: { name: 'system-resource-knowledge-hit-test' },
-        meta: { title: 'knowledge.retrieval.title', icon: 'icon_trace_outlined', order: 30 },
+        meta: { title: 'knowledge.menu.retrieval', icon: 'icon_trace_outlined', order: 30 },
         children: [
           {
             path: 'hit-test',
@@ -115,7 +115,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.hitTest(),
               next: 'system-resource-knowledge-problem',
-              title: 'knowledge.hitTest.title',
+              title: 'knowledge.menu.hitTest',
               order: 10,
             },
           },
@@ -126,7 +126,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.problemRead(),
               next: 'system-resource-knowledge-dictionary',
-              title: 'knowledge.questions.title',
+              title: 'knowledge.menu.questions',
               order: 20,
             },
           },
@@ -137,7 +137,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.termbaseRead(),
               next: 'system-resource-knowledge-integration',
-              title: 'knowledge.termbase.title',
+              title: 'knowledge.menu.termbase',
               order: 30,
             },
           },
@@ -147,7 +147,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
         path: 'integration',
         name: 'system-resource-knowledge-integration',
         redirect: { name: 'system-resource-knowledge-chat-user' },
-        meta: { title: 'knowledge.integration.title', icon: 'icon_personal-privacy_outlined', order: 40 },
+        meta: { title: 'knowledge.menu.integration', icon: 'icon_personal-privacy_outlined', order: 40 },
         children: [
           {
             path: 'chat-user',
@@ -156,7 +156,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.knowledgeChatUserRead(),
               next: 'system-resource-knowledge-external-retrieval',
-              title: 'knowledge.chatUsers.title',
+              title: 'knowledge.menu.chatUsers',
               order: 10,
             },
           },
@@ -167,7 +167,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.externalServiceRead(),
               next: 'system-resource-knowledge-setting',
-              title: 'knowledge.externalRetrieval.title',
+              title: 'knowledge.menu.externalRetrieval',
               order: 20,
             },
           },
@@ -207,7 +207,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.settingRead(),
               next: 'system-resource-knowledge-document-strategy',
-              title: 'knowledge.baseSettings.title',
+              title: 'knowledge.menu.baseSettings',
               order: 10,
             },
           },
@@ -230,7 +230,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.scheduledSyncRead(),
               next: 'system-resource-knowledge-library',
-              title: 'knowledge.scheduledSync.title',
+              title: 'knowledge.menu.scheduledSync',
               order: 30,
             },
           },

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentParagraphApi } from '@/views/document-detail/context'
 import ParagraphMigrateDialog from './ParagraphMigrateDialog.vue'
 
 defineOptions({ name: 'MigrateParagraphAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: DocumentParagraphApi
   knowledgeId: string
@@ -32,7 +34,7 @@ function handleOpenDialog() {
   <MkDropdownItem :disabled="disabled || !paragraphId" @click="handleOpenDialog">
     <template #icon><MkIcon name="icon_move2_outlined" /></template>
 
-    迁移
+    {{ t('knowledge.actions.migrate') }}
   </MkDropdownItem>
   <ParagraphMigrateDialog
     v-if="dialogMounted"

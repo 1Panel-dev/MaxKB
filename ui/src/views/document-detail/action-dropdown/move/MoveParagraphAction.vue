@@ -1,16 +1,18 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { ParagraphMoveDirection } from './types'
 
 defineOptions({ name: 'MoveParagraphAction' })
+const { t } = useI18n({ useScope: 'global' })
 defineProps<{ label: string; disabled?: boolean }>()
 const emit = defineEmits<{ move: [direction: ParagraphMoveDirection]; 'visible-change': [visible: boolean] }>()
 
 const positionOptions = [
-  { label: '置于顶部', value: 'top' },
-  { label: '上移', value: 'up' },
-  { label: '下移', value: 'down' },
-  { label: '置于底部', value: 'bottom' },
-] as const satisfies readonly { label: string; value: ParagraphMoveDirection }[]
+  { labelKey: 'knowledge.paragraph.position.top', value: 'top' },
+  { labelKey: 'knowledge.paragraph.position.up', value: 'up' },
+  { labelKey: 'knowledge.paragraph.position.down', value: 'down' },
+  { labelKey: 'knowledge.paragraph.position.bottom', value: 'bottom' },
+] as const satisfies readonly { labelKey: string; value: ParagraphMoveDirection }[]
 </script>
 
 <template>
@@ -29,7 +31,7 @@ const positionOptions = [
           <template v-for="positionOption in positionOptions" :key="positionOption.value">
             <!-- 按所选方向移动分段 -->
             <MkDropdownItem :disabled="disabled" @click="emit('move', positionOption.value)">
-              {{ positionOption.label }}
+              {{ t(positionOption.labelKey) }}
             </MkDropdownItem>
           </template>
         </MkDropdownMenu>

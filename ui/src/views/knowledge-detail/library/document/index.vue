@@ -501,15 +501,15 @@ onBeforeUnmount(() => {
         {{ documentHitHandlingOptions.find((option) => option.value === row.hit_handling_method)?.label }}
       </template>
     </el-table-column>
-    <el-table-column prop="hit_num" min-width="140" :label="t('knowledge.document.labels.retrievalCount')" sortable>
+    <el-table-column prop="hit_num" min-width="140" :label="t('knowledge.stats.retrievalCount')" sortable>
       <template #default="{ row }">
         {{ numberFormat(row.hit_num) }}
       </template>
     </el-table-column>
-    <el-table-column prop="last_hit_time" :label="t('knowledge.document.labels.lastRetrievedAt')" width="180" sortable>
+    <el-table-column prop="last_hit_time" :label="t('knowledge.stats.lastRetrievedAt')" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.last_hit_time) }}</template>
     </el-table-column>
-    <el-table-column prop="nick_name" width="120" :label="t('common.labels.creator')" show-overflow-tooltip />
+    <el-table-column prop="nick_name" :label="t('common.labels.creator')" min-width="120" show-overflow-tooltip />
     <el-table-column prop="update_time" :label="t('common.labels.updatedAt')" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
     </el-table-column>
@@ -595,7 +595,7 @@ onBeforeUnmount(() => {
 
               <!-- 迁移文档 -->
               <MigrateDocumentAction
-                :label="t('knowledge.document.actions.migrate')"
+                :label="t('knowledge.actions.migrate')"
                 icon="icon_move2_outlined"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
@@ -716,7 +716,7 @@ onBeforeUnmount(() => {
             />
             <!-- 批量迁移文档 -->
             <MigrateDocumentAction
-              :label="t('knowledge.document.actions.migrateTo')"
+              :label="t('knowledge.actions.migrateTo')"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
               :document-ids="selectedDocumentIds"

@@ -47,7 +47,7 @@ const percentage = computed(() => props.percentage ?? props.file.percentage ?? 0
         <span class="flex-center"><MkIcon name="icon_warning_filled" class="text-danger!" :size="iconSize" /></span>
       </MkTooltip>
       <!-- 重新上传失败图片 -->
-      <MkTooltip :content="t('common.upload.retryUpload')" placement="top" :offset="size / 2">
+      <MkTooltip :content="t('upload.retryUpload')" placement="top" :offset="size / 2">
         <button type="button" class="flex-center cursor-pointer disabled:cursor-not-allowed" :disabled="disabled" @click.stop="emit('retry')">
           <MkIcon name="icon_refresh_outlined" class="text-white!" :size="iconSize" />
         </button>

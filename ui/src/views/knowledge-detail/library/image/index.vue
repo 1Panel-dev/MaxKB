@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import type { Dict, DocumentHitHandling, DocumentItem, OptionItem, ParagraphItem } from '@/api/types'
+import type { Dict, DocumentHitHandling, DocumentItem, KnowledgeTagGroup, OptionItem, ParagraphItem } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { CascaderOption, TableColumnCtx } from 'element-plus'
 import { DOCUMENT_RESOURCE_TYPE, DOCUMENT_TASK_TYPE } from '@/api/enums'
@@ -96,7 +96,7 @@ function handleOpenParagraph(document: DocumentItem, column?: TableColumnCtx<Doc
 /* 文档名称编辑 */
 function validateDocumentName(name: string): string | undefined {
   if (/[:\\/?*\[\]]/.test(name)) {
-    return '文件名称不能包含以下特殊字符：: \\ / ? * [ ]'
+    return `${t('knowledge.document.name.invalidCharactersMessage')}: : \\ / ? * [ ]`
   }
 }
 
@@ -121,8 +121,8 @@ const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const documentQuery = ref<Dict<unknown>>({})
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
-  { label: '名称', value: 'name' },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.name.label'), value: 'name' },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 
 function loadCreatorOptions(keyword: string) {
@@ -141,10 +141,10 @@ const documentStatusOptions = computed(() =>
 const documentStatusFilter = computed(() => DOCUMENT_STATUS_FILTER_OPTIONS.find(({ value }) => value === selectedDocumentStatus.value))
 
 // 启用状态
-const documentActiveOptions = [
-  { label: '已启用', value: true },
-  { label: '已禁用', value: false },
-]
+const documentActiveOptions = computed(() => [
+  { label: t('common.status.enabled'), value: true },
+  { label: t('common.status.disabled'), value: false },
+])
 const selectedDocumentActive = ref<boolean | null>(null)
 
 // 召回处理
@@ -155,7 +155,19 @@ const selectedDocumentHitHandling = ref<DocumentHitHandling | null>(null)
 
 // 标签
 const selectedDocumentTags = ref<string[]>([])
-const documentTagOptions = ref<CascaderOption[]>([])
+const documentTagGroups = ref<KnowledgeTagGroup[]>()
+const documentTagOptions = computed<CascaderOption[]>(() =>
+  documentTagGroups.value
+    ? [
+        ...documentTagGroups.value.map((group) => ({
+          label: group.key,
+          value: `key:${group.key}`,
+          children: group.values.map((tag) => ({ label: tag.value, value: tag.id })),
+        })),
+        { label: t('knowledge.tags.untagged'), value: 'NO_TAG' },
+      ]
+    : [],
+)
 const documentTagLoading = ref(false)
 
 function loadDocumentTagOptions() {
@@ -164,14 +176,7 @@ function loadDocumentTagOptions() {
   return resourceApi.tags
     .getKnowledgeTags(knowledgeId.value)
     .then((groups) => {
-      documentTagOptions.value = [
-        ...groups.map((group) => ({
-          label: group.key,
-          value: `key:${group.key}`,
-          children: group.values.map((tag) => ({ label: tag.value, value: tag.id })),
-        })),
-        { label: '无标签', value: 'NO_TAG' },
-      ]
+      documentTagGroups.value = groups
     })
     .finally(() => {
       documentTagLoading.value = false
@@ -272,7 +277,7 @@ function handleChangeActive(document: DocumentItem) {
     resourceApi.document
       .putDocument?.(knowledgeId.value, document.id, { is_active: !document.is_active })
       .then(() => {
-        MsgSuccess('操作成功')
+        MsgSuccess(t('common.messages.operationSuccess'))
         return refreshAfterOperation().then(() => false)
       })
       .catch(() => false) ?? Promise.resolve(false)
@@ -335,7 +340,7 @@ onBeforeUnmount(() => {
   >
     <el-table-column type="selection" width="40" reserve-selection v-if="!isWorkspaceSharedResource()" />
 
-    <el-table-column prop="name" label="图片名称" min-width="220" show-overflow-tooltip>
+    <el-table-column prop="name" :label="t('knowledge.image.name.label')" min-width="220" show-overflow-tooltip>
       <template #default="{ row }: { row: DocumentItem }">
         <!-- 编辑文档名称 -->
         <MkEditName
@@ -359,7 +364,7 @@ onBeforeUnmount(() => {
         <MkTableFilter
           v-model="selectedDocumentStatus"
           mode="single"
-          label="文件状态"
+          :label="t('knowledge.document.status.label')"
           :options="documentStatusOptions"
           @change="handleDocumentFilterChange"
         />
@@ -368,19 +373,19 @@ onBeforeUnmount(() => {
         <DocumentStatus :status="row.status" :status-meta="row.status_meta" />
       </template>
     </el-table-column>
-    <el-table-column width="120">
+    <el-table-column min-width="170">
       <template #header>
         <MkTableFilter
           v-model="selectedDocumentActive"
           mode="single"
-          label="启用状态"
+          :label="t('knowledge.document.labels.activeStatus')"
           :options="documentActiveOptions"
           @change="handleDocumentFilterChange"
         />
       </template>
       <template #default="{ row }"><MkStatusLabel :active="row.is_active" /></template>
     </el-table-column>
-    <el-table-column prop="char_length" label="字符数">
+    <el-table-column prop="char_length" :label="t('knowledge.document.labels.characters')" min-width="120" sortable>
       <template #default="{ row }">
         {{ numberFormat(row.char_length) }}
       </template>
@@ -391,7 +396,7 @@ onBeforeUnmount(() => {
         <MkTableFilter
           v-model="selectedDocumentTags"
           mode="cascader"
-          label="标签"
+          :label="t('knowledge.tags.label')"
           :options="documentTagOptions"
           @open="loadDocumentTagOptions"
           @change="handleDocumentFilterChange"
@@ -410,12 +415,12 @@ onBeforeUnmount(() => {
       </template>
     </el-table-column>
 
-    <el-table-column width="130">
+    <el-table-column min-width="180">
       <template #header>
         <MkTableFilter
           v-model="selectedDocumentHitHandling"
           mode="single"
-          label="召回处理"
+          :label="t('knowledge.document.hitHandling.label')"
           :options="documentHitHandlingOptions"
           @change="handleDocumentFilterChange"
         />
@@ -424,22 +429,22 @@ onBeforeUnmount(() => {
         {{ documentHitHandlingOptions.find((option) => option.value === row.hit_handling_method)?.label }}
       </template>
     </el-table-column>
-    <el-table-column prop="hit_num" label="召回次数">
+    <el-table-column prop="hit_num" :label="t('knowledge.stats.retrievalCount')" min-width="140" sortable>
       <template #default="{ row }">
         {{ numberFormat(row.hit_num) }}
       </template>
     </el-table-column>
-    <el-table-column label="最后一次召回时间" width="180">
+    <el-table-column :label="t('knowledge.stats.lastRetrievedAt')" width="180" sortable>
       <template #default="{ row }">{{ datetimeFormat(row.last_hit_time) }}</template>
     </el-table-column>
-    <el-table-column prop="nick_name" label="创建者" show-overflow-tooltip />
-    <el-table-column label="更新时间" width="180">
+    <el-table-column prop="nick_name" :label="t('common.labels.creator')" min-width="120" show-overflow-tooltip />
+    <el-table-column :label="t('common.labels.updatedAt')" width="180">
       <template #default="{ row }">{{ datetimeFormat(row.update_time) }}</template>
     </el-table-column>
-    <el-table-column label="创建时间" width="180">
+    <el-table-column :label="t('common.labels.createdAt')" width="180">
       <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
     </el-table-column>
-    <el-table-column label="操作" width="160" fixed="right" v-if="!isWorkspaceSharedResource()">
+    <el-table-column :label="t('common.labels.operation')" width="160" fixed="right" v-if="!isWorkspaceSharedResource()">
       <template #default="{ row }: { row: DocumentItem }">
         <div class="flex-align-center" @click.stop>
           <!-- 启用或禁用文档 -->
@@ -497,7 +502,7 @@ onBeforeUnmount(() => {
               <!-- 文档设置 -->
               <SettingDocumentAction
                 v-if="canImage('edit')"
-                label="设置"
+                :label="t('common.labels.settings')"
                 icon="icon_setting"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
@@ -518,7 +523,7 @@ onBeforeUnmount(() => {
               <!-- 迁移文档 -->
               <MigrateDocumentAction
                 v-if="canImage('migrate')"
-                :label="t('knowledge.document.actions.migrate')"
+                :label="t('knowledge.actions.migrate')"
                 icon="icon_move2_outlined"
                 :api="resourceApi.document"
                 :knowledge-id="knowledgeId"
@@ -585,7 +590,7 @@ onBeforeUnmount(() => {
       <!-- 批量文档设置 -->
       <BatchSettingDocumentAction
         v-if="canImage('edit')"
-        label="设置"
+        :label="t('common.labels.settings')"
         :api="resourceApi.document"
         :knowledge-id="knowledgeId"
         :document-ids="selectedDocumentIds"
@@ -614,7 +619,7 @@ onBeforeUnmount(() => {
             <!-- 批量迁移文档 -->
             <MigrateDocumentAction
               v-if="canImage('migrate')"
-              :label="t('knowledge.document.actions.migrateTo')"
+              :label="t('knowledge.actions.migrateTo')"
               :api="resourceApi.document"
               :knowledge-id="knowledgeId"
               :document-ids="selectedDocumentIds"
@@ -664,7 +669,7 @@ onBeforeUnmount(() => {
   <ParagraphDialog
     v-if="selectedParagraph"
     ref="paragraphDialogRef"
-    title="图片详情"
+    :title="t('knowledge.image.detailTitle')"
     :readonly="!canImage('edit')"
     :knowledge-id="knowledgeId"
     :document-id="selectedParagraph.document_id"

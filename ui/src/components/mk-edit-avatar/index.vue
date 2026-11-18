@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 import { ClickOutside as vClickOutside, ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import type { UploadFile, UploadInstance } from 'element-plus'
 
 defineOptions({ name: 'MkEditAvatar' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(defineProps<{ disabled?: boolean; size?: number }>(), {
   disabled: false,
@@ -15,7 +18,7 @@ defineSlots<{ default(props: { icon: string | undefined }): unknown }>()
 
 // 头像编辑草稿：确认前不修改外部值。
 const visible = ref(false)
-const logoMode = ref<'default' | 'custom'>('default')
+const avatarMode = ref<'default' | 'custom'>('default')
 const previewIcon = ref('')
 const draftFile = ref<File | null>(null)
 const referenceRef = useTemplateRef<HTMLElement>('referenceRef')
@@ -23,8 +26,8 @@ const uploadRef = useTemplateRef<UploadInstance>('uploadRef')
 
 function open() {
   if (visible.value) return
-  logoMode.value = avatar.value ? 'custom' : 'default'
-  previewIcon.value = logoMode.value === 'custom' ? avatar.value : ''
+  avatarMode.value = avatar.value ? 'custom' : 'default'
+  previewIcon.value = avatarMode.value === 'custom' ? avatar.value : ''
   draftFile.value = null
   visible.value = true
 }
@@ -46,8 +49,8 @@ function closeOutside(event: MouseEvent) {
 }
 
 function confirm() {
-  if (logoMode.value === 'custom' && !previewIcon.value) return
-  if (logoMode.value === 'default') {
+  if (avatarMode.value === 'custom' && !previewIcon.value) return
+  if (avatarMode.value === 'default') {
     avatar.value = ''
     emit('change', null)
   } else if (draftFile.value) {
@@ -58,16 +61,18 @@ function confirm() {
 }
 
 // 本地图片校验与预览，文件由调用方上传。
+const maxImageSizeMb = 10
+
 function selectImage(uploadFile: UploadFile) {
   const file = uploadFile.raw
   uploadRef.value?.clearFiles()
   if (!file) return
   if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
-    ElMessage.warning('仅支持 JPG、PNG、GIF 格式的图片')
+    ElMessage.warning(t('upload.avatar.formatMessage'))
     return
   }
-  if (file.size > 10 * 1024 * 1024) {
-    ElMessage.warning('文件大小不能超过 10MB')
+  if (file.size > maxImageSizeMb * 1024 * 1024) {
+    ElMessage.warning(t('upload.avatar.sizeLimitMessage', { size: maxImageSizeMb }))
     return
   }
   previewIcon.value = URL.createObjectURL(file)
@@ -112,12 +117,12 @@ onBeforeUnmount(() => {
     </template>
 
     <div v-click-outside="closeOutside" class="p-4" @keydown.esc.stop="close" @click.stop>
-      <div class="mb-1">Logo 设置</div>
-      <el-radio-group v-model="logoMode" class="mb-2">
-        <el-radio value="default">默认 Logo</el-radio>
-        <el-radio value="custom">自定义上传</el-radio>
+      <div class="mb-1">{{ t('upload.avatar.title') }}</div>
+      <el-radio-group v-model="avatarMode" class="mb-2">
+        <el-radio value="default">{{ t('upload.avatar.default') }}</el-radio>
+        <el-radio value="custom">{{ t('upload.avatar.customUpload') }}</el-radio>
       </el-radio-group>
-      <div v-if="logoMode === 'default'" class="h-20 w-20 [&>*]:h-full! [&>*]:w-full!">
+      <div v-if="avatarMode === 'default'" class="h-20 w-20 [&>*]:h-full! [&>*]:w-full!">
         <slot :icon="undefined" />
       </div>
 
@@ -142,14 +147,14 @@ onBeforeUnmount(() => {
             <MkIcon name="icon_add_outlined" :size="24" />
           </div>
         </el-upload>
-        <p class="text-N600 mt-1">支持 JPG、PNG、GIF，文件大小不超过 10MB</p>
+        <p class="text-N600 mt-1">{{ t('upload.avatar.uploadHint', { size: maxImageSizeMb }) }}</p>
       </div>
 
       <div class="mt-4 text-right">
         <!-- 取消头像修改 -->
-        <el-button plain @click="close">取消</el-button>
+        <el-button plain @click="close">{{ t('common.actions.cancel') }}</el-button>
         <!-- 确认头像修改 -->
-        <el-button type="primary" :disabled="logoMode === 'custom' && !previewIcon" @click="confirm">确定</el-button>
+        <el-button type="primary" :disabled="avatarMode === 'custom' && !previewIcon" @click="confirm">{{ t('common.actions.confirm') }}</el-button>
       </div>
     </div>
   </el-popover>

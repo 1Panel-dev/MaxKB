@@ -58,7 +58,7 @@ defineExpose({ validate })
 function handleDeleteParagraph(index: number) {
   const document = selectedDocument.value
   if (!document) return
-  return MsgConfirm(`${t('knowledge.document.preview.deleteParagraphConfirm')}?`)
+  return MsgConfirm(`${t('knowledge.paragraph.delete.confirm')}?`)
     .then(() => {
       document.content.splice(index, 1)
     })
@@ -135,7 +135,7 @@ function handleDeleteParagraph(index: number) {
             </el-card>
           </template>
         </div>
-        <MkEmpty v-if="!selectedDocument.content.length" :description="t('knowledge.document.preview.emptyParagraphs')" />
+        <MkEmpty v-if="!selectedDocument.content.length" :description="t('knowledge.paragraph.empty')" />
       </template>
       <MkEmpty v-else :description="t('knowledge.document.preview.emptyDocuments')" />
     </template>

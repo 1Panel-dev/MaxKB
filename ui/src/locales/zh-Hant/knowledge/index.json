@@ -1,5 +1,17 @@
 {
   "title": "知識庫",
+  "menu": {
+    "library": "資料庫",
+    "retrieval": "檢索最佳化",
+    "hitTest": "召回測試",
+    "questions": "問題",
+    "termbase": "自訂分詞",
+    "integration": "授權與整合",
+    "chatUsers": "對話使用者",
+    "externalRetrieval": "外部檢索服務",
+    "baseSettings": "基本設定",
+    "scheduledSync": "排程同步"
+  },
   "categories": {
     "all": "全部知識庫",
     "shared": "共用知識庫"
@@ -57,9 +69,13 @@
     "documents": "文件",
     "paragraphs": "分段",
     "characters": "字元",
-    "images": "圖片"
+    "images": "圖片",
+    "retrievalCount": "召回次數",
+    "lastRetrievedAt": "最後一次召回時間"
   },
   "actions": {
+    "migrate": "遷移",
+    "migrateTo": "遷移至",
     "sync": "同步",
     "generateEmbeddings": "向量化",
     "generateQuestions": "產生問題",

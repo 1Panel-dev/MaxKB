@@ -260,7 +260,8 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 
 ### MkSearchInput
 
-默认搜索图标、placeholder“搜索”，固定支持清空。`v-model`、其他 Input 属性和事件透传；
+默认搜索图标，placeholder 读取 `common.placeholders.search` 并跟随界面语言；显式传入的 placeholder（包括空字符串）优先。
+固定支持清空。`v-model`、其他 Input 属性和事件透传；
 `prefix` 可覆盖图标，`prepend`、`append`、`suffix` 插槽可用。
 
 ### MkSlider
@@ -281,8 +282,8 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 `StatusLabelType`、`StatusLabelOptions` 从 `global/mk-status-label/types.ts` 导入。
 传入 `type` 时使用该类型和外部 `label`，优先于布尔模式，不回退到启用／禁用文案。
 
-未传 `type` 时保留 `active` 便捷模式，默认“已启用 / 已禁用”；
-`activeText`、`inactiveText` 可修改文案。
+未传 `type` 时保留 `active` 便捷模式，默认文案读取 `common.status.enabled` / `common.status.disabled` 并跟随界面语言；
+`activeText`、`inactiveText` 可修改文案，包括传入空字符串。
 `icon` 接收完整 SVG Symbol ID，在两种模式下均优先替换图标，包括加载图标；不改变状态文案及禁用状态的灰色样式。
 未传 `icon` 时，成功使用 `icon_succeed_colorful`，失败使用 `icon_close_colorful`，加载使用 `LoadingIcon`，
 禁用使用 `icon_ban_filled`。仅替换未激活图标时，由调用方按 `active` 条件传入 `icon`。
@@ -312,6 +313,7 @@ Element Plus `append`，仅在传入该插槽时将直属表体滚动容器设�
 组件只提供行内快速创建交互，不依赖文档 API 或业务 ID。点击创建只发出 `create(name)` 事件，
 由页面管理请求、`loading`、成功提示及列表刷新；成功后通过组件 ref 调用 `close()` 清空并收起，失败保留输入。
 `text` 默认为“快速创建”，`placeholder` 默认为“请输入名称”，`maxlength` 默认为 256。
+默认文字及创建、取消按钮读取 `common` 语言包，随界面语言更新；传入的 `text` 和 `placeholder` 原样展示，包括空字符串。
 组件不使用 Form 或表单校验；空名称、纯空白及提交期间禁用创建按钮，提交前 trim。
 输入框按 Enter 触发同一创建流程，输入法选词时不提交。
 Esc 或取消清理草稿；`loading` 默认为 false，为 true 时禁止创建和取消。组件不等待 Promise，不自动收起。
@@ -352,6 +354,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 `MkTableFilter` 的公开入口为 `global/mk-table/mk-table-filter/index.vue`，不直接引用内部模式组件。
 页面只维护生效条件、业务选项和查询映射，草稿、显隐、提交及重置由组件负责。
+内置“全部”、搜索占位、重置与确认按钮使用 `common` 语言包；搜索空状态复用 `MkEmpty` 的默认译文，业务选项和插槽内容由调用方提供。
 
 表头筛选使用 `MkTableFilter`，`label` 设置表头文案，必填 `v-model` 保存已生效的条件。
 `mode` 支持以下模式，默认 `multiple`；调用时显式填写 `mode`，便于区分筛选方式：
@@ -460,7 +463,8 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 提供 `item`、`index`，业务组件在插槽中继续声明
 `el-form-item`、字段路径和校验规则。
 
-`addText` 设置添加按钮文案，`showAddButton` 默认为 `true`；添加入口由业务布局单独提供时传入
+`addText` 设置添加按钮文案，未传时读取 `common.actions.add` 并跟随界面语言，显式空字符串保留。
+`showAddButton` 默认为 `true`；添加入口由业务布局单独提供时传入
 `:show-add-button="false"`。`firstRowHasLabel` 默认为 `true`：第一行删除按钮使用 `mt-8`，后续行
 使用 `mt-0.5`；并列表单项没有 label 时传入 `:firstRowHasLabel="false"`。删除成功后通过
 `remove(item, index)` 返回被删除的行数据和原索引，业务组件可处理关联状态，不需要再次修改列表。
@@ -486,6 +490,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 默认查询参数，并将筛选结果映射为业务查询参数。
 `defaultValue` 接收 `{ startTime, endTime }`，仅在挂载时回填：匹配预设范围时选中对应预设，
 否则显示自定义日期。切换到自定义时保留当前范围，不立即触发查询，选定日期后触发 `change`。
+预设标签和日期占位读取 `common.dateRange`；语言切换只更新文案，不重置选中范围或触发查询。
 
 ### MkSearchList
 
@@ -497,7 +502,8 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 默认插槽提供 `{ row, index, active }`。`action`、`action-dropdown` 的
 参数与优先级沿用 `MkListItem`，下拉直接放 `MkDropdownItem`。`click(row, index)` 返回原始行。
-`empty` 可自定义空态；默认空数据使用 `emptyText`（“暂无数据”），有搜索词时显示“没有找到相关内容”。
+`empty` 可自定义空态；无搜索词时优先展示 `emptyText`（包括空字符串），未传时读取 `common.empty.default`；
+有搜索词时读取 `common.empty.search`。默认空态文案跟随界面语言。
 
 ### MkCardCheckbox
 
@@ -525,6 +531,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 编辑态仅使用 `el-input`，不包装 Form、FormItem 或错误 Tooltip。保存前清理首尾空格，
 空名称或纯空白时阻止保存并通过 `MsgWarning` 提示“请输入名称”；`maxlength` 可限制长度，`validate(name)` 可返回
 业务错误文案并通过消息提示，返回 `undefined` 表示通过。名称未变化直接退出，不请求。
+名称占位使用 `common.name.placeholder`，空名称提示在保存时读取 `common.name.requiredMessage`。
 保存期间输入框只读，失败保留草稿，接口错误由请求层提示，允许重新聚焦后修改、重试或取消。
 名称展示区域保留父级点击行为，编辑按钮和输入区域阻止点击冒泡。
 编辑期间根节点自动设置内部标记 `data-mk-edit-name-editing`，供 `MkTable` 识别编辑焦点；
@@ -542,7 +549,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `size` 默认为 `32`（px），只设置 `referenceRef` 触发容器的宽高；弹层预览和上传区域固定为 80px。
 `disabled` 默认为 `false`，直接传给 `el-popover` 控制禁用，不额外维护禁用状态监听。
 
-必填默认插槽同时渲染触发区和默认 Logo 预览，只透出 `{ icon }`。触发区传入当前头像
+必填默认插槽同时渲染触发区和默认头像预览，只透出 `{ icon }`。触发区传入当前头像
 （空值转为 `undefined`）；默认预览始终传入 `icon: undefined`。两处容器通过样式让插槽的
 直接子元素填满各自宽高，不向插槽传递 `size`，也不修改插槽组件的 Props。
 调用方必须使用插槽的 `icon`，由 `PortalIcon`、`ToolIcon` 等资源组件自行展示默认图标，
@@ -550,7 +557,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 触发区由 `MkEditAvatar` 的 `span` 容器承载，统一处理悬停，插槽内只放展示内容。
 门户编辑通过此插槽渲染 `PortalIcon`，并将头像绑定到 `portalForm.logo`。
 
-悬停头像打开 Logo 设置，打开后保持显示以便选择本地文件；取消、点击外部或弹层内按 Escape
+悬停头像打开头像设置，打开后保持显示以便选择本地文件；取消、点击外部或弹层内按 Escape
 关闭并丢弃草稿。选择新图片后确定，先将预览地址写入 `v-model`，再触发 `change(file)`；保留已有自定义
 头像直接确定时不触发事件。恢复默认时先将 `v-model` 设为空，再触发 `change(null)`。
 自定义图片支持 JPG、PNG、GIF，大小不超过 10MB；组件通过 `URL.createObjectURL` 创建预览，
@@ -559,13 +566,15 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `blob:` 地址仅供当前组件存续期间预览，不能提交给后端作为持久图片地址。
 组件只通过 `change(file)` 通知调用方，不请求接口，也不规定文件何时上传。
 调用方按业务流程处理文件，通过 `v-model` 传入用于展示的头像地址。
+头像设置、上传说明和图片校验读取 `upload.avatar`，按钮复用 `common.actions`；大小提示与校验使用同一上限。
 
 ### MkFilterableDropdown
 
 带搜索过滤和滚动列表的下拉选择。组件不限制选项字段，默认使用 `label` 作为展示和搜索字段、
 `value` 作为唯一值；数据结构不同时通过 `props.label` 和 `props.value` 映射，使用方式与
 `MkSearchList` 一致。原始选项类型会贯穿 `options`、作用域插槽和 `select` 事件。
-`emptyText` 默认为“暂无匹配结果”。默认插槽接收 `selectedOption` 和 `text`，`option` 插槽接收
+`emptyText` 未传时读取 `common.empty.search` 并跟随界面语言；显式传入的文案（包括空字符串）优先。
+默认插槽接收 `selectedOption` 和 `text`，`option` 插槽接收
 当前原始选项；选择后先更新 `v-model`，再通过 `select` 返回未经转换的原始选项。
 
 ### MkTagsEdit
@@ -574,7 +583,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 编辑文件后缀。可选 `presetExtensions` 接收预设文件后缀数组，默认为空。
 输入失焦或按回车时，组件内部去除首尾空格和一个前导点，并转为大写，空值不添加；
 重复检查对预设后缀与当前列表应用相同规则，兼容已有的小写后缀，重复时提示“文件后缀已存在”。
-已有数据不自动改写，新添加的后缀按上述格式保存。添加按钮和输入提示固定为“添加后缀名”。
+已有数据不自动改写，新添加的后缀按上述格式保存。添加按钮、输入提示及重复提示读取 `upload.extension`。
 组件内部维护输入框显隐与自动聚焦，根节点阻止点击冒泡；外部间距通过 `class` 设置。
 
 ### LogoFull、LogoIcon
@@ -616,7 +625,7 @@ Logo 数据统一从 Theme Store 获取。
 - `accept`、`limit` 控制格式／数量，多文件 `sizeLimit` 默认 100MB；格式、空文件、重复选择移除，
   大小超限保留 fail 文件，图片模式保留原图和红框；所有失败均提供重试，重试仍执行原有文件校验。
   超量发出 exceed，DS_Store 格式不支持时静默移除。
-- 默认按钮、拖拽提示和上传状态随界面语言切换。`dragText`、`selectText`、`tipText`、`replaceText` 支持调用方传入自定义文案，包括空字符串。download 作用域插槽提供下载操作。
+- 默认按钮、拖拽提示、上传状态和校验读取 `upload` 语言包，界面文案随语言切换。`dragText`、`selectText`、`tipText`、`replaceText` 支持调用方传入自定义文案，包括空字符串。download 作用域插槽提供下载操作。
 - 多文件通过 `inject('upload')` 获取 `DragUploadHandler`，返回 `{ request: Promise<string>, abort }`。
   change 后等待调用方回写和校验，再上传 ready 文件；响应成功才标记 success 并提取 file_id，100% 仅表示传输完成。
 - 未注入请求时只选择文件，重试发出 retry(file)。删除／清空／卸载取消上传；移除有 file_id 的成功文件会调用
@@ -662,7 +671,7 @@ JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，�
 设为 `false` 可关闭自动触发。无效输入也会触发校验，不能仅监听解析后的 `v-model`。
 
 组件暴露 `format()` 和 `validateRules()`。JSON 语法规则统一由 `validateRules` 校验编辑器原始
-文本，空白或无效 JSON 提示“请输入正确的 JSON 格式”；外层 `rules` 接入该方法后，表单提交
+文本，空白或无效 JSON 在校验时读取 `common.validation.jsonFormat`；外层 `rules` 接入该方法后，表单提交
 也会检查语法。无法解析的输入不会覆盖最后一次有效的 `v-model` 值，不要直接对已经解析的
 `value` 再调用 `JSON.parse(value)`。必填等业务规则继续放在外层表单项。
 

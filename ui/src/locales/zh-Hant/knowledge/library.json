@@ -1,9 +1,0 @@
-{
-  "library": {
-    "title": "資料庫"
-  },
-  "image": {
-    "title": "圖片",
-    "unsupportedFormatMessage": "僅支援 {formats} 格式的圖片"
-  }
-}

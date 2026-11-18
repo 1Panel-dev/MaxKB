@@ -22,7 +22,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
         path: '',
         name: 'system-shared-knowledge-library',
         redirect: { name: 'system-shared-knowledge-document-list' },
-        meta: { title: 'knowledge.library.title', icon: 'icon-draft', order: 10 },
+        meta: { title: 'knowledge.menu.library', icon: 'icon-draft', order: 10 },
         children: [
           {
             path: 'document',
@@ -80,7 +80,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
         path: 'retrieval',
         name: 'system-shared-knowledge-retrieval',
         redirect: { name: 'system-shared-knowledge-hit-test' },
-        meta: { title: 'knowledge.retrieval.title', icon: 'icon_trace_outlined', order: 30 },
+        meta: { title: 'knowledge.menu.retrieval', icon: 'icon_trace_outlined', order: 30 },
         children: [
           {
             path: 'hit-test',
@@ -89,7 +89,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.hitTest(),
               next: 'system-shared-knowledge-problem',
-              title: 'knowledge.hitTest.title',
+              title: 'knowledge.menu.hitTest',
               order: 10,
             },
           },
@@ -100,7 +100,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.problemRead(),
               next: 'system-shared-knowledge-dictionary',
-              title: 'knowledge.questions.title',
+              title: 'knowledge.menu.questions',
               order: 20,
             },
           },
@@ -111,7 +111,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.termbaseRead(),
               next: 'system-shared-knowledge-integration',
-              title: 'knowledge.termbase.title',
+              title: 'knowledge.menu.termbase',
               order: 30,
             },
           },
@@ -121,7 +121,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
         path: 'integration',
         name: 'system-shared-knowledge-integration',
         redirect: { name: 'system-shared-knowledge-chat-user' },
-        meta: { title: 'knowledge.integration.title', icon: 'icon_personal-privacy_outlined', order: 40 },
+        meta: { title: 'knowledge.menu.integration', icon: 'icon_personal-privacy_outlined', order: 40 },
         children: [
           {
             path: 'chat-user',
@@ -130,7 +130,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.knowledgeChatUserRead(),
               next: 'system-shared-knowledge-external-retrieval',
-              title: 'knowledge.chatUsers.title',
+              title: 'knowledge.menu.chatUsers',
               order: 10,
             },
           },
@@ -141,7 +141,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.knowledgeExternalServiceRead(),
               next: 'system-shared-knowledge-setting',
-              title: 'knowledge.externalRetrieval.title',
+              title: 'knowledge.menu.externalRetrieval',
               order: 20,
             },
           },
@@ -179,7 +179,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.settingRead(),
               next: 'system-shared-knowledge-document-strategy',
-              title: 'knowledge.baseSettings.title',
+              title: 'knowledge.menu.baseSettings',
               order: 10,
             },
           },
@@ -202,7 +202,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.scheduledSyncRead(),
               next: 'system-shared-knowledge-library',
-              title: 'knowledge.scheduledSync.title',
+              title: 'knowledge.menu.scheduledSync',
               order: 30,
             },
           },

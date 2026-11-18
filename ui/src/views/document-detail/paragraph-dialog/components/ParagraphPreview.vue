@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { ParagraphDetail } from '@/api/types'
 import { getFileUrl } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'ParagraphPreview' })
+const { t } = useI18n({ useScope: 'global' })
 defineProps<{ paragraph?: ParagraphDetail }>()
 </script>
 
@@ -24,8 +26,8 @@ defineProps<{ paragraph?: ParagraphDetail }>()
     <MdPreview :model-value="paragraph?.content ?? ''" />
   </el-scrollbar>
   <div class="mt-4 flex-align-center shrink-0 gap-2 text-sm text-N600">
-    <span>召回次数 {{ paragraph?.hit_num ?? 0 }}</span>
+    <span>{{ t('knowledge.stats.retrievalCount') }} {{ paragraph?.hit_num ?? 0 }}</span>
     <el-divider direction="vertical" />
-    <span>最近一次召回时间 {{ datetimeFormat(paragraph?.last_hit_time) || '-' }}</span>
+    <span>{{ t('knowledge.stats.lastRetrievedAt') }} {{ datetimeFormat(paragraph?.last_hit_time) || '-' }}</span>
   </div>
 </template>

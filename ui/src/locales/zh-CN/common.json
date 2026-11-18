@@ -27,32 +27,16 @@
     "enabled": "已启用",
     "disabled": "已禁用"
   },
+  "dateRange": {
+    "lastDays": "过去 {days} 天",
+    "lastHalfYear": "过去半年",
+    "custom": "自定义",
+    "startDate": "开始日期",
+    "endDate": "结束日期"
+  },
   "parameters": {
     "add": "添加参数",
     "edit": "编辑参数"
-  },
-  "upload": {
-    "dropHint": "将文件拖至此区域。",
-    "selectFile": "选择文件上传",
-    "selectFiles": "选择文件",
-    "selectFolder": "选择文件夹",
-    "replaceFile": "更换文件",
-    "retryUpload": "重新上传",
-    "limits": "每次最多上传 {count} 个文件，每个文件不超过 {size} MB",
-    "formats": "支持格式",
-    "emptyFileMessage": "不能上传空文件",
-    "sizeLimitMessage": "大小超限",
-    "unsupportedFormatMessage": "文件格式不支持",
-    "countLimitMessage": "每次最多上传 {count} 个文件",
-    "networkErrorMessage": "网络失败",
-    "uploadInProgressMessage": "文件正在上传，请稍候",
-    "noSuccessfulFilesMessage": "没有上传成功的文件，请重新上传",
-    "status": {
-      "completed": "已完成",
-      "uploading": "上传中",
-      "failed": "失败",
-      "allSucceeded": "全部成功"
-    }
   },
   "actions": {
     "manage": "管理",
@@ -60,15 +44,22 @@
     "delete": "删除",
     "cancel": "取消",
     "retry": "重试",
+    "reset": "重置",
     "save": "保存",
     "add": "添加",
     "previous": "上一步",
     "next": "下一步",
+    "expand": "展开",
+    "collapse": "收起",
     "uploadFiles": "上传文件",
     "create": "创建",
+    "quickCreate": "快速创建",
     "createFromImport": "导入创建",
     "duplicate": "复制",
+    "import": "导入",
     "export": "导出",
+    "link": "关联",
+    "unlink": "取消关联",
     "batchSelect": "批量选择",
     "cancelSelection": "取消选择",
     "disable": "禁用",
@@ -93,6 +84,8 @@
     "updateSuccess": "修改成功",
     "moveSuccess": "移动成功",
     "importSuccess": "导入成功",
+    "linkSuccess": "关联成功",
+    "unlinkSuccess": "取消关联成功",
     "enableSuccess": "启用成功",
     "disableSuccess": "禁用成功",
     "exportFailed": "导出失败",
@@ -101,7 +94,9 @@
     "replaceSuccess": "替换成功",
     "submitSuccess": "提交成功",
     "taskSubmitted": "任务已提交",
-    "operationSuccess": "操作成功"
+    "operationSuccess": "操作成功",
+    "audioPlaybackFailed": "无法播放，请检查音频格式或文件地址",
+    "videoPlaybackFailed": "无法播放，请检查视频格式或文件地址"
   },
   "placeholders": {
     "input": "请输入",
@@ -113,11 +108,13 @@
     "inputRequired": "请输入",
     "inputFieldRequired": "请输入 {label}",
     "selectRequired": "请选择",
-    "selectFieldRequired": "请选择 {label}"
+    "selectFieldRequired": "请选择 {label}",
+    "jsonFormat": "请输入正确的 JSON 格式"
   },
   "empty": {
     "default": "暂无数据",
     "search": "没有找到相关内容",
-    "noDetails": "暂无详细说明"
+    "noDetails": "暂无详细说明",
+    "noMore": "没有更多了"
   }
 }

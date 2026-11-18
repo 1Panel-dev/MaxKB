@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { Dict, DocumentItem, KnowledgeTagUpdatePayload } from '@/api/types'
 import { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import { getFileIconUrl } from '@/utils/icon'
@@ -22,6 +23,7 @@ function knowledgeDocPermission(method: KnowledgeDocPermissionMethod): boolean {
 }
 
 defineOptions({ name: 'TagDocumentDrawer' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ knowledgeId: string; tagsApi: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags'] }>()
 const emit = defineEmits<{ refresh: [] }>()
@@ -30,13 +32,13 @@ const { resourceApi } = useKnowledgeDetailContext()
 const visible = ref(false)
 const loading = ref(false)
 const currentTag = ref<KnowledgeTagUpdatePayload>()
-const title = computed(() => (currentTag.value ? `${currentTag.value.key}—${currentTag.value.value}` : '关联文档'))
+const title = computed(() => (currentTag.value ? `${currentTag.value.key}—${currentTag.value.value}` : t('knowledge.tags.documents.title')))
 const activeTab = ref<'linked' | 'unlinked'>('linked')
 const searchName = ref('')
-const documentActiveOptions = [
-  { label: '已启用', value: true },
-  { label: '已禁用', value: false },
-]
+const documentActiveOptions = computed(() => [
+  { label: t('common.status.enabled'), value: true },
+  { label: t('common.status.disabled'), value: false },
+])
 const selectedDocumentActive = ref<boolean | null>(null)
 const documentData = ref<DocumentItem[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
@@ -120,7 +122,7 @@ function handleLinkDocuments(documentIds: string[]) {
     : props.tagsApi.postBatchAddDocumentTags?.(props.knowledgeId, documentIds, [currentTag.value.id])
   return (
     request?.then(() => {
-      MsgSuccess(unlink ? '取消关联成功' : '关联成功')
+      MsgSuccess(unlink ? t('common.messages.unlinkSuccess') : t('common.messages.linkSuccess'))
       emit('refresh')
       return loadDocuments()
     }) ?? Promise.resolve()
@@ -151,16 +153,16 @@ defineExpose({ open })
   <MkDrawer v-model="visible" :title="title" size="840" @closed="resetData">
     <div class="flex-column gap-4" :inert="loading">
       <el-tabs v-model="activeTab" :before-leave="() => !loading" @tab-change="handleTabChange">
-        <el-tab-pane label="已关联文档" name="linked" />
-        <el-tab-pane label="未关联文档" name="unlinked" />
+        <el-tab-pane :label="t('knowledge.tags.documents.linked')" name="linked" />
+        <el-tab-pane :label="t('knowledge.tags.documents.unlinked')" name="unlinked" />
       </el-tabs>
       <div class="flex-between gap-3">
         <!-- 批量关联或取消关联文档 -->
         <el-button plain :disabled="!selectedDocuments.length || (loading && !knowledgeDocPermission('docEdit'))" @click="handleBatchLinkDocuments">
           <MkIcon :name="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'" />
-          <span>{{ activeTab === 'linked' ? '取消关联' : '关联' }}</span>
+          <span>{{ activeTab === 'linked' ? t('common.actions.unlink') : t('common.actions.link') }}</span>
         </el-button>
-        <MkComplexSearch :key="activeTab" :fields="[{ label: '名称', value: 'name' }]" @change="handleComplexSearchChange" />
+        <MkComplexSearch :key="activeTab" :fields="[{ label: t('common.name.label'), value: 'name' }]" @change="handleComplexSearchChange" />
       </div>
       <MkTable
         ref="documentTableRef"
@@ -172,7 +174,7 @@ defineExpose({ open })
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="40" />
-        <el-table-column prop="name" label="文档名称" min-width="200">
+        <el-table-column prop="name" :label="t('knowledge.document.name.label')" min-width="200">
           <template #default="{ row }: { row: DocumentItem }">
             <div class="flex-align-center gap-2">
               <img :src="getFileIconUrl(row.name)" alt="" class="size-5 shrink-0" />
@@ -180,12 +182,12 @@ defineExpose({ open })
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="is_active" label="启用状态" width="120">
+        <el-table-column prop="is_active" :label="t('knowledge.document.labels.activeStatus')" width="120">
           <template #header>
             <MkTableFilter
               v-model="selectedDocumentActive"
               mode="single"
-              label="启用状态"
+              :label="t('knowledge.document.labels.activeStatus')"
               :options="documentActiveOptions"
               @change="handleDocumentFilterChange"
             />
@@ -194,15 +196,15 @@ defineExpose({ open })
             <MkStatusLabel :active="row.is_active" />
           </template>
         </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" width="180">
+        <el-table-column prop="create_time" :label="t('common.labels.createdAt')" width="180">
           <template #default="{ row }: { row: DocumentItem }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="70" fixed="right">
+        <el-table-column :label="t('common.labels.operation')" width="70" fixed="right">
           <template #default="{ row }: { row: DocumentItem }">
             <!-- 关联或取消关联当前文档 -->
             <MkAction
               display="button"
-              :label="activeTab === 'linked' ? '取消关联' : '关联'"
+              :label="activeTab === 'linked' ? t('common.actions.unlink') : t('common.actions.link')"
               :icon="activeTab === 'linked' ? 'icon_unlink_outlined' : 'icon_link-record_outlined'"
               :disabled="loading && !knowledgeDocPermission('docEdit')"
               @click="handleLinkDocuments([row.id])"

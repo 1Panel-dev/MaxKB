@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentParagraphApi } from '@/views/document-detail/context'
 import ParagraphMigrateDialog from './ParagraphMigrateDialog.vue'
 
 defineOptions({ name: 'BatchMigrateParagraphAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: DocumentParagraphApi
   knowledgeId: string
@@ -29,7 +31,9 @@ function handleOpenDialog() {
 
 <template>
   <!-- 批量迁移分段 -->
-  <el-button type="primary" plain :disabled="disabled || !paragraphIds.length" @click="handleOpenDialog">迁移至</el-button>
+  <el-button type="primary" plain :disabled="disabled || !paragraphIds.length" @click="handleOpenDialog">
+    {{ t('knowledge.actions.migrateTo') }}
+  </el-button>
   <ParagraphMigrateDialog
     v-if="dialogMounted"
     ref="dialogRef"

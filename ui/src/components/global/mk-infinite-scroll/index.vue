@@ -1,8 +1,11 @@
 <script setup lang="ts" generic="T">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ResponsePage } from '@/api/admin/core/types'
 
 defineOptions({ name: 'MkInfiniteScroll' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 interface InfiniteScrollPagination {
   currentPage: number
@@ -107,7 +110,7 @@ defineExpose({ reset })
     <slot v-else-if="firstPageLoaded" name="empty" />
     <div ref="triggerRef" aria-live="polite" class="flex-center py-4 shrink-0">
       <span v-if="loading && dataList.length"><span class="mk-conversation-loading" /></span>
-      <span v-else-if="showFinishedText" class="text-sm text-N600">没有更多了</span>
+      <span v-else-if="showFinishedText" class="text-sm text-N600">{{ t('common.empty.noMore') }}</span>
     </div>
   </div>
 </template>
