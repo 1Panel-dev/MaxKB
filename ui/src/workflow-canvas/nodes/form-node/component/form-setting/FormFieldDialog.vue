@@ -6,12 +6,18 @@ import { MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'WorkflowFormFieldDialog' })
 
-const props = defineProps<{ formFields: FormField[]; upstreamFieldOptions: VisibilityFieldOption[]; nodeId: string; nodeName: string }>()
+const props = defineProps<{
+  formFields: FormField[]
+  getUpstreamFieldOptions: () => VisibilityFieldOption[]
+  nodeId: string
+  nodeName: string
+}>()
 const emit = defineEmits<{ submit: [data: FormField, index?: number] }>()
 const dynamicsFormConstructorRef = useTemplateRef<InstanceType<typeof MkDynamicsFormConstructor>>('dynamicsFormConstructorRef')
 const visible = ref(false)
 const currentIndex = ref<number>()
 const formData = ref<Partial<FormField>>({})
+const upstreamFieldOptions = ref<VisibilityFieldOption[]>([])
 
 // 当前表单只能选择编辑字段之前的字段，上游变量由节点入口提供。
 const visibilityFieldOptions = computed<VisibilityFieldOption[]>(() => {
@@ -25,12 +31,14 @@ const visibilityFieldOptions = computed<VisibilityFieldOption[]>(() => {
       attrs: field.attrs,
     }))
   return [
-    ...props.upstreamFieldOptions,
+    ...upstreamFieldOptions.value,
     ...(selfFields.length ? [{ label: props.nodeName, value: props.nodeId, self: true, children: selfFields }] : []),
   ]
 })
 
+// 每次打开时读取最新的上游字段，画布连线变化后无需依赖渲染期响应式追踪。
 function open(data?: FormField, index?: number) {
+  upstreamFieldOptions.value = props.getUpstreamFieldOptions()
   if (data) {
     formData.value = cloneDeep(data)
     currentIndex.value = index

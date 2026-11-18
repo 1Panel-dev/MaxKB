@@ -67,9 +67,10 @@ const formFields = computed({
   },
 })
 
-const upstreamFieldOptions = computed<VisibilityFieldOption[]>(() =>
-  model.getUpNodeFieldList(false, true).filter((field) => Boolean(field.children?.length)),
-)
+// 上游字段遍历会写入节点缓存，只在打开字段弹窗时读取，不放进渲染期 computed。
+function getUpstreamFieldOptions(): VisibilityFieldOption[] {
+  return model.getUpNodeFieldList(false, true).filter((field) => Boolean(field.children?.length))
+}
 
 // 节点校验保留表单内容与显隐条件中的失效引用检查。
 function validate() {
@@ -125,7 +126,7 @@ onMounted(() => {
         <el-form-item>
           <FormSettingTable
             v-model="formFields"
-            :upstream-field-options="upstreamFieldOptions"
+            :get-upstream-field-options="getUpstreamFieldOptions"
             :node-id="model.id"
             :node-name="String(model.properties.stepName || '表单收集')"
           />
