@@ -179,7 +179,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.settingRead(),
               next: 'system-shared-knowledge-document-strategy',
-              title: 'knowledge.menu.baseSettings',
+              title: 'knowledge.baseSettings.title',
               order: 10,
             },
           },
@@ -202,7 +202,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.scheduledSyncRead(),
               next: 'system-shared-knowledge-library',
-              title: 'knowledge.menu.scheduledSync',
+              title: 'knowledge.scheduledSync.title',
               order: 30,
             },
           },

@@ -131,7 +131,7 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
             path: 'setting/base',
             name: 'workspace-shared-knowledge-base-setting',
             component: () => import('@/views/knowledge-detail/setting/base/index.vue'),
-            meta: { title: 'knowledge.menu.baseSettings', order: 10 },
+            meta: { title: 'knowledge.baseSettings.title', order: 10 },
           },
           {
             path: 'setting/document-strategy',
@@ -143,7 +143,7 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
             path: 'setting/scheduled-sync',
             name: 'workspace-shared-knowledge-scheduled-sync',
             component: () => import('@/views/knowledge-detail/setting/scheduled-sync/index.vue'),
-            meta: { title: 'knowledge.menu.scheduledSync', order: 30 },
+            meta: { title: 'knowledge.scheduledSync.title', order: 30 },
           },
         ],
       },

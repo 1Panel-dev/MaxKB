@@ -1,0 +1,69 @@
+{
+  "sync": {
+    "title": "Sync knowledge",
+    "label": "Sync",
+    "method": "Sync method",
+    "incremental": {
+      "label": "Incremental sync",
+      "description": "Skip unchanged documents, update changed documents, and remove documents that no longer exist in the source."
+    },
+    "replace": {
+      "label": "Replace matching documents",
+      "description": "Fetch documents from the source again and replace matching documents. Keep existing documents with no match."
+    },
+    "complete": {
+      "label": "Full sync",
+      "description": "Fetch and rebuild all documents from this source. Keep documents from other sources."
+    },
+    "incrementalWarning": "Incremental sync updates the paragraphs of changed documents and skips unchanged documents.",
+    "rebuildWarning": "Sync deletes existing data before fetching fresh data. Proceed with care.",
+    "taskSubmitted": "Sync task submitted"
+  },
+  "scheduledSync": {
+    "title": "Scheduled sync",
+    "settings": "Sync settings",
+    "enabled": {
+      "label": "Enable scheduled sync",
+      "description": "(Automatically sync documents in this knowledge on the configured schedule)"
+    },
+    "period": {
+      "label": "Sync schedule",
+      "placeholder": "Select a sync schedule",
+      "requiredMessage": "Select a sync schedule"
+    },
+    "time": {
+      "requiredMessage": "Select a sync time"
+    },
+    "date": {
+      "requiredMessage": "Select a sync date"
+    },
+    "interval": {
+      "minHoursMessage": "The sync interval must be at least {count} hour. | The sync interval must be at least {count} hours.",
+      "minMinutesMessage": "The sync interval must be at least {count} minute. | The sync interval must be at least {count} minutes."
+    }
+  },
+  "syncLog": {
+    "title": "Sync logs",
+    "time": "Sync time",
+    "content": "Sync details",
+    "status": {
+      "label": "Sync status",
+      "running": "Syncing",
+      "success": "Success",
+      "failure": "Failed",
+      "skipped": "Skipped"
+    },
+    "counts": {
+      "synced": "Synced",
+      "skipped": "Skipped",
+      "deleted": "Deleted",
+      "failed": "Failed"
+    },
+    "messages": {
+      "running": "Sync in progress",
+      "taskInProgress": "Skipped because another sync task is running or queued.",
+      "syncDisabled": "Skipped because scheduled sync is disabled.",
+      "skipped": "This sync was skipped."
+    }
+  }
+}

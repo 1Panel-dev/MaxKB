@@ -8,9 +8,7 @@
     "termbase": "自訂分詞",
     "integration": "授權與整合",
     "chatUsers": "對話使用者",
-    "externalRetrieval": "外部檢索服務",
-    "baseSettings": "基本設定",
-    "scheduledSync": "排程同步"
+    "externalRetrieval": "外部檢索服務"
   },
   "categories": {
     "all": "全部知識庫",
@@ -76,10 +74,7 @@
   "actions": {
     "migrate": "遷移",
     "migrateTo": "遷移至",
-    "sync": "同步",
     "generateEmbeddings": "向量化",
-    "generateQuestions": "產生問題",
-    "cancelGenerateQuestions": "取消產生問題",
     "buildKeywordIndex": "分詞索引",
     "cancelEmbeddings": "取消向量化",
     "cancelKeywordIndex": "取消分詞索引"

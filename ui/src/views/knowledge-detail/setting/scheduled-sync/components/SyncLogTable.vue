@@ -23,25 +23,25 @@ const loading = ref(false)
 const syncLogs = ref<KnowledgeSyncLog[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const syncMethodLabels = computed(() => new Map(KNOWLEDGE_SYNC_OPTIONS.map(({ value, labelKey }) => [value, t(labelKey)])))
-const syncStatusOptions: Partial<Record<KnowledgeSyncStatus, StatusLabelOptions>> = {
-  [KNOWLEDGE_SYNC_STATUS.RUNNING]: { type: 'loading', label: '同步中' },
-  [KNOWLEDGE_SYNC_STATUS.SUCCESS]: { type: 'success', label: '成功' },
-  [KNOWLEDGE_SYNC_STATUS.FAILURE]: { type: 'failure', label: '失败' },
-  [KNOWLEDGE_SYNC_STATUS.SKIPPED]: { type: 'disabled', label: '跳过', icon: 'icon_skip_filled' },
-}
+const syncStatusOptions = computed<Partial<Record<KnowledgeSyncStatus, StatusLabelOptions>>>(() => ({
+  [KNOWLEDGE_SYNC_STATUS.RUNNING]: { type: 'loading', label: t('knowledge.syncLog.status.running') },
+  [KNOWLEDGE_SYNC_STATUS.SUCCESS]: { type: 'success', label: t('knowledge.syncLog.status.success') },
+  [KNOWLEDGE_SYNC_STATUS.FAILURE]: { type: 'failure', label: t('knowledge.syncLog.status.failure') },
+  [KNOWLEDGE_SYNC_STATUS.SKIPPED]: { type: 'disabled', label: t('knowledge.syncLog.status.skipped'), icon: 'icon_skip_filled' },
+}))
 
 function getSyncContent(log: KnowledgeSyncLog) {
-  if (log.status === KNOWLEDGE_SYNC_STATUS.RUNNING) return '正在同步'
+  if (log.status === KNOWLEDGE_SYNC_STATUS.RUNNING) return t('knowledge.syncLog.messages.running')
   if (log.status === KNOWLEDGE_SYNC_STATUS.SKIPPED) {
-    if (/already running|still running|already queued/.test(log.message)) return '有正在同步的任务，本次跳过'
-    if (log.message === 'Scheduled synchronization is disabled') return '已关闭定时同步，本次跳过'
-    return log.message || '本次同步已跳过'
+    if (/already running|still running|already queued/.test(log.message)) return t('knowledge.syncLog.messages.taskInProgress')
+    if (log.message === 'Scheduled synchronization is disabled') return t('knowledge.syncLog.messages.syncDisabled')
+    return log.message || t('knowledge.syncLog.messages.skipped')
   }
-  const counts = [`已同步:${log.synced_count}`]
-  if (log.skipped_count) counts.push(`跳过:${log.skipped_count}`)
-  if (log.deleted_count) counts.push(`删除:${log.deleted_count}`)
-  if (log.failed_count) counts.push(`失败:${log.failed_count}`)
-  return `共${log.total_count}个文档 (${counts.join('，')})`
+  const counts = [`${t('knowledge.syncLog.counts.synced')}: ${log.synced_count}`]
+  if (log.skipped_count) counts.push(`${t('knowledge.syncLog.counts.skipped')}: ${log.skipped_count}`)
+  if (log.deleted_count) counts.push(`${t('knowledge.syncLog.counts.deleted')}: ${log.deleted_count}`)
+  if (log.failed_count) counts.push(`${t('knowledge.syncLog.counts.failed')}: ${log.failed_count}`)
+  return `${t('knowledge.stats.documents', log.total_count)}: ${log.total_count} (${counts.join(', ')})`
 }
 function loadSyncLogs() {
   if (loading.value) return
@@ -80,10 +80,10 @@ watch(
       @current-change="loadSyncLogs"
       @size-change="loadSyncLogs"
     >
-      <el-table-column label="同步时间" width="200">
+      <el-table-column :label="t('knowledge.syncLog.time')" width="200">
         <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
       </el-table-column>
-      <el-table-column label="同步内容" min-width="400" show-overflow-tooltip>
+      <el-table-column :label="t('knowledge.syncLog.content')" min-width="400" show-overflow-tooltip>
         <template #default="{ row }">
           <MkTooltip :disabled="!row.message" :content="row.message" placement="top">
             <span>{{ getSyncContent(row) }}</span>
@@ -95,12 +95,12 @@ watch(
           {{ syncMethodLabels.get(row.sync_type) ?? row.sync_type }}
         </template>
       </el-table-column>
-      <el-table-column label="同步状态" width="120">
+      <el-table-column :label="t('knowledge.syncLog.status.label')" width="120">
         <template #default="{ row }">
           <MkStatusLabel v-if="syncStatusOptions[row.status as KnowledgeSyncStatus]" v-bind="syncStatusOptions[row.status as KnowledgeSyncStatus]" />
         </template>
       </el-table-column>
-      <el-table-column label="耗时" width="110">
+      <el-table-column :label="t('common.labels.duration')" width="110">
         <template #default="{ row }">{{ (row.duration_seconds ?? row.duration_ms / 1000).toFixed(2) }}s</template>
       </el-table-column>
     </MkTable>

@@ -197,14 +197,14 @@ onMounted(() => {
                 <SyncKnowledgeAction
                   v-if="row.type !== KNOWLEDGE_TYPE.BASE && perm.knowledge.system.sync()"
                   v-model:loading="knowledgeOperationLoading"
-                  :label="t('knowledge.actions.sync')"
+                  :label="t('knowledge.sync.label')"
                   :api="SystemResourceKnowledgeApi"
                   :knowledge="row"
                 />
                 <!-- 生成问题 -->
                 <GenerateQuestionsAction
                   v-model:loading="knowledgeOperationLoading"
-                  :label="t('knowledge.actions.generateQuestions')"
+                  :label="t('knowledge.generateQuestions.title')"
                   :api="SystemResourceKnowledgeApi"
                   :knowledge="row"
                   v-if="perm.knowledge.system.generate()"

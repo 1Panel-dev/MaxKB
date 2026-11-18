@@ -12,8 +12,8 @@ const props = defineProps<{ status: string; statusMeta?: DocumentStatusMeta | nu
 
 const DOCUMENT_TASKS = [
   { type: DOCUMENT_TASK_TYPE.EMBEDDING, label: 'knowledge.actions.generateEmbeddings', startedStatus: 'EMBEDDING' },
-  { type: DOCUMENT_TASK_TYPE.GENERATE_PROBLEM, label: 'knowledge.actions.generateQuestions', startedStatus: 'GENERATE' },
-  { type: DOCUMENT_TASK_TYPE.SYNC, label: 'knowledge.actions.sync', startedStatus: 'SYNC' },
+  { type: DOCUMENT_TASK_TYPE.GENERATE_PROBLEM, label: 'knowledge.generateQuestions.title', startedStatus: 'GENERATE' },
+  { type: DOCUMENT_TASK_TYPE.SYNC, label: 'knowledge.sync.label', startedStatus: 'SYNC' },
   { type: DOCUMENT_TASK_TYPE.TOKENIZE, label: 'knowledge.actions.buildKeywordIndex', startedStatus: 'TOKENIZE' },
 ] as const
 

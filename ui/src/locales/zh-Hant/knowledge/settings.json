@@ -1,6 +1,24 @@
 {
+  "baseSettings": {
+    "title": "基本設定",
+    "type": {
+      "label": "知識庫類型"
+    },
+    "otherSettings": "其他設定",
+    "fileCountLimit": {
+      "label": "每次上傳最多檔案數"
+    },
+    "fileSizeLimit": {
+      "label": "上傳的每個文件最大",
+      "description": "建議依伺服器配置調整，否則可能導致服務當機"
+    },
+    "embeddingModel": {
+      "changeConfirm": "修改知識庫向量模型後，需要對知識庫重新向量化，是否繼續儲存"
+    }
+  },
   "documentStrategy": {
     "title": "文件處理策略",
+    "syncHint": "同步知識庫時，新的 URL 會依此策略處理；策略變更會在下次同步時生效",
     "splitRules": "分段規則",
     "smart": {
       "label": "智慧分段（建議）",
@@ -56,24 +74,5 @@
       "label": "將分段標題設為問題索引",
       "description": "啟用後，系統會自動將分段標題新增為關聯問題。"
     }
-  },
-  "sync": {
-    "title": "同步知識庫",
-    "method": "同步方式",
-    "incremental": {
-      "label": "增量同步",
-      "description": "略過未更新的文件，更新有變更的文件，並移除來源中已不存在的文件"
-    },
-    "replace": {
-      "label": "取代同步",
-      "description": "重新取得來源文件並取代相符的文件，保留不相符的舊文件"
-    },
-    "complete": {
-      "label": "完整同步",
-      "description": "重新取得來源文件並重建該來源的文件，保留其他來源的文件"
-    },
-    "incrementalWarning": "注意：增量同步會略過內容未變更的文件，並更新內容有變更的文件分段，請謹慎操作。",
-    "rebuildWarning": "注意：同步會刪除現有資料並重新取得資料，請謹慎操作。",
-    "taskSubmitted": "同步任務已送出"
   }
 }

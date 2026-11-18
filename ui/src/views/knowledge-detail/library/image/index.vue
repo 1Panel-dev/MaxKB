@@ -647,7 +647,7 @@ onBeforeUnmount(() => {
               v-model:loading="operationLoading"
               :document-ids="selectedDocumentIds"
               :task-type="DOCUMENT_TASK_TYPE.GENERATE_PROBLEM"
-              :label="t('knowledge.actions.cancelGenerateQuestions')"
+              :label="t('knowledge.generateQuestions.cancel')"
               @refresh="refreshAfterOperation"
             />
             <!-- 批量删除文档 -->

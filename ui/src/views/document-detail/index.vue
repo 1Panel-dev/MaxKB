@@ -407,7 +407,7 @@ onMounted(() => {
                           <MkDropdownMenu>
                             <!-- 生成当前分段的问题 -->
                             <GenerateQuestionsAction
-                              :label="t('knowledge.actions.generateQuestions')"
+                              :label="t('knowledge.generateQuestions.title')"
                               :api="resourceApi.paragraph"
                               :knowledge-id="knowledgeId"
                               :document-id="documentId"

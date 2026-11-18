@@ -87,7 +87,7 @@ function handleClosed() {
   <!-- 单个文档生成或取消生成问题 -->
   <MkAction
     :display="display ?? 'menu'"
-    :label="running ? t('knowledge.actions.cancelGenerateQuestions') : t('knowledge.actions.generateQuestions')"
+    :label="running ? t('knowledge.generateQuestions.cancel') : t('knowledge.generateQuestions.title')"
     :icon="running ? 'icon_close_outlined' : 'icon_link-record_outlined'"
     :disabled="disabled || loading"
     @click="running ? handleCancelQuestions() : handleOpenDialog()"

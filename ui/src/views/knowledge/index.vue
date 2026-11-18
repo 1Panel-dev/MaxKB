@@ -270,7 +270,7 @@ function handleBatchDelete() {
                   <SyncKnowledgeAction
                     v-if="knowledge.type === KNOWLEDGE_TYPE.WEB && perm.knowledge.workspace.sync(knowledge.id)"
                     v-model:loading="knowledgeOperationLoading"
-                    :label="t('knowledge.actions.sync')"
+                    :label="t('knowledge.sync.label')"
                     :api="KnowledgeApi"
                     :knowledge="knowledge"
                   />
@@ -286,7 +286,7 @@ function handleBatchDelete() {
                   <GenerateQuestionsAction
                     v-if="perm.knowledge.workspace.generate(knowledge.id)"
                     v-model:loading="knowledgeOperationLoading"
-                    :label="t('knowledge.actions.generateQuestions')"
+                    :label="t('knowledge.generateQuestions.title')"
                     :api="KnowledgeApi"
                     :knowledge="knowledge"
                   />

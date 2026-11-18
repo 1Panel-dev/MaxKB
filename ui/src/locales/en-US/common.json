@@ -1,5 +1,6 @@
 {
   "labels": {
+    "duration": "Duration",
     "creator": "Created by",
     "operation": "Actions",
     "createdOn": "created on",
@@ -33,6 +34,33 @@
     "custom": "Custom",
     "startDate": "Start date",
     "endDate": "End date"
+  },
+  "schedule": {
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "interval": "At intervals",
+    "day": "day",
+    "weekdays": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "units": {
+      "hours": "Hours",
+      "minutes": "Minutes"
+    },
+    "cron": {
+      "label": "Cron expression",
+      "placeholder": "Enter a Cron expression (e.g. 0 0 1 * *)",
+      "invalidMessage": "Enter a valid Cron expression (minute hour day month weekday)"
+    },
+    "switchToPreset": "Switch to preset schedule",
+    "switchToCron": "Switch to Cron expression"
   },
   "parameters": {
     "add": "Add parameter",

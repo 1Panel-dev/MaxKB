@@ -44,6 +44,21 @@ const syncSetting = ref<SyncSettingDraft>(createDefaultSyncSetting())
 const formRef = useTemplateRef<FormInstance>('formRef')
 
 // 与触发器使用同一套周期级联选项，页面负责配置回写和校验。
+const scheduleOptions = computed(() =>
+  SCHEDULE_OPTION.map((period) => ({
+    ...period,
+    label: typeof period.labelKey === 'string' ? t(period.labelKey) : period.label,
+    children: period.children?.map((option) => ({
+      ...option,
+      label:
+        period.value === SCHEDULE_TYPE.MONTHLY
+          ? `${option.value} ${t('common.schedule.day')}`
+          : typeof option.labelKey === 'string'
+            ? t(option.labelKey)
+            : option.label,
+    })),
+  })),
+)
 const presetScheduleType = ref<KnowledgeSyncScheduleType>()
 const scheduleValue = computed<Array<number | string>>({
   get: () => {
@@ -99,18 +114,23 @@ const rules: FormRules<SyncSettingDraft> = {
         const setting = syncSetting.value
         let error = ''
         if (!setting.schedule_type) {
-          error = '请选择同步周期'
+          error = t('knowledge.scheduledSync.period.requiredMessage')
         } else if (setting.schedule_type === SCHEDULE_TYPE.CRON) {
-          if (setting.cron_expression?.trim().split(/\s+/).length !== 5) error = '请输入有效的 Cron 表达式（分钟 小时 日期 月份 星期）'
+          if (setting.cron_expression?.trim().split(/\s+/).length !== 5) error = t('common.schedule.cron.invalidMessage')
         } else if (setting.schedule_type === SCHEDULE_TYPE.INTERVAL) {
           const minimum = setting.interval_unit === 'hours' ? 1 : 5
           if (!Number.isInteger(setting.interval_value) || (setting.interval_value ?? 0) < minimum)
-            error = `同步间隔不能小于 ${minimum} ${setting.interval_unit === 'hours' ? '小时' : '分钟'}`
+            error =
+              setting.interval_unit === 'hours'
+                ? t('knowledge.scheduledSync.interval.minHoursMessage', { count: minimum }, minimum)
+                : t('knowledge.scheduledSync.interval.minMinutesMessage', { count: minimum }, minimum)
         } else {
-          if (!setting.time?.length || setting.time.some((time) => !/^([01]\d|2[0-3]):[0-5]\d$/.test(time))) error = '请选择同步时间'
+          if (!setting.time?.length || setting.time.some((time) => !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)))
+            error = t('knowledge.scheduledSync.time.requiredMessage')
           if (setting.schedule_type === SCHEDULE_TYPE.WEEKLY || setting.schedule_type === SCHEDULE_TYPE.MONTHLY) {
             const maximum = setting.schedule_type === SCHEDULE_TYPE.WEEKLY ? 7 : 31
-            if (!setting.days?.length || setting.days.some((day) => !Number.isInteger(day) || day < 1 || day > maximum)) error = '请选择同步日期'
+            if (!setting.days?.length || setting.days.some((day) => !Number.isInteger(day) || day < 1 || day > maximum))
+              error = t('knowledge.scheduledSync.date.requiredMessage')
           }
         }
         callback(error ? new Error(error) : undefined)
@@ -133,7 +153,7 @@ function handleSave() {
       return resourceApi.scheduledSync.putKnowledgeSyncSetting?.(detail.id, setting).then((savedSetting) => {
         syncSetting.value = cloneDeep(savedSetting)
         replaceKnowledgeDetail({ ...detail, meta: { ...detail.meta, sync_setting: savedSetting } })
-        MsgSuccess('保存成功')
+        MsgSuccess(t('common.messages.saveSuccess'))
       })
     })
     .catch(() => {})
@@ -175,8 +195,8 @@ watch(
 <template>
   <div class="flex-column min-h-0 flex-1">
     <el-tabs v-model="activeTab" class="mb-4 shrink-0">
-      <el-tab-pane label="同步设置" name="settings" />
-      <el-tab-pane label="同步日志" name="logs" />
+      <el-tab-pane :label="t('knowledge.scheduledSync.settings')" name="settings" />
+      <el-tab-pane :label="t('knowledge.syncLog.title')" name="logs" />
     </el-tabs>
     <div v-show="activeTab === 'settings'" v-loading="loading || saving" class="min-h-40">
       <el-form
@@ -191,8 +211,8 @@ watch(
         <el-form-item>
           <template #label>
             <span>
-              启用定时同步
-              <span class="ml-2 text-N600">（开启后，系统将按设定周期自动同步知识库中文档）</span>
+              {{ t('knowledge.scheduledSync.enabled.label') }}
+              <span class="ml-2 text-N600">{{ t('knowledge.scheduledSync.enabled.description') }}</span>
             </span>
           </template>
           <el-switch :disabled="!knowledgeScheduledSyncPermission('scheduledSyncEdit')" v-model="syncSetting.enabled" />
@@ -201,8 +221,15 @@ watch(
           <el-form-item prop="schedule_type">
             <div class="w-full">
               <div class="flex-between mb-2">
-                <span class="mk-required">{{ syncSetting.schedule_type === SCHEDULE_TYPE.CRON ? 'Cron 表达式' : '同步周期' }}</span>
-                <MkTooltip :content="syncSetting.schedule_type === SCHEDULE_TYPE.CRON ? '切换为周期设置' : '切换为 Cron 表达式'" placement="top">
+                <span class="mk-required">
+                  {{ syncSetting.schedule_type === SCHEDULE_TYPE.CRON ? t('common.schedule.cron.label') : t('knowledge.scheduledSync.period.label') }}
+                </span>
+                <MkTooltip
+                  :content="
+                    syncSetting.schedule_type === SCHEDULE_TYPE.CRON ? t('common.schedule.switchToPreset') : t('common.schedule.switchToCron')
+                  "
+                  placement="top"
+                >
                   <!-- 切换周期设置与 Cron 表达式 -->
                   <el-button text type="primary" @click="handleSwitchScheduleMode"><MkIcon name="icon_swich" /></el-button>
                 </MkTooltip>
@@ -210,13 +237,13 @@ watch(
               <el-cascader
                 v-if="syncSetting.schedule_type !== SCHEDULE_TYPE.CRON"
                 v-model="scheduleValue"
-                :options="SCHEDULE_OPTION"
+                :options="scheduleOptions"
                 :teleported="false"
                 class="w-full"
                 clearable
-                placeholder="请选择同步周期"
+                :placeholder="t('knowledge.scheduledSync.period.placeholder')"
               />
-              <el-input v-else v-model="syncSetting.cron_expression" placeholder="请输入Cron表达式（如：0 0 1 * *）" />
+              <el-input v-else v-model="syncSetting.cron_expression" :placeholder="t('common.schedule.cron.placeholder')" />
             </div>
           </el-form-item>
           <el-form-item :label="t('knowledge.sync.method')">
@@ -241,7 +268,7 @@ watch(
           :disabled="!settingLoaded"
           @click="handleSave"
         >
-          保存
+          {{ t('common.actions.save') }}
         </el-button>
       </el-form>
     </div>

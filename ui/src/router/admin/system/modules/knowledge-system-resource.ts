@@ -207,7 +207,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.settingRead(),
               next: 'system-resource-knowledge-document-strategy',
-              title: 'knowledge.menu.baseSettings',
+              title: 'knowledge.baseSettings.title',
               order: 10,
             },
           },
@@ -230,7 +230,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.scheduledSyncRead(),
               next: 'system-resource-knowledge-library',
-              title: 'knowledge.menu.scheduledSync',
+              title: 'knowledge.scheduledSync.title',
               order: 30,
             },
           },

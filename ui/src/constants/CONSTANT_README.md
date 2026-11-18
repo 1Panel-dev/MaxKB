@@ -17,7 +17,8 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 
 知识库类型的接口值保持为 `KNOWLEDGE_TYPE` 中的数字。`constants/knowledge.ts` 提供
 `KNOWLEDGE_TYPE_MAP`，将数字转换为 `BASE`、`WEB`、`LARK`、`WORKFLOW` 字符串，
-供前端判断及知识库详情路由 `type` 参数使用，地址不传数字；`KNOWLEDGE_TYPE_LABELS` 按这些字符串提供展示文案。提交接口时仍使用数字枚举值。
+供前端判断及知识库详情路由 `type` 参数使用，地址不传数字；类型名称与说明读取 `knowledge.base`、
+`knowledge.web`、`knowledge.lark` 和 `knowledge.workflow` 的翻译。提交接口时仍使用数字枚举值。
 字符串标识统一由 `KNOWLEDGE_TYPE_KEY` 维护，映射、文案和业务判断均引用该常量，避免重复写裸字符串。
 
 `model.ts` 的 `MODEL_TYPE_MESSAGE_KEYS` 是模型类型的共用翻译 key 映射，供模型业务、系统模型页、
@@ -42,6 +43,8 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 
 `schedule.ts` 的 `SCHEDULE_OPTION` 统一提供触发器、长期记忆与知识库定时同步的周期级联选项，
 包含周期文案、执行时间和间隔数值；使用方只读，配置回填与校验仍由各自组件维护。
+周期、星期及间隔单位提供可选 `labelKey`。已接入国际化的调用方在 computed 中通过 `t` 生成标签，
+每月日期由数字和日期单位组合；未接入的调用方继续读取 `label`，不修改共享选项及其子项。
 周期类型统一使用 `api/enums/schedule.ts` 的 `SCHEDULE_TYPE`，经 `@/api/enums` 导入。
 
 `state.ts` 的 `EXECUTION_STATUS_OPTIONS` 维护触发器、工具和知识库工作流执行记录共用的

@@ -62,6 +62,6 @@ function handleClosed() {
 
 <template>
   <!-- 批量生成问题 -->
-  <el-button plain type="primary" :disabled="disabled || loading" @click="handleOpenDialog">{{ t('knowledge.actions.generateQuestions') }}</el-button>
+  <el-button plain type="primary" :disabled="disabled || loading" @click="handleOpenDialog">{{ t('knowledge.generateQuestions.title') }}</el-button>
   <GenerateQuestionsDialog v-if="dialogMounted" ref="dialogRef" :loading="loading" @submit="handleSubmit" @closed="handleClosed" />
 </template>

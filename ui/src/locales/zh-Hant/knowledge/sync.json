@@ -1,0 +1,69 @@
+{
+  "sync": {
+    "title": "同步知識庫",
+    "label": "同步",
+    "method": "同步方式",
+    "incremental": {
+      "label": "增量同步",
+      "description": "略過未更新的文件，更新有變更的文件，並移除來源中已不存在的文件"
+    },
+    "replace": {
+      "label": "取代同步",
+      "description": "重新取得來源文件並取代相符的文件，保留不相符的舊文件"
+    },
+    "complete": {
+      "label": "完整同步",
+      "description": "重新取得來源文件並重建該來源的文件，保留其他來源的文件"
+    },
+    "incrementalWarning": "注意：增量同步會略過內容未變更的文件，並更新內容有變更的文件分段，請謹慎操作。",
+    "rebuildWarning": "注意：同步會刪除現有資料並重新取得資料，請謹慎操作。",
+    "taskSubmitted": "同步任務已送出"
+  },
+  "scheduledSync": {
+    "title": "排程同步",
+    "settings": "同步設定",
+    "enabled": {
+      "label": "啟用排程同步",
+      "description": "（啟用後，系統會依設定週期自動同步知識庫中的文件）"
+    },
+    "period": {
+      "label": "同步週期",
+      "placeholder": "請選擇同步週期",
+      "requiredMessage": "請選擇同步週期"
+    },
+    "time": {
+      "requiredMessage": "請選擇同步時間"
+    },
+    "date": {
+      "requiredMessage": "請選擇同步日期"
+    },
+    "interval": {
+      "minHoursMessage": "同步間隔不能少於 {count} 小時",
+      "minMinutesMessage": "同步間隔不能少於 {count} 分鐘"
+    }
+  },
+  "syncLog": {
+    "title": "同步日誌",
+    "time": "同步時間",
+    "content": "同步內容",
+    "status": {
+      "label": "同步狀態",
+      "running": "同步中",
+      "success": "成功",
+      "failure": "失敗",
+      "skipped": "略過"
+    },
+    "counts": {
+      "synced": "已同步",
+      "skipped": "略過",
+      "deleted": "刪除",
+      "failed": "失敗"
+    },
+    "messages": {
+      "running": "正在同步",
+      "taskInProgress": "有正在同步的工作，本次略過",
+      "syncDisabled": "已關閉排程同步，本次略過",
+      "skipped": "本次同步已略過"
+    }
+  }
+}
