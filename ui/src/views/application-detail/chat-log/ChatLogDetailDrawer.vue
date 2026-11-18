@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatLog } from '@/api/types'
 import LogConversation from '@/conversation-panel/view/log/index.vue'
 import { useApplicationDetailContext } from '../context'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   chatLog: ChatLog
@@ -59,9 +62,9 @@ defineExpose({ open, close })
     </div>
     <template #footer>
       <!-- 浏览上一个对话日志 -->
-      <el-button plain :disabled="props.previousDisabled || props.loading" @click="handlePrevious">上一个</el-button>
+      <el-button plain :disabled="props.previousDisabled || props.loading" @click="handlePrevious">{{ t('common.actions.previousItem') }}</el-button>
       <!-- 浏览下一个对话日志 -->
-      <el-button plain :disabled="props.nextDisabled || props.loading" @click="handleNext">下一个</el-button>
+      <el-button plain :disabled="props.nextDisabled || props.loading" @click="handleNext">{{ t('common.actions.nextItem') }}</el-button>
     </template>
   </MkDrawer>
 </template>

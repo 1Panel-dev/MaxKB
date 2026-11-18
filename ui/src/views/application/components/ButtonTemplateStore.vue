@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationStoreTemplate } from '@/api/types'
 import StoreApi from '@/api/admin/store'
 import TemplateStoreDialog from '@/views/workflow/components/template-store/TemplateStoreDialog.vue'
 import AdvancedCreateDialog from '../create-application/AdvancedCreateDialog.vue'
 
 defineOptions({ name: 'ButtonTemplateStore' })
+
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ folderId: string }>()
 const templateStoreDialogRef = useTemplateRef<InstanceType<typeof TemplateStoreDialog>>('templateStoreDialogRef')
 const targetFolderId = ref('default')
@@ -43,7 +46,7 @@ function handleUse(template: ApplicationStoreTemplate) {
   <!-- 打开模板中心 -->
   <el-button plain @click="handleOpen">
     <MkIcon name="icon_template_outlined" />
-    <span>模板中心</span>
+    <span>{{ t('resource.templateStore.title') }}</span>
   </el-button>
   <TemplateStoreDialog
     ref="templateStoreDialogRef"

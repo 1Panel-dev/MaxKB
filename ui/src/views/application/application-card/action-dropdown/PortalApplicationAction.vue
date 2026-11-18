@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail } from '@/api/types'
@@ -8,6 +9,8 @@ import perm from '@/permission'
 
 defineOptions({ name: 'PortalApplicationAction' })
 
+const { t } = useI18n({ useScope: 'global' })
+
 const props = defineProps<{ api: typeof ApplicationApi | typeof SystemResourceApplicationApi; application: ApplicationDetail }>()
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ change: [isPortal: boolean] }>()
@@ -15,10 +18,11 @@ const emit = defineEmits<{ change: [isPortal: boolean] }>()
 /** 依据 api 是否含工作空间独有方法区分工作空间/系统资源管理场景，用于选择对应权限。 */
 const isSystem = computed(() => !('putMoveApplication' in props.api))
 
-
 /** 上下架权限：未授权时隐藏对应入口。 */
 const canPortalUp = computed(() => (isSystem.value ? perm.application.system.portalUp() : perm.application.workspace.portalUp(props.application.id)))
-const canPortalDown = computed(() => (isSystem.value ? perm.application.system.portalDown() : perm.application.workspace.portalDown(props.application.id)))
+const canPortalDown = computed(() =>
+  isSystem.value ? perm.application.system.portalDown() : perm.application.workspace.portalDown(props.application.id),
+)
 
 /** 上架到门户：仅已发布可上架。 */
 const canUp = computed(() => canPortalUp.value && Boolean(props.application.is_publish))
@@ -30,7 +34,7 @@ function handlePortalUp() {
     .putApplicationPortalUp(props.application.id)
     .then((application) => {
       emit('change', application.is_portal)
-      MsgSuccess('上架成功')
+      MsgSuccess(t('application.portal.addSuccess'))
     })
     .catch(() => {})
     .finally(() => {
@@ -45,7 +49,7 @@ function handlePortalDown() {
     .putApplicationPortalDown(props.application.id)
     .then((application) => {
       emit('change', application.is_portal)
-      MsgSuccess('下架成功')
+      MsgSuccess(t('application.portal.removeSuccess'))
     })
     .catch(() => {})
     .finally(() => {
@@ -60,13 +64,13 @@ function handlePortalDown() {
     <template #icon>
       <MkIcon name="icon_launch_outlined1" />
     </template>
-    <span>上架到门户</span>
+    <span>{{ t('application.portal.add') }}</span>
   </MkDropdownItem>
   <!-- 从门户下架 -->
   <MkDropdownItem v-if="application.is_portal && canPortalDown" :disabled="loading" @click="handlePortalDown">
     <template #icon>
       <MkIcon name="icon_remove_outlined" />
     </template>
-    <span>从门户下架</span>
+    <span>{{ t('application.portal.remove') }}</span>
   </MkDropdownItem>
 </template>

@@ -68,7 +68,7 @@ export const systemResourceApplicationRoutes: RouteRecordRaw[] = [
         name: 'system-resource-application-access',
         component: () => import('@/views/application-detail/access/index.vue'),
         meta: {
-          title: '发布渠道',
+          title: 'application.access.title',
           icon: 'icon_application_outlined',
           activeIcon: 'icon_application_filled',
           order: 30,
@@ -81,7 +81,7 @@ export const systemResourceApplicationRoutes: RouteRecordRaw[] = [
         name: 'system-resource-application-chat-user',
         component: () => import('@/views/application-detail/chat-user/index.vue'),
         meta: {
-          title: '对话用户',
+          title: 'resource.chatUserAuthorization.title',
           icon: 'icon_contacts_outlined',
           activeIcon: 'icon_contacts_filled',
           order: 40,
@@ -94,7 +94,7 @@ export const systemResourceApplicationRoutes: RouteRecordRaw[] = [
         name: 'system-resource-application-operation-log',
         component: () => import('@/views/application-detail/chat-log/index.vue'),
         meta: {
-          title: '对话日志',
+          title: 'application.chatLog.title',
           icon: 'icon_logs_outlined',
           activeIcon: 'icon_logs_filled',
           order: 50,

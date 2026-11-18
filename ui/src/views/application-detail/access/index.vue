@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { AccessPlatformDefinition } from './platforms'
 import type { ApplicationAccessStatus } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
@@ -11,8 +12,7 @@ import { MsgSuccess } from '@/utils/message'
 import { isSystemResource } from '@/utils/resource-context.ts'
 import perm from '@/permission/index.ts'
 
-type ApplicationAccessPermissionMethod =
-    | 'accessEdit'
+type ApplicationAccessPermissionMethod = 'accessEdit'
 function applicationAccessPermission(method: ApplicationAccessPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.application.system[method]())
   return Boolean(perm.application.workspace[method](applicationId.value))
@@ -22,6 +22,8 @@ const { resourceApi } = useApplicationDetailContext()
 
 defineOptions({ name: 'ApplicationAccessView' })
 defineProps<ResourceDetailPageProps>()
+
+const { t } = useI18n({ useScope: 'global' })
 
 const route = useRoute()
 const applicationId = computed(() => String(route.params.applicationId ?? ''))
@@ -56,7 +58,7 @@ function handlePlatformStatusChange(platform: AccessPlatformDefinition, value: s
     .postPlatformStatus(applicationId.value, { type: platform.key, status: value === true })
     .then(() => {
       status[1] = value === true
-      MsgSuccess('保存成功')
+      MsgSuccess(t('common.messages.saveSuccess'))
     })
     .finally(() => {
       loading.value = false
@@ -82,15 +84,17 @@ watch(
         <el-card shadow="hover" class="cursor-pointer" @click="handleOpenPlatform(platform)">
           <div class="flex-between gap-4">
             <div class="flex-align-center min-w-0 gap-3">
-              <img :src="platform.logo" :alt="platform.name" class="h-6 w-6 shrink-0" />
+              <img :src="platform.logo" :alt="t(`application.access.${platform.key}.label`)" class="h-6 w-6 shrink-0" />
               <div class="min-w-0">
-                <h4>{{ platform.name }}</h4>
-                <p class="text-sm text-N600">{{ platform.description }}</p>
+                <h4>{{ t(`application.access.${platform.key}.label`) }}</h4>
+                <p class="text-sm text-N600">{{ t(`application.access.${platform.key}.description`) }}</p>
               </div>
             </div>
             <div class="flex-align-center shrink-0 gap-4">
               <!-- 配置发布渠道 -->
-              <el-button v-if="applicationAccessPermission('accessEdit')" plain @click.stop="handleOpenPlatform(platform)">{{ platformStatus[platform.key]?.[0] ? '配置' : '未配置' }}</el-button>
+              <el-button v-if="applicationAccessPermission('accessEdit')" plain @click.stop="handleOpenPlatform(platform)">
+                {{ platformStatus[platform.key]?.[0] ? t('application.access.actions.configure') : t('application.access.states.unconfigured') }}
+              </el-button>
               <template v-if="platformStatus[platform.key]?.[0]">
                 <el-divider direction="vertical" />
                 <!-- 启停发布渠道，阻止点击打开配置 -->

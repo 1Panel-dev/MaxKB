@@ -109,6 +109,7 @@
     "deleteSuccess": "删除成功",
     "deleteFailed": "删除失败",
     "createSuccess": "创建成功",
+    "duplicateSuccess": "复制成功",
     "addSuccess": "添加成功",
     "removeSuccess": "移除成功",
     "fetchSuccess": "获取成功",

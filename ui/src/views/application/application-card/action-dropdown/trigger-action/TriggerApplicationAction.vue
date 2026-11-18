@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
 import type ApplicationApi from '@/api/admin/workspace/application/application'
 import type ResourceTriggerApi from '@/api/admin/workspace/trigger/resource-trigger'
 import type { ApplicationDetail } from '@/api/types'
 import ApplicationTriggerDialog from './ApplicationTriggerDialog.vue'
 import { MsgError } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   api: typeof ResourceTriggerApi
@@ -19,7 +22,7 @@ const dialogMounted = ref(false)
 const resourceTriggerRef = useTemplateRef<InstanceType<typeof ApplicationTriggerDialog>>('resourceTriggerRef')
 function handleOpenTriggers() {
   if (!props.application.workspace_id) {
-    MsgError('智能体缺少所属工作空间信息')
+    MsgError(t('application.messages.missingWorkspace'))
     return
   }
   dialogMounted.value = true

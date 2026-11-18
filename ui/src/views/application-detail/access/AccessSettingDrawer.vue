@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { AccessPlatformDefinition } from './platforms'
 import type { ApplicationAccessConfig } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -14,6 +15,7 @@ import perm from '@/permission/index.ts'
 const { resourceApi } = useApplicationDetailContext()
 
 defineOptions({ name: 'AccessSettingDrawer' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ applicationId: string; platform: AccessPlatformDefinition }>()
 const emit = defineEmits<{ refresh: []; closed: [] }>()
 const visible = ref(true)
@@ -21,8 +23,7 @@ const loading = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
 const form = reactive<ApplicationAccessConfig>({})
 
-type ApplicationAccessPermissionMethod =
-    | 'accessEdit'
+type ApplicationAccessPermissionMethod = 'accessEdit'
 function applicationAccessPermission(method: ApplicationAccessPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.application.system[method]())
   return Boolean(perm.application.workspace[method](props.applicationId))
@@ -33,7 +34,8 @@ const modeField = computed(() => props.platform.modeField)
 // 表单字段随连接方式切换：长连接(ws)需要 bot_id/secret，URL 回调(callback)需要 token/encoding_aes_key。
 const activeFields = computed(() => {
   const mode = String(form[modeField.value?.key ?? ''] ?? modeField.value?.default ?? '')
-  return (modeField.value && mode ? modeField.value.fields?.[mode] : undefined) ?? props.platform.fields
+  const fields = (modeField.value && mode ? modeField.value.fields?.[mode] : undefined) ?? props.platform.fields
+  return fields.map((field) => ({ ...field, label: field.labelKey ? t(field.labelKey) : (field.label ?? field.key) }))
 })
 // 智能机器人默认长连接(ws)，无需回调地址；切到 URL 回调时才展示回调地址。
 const showCallback = computed(() => !modeField.value || form[modeField.value.key] === 'callback')
@@ -43,7 +45,10 @@ const rules = computed<FormRules>(() =>
   Object.fromEntries(
     activeFields.value
       .filter((field) => field.required !== false)
-      .map((field) => [field.key, [{ required: true, whitespace: true, message: `请输入 ${field.label}`, trigger: 'blur' }]]),
+      .map((field) => [
+        field.key,
+        [{ required: true, whitespace: true, message: t('common.validation.inputFieldRequired', { label: field.label }), trigger: 'blur' }],
+      ]),
   ),
 )
 
@@ -75,7 +80,7 @@ function handleSave() {
     resourceApi.access
       .postPlatformConfig(props.applicationId, props.platform.key, payload)
       .then(() => {
-        MsgSuccess('保存成功')
+        MsgSuccess(t('common.messages.saveSuccess'))
         emit('refresh')
         visible.value = false
       })
@@ -89,17 +94,33 @@ onMounted(loadPlatformConfig)
 </script>
 
 <template>
-  <MkDrawer v-model="visible" :title="`${platform.name}配置`" @closed="emit('closed')">
+  <MkDrawer
+    v-model="visible"
+    :title="
+      t('application.access.configurationTitle', {
+        name: t(`application.access.${platform.key}.label`),
+      })
+    "
+    @closed="emit('closed')"
+  >
     <div v-loading="loading">
-      <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item v-if="modeField" label="连接方式" required>
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
+        <el-form-item v-if="modeField" :label="t('application.access.connection.label')" required>
           <!-- 选择发布渠道连接方式 -->
           <el-radio-group v-model="form[modeField.key]" class="w-full space-y-2">
             <template v-for="option in modeField.options" :key="option.value">
               <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': form[modeField.key] === option.value }">
                 <el-radio :value="option.value" class="mk-card-radio">
-                  <h6>{{ option.label }}</h6>
-                  <span class="block text-sm text-N600">{{ option.tip }}</span>
+                  <h6>{{ t(option.labelKey) }}</h6>
+                  <span class="block text-sm text-N600">{{ t(option.tipKey) }}</span>
                 </el-radio>
               </el-card>
             </template>
@@ -112,32 +133,32 @@ onMounted(loadPlatformConfig)
               :type="field.secret ? 'password' : 'text'"
               :show-password="field.secret"
               :autocomplete="field.secret ? 'new-password' : 'off'"
-              :placeholder="`请输入${field.label}`"
+              :placeholder="t('common.placeholders.inputField', { label: field.label })"
             />
           </el-form-item>
         </template>
-        <el-form-item v-if="isWechat" label="认证成功">
+        <el-form-item v-if="isWechat" :label="t('application.access.wechat.certified')">
           <!-- 设置公众号认证状态 -->
           <el-switch v-model="form.is_certification" />
         </el-form-item>
 
-        <el-form-item v-if="showCallback" label="回调地址">
+        <el-form-item v-if="showCallback" :label="t('application.access.callback.label')">
           <el-input :model-value="callbackUrl" readonly>
             <template #suffix>
               <!-- 复制发布渠道回调地址 -->
-              <el-button text class="-mr-1" :disabled="!callbackUrl" @click="copyText(callbackUrl)">
+              <el-button text class="-mr-1" :disabled="!callbackUrl" @click="copyText(callbackUrl, t('common.messages.copied'))">
                 <MkIcon name="icon_copy_outlined" />
               </el-button>
             </template>
           </el-input>
 
-          <p v-if="platform.consoleUrl" class="mt-2 text-N500">
-            复制链接填入到
+          <p v-if="platform.consoleUrl && platform.consoleNameKey" class="mt-2 text-N500">
+            {{ t('application.access.callback.pasteHint') }}
             <!-- 打开对应平台后台配置回调 -->
             <a class="mk-link" :href="platform.consoleUrl" target="_blank">
-              {{ platform.consoleName }}
+              {{ t(platform.consoleNameKey) }}
             </a>
-            {{ platform.callbackTip }}
+            {{ t(`application.access.${platform.key}.callbackTip`) }}
           </p>
         </el-form-item>
       </el-form>
@@ -145,9 +166,11 @@ onMounted(loadPlatformConfig)
 
     <template #footer>
       <!-- 取消发布渠道配置 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存发布渠道配置 -->
-      <el-button v-if="applicationAccessPermission('accessEdit')" type="primary" :loading="loading" @click="handleSave">保存</el-button>
+      <el-button v-if="applicationAccessPermission('accessEdit')" type="primary" :loading="loading" @click="handleSave">
+        {{ t('common.actions.save') }}
+      </el-button>
     </template>
   </MkDrawer>
 </template>

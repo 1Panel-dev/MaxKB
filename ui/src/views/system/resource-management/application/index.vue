@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDetail, Dict, OptionItem } from '@/api/types'
+import type { ApiInputField } from '@/workflow-canvas/nodes/base-node/types'
 import { APPLICATION_TYPE } from '@/api/enums'
 import SystemCommonApi from '@/api/admin/system/common'
 import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
@@ -23,14 +25,18 @@ import { isWorkFlow, toOrderBy } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission'
 
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 const router = useRouter()
 const chatBasePath = CHAT_API_BASE_PATH.replace(/\/api$/, '')
 
 function apiQuery(application: ApplicationDetail) {
-  const query = application?.work_flow?.nodes?.find(n => n.id === 'base-node')?.properties?.api_input_field_list.map((f: any) => {
-    return `${f.variable}=${f.default_value}`
-  }).join('&')
+  const query = application?.work_flow?.nodes
+    ?.find((n) => n.id === 'base-node')
+    ?.properties?.api_input_field_list.map((field: ApiInputField) => {
+      return `${field.variable}=${field.default_value}`
+    })
+    .join('&')
   if (query) {
     return '?' + query
   }
@@ -59,19 +65,19 @@ const creatorOptions = ref<OptionItem<string>[]>([])
 const workspaceOptions = ref<OptionItem<string>[]>([])
 const selectedWorkspaceIds = ref<string[]>([])
 const searchFields = computed(() => [
-  { label: '名称', value: 'name' },
-  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
+  { label: t('common.name.label'), value: 'name' },
+  { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 const selectedType = ref<string | null>(null)
 const typeOptions = computed(() => [
-  { value: APPLICATION_TYPE.SIMPLE, label: '简易' },
-  { value: APPLICATION_TYPE.WORK_FLOW, label: '高级' },
+  { value: APPLICATION_TYPE.SIMPLE, label: t('application.simple.shortLabel') },
+  { value: APPLICATION_TYPE.WORK_FLOW, label: t('application.advanced.shortLabel') },
 ])
 const selectedStatus = ref<string | null>(null)
 const applicationStatusOptions = computed(() => [
-  { value: 'unpublished', label: '未发布' },
-  { value: 'published', label: '已发布' },
-  { value: 'on_portal', label: '已上架' },
+  { value: 'unpublished', label: t('application.status.unpublished') },
+  { value: 'published', label: t('application.status.published') },
+  { value: 'on_portal', label: t('application.status.onPortal') },
 ])
 
 function loadCreatorOptions(keyword: string) {
@@ -141,7 +147,7 @@ onMounted(() => {
         @sort-change="handleSortChange"
         resizable
       >
-        <el-table-column prop="name" label="名称" min-width="200" show-overflow-tooltip>
+        <el-table-column prop="name" :label="t('common.name.label')" min-width="200" show-overflow-tooltip>
           <template #default="{ row }">
             <div class="flex-align-center gap-2">
               <ApplicationIcon :icon="row.icon" :size="20" class="shrink-0" />
@@ -149,26 +155,38 @@ onMounted(() => {
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="type" label="类型" width="100">
+        <el-table-column prop="type" :label="t('common.labels.type')" width="100">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedType" label="类型" :options="typeOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedType"
+              :label="t('common.labels.type')"
+              :options="typeOptions"
+              @change="handleFilterChange"
+            />
           </template>
           <template #default="{ row }">
-            <el-tag v-if="isWorkFlow(row.type)" type="warning" size="small">高级</el-tag>
-            <el-tag v-else type="primary" class="default" size="small">简易</el-tag>
+            <el-tag v-if="isWorkFlow(row.type)" type="warning" size="small">{{ t('application.advanced.shortLabel') }}</el-tag>
+            <el-tag v-else type="primary" class="default" size="small">{{ t('application.simple.shortLabel') }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="100">
+        <el-table-column :label="t('common.status.label')" width="100">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="applicationStatusOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedStatus"
+              :label="t('common.status.label')"
+              :options="applicationStatusOptions"
+              @change="handleFilterChange"
+            />
           </template>
           <template #default="{ row }">
-            <MkStatusLabel v-if="row.is_portal" type="custom" label="已上架" icon="icon_launch" />
+            <MkStatusLabel v-if="row.is_portal" type="custom" :label="t('application.status.onPortal')" icon="icon_launch" />
             <MkStatusLabel
               v-else
               :active="row.is_publish"
-              active-text="已发布"
-              inactive-text="未发布"
+              :active-text="t('application.status.published')"
+              :inactive-text="t('application.status.unpublished')"
               :icon="row.is_publish ? undefined : 'icon_time_filled'"
             />
           </template>
@@ -178,31 +196,31 @@ onMounted(() => {
             <MkTableFilter
               mode="multiple"
               v-model="selectedWorkspaceIds"
-              label="工作空间"
+              :label="t('workspace.title')"
               filterable
               :options="workspaceOptions"
               @change="handleFilterChange"
             />
           </template>
         </el-table-column>
-        <el-table-column prop="nick_name" label="创建者" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="publish_time" label="发布时间" width="180" sortable>
+        <el-table-column prop="nick_name" :label="t('common.labels.creator')" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="publish_time" :label="t('application.publishTime')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.publish_time) || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
+        <el-table-column prop="create_time" :label="t('common.labels.createTime')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="120" fixed="right">
+        <el-table-column :label="t('common.labels.operation')" width="120" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 去对话 -->
-              <MkTooltip content="去对话">
+              <MkTooltip :content="t('application.actions.chat')">
                 <el-button text type="primary" @click="toChat(row)">
                   <MkIcon name="icon_new-chat_outlined" />
                 </el-button>
               </MkTooltip>
               <!-- 进入智能体详情 -->
-              <MkTooltip v-if="perm.application.system.edit()" content="管理">
+              <MkTooltip v-if="perm.application.system.edit()" :content="t('common.actions.manage')">
                 <el-button text type="primary" @click="handleOpenApplication(row)">
                   <MkIcon name="icon_admin_outlined" />
                 </el-button>
@@ -210,21 +228,21 @@ onMounted(() => {
 
               <MkTableMoreDropdown>
                 <!-- 资源授权 -->
-                <AuthorizeApplicationAction v-if="perm.application.system.auth()" label="资源授权" :application="row" />
+                <AuthorizeApplicationAction v-if="perm.application.system.auth()" :label="t('resource.authorization.title')" :application="row" />
                 <!-- 智能体触发器 -->
                 <TriggerApplicationAction
                   v-if="perm.application.system.triggerRead()"
-                  label="触发器"
+                  :label="t('resource.triggers.title')"
                   :api="SystemResourceTriggerApi"
                   :application-api="SystemResourceApplicationApi"
                   :application="row"
                 />
                 <!-- MCP 服务配置 -->
-                <McpConfigApplicationAction v-if="perm.application.system.mcpConfig()" label="MCP 服务配置" :application="row" />
+                <McpConfigApplicationAction v-if="perm.application.system.mcpConfig()" :label="t('resource.mcpConfig.title')" :application="row" />
                 <!-- 查看关联资源 -->
                 <RelatedResourcesApplicationAction
                   v-if="perm.application.system.relateMap()"
-                  label="查看关联资源"
+                  :label="t('resource.relations.title')"
                   :api="SystemRelatedResourcesApi"
                   :application="row"
                 />
@@ -240,14 +258,14 @@ onMounted(() => {
                 <ExportApplicationAction
                   v-if="perm.application.system.export() || perm.application.system.exportSkills()"
                   v-model:loading="operationLoading"
-                  label="导出"
+                  :label="t('common.actions.export')"
                   :api="SystemResourceApplicationApi"
                   :application="row"
                 />
                 <!-- 删除 -->
                 <DeleteApplicationAction
                   v-model:loading="operationLoading"
-                  label="删除"
+                  :label="t('common.actions.delete')"
                   :api="SystemResourceApplicationApi"
                   :application="row"
                   @delete="loadApplicationPage"

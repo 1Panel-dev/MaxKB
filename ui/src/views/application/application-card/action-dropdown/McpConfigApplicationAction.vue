@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDetail } from '@/api/types'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
 import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'McpConfigApplicationAction' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ application: ApplicationDetail; label: string }>()
 
@@ -37,11 +40,11 @@ function handleOpenMcpConfig() {
     <span>{{ label }}</span>
   </MkDropdownItem>
 
-  <MkDialog v-model="visible" title="MCP 服务配置">
+  <MkDialog v-model="visible" :title="t('resource.mcpConfig.title')">
     <div class="group relative">
       <el-input :model-value="mcpConfig" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
       <!-- 复制 MCP 配置 -->
-      <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle @click="copyText(mcpConfig)">
+      <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle @click="copyText(mcpConfig, t('common.messages.copied'))">
         <MkIcon name="icon_copy_outlined" />
       </el-button>
     </div>

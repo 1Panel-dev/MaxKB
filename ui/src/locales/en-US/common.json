@@ -109,6 +109,7 @@
     "deleteSuccess": "Deleted successfully",
     "deleteFailed": "Deletion failed",
     "createSuccess": "Created successfully",
+    "duplicateSuccess": "Duplicated successfully",
     "addSuccess": "Added successfully",
     "removeSuccess": "Removed successfully",
     "fetchSuccess": "Fetched successfully",

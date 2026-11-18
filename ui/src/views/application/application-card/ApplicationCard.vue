@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDetail } from '@/api/types'
 import type { ApiInputField } from '@/workflow-canvas/nodes/base-node/types'
 import applicationAPI from '@/api/admin/workspace/application/application'
@@ -9,6 +10,8 @@ import { dateFormat } from '@/utils/time'
 import { hasRenderableSlotContent } from '@/utils/vnode'
 
 defineOptions({ name: 'ApplicationCard' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ application: ApplicationDetail; selectable?: boolean; selected?: boolean }>()
 
@@ -58,8 +61,8 @@ function toChat() {
     </template>
 
     <template #tag>
-      <el-tag v-if="isWorkFlow(application.type)" type="warning" size="small">高级</el-tag>
-      <el-tag v-else type="primary" class="default" size="small">简易</el-tag>
+      <el-tag v-if="isWorkFlow(application.type)" type="warning" size="small">{{ t('application.advanced.shortLabel') }}</el-tag>
+      <el-tag v-else type="primary" class="default" size="small">{{ t('application.simple.shortLabel') }}</el-tag>
     </template>
 
     <p class="line-clamp-2" :title="application.desc ?? undefined">
@@ -67,12 +70,12 @@ function toChat() {
     </p>
 
     <template #footer="{ Action, ActionDropdown }">
-      <MkStatusLabel v-if="application.is_portal" type="custom" label="已上架" icon="icon_launch" class="text-N600!" />
+      <MkStatusLabel v-if="application.is_portal" type="custom" :label="t('application.status.onPortal')" icon="icon_launch" class="text-N600!" />
       <MkStatusLabel
         v-else
         :active="application.is_publish"
-        active-text="已发布"
-        inactive-text="未发布"
+        :active-text="t('application.status.published')"
+        :inactive-text="t('application.status.unpublished')"
         :icon="application.is_publish ? undefined : 'icon_time_filled'"
         class="text-N600!"
       />
@@ -86,7 +89,7 @@ function toChat() {
 
       <component :is="Action">
         <!-- 去对话 -->
-        <MkTooltip content="去对话" placement="top">
+        <MkTooltip :content="t('application.actions.chat')" placement="top">
           <el-button text @click="toChat">
             <MkIcon name="icon_new-chat_outlined" />
           </el-button>

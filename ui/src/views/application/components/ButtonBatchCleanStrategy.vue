@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import { MsgSuccess } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ applicationIds: string[] }>()
 const emit = defineEmits<{ refresh: [] }>()
@@ -23,7 +26,7 @@ function handleSubmit() {
   loading.value = true
   return ApplicationApi.putBatchApplicationCleanTime(selectedApplicationIds.value, days.value, Math.min(fileDays.value, days.value))
     .then(() => {
-      MsgSuccess('保存成功')
+      MsgSuccess(t('common.messages.saveSuccess'))
       visible.value = false
       emit('refresh')
     })
@@ -41,12 +44,14 @@ function resetData() {
 
 <template>
   <!-- 批量设置对话日志清除策略 -->
-  <el-button type="primary" plain :disabled="!applicationIds.length" @click="handleOpenDialog">清除策略</el-button>
+  <el-button type="primary" plain :disabled="!applicationIds.length" @click="handleOpenDialog">
+    {{ t('application.chatLog.cleanStrategy.title') }}
+  </el-button>
 
-  <MkDialog v-model="visible" title="清除策略" @closed="resetData">
+  <MkDialog v-model="visible" :title="t('application.chatLog.cleanStrategy.title')" @closed="resetData">
     <div class="space-y-4">
       <div class="flex-align-center gap-2">
-        <span>删除</span>
+        <span>{{ t('application.chatLog.cleanStrategy.recordsPrefix') }}</span>
         <el-input-number
           v-model="days"
           class="w-40!"
@@ -57,10 +62,10 @@ function resetData() {
           :value-on-clear="1"
           step-strictly
         />
-        <span>天之前的对话记录</span>
+        <span>{{ t('application.chatLog.cleanStrategy.recordsSuffix', days) }}</span>
       </div>
       <div class="flex-align-center gap-2">
-        <span>删除</span>
+        <span>{{ t('application.chatLog.cleanStrategy.attachmentsPrefix') }}</span>
         <el-input-number
           v-model="fileDays"
           class="w-40!"
@@ -71,14 +76,14 @@ function resetData() {
           :value-on-clear="1"
           step-strictly
         />
-        <span>天之前的对话上传的附件</span>
+        <span>{{ t('application.chatLog.cleanStrategy.attachmentsSuffix', fileDays) }}</span>
       </div>
     </div>
     <template #footer>
       <!-- 取消清除策略设置 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存批量清除策略 -->
-      <el-button type="primary" :loading="loading" @click="handleSubmit">保存</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>
