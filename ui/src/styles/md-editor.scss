@@ -14,9 +14,9 @@
   font-size: inherit;
   word-break: break-word;
   table {
-    display: table;
-    width: max-content;
-    min-width: 100%;
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
   }
   .md-table-wrap {
     max-width: 100%;

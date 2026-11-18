@@ -53,7 +53,12 @@
             </el-button>
           </el-tooltip>
         </span>
-        <el-dropdown trigger="click" :teleported="false" v-if="MoreFieldPermission(id)">
+        <el-dropdown
+          trigger="click"
+          :teleported="false"
+          @visible-change="dropdownVisibleChange"
+          v-if="MoreFieldPermission(id)"
+        >
           <el-button text>
             <AppIcon iconName="app-more" class="color-secondary"></AppIcon>
           </el-button>
@@ -77,7 +82,6 @@
                 <el-dropdown
                   class="w-full"
                   trigger="hover"
-                  :teleported="false"
                   :show-arrow="false"
                   placement="right-start"
                   popper-class="move-position-popper"
@@ -210,13 +214,20 @@ const changeStateloading = ref(false)
 const show = ref(false)
 // card上面存在dropdown菜单
 const subHovered = ref(false)
+const cardHovered = ref(false)
 function cardEnter() {
+  cardHovered.value = true
   show.value = true
-  subHovered.value = false
 }
 
 function cardLeave() {
+  cardHovered.value = false
   show.value = subHovered.value
+}
+
+function dropdownVisibleChange(visible: boolean) {
+  subHovered.value = visible
+  show.value = cardHovered.value || visible
 }
 
 async function changeState(row: any) {
@@ -314,6 +325,7 @@ watch(dialogVisible, (val: boolean) => {
 </script>
 <style lang="scss" scoped>
 .paragraph-box {
+  min-width: 0;
   background: var(--app-layout-bg-color);
   border: 1px solid #ffffff;
   box-shadow: none !important;
