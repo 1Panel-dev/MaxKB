@@ -148,7 +148,7 @@ function openFeedback(status: '0' | '1') {
         <span>执行详情</span>
       </el-button>
       <template v-if="meta.runTime || tokens">
-        <el-divider direction="vertical" class="ml-2! mr-3!" />
+        <el-divider v-if="meta.paragraphList.length || show_exec" direction="vertical" class="ml-2! mr-3!" />
         <span class="text-N600">Tokens {{ tokens }} · 耗时 {{ meta.runTime.toFixed(2) }}s</span>
       </template>
     </div>
