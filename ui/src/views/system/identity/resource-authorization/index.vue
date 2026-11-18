@@ -34,15 +34,21 @@ const pageTitle = computed(() => {
 })
 
 const resourceType = ref<ResourceAuthorizationType>((route.meta.resource as ResourceAuthorizationType) ?? RESOURCE_TYPE.APPLICATION)
-const resourceTypeOptions: OptionItem<ResourceAuthorizationType>[] = [
-  RESOURCE_TYPE.APPLICATION,
-  RESOURCE_TYPE.KNOWLEDGE,
-  RESOURCE_TYPE.TOOL,
-  RESOURCE_TYPE.MODEL,
-].map((value) => ({
-  label: RESOURCE_AUTHORIZATION_LABELS[value],
-  value,
-}))
+const resourceReadPermissions: Record<ResourceAuthorizationType, () => boolean> = {
+  [RESOURCE_TYPE.APPLICATION]: perm.system.authorization.application.read,
+  [RESOURCE_TYPE.KNOWLEDGE]: perm.system.authorization.knowledge.read,
+  [RESOURCE_TYPE.TOOL]: perm.system.authorization.tool.read,
+  [RESOURCE_TYPE.MODEL]: perm.system.authorization.model.read,
+}
+
+const resourceTypeOptions = computed<OptionItem<ResourceAuthorizationType>[]>(() =>
+  [RESOURCE_TYPE.APPLICATION, RESOURCE_TYPE.KNOWLEDGE, RESOURCE_TYPE.TOOL, RESOURCE_TYPE.MODEL]
+    .filter((value) => resourceReadPermissions[value]())
+    .map((value) => ({
+      label: RESOURCE_AUTHORIZATION_LABELS[value],
+      value,
+    })),
+)
 
 /* 选择工作空间列表 */
 const loadingView = ref(false)
