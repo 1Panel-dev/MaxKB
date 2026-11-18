@@ -11,6 +11,7 @@ from typing import Dict, List
 
 import requests
 import uuid_utils.compat as uuid
+from django.core import validators
 from django.db import transaction
 from django.db.models import QuerySet
 from django.http import HttpResponse
@@ -599,7 +600,17 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
         type = serializers.CharField(required=True, label=_("type"))
         id = serializers.CharField(required=True, label=_("type"))
         params = serializers.DictField(required=True, label="")
-        function_name = serializers.CharField(required=True, label=_("function_name"))
+        function_name = serializers.CharField(
+            required=True,
+            label=_("function_name"),
+            validators=[
+                validators.RegexValidator(
+                    regex=r"^[A-Za-z][A-Za-z0-9_]*\Z",
+                    message=_("Invalid function name"),
+                    code=500,
+                )
+            ],
+        )
 
         def action(self):
             self.is_valid(raise_exception=True)

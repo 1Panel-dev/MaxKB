@@ -5685,6 +5685,9 @@ msgstr "Knowledge action does not exist"
 msgid "function_name"
 msgstr "function_name"
 
+msgid "Invalid function name"
+msgstr "Invalid function name"
+
 #: apps/knowledge/serializers/knowledge_workflow.py:965
 msgid "Only support transport=sse or transport=streamable_http"
 msgstr "Only support transport=sse or transport=streamable_http"

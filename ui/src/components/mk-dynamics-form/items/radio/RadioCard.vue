@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue'
+import DOMPurify from 'dompurify'
 import { formItemContextKey, useFormDisabled } from 'element-plus'
 import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
@@ -47,6 +48,11 @@ const valueField = computed(() => {
 const options = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
+
+// 选项文本允许 HTML，渲染前经 DOMPurify 净化，避免存储型 XSS。
+const optionLabel = (option: DynamicFormValue) => {
+  return DOMPurify.sanitize(String(option[textField.value] ?? '')) || '\u200D'
+}
 </script>
 
 <template>
@@ -58,7 +64,8 @@ const options = computed(() => {
       :class="[inputDisabled ? 'cursor-not-allowed! bg-N100! text-N600!' : '', isOptionActive(item[valueField]) ? 'border-primary! text-primary!' : '']"
       @click="selectOption(item[valueField])"
     >
-      <span v-html="item[textField] || '\u200D'"></span>
+      <!-- eslint-disable-next-line vue/no-v-html -- 内容已经 DOMPurify 净化 -->
+      <span v-html="optionLabel(item)"></span>
     </div>
   </div>
 </template>

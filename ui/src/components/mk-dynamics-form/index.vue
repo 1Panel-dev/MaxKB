@@ -4,7 +4,6 @@ import { cloneDeep, isEqual } from 'lodash'
 import type {
   DynamicFormResponse,
   DynamicFormSource,
-  DynamicFormTriggerSetting,
   DynamicFormValue,
   FormField,
   VisibilityCompareOperator,
@@ -13,8 +12,7 @@ import type {
 } from './type'
 import type { Dict } from '@/api/types'
 import type { FormInstance } from 'element-plus'
-import type { Ref } from 'vue'
-import { del, get, post, put } from '@/api/admin/core/request'
+import { get } from '@/api/admin/core/request'
 import FormItem from './FormItem.vue'
 import { MsgWarning } from '@/utils/message'
 
@@ -24,7 +22,7 @@ const props = withDefaults(
   defineProps<{
     /** 页面字段配置或字段配置加载器。 */
     renderData: DynamicFormSource
-    /** 动态请求脚本使用的额外参数。 */
+    /** 透传给字段组件的额外参数。 */
     otherParams?: Dict<DynamicFormValue>
     /** 是否只读。 */
     view?: boolean
@@ -39,7 +37,6 @@ const props = withDefaults(
 
 const emit = defineEmits<{ 'update:modelValue': [value: Dict<DynamicFormValue>] }>()
 
-const request = { del, get, post, put }
 const formValue = ref<Dict<DynamicFormValue>>(cloneDeep(props.modelValue))
 const loading = ref(false)
 const formFieldList = ref<FormField[]>([])
@@ -183,63 +180,7 @@ watch(
   { deep: true },
 )
 
-// ===== 动态字段请求 =====
-function renderTemplate(template: string, data: Dict<DynamicFormValue>) {
-  return template.replace(/\$\{(\w+)\}/g, (match, key: string) => {
-    return data[key] === undefined ? match : String(data[key])
-  })
-}
-
-function triggerFieldRequest(
-  triggerField: string,
-  triggerValue: DynamicFormValue,
-  triggerSetting: DynamicFormTriggerSetting,
-  target: Dict<DynamicFormValue>,
-  requestLoading: Ref<boolean>,
-) {
-  const executeRequest = new Function(
-    'self',
-    'triggerSetting',
-    'request',
-    'extra',
-    triggerSetting.request || 'return request.get(extra.renderTemplate(triggerSetting.url));',
-  ) as (
-    self: Dict<DynamicFormValue>,
-    setting: DynamicFormTriggerSetting,
-    requestHelpers: typeof request,
-    extra: Dict<DynamicFormValue>,
-  ) => Promise<DynamicFormValue>
-
-  requestLoading.value = true
-  return Promise.resolve()
-    .then(() =>
-      executeRequest(target, triggerSetting, request, {
-        renderTemplate: (url: string) => renderTemplate(url, { trigger_value: triggerValue, ...props.otherParams }),
-      }),
-    )
-    .then((response) => {
-      if (!triggerSetting.change && !triggerSetting.change_field) {
-        return
-      }
-      const applyResponse = new Function(
-        'self',
-        'triggerSetting',
-        'response',
-        'extra',
-        triggerSetting.change ||
-          `self[triggerSetting.change_field]=[
-            ...response.data.shared_model.map((model) => ({ ...model, type: 'share' })),
-            ...response.data.model.map((model) => ({ ...model, type: 'workspace' }))
-          ];`,
-      ) as (self: Dict<DynamicFormValue>, setting: DynamicFormTriggerSetting, response: DynamicFormValue, extra: Dict<DynamicFormValue>) => void
-
-      applyResponse(target, triggerSetting, response, { formData: formValue.value, getDefault: getFormDefaultValue })
-    })
-    .finally(() => {
-      requestLoading.value = false
-    })
-}
-
+// ===== 字段默认值 =====
 function initializeFieldDefault(field: FormField) {
   const currentValue = formValue.value[field.field]
   if (field.show_default_value === true && (currentValue === undefined || currentValue === null) && field.default_value !== undefined) {
@@ -342,7 +283,6 @@ defineExpose({ initDefaultData: initializeFieldDefault, render, ruleFormRef, val
         ref="formItemRefs"
         :model-value="formValue[field.field]"
         :form-field="field"
-        :trigger="triggerFieldRequest"
         :view="view"
         :init-default-data="initializeFieldDefault"
         :default-item-width="defaultItemWidth"

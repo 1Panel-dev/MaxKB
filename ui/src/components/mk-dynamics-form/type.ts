@@ -51,43 +51,12 @@ export interface VisibilityRules {
   conditions: VisibilityCondition[]
 }
 
-export interface DynamicFormTriggerSetting extends Dict<DynamicFormValue> {
-  change?: string
-  change_field?: string
-  request?: string
-  url?: string
-  values?: DynamicFormValue[]
-}
-
-export type DynamicFormTriggerMap = Dict<DynamicFormTriggerSetting>
-
 export interface FormFieldLabel extends Dict<DynamicFormValue> {
   attrs?: FormFieldAttributes
   field?: string
   input_type: string
   label?: string
   props_info?: FormFieldProps
-  relation_trigger_field_dict?: DynamicFormTriggerMap
-}
-
-export interface FormViewCardItem {
-  type: 'eval' | 'default'
-  title: string
-  value_field: string
-}
-
-export interface FormTableColumn {
-  property: string
-  label: string
-  value_field?: string
-  attrs?: FormFieldAttributes
-  type: 'eval' | 'component' | 'default'
-  props_info?: FormFieldProps
-}
-
-export interface FormProgressColor {
-  color: string
-  percentage: number
 }
 
 export interface FormFieldAttributes extends Dict<DynamicFormValue> {
@@ -95,17 +64,14 @@ export interface FormFieldAttributes extends Dict<DynamicFormValue> {
   labelWidth?: string
   labelSuffix?: string
   requireAsteriskPosition?: 'left' | 'right'
-  color?: FormProgressColor[]
 }
 
 export interface SerializedFormRule extends Dict<DynamicFormValue> {
+  /** 服务端协议中的字符串校验器只作为标记，统一交由字段组件的 validateRules 校验，不执行其内容。 */
   validator?: string | ((...args: DynamicFormValue[]) => void)
 }
 
 export interface FormFieldProps extends Dict<DynamicFormValue> {
-  view_card?: FormViewCardItem[]
-  table_columns?: FormTableColumn[]
-  active_msg?: string
   style?: CSSProperties
   item_style?: CSSProperties
   rules?: SerializedFormRule[]
@@ -121,7 +87,6 @@ export interface FormField extends Dict<DynamicFormValue> {
   default_value?: DynamicFormValue
   show_default_value?: boolean
   visibility_rules?: VisibilityRules | null
-  relation_trigger_field_dict?: DynamicFormTriggerMap
   trigger_type?: 'OPTION_LIST' | 'CHILD_FORMS'
   attrs?: FormFieldAttributes
   props_info?: FormFieldProps

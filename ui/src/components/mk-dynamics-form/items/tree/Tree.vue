@@ -76,6 +76,10 @@ function restoreSelection() {
   handleSelectionChange(table.getSelectionRows() as DocumentRow[])
 }
 
+// fetch_list_function 是工具代码中的函数名，只允许标识符，防止拼接出其他接口路径。
+const fetchListFunction = computed(() => String(props.formField.attrs?.fetch_list_function ?? attrs.fetch_list_function ?? ''))
+const isValidFetchListFunction = computed(() => /^[A-Za-z][A-Za-z0-9_]*$/.test(fetchListFunction.value))
+
 // 懒加载沿用工具数据源协议，根目录不传 current_node。
 function renderTemplate(template: string, data: Dict<DynamicFormValue>) {
   return template.replace(/\$\{(\w+)\}/g, (match, key) => (data[key] !== undefined ? String(data[key]) : match))
@@ -83,17 +87,20 @@ function renderTemplate(template: string, data: Dict<DynamicFormValue>) {
 const requestUrl = computed(() =>
   renderTemplate(
     '/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/${current_tool_id}/' +
-      (props.formField.attrs?.fetch_list_function ?? attrs.fetch_list_function),
+      fetchListFunction.value,
     { ...props.otherParams, ...getExtra?.() },
   ),
 )
 
 function loadDocuments(currentNode?: Dict<DynamicFormValue>) {
+  if (!isValidFetchListFunction.value) {
+    return Promise.resolve([])
+  }
   pendingLoads.value += 1
   return Promise.resolve()
     .then(() =>
       loadTreeData
-        ? loadTreeData(String(props.formField.attrs?.fetch_list_function ?? attrs.fetch_list_function), currentNode)
+        ? loadTreeData(fetchListFunction.value, currentNode)
         : post<{ current_node?: Dict<DynamicFormValue> }, Dict<DynamicFormValue>[]>(requestUrl.value, { current_node: currentNode }),
     )
     .then(normalizeDocuments)
