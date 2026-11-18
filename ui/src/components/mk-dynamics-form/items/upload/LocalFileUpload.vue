@@ -60,7 +60,7 @@ const fileCountLimit = computed(() => Number(props.formField.attrs?.file_count_l
       :accept="accept"
       :limit="fileCountLimit"
       :size-limit="fileSizeLimit"
-      :tip-text="formats ? `${t('common.upload.formats')}: ${formats}` : ''"
+      :tip-text="formats ? `${t('upload.formats')}: ${formats}` : ''"
     />
   </div>
 </template>

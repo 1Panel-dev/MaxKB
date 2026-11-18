@@ -75,7 +75,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="t('knowledge.document.actions.migrateTo')" @closed="emit('closed')">
+  <MkDialog v-model="visible" :title="t('knowledge.actions.migrateTo')" @closed="emit('closed')">
     <el-form
       ref="migrateFormRef"
       :model="migrateForm"

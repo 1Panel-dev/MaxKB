@@ -1,8 +1,11 @@
 <script setup lang="ts" generic="T extends object">
 import { computed, nextTick, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ScrollbarDirection, ScrollbarInstance } from 'element-plus'
 
 defineOptions({ name: 'MkSearchList' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 /**
  * 带搜索、选中态和悬浮操作区的通用列表。
@@ -32,7 +35,7 @@ const componentProps = withDefaults(
     /** 将业务数据的字段名映射为组件的展示字段和唯一值字段 */
     props?: { label?: keyof T & string; value?: keyof T & string }
   }>(),
-  { defaultActive: '', emptyText: '暂无数据', props: () => ({}) },
+  { defaultActive: '', props: () => ({}) },
 )
 
 const emit = defineEmits<{ click: [row: T, index: number]; search: [keyword: string] }>()
@@ -126,7 +129,7 @@ function selectRow(row: T, index: number) {
       </div>
       <slot v-else name="empty">
         <p class="text-center mt-20 text-N600">
-          {{ searchKeyword ? '没有找到相关内容' : emptyText }}
+          {{ searchKeyword ? t('common.empty.search') : (componentProps.emptyText ?? t('common.empty.default')) }}
         </p>
       </slot>
     </el-scrollbar>

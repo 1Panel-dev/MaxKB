@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { MediaPreviewProps } from './types'
 import MkMediaPreview from './index.vue'
 import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'MkVideo' })
+
+const { t } = useI18n({ useScope: 'global' })
+
 const props = defineProps<MediaPreviewProps>()
 defineSlots<{ default(): unknown }>()
 </script>
@@ -19,7 +23,7 @@ defineSlots<{ default(): unknown }>()
         autoplay
         playsinline
         class="w-full max-h-[75vh] object-contain"
-        @error="MsgWarning('无法播放，请检查视频格式或文件地址')"
+        @error="MsgWarning(t('common.messages.videoPlaybackFailed'))"
       />
     </template>
   </MkMediaPreview>

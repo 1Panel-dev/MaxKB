@@ -94,7 +94,7 @@ function validateFile(file: DragUploadFile) {
   if (file.raw.size > props.sizeLimit * 1024 * 1024) {
     file.status = 'fail'
     file.percentage = 0
-    file.errMsg = t('common.upload.sizeLimitMessage')
+    file.errMsg = t('upload.sizeLimitMessage')
     return false
   }
   const acceptedTypes = props.accept
@@ -108,12 +108,12 @@ function validateFile(file: DragUploadFile) {
     type.startsWith('.') ? filename.endsWith(type) : type.endsWith('/*') ? mimeType.startsWith(type.slice(0, -1)) : mimeType === type,
   )
   if (acceptedTypes.length && !accepted) {
-    if (file.name !== '.DS_Store') MsgWarning(t('common.upload.unsupportedFormatMessage'))
+    if (file.name !== '.DS_Store') MsgWarning(t('upload.unsupportedFormatMessage'))
     handleRemove(file)
     return false
   }
   if (file.raw.size === 0) {
-    MsgWarning(t('common.upload.emptyFileMessage'))
+    MsgWarning(t('upload.emptyFileMessage'))
     handleRemove(file)
     return false
   }
@@ -147,7 +147,7 @@ function handleUpload(file: DragUploadFile) {
     .catch(() => {
       if (file.status !== 'uploading') return
       file.status = 'fail'
-      file.errMsg = t('common.upload.networkErrorMessage')
+      file.errMsg = t('upload.networkErrorMessage')
     })
     .finally(() => uploadRequests.delete(uid))
 }
@@ -165,7 +165,7 @@ onBeforeUnmount(() => {
 })
 
 function handleExceed(files: File[], selectedFiles: UploadUserFile[]) {
-  if (props.limit !== undefined) MsgWarning(t('common.upload.countLimitMessage', { count: props.limit }))
+  if (props.limit !== undefined) MsgWarning(t('upload.countLimitMessage', { count: props.limit }))
   emit('exceed', files, selectedFiles)
 }
 
@@ -278,10 +278,10 @@ defineExpose({ clearFiles, handleRemove })
       </div>
       <div class="el-upload__text">
         <p class="flex-center gap-1">
-          {{ dragText ?? t('common.upload.dropHint') }}
-          <em>{{ selectText ?? t('common.upload.selectFiles') }}</em>
+          {{ dragText ?? t('upload.dropHint') }}
+          <em>{{ selectText ?? t('upload.selectFiles') }}</em>
           <!-- 选择文件夹 -->
-          <el-button :disabled="disabled" link type="primary" @click.stop="handleOpenFolder">{{ t('common.upload.selectFolder') }}</el-button>
+          <el-button :disabled="disabled" link type="primary" @click.stop="handleOpenFolder">{{ t('upload.selectFolder') }}</el-button>
         </p>
         <p v-if="tipText" class="mt-1 text-N500">{{ tipText }}</p>
       </div>
@@ -290,19 +290,19 @@ defineExpose({ clearFiles, handleRemove })
 
     <template v-if="fileList.length">
       <div class="my-4 flex-between gap-3">
-        <p>{{ t('common.upload.status.completed') }} {{ uploadSummary.completed }}/{{ fileList.length }}</p>
+        <p>{{ t('upload.status.completed') }} {{ uploadSummary.completed }}/{{ fileList.length }}</p>
 
         <div class="flex-align-center gap-4">
-          <MkStatusLabel v-if="mode === 'file' && uploadSummary.uploading" type="loading" :label="t('common.upload.status.uploading')" />
+          <MkStatusLabel v-if="mode === 'file' && uploadSummary.uploading" type="loading" :label="t('upload.status.uploading')" />
           <template v-else-if="uploadSummary.error">
-            <MkStatusLabel type="failure" :label="`${t('common.upload.status.failed')} ${uploadSummary.error}`" />
+            <MkStatusLabel type="failure" :label="`${t('upload.status.failed')} ${uploadSummary.error}`" />
             <!-- 重试所有可重试的失败文件 -->
             <el-button v-if="retryFiles.length" :disabled="disabled" text @click="handleRetryAll">
               <MkIcon name="icon_refresh_outlined" />
               <span>{{ t('common.actions.retry') }}</span>
             </el-button>
           </template>
-          <MkStatusLabel v-else-if="uploadSummary.success === fileList.length" type="success" :label="t('common.upload.status.allSucceeded')" />
+          <MkStatusLabel v-else-if="uploadSummary.success === fileList.length" type="success" :label="t('upload.status.allSucceeded')" />
         </div>
       </div>
       <div v-if="mode === 'image'" class="mt-4 flex flex-wrap gap-3">

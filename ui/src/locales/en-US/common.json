@@ -27,32 +27,16 @@
     "enabled": "Enabled",
     "disabled": "Disabled"
   },
+  "dateRange": {
+    "lastDays": "Past {days} days",
+    "lastHalfYear": "Past 6 months",
+    "custom": "Custom",
+    "startDate": "Start date",
+    "endDate": "End date"
+  },
   "parameters": {
     "add": "Add parameter",
     "edit": "Edit parameter"
-  },
-  "upload": {
-    "dropHint": "Drag and drop here.",
-    "selectFile": "Choose a file to upload",
-    "selectFiles": "Choose files",
-    "selectFolder": "Choose folder",
-    "replaceFile": "Replace file",
-    "retryUpload": "Retry upload",
-    "limits": "Upload up to {count} file at a time, no larger than {size} MB. | Upload up to {count} files at a time, each no larger than {size} MB.",
-    "formats": "Supported formats",
-    "emptyFileMessage": "Cannot upload an empty file.",
-    "sizeLimitMessage": "File too large",
-    "unsupportedFormatMessage": "Unsupported file format",
-    "countLimitMessage": "You can upload up to {count} file at a time. | You can upload up to {count} files at a time.",
-    "networkErrorMessage": "Network error",
-    "uploadInProgressMessage": "Please wait for the upload to finish.",
-    "noSuccessfulFilesMessage": "No files were uploaded successfully. Try uploading again.",
-    "status": {
-      "completed": "Completed",
-      "uploading": "Uploading",
-      "failed": "Failed",
-      "allSucceeded": "All files uploaded"
-    }
   },
   "actions": {
     "manage": "Manage",
@@ -60,15 +44,22 @@
     "delete": "Delete",
     "cancel": "Cancel",
     "retry": "Retry",
+    "reset": "Reset",
     "save": "Save",
     "add": "Add",
     "previous": "Previous",
     "next": "Next",
+    "expand": "Expand",
+    "collapse": "Collapse",
     "uploadFiles": "Upload files",
     "create": "Create",
+    "quickCreate": "Quick create",
     "createFromImport": "Create from file",
     "duplicate": "Duplicate",
+    "import": "Import",
     "export": "Export",
+    "link": "Link",
+    "unlink": "Unlink",
     "batchSelect": "Select multiple",
     "cancelSelection": "Cancel selection",
     "disable": "Disable",
@@ -93,6 +84,8 @@
     "updateSuccess": "Updated successfully",
     "moveSuccess": "Moved successfully",
     "importSuccess": "Imported successfully",
+    "linkSuccess": "Linked successfully",
+    "unlinkSuccess": "Unlinked successfully",
     "enableSuccess": "Enabled successfully",
     "disableSuccess": "Disabled successfully",
     "exportFailed": "Export failed",
@@ -101,7 +94,9 @@
     "replaceSuccess": "Replaced successfully",
     "submitSuccess": "Submitted successfully",
     "taskSubmitted": "Task submitted",
-    "operationSuccess": "Operation successful"
+    "operationSuccess": "Operation successful",
+    "audioPlaybackFailed": "Unable to play audio. Check the audio format or file URL.",
+    "videoPlaybackFailed": "Unable to play video. Check the video format or file URL."
   },
   "placeholders": {
     "input": "Please enter",
@@ -113,11 +108,13 @@
     "inputRequired": "This field is required",
     "inputFieldRequired": "Enter {label}",
     "selectRequired": "This field is required",
-    "selectFieldRequired": "Select {label}"
+    "selectFieldRequired": "Select {label}",
+    "jsonFormat": "Enter valid JSON"
   },
   "empty": {
     "default": "No data",
     "search": "No results found",
-    "noDetails": "No details available"
+    "noDetails": "No details available",
+    "noMore": "No more"
   }
 }

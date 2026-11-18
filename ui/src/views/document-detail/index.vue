@@ -48,10 +48,10 @@ const infiniteScrollRef = ref<{ reset: () => Promise<void> }>()
 const paragraphTotal = ref(0)
 const loading = ref(false)
 const paragraphQuery = ref<ParagraphQuery>({})
-const searchFields = [
-  { label: '标题', value: 'title' },
-  { label: '内容', value: 'content' },
-]
+const searchFields = computed(() => [
+  { label: t('knowledge.paragraph.heading.label'), value: 'title' },
+  { label: t('knowledge.paragraph.content.label'), value: 'content' },
+])
 
 function loadParagraphPage(pagination: ParamsPage) {
   return resourceApi.paragraph.getParagraphPage(knowledgeId.value, documentId.value, pagination, paragraphQuery.value).then((page) => {
@@ -135,10 +135,10 @@ function handleBatchDeleteParagraphs() {
   const targetKnowledgeId = knowledgeId.value
   const targetDocumentId = documentId.value
   loading.value = true
-  return MsgConfirm(`确认删除选中的 ${targetParagraphIds.length} 个分段？`, '删除后无法恢复，请谨慎操作。')
+  return MsgConfirm(`${t('knowledge.paragraph.delete.batchTitle', targetParagraphIds.length)}?`, t('common.dialogs.deleteWarning'))
     .then(() => {
       return resourceApi.paragraph.putBatchDeleteParagraphs?.(targetKnowledgeId, targetDocumentId, targetParagraphIds).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         return refreshParagraphs()
       })
     })
@@ -188,7 +188,7 @@ function handleToggleParagraph(paragraph: ParagraphItem) {
       .putParagraph?.(knowledgeId.value, documentId.value, paragraph.id, { is_active: !paragraph.is_active })
       .then((updatedParagraph) => {
         handleReplaceParagraph(updatedParagraph)
-        MsgSuccess('操作成功')
+        MsgSuccess(t('common.messages.operationSuccess'))
         // 服务端响应已更新受控开关，阻止 before-change 再触发一次切换。
         return false
       })
@@ -204,10 +204,10 @@ function handleDeleteParagraph(paragraph: ParagraphItem) {
   const targetDocumentId = documentId.value
   const targetParagraphId = paragraph.id
   loading.value = true
-  return MsgConfirm(`是否删除分段：${paragraph.title || '-'}？`, '删除后无法恢复，请谨慎操作。')
+  return MsgConfirm(`${t('knowledge.paragraph.delete.title')}: ${paragraph.title || '-'}?`, t('common.dialogs.deleteWarning'))
     .then(() => {
       return resourceApi.paragraph.deleteParagraph?.(targetKnowledgeId, targetDocumentId, targetParagraphId).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         return refreshParagraphs()
       })
     })
@@ -283,7 +283,7 @@ onMounted(() => {
           <span v-if="!isWorkspaceSharedResource()">
             <el-button :type="batchMode ? 'primary' : undefined" :disabled="!paragraphs.length" plain @click="handleToggleBatchMode">
               <MkIcon name="icon_Batch_outlined" />
-              <span>{{ batchMode ? '取消选择' : '批量选择' }}</span>
+              <span>{{ batchMode ? t('common.actions.cancelSelection') : t('common.actions.batchSelect') }}</span>
             </el-button>
           </span>
           <!-- 添加文档分段 -->
@@ -293,7 +293,7 @@ onMounted(() => {
             @click="handleOpenCreateParagraph()"
           >
             <MkIcon name="icon_add_outlined" />
-            <span>添加分段</span>
+            <span>{{ t('knowledge.paragraph.actions.add') }}</span>
           </el-button>
         </div>
       </div>
@@ -340,7 +340,7 @@ onMounted(() => {
 
     <template #default="{ Header, Footer }">
       <component :is="Header">
-        <p class="text-N600">{{ paragraphTotal }} 分段</p>
+        <p class="text-N600">{{ paragraphTotal }} {{ t('knowledge.stats.paragraphs', paragraphTotal) }}</p>
       </component>
       <MkInfiniteScroll ref="infiniteScrollRef" v-model="paragraphs" :load="loadParagraphPage">
         <div ref="paragraphCardsRef" class="space-y-3">
@@ -381,13 +381,13 @@ onMounted(() => {
                         :before-change="() => handleToggleParagraph(paragraph)"
                       />
                       <el-divider direction="vertical" class="ml-3! mr-2!" />
-                      <MkTooltip v-if="knowledgeDocPermission('docEdit')" content="编辑">
+                      <MkTooltip v-if="knowledgeDocPermission('docEdit')" :content="t('common.actions.edit')">
                         <!-- 编辑当前分段 -->
                         <el-button text @click="handleOpenParagraphDetail(paragraph, 'edit')">
                           <MkIcon name="icon_edit_outlined" />
                         </el-button>
                       </MkTooltip>
-                      <MkTooltip v-if="knowledgeDocPermission('docEdit')" content="上方插入分段">
+                      <MkTooltip v-if="knowledgeDocPermission('docEdit')" :content="t('knowledge.paragraph.actions.insertAbove')">
                         <!-- 在当前分段上方插入 -->
                         <el-button text @click="handleOpenCreateParagraph(paragraph.position)">
                           <MkIcon name="icon_add_outlined-1" />
@@ -428,7 +428,7 @@ onMounted(() => {
                             />
                             <!-- 展开分段位置菜单 -->
                             <MoveParagraphAction
-                              label="移动位置"
+                              :label="t('knowledge.paragraph.actions.movePosition')"
                               :disabled="loading"
                               @move="handleMoveParagraph(paragraph, $event)"
                               @visible-change="handleParagraphMenuVisibleChange(paragraph.id, 'position', $event)"
@@ -437,7 +437,7 @@ onMounted(() => {
                             <!-- 删除当前分段 -->
                             <MkDropdownItem v-if="knowledgeDocPermission('docDelete')" :disabled="loading" @click="handleDeleteParagraph(paragraph)">
                               <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                              删除
+                              {{ t('common.actions.delete') }}
                             </MkDropdownItem>
                           </MkDropdownMenu>
                         </template>
@@ -456,13 +456,13 @@ onMounted(() => {
 
                 <h4 class="mb-2 pr-44">{{ paragraph.title || '-' }}</h4>
                 <MdPreview :model-value="paragraph.content" />
-                <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} 字符</p>
+                <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} {{ t('knowledge.stats.characters', paragraph.content.length) }}</p>
               </el-card>
             </div>
           </template>
         </div>
         <template #empty>
-          <MkEmpty :type="Object.keys(paragraphQuery).length ? 'search' : 'default'" description="暂无分段" />
+          <MkEmpty :type="Object.keys(paragraphQuery).length ? 'search' : 'default'" :description="t('knowledge.paragraph.empty')" />
         </template>
       </MkInfiniteScroll>
       <component
@@ -502,7 +502,7 @@ onMounted(() => {
             :disabled="loading || !selectedParagraphIds.length"
             @click="handleBatchDeleteParagraphs"
           >
-            删除
+            {{ t('common.actions.delete') }}
           </el-button>
         </template>
       </component>
@@ -519,7 +519,7 @@ onMounted(() => {
   <EditParagraphDialog
     v-if="editDialogMounted"
     ref="editDialogRef"
-    title="分段详情"
+    :title="t('knowledge.paragraph.detailTitle')"
     :knowledge-id="knowledgeId"
     :document-id="documentId"
     @success="handleReplaceParagraph"

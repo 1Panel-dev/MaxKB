@@ -28,7 +28,14 @@
       "editValue": "编辑标签值"
     },
     "documents": {
-      "linked": "已关联文档"
+      "title": "关联文档",
+      "linked": "已关联文档",
+      "unlinked": "未关联文档"
+    },
+    "import": {
+      "title": "导入标签",
+      "downloadTemplate": "下载模板",
+      "unsupportedFormatMessage": "仅支持上传 XLS、XLSX 格式的文件"
     },
     "delete": {
       "title": "是否删除标签",

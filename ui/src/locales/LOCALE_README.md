@@ -11,6 +11,7 @@
 | 业务域      | 内容                                             |
 | ----------- | ------------------------------------------------ |
 | common      | 无业务含义的操作、基础校验、界面偏好和通用错误页 |
+| upload      | 文件选择、上传提示、校验、状态、后缀与头像上传   |
 | auth        | 登录、退出、找回密码、身份认证                   |
 | application | 智能体创建、配置、发布、版本                     |
 | knowledge   | 知识库、文档、分段、问题、标签、检索             |
@@ -42,7 +43,10 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 仅有展示文案的通用标签归 common.labels，例如“创建者”和“操作”。名称与描述直接归 common.name 和 common.description，
 字段的 label、placeholder 和实际使用的 requiredMessage 放在一起，表单、表头和筛选器共用 label。
 common.status 维护状态标签 label 和通用启停选项 enabled、disabled。
-通用文件选择、上传提示和校验归 `common.upload`，上传进度和结果汇总归 `common.upload.status`。业务模板、文件内容要求和导入说明归各自业务域。
+通用日期范围预设及起止日期占位归 `common.dateRange`，音视频播放失败提示归 `common.messages`。
+通用文件选择、上传提示和校验归 `upload.json`，上传进度和结果汇总归 `upload.status`。
+头像设置、图片上传说明及校验归 `upload.avatar`；文件后缀编辑的操作和提示归 `upload.extension`。
+业务模板、文件内容要求和导入说明归各自业务域。
 “请输入模型名称”等指明业务对象的提示，以及发布状态、执行状态等业务选项归对应业务域。
 通用操作结果归 common.messages，通用对话框标题归 common.dialogs；业务专属确认句仍留在所属业务域。
 用户内容、用户保存的提示词、协议枚举和已保存节点名称保留原文。
@@ -50,13 +54,13 @@ common.status 维护状态标签 label 和通用启停选项 enabled、disabled�
 ## JSON 键顺序
 
 - 同一语言包的键按含义分组，简体、繁体和英文采用相同的排列顺序，方便逐项对照。
-- `common.json` 的顶层顺序为 `labels` → `name` → `description` → `status` → `parameters` → `upload` → `actions` → `dialogs` → `messages` → `placeholders` → `validation` → `empty`。
+- `common.json` 的顶层顺序为 `labels` → `name` → `description` → `status` → `dateRange` → `parameters` → `actions` → `dialogs` → `messages` → `placeholders` → `validation` → `empty`。
 - 字段内先放 `label`，再放 `placeholder`，最后放 `requiredMessage` 等校验提示。状态组先放 `label`，再放 `enabled`、`disabled`。其他组沿用现有顺序。
 
 ## 使用约定
 
 - key 使用表达业务含义的英文 camelCase，不使用中文、数字序号或 misc 等模糊分类。
-- Vite 自动收集语言目录下的 JSON。单文件业务使用文件名作为命名空间，如 `dynamic-form.json` 对应 `dynamicForm`。分文件的业务使用第一级目录名，如 `knowledge/library.json` 归入 `knowledge`。分文件直接写各自负责的业务字段，同一业务的顶层字段只在一个文件中定义。
+- Vite 自动收集语言目录下的 JSON。单文件业务使用文件名作为命名空间，如 `dynamic-form.json` 对应 `dynamicForm`。分文件的业务使用第一级目录名，如 `knowledge/document.json` 归入 `knowledge`。分文件直接写各自负责的业务字段，同一业务的顶层字段只在一个文件中定义。
 - 纯标签、数量单位、固定比例、编号和倒计时只翻译文字，数字、名称及固定格式在使用处组合；
   问号、作为分隔符的冒号不单独翻译，三种语言使用相同的显示格式。只有文件名和错误原因等数据的组合不建立翻译键。
   例如“已选 3/10”只翻译“已选”；单项确认标题翻译操作文字，使用处追加 `: 名称?`。
@@ -130,7 +134,7 @@ Skill、工作流、MCP 和数据源的类型名称使用各自分组的 `label`
 商店自定义分类、工具名称、描述和 README 使用接口原文。
 普通工具的创建、编辑、复制标题使用 `tool.createTitle`、`tool.editTitle`、`tool.duplicateTitle`，代码必填提示归 `tool.fields.code`。调试入口、运行状态和缺省错误提示归 `tool.debug`。
 调试参数的占位与必填提示分别使用 `common.placeholders.inputField` 和 `common.validation.inputFieldRequired`，通过 `{label}` 传入参数名。执行输出和接口错误详情按原文展示。
-Skill 表单的标题、名称提示和 ZIP 文件要求归 `tool.skill`。文件大小提示通过 `{size}` 读取校验上限，拖入、选择、更换文件和空文件提示复用 `common.upload`。
+Skill 表单的标题、名称提示和 ZIP 文件要求归 `tool.skill`。文件大小提示通过 `{size}` 读取校验上限，拖入、选择、更换文件和空文件提示复用 `upload`。
 工作流工具的创建、编辑、复制标题及工作流名称提示归 `tool.workflow`。复制工具时在原名称后追加 `common.name.copySuffix`，三语均使用“名称 + 空格 + 副本后缀”。
 MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 `tool.mcp`。配置字段复用 `resource.mcpConfig.title`，JSON 示例与用户填写的配置保留原文。
 数据源工具的表单标题、名称提示和代码必填提示归 `tool.dataSource`。Python 模板和用户编辑的代码作为表单数据原样提交。
@@ -148,12 +152,20 @@ MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 
 手动同步、定时同步及日志共用 `knowledge.sync` 中的同步方式。向量化和生成问题共用的分段范围在 `knowledge/index.json` 中维护，使用 `knowledge.paragraphScope`。生成问题弹窗的字段、校验和内置默认提示词归 `knowledge.generateQuestions`。无已保存配置时按打开弹窗时的语言填入默认提示词，保留 `{data}` 与 `<question></question>`。提交时使用编辑框中的原文。
 导出格式与源文件说明归 `knowledge.export`，单个及批量删除的确认标题归 `knowledge.delete`。
 Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传、导入和设置共用的分段规则、图片处理与索引增强文案归 `knowledge.documentStrategy`。
+分段标识的文字选项归 `knowledge.documentStrategy.splitPatterns`，在 `knowledge/settings.json` 中维护。文档策略表单与工作流分段节点在展示时翻译 `DOCUMENT_SPLIT_PATTERN_OPTIONS` 的 `labelKey`；纯符号、Agent 参数识别用的 `label` 及正则 `value` 保留原值。
 
 ## 知识库详情
 
-`knowledge/index.json` 维护列表、知识库类型与创建等文案。`library.json` 维护资料库和图片。`tag.json` 维护标签管理与文档标签设置，使用 `knowledge.tags`。`document.json` 维护文档列表、上传与预览，使用 `knowledge.document`。`paragraph.json` 维护分段字段、校验和关联问题，使用 `knowledge.paragraph`。`retrieval.json` 维护召回测试、问题与自定义分词，`integration.json` 维护对话用户和外部检索服务，`settings.json` 维护基础设置、文档处理策略和同步。生成问题弹窗归 `generate-questions.json`。
-四种资源范围的详情菜单和页面标题共用业务分组的 `title`，例如 `knowledge.document.title` 和 `knowledge.documentStrategy.title`。“设置”复用 `common.labels.settings`。
+`knowledge/index.json` 维护列表、知识库类型、创建、共用文案及尚未独立分文件的业务文案。仅有菜单名称、尚未形成独立业务分组的功能集中在 `knowledge.menu`，按菜单显示顺序排列，使用 `knowledge.menu.<名称>`。
+`tag.json` 维护标签管理与文档标签设置，使用 `knowledge.tags`。`document.json` 维护文档列表、上传与预览，使用 `knowledge.document`；图片列表、上传、详情及校验文案同文件存放，使用与 `document` 平级的 `image` 分组，引用为 `knowledge.image`。`paragraph.json` 维护分段字段、校验、关联问题、列表操作及删除确认，使用 `knowledge.paragraph`；分段列表与导入预览共用 `knowledge.paragraph.empty`，数量单位复用 `knowledge.stats`。`settings.json` 维护文档处理策略和同步，生成问题弹窗归 `generate-questions.json`。
+标签导入标题、模板和格式限制归 `knowledge.tags.import`，关联文档标题及页签归 `knowledge.tags.documents`；文档字段复用 `knowledge.document`，通用关联操作及结果提示复用 `common`，文件选择校验复用 `upload`。
+翻译按业务含义归属，不与页面目录一一对应：分段字段和操作归 `knowledge.paragraph`，文档字段、操作及流程说明归 `knowledge.document`，页面可交叉引用。
+导入预览删除分段使用 `knowledge.paragraph.delete.confirm`；继续导入前的编辑未完成提示保留在 `knowledge.document.preview`。文档召回处理和删除文档的影响说明仍归 `knowledge.document`。
+跨对象共用的召回次数、最后一次召回时间归 `knowledge.stats.retrievalCount` / `lastRetrievedAt`，文档列表和分段预览共用。
+文档、图片与分段的迁移入口共用 `knowledge.actions.migrate` / `migrateTo`，成功提示共用 `knowledge.messages.migrateSuccess`。迁移目标知识库使用 `knowledge.fields.targetKnowledge`，目标文档使用 `knowledge.document.target`，占位与必填提示分别维护。分段位置菜单归 `knowledge.paragraph.position`；新增、保存和移动成功提示复用 `common.messages`。
+四种资源范围的详情菜单和页面标题共用路由中的翻译 key：已整理的业务引用所属分组的 `title`，例如 `knowledge.document.title`、`knowledge.tags.title` 和 `knowledge.documentStrategy.title`；仅有菜单名称的功能引用 `knowledge.menu`，不重复定义标题。“设置”复用 `common.labels.settings`。
 文档列表的文件状态和进度归 `knowledge.document.status`，召回处理选项归 `knowledge.document.hitHandling`。筛选项和行内展示共用译文，接口接收原有状态、任务类型和召回处理值。
+图片菜单与页面标题共用 `knowledge.image.title`。图片处理配置复用 `knowledge.documentStrategy`，上传限制、格式说明和上传校验复用 `upload`；文档状态、召回处理及共用文档操作继续引用 `knowledge.document`，统计字段引用 `knowledge.stats`。接口返回的图片名称、标签、模型和工具名称保留原文。
 工作流文档导入的操作归 `knowledge.document.import`。导入与调试共用的数据源、默认用户输入标题和执行结果归 `workflow.json`，分别使用 `workflow.dataSource`、`workflow.userInput` 和 `workflow.executionResult`。
 
 ## 文件夹

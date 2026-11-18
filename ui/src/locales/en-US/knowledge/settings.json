@@ -1,7 +1,4 @@
 {
-  "baseSettings": {
-    "title": "Basic settings"
-  },
   "documentStrategy": {
     "title": "Document processing strategy",
     "splitRules": "Paragraph splitting",
@@ -17,6 +14,14 @@
       "label": "Paragraph delimiters",
       "placeholder": "Select paragraph delimiters",
       "description": "The document is split recursively using the delimiters in the order you select. Paragraphs longer than the configured length are truncated."
+    },
+    "splitPatterns": {
+      "space": "Space",
+      "semicolon": "Semicolon",
+      "comma": "Comma",
+      "period": "Period",
+      "lineBreak": "Line break",
+      "blankLine": "Blank line"
     },
     "paragraphLength": "Paragraph length",
     "childChunkLength": {
@@ -51,9 +56,6 @@
       "label": "Index paragraph titles as questions",
       "description": "Automatically add each paragraph title as a related question."
     }
-  },
-  "scheduledSync": {
-    "title": "Scheduled sync"
   },
   "sync": {
     "title": "Sync knowledge",

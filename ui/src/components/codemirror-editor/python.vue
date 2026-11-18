@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { python } from '@codemirror/lang-python'
 import { linter } from '@codemirror/lint'
 import { Codemirror } from 'vue-codemirror'
+import { useI18n } from 'vue-i18n'
 import type { ToolPylintIssue } from '@/api/types'
 import type { Diagnostic } from '@codemirror/lint'
 import type { EditorState } from '@codemirror/state'
@@ -12,6 +13,8 @@ import ToolApi from '@/api/admin/workspace/tool/tool'
 import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'PythonCodeEditor', inheritAttrs: false })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const code = defineModel<string>({ required: true })
 defineProps<{ title?: string }>()
@@ -104,7 +107,8 @@ function submitEditorDialog() {
     </div>
 
     <template #footer>
-      <el-button type="primary" @click="submitEditorDialog">确定</el-button>
+      <!-- 确认代码编辑 -->
+      <el-button type="primary" @click="submitEditorDialog">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

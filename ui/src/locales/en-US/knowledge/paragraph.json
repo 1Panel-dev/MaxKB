@@ -1,5 +1,6 @@
 {
   "paragraph": {
+    "detailTitle": "Paragraph details",
     "heading": {
       "label": "Title",
       "placeholder": "Enter a title"
@@ -14,6 +15,23 @@
       "label": "Related questions",
       "requiredMessage": "Enter a related question",
       "lengthMessage": "Questions cannot exceed {max} characters."
-    }
+    },
+    "actions": {
+      "add": "Add paragraph",
+      "insertAbove": "Insert paragraph above",
+      "movePosition": "Move position"
+    },
+    "position": {
+      "top": "Move to top",
+      "up": "Move up",
+      "down": "Move down",
+      "bottom": "Move to bottom"
+    },
+    "delete": {
+      "title": "Delete paragraph",
+      "confirm": "Delete this paragraph",
+      "batchTitle": "Delete {count} selected paragraph | Delete {count} selected paragraphs"
+    },
+    "empty": "No paragraphs"
   }
 }

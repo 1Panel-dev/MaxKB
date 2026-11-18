@@ -52,7 +52,8 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 
 `document.ts` 的 `DOCUMENT_HIT_HANDLING_MESSAGE_KEYS` 按 API 枚举 `DOCUMENT_HIT_HANDLING` 提供翻译键，文档和图片的列表筛选、表格单元格及文档设置共用。
 `DOCUMENT_SPLIT_PATTERN_OPTIONS` 维护文档分段标识的完整选项与正则值，知识库文档策略表单和工作流分段节点共同引用。
-表单和节点直接展示选项的 `label`。工作流 Agent 使用 `label` 识别已有参数，提交分段策略时使用正则 `value`。
+表单和节点通过当前应用的 `t` 翻译可选的 `labelKey`；`#`、`-` 等纯符号直接展示 `label`。
+`label` 保留为工作流 Agent 的固定参数识别值，不随界面语言变化；提交分段策略时使用正则 `value`。
 
 `file-type.ts` 维护图片、文档、视频和音频的文件扩展名常量，扩展名统一使用大写。
 使用方判断文件类型时先将后缀转换为大写，再与对应常量匹配。

@@ -28,7 +28,14 @@
       "editValue": "編輯標籤值"
     },
     "documents": {
-      "linked": "已關聯文件"
+      "title": "關聯文件",
+      "linked": "已關聯文件",
+      "unlinked": "未關聯文件"
+    },
+    "import": {
+      "title": "匯入標籤",
+      "downloadTemplate": "下載範本",
+      "unsupportedFormatMessage": "僅支援上傳 XLS、XLSX 格式的檔案"
     },
     "delete": {
       "title": "確定刪除標籤",

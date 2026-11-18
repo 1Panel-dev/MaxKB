@@ -11,18 +11,23 @@
       "placeholder": "Enter one document URL per line. Documents with invalid URLs cannot be imported.",
       "requiredMessage": "Enter a document URL"
     },
+    "target": {
+      "label": "Save to document",
+      "placeholder": "Select a document",
+      "requiredMessage": "Select a document"
+    },
     "labels": {
       "activeStatus": "Activation status",
       "characters": "Characters",
-      "paragraphs": "Paragraphs",
-      "retrievalCount": "Retrieval count",
-      "lastRetrievedAt": "Last retrieved"
+      "paragraphs": "Paragraphs"
     },
     "hitHandling": {
       "label": "Retrieval handling",
       "description": "When a user asks a question, retrieved paragraphs are processed according to these settings.",
       "optimization": "Model optimization",
-      "directlyReturn": "Direct answer"
+      "directlyReturn": "Direct answer",
+      "similarityAbove": "When similarity exceeds",
+      "returnParagraphContent": "return paragraph content directly"
     },
     "settings": {
       "title": "Document settings",
@@ -46,8 +51,6 @@
     "actions": {
       "quickCreate": "Create a blank document",
       "generatePreview": "Generate preview",
-      "migrate": "Migrate",
-      "migrateTo": "Migrate to",
       "downloadOriginal": "Download original document",
       "replaceOriginal": "Replace original document"
     },
@@ -90,10 +93,22 @@
     },
     "preview": {
       "title": "Preview",
-      "emptyParagraphs": "No paragraphs",
       "emptyDocuments": "No documents to preview",
-      "finishEditingMessage": "Save or cancel your paragraph edits first.",
-      "deleteParagraphConfirm": "Delete this paragraph"
+      "finishEditingMessage": "Save or cancel your paragraph edits first."
     }
+  },
+  "image": {
+    "title": "Images",
+    "detailTitle": "Image details",
+    "name": {
+      "label": "Image name"
+    },
+    "upload": {
+      "title": "Upload images"
+    },
+    "preview": {
+      "emptyMessage": "The image preview has no paragraphs. Go back and generate the preview again."
+    },
+    "unsupportedFormatMessage": "Supported image formats: {formats}."
   }
 }

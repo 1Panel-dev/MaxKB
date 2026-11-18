@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { useKnowledgeDetailContext } from '@/views/knowledge-detail/context'
 import UploadImageDrawer from './UploadImageDrawer.vue'
 
 defineOptions({ name: 'ButtonUploadImage' })
+const { t } = useI18n({ useScope: 'global' })
 defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['image']
   knowledgeId: string
@@ -25,7 +27,7 @@ function handleOpenUpload() {
   <!-- 上传图片 -->
   <el-button type="primary" @click="handleOpenUpload">
     <MkIcon name="icon_upload_outlined" />
-    <span>上传图片</span>
+    <span>{{ t('knowledge.image.upload.title') }}</span>
   </el-button>
   <UploadImageDrawer
     v-if="drawerMounted"

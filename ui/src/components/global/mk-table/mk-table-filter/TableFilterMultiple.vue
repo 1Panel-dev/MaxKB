@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { TableFilterOption } from './types'
 import type { CheckboxValueType } from 'element-plus'
 
 defineOptions({ name: 'TableFilterMultiple' })
+const { t } = useI18n({ useScope: 'global' })
 const props = withDefaults(
   defineProps<{
     modelValue: CheckboxValueType[]
@@ -58,7 +60,7 @@ function handleConfirm() {
   <el-popover v-model:visible="visible" placement="bottom-start" trigger="click" :width="width" @before-enter="handleOpen">
     <template #reference><slot /></template>
     <div v-if="filterable" class="px-3 pt-3">
-      <MkSearchInput v-model="searchKeyword" />
+      <MkSearchInput v-model="searchKeyword" :placeholder="t('common.placeholders.search')" />
     </div>
     <el-scrollbar max-height="280px">
       <div class="flex-column gap-2 p-3 pb-0">
@@ -69,7 +71,7 @@ function handleConfirm() {
           class="mr-0!"
           @change="handleSelectAllChange"
         >
-          全部
+          {{ t('common.labels.all') }}
         </el-checkbox>
         <el-checkbox-group v-model="pendingValues" class="mk-checkbox-group-vertical gap-2">
           <el-checkbox
@@ -81,15 +83,15 @@ function handleConfirm() {
             <span class="block min-w-0 truncate" :title="option.label">{{ option.label }}</span>
           </el-checkbox>
         </el-checkbox-group>
-        <MkEmpty v-if="filterable && !filteredOptions.length" type="search" description="暂无匹配结果" :image-size="64" />
+        <MkEmpty v-if="filterable && !filteredOptions.length" type="search" :image-size="64" />
       </div>
     </el-scrollbar>
 
     <div class="p-3 text-right">
       <!-- 清除多选筛选 -->
-      <el-button plain class="min-w-12! w-12!" size="small" @click="handleReset">重置</el-button>
+      <el-button plain class="min-w-12!" size="small" @click="handleReset">{{ t('common.actions.reset') }}</el-button>
       <!-- 确认多选筛选 -->
-      <el-button class="min-w-12! w-12!" size="small" type="primary" @click="handleConfirm">确定</el-button>
+      <el-button class="min-w-12!" size="small" type="primary" @click="handleConfirm">{{ t('common.actions.confirm') }}</el-button>
     </div>
   </el-popover>
 </template>

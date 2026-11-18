@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ParagraphQuestionDraft } from './types'
 import type { ParagraphUpdatePayload } from '@/api/types'
 import { useDocumentDetailContext } from '@/views/document-detail/context'
@@ -8,6 +9,7 @@ import ParagraphQuestions from './components/ParagraphQuestions.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CreateParagraphDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   knowledgeId: string
   documentId: string
@@ -54,7 +56,7 @@ function handleSubmit() {
           })
           .then(() => {
             visible.value = false
-            MsgSuccess('添加成功')
+            MsgSuccess(t('common.messages.addSuccess'))
             emit('success', 'create')
           }) ?? Promise.resolve()
       ).finally(() => {
@@ -68,7 +70,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="添加分段" width="1000" @closed="emit('closed')">
+  <MkDialog v-model="visible" :title="t('knowledge.paragraph.actions.add')" width="1000" @closed="emit('closed')">
     <div v-loading="loading" class="flex w-full gap-4">
       <ParagraphForm ref="paragraphFormRef" v-model="paragraphForm" :knowledge-id="targetKnowledgeId" />
       <!-- 关联问题 -->
@@ -76,9 +78,9 @@ defineExpose({ open, close })
     </div>
     <template #footer>
       <!-- 取消添加分段 -->
-      <el-button plain :disabled="loading" @click="close">取消</el-button>
+      <el-button plain :disabled="loading" @click="close">{{ t('common.actions.cancel') }}</el-button>
       <!-- 提交新增分段和关联问题 -->
-      <el-button type="primary" :loading="loading" @click="handleSubmit">添加</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.add') }}</el-button>
     </template>
   </MkDialog>
 </template>

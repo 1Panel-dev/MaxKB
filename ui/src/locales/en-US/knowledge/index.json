@@ -1,5 +1,17 @@
 {
   "title": "Knowledge",
+  "menu": {
+    "library": "Library",
+    "retrieval": "Retrieval optimization",
+    "hitTest": "Retrieval test",
+    "questions": "Questions",
+    "termbase": "Custom dictionary",
+    "integration": "Access and integrations",
+    "chatUsers": "Chat users",
+    "externalRetrieval": "External retrieval service",
+    "baseSettings": "Basic settings",
+    "scheduledSync": "Scheduled sync"
+  },
   "categories": {
     "all": "All knowledge",
     "shared": "Shared knowledge"
@@ -57,9 +69,13 @@
     "documents": "doc | docs",
     "paragraphs": "paragraph | paragraphs",
     "characters": "character | characters",
-    "images": "image | images"
+    "images": "image | images",
+    "retrievalCount": "Retrieval count",
+    "lastRetrievedAt": "Last retrieved"
   },
   "actions": {
+    "migrate": "Migrate",
+    "migrateTo": "Migrate to",
     "sync": "Sync",
     "generateEmbeddings": "Generate embeddings",
     "generateQuestions": "Generate questions",

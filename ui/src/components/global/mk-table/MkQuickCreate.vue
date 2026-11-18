@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ButtonInstance, InputInstance } from 'element-plus'
 
 defineOptions({ name: 'MkQuickCreate' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(
   defineProps<{
@@ -11,7 +13,7 @@ const props = withDefaults(
     placeholder?: string
     maxlength?: number
   }>(),
-  { loading: false, text: '快速创建', placeholder: '请输入名称', maxlength: 256 },
+  { loading: false, maxlength: 256 },
 )
 const emit = defineEmits<{ create: [name: string] }>()
 
@@ -58,21 +60,21 @@ defineExpose({ close: resetDraft })
         ref="inputRef"
         v-model="createName"
         class="mr-3 w-80!"
-        :placeholder="props.placeholder"
+        :placeholder="props.placeholder ?? t('common.name.placeholder')"
         :maxlength="props.maxlength"
         @keydown="handleKeydown"
         show-word-limit
         clearable
       />
       <!-- 创建 -->
-      <el-button type="primary" :loading="props.loading" :disabled="createDisabled" @click="handleCreate">创建</el-button>
+      <el-button type="primary" :loading="props.loading" :disabled="createDisabled" @click="handleCreate">{{ t('common.actions.create') }}</el-button>
       <!-- 取消创建 -->
-      <el-button plain :disabled="props.loading" @click="handleCancel">取消</el-button>
+      <el-button plain :disabled="props.loading" @click="handleCancel">{{ t('common.actions.cancel') }}</el-button>
     </div>
     <!-- 展开快速创建 -->
     <el-button v-else ref="triggerRef" type="primary" link @click="handleShowCreateInput">
       <MkIcon name="icon_add_outlined" />
-      <span>{{ props.text }}</span>
+      <span>{{ props.text ?? t('common.actions.quickCreate') }}</span>
     </el-button>
   </div>
 </template>

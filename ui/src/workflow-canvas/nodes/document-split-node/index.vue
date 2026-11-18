@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
@@ -9,6 +10,7 @@ import { DOCUMENT_SPLIT_STRATEGY_LABELS } from './constant'
 import { DOCUMENT_SPLIT_PATTERN_OPTIONS } from '@/constants/document'
 
 defineOptions({ name: 'WorkflowDocumentSplitNode' })
+const { t } = useI18n({ useScope: 'global' })
 
 type ConfigurableField = 'chunk_size' | 'patterns' | 'limit' | 'with_filter' | 'paragraph_title_relate_problem' | 'document_name_relate_problem'
 type DocumentSplitForm = {
@@ -192,7 +194,7 @@ onBeforeUnmount(() => anchorGuard.reset())
             <el-option
               v-for="pattern in DOCUMENT_SPLIT_PATTERN_OPTIONS"
               :key="pattern.value"
-              :label="pattern.label"
+              :label="pattern.labelKey ? t(pattern.labelKey) : pattern.label"
               :value="pattern.value"
             ></el-option>
           </el-select>

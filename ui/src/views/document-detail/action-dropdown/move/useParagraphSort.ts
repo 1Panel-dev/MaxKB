@@ -1,9 +1,10 @@
 /** 分段菜单移动和两处拖拽共用位置保存及本地排序。 */
-import type { Ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ParagraphMoveDirection } from './types'
 import type { ParagraphItem } from '@/api/types'
 import type { SortableChange } from '@/utils/use-sortable'
 import type { useDocumentDetailContext } from '@/views/document-detail/context'
+import type { Ref } from 'vue'
 import { MsgSuccess } from '@/utils/message'
 import { useSortable } from '@/utils/use-sortable'
 
@@ -20,6 +21,7 @@ interface ParagraphSortOptions {
 }
 
 export function useParagraphSort(options: ParagraphSortOptions) {
+  const { t } = useI18n({ useScope: 'global' })
   let sortSnapshot: ParagraphItem[] = []
 
   // 菜单和拖拽均使用移动前的位置；索引只用于本地排序，不作为接口位置。
@@ -49,7 +51,7 @@ export function useParagraphSort(options: ParagraphSortOptions) {
             else if (oldPosition > position && nextPosition >= position && nextPosition < oldPosition) nextPosition += 1
             return nextPosition === paragraph.position ? paragraph : { ...paragraph, position: nextPosition }
           })
-          MsgSuccess('移动成功')
+          MsgSuccess(t('common.messages.moveSuccess'))
         })
         .catch(() => {
           options.paragraphs.value = previousParagraphs

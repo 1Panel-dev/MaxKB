@@ -27,32 +27,16 @@
     "enabled": "已啟用",
     "disabled": "已停用"
   },
+  "dateRange": {
+    "lastDays": "過去 {days} 天",
+    "lastHalfYear": "過去半年",
+    "custom": "自訂",
+    "startDate": "開始日期",
+    "endDate": "結束日期"
+  },
   "parameters": {
     "add": "新增參數",
     "edit": "編輯參數"
-  },
-  "upload": {
-    "dropHint": "將檔案拖曳到此處。",
-    "selectFile": "選擇檔案上傳",
-    "selectFiles": "選擇檔案",
-    "selectFolder": "選擇資料夾",
-    "replaceFile": "更換檔案",
-    "retryUpload": "重新上傳",
-    "limits": "每次最多上傳 {count} 個檔案，每個檔案不超過 {size} MB",
-    "formats": "支援格式",
-    "emptyFileMessage": "無法上傳空檔案",
-    "sizeLimitMessage": "檔案大小超過上限",
-    "unsupportedFormatMessage": "不支援此檔案格式",
-    "countLimitMessage": "每次最多上傳 {count} 個檔案",
-    "networkErrorMessage": "網路連線失敗",
-    "uploadInProgressMessage": "檔案正在上傳，請稍候",
-    "noSuccessfulFilesMessage": "沒有成功上傳的檔案，請重新上傳",
-    "status": {
-      "completed": "已完成",
-      "uploading": "上傳中",
-      "failed": "失敗",
-      "allSucceeded": "全部成功"
-    }
   },
   "actions": {
     "manage": "管理",
@@ -60,15 +44,22 @@
     "delete": "刪除",
     "cancel": "取消",
     "retry": "重試",
+    "reset": "重設",
     "save": "儲存",
     "add": "新增",
     "previous": "上一步",
     "next": "下一步",
+    "expand": "展開",
+    "collapse": "收合",
     "uploadFiles": "上傳檔案",
     "create": "建立",
+    "quickCreate": "快速建立",
     "createFromImport": "匯入建立",
     "duplicate": "複製",
+    "import": "匯入",
     "export": "匯出",
+    "link": "關聯",
+    "unlink": "取消關聯",
     "batchSelect": "批次選取",
     "cancelSelection": "取消選取",
     "disable": "停用",
@@ -93,6 +84,8 @@
     "updateSuccess": "修改成功",
     "moveSuccess": "移動成功",
     "importSuccess": "匯入成功",
+    "linkSuccess": "關聯成功",
+    "unlinkSuccess": "取消關聯成功",
     "enableSuccess": "啟用成功",
     "disableSuccess": "停用成功",
     "exportFailed": "匯出失敗",
@@ -101,7 +94,9 @@
     "replaceSuccess": "取代成功",
     "submitSuccess": "提交成功",
     "taskSubmitted": "任務已提交",
-    "operationSuccess": "操作成功"
+    "operationSuccess": "操作成功",
+    "audioPlaybackFailed": "無法播放，請檢查音訊格式或檔案網址",
+    "videoPlaybackFailed": "無法播放，請檢查影片格式或檔案網址"
   },
   "placeholders": {
     "input": "請輸入",
@@ -113,11 +108,13 @@
     "inputRequired": "請輸入",
     "inputFieldRequired": "請輸入 {label}",
     "selectRequired": "請選擇",
-    "selectFieldRequired": "請選擇 {label}"
+    "selectFieldRequired": "請選擇 {label}",
+    "jsonFormat": "請輸入正確的 JSON 格式"
   },
   "empty": {
     "default": "暫無資料",
     "search": "沒有找到相關內容",
-    "noDetails": "暫無詳細說明"
+    "noDetails": "暫無詳細說明",
+    "noMore": "沒有更多了"
   }
 }

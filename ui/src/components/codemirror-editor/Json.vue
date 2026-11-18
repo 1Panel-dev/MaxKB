@@ -5,8 +5,11 @@ import { linter } from '@codemirror/lint'
 import { DocumentChecked } from '@element-plus/icons-vue'
 import { useFormItem } from 'element-plus'
 import { Codemirror } from 'vue-codemirror'
+import { useI18n } from 'vue-i18n'
 
 defineOptions({ name: 'JsonInput', inheritAttrs: false })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const modelValue = defineModel<unknown>({ required: true })
 const props = withDefaults(defineProps<{ title?: string; validateEvent?: boolean }>(), { title: 'JSON', validateEvent: true })
@@ -94,7 +97,7 @@ function validateRules(_rule: unknown, _value: unknown, callback: (error?: Error
     JSON.parse(editorContent.value)
     callback()
   } catch {
-    callback(new Error('请输入正确的 JSON 格式'))
+    callback(new Error(t('common.validation.jsonFormat')))
   }
 }
 
@@ -127,8 +130,10 @@ defineExpose({ format, validateRules })
     </div>
 
     <template #footer>
-      <el-button plain @click="closeEditorDialog">取消</el-button>
-      <el-button type="primary" @click="submitEditorDialog">确定</el-button>
+      <!-- 取消 JSON 编辑 -->
+      <el-button plain @click="closeEditorDialog">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 确认 JSON 编辑 -->
+      <el-button type="primary" @click="submitEditorDialog">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>
