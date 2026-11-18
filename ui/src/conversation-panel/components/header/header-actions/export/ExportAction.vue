@@ -38,7 +38,8 @@ async function previewPdf() {
     const { captureMessages } = await import('./capture.ts')
     const canvas = await captureMessages(element)
     if (!disposed) previewRef.value?.open(canvas, name)
-  } catch {
+  } catch (error) {
+    console.error('[conversation-export] 导出预览失败', error)
     if (!disposed) MsgError('导出预览失败，请等待内容加载完成后重试')
   } finally {
     loading.value = false

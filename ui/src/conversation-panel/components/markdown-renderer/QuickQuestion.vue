@@ -9,7 +9,7 @@ defineProps<{
 
 <template>
   <!-- 发送快捷问题 -->
-  <el-button size="large" class="mt-2 rounded-xl!" plain @click="sendMessage?.(question)">
+  <el-button size="large" class="mk-conversation-export-include mt-2 rounded-xl!" plain @click="sendMessage?.(question)">
     {{ question }}
   </el-button>
 </template>
