@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, LoginMethod, OptionItem, SystemUser } from '@/api/types'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
 import UserManageApi from '@/api/admin/system/user-manage'
@@ -15,6 +16,7 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission/index.ts'
 
+const { t } = useI18n({ useScope: 'global' })
 const { auth, user } = useStore()
 
 /* 添加编辑用户表单drawer */
@@ -31,16 +33,20 @@ const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const systemUsersData = ref<SystemUser[]>([])
 const orderBy = ref<string>()
 
-const searchFields: OptionItem<string>[] = [
-  { label: '姓名', value: 'nick_name' },
-  { label: '用户名', value: 'username' },
-  { label: '邮箱', value: 'email' },
-]
+const searchFields = computed<OptionItem<string>[]>(() => [
+  { label: t('system.user.name.label'), value: 'nick_name' },
+  { label: t('system.user.username.label'), value: 'username' },
+  { label: t('system.user.email.label'), value: 'email' },
+])
 const systemUserSearchQuery = ref<Dict<unknown>>()
-const sourceFilterOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
-  label: value === LOGIN_METHOD.LOCAL ? '系统用户' : label,
-  value,
+const userSourceLabels = computed<Record<LoginMethod, string>>(() => ({
+  ...LOGIN_METHOD_LABELS,
+  [LOGIN_METHOD.LOCAL]: t('system.user.source.local'),
+  [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
+  [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
+  [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
 }))
+const sourceFilterOptions = computed<OptionItem<string>[]>(() => Object.entries(userSourceLabels.value).map(([value, label]) => ({ label, value })))
 const selectedStatus = ref<boolean | null>(null)
 const selectedSource = ref<string | null>(null)
 
@@ -91,7 +97,7 @@ function handleChangeStatus(systemUser: SystemUser) {
 
   return UserManageApi.putUser(systemUser.id, { is_active: nextActive })
     .then(() => {
-      MsgSuccess(nextActive ? '启用成功' : '禁用成功')
+      MsgSuccess(t(nextActive ? 'common.messages.enableSuccess' : 'common.messages.disableSuccess'))
       return true
     })
     .catch(() => false)
@@ -99,11 +105,11 @@ function handleChangeStatus(systemUser: SystemUser) {
 
 /* 删除用户*/
 function deleteUser(user: SystemUser) {
-  MsgConfirm(`确定删除用户“${user.username}”吗？`, '删除用户，该用户创建的资源（智能体、知识库、模型）不会删除，请谨慎操作。')
+  MsgConfirm(`${t('system.user.delete.title')}: ${user.username}?`, t('system.user.delete.description'))
     .then(() => {
       systemUsersLoading.value = true
       return UserManageApi.deleteUser(user.id).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         return loadSystemUsers()
       })
     })
@@ -120,12 +126,12 @@ function handleBatchSelectionChange(selection: unknown[]) {
 }
 function handleBatchDelete() {
   const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
-  MsgConfirm(`是否删除选中的 ${batchSelectedUsers.value.length} 个用户？`)
+  MsgConfirm(`${t('system.user.delete.batchTitle', { count: batchSelectedUsers.value.length }, batchSelectedUsers.value.length)}?`)
     .then(() => {
       systemUsersLoading.value = true
 
       return UserManageApi.postBatchDeleteUsers(selectedUserIds).then(async () => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         await loadSystemUsers()
         userTableRef.value?.clearSelection()
       })
@@ -141,7 +147,7 @@ onMounted(() => loadSystemUsers())
 </script>
 
 <template>
-  <MkViewLayout class="system-identity-users">
+  <MkViewLayout :title="t('system.user.title')" class="system-identity-users">
     <template #default="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -155,7 +161,7 @@ onMounted(() => loadSystemUsers())
           <!-- 创建用户 -->
           <el-button v-if="perm.system.user.create()" type="primary" @click="handleOpenUserFormDrawer()">
             <MkIcon name="icon_add_outlined" />
-            <span>创建用户</span>
+            <span>{{ t('system.user.createTitle') }}</span>
           </el-button>
         </div>
       </component>
@@ -171,17 +177,17 @@ onMounted(() => loadSystemUsers())
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="40" />
-        <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="username" label="用户名" min-width="150" show-overflow-tooltip />
-        <el-table-column width="140" label="启用状态">
+        <el-table-column prop="nick_name" :label="t('system.user.name.label')" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="username" :label="t('system.user.username.label')" min-width="150" show-overflow-tooltip />
+        <el-table-column width="140" :label="t('system.user.activeStatus')">
           <template #header>
             <MkTableFilter
               mode="single"
               v-model="selectedStatus"
-              label="启用状态"
+              :label="t('system.user.activeStatus')"
               :options="[
-                { label: '已启用', value: true },
-                { label: '已禁用', value: false },
+                { label: t('common.status.enabled'), value: true },
+                { label: t('common.status.disabled'), value: false },
               ]"
               @change="handleHeaderFilterChange"
             />
@@ -191,25 +197,25 @@ onMounted(() => loadSystemUsers())
           </template>
         </el-table-column>
 
-        <el-table-column prop="email" label="邮箱" show-overflow-tooltip min-width="180">
+        <el-table-column prop="email" :label="t('system.user.email.label')" show-overflow-tooltip min-width="180">
           <template #default="{ row }">
             {{ row.email || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="phone" width="120" label="手机号">
+        <el-table-column prop="phone" width="120" :label="t('system.user.phone.label')">
           <template #default="{ row }">
             {{ row.phone || '-' }}
           </template>
         </el-table-column>
 
-        <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" label="角色">
+        <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" :label="t('system.user.role.label')">
           <template #default="{ row }">
             <span v-if="!row.role_workspace?.length">-</span>
             <WorkspaceRelationTags
               v-else
               :columns="[
-                { prop: 'role_name', label: '角色' },
-                { prop: 'workspace', label: '工作空间' },
+                { prop: 'role_name', label: t('system.user.role.label') },
+                { prop: 'workspace', label: t('workspace.title') },
               ]"
               :tags="row.role_name"
               :data="row.role_workspace"
@@ -217,14 +223,14 @@ onMounted(() => loadSystemUsers())
           </template>
         </el-table-column>
 
-        <el-table-column prop="user_group_names" width="180" label="用户组">
+        <el-table-column prop="user_group_names" width="180" :label="t('system.user.userGroup.label')">
           <template #default="{ row }">
             <span v-if="!row.user_group_names?.length">-</span>
             <WorkspaceRelationTags
               v-else
               :columns="[
-                { prop: 'user_group_names', label: '用户组' },
-                { prop: 'workspace', label: '工作空间' },
+                { prop: 'user_group_names', label: t('system.user.userGroup.label') },
+                { prop: 'workspace', label: t('workspace.title') },
               ]"
               :tags="row.user_group_names"
               :data="row.user_group_workspace ?? []"
@@ -232,27 +238,27 @@ onMounted(() => loadSystemUsers())
           </template>
         </el-table-column>
 
-        <el-table-column width="120" label="用户来源">
+        <el-table-column width="120" :label="t('system.user.source.label')">
           <template #header>
             <MkTableFilter
               mode="single"
               v-model="selectedSource"
-              label="用户来源"
+              :label="t('system.user.source.label')"
               :options="sourceFilterOptions"
               @change="handleHeaderFilterChange"
             />
           </template>
           <template #default="{ row }">
-            {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
+            {{ userSourceLabels[row.source as LoginMethod] ?? row.source }}
           </template>
         </el-table-column>
 
-        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
+        <el-table-column prop="create_time" :label="t('common.labels.createTime')" width="180" sortable>
           <template #default="{ row }">
             {{ datetimeFormat(row.create_time) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="160" fixed="right">
+        <el-table-column :label="t('common.labels.operation')" width="160" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 修改状态 -->
@@ -266,7 +272,7 @@ onMounted(() => loadSystemUsers())
 
               <div class="flex">
                 <!-- 编辑 -->
-                <MkTooltip content="编辑" placement="top" v-if="perm.system.user.edit()">
+                <MkTooltip :content="t('common.actions.edit')" placement="top" v-if="perm.system.user.edit()">
                   <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
@@ -274,7 +280,7 @@ onMounted(() => loadSystemUsers())
                 <!-- 修改用户密码 -->
                 <ButtonChangeUserPassword v-if="perm.system.user.edit()" :user="row" @refresh="loadSystemUsers(false)" />
                 <!-- 删除 -->
-                <MkTooltip content="删除" placement="top" v-if="perm.system.user.delete()">
+                <MkTooltip :content="t('common.actions.delete')" placement="top" v-if="perm.system.user.delete()">
                   <el-button type="primary" :disabled="row.id === user.userInfo?.id" text @click.stop="deleteUser(row)">
                     <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>
@@ -292,7 +298,7 @@ onMounted(() => loadSystemUsers())
             @refresh="loadSystemUsers(false)"
           />
           <!-- 批量删除 -->
-          <el-button v-if="perm.system.user.delete()" type="danger" plain @click="handleBatchDelete">删除</el-button>
+          <el-button v-if="perm.system.user.delete()" type="danger" plain @click="handleBatchDelete">{{ t('common.actions.delete') }}</el-button>
         </template>
       </MkTable>
     </template>

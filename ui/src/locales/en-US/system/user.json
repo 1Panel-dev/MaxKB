@@ -1,0 +1,61 @@
+{
+  "user": {
+    "title": "User management",
+    "createTitle": "Create user",
+    "editTitle": "Edit user",
+    "username": {
+      "label": "Username",
+      "placeholder": "Enter a username",
+      "requiredMessage": "Enter a username"
+    },
+    "name": {
+      "label": "Name",
+      "placeholder": "Enter a name",
+      "requiredMessage": "Enter a name"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "Enter an email address",
+      "requiredMessage": "Enter an email address",
+      "invalidMessage": "Enter a valid email address"
+    },
+    "phone": {
+      "label": "Phone number",
+      "placeholder": "Enter a phone number",
+      "invalidMessage": "Enter a valid phone number"
+    },
+    "password": {
+      "defaultLabel": "Default password",
+      "changeTitle": "Change user password"
+    },
+    "role": {
+      "label": "Role",
+      "placeholder": "Select a role",
+      "requiredMessage": "Select a role",
+      "settingsTitle": "Role settings",
+      "add": "Add role",
+      "set": "Set roles"
+    },
+    "workspace": {
+      "placeholder": "Select a workspace",
+      "requiredMessage": "Select a workspace"
+    },
+    "userGroup": {
+      "label": "User group",
+      "placeholder": "Select a user group"
+    },
+    "activeStatus": "Enabled status",
+    "source": {
+      "label": "User source",
+      "local": "System user"
+    },
+    "import": {
+      "title": "Import users"
+    },
+    "delete": {
+      "title": "Delete user",
+      "batchTitle": "Delete the {count} selected user | Delete the {count} selected users",
+      "description": "Deleting this user will not delete the resources they created (agents, knowledge, and models). Proceed with caution."
+    }
+  }
+}

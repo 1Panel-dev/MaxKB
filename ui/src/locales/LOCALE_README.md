@@ -199,6 +199,17 @@ MCP、资源授权、关联资源和模板中心入口复用 `resource`，触发
 Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传、导入和设置共用的分段规则、图片处理与索引增强文案归 `knowledge.documentStrategy`。
 分段标识的文字选项归 `knowledge.documentStrategy.splitPatterns`，在 `knowledge/settings.json` 中维护。文档策略表单与工作流分段节点在展示时翻译 `DOCUMENT_SPLIT_PATTERN_OPTIONS` 的 `labelKey`；纯符号、Agent 参数识别用的 `label` 及正则 `value` 保留原值。
 
+## 系统管理
+
+`system/` 按业务分文件，用户管理使用 `system/user.json` 中的 `user` 分组，引用为 `system.user`。
+菜单与列表共用 `system.user.title`；创建／编辑标题、用户字段、角色分配、用户组选择和删除确认归该分组，
+字段的 label、placeholder 和 requiredMessage 同级维护，不再叠加 fields，翻译 key 保持最多四层。
+通用操作、状态、创建时间和结果提示复用 `common`，字符长度范围复用 `common.validation.lengthRange`，工作空间标签复用 `workspace.title`。
+用户来源复用登录方式常量的协议值及固定英文名称，本地来源使用 `system.user.source.local`，钉钉、飞书和企业微信名称复用 `auth.login.options`；
+页面在 computed 中调用 `t` 生成标签，筛选和表格使用同一组文案，不改写共享常量。未知来源及接口返回的角色、工作空间和用户组名称保留原文。
+用户表单规则在 computed 中翻译，使用 `validate-on-rule-change=false`；语言切换不重置表单、不重新请求选项、不主动触发校验。
+导入入口归 `system.user.import`，默认密码与改密入口归 `system.user.password`，角色设置入口归 `system.user.role`。
+
 ## 知识库详情
 
 `knowledge/index.json` 维护列表、知识库类型、创建、共用文案及尚未独立分文件的业务文案。仅有菜单名称、尚未形成独立业务分组的功能集中在 `knowledge.menu`，按菜单显示顺序排列，使用 `knowledge.menu.<名称>`。

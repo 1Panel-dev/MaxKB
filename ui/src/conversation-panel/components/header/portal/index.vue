@@ -44,9 +44,11 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
         </div>
       </el-tag>
     </div>
+
     <!-- 新建对话 -->
+
     <MkTooltip content="新建对话" v-if="!list.leftSideOpen.value">
-      <el-button text @click="handleNewConversation">
+      <el-button text @click="handleNewConversation" class="mr-1">
         <MkIcon name="icon_new-chat_outlined" :size="18" class="text-N900!" />
       </el-button>
     </MkTooltip>

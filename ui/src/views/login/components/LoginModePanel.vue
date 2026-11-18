@@ -57,8 +57,8 @@ const showLoginModeSwitch = computed(() => accountLoginMethods.value.length > 0 
   overflow: hidden;
   padding: 0;
   position: absolute;
-  right: 0;
-  top: 0;
+  right: 4px;
+  top: 4px;
   width: 70px;
   z-index: 1;
   .el-icon {

@@ -430,6 +430,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `display="button"` 显式选择菜单项或带 Tooltip 的图标按钮，不注入或推断展示上下文。
 接收 `label`、SVG Symbol 名称 `icon`、`disabled`、`divided`，发出 `click` 并阻止点击冒泡。
 `divided` 仅用于菜单模式。页面自行组合外露操作与 `MkTableMoreDropdown`，不自动分配位置。
+`type` 沿用 Element Plus Button 类型，仅用于按钮模式，默认 `primary`；传入空字符串使用默认按钮配色。
 
 ### MkTagGroup
 

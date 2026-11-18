@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import JSEncrypt from 'jsencrypt'
+import { useI18n } from 'vue-i18n'
 import type { ListItem, SystemUser, SystemUserPayload, SystemUserRoleAssignment } from '@/api/types/index.ts'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ROLE_TYPE } from '@/api/enums'
@@ -14,6 +15,7 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'UserFromDrawer' })
 
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 
 const emit = defineEmits<{
@@ -34,24 +36,24 @@ const userForm = reactive<SystemUserPayload>({
   user_group_ids: [],
 })
 
-const drawerTitle = computed(() => (isEdit.value ? '编辑用户' : '创建用户'))
-const submitText = computed(() => (isEdit.value ? '保存' : '创建'))
+const drawerTitle = computed(() => t(isEdit.value ? 'system.user.editTitle' : 'system.user.createTitle'))
+const submitText = computed(() => t(isEdit.value ? 'common.actions.save' : 'common.actions.create'))
 
-const userFormRules = reactive<FormRules<SystemUserPayload>>({
+const userFormRules = computed<FormRules<SystemUserPayload>>(() => ({
   username: [
-    { whitespace: true, required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 4, max: 64, message: '长度应为 4-64 个字符', trigger: 'blur' },
+    { whitespace: true, required: true, message: t('system.user.username.requiredMessage'), trigger: 'blur' },
+    { min: 4, max: 64, message: t('common.validation.lengthRange', { min: 4, max: 64 }), trigger: 'blur' },
   ],
   nick_name: [
-    { whitespace: true, required: true, message: '请输入姓名', trigger: 'blur' },
-    { min: 1, max: 64, message: '长度应为 1-64 个字符', trigger: 'blur' },
+    { whitespace: true, required: true, message: t('system.user.name.requiredMessage'), trigger: 'blur' },
+    { min: 1, max: 64, message: t('common.validation.lengthRange', { min: 1, max: 64 }), trigger: 'blur' },
   ],
   email: [
-    { whitespace: true, required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱', trigger: 'blur' },
+    { whitespace: true, required: true, message: t('system.user.email.requiredMessage'), trigger: 'blur' },
+    { type: 'email', message: t('system.user.email.invalidMessage'), trigger: 'blur' },
   ],
-  phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
-})
+  phone: [{ pattern: /^1[3-9]\d{9}$/, message: t('system.user.phone.invalidMessage'), trigger: 'blur' }],
+}))
 
 // 角色与工作空间选项
 const roleSettingOptionsLoading = ref(false)
@@ -129,7 +131,7 @@ async function submitUser() {
       if (isEdit.value) {
         UserManageApi.putUser(userForm.id as string, userForm)
           .then(() => {
-            MsgSuccess('编辑成功')
+            MsgSuccess(t('common.messages.saveSuccess'))
             emit('refresh', false)
             drawerVisible.value = false
           })
@@ -142,7 +144,7 @@ async function submitUser() {
         const encryptedPassword = encryptor.encrypt(userForm.password as string)
         UserManageApi.postUser({ ...userForm, encrypted: true, password: encryptedPassword as string })
           .then(() => {
-            MsgSuccess('创建成功')
+            MsgSuccess(t('common.messages.createSuccess'))
             emit('refresh', true)
             drawerVisible.value = false
           })
@@ -210,31 +212,40 @@ defineExpose({ open })
       ref="userFormRef"
       :model="userForm"
       :rules="userFormRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent="submitUser"
     >
       <section>
-        <h4 class="mk-title-decoration mb-4">基本信息</h4>
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="userForm.username" :disabled="isEdit" maxlength="64" minlength="4" placeholder="请输入用户名" show-word-limit />
+        <h4 class="mk-title-decoration mb-4">{{ t('common.labels.basicInfo') }}</h4>
+        <el-form-item :label="t('system.user.username.label')" prop="username">
+          <el-input
+            v-model="userForm.username"
+            :disabled="isEdit"
+            maxlength="64"
+            minlength="4"
+            :placeholder="t('system.user.username.placeholder')"
+            show-word-limit
+          />
         </el-form-item>
-        <el-form-item label="姓名" prop="nick_name">
-          <el-input v-model="userForm.nick_name" maxlength="64" placeholder="请输入姓名" show-word-limit />
+        <el-form-item :label="t('system.user.name.label')" prop="nick_name">
+          <el-input v-model="userForm.nick_name" maxlength="64" :placeholder="t('system.user.name.placeholder')" show-word-limit />
         </el-form-item>
 
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="userForm.email" type="email" placeholder="请输入邮箱" />
+        <el-form-item :label="t('system.user.email.label')" prop="email">
+          <el-input v-model="userForm.email" type="email" :placeholder="t('system.user.email.placeholder')" />
         </el-form-item>
 
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="userForm.phone" maxlength="11" placeholder="请输入手机号" />
+        <el-form-item :label="t('system.user.phone.label')" prop="phone">
+          <el-input v-model="userForm.phone" maxlength="11" :placeholder="t('system.user.phone.placeholder')" />
         </el-form-item>
 
-        <el-form-item v-if="!isEdit" label="默认密码">
+        <el-form-item v-if="!isEdit" :label="t('system.user.password.defaultLabel')">
           <el-input v-model="userForm.password" readonly>
             <template #suffix>
-              <el-button text @click="copyText(userForm.password)" class="-mr-1">
+              <!-- 复制默认密码 -->
+              <el-button text @click="copyText(userForm.password, t('common.messages.copied'))" class="-mr-1">
                 <MkIcon name="icon_copy_outlined" />
               </el-button>
             </template>
@@ -242,18 +253,18 @@ defineExpose({ open })
         </el-form-item>
       </section>
       <section v-if="auth.isEE || auth.isPE">
-        <h4 class="mk-title-decoration mb-4 mt-4">角色设置</h4>
-        <MkFormList v-model="userForm.role_setting" add-text="添加角色" :default-item="{ role_id: '', workspace_ids: [] }">
+        <h4 class="mk-title-decoration mb-4 mt-4">{{ t('system.user.role.settingsTitle') }}</h4>
+        <MkFormList v-model="userForm.role_setting" :add-text="t('system.user.role.add')" :default-item="{ role_id: '', workspace_ids: [] }">
           <template #default="{ index, item: roleAssignment }">
             <el-form-item
               class="flex-1 small"
-              :label="index === 0 ? '角色' : ''"
+              :label="index === 0 ? t('system.user.role.label') : ''"
               :prop="`role_setting.${index}.role_id`"
-              :rules="{ required: true, message: '请选择角色', trigger: 'change' }"
+              :rules="{ required: true, message: t('system.user.role.requiredMessage'), trigger: 'change' }"
             >
               <el-select
                 v-model="roleAssignment.role_id"
-                placeholder="请选择角色"
+                :placeholder="t('system.user.role.placeholder')"
                 :loading="roleSettingOptionsLoading"
                 clearable
                 filterable
@@ -274,15 +285,17 @@ defineExpose({ open })
             <el-form-item
               v-if="auth.isEE"
               class="flex-1 small"
-              :label="index === 0 ? '工作空间' : ''"
+              :label="index === 0 ? t('workspace.title') : ''"
               :prop="`role_setting.${index}.workspace_ids`"
               :rules="
-                isAdminRole(roleAssignment.role_id) ? [] : { required: true, type: 'array', min: 1, message: '请选择工作空间', trigger: 'change' }
+                isAdminRole(roleAssignment.role_id)
+                  ? []
+                  : { required: true, type: 'array', min: 1, message: t('system.user.workspace.requiredMessage'), trigger: 'change' }
               "
             >
               <el-select
                 v-model="roleAssignment.workspace_ids"
-                :placeholder="isAdminRole(roleAssignment.role_id) ? '' : '请选择工作空间'"
+                :placeholder="isAdminRole(roleAssignment.role_id) ? '' : t('system.user.workspace.placeholder')"
                 :loading="roleSettingOptionsLoading"
                 :disabled="isAdminRole(roleAssignment.role_id)"
                 :validate-event="!isAdminRole(roleAssignment.role_id)"
@@ -307,13 +320,15 @@ defineExpose({ open })
         </MkFormList>
       </section>
       <section v-if="showUserGroup">
-        <h4 class="mk-title-decoration mb-4 mt-4">用户组</h4>
+        <h4 class="mk-title-decoration mb-4 mt-4">{{ t('system.user.userGroup.label') }}</h4>
         <UserGroupSetting v-model="userForm.user_group_ids" :workspace-ids="selectedWorkspaceIds" :workspace-options="workspaceOptions" />
       </section>
     </el-form>
 
     <template #footer>
-      <el-button plain @click="drawerVisible = false">取消</el-button>
+      <!-- 取消用户编辑 -->
+      <el-button plain @click="drawerVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存用户 -->
       <el-button :loading="userSubmitting" type="primary" @click="submitUser">
         {{ submitText }}
       </el-button>
