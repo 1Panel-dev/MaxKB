@@ -224,6 +224,7 @@ class LLMNode(INode):
 
         system = self.workflow_manage.generate_prompt(node_params.get("system") or "")
         if system:
+            self.data["system"] = system
             # 上下文首条已是 system 时合并为一条,避免出现多条 system(部分模型要求 system 唯一)
             if messages and isinstance(messages[0], SystemMessage):
                 existing = messages[0].content if isinstance(messages[0].content, str) else ""
@@ -233,6 +234,7 @@ class LLMNode(INode):
 
         prompt = self.workflow_manage.generate_prompt(node_params.get("prompt") or "")
         if prompt:
+            self.data["prompt"] = prompt
             messages.append(HumanMessage(prompt))
         return messages
 
@@ -390,8 +392,8 @@ class LLMNode(INode):
                 "message_tokens": self.data.get("message_tokens"),
                 "answer_tokens": self.data.get("answer_tokens"),
                 "messages": aggregation.get_contents(),
-                "system": self.get_parameters().get("system"),
-                "prompt": self.get_parameters().get("prompt"),
+                "system": self.data.get("system"),
+                "prompt": self.data.get("prompt"),
             }
         )
         return details
