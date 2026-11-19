@@ -1,9 +1,12 @@
 {
+  "byGroup": "By user group",
+  "byUser": "By user",
+  "autoAuthorization": "Auto authorization",
+  "authorized": "Authorized",
+  "authorize": "Authorize",
   "resource": {
     "title": "Resource authorization",
     "permissionTitle": "Resource permission configuration",
-    "byGroup": "By user group",
-    "byUser": "By user",
     "scope": {
       "label": "Resource scope",
       "current": "Current resource only",
@@ -31,19 +34,10 @@
     }
   },
   "workspace": {
-    "title": "Authorize workspaces"
-  },
-  "chatUser": {
-    "title": "Chat users",
-    "byGroup": "By user group",
-    "name": "Name",
-    "username": "Username",
-    "source": {
-      "label": "User source",
-      "local": "Created locally"
-    },
-    "autoAuthorization": "Auto authorization",
-    "authorized": "Authorized",
-    "authorize": "Authorize"
+    "title": "Authorize workspaces",
+    "description": "Authorized workspaces can use this resource.",
+    "select": "Select workspaces",
+    "whiteList": "Whitelist",
+    "blackList": "Blacklist"
   }
 }

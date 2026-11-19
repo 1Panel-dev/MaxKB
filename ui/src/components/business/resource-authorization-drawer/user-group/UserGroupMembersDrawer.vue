@@ -87,7 +87,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="drawerVisible" :title="currentGroup?.name" @closed="resetData">
+  <MkDrawer :size="920" v-model="drawerVisible" :title="currentGroup?.name" @closed="resetData">
     <template #header>
       <div class="flex-align-center min-w-0 gap-2">
         <h4 class="min-w-0 truncate" :title="currentGroup?.name">{{ currentGroup?.name }}</h4>

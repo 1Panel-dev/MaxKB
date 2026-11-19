@@ -1,9 +1,12 @@
 {
+  "byGroup": "按用户组",
+  "byUser": "按用户",
+  "autoAuthorization": "自动授权",
+  "authorized": "已授权",
+  "authorize": "授权",
   "resource": {
     "title": "资源授权",
     "permissionTitle": "资源权限配置",
-    "byGroup": "按用户组",
-    "byUser": "按用户",
     "scope": {
       "label": "生效资源",
       "current": "仅当前资源",
@@ -31,19 +34,10 @@
     }
   },
   "workspace": {
-    "title": "授权工作空间"
-  },
-  "chatUser": {
-    "title": "对话用户",
-    "byGroup": "按用户组",
-    "name": "姓名",
-    "username": "用户名",
-    "source": {
-      "label": "用户来源",
-      "local": "本地创建"
-    },
-    "autoAuthorization": "自动授权",
-    "authorized": "已授权",
-    "authorize": "授权"
+    "title": "授权工作空间",
+    "description": "被授权的工作空间，可使用当前资源",
+    "select": "选择工作空间",
+    "whiteList": "白名单",
+    "blackList": "黑名单"
   }
 }

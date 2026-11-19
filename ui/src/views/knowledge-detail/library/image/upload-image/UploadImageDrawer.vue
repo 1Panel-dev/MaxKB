@@ -14,7 +14,7 @@ import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_EXTENSIONS } from '@/constants/
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'UploadImageDrawer' })
-const { locale, t } = useI18n({ useScope: 'global' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['image']
   knowledgeId: string
@@ -168,7 +168,7 @@ defineExpose({ open })
             :accept="KNOWLEDGE_IMAGE_ACCEPT"
             :limit="countLimit"
             :size-limit="sizeLimit"
-            :tip-text="`${t('upload.formats')}: ${KNOWLEDGE_IMAGE_EXTENSIONS.join(locale === 'en-US' ? ', ' : '、')}`"
+            :tip-text="`${t('upload.formats')}: ${KNOWLEDGE_IMAGE_EXTENSIONS.join('、')}`"
           />
         </section>
         <section v-if="processingMounted" v-show="activeStep === 1 && !previewVisible">

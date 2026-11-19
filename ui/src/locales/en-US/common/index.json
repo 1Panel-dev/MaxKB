@@ -106,6 +106,7 @@
     "relate": "Relate",
     "unrelate": "Unrelate",
     "batchSelect": "Select multiple",
+    "selectAll": "Select all",
     "cancelSelection": "Cancel selection",
     "enable": "Enable",
     "disable": "Disable",

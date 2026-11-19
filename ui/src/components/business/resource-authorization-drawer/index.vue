@@ -160,12 +160,12 @@ defineExpose({ open })
     :title="t('authorization.resource.title')"
     class="mk-drawer-with-tabs"
     contentClass="pt-0"
-    :size="920"
+    :size="900"
     @closed="handleClosed"
   >
     <el-tabs v-model="targetType" :before-leave="() => !submitting">
-      <el-tab-pane :label="t('authorization.resource.byGroup')" name="user-group" />
-      <el-tab-pane :label="t('authorization.resource.byUser')" name="user" />
+      <el-tab-pane :label="t('authorization.byGroup')" name="user-group" />
+      <el-tab-pane :label="t('authorization.byUser')" name="user" />
     </el-tabs>
     <div class="mt-6">
       <UserGroupAuthorization

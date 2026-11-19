@@ -220,8 +220,8 @@ const canEditResourcePermission = computed(() => resourceEditPermissions[resourc
     <template #aside="{ Header }">
       <component :is="Header">
         <el-tabs class="w-full" v-model="targetType" @tab-change="handleTargetTypeChange">
-          <el-tab-pane :label="t('authorization.resource.byGroup')" name="user-group" />
-          <el-tab-pane :label="t('authorization.resource.byUser')" name="user" />
+          <el-tab-pane :label="t('authorization.byGroup')" name="user-group" />
+          <el-tab-pane :label="t('authorization.byUser')" name="user" />
         </el-tabs>
       </component>
 

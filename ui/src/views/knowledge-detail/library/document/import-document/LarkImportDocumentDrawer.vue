@@ -9,7 +9,7 @@ import { getFileIconUrl } from '@/utils/icon'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'LarkImportDocumentDrawer' })
-const { locale, t } = useI18n({ useScope: 'global' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -150,7 +150,7 @@ defineExpose({ open })
         <el-alert type="primary" show-icon :closable="false" class="mb-4!">
           <template #icon><MkIcon name="icon_info_filled" /></template>
           <ol class="list-inside list-decimal space-y-1">
-            <li>{{ t('knowledge.document.import.larkFormatsHint', { formats: larkDocumentFormats.join(locale === 'en-US' ? ', ' : '、') }) }}</li>
+            <li>{{ t('knowledge.document.import.larkFormatsHint', { formats: larkDocumentFormats.join('、') }) }}</li>
             <li>{{ t('knowledge.document.import.delimiterHint') }}</li>
           </ol>
         </el-alert>
