@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ModelProviderItem } from '@/api/types'
 import ProviderApi from '@/api/admin/model-provider'
-import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
+import { MODEL_TYPE_LABELS } from '@/constants/model'
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -79,7 +79,7 @@ defineExpose({ open })
         <h4>{{ t('model.create.selectProvider') }}</h4>
         <el-select v-model="modelType" class="w-45!" @change="handleModelTypeChange">
           <el-option :label="t('model.categories.all')" value="all" />
-          <el-option v-for="(key, value) in MODEL_TYPE_MESSAGE_KEYS" :key="value" :label="t(key)" :value="value" />
+          <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
         </el-select>
       </div>
       <div v-loading="loading">

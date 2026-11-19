@@ -1,0 +1,59 @@
+{
+  "menu": {
+    "aiCapabilities": "AI 能力",
+    "businessLogic": "业务逻辑",
+    "dataProcessing": "数据处理",
+    "other": "其他",
+    "searchPlaceholder": "按名称搜索"
+  },
+  "model": {
+    "label": "AI 模型",
+    "placeholder": "请选择 AI 模型",
+    "requiredMessage": "请选择 AI 模型"
+  },
+  "defaultModel": {
+    "label": "默认模型",
+    "custom": "自定义",
+    "unconfigured": "未配置默认模型",
+    "requiredMessage": "请配置默认模型",
+    "sttRequiredMessage": "请在默认模型设置中选择语音识别模型",
+    "ttsRequiredMessage": "请在默认模型设置中选择语音合成模型"
+  },
+  "systemPrompt": {
+    "label": "系统提示词",
+    "description": "设定模型扮演的角色或遵循的指令"
+  },
+  "userPrompt": {
+    "label": "用户提示词",
+    "description": "用户向模型提出的问题或输入的指令",
+    "requiredMessage": "请输入用户提示词"
+  },
+  "promptGeneration": {
+    "title": "生成提示词",
+    "placeholder": "请输入提示词主题",
+    "empty": "提示词显示在这里"
+  },
+  "history": {
+    "label": "历史聊天记录"
+  },
+  "thinking": {
+    "label": "输出思考",
+    "description": "请根据模型返回的思考标签设置，标签中间的内容将会认定为思考过程",
+    "start": "开始",
+    "end": "结束"
+  },
+  "skills": {
+    "outputExecution": "输出执行过程"
+  },
+  "dataSource": {
+    "label": "数据源",
+    "selectTitle": "选择数据源",
+    "typeLabel": "数据源类型",
+    "documentsUnavailableMessage": "当前知识库不支持数据源文件查询"
+  },
+  "executionResult": {
+    "title": "执行结果",
+    "success": "执行成功",
+    "failure": "执行失败"
+  }
+}

@@ -86,10 +86,9 @@ const errorMessage = computed(() => {
     return fieldProps.value.err_msg
   }
   const label = isString(props.formField.label) ? props.formField.label : props.formField.label?.label
-  const messageKey = isSelectionFieldType(props.formField.input_type)
-    ? 'common.validation.selectFieldRequired'
-    : 'common.validation.inputFieldRequired'
-  return t(messageKey, { label: label || props.formField.field })
+  return isSelectionFieldType(props.formField.input_type)
+    ? t('common.validation.selectFieldRequired', { label: label || props.formField.field })
+    : t('common.validation.inputFieldRequired', { label: label || props.formField.field })
 })
 
 const componentValidator: FormItemRule['validator'] = (rule, value, callback) => {

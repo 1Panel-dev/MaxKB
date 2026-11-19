@@ -6,7 +6,7 @@ import type { DynamicFormValue } from '../../type'
 import type { ModelItem } from '@/api/types'
 import SelectModel from '@/components/business/select-model/index.vue'
 import { getProviderOptions } from '../../items/model/provider-data'
-import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
+import { MODEL_TYPE_LABELS } from '@/constants/model'
 const { t } = useI18n({ useScope: 'global' })
 const providerOptions = computed(() => getProviderOptions(t('model.provider.local')))
 
@@ -197,7 +197,7 @@ defineExpose({ getData, render })
     :rules="[{ required: true, message: t('model.fields.type.requiredMessage') }]"
   >
     <el-select v-model="formValue.model_type" :placeholder="t('model.fields.type.placeholder')" @change="handleModelTypeChange">
-      <el-option v-for="(key, value) in MODEL_TYPE_MESSAGE_KEYS" :key="value" :label="t(key)" :value="value" />
+      <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
     </el-select>
   </el-form-item>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, nextTick, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, defineAsyncComponent, nextTick, onMounted, reactive, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type { FolderSort } from './types'
@@ -54,28 +54,21 @@ if (props.showAll && typeof routeFolderId === 'string' && routeFolderId) current
 
 const emit = defineEmits<{ loaded: [folder?: FolderItem]; select: [folder: FolderItem] }>()
 
-const folderEntryKeys = {
-  [RESOURCE_TYPE.APPLICATION]: { all: 'application.categories.all', shared: 'application.categories.shared' },
-  [RESOURCE_TYPE.KNOWLEDGE]: { all: 'knowledge.categories.all', shared: 'knowledge.categories.shared' },
-  [RESOURCE_TYPE.TOOL]: { all: 'tool.categories.all', shared: 'tool.categories.shared' },
-} as const satisfies Record<FolderSource, { all: string; shared: string }>
+const folderEntryLabels = reactive({
+  [RESOURCE_TYPE.APPLICATION]: { all: computed(() => t('application.categories.all')), shared: computed(() => t('application.categories.shared')) },
+  [RESOURCE_TYPE.KNOWLEDGE]: { all: computed(() => t('knowledge.categories.all')), shared: computed(() => t('knowledge.categories.shared')) },
+  [RESOURCE_TYPE.TOOL]: { all: computed(() => t('tool.categories.all')), shared: computed(() => t('tool.categories.shared')) },
+}) satisfies Record<FolderSource, { all: string; shared: string }>
 
-const folderEntries = computed(() => {
-  const keys = folderEntryKeys[props.source]
-  return {
-    all: {
-      id: FOLDER_ENTRY_ID.ALL,
-      get name() {
-        return props.rootLabel || t(keys.all)
-      },
-    },
-    shared: {
-      id: FOLDER_ENTRY_ID.SHARED,
-      get name() {
-        return t(keys.shared)
-      },
-    },
-  }
+const folderEntries = reactive({
+  all: {
+    id: computed(() => FOLDER_ENTRY_ID.ALL),
+    name: computed(() => props.rootLabel || folderEntryLabels[props.source].all),
+  },
+  shared: {
+    id: FOLDER_ENTRY_ID.SHARED,
+    name: computed(() => folderEntryLabels[props.source].shared),
+  },
 })
 
 interface SelectableFolderItem extends Omit<FolderItem, 'children'> {
@@ -115,13 +108,13 @@ const workspaceId = getWorkspaceId()
 const CUSTOM_FOLDER_SORT = `${user.userInfo?.id}-${workspaceId}-${props.source}-folder-custom-sort`
 const FOLDER_SORT_TYPE = `${user.userInfo?.id}-${workspaceId}-${props.source}-folder-sort-type`
 
-const sortOptions: { labelKey: string; value: FolderSort; divided?: boolean }[] = [
-  { labelKey: 'folder.sort.createdAtAsc', value: FOLDER_SORT.CREATE_TIME_ASC },
-  { labelKey: 'folder.sort.createdAtDesc', value: FOLDER_SORT.CREATE_TIME_DESC },
-  { labelKey: 'folder.sort.nameAsc', value: FOLDER_SORT.NAME_ASC, divided: true },
-  { labelKey: 'folder.sort.nameDesc', value: FOLDER_SORT.NAME_DESC },
-  { labelKey: 'folder.sort.custom', value: FOLDER_SORT.CUSTOM, divided: true },
-]
+const sortOptions: { label: string; value: FolderSort; divided?: boolean }[] = reactive([
+  { label: computed(() => t('folder.sort.createdAtAsc')), value: FOLDER_SORT.CREATE_TIME_ASC },
+  { label: computed(() => t('folder.sort.createdAtDesc')), value: FOLDER_SORT.CREATE_TIME_DESC },
+  { label: computed(() => t('folder.sort.nameAsc')), value: FOLDER_SORT.NAME_ASC, divided: true },
+  { label: computed(() => t('folder.sort.nameDesc')), value: FOLDER_SORT.NAME_DESC },
+  { label: computed(() => t('folder.sort.custom')), value: FOLDER_SORT.CUSTOM, divided: true },
+])
 
 const currentSort = ref<FolderSort>(FOLDER_SORT.CREATE_TIME_DESC)
 const currentSortIcon = computed(() => {
@@ -243,20 +236,20 @@ function handleFolderDrop(draggingFolder: FolderItem, targetFolder: FolderItem, 
 
 /* 文件夹表单 */
 const folderFormDialogRef = useTemplateRef<InstanceType<typeof FolderFormDialog>>('folderFormDialogRef')
-const formTitleKey = ref('folder.actions.create')
+const formAction = ref<'create' | 'createChild' | 'edit'>('create')
 
 function handleOpenCreateFolder() {
-  formTitleKey.value = 'folder.actions.create'
-  folderFormDialogRef.value?.open(workspaceId ?? folderEntries.value.all.id)
+  formAction.value = 'create'
+  folderFormDialogRef.value?.open(workspaceId ?? folderEntries.all.id)
 }
 
 function handleOpenCreateChildFolder(folder: FolderItem) {
-  formTitleKey.value = 'folder.actions.createChild'
+  formAction.value = 'createChild'
   folderFormDialogRef.value?.open(folder.id)
 }
 
 function handleOpenEditFolder(folder: FolderItem) {
-  formTitleKey.value = 'folder.actions.edit'
+  formAction.value = 'edit'
   folderFormDialogRef.value?.open(folder.id, folder)
 }
 
@@ -317,10 +310,10 @@ function findFolderById(folders: FolderItem[], folderId: string): FolderItem | u
 }
 
 function resolveCurrentFolder() {
-  if (currentNodeKey.value === FOLDER_ENTRY_ID.ALL && props.showAll) return folderEntries.value.all
-  if (currentNodeKey.value === FOLDER_ENTRY_ID.SHARED && props.showShared) return folderEntries.value.shared
+  if (currentNodeKey.value === FOLDER_ENTRY_ID.ALL && props.showAll) return folderEntries.all
+  if (currentNodeKey.value === FOLDER_ENTRY_ID.SHARED && props.showShared) return folderEntries.shared
 
-  return findFolderById(folderTreeData.value, currentNodeKey.value) ?? (props.showAll ? folderEntries.value.all : sortTreeData.value[0])
+  return findFolderById(folderTreeData.value, currentNodeKey.value) ?? (props.showAll ? folderEntries.all : sortTreeData.value[0])
 }
 
 function getFolderDeleteContext(folder: FolderItem) {
@@ -340,15 +333,14 @@ function getFolderDeleteContext(folder: FolderItem) {
 
   if (!findFolderById([deletedFolder], currentNodeKey.value)) return { positionCache }
   if (parentId !== FOLDER_ENTRY_ID.ALL) {
-    const targetFolder = findFolderById(folderTreeData.value, parentId) ?? folderEntries.value.all
+    const targetFolder = findFolderById(folderTreeData.value, parentId) ?? folderEntries.all
     return { positionCache, targetFolder }
   }
 
   // 顶级文件夹按当前展示顺序回退到下一个、上一个或“全部”。
   const siblingFolders = sortTreeData.value
   const folderIndex = siblingFolders.findIndex(({ id }) => id === deletedFolder.id)
-  const targetFolder =
-    folderIndex < 0 ? folderEntries.value.all : (siblingFolders[folderIndex + 1] ?? siblingFolders[folderIndex - 1] ?? folderEntries.value.all)
+  const targetFolder = folderIndex < 0 ? folderEntries.all : (siblingFolders[folderIndex + 1] ?? siblingFolders[folderIndex - 1] ?? folderEntries.all)
   return { positionCache, targetFolder }
 }
 
@@ -416,7 +408,7 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
               @click="handleSortSelect(option.value)"
               :divided="option.divided"
             >
-              {{ t(option.labelKey) }}
+              {{ option.label }}
             </MkDropdownItem>
           </MkDropdownMenu>
         </template>
@@ -481,7 +473,7 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
       </VirtualizedTree>
     </div>
 
-    <FolderFormDialog ref="folderFormDialogRef" :title="t(formTitleKey)" :source="props.source" @refresh="handleFolderRefresh" />
+    <FolderFormDialog ref="folderFormDialogRef" :title="t(`folder.actions.${formAction}`)" :source="props.source" @refresh="handleFolderRefresh" />
     <MoveToDialog v-if="canEdit" ref="moveToDialogRef" :loading="moveSubmitting" :source="props.source" @submit="handleMoveFolder" />
     <ResourceAuthorizationDrawer
       v-if="canEdit"

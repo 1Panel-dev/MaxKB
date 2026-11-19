@@ -11,7 +11,8 @@
     "details": "详情",
     "basicInfo": "基本信息",
     "type": "类型",
-    "settings": "设置"
+    "settings": "设置",
+    "example": "示例"
   },
   "name": {
     "label": "名称",
@@ -30,6 +31,7 @@
     "disabled": "已禁用",
     "pending": "排队中",
     "running": "执行中",
+    "generating": "生成中",
     "success": "成功",
     "failure": "失败",
     "canceling": "取消中",
@@ -86,14 +88,17 @@
     "manage": "管理",
     "edit": "编辑",
     "rename": "重命名",
+    "replace": "替换",
     "delete": "删除",
     "remove": "移除",
     "cancel": "取消",
     "retry": "重试",
+    "regenerate": "重新生成",
     "reload": "重新加载",
     "clear": "清空",
     "reset": "重置",
     "save": "保存",
+    "publish": "发布",
     "add": "添加",
     "previous": "上一步",
     "next": "下一步",
@@ -127,9 +132,11 @@
   },
   "messages": {
     "saveSuccess": "保存成功",
+    "publishSuccess": "发布成功",
     "deleteSuccess": "删除成功",
     "deleteFailed": "删除失败",
     "createSuccess": "创建成功",
+    "generateFailed": "生成失败",
     "duplicateSuccess": "复制成功",
     "addSuccess": "添加成功",
     "removeSuccess": "移除成功",
@@ -161,6 +168,7 @@
     "search": "搜索"
   },
   "validation": {
+    "formInvalid": "请检查表单填写内容",
     "inputRequired": "请输入",
     "inputFieldRequired": "请输入 {label}",
     "selectRequired": "请选择",

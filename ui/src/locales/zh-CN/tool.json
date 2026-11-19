@@ -53,14 +53,23 @@
     "editTitle": "编辑 MCP",
     "duplicateTitle": "复制 MCP",
     "serviceTitle": "MCP 服务",
+    "settingsTitle": "MCP 设置",
+    "reference": "引用 MCP",
+    "customService": "自定义 MCP 服务",
     "name": {
       "placeholder": "请输入 MCP 名称",
       "requiredMessage": "请输入 MCP 名称"
     },
     "config": {
-      "description": "（仅支持 SSE、Streamable HTTP 调用方式）",
+      "description": "仅支持 SSE、Streamable HTTP 调用方式",
       "requiredMessage": "请输入 MCP 服务配置",
-      "invalidMessage": "请输入有效的 JSON 对象作为 MCP 服务配置"
+      "invalidMessage": "请输入有效的 JSON 对象作为 MCP 服务配置",
+      "invalidJsonMessage": "MCP 服务配置必须是合法的 JSON"
+    },
+    "tools": {
+      "label": "MCP 工具",
+      "placeholder": "请选择 MCP 工具",
+      "requiredMessage": "请选择 MCP 工具"
     }
   },
   "dataSource": {

@@ -25,7 +25,7 @@ const initFieldInputTypes = [
 const initFieldTypeOptions = computed<DynamicFormConstructorOption[]>(() =>
   initFieldInputTypes.map((inputType) => {
     const definition = DYNAMIC_FORM_TYPES.find(({ value }) => value === inputType)
-    return { label: definition ? t(definition.labelKey) : inputType, value: `${inputType}Constructor` }
+    return { label: definition ? definition.label : inputType, value: `${inputType}Constructor` }
   }),
 )
 

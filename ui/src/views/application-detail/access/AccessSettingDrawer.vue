@@ -35,7 +35,7 @@ const modeField = computed(() => props.platform.modeField)
 const activeFields = computed(() => {
   const mode = String(form[modeField.value?.key ?? ''] ?? modeField.value?.default ?? '')
   const fields = (modeField.value && mode ? modeField.value.fields?.[mode] : undefined) ?? props.platform.fields
-  return fields.map((field) => ({ ...field, label: field.labelKey ? t(field.labelKey) : (field.label ?? field.key) }))
+  return fields.map((field) => ({ ...field, label: field.label ?? field.key }))
 })
 // 智能机器人默认长连接(ws)，无需回调地址；切到 URL 回调时才展示回调地址。
 const showCallback = computed(() => !modeField.value || form[modeField.value.key] === 'callback')
@@ -119,8 +119,8 @@ onMounted(loadPlatformConfig)
             <template v-for="option in modeField.options" :key="option.value">
               <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': form[modeField.key] === option.value }">
                 <el-radio :value="option.value" class="mk-card-radio">
-                  <h6>{{ t(option.labelKey) }}</h6>
-                  <span class="block text-sm text-N600">{{ t(option.tipKey) }}</span>
+                  <h6>{{ option.label }}</h6>
+                  <span class="block text-sm text-N600">{{ option.tip }}</span>
                 </el-radio>
               </el-card>
             </template>
@@ -152,11 +152,11 @@ onMounted(loadPlatformConfig)
             </template>
           </el-input>
 
-          <p v-if="platform.consoleUrl && platform.consoleNameKey" class="mt-2 text-N500">
+          <p v-if="platform.consoleUrl && platform.consoleName" class="mt-2 text-N500">
             {{ t('application.access.callback.pasteHint') }}
             <!-- 打开对应平台后台配置回调 -->
             <a class="mk-link" :href="platform.consoleUrl" target="_blank">
-              {{ t(platform.consoleNameKey) }}
+              {{ platform.consoleName }}
             </a>
             {{ t(`application.access.${platform.key}.callbackTip`) }}
           </p>

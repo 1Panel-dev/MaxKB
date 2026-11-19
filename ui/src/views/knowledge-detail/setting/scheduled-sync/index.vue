@@ -44,21 +44,6 @@ const syncSetting = ref<SyncSettingDraft>(createDefaultSyncSetting())
 const formRef = useTemplateRef<FormInstance>('formRef')
 
 // 与触发器使用同一套周期级联选项，页面负责配置回写和校验。
-const scheduleOptions = computed(() =>
-  SCHEDULE_OPTION.map((period) => ({
-    ...period,
-    label: typeof period.labelKey === 'string' ? t(period.labelKey) : period.label,
-    children: period.children?.map((option) => ({
-      ...option,
-      label:
-        period.value === SCHEDULE_TYPE.MONTHLY
-          ? `${option.value} ${t('common.schedule.day')}`
-          : typeof option.labelKey === 'string'
-            ? t(option.labelKey)
-            : option.label,
-    })),
-  })),
-)
 const presetScheduleType = ref<KnowledgeSyncScheduleType>()
 const scheduleValue = computed<Array<number | string>>({
   get: () => {
@@ -237,7 +222,7 @@ watch(
               <el-cascader
                 v-if="syncSetting.schedule_type !== SCHEDULE_TYPE.CRON"
                 v-model="scheduleValue"
-                :options="scheduleOptions"
+                :options="SCHEDULE_OPTION"
                 :teleported="false"
                 class="w-full"
                 clearable
@@ -251,8 +236,8 @@ watch(
               <template v-for="method in KNOWLEDGE_SYNC_OPTIONS" :key="method.value">
                 <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': syncSetting.sync_type === method.value }">
                   <el-radio :value="method.value" class="mk-card-radio">
-                    <h6>{{ t(method.labelKey) }}</h6>
-                    <span class="block text-sm text-N600">{{ t(method.descriptionKey) }}</span>
+                    <h6>{{ method.label }}</h6>
+                    <span class="block text-sm text-N600">{{ method.description }}</span>
                   </el-radio>
                 </el-card>
               </template>

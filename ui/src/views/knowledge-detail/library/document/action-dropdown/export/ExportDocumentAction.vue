@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject } from 'vue'
+import { computed, inject, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { DROPDOWN_INJECTION_KEY } from 'element-plus'
 import { useI18n } from 'vue-i18n'
@@ -17,10 +17,10 @@ const loading = defineModel<boolean>('loading', { default: false })
 const parentDropdown = inject(DROPDOWN_INJECTION_KEY, undefined)
 
 /* 文档导出菜单 */
-const exportOptions = [
-  { labelKey: 'knowledge.export.documentsExcel', method: 'exportDocument' },
-  { labelKey: 'knowledge.export.documentsZip', method: 'exportDocumentZip' },
-] as const
+const exportOptions = reactive([
+  { label: computed(() => t('knowledge.export.documentsExcel')), method: 'exportDocument' },
+  { label: computed(() => t('knowledge.export.documentsZip')), method: 'exportDocumentZip' },
+] as const)
 
 // 导出当前文档，保留列表状态。
 function handleExportDocument(method: (typeof exportOptions)[number]['method']) {
@@ -50,7 +50,7 @@ function handleExportDocument(method: (typeof exportOptions)[number]['method']) 
           <template v-for="exportOption in exportOptions" :key="exportOption.method">
             <!-- 按所选格式导出文档 -->
             <MkDropdownItem :disabled="loading" @click="handleExportDocument(exportOption.method)">
-              {{ t(exportOption.labelKey) }}
+              {{ exportOption.label }}
             </MkDropdownItem>
           </template>
         </MkDropdownMenu>

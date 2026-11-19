@@ -2,6 +2,7 @@
 import { computed, inject, nextTick, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationResourceOption, ResourceSetting, ToolResourceOption } from '../../types'
 import type { ApplicationDetail, ToolItem } from '@/api/types'
 import type { Ref } from 'vue'
@@ -12,6 +13,7 @@ import McpSettingDialog from './McpSettingDialog.vue'
 import { isSystemSharedResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'AiChatNodeResourceSetting' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(
   defineProps<{
@@ -71,7 +73,7 @@ const selectedMcpTools = computed(() =>
   props.setting.mcp_tool_ids.map(
     (id) =>
       loadedMcpOptions.value.find((option) => option.id === id) ??
-      props.mcpOptions.find((option) => option.id === id) ?? { id, name: `已选 MCP（${id}）`, tool_type: 'MCP' as const },
+      props.mcpOptions.find((option) => option.id === id) ?? { id, name: '', tool_type: 'MCP' as const },
   ),
 )
 const mcpCount = computed(() => props.setting.mcp_tool_ids.length + Number(Boolean(props.setting.mcp_servers)))
@@ -79,20 +81,20 @@ const mcpCount = computed(() => props.setting.mcp_tool_ids.length + Number(Boole
 const selectedTools = computed(() =>
   props.setting.tool_ids.map((id) => {
     const tool = props.toolOptions.find((option) => option.id === id) ?? props.setting.tool_list?.find((option) => option.id === id)
-    return { ...tool, id, icon: tool?.icon, tool_type: tool?.tool_type, name: tool?.name || `已选资源（${id}）` }
+    return { ...tool, id, icon: tool?.icon, tool_type: tool?.tool_type, name: tool?.name }
   }),
 )
 const selectedSkills = computed(() =>
   props.setting.skill_tool_ids.map((id) => {
     const tool = props.skillOptions.find((option) => option.id === id) ?? props.setting.skill_tool_list?.find((option) => option.id === id)
-    return { ...tool, id, icon: tool?.icon, tool_type: tool?.tool_type, name: tool?.name || `已选资源（${id}）` }
+    return { ...tool, id, icon: tool?.icon, tool_type: tool?.tool_type, name: tool?.name }
   }),
 )
 const selectedApplications = computed(() =>
   props.setting.application_ids.map((id) => {
     const application =
       props.applicationOptions.find((option) => option.id === id) ?? props.setting.application_list?.find((option) => option.id === id)
-    return { ...application, id, icon: application?.icon, name: application?.name || `已选资源（${id}）` }
+    return { ...application, id, icon: application?.icon, name: application?.name }
   }),
 )
 
@@ -115,7 +117,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
       <template #label>
         <div class="flex-between min-w-0 flex-1">
           <span>
-            MCP
+            {{ t('tool.mcp.label') }}
             <span v-if="mcpCount">（{{ mcpCount }}）</span>
           </span>
           <el-button text type="primary" @click.stop="mcpDialogRef?.open(setting)"><MkIcon name="icon_add_outlined" /></el-button>
@@ -128,7 +130,9 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
             <div class="flex-between">
               <span class="flex-align-center min-w-0 gap-2">
                 <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
-                <span class="truncate" :title="resource.name">{{ resource.name }}</span>
+                <span class="truncate" :title="resource.name || `${t('common.labels.selected')} ${t('tool.mcp.label')}（${resource.id}）`">
+                  {{ resource.name || `${t('common.labels.selected')} ${t('tool.mcp.label')}（${resource.id}）` }}
+                </span>
               </span>
               <el-button text @click="removeId('mcp_tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
             </div>
@@ -139,7 +143,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
           <div class="flex-between">
             <span class="flex-align-center min-w-0 gap-2">
               <ToolIcon :size="20" class="shrink-0 small" type="MCP" />
-              <span>自定义 MCP 服务</span>
+              <span>{{ t('tool.mcp.customService') }}</span>
             </span>
             <el-button text @click="updateSetting({ mcp_servers: '' })"><MkIcon name="icon_close_outlined" /></el-button>
           </div>
@@ -151,7 +155,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
       <template #label>
         <div class="flex-between min-w-0 flex-1">
           <span>
-            工具
+            {{ t('tool.title') }}
             <span v-if="selectedTools.length">（{{ selectedTools.length }}）</span>
           </span>
           <el-button text type="primary" @click.stop="openToolDialog(false)">
@@ -166,7 +170,9 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
             <div class="flex-between">
               <span class="flex-align-center min-w-0 gap-2">
                 <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
-                <span class="truncate" :title="resource.name">{{ resource.name }}</span>
+                <span class="truncate" :title="resource.name || `${t('resource.selected')}（${resource.id}）`">
+                  {{ resource.name || `${t('resource.selected')}（${resource.id}）` }}
+                </span>
               </span>
               <el-button text @click="removeId('tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
             </div>
@@ -179,7 +185,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
       <template #label>
         <div class="flex-between min-w-0 flex-1">
           <span>
-            Skills
+            {{ t('tool.skill.label') }}
             <span v-if="selectedSkills.length">（{{ selectedSkills.length }}）</span>
           </span>
           <el-button text type="primary" @click.stop="openToolDialog(true)">
@@ -194,7 +200,9 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
             <div class="flex-between">
               <span class="flex-align-center min-w-0 gap-2">
                 <ToolIcon :icon="resource.icon" :size="20" class="shrink-0 small" :type="resource.tool_type" />
-                <span class="truncate" :title="resource.name">{{ resource.name }}</span>
+                <span class="truncate" :title="resource.name || `${t('resource.selected')}（${resource.id}）`">
+                  {{ resource.name || `${t('resource.selected')}（${resource.id}）` }}
+                </span>
               </span>
               <el-button text @click="removeId('skill_tool_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
             </div>
@@ -207,7 +215,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
       <template #label>
         <div class="flex-between min-w-0 flex-1">
           <span>
-            智能体
+            {{ t('application.title') }}
             <span v-if="selectedApplications.length">（{{ selectedApplications.length }}）</span>
           </span>
           <el-button text type="primary" @click.stop="applicationDialogRef?.open(selectedApplications)">
@@ -222,7 +230,9 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
             <div class="flex-between">
               <span class="flex-align-center min-w-0 gap-2">
                 <ApplicationIcon :icon="resource.icon" :size="20" class="shrink-0 small" />
-                <span class="truncate" :title="resource.name">{{ resource.name }}</span>
+                <span class="truncate" :title="resource.name || `${t('resource.selected')}（${resource.id}）`">
+                  {{ resource.name || `${t('resource.selected')}（${resource.id}）` }}
+                </span>
               </span>
               <el-button text @click="removeId('application_ids', resource.id)"><MkIcon name="icon_close_outlined" /></el-button>
             </div>
@@ -235,7 +245,7 @@ function removeId(field: 'application_ids' | 'mcp_tool_ids' | 'skill_tool_ids' |
   <SelectToolDialog
     ref="toolDialogRef"
     :workspace-id="resourceWorkspaceId"
-    :title="selectingSkills ? 'Skills' : undefined"
+    :title="selectingSkills ? t('tool.skill.label') : undefined"
     :tool-types="selectingSkills ? [TOOL_TYPE.SKILL] : undefined"
     :excluded-ids="excludedToolIds"
     @submit="submitToolDialog"

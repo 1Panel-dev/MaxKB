@@ -13,13 +13,6 @@ defineOptions({ name: 'SimpleCreateDialog' })
 
 const { t } = useI18n({ useScope: 'global' })
 
-const DEFAULT_PROLOGUE = '您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务'
-const DEFAULT_PROMPT = `已知信息：{data}
-用户问题：{question}
-回答要求：
-- 请使用中文回答用户问题`
-const DEFAULT_OPTIMIZATION_PROMPT = '()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中'
-
 interface SimpleApplicationDraft {
   desc: string
   name: string
@@ -57,11 +50,18 @@ function submit() {
         top_n: 3,
       },
       model_params_setting: {},
-      model_setting: { no_references_prompt: '{question}', prompt: DEFAULT_PROMPT, system: '' },
+      model_setting: {
+        no_references_prompt: '{question}',
+        prompt: t('application.prompt.userDefaultValue', { data: '{data}', question: '{question}' }),
+        system: '',
+      },
       name: applicationForm.name.trim(),
       problem_optimization: false,
-      problem_optimization_prompt: DEFAULT_OPTIMIZATION_PROMPT,
-      prologue: DEFAULT_PROLOGUE,
+      problem_optimization_prompt: t('application.knowledgeSetting.problemOptimization.defaultValue', {
+        question: '{question}',
+        dataTags: '<data></data>',
+      }),
+      prologue: t('application.prologue.defaultValue'),
       stt_model_enable: false,
       tts_model_enable: false,
       tts_type: 'BROWSER',

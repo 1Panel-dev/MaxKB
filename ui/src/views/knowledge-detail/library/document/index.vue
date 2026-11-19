@@ -37,7 +37,7 @@ import DocumentTags from './components/DocumentTags.vue'
 import ButtonImportDocument from './import-document/ButtonImportDocument.vue'
 import { DOCUMENT_STATUS_FILTER_OPTIONS, DOCUMENT_STATUS_OPTIONS } from './status'
 import ButtonUploadDocument from './upload-document/ButtonUploadDocument.vue'
-import { DOCUMENT_HIT_HANDLING_MESSAGE_KEYS } from '@/constants/document'
+import { DOCUMENT_HIT_HANDLING_LABELS } from '@/constants/document'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
 import { isWorkFlow, toOrderBy } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
@@ -166,7 +166,7 @@ function loadCreatorOptions(keyword: string) {
 // 文档状态
 const selectedDocumentStatus = ref<string | null>(null)
 const documentStatusOptions = computed(() =>
-  DOCUMENT_STATUS_FILTER_OPTIONS.map(({ value }) => ({ value, label: t(DOCUMENT_STATUS_OPTIONS[value].labelKey) })),
+  DOCUMENT_STATUS_FILTER_OPTIONS.map(({ value }) => ({ value, label: DOCUMENT_STATUS_OPTIONS[value].label })),
 )
 const documentStatusFilter = computed(() => DOCUMENT_STATUS_FILTER_OPTIONS.find(({ value }) => value === selectedDocumentStatus.value))
 
@@ -178,9 +178,7 @@ const documentActiveOptions = computed(() => [
 const selectedDocumentActive = ref<boolean | null>(null)
 
 // 召回处理
-const documentHitHandlingOptions = computed(() =>
-  Object.entries(DOCUMENT_HIT_HANDLING_MESSAGE_KEYS).map(([value, key]) => ({ value, label: t(key) })),
-)
+const documentHitHandlingOptions = computed(() => Object.entries(DOCUMENT_HIT_HANDLING_LABELS).map(([value, label]) => ({ value, label })))
 const selectedDocumentHitHandling = ref<DocumentHitHandling | null>(null)
 
 // 标签

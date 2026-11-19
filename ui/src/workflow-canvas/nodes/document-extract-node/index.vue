@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
-import { fileTooltip } from '@/workflow-canvas/config/constants'
+import { FILE_REFERENCE_EXAMPLE } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'WorkflowDocumentExtractNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
@@ -26,9 +29,7 @@ model.properties.node_data = {
 const formData = computed(() => model.properties.node_data as DocumentExtractForm)
 
 async function validate() {
-  return formRef.value?.validate().catch((error) =>
-    Promise.reject({ node: model, errMessage: error }),
-  )
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 onMounted(() => {
   model.validate = validate
@@ -49,9 +50,9 @@ onMounted(() => {
             <span class="flex-align-center gap-1">
               <span class="mk-required">选择文档</span>
               <MkTooltip placement="right">
-                <template #content
-                  ><div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div></template
-                >
+                <template #content>
+                  <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>
+                </template>
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </span>

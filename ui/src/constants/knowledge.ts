@@ -1,5 +1,7 @@
+import { computed, reactive } from 'vue'
 import type { KnowledgeType } from '@/api/types'
 import { KNOWLEDGE_SEARCH_MODE, KNOWLEDGE_SYNC_TYPE, KNOWLEDGE_TYPE } from '@/api/enums'
+import { t } from '@/locales'
 
 /** 知识库图片上传与召回测试共用的格式、文件选择范围和展示文案。 */
 export const KNOWLEDGE_IMAGE_EXTENSIONS: readonly string[] = ['JPG', 'JPEG', 'PNG', 'WEBP', 'BMP']
@@ -23,39 +25,39 @@ export const KNOWLEDGE_TYPE_MAP = {
 } as const satisfies Record<KnowledgeType, keyof typeof KNOWLEDGE_TYPE>
 
 /** 手动同步与定时同步共用的同步方式选项。 */
-export const KNOWLEDGE_SYNC_OPTIONS = [
+export const KNOWLEDGE_SYNC_OPTIONS = reactive([
   {
     value: KNOWLEDGE_SYNC_TYPE.INCREMENTAL,
-    labelKey: 'knowledge.sync.incremental.label',
-    descriptionKey: 'knowledge.sync.incremental.description',
+    label: computed(() => t('knowledge.sync.incremental.label')),
+    description: computed(() => t('knowledge.sync.incremental.description')),
   },
   {
     value: KNOWLEDGE_SYNC_TYPE.REPLACE,
-    labelKey: 'knowledge.sync.replace.label',
-    descriptionKey: 'knowledge.sync.replace.description',
+    label: computed(() => t('knowledge.sync.replace.label')),
+    description: computed(() => t('knowledge.sync.replace.description')),
   },
   {
     value: KNOWLEDGE_SYNC_TYPE.COMPLETE,
-    labelKey: 'knowledge.sync.complete.label',
-    descriptionKey: 'knowledge.sync.complete.description',
+    label: computed(() => t('knowledge.sync.complete.label')),
+    description: computed(() => t('knowledge.sync.complete.description')),
   },
-] as const
+] as const)
 
 /** 召回测试、智能体设置与工作流知识库检索共用的模式选项。 */
-export const KNOWLEDGE_SEARCH_MODE_OPTIONS = [
+export const KNOWLEDGE_SEARCH_MODE_OPTIONS = reactive([
   {
     value: KNOWLEDGE_SEARCH_MODE.EMBEDDING,
-    labelKey: 'knowledge.retrieval.embedding.label',
-    descriptionKey: 'knowledge.retrieval.embedding.description',
+    label: computed(() => t('knowledge.retrieval.embedding.label')),
+    description: computed(() => t('knowledge.retrieval.embedding.description')),
   },
   {
     value: KNOWLEDGE_SEARCH_MODE.KEYWORDS,
-    labelKey: 'knowledge.retrieval.keywords.label',
-    descriptionKey: 'knowledge.retrieval.keywords.description',
+    label: computed(() => t('knowledge.retrieval.keywords.label')),
+    description: computed(() => t('knowledge.retrieval.keywords.description')),
   },
   {
     value: KNOWLEDGE_SEARCH_MODE.BLEND,
-    labelKey: 'knowledge.retrieval.blend.label',
-    descriptionKey: 'knowledge.retrieval.blend.description',
+    label: computed(() => t('knowledge.retrieval.blend.label')),
+    description: computed(() => t('knowledge.retrieval.blend.description')),
   },
-] as const
+] as const)

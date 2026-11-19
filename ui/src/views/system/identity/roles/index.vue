@@ -6,7 +6,7 @@ import RoleApi from '@/api/admin/system/role'
 import RoleMemberList from './components/RoleMemberList.vue'
 import RolePermissionConfiguration from './components/RolePermissionConfiguration.vue'
 import CreateOrUpdateRoleDialog from './dialog/CreateOrUpdateRoleDialog.vue'
-import { ROLE_TYPE_MESSAGE_KEYS } from '@/constants'
+import { ROLE_TYPE_LABELS } from '@/constants'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
@@ -116,7 +116,7 @@ onMounted(() => loadRoles())
             :key="roleGroup.role_type"
             v-model:expanded="expandedRoleTypes[roleGroup.role_type]"
             :default-expanded="false"
-            :title="t(ROLE_TYPE_MESSAGE_KEYS[roleGroup.role_type])"
+            :title="ROLE_TYPE_LABELS[roleGroup.role_type]"
             trigger-class="text-N500 py-2!"
           >
             <div class="space-y-1">
@@ -160,7 +160,7 @@ onMounted(() => loadRoles())
               {{ currentRole.role_name }}
             </h4>
             <el-tag type="info" size="small" class="shrink-0">
-              {{ currentRole.internal ? t('role.internalLabel') : t(ROLE_TYPE_MESSAGE_KEYS[currentRole.type]) }}
+              {{ currentRole.internal ? t('role.internalLabel') : ROLE_TYPE_LABELS[currentRole.type] }}
             </el-tag>
             <el-divider class="shrink-0" direction="vertical" />
             <span class="flex-align-center shrink-0 text-N500">

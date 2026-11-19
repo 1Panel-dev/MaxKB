@@ -130,7 +130,7 @@ onMounted(() => loadPermissions())
       <el-table-column :label="t('authorization.permission.operationLabel')" min-width="340">
         <template #default="{ row }">
           <el-radio-group :model-value="row.permission" :disabled="submitting" @change="handlePermissionChange($event, row)">
-            <el-radio v-for="option in permissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{ t(option.labelKey) }}</el-radio>
+            <el-radio v-for="option in permissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{ option.label }}</el-radio>
           </el-radio-group>
         </template>
       </el-table-column>

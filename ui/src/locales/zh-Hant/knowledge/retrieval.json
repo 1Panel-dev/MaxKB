@@ -18,7 +18,8 @@
       "label": "相似度高於",
       "description": "相似度越高相關性越強。"
     },
-    "topNumber": "召回分段數 TOP"
+    "topNumber": "召回分段數 TOP",
+    "maxReferenceCharacters": "最多引用字元數"
   },
   "hitTest": {
     "title": "召回測試",

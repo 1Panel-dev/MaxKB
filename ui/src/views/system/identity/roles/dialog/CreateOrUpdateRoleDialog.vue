@@ -5,7 +5,7 @@ import type { RoleItem, RolePayload, RoleType } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ROLE_TYPE } from '@/api/enums'
 import RoleApi from '@/api/admin/system/role'
-import { ROLE_TYPE_MESSAGE_KEYS } from '@/constants'
+import { ROLE_TYPE_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 
 const emit = defineEmits<{ refresh: [role: RoleItem] }>()
@@ -70,7 +70,7 @@ defineExpose({ open })
       </el-form-item>
       <el-form-item v-if="!roleForm.role_id" :label="t('role.inheritedRole.label')" prop="role_type">
         <el-select v-model="roleForm.role_type" :placeholder="t('user.role.placeholder')">
-          <el-option v-for="option in roleTypeOptions" :key="option" :value="option" :label="t(ROLE_TYPE_MESSAGE_KEYS[option])" />
+          <el-option v-for="option in roleTypeOptions" :key="option" :value="option" :label="ROLE_TYPE_LABELS[option]" />
         </el-select>
       </el-form-item>
     </el-form>

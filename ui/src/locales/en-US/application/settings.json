@@ -1,0 +1,78 @@
+{
+  "settings": {
+    "model": "Model settings",
+    "skills": "Skills",
+    "advanced": "Advanced settings",
+    "unsavedMessage": "Settings have unsaved changes. Save them to apply them when debugging."
+  },
+  "prompt": {
+    "systemPlaceholder": "System prompt. You can reference these system variables: {data} contains segments retrieved from knowledge; {question} is the user's question; {memory} contains user memory after long-term memory is enabled.",
+    "userPlaceholder": "User prompt. You can reference these system variables: {data} contains segments retrieved from knowledge; {question} is the user's question.",
+    "userDefaultValue": "Known information: {data}\nUser question: {question}\nResponse requirements:\n- Answer the user's question in Chinese",
+    "references": "With knowledge references",
+    "noReferences": "Without knowledge references"
+  },
+  "knowledgeSetting": {
+    "settingsTitle": "Parameter settings",
+    "empty": "Related knowledge appears here",
+    "noReferences": {
+      "label": "When no knowledge segments are referenced",
+      "askAI": "Continue asking AI",
+      "designatedAnswer": "Specified answer",
+      "defaultValue": "Hello, I'm the XXX assistant. My knowledge only covers the XXX product. Please rephrase your question.",
+      "requiredMessage": "Enter an answer"
+    },
+    "problemOptimization": {
+      "label": "Question optimization",
+      "defaultValue": "The text in () is the user's question. Use the conversation context to infer the user's intended question ({question}). Output one complete question enclosed in {dataTags} tags."
+    }
+  },
+  "prologue": {
+    "label": "Prologue",
+    "defaultValue": "Hello, I'm the XXX assistant. You can ask me questions about using XXX.\n- What are the main features of XXX?\n- How is XXX priced?\n- I need to speak to a human agent"
+  },
+  "longTermMemory": {
+    "label": "Long-term memory",
+    "title": "Long-term memory settings",
+    "description": "When enabled, new conversations are recorded from that point onward and periodically summarized into memory. Use the {memory} variable in the system prompt to access it. Disabling this clears chat users' long-term memory. Re-enabling it starts collecting conversations again from that point.",
+    "model": {
+      "placeholder": "Select a long-term memory model",
+      "requiredMessage": "Select a long-term memory model"
+    },
+    "trigger": {
+      "label": "Trigger method",
+      "requiredMessage": "Select a trigger method",
+      "rounds": "Round-based trigger",
+      "roundsDescription": "After N rounds, automatically summarize those N conversation rounds to generate memory.",
+      "scheduled": "Scheduled trigger",
+      "scheduledDescription": "At the scheduled time, automatically summarize all conversations within the period to generate memory."
+    },
+    "rounds": {
+      "label": "Trigger interval",
+      "invalidMessage": "Enter a whole number of rounds between 5 and 100"
+    },
+    "period": {
+      "label": "Trigger schedule",
+      "placeholder": "Select a trigger schedule",
+      "requiredMessage": "Select a trigger schedule"
+    }
+  },
+  "speechInput": {
+    "label": "Voice input",
+    "autoSend": "Auto-send",
+    "model": {
+      "placeholder": "Select a speech-to-text model",
+      "requiredMessage": "Select a speech-to-text model"
+    }
+  },
+  "speechPlayback": {
+    "label": "Voice playback",
+    "autoPlay": "Autoplay",
+    "browser": "Browser playback (free)",
+    "custom": "Custom",
+    "model": {
+      "placeholder": "Select a text-to-speech model",
+      "requiredMessage": "Select a text-to-speech model"
+    }
+  }
+}

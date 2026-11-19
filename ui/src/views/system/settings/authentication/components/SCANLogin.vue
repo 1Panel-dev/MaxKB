@@ -8,7 +8,7 @@ import dingtalkLogo from '@/assets/logo/logo_dingtalk.svg'
 import enterpriseWechatLogo from '@/assets/logo/logo_enterprise-wechat.svg'
 import larkLogo from '@/assets/logo/logo_lark.svg'
 import EditSCANDrawer from '../EditSCANDrawer.vue'
-import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
 
@@ -85,8 +85,8 @@ onMounted(loadQrPlatforms)
       <el-card shadow="hover" @click="handleEditPlatform(platform)">
         <div class="flex-between">
           <div class="flex-align-center gap-2">
-            <img :src="platform.logo" :alt="t(LOGIN_METHOD_LABEL_KEYS[platform.key])" class="h-6 w-6" />
-            <h4>{{ t(LOGIN_METHOD_LABEL_KEYS[platform.key]) }}</h4>
+            <img :src="platform.logo" :alt="LOGIN_METHOD_LABELS[platform.key]" class="h-6 w-6" />
+            <h4>{{ LOGIN_METHOD_LABELS[platform.key] }}</h4>
             <el-tag v-if="platform.isValid" size="small" type="success">{{ t('auth.qrCode.valid') }}</el-tag>
           </div>
 

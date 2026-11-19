@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, provide, ref, useTemplateRef, watch } from 'vue'
 import { cloneDeep, isEqual } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationSettings, LongTermSettingData, SelectedKnowledge } from './settings'
 import type { ApplicationDetail, ModelItem, ModelProviderItem, ToolItem } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
@@ -34,6 +35,7 @@ function applicationSettingPermission(method: ApplicationSettingPermissionMethod
 
 defineProps<ResourceDetailPageProps>()
 defineExpose({ customHeader: true })
+const { t } = useI18n({ useScope: 'global' })
 const { application, applicationId, resourceApi, replaceApplicationDetail } = useApplicationDetailContext()
 const isSystem = computed(() => isSystemResource())
 const modelApi = computed(() => (isSystem.value ? SystemModelApi : ModelApi))
@@ -47,6 +49,7 @@ provide('getModelParamsForm', (modelId: string) => modelApi.value.getModelParams
 
 /* 详情回填到设置表单，编辑数据与接口详情保持隔离。 */
 const settings = ref(createSettings())
+const savedSettingsPayload = ref(createSettingsPayload(settings.value))
 const formRef = useTemplateRef<FormInstance>('formRef')
 const saving = ref(false)
 const promptMode = ref<'references' | 'none'>('none')
@@ -80,6 +83,8 @@ watch(
   application,
   (detail, previousDetail) => {
     settings.value = createSettings(detail)
+    // 与本次回填使用相同的默认值，语言切换不重新生成比较基准。
+    savedSettingsPayload.value = createSettingsPayload(settings.value)
     selectedKnowledge.value = cloneDeep(detail?.knowledge_list ?? (detail?.knowledge_id_list ?? []).map((id) => ({ id })))
     if (!detail) return
     if (detail.id !== previousDetail?.id || detail.workspace_id !== previousDetail.workspace_id) {
@@ -111,14 +116,13 @@ watch(
 
 /* 调试执行已保存的配置；草稿与详情回填结果不同时提示先保存。 */
 const debugConversationRef = useTemplateRef<InstanceType<typeof SimpleDebugConversation>>('debugConversationRef')
-const savedSettingsPayload = computed(() => createSettingsPayload(createSettings(application.value)))
 const hasUnsavedSettings = computed(() => !!application.value && !isEqual(createSettingsPayload(settings.value), savedSettingsPayload.value))
 
 /* 长期记忆配置确认后合并到表单草稿。 */
 // 固定校验规则，避免启用开关时因规则变化提前校验；保存、发布时仍检查模型。
 const longTermModelRule: FormItemRule = {
   validator: (_rule, value, callback) => {
-    callback(settings.value.long_term_enable && !value ? new Error('请选择长期记忆模型') : undefined)
+    callback(settings.value.long_term_enable && !value ? new Error(t('application.longTermMemory.model.requiredMessage')) : undefined)
   },
 }
 const longTermSetting = computed<LongTermSettingData>({
@@ -187,13 +191,13 @@ function submit() {
       if (valid) return
       // 设置表单收起时展开，显示校验错误。
       debugConversationRef.value?.openSetting()
-      MsgWarning('请检查表单填写内容')
+      MsgWarning(t('common.validation.formInvalid'))
     })
     .then((valid) => {
       if (!valid) return
       return resourceApi.application.putApplication(applicationId.value, createSettingsPayload(settings.value)).then((detail) => {
         replaceApplicationDetail(detail)
-        MsgSuccess('保存成功')
+        MsgSuccess(t('common.messages.saveSuccess'))
       })
     })
     .catch(() => {
@@ -213,7 +217,7 @@ function publish() {
       if (valid) return
       // 设置表单收起时展开，显示校验错误。
       debugConversationRef.value?.openSetting()
-      MsgWarning('请检查表单填写内容')
+      MsgWarning(t('common.validation.formInvalid'))
     })
     .then((valid) => {
       if (!valid) return
@@ -221,7 +225,7 @@ function publish() {
         replaceApplicationDetail(detail)
         return resourceApi.application.putApplicationPublish(applicationId.value, detail.name).then((published) => {
           replaceApplicationDetail(published)
-          MsgSuccess('发布成功')
+          MsgSuccess(t('common.messages.publishSuccess'))
         })
       })
     })
@@ -250,10 +254,12 @@ onMounted(() => {
         <!-- 保存智能体设置 -->
         <el-button plain :loading="saving" @click="submit">
           <MkIcon name="icon_save_outlined" class="mr-1" />
-          保存
+          {{ t('common.actions.save') }}
         </el-button>
         <!-- 保存并发布智能体 -->
-        <el-button v-if="applicationSettingPermission('publish')" type="primary" :disabled="saving" @click="publish">发布</el-button>
+        <el-button v-if="applicationSettingPermission('publish')" type="primary" :disabled="saving" @click="publish">
+          {{ t('common.actions.publish') }}
+        </el-button>
       </div>
     </div>
   </Teleport>
@@ -267,6 +273,7 @@ onMounted(() => {
             v-loading="saving"
             ref="formRef"
             :model="settings"
+            :validate-on-rule-change="false"
             label-position="top"
             require-asterisk-position="right"
             @submit.prevent
@@ -275,24 +282,29 @@ onMounted(() => {
             <!-- 基本信息 -->
             <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
               <template #label>
-                <h6>基本信息</h6>
+                <h6>{{ t('common.labels.basicInfo') }}</h6>
               </template>
               <div class="p-2">
                 <el-form-item
-                  label="智能体名称"
+                  :label="t('common.name.label')"
                   prop="name"
-                  :rules="{ required: true, whitespace: true, message: '请输入智能体名称', trigger: 'blur' }"
+                  :rules="{ required: true, whitespace: true, message: t('application.fields.name.requiredMessage'), trigger: 'blur' }"
                 >
-                  <el-input v-model="settings.name" maxlength="64" placeholder="请输入智能体名称" @blur="settings.name = settings.name.trim()" />
+                  <el-input
+                    v-model="settings.name"
+                    maxlength="64"
+                    :placeholder="t('application.fields.name.placeholder')"
+                    @blur="settings.name = settings.name.trim()"
+                  />
                 </el-form-item>
-                <el-form-item label="描述">
+                <el-form-item :label="t('common.description.label')">
                   <el-input
                     v-model="settings.desc"
                     type="textarea"
                     :rows="3"
                     maxlength="256"
                     show-word-limit
-                    placeholder="描述该智能体的应用场景及用途"
+                    :placeholder="t('application.fields.description.placeholder')"
                   />
                 </el-form-item>
               </div>
@@ -300,10 +312,10 @@ onMounted(() => {
             <!-- 模型设置 -->
             <MkCollapse :expanded="true" trigger-class="mk-gray-card-sm px-2! py-[9px]!">
               <template #label>
-                <h6>模型设置</h6>
+                <h6>{{ t('application.settings.model') }}</h6>
               </template>
               <div class="p-2">
-                <el-form-item label="AI 模型">
+                <el-form-item :label="t('workflow.model.label')">
                   <SelectModel
                     v-model="settings.model_id"
                     v-model:model-params="settings.model_params_setting"
@@ -313,7 +325,7 @@ onMounted(() => {
                     can-edit-params
                     can-add
                     teleported
-                    placeholder="请选择 AI 模型"
+                    :placeholder="t('workflow.model.placeholder')"
                     @refresh="loadModels"
                   />
                 </el-form-item>
@@ -322,8 +334,8 @@ onMounted(() => {
                   <template #label>
                     <div class="flex-between w-full">
                       <div class="flex-align-center gap-1">
-                        <span>系统提示词</span>
-                        <MkTooltip content="设定模型扮演的角色或遵循的指令" placement="right">
+                        <span>{{ t('workflow.systemPrompt.label') }}</span>
+                        <MkTooltip :content="t('workflow.systemPrompt.description')" placement="right">
                           <MkIcon name="icon_info_outlined" class="text-N600!" />
                         </MkTooltip>
                       </div>
@@ -337,44 +349,44 @@ onMounted(() => {
                   </template>
                   <MdEditorMagnify
                     v-model="settings.model_setting.system"
-                    placeholder="系统提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题，{memory}开启长期记忆后的用户记忆。"
-                    title="系统提示词"
+                    :placeholder="t('application.prompt.systemPlaceholder', { data: '{data}', question: '{question}', memory: '{memory}' })"
+                    :title="t('workflow.systemPrompt.label')"
                   />
                 </el-form-item>
                 <!-- 用户提示词 -->
                 <el-form-item
                   class="mk-hide-asterisk"
                   :prop="promptMode === 'references' ? 'model_setting.prompt' : 'model_setting.no_references_prompt'"
-                  :rules="{ required: !!settings.model_id, whitespace: true, message: '请输入用户提示词', trigger: 'blur' }"
+                  :rules="{ required: !!settings.model_id, whitespace: true, message: t('workflow.userPrompt.requiredMessage'), trigger: 'blur' }"
                 >
                   <template #label>
                     <span class="flex-align-center gap-1">
-                      <span class="mk-required">用户提示词</span>
-                      <MkTooltip content="用户向模型提出的问题或输入的指令" placement="right">
+                      <span class="mk-required">{{ t('workflow.userPrompt.label') }}</span>
+                      <MkTooltip :content="t('workflow.userPrompt.description')" placement="right">
                         <MkIcon name="icon_info_outlined" class="text-N600!" />
                       </MkTooltip>
                     </span>
                   </template>
                   <!-- 切换有无引用知识库的提示词 -->
                   <el-radio-group v-model="promptMode" size="small" class="mb-2">
-                    <el-radio-button value="references">引用知识库</el-radio-button>
-                    <el-radio-button value="none">无引用知识库</el-radio-button>
+                    <el-radio-button value="references">{{ t('application.prompt.references') }}</el-radio-button>
+                    <el-radio-button value="none">{{ t('application.prompt.noReferences') }}</el-radio-button>
                   </el-radio-group>
                   <MdEditorMagnify
                     v-if="promptMode === 'references'"
                     v-model="settings.model_setting.prompt"
-                    placeholder="用户提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题。"
-                    title="用户提示词（引用知识库）"
+                    :placeholder="t('application.prompt.userPlaceholder', { data: '{data}', question: '{question}' })"
+                    :title="`${t('workflow.userPrompt.label')}（${t('application.prompt.references')}）`"
                   />
                   <MdEditorMagnify
                     v-if="promptMode === 'none'"
                     v-model="settings.model_setting.no_references_prompt"
-                    placeholder="用户提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题。"
-                    title="用户提示词 （无引用知识库）"
+                    :placeholder="t('application.prompt.userPlaceholder', { data: '{data}', question: '{question}' })"
+                    :title="`${t('workflow.userPrompt.label')} （${t('application.prompt.noReferences')}）`"
                   />
                 </el-form-item>
 
-                <el-form-item label="历史聊天记录">
+                <el-form-item :label="t('workflow.history.label')">
                   <el-input-number
                     v-model="settings.dialogue_number"
                     :min="0"
@@ -391,7 +403,7 @@ onMounted(() => {
             <MkCollapse :expanded="true" trigger-class="mk-gray-card-sm px-2! py-[9px]!">
               <template #label>
                 <div class="flex-between w-full">
-                  <h6>知识库</h6>
+                  <h6>{{ t('knowledge.title') }}</h6>
                   <div>
                     <!-- 参数设置 -->
                     <ButtonKnowledgeSetting :setting="settings" @submit="handleKnowledgeSettingSubmit" />
@@ -401,7 +413,7 @@ onMounted(() => {
                 </div>
               </template>
               <div class="p-2">
-                <div v-if="!selectedKnowledge.length" class="text-center text-N600">关联的知识库显示在这里</div>
+                <div v-if="!selectedKnowledge.length" class="text-center text-N600">{{ t('application.knowledgeSetting.empty') }}</div>
                 <div v-else class="space-y-2">
                   <template v-for="knowledge in selectedKnowledge" :key="knowledge.id">
                     <el-card class="small" shadow="never">
@@ -421,11 +433,11 @@ onMounted(() => {
             <!-- 开场白 -->
             <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
               <template #label>
-                <h6>开场白</h6>
+                <h6>{{ t('application.prologue.label') }}</h6>
               </template>
               <div class="p-2">
-                <el-form-item label="开场白">
-                  <MdEditorMagnify v-model="settings.prologue" title="开场白" />
+                <el-form-item :label="t('application.prologue.label')">
+                  <MdEditorMagnify v-model="settings.prologue" :title="t('application.prologue.label')" />
                 </el-form-item>
               </div>
             </MkCollapse>
@@ -433,9 +445,9 @@ onMounted(() => {
             <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
               <template #label>
                 <div class="flex-between w-full">
-                  <h6>技能</h6>
+                  <h6>{{ t('application.settings.skills') }}</h6>
                   <!-- 控制是否展示技能执行过程 -->
-                  <el-checkbox v-model="settings.mcp_output_enable" @click.stop>输出执行过程</el-checkbox>
+                  <el-checkbox v-model="settings.mcp_output_enable" @click.stop>{{ t('workflow.skills.outputExecution') }}</el-checkbox>
                 </div>
               </template>
               <div class="p-2">
@@ -452,7 +464,7 @@ onMounted(() => {
             <!-- 高级设置 -->
             <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
               <template #label>
-                <h6>高级设置</h6>
+                <h6>{{ t('application.settings.advanced') }}</h6>
               </template>
               <div class="p-2">
                 <!-- 长期记忆 -->
@@ -460,11 +472,8 @@ onMounted(() => {
                   <template #label>
                     <div class="flex-between">
                       <span class="flex-align-center gap-1">
-                        <span :class="settings.long_term_enable ? 'mk-required' : ''">长期记忆</span>
-                        <MkTooltip
-                          content="开启后，从开启时间记录新对话并按周期生成记忆，可通过 {memory} 变量在系统提示词中调用。关闭后，将清空对话用户的长期记忆，再次开启将重新从开启时点开始累积。"
-                          placement="right"
-                        >
+                        <span :class="settings.long_term_enable ? 'mk-required' : ''">{{ t('application.longTermMemory.label') }}</span>
+                        <MkTooltip :content="t('application.longTermMemory.description', { memory: '{memory}' })" placement="right">
                           <MkIcon name="icon_info_outlined" class="text-N600!" />
                         </MkTooltip>
                       </span>
@@ -488,7 +497,7 @@ onMounted(() => {
                 </el-form-item>
                 <!-- 输出思考 -->
                 <div class="flex-between mb-4">
-                  <span>输出思考</span>
+                  <span>{{ t('workflow.thinking.label') }}</span>
                   <div class="flex-align-center gap-2">
                     <!-- 输出思考设置 -->
                     <ThinkingSetting v-if="settings.model_setting.reasoning_content_enable" v-model="thinkingSetting" />
@@ -497,9 +506,11 @@ onMounted(() => {
                 </div>
                 <!-- 语音输入 -->
                 <div class="flex-between">
-                  <span :class="settings.stt_model_enable ? 'mk-required' : ''">语音输入</span>
+                  <span :class="settings.stt_model_enable ? 'mk-required' : ''">{{ t('application.speechInput.label') }}</span>
                   <span class="flex-align-center gap-3">
-                    <el-checkbox v-if="settings.stt_model_enable" v-model="settings.stt_autosend">自动发送</el-checkbox>
+                    <el-checkbox v-if="settings.stt_model_enable" v-model="settings.stt_autosend">
+                      {{ t('application.speechInput.autoSend') }}
+                    </el-checkbox>
                     <el-switch v-model="settings.stt_model_enable" size="small" @change="changeSpeechInputEnabled" />
                   </span>
                 </div>
@@ -507,7 +518,7 @@ onMounted(() => {
                   v-if="settings.stt_model_enable"
                   class="mt-2"
                   prop="stt_model_id"
-                  :rules="{ required: true, message: '请选择语音输入模型', trigger: 'change' }"
+                  :rules="{ required: true, message: t('application.speechInput.model.requiredMessage'), trigger: 'change' }"
                 >
                   <SelectModel
                     v-model="settings.stt_model_id"
@@ -517,16 +528,20 @@ onMounted(() => {
                     can-edit-params
                     can-add
                     teleported
-                    placeholder="请选择语音输入模型"
+                    :placeholder="t('application.speechInput.model.placeholder')"
                     @refresh="loadModels"
                   />
                 </el-form-item>
 
                 <!-- 语音播放 -->
                 <div class="flex-between mt-4">
-                  <span :class="settings.tts_model_enable && settings.tts_type !== 'BROWSER' ? 'mk-required' : ''">语音播放</span>
+                  <span :class="settings.tts_model_enable && settings.tts_type !== 'BROWSER' ? 'mk-required' : ''">
+                    {{ t('application.speechPlayback.label') }}
+                  </span>
                   <span class="flex-align-center gap-3">
-                    <el-checkbox v-if="settings.tts_model_enable" v-model="settings.tts_autoplay">自动播放</el-checkbox>
+                    <el-checkbox v-if="settings.tts_model_enable" v-model="settings.tts_autoplay">
+                      {{ t('application.speechPlayback.autoPlay') }}
+                    </el-checkbox>
                     <el-switch v-model="settings.tts_model_enable" size="small" @change="changeSpeechPlaybackEnabled" />
                   </span>
                 </div>
@@ -534,11 +549,15 @@ onMounted(() => {
                   v-if="settings.tts_model_enable"
                   class="mt-2"
                   prop="tts_model_id"
-                  :rules="{ required: settings.tts_type === 'TTS', message: '请选择语音播放模型', trigger: 'change' }"
+                  :rules="{
+                    required: settings.tts_type === 'TTS',
+                    message: t('application.speechPlayback.model.requiredMessage'),
+                    trigger: 'change',
+                  }"
                 >
                   <el-radio-group v-model="settings.tts_type" class="mb-2">
-                    <el-radio value="BROWSER">浏览器播放（免费）</el-radio>
-                    <el-radio value="TTS">自定义</el-radio>
+                    <el-radio value="BROWSER">{{ t('application.speechPlayback.browser') }}</el-radio>
+                    <el-radio value="TTS">{{ t('application.speechPlayback.custom') }}</el-radio>
                   </el-radio-group>
                   <SelectModel
                     v-if="settings.tts_type === 'TTS'"
@@ -549,7 +568,7 @@ onMounted(() => {
                     can-edit-params
                     can-add
                     teleported
-                    placeholder="请选择语音播放模型"
+                    :placeholder="t('application.speechPlayback.model.placeholder')"
                     @refresh="loadModels"
                   />
                 </el-form-item>
@@ -560,7 +579,7 @@ onMounted(() => {
       </template>
       <template v-if="hasUnsavedSettings" #notice>
         <div class="shrink-0 px-3 pb-2">
-          <el-alert type="warning" :closable="false" show-icon title="设置有未保存的修改，保存后调试生效" />
+          <el-alert type="warning" :closable="false" show-icon :title="t('application.settings.unsavedMessage')" />
         </div>
       </template>
     </SimpleDebugConversation>

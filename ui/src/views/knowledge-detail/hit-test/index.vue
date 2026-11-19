@@ -125,8 +125,8 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
               <template v-for="searchMode in KNOWLEDGE_SEARCH_MODE_OPTIONS" :key="searchMode.value">
                 <el-card shadow="never" class="w-full!" :class="{ 'border-primary!': searchForm.search_mode === searchMode.value }">
                   <el-radio :value="searchMode.value" class="mk-card-radio">
-                    <h6>{{ t(searchMode.labelKey) }}</h6>
-                    <span class="block text-sm text-N600">{{ t(searchMode.descriptionKey) }}</span>
+                    <h6>{{ searchMode.label }}</h6>
+                    <span class="block text-sm text-N600">{{ searchMode.description }}</span>
                   </el-radio>
                 </el-card>
               </template>

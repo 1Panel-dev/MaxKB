@@ -1,0 +1,126 @@
+{
+  "aiChat": {
+    "label": "AI chat",
+    "description": "Chat with a large language model"
+  },
+  "llm": {
+    "label": "LLM",
+    "description": "Call a large language model once, optionally providing tool definitions and receiving tool calls"
+  },
+  "intent": {
+    "label": "Intent classification",
+    "description": "Match user questions to predefined intent categories"
+  },
+  "speechToText": {
+    "label": "Speech to text",
+    "description": "Convert audio to text using a speech recognition model"
+  },
+  "textToSpeech": {
+    "label": "Text to speech",
+    "description": "Convert text to audio using a speech synthesis model"
+  },
+  "imageGenerate": {
+    "label": "Image generation",
+    "description": "Generate images from the provided text"
+  },
+  "imageToVideo": {
+    "label": "Image to video",
+    "description": "Generate videos from the provided images"
+  },
+  "textToVideo": {
+    "label": "Text to video",
+    "description": "Generate videos from the provided text"
+  },
+  "imageUnderstand": {
+    "label": "Image understanding",
+    "description": "Identify objects and scenes in images to answer user questions"
+  },
+  "videoUnderstand": {
+    "label": "Video understanding",
+    "description": "Identify objects and scenes in videos to answer user questions"
+  },
+  "questionOptimization": {
+    "label": "Question optimization",
+    "description": "Refine the current question using conversation history to better match knowledge segments"
+  },
+  "reply": {
+    "label": "Specified reply",
+    "description": "Return the specified content, converting referenced variables to strings"
+  },
+  "condition": {
+    "label": "Condition",
+    "description": "Run different nodes based on conditions"
+  },
+  "form": {
+    "label": "Form collection",
+    "description": "Collect user information during a conversation and use the form data in subsequent steps"
+  },
+  "variableAssign": {
+    "label": "Variable assignment",
+    "description": "Update the values of global variables"
+  },
+  "variableAggregation": {
+    "label": "Variable aggregation",
+    "description": "Aggregate each group of variables using the configured strategy"
+  },
+  "variableSplitting": {
+    "label": "Variable splitting",
+    "description": "Parse and split JSON variables using JSON Path expressions"
+  },
+  "parameterExtraction": {
+    "label": "Parameter extraction",
+    "description": "Extract structured parameters using an AI model"
+  },
+  "searchKnowledge": {
+    "label": "Knowledge retrieval",
+    "description": "Relate knowledge and find segments relevant to the question"
+  },
+  "searchDocument": {
+    "label": "Document tag retrieval",
+    "description": "Find documents matching the specified tags within the configured search scope"
+  },
+  "documentExtract": {
+    "label": "Document content extraction",
+    "description": "Parse input documents and output structured content"
+  },
+  "reranker": {
+    "label": "Multi-source retrieval",
+    "description": "Rerank retrieval results from multiple knowledge sources using a reranking model"
+  },
+  "mcp": {
+    "label": "MCP call",
+    "description": "Run tools on MCP servers over SSE or Streamable HTTP"
+  },
+  "customTool": {
+    "label": "Custom tool",
+    "description": "Process data by running custom scripts"
+  },
+  "loop": {
+    "label": "Loop",
+    "description": "Repeat a series of tasks using the configured iteration count and logic"
+  },
+  "loopContinue": {
+    "label": "Continue",
+    "description": "End the current iteration and continue with the next one"
+  },
+  "loopBreak": {
+    "label": "Break",
+    "description": "Stop the loop and exit its body"
+  },
+  "documentSplit": {
+    "label": "Document segmentation",
+    "description": "Split input document content into a list of segments using the segmentation strategy"
+  },
+  "localFile": {
+    "label": "Local files",
+    "description": "Upload local documents and output a document list. Use the Document content extraction node to parse their contents"
+  },
+  "webSource": {
+    "label": "Web site",
+    "description": "Crawl web data from a root URL and output documents with content, with one document per URL"
+  },
+  "knowledgeWrite": {
+    "label": "Write to knowledge",
+    "description": "Write the input segments to the current knowledge and generate embeddings"
+  }
+}

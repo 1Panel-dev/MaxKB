@@ -53,14 +53,23 @@
     "editTitle": "編輯 MCP",
     "duplicateTitle": "複製 MCP",
     "serviceTitle": "MCP 服務",
+    "settingsTitle": "MCP 設定",
+    "reference": "引用 MCP",
+    "customService": "自訂 MCP 服務",
     "name": {
       "placeholder": "請輸入 MCP 名稱",
       "requiredMessage": "請輸入 MCP 名稱"
     },
     "config": {
-      "description": "（僅支援 SSE 和 Streamable HTTP 連線方式）",
+      "description": "僅支援 SSE 和 Streamable HTTP 連線方式",
       "requiredMessage": "請輸入 MCP 服務設定",
-      "invalidMessage": "請輸入有效的 JSON 物件作為 MCP 服務設定"
+      "invalidMessage": "請輸入有效的 JSON 物件作為 MCP 服務設定",
+      "invalidJsonMessage": "MCP 服務設定必須是有效的 JSON"
+    },
+    "tools": {
+      "label": "MCP 工具",
+      "placeholder": "請選擇 MCP 工具",
+      "requiredMessage": "請選擇 MCP 工具"
     }
   },
   "dataSource": {

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { inject, provide, ref } from 'vue'
 import { cloneDeep, groupBy } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ModelItem, ModelProviderItem, PromptGenerateMessage } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
 import GenerateContent from '@/components/business/generate-content/index.vue'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 defineOptions({ name: 'PromptGenerate' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   modelId?: string
   modelParamsSetting?: Record<string, unknown>
@@ -145,9 +147,9 @@ function requestGeneratePrompt(messages: PromptGenerateMessage[]) {
   <GenerateContent
     v-model:model-id="activeModelId"
     v-model:model-params="modelParams"
-    title="生成提示词"
-    placeholder="请输入提示词主题"
-    empty-text="提示词显示在这里"
+    :title="t('workflow.promptGeneration.title')"
+    :placeholder="t('workflow.promptGeneration.placeholder')"
+    :empty-text="t('workflow.promptGeneration.empty')"
     :request="requestGeneratePrompt"
     :model-options="modelOptions"
     :provider-options="providerOptions"

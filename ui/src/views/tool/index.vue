@@ -246,7 +246,7 @@ onMounted(() => {
           <h4 class="min-w-0 truncate" :title="currentFolder.name">{{ currentFolder.name }}</h4>
           <el-divider direction="vertical" />
           <el-select v-model="toolType" class="w-30!" :empty-values="[null, undefined]" :value-on-clear="null" @change="refreshTool">
-            <el-option v-for="option in TOOL_TYPE_OPTIONS" :key="option.value" :label="t(option.labelKey)" :value="option.value" />
+            <el-option v-for="option in TOOL_TYPE_OPTIONS" :key="option.value" :label="option.label" :value="option.value" />
           </el-select>
         </div>
         <div class="flex-align-center gap-3">
@@ -310,7 +310,11 @@ onMounted(() => {
                     icon="icon_edit_outlined"
                     @click="handleOpenEditTool(tool)"
                   />
-                  <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW && perm.tool.workspace.edit(tool.id)" :label="t('tool.workflow.label')" :tool="tool" />
+                  <ToolWorkflowAction
+                    v-if="tool.tool_type === TOOL_TYPE.WORKFLOW && perm.tool.workspace.edit(tool.id)"
+                    :label="t('tool.workflow.label')"
+                    :tool="tool"
+                  />
                   <!-- 复制 -->
                   <CopyToolAction
                     v-if="perm.tool.workspace.copy(tool.id)"

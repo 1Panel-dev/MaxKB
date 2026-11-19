@@ -35,9 +35,9 @@ const sourceTypeOptions = [
   { label: sourceLabels[TOOL_RECORD_SOURCE.TRIGGER], value: TOOL_RECORD_SOURCE.TRIGGER },
 ]
 const stateOptions = computed(() => [
-  { label: t(EXECUTION_STATUS_OPTIONS[STATE_TYPES.SUCCESS].labelKey), value: STATE_TYPES.SUCCESS },
-  { label: t(EXECUTION_STATUS_OPTIONS[STATE_TYPES.STARTED].labelKey), value: STATE_TYPES.STARTED },
-  { label: t(EXECUTION_STATUS_OPTIONS[STATE_TYPES.FAILURE].labelKey), value: STATE_TYPES.FAILURE },
+  { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.SUCCESS].label, value: STATE_TYPES.SUCCESS },
+  { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.STARTED].label, value: STATE_TYPES.STARTED },
+  { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.FAILURE].label, value: STATE_TYPES.FAILURE },
 ])
 const searchFields = [{ label: '触发来源', value: 'source_name' }]
 const selectedSourceType = ref<string | null>(null)
@@ -181,7 +181,7 @@ defineExpose({ open })
           <MkStatusLabel
             v-if="EXECUTION_STATUS_OPTIONS[row.state]"
             :type="EXECUTION_STATUS_OPTIONS[row.state].type"
-            :label="t(EXECUTION_STATUS_OPTIONS[row.state].labelKey)"
+            :label="EXECUTION_STATUS_OPTIONS[row.state].label"
             :icon="EXECUTION_STATUS_OPTIONS[row.state].icon"
           />
           <span v-else>{{ row.state }}</span>

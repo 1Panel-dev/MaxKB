@@ -47,8 +47,8 @@ defineExpose({ open })
       <template v-for="option in KNOWLEDGE_SYNC_OPTIONS" :key="option.value">
         <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': syncType === option.value }">
           <el-radio :value="option.value" class="mk-card-radio">
-            <h6>{{ t(option.labelKey) }}</h6>
-            <span class="mt-1 block text-sm text-N600">{{ t(option.descriptionKey) }}</span>
+            <h6>{{ option.label }}</h6>
+            <span class="mt-1 block text-sm text-N600">{{ option.description }}</span>
           </el-radio>
         </el-card>
       </template>

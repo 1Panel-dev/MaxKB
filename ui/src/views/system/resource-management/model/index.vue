@@ -8,7 +8,7 @@ import SystemModelApi from '@/api/admin/system/resource-management/model'
 import SystemRelatedResourcesApi from '@/api/admin/system/resource-management/related-resources'
 import SystemWorkspaceApi from '@/api/admin/system/workspace'
 import { AuthorizeModelAction, EditModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
-import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
+import { MODEL_TYPE_LABELS } from '@/constants/model'
 import { useStore } from '@/stores'
 import { toOrderBy } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
@@ -33,7 +33,7 @@ const searchFields = computed(() => [
   { label: t('model.fields.name.label'), value: 'name' },
   { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
-const modelTypeOptions = computed(() => Object.entries(MODEL_TYPE_MESSAGE_KEYS).map(([value, key]) => ({ value, label: t(key) })))
+const modelTypeOptions = computed(() => Object.entries(MODEL_TYPE_LABELS).map(([value, label]) => ({ value, label })))
 
 function loadCreatorOptions(keyword: string) {
   return SystemCommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
@@ -171,7 +171,7 @@ onMounted(() => {
             />
           </template>
           <template #default="{ row }">
-            {{ MODEL_TYPE_MESSAGE_KEYS[row.model_type] ? t(MODEL_TYPE_MESSAGE_KEYS[row.model_type]!) : row.model_type }}
+            {{ MODEL_TYPE_LABELS[row.model_type] ?? row.model_type }}
           </template>
         </el-table-column>
         <el-table-column prop="model_name" :label="t('model.fields.baseModel.label')" min-width="180" show-overflow-tooltip />

@@ -22,7 +22,7 @@ const props = defineProps<{
 const loading = ref(false)
 const syncLogs = ref<KnowledgeSyncLog[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
-const syncMethodLabels = computed(() => new Map(KNOWLEDGE_SYNC_OPTIONS.map(({ value, labelKey }) => [value, t(labelKey)])))
+const syncMethodLabels = computed(() => new Map(KNOWLEDGE_SYNC_OPTIONS.map(({ value, label }) => [value, label])))
 const syncStatusOptions = computed<Partial<Record<KnowledgeSyncStatus, StatusLabelOptions>>>(() => ({
   [KNOWLEDGE_SYNC_STATUS.RUNNING]: { type: 'loading', label: t('knowledge.syncLog.status.running') },
   [KNOWLEDGE_SYNC_STATUS.SUCCESS]: { type: 'success', label: t('common.status.success') },

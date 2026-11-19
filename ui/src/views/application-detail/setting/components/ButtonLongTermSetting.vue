@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { LongTermSettingData } from '../settings'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { CascaderOption, FormInstance } from 'element-plus'
@@ -9,6 +10,7 @@ import SelectModel from '@/components/business/select-model/index.vue'
 import { SCHEDULE_OPTION } from '@/constants/schedule'
 
 defineOptions({ name: 'ButtonLongTermSetting' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ modelOptions: ModelItem[]; providerOptions: ModelProviderItem[] }>()
 const setting = defineModel<LongTermSettingData>({ required: true })
@@ -39,10 +41,21 @@ const triggerRounds = computed<number | undefined>({
     formData.value.long_term_trigger_setting.rounds = rounds
   },
 })
-const triggerOptions = [
-  { value: 'ROUND', label: '按轮次触发', description: '累计到 N 轮后，自动提炼 N 轮对话，生成记忆' },
-  { value: 'SCHEDULED', label: '定时触发', description: '到设定时间后，自动提炼周期内所有对话，生成记忆' },
-] as const
+const triggerOptions = computed(
+  () =>
+    [
+      {
+        value: 'ROUND',
+        label: t('application.longTermMemory.trigger.rounds'),
+        description: t('application.longTermMemory.trigger.roundsDescription'),
+      },
+      {
+        value: 'SCHEDULED',
+        label: t('application.longTermMemory.trigger.scheduled'),
+        description: t('application.longTermMemory.trigger.scheduledDescription'),
+      },
+    ] as const,
+)
 const scheduleMode = computed<'cron' | 'preset'>({
   get: () => (formData.value.long_term_trigger_setting.schedule_type === 'cron' ? 'cron' : 'preset'),
   set: (mode) => {
@@ -96,7 +109,11 @@ async function validateTriggerSetting() {
 }
 
 function validateRounds(_rule: unknown, value: unknown, callback: (error?: Error) => void) {
-  callback(typeof value === 'number' && Number.isInteger(value) && value >= 5 && value <= 100 ? undefined : new Error('请输入 5–100 之间的整数轮次'))
+  callback(
+    typeof value === 'number' && Number.isInteger(value) && value >= 5 && value <= 100
+      ? undefined
+      : new Error(t('application.longTermMemory.rounds.invalidMessage')),
+  )
 }
 
 function validateSchedule(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
@@ -107,7 +124,7 @@ function validateSchedule(_rule: unknown, _value: unknown, callback: (error?: Er
     if (!selectedOption) break
     options = selectedOption.children ?? []
   }
-  callback(selectedOption && !selectedOption.children?.length ? undefined : new Error('请选择触发周期'))
+  callback(selectedOption && !selectedOption.children?.length ? undefined : new Error(t('application.longTermMemory.period.requiredMessage')))
 }
 
 function open() {
@@ -138,7 +155,7 @@ function validateCron(_rule: unknown, value: unknown, callback: (error?: Error) 
     .trim()
     .split(/\s+/)
   if (fields.length !== 5 || fields.some((field) => !field)) {
-    callback(new Error('请输入有效的Cron 表达式'))
+    callback(new Error(t('common.schedule.cron.invalidMessage')))
     return
   }
   callback()
@@ -168,9 +185,13 @@ function submit() {
   <el-button text type="primary" @click="open">
     <MkIcon name="icon_setting" />
   </el-button>
-  <MkDialog v-model="visible" title="长期记忆设置" @closed="resetData">
-    <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="AI 模型" prop="long_term_model_id" :rules="{ required: true, message: '请选择长期记忆模型', trigger: 'change' }">
+  <MkDialog v-model="visible" :title="t('application.longTermMemory.title')" @closed="resetData">
+    <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form-item
+        :label="t('workflow.model.label')"
+        prop="long_term_model_id"
+        :rules="{ required: true, message: t('application.longTermMemory.model.requiredMessage'), trigger: 'change' }"
+      >
         <SelectModel
           v-model="formData.long_term_model_id"
           v-model:model-params="formData.long_term_model_params_setting"
@@ -178,11 +199,15 @@ function submit() {
           teleported
           :options="modelOptions"
           :provider-options="providerOptions"
-          placeholder="请选择长期记忆模型"
+          :placeholder="t('application.longTermMemory.model.placeholder')"
         />
       </el-form-item>
 
-      <el-form-item label="触发方式" prop="long_term_trigger_type" :rules="{ required: true, message: '请选择触发方式', trigger: 'change' }">
+      <el-form-item
+        :label="t('application.longTermMemory.trigger.label')"
+        prop="long_term_trigger_type"
+        :rules="{ required: true, message: t('application.longTermMemory.trigger.requiredMessage'), trigger: 'change' }"
+      >
         <div class="w-full space-y-2">
           <!-- 选择长期记忆触发方式 -->
           <template v-for="trigger in triggerOptions" :key="trigger.value">
@@ -202,9 +227,14 @@ function submit() {
                   <!-- 定时 -->
                   <template v-if="trigger.value === 'SCHEDULED'">
                     <div class="flex-between mb-2">
-                      <span class="mk-required">{{ scheduleMode === 'preset' ? '触发周期' : 'Cron 表达式' }}</span>
+                      <span class="mk-required">
+                        {{ scheduleMode === 'preset' ? t('application.longTermMemory.period.label') : t('common.schedule.cron.label') }}
+                      </span>
                       <!-- 切换周期设置与 Cron 表达式 -->
-                      <MkTooltip :content="scheduleMode === 'preset' ? '切换为 Cron 表达式' : '切换为周期设置'" placement="top">
+                      <MkTooltip
+                        :content="scheduleMode === 'preset' ? t('common.schedule.switchToCron') : t('common.schedule.switchToPreset')"
+                        placement="top"
+                      >
                         <el-button text type="primary" @click="scheduleMode = scheduleMode === 'preset' ? 'cron' : 'preset'">
                           <MkIcon name="icon_swich" />
                         </el-button>
@@ -222,25 +252,25 @@ function submit() {
                         teleported
                         class="w-full"
                         clearable
-                        placeholder="请选择触发周期"
+                        :placeholder="t('application.longTermMemory.period.placeholder')"
                       />
                     </el-form-item>
                     <el-form-item
                       v-else
                       prop="long_term_trigger_setting.cron_expression"
                       :rules="[
-                        { required: true, whitespace: true, message: '请输入有效的Cron 表达式', trigger: ['blur', 'change'] },
+                        { required: true, whitespace: true, message: t('common.schedule.cron.invalidMessage'), trigger: ['blur', 'change'] },
                         { validator: validateCron, trigger: ['blur', 'change'] },
                       ]"
                       class="mb-0!"
                     >
-                      <el-input v-model="formData.long_term_trigger_setting.cron_expression" placeholder="请输入Cron表达式（如：0 0 1 * *）" />
+                      <el-input v-model="formData.long_term_trigger_setting.cron_expression" :placeholder="t('common.schedule.cron.placeholder')" />
                     </el-form-item>
                   </template>
                   <!-- 按轮次 -->
                   <el-form-item
                     v-else
-                    label="触发间隔"
+                    :label="t('application.longTermMemory.rounds.label')"
                     prop="long_term_trigger_setting.rounds"
                     :rules="{ required: true, validator: validateRounds, trigger: ['blur', 'change'] }"
                     class="mb-0!"
@@ -265,9 +295,9 @@ function submit() {
 
     <template #footer>
       <!-- 取消长期记忆设置 -->
-      <el-button plain @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存长期记忆设置 -->
-      <el-button type="primary" @click="submit">保存</el-button>
+      <el-button type="primary" @click="submit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

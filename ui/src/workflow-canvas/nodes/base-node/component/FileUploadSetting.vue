@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { computed, reactive, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FileUploadSettingData } from '../types'
 import type { FormInstance, FormRules } from 'element-plus'
 import audioIcon from '@/assets/file-type/file-audio-icon.svg'
@@ -10,6 +11,8 @@ import videoIcon from '@/assets/file-type/file-video-icon.svg'
 import MkTagsEdit from '@/components/mk-tags-edit/index.vue'
 import { defaultFileUploadSetting } from '../constant'
 import { AUDIO_EXTENSIONS, DOCUMENT_EXTENSIONS, IMAGE_EXTENSIONS, VIDEO_EXTENSIONS } from '@/constants/file-type'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'BaseNodeFileUploadSetting' })
 
@@ -25,18 +28,18 @@ const rules: FormRules<FileUploadSettingData> = {
       required: true,
       trigger: 'change',
       validator: (_rule, _value, callback) => {
-        callback(formData.value.local_upload || formData.value.url_upload ? undefined : new Error('请至少选择一种上传方式'))
+        callback(formData.value.local_upload || formData.value.url_upload ? undefined : new Error(t('workflow.fileUpload.method.requiredMessage')))
       },
     },
   ],
 }
 
-const fileTypes = [
-  { field: 'document', label: '文档', icon: documentIcon, extensions: DOCUMENT_EXTENSIONS },
-  { field: 'image', label: '图片', icon: imageIcon, extensions: IMAGE_EXTENSIONS },
-  { field: 'audio', label: '音频', icon: audioIcon, extensions: AUDIO_EXTENSIONS },
-  { field: 'video', label: '视频', icon: videoIcon, extensions: VIDEO_EXTENSIONS },
-] as const
+const fileTypes = reactive([
+  { field: 'document', label: computed(() => t('workflow.fileUpload.types.document')), icon: documentIcon, extensions: DOCUMENT_EXTENSIONS },
+  { field: 'image', label: computed(() => t('workflow.fileUpload.types.image')), icon: imageIcon, extensions: IMAGE_EXTENSIONS },
+  { field: 'audio', label: computed(() => t('workflow.fileUpload.types.audio')), icon: audioIcon, extensions: AUDIO_EXTENSIONS },
+  { field: 'video', label: computed(() => t('workflow.fileUpload.types.video')), icon: videoIcon, extensions: VIDEO_EXTENSIONS },
+] as const)
 
 const presetExtensions = fileTypes.flatMap(({ extensions }) => extensions)
 
@@ -64,23 +67,31 @@ function resetData() {
   <el-button text type="primary" @click="open">
     <MkIcon name="icon_setting" />
   </el-button>
-  <MkDialog v-model="visible" title="文件上传设置" @closed="resetData">
-    <el-form ref="formRef" :model="formData" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="上传方式" prop="local_upload">
+  <MkDialog v-model="visible" :title="t('workflow.fileUpload.title')" @closed="resetData">
+    <el-form
+      :validate-on-rule-change="false"
+      ref="formRef"
+      :model="formData"
+      :rules="rules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('workflow.fileUpload.method.label')" prop="local_upload">
         <div class="flex w-full flex-wrap gap-6">
-          <el-checkbox v-model="formData.local_upload">本地上传</el-checkbox>
-          <el-checkbox v-model="formData.url_upload">URL 上传</el-checkbox>
+          <el-checkbox v-model="formData.local_upload">{{ t('workflow.fileUpload.method.local') }}</el-checkbox>
+          <el-checkbox v-model="formData.url_upload">{{ t('workflow.fileUpload.method.url') }}</el-checkbox>
         </div>
       </el-form-item>
-      <el-form-item label="单次最多上传文件数">
+      <el-form-item :label="t('workflow.fileUpload.maxFiles')">
         <MkSlider v-model="formData.maxFiles" :max="100" :min="1" />
       </el-form-item>
 
-      <el-form-item label="每个文件最大 (MB)">
+      <el-form-item :label="`${t('workflow.fileUpload.fileSize')} (MB)`">
         <MkSlider v-model="formData.fileLimit" :max="1000" :min="1" />
       </el-form-item>
 
-      <el-form-item label="允许上传的文件类型">
+      <el-form-item :label="t('workflow.fileUpload.allowedTypes')">
         <div class="w-full space-y-2">
           <template v-for="fileType in fileTypes" :key="fileType.field">
             <MkCardCheckbox v-model="formData[fileType.field]" :label="fileType.label">
@@ -94,11 +105,11 @@ function resetData() {
             </MkCardCheckbox>
           </template>
 
-          <MkCardCheckbox v-model="formData.other" label="其他文件">
+          <MkCardCheckbox v-model="formData.other" :label="t('workflow.fileUpload.types.other')">
             <div class="flex-align-center min-w-0 gap-3">
               <img class="shrink-0 w-6" src="@/assets/file-type/unknown-icon.svg" />
               <div class="min-w-0 flex-1">
-                <h6 class="mb-2">其他文件</h6>
+                <h6 class="mb-2">{{ t('workflow.fileUpload.types.other') }}</h6>
                 <MkTagsEdit v-model="formData.otherExtensions" :preset-extensions="presetExtensions" />
               </div>
             </div>
@@ -109,9 +120,9 @@ function resetData() {
 
     <template #footer>
       <!-- 取消设置 -->
-      <el-button plain @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存文件上传设置 -->
-      <el-button type="primary" @click="submit">确定</el-button>
+      <el-button type="primary" @click="submit">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

@@ -19,7 +19,7 @@
 ```text
 src/workflow-canvas/
 ├── component/          # NodeAdd、NodeSearch、节点设置及 NodeControl 画布控制栏
-├── config/             # 节点数据、映射、常量及预留的本地化配置
+├── config/             # 节点数据、映射与常量
 ├── Execution-details/  # 执行详情：顶层分发入口与公共卡壳，节点内容由 nodes/*/details/ 提供
 ├── ai-generate/        # 工作流 AI 生成：agent 引擎、画布适配、建图工具、节点配置 agent 与生成面板
 ├── core/               # 稳定的画布内核与所有节点共用的基础能力
@@ -83,13 +83,20 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 - `node-mapping.ts`：节点类型到配置数据的映射、模式匹配和默认节点集合。知识库的
   `defaultKnowledgeNodes` 使用本地文件数据源；`defaultApplicationNodes` 使用基本信息与开始，
   `defaultToolNodes` 使用工具基本信息与工具开始，均作为空工作流的初始节点。
-- `constants.ts`：仅供工作流画布使用的稳定常量。
-- `locale.ts`：预留的节点文案本地化配置；国际化接入前不参与当前逻辑。
+- `constants.ts`：比较符选项与文件引用示例；比较符也供动态表单显隐条件复用。
+
+国际化不得更改 `node-data.ts` 的数据属性名或结构，也不得增加 `labelKey`、`descriptionKey` 等属性。
+菜单通过 `node-menu/menu.ts` 的 `WORKFLOW_NODE_DISPLAY` 按原有节点 `type` 读取响应式名称和说明，配置中直接调用 `t`；新增菜单节点时同步补齐展示文案。
+`label`、`text` 继续供 AI 节点目录读取，`properties.stepName` 仍是节点默认名称和变量引用的来源。
+菜单展示与搜索读取响应式文案，不在配置模块加载时固化当前语言，也不修改节点的保存数据。
+
+`compareList` 保留比较符协议值和顺序，界面按比较符 `value` 直接调用 `t` 读取 `dynamicForm.operators`；
+`label` 仅供 AI 工具的固定参数说明使用。`FILE_REFERENCE_EXAMPLE` 只保存 JSON 示例字符串，
+展示处使用 `t('common.labels.example')` 组合提示标题，示例字段、地址和文件 ID 保持原样。
 
 配置数据中的函数应提取到对应职责文件，不把行为逻辑混入 `node-data.ts`。当前尚未接入国际化
 的文案直接使用中文，不从 `@/locales` 引入 `t`。
-用户输入和表单节点的控件类型名称使用动态表单公开的 DYNAMIC_FORM_TYPES，由组件通过
-当前应用的 useI18n 翻译 labelKey；可选范围与顺序沿用节点约束，已保存字段与默认值不随语言变化。
+用户输入和表单节点的控件类型名称使用动态表单公开的 DYNAMIC_FORM_TYPES，在响应式展示配置中直接调用 t，组件读取 label；可选范围与顺序沿用节点约束，已保存字段与默认值不随语言变化。
 
 ### `node-menu/`
 
@@ -97,6 +104,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 `BasicNodeMenu.vue` 负责基础组件搜索和列表；`ResourceNodeMenu.vue` 负责工具、数据源与智能体的文件夹、
 搜索和资源列表；`index.vue` 只负责 Tabs 和事件汇总。`component/NodeAdd.vue` 负责画布左上角的
 悬浮入口与菜单显隐；画布入口传入 `workflowMode` 并完成节点创建。左上角和锚点菜单均支持点击与拖拽添加。
+分组原名称供 AI 目录使用，界面读取 `WORKFLOW_MENU_LABELS` 的响应式文案；搜索按当前语言的节点名称匹配，点击与拖拽向外传递原节点定义。
 
 工作流 Store 的 `getToolListWithShared` 用于包含已授权共享工具的选项查询，MCP 节点使用
 `tool_type: 'MCP'` 筛选；AI 对话的 `McpSettingDialog` 每次打开通过
@@ -286,6 +294,8 @@ AI 对话、意图识别、问题优化、参数提取、图片理解、视频�
 
 #### 基本信息设置
 
+基本信息节点及其弹窗直接使用当前语言的 `t`；文案复用与文件分配见 [国际化规则](../locales/LOCALE_README.md#工作流)。保留节点名称、变量路径和已保存字段内容，语言切换不重置配置或触发表单校验。
+
 `component/LongTermSetting.vue` 封装长期记忆按钮与弹窗，通过 `v-model` 接收 `LongTermSetting`，
 模型与供应商选项由节点传入；保存时仅合并长期记忆配置。
 
@@ -392,8 +402,8 @@ AI 对话、图片理解和视频理解统一复用 `component/ThinkingSetting.v
 问答对策略下的字段显隐。文档与当前可见的配置引用仅在表单项声明数组必填规则，
 由 `NodeCascader` 触发表单项校验，节点统一调用 `formRef.validate()`，不维护引用组件校验 Ref；
 切换来源或策略保留字段值并清理校验和浮层保护。分段标识选项共用 `@/constants/document` 的
-`DOCUMENT_SPLIT_PATTERN_OPTIONS`，文字标签在展示时通过 `t` 翻译，纯符号及提交的正则值保持原样；
-Agent 使用固定的 `label` 识别参数。选项与后端 `DocumentSerializers.SplitPattern` 保持一致，
+`DOCUMENT_SPLIT_PATTERN_OPTIONS`，文字标签在响应式配置中直接调用 `t`，纯符号及提交的正则值保持原样；
+Agent 使用 `DOCUMENT_SPLIT_PATTERNS` 的固定标识识别参数。选项与后端 `DocumentSerializers.SplitPattern` 保持一致，
 支持按选择顺序递归分割和添加自定义标识；定义与使用约定见 [CONSTANT_README.md](../constants/CONSTANT_README.md)。
 
 #### 循环画布与导出

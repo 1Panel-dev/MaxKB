@@ -28,7 +28,7 @@ const searchFields = computed(() => [
     value: 'state',
     options: [STATE_TYPES.PENDING, STATE_TYPES.STARTED, STATE_TYPES.SUCCESS, STATE_TYPES.FAILURE, STATE_TYPES.REVOKE, STATE_TYPES.REVOKED].map(
       (state) => ({
-        label: t(EXECUTION_STATUS_OPTIONS[state].labelKey),
+        label: EXECUTION_STATUS_OPTIONS[state].label,
         value: state,
       }),
     ),
@@ -174,7 +174,7 @@ defineExpose({ open, close })
           <MkStatusLabel
             v-if="EXECUTION_STATUS_OPTIONS[row.state]"
             :type="EXECUTION_STATUS_OPTIONS[row.state].type"
-            :label="t(EXECUTION_STATUS_OPTIONS[row.state].labelKey)"
+            :label="EXECUTION_STATUS_OPTIONS[row.state].label"
             :icon="EXECUTION_STATUS_OPTIONS[row.state].icon"
           />
           <span v-else>{{ row.state }}</span>

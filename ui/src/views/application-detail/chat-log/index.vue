@@ -9,7 +9,7 @@ import { useApplicationDetailContext } from '../context'
 import ChatLogDetailDrawer from './ChatLogDetailDrawer.vue'
 import ButtonAddKnowledge from './add-knowledge/ButtonAddKnowledge.vue'
 import ButtonCleanStrategy from './clean-strategy/ButtonCleanStrategy.vue'
-import { CHAT_LOG_SOURCE_MESSAGE_KEYS } from './constants'
+import { CHAT_LOG_SOURCE_LABELS } from './constants'
 import { toOrderBy } from '@/utils/common'
 import { isSystemResource } from '@/utils/resource-context.ts'
 import { beforeDay, datetimeFormat } from '@/utils/time'
@@ -34,9 +34,7 @@ const loading = ref(false)
 const chatLogs = ref<ChatLog[]>([])
 const orderBy = ref<string>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
-const sourceOptions = computed<OptionItem<string>[]>(() =>
-  Object.entries(CHAT_LOG_SOURCE_MESSAGE_KEYS).map(([value, key]) => ({ value, label: t(key) })),
-)
+const sourceOptions = computed<OptionItem<string>[]>(() => Object.entries(CHAT_LOG_SOURCE_LABELS).map(([value, label]) => ({ value, label })))
 const searchFields = computed<OptionItem<string>[]>(() => [
   { label: t('application.chatLog.labels.abstract'), value: 'abstract' },
   { label: t('application.chatLog.labels.user'), value: 'username' },
@@ -111,8 +109,7 @@ function loadChatLogs(currentPage = paginationConfig.value.currentPage): Promise
 
 function formatSource(source?: string) {
   if (!source) return '-'
-  const sourceKey = CHAT_LOG_SOURCE_MESSAGE_KEYS[source as ChatLogSource]
-  return sourceKey ? t(sourceKey) : source
+  return CHAT_LOG_SOURCE_LABELS[source as ChatLogSource] ?? source
 }
 
 // 对话详情的打开、关闭与跨页切换

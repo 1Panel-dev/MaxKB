@@ -9,7 +9,7 @@ import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import ProviderApi from '@/api/admin/model-provider'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import { loadCachedBaseModelOptions, loadCachedOrBuiltinBaseModelOptions } from '@/views/model/base-model-options'
-import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
+import { MODEL_TYPE_LABELS } from '@/constants/model'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'EditModelDrawer' })
@@ -253,7 +253,7 @@ defineExpose({ open })
               </span>
             </template>
             <el-select v-model="modelForm.model_type" class="w-full" disabled :placeholder="t('model.fields.type.placeholder')">
-              <el-option v-for="(key, value) in MODEL_TYPE_MESSAGE_KEYS" :key="value" :label="t(key)" :value="value" />
+              <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
             </el-select>
           </el-form-item>
         </template>

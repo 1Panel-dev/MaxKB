@@ -161,21 +161,6 @@ function open(triggerId?: string) {
 }
 
 /* 触发周期及事件参数 */
-const scheduleOptions = computed(() =>
-  SCHEDULE_OPTION.map((period) => ({
-    ...period,
-    label: typeof period.labelKey === 'string' ? t(period.labelKey) : period.label,
-    children: period.children?.map((option) => ({
-      ...option,
-      label:
-        period.value === SCHEDULE_TYPE.MONTHLY
-          ? `${option.value} ${t('common.schedule.day')}`
-          : typeof option.labelKey === 'string'
-            ? t(option.labelKey)
-            : option.label,
-    })),
-  })),
-)
 const scheduleValue = computed<Array<number | string>>({
   get: () => {
     const setting = form.value.trigger_setting
@@ -396,7 +381,7 @@ defineExpose({ open })
                       <el-cascader
                         v-if="form.trigger_setting.schedule_type !== SCHEDULE_TYPE.CRON"
                         v-model="scheduleValue"
-                        :options="scheduleOptions"
+                        :options="SCHEDULE_OPTION"
                         :teleported="false"
                         class="w-full"
                         clearable

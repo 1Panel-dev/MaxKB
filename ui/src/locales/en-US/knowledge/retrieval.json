@@ -18,7 +18,8 @@
       "label": "Similarity higher than",
       "description": "The higher the similarity, the stronger the relevance."
     },
-    "topNumber": "Top segments"
+    "topNumber": "Top segments",
+    "maxReferenceCharacters": "Maximum referenced characters"
   },
   "hitTest": {
     "title": "Retrieval testing",

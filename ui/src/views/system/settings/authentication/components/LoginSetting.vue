@@ -8,7 +8,7 @@ import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
@@ -175,11 +175,7 @@ onActivated(() => {
     <el-form-item :label="t('auth.loginSettings.method.label')" prop="login_methods">
       <el-checkbox-group v-model="form.login_methods" @change="handleLoginMethodsChange" class="flex-wrap">
         <el-checkbox v-for="loginMethodOption in loginMethodOptions" :key="loginMethodOption.value" :value="loginMethodOption.value" class="w-40">
-          {{
-            LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod]
-              ? t(LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod])
-              : loginMethodOption.label
-          }}
+          {{ LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] ?? loginMethodOption.label }}
         </el-checkbox>
       </el-checkbox-group>
     </el-form-item>
@@ -190,11 +186,7 @@ onActivated(() => {
           v-for="loginMethodOption in defaultLoginMethodOptions"
           :key="loginMethodOption.value"
           :value="loginMethodOption.value"
-          :label="
-            LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod]
-              ? t(LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod])
-              : loginMethodOption.label
-          "
+          :label="LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] ?? loginMethodOption.label"
         />
       </el-select>
     </el-form-item>

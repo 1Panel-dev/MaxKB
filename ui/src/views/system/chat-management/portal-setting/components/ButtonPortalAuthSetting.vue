@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import type { LoginMethod, PortalAuthConfig, PortalSetting, PortalSettingPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
-import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 
 const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ disabled: boolean; setting: PortalSetting; saving: boolean; save: (payload: PortalSettingPayload) => Promise<void> }>()
@@ -119,11 +119,7 @@ defineExpose({ open })
       <el-form-item :label="t('auth.loginSettings.method.label')" prop="login_value">
         <el-checkbox-group v-model="authForm.login_value" @change="handleLoginMethodsChange" class="flex-wrap">
           <el-checkbox v-for="loginMethodOption in loginMethodOptions" :key="loginMethodOption.value" :value="loginMethodOption.value" class="w-32">
-            {{
-              LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod]
-                ? t(LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod])
-                : loginMethodOption.label
-            }}
+            {{ LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] ?? loginMethodOption.label }}
           </el-checkbox>
         </el-checkbox-group>
       </el-form-item>
@@ -133,11 +129,7 @@ defineExpose({ open })
             v-for="loginMethodOption in defaultLoginMethodOptions"
             :key="loginMethodOption.value"
             :value="loginMethodOption.value"
-            :label="
-              LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod]
-                ? t(LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod])
-                : loginMethodOption.label
-            "
+            :label="LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] ?? loginMethodOption.label"
           />
         </el-select>
       </el-form-item>

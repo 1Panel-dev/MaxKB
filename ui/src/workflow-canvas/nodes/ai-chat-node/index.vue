@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { AiChatNodeForm } from './types'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -10,12 +11,14 @@ import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
 import ThinkingSetting from '@/workflow-canvas/component/ThinkingSetting.vue'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
-import { fileTooltip } from '@/workflow-canvas/config/constants'
+import { FILE_REFERENCE_EXAMPLE } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import ResourceSetting from './component/resource-setting/index.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'WorkflowAiChatNode' })
 
@@ -217,7 +220,7 @@ onMounted(() => {
                 <span>图片</span>
                 <MkTooltip placement="right">
                   <template #content>
-                    <div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div>
+                    <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>
                   </template>
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
@@ -232,7 +235,7 @@ onMounted(() => {
                 视频
                 <MkTooltip placement="right">
                   <template #content>
-                    <div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div>
+                    <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>
                   </template>
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>

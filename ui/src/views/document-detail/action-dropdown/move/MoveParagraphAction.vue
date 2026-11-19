@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ParagraphMoveDirection } from './types'
 
@@ -7,12 +8,12 @@ const { t } = useI18n({ useScope: 'global' })
 defineProps<{ label: string; disabled?: boolean }>()
 const emit = defineEmits<{ move: [direction: ParagraphMoveDirection]; 'visible-change': [visible: boolean] }>()
 
-const positionOptions = [
-  { labelKey: 'knowledge.paragraph.position.top', value: 'top' },
-  { labelKey: 'knowledge.paragraph.position.up', value: 'up' },
-  { labelKey: 'knowledge.paragraph.position.down', value: 'down' },
-  { labelKey: 'knowledge.paragraph.position.bottom', value: 'bottom' },
-] as const satisfies readonly { labelKey: string; value: ParagraphMoveDirection }[]
+const positionOptions = reactive([
+  { label: computed(() => t('knowledge.paragraph.position.top')), value: 'top' },
+  { label: computed(() => t('knowledge.paragraph.position.up')), value: 'up' },
+  { label: computed(() => t('knowledge.paragraph.position.down')), value: 'down' },
+  { label: computed(() => t('knowledge.paragraph.position.bottom')), value: 'bottom' },
+] as const) satisfies readonly { label: string; value: ParagraphMoveDirection }[]
 </script>
 
 <template>
@@ -31,7 +32,7 @@ const positionOptions = [
           <template v-for="positionOption in positionOptions" :key="positionOption.value">
             <!-- 按所选方向移动分段 -->
             <MkDropdownItem :disabled="disabled" @click="emit('move', positionOption.value)">
-              {{ t(positionOption.labelKey) }}
+              {{ positionOption.label }}
             </MkDropdownItem>
           </template>
         </MkDropdownMenu>

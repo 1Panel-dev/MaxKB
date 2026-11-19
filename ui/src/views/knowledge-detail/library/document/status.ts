@@ -1,21 +1,23 @@
 /** 文档状态展示、筛选配置及任务运行状态判断。 */
-import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, STATE_TYPES } from '@/api/enums'
+import { computed, reactive } from 'vue'
 import type { DocumentItem, DocumentTaskType } from '@/api/types'
 import type { StatusLabelType } from '@/components/global/mk-status-label/types'
+import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, STATE_TYPES } from '@/api/enums'
+import { t } from '@/locales'
 
 // 文档展示阶段独立于执行记录接口状态，筛选值不直接提交给后端。
-export const DOCUMENT_STATUS_OPTIONS = {
-  [STATE_TYPES.PENDING]: { type: 'loading', labelKey: 'common.status.pending' },
-  [STATE_TYPES.STARTED]: { type: 'loading', labelKey: 'common.status.running' },
-  EMBEDDING: { type: 'loading', labelKey: 'knowledge.document.status.embedding' },
-  GENERATE: { type: 'loading', labelKey: 'knowledge.document.status.generate' },
-  SYNC: { type: 'loading', labelKey: 'knowledge.document.status.sync' },
-  TOKENIZE: { type: 'loading', labelKey: 'knowledge.document.status.tokenize' },
-  [STATE_TYPES.SUCCESS]: { type: 'success', labelKey: 'common.status.success' },
-  [STATE_TYPES.FAILURE]: { type: 'failure', labelKey: 'common.status.failure' },
-  [STATE_TYPES.REVOKE]: { type: 'loading', labelKey: 'common.status.canceling' },
-  [STATE_TYPES.REVOKED]: { type: 'failure', labelKey: 'common.status.canceled' },
-} satisfies Record<string, { type: StatusLabelType; labelKey: string }>
+export const DOCUMENT_STATUS_OPTIONS = reactive({
+  [STATE_TYPES.PENDING]: { type: 'loading', label: computed(() => t('common.status.pending')) },
+  [STATE_TYPES.STARTED]: { type: 'loading', label: computed(() => t('common.status.running')) },
+  EMBEDDING: { type: 'loading', label: computed(() => t('knowledge.document.status.embedding')) },
+  GENERATE: { type: 'loading', label: computed(() => t('knowledge.document.status.generate')) },
+  SYNC: { type: 'loading', label: computed(() => t('knowledge.document.status.sync')) },
+  TOKENIZE: { type: 'loading', label: computed(() => t('knowledge.document.status.tokenize')) },
+  [STATE_TYPES.SUCCESS]: { type: 'success', label: computed(() => t('common.status.success')) },
+  [STATE_TYPES.FAILURE]: { type: 'failure', label: computed(() => t('common.status.failure')) },
+  [STATE_TYPES.REVOKE]: { type: 'loading', label: computed(() => t('common.status.canceling')) },
+  [STATE_TYPES.REVOKED]: { type: 'failure', label: computed(() => t('common.status.canceled')) },
+}) satisfies Record<string, { type: StatusLabelType; label: string }>
 
 interface DocumentStatusFilter {
   value: keyof typeof DOCUMENT_STATUS_OPTIONS

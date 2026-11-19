@@ -6,7 +6,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
 import AuthScanApi from '@/api/admin/system/settings/auth-scan-setting'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
-import { LOGIN_METHOD_LABEL_KEYS, SCAN_FIELD_LABELS } from '@/constants'
+import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
 import { copyText } from '@/utils/clipboard'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
@@ -80,7 +80,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" :title="t('common.configuration.title', { name: t(LOGIN_METHOD_LABEL_KEYS[form.key]) })" @closed="resetData">
+  <MkDrawer v-model="visible" :title="t('common.configuration.title', { name: LOGIN_METHOD_LABELS[form.key] })" @closed="resetData">
     <el-form
       ref="formRef"
       v-loading="loading"

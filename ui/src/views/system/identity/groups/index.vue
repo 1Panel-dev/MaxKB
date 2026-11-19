@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
-import { mapValues } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { Dict, LoginMethod, OptionItem, SystemUserGroup, SystemUserGroupMember, WorkspaceItem } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
@@ -9,7 +8,7 @@ import WorkspaceApi from '@/api/admin/system/workspace'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
-import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
@@ -126,7 +125,7 @@ const memberSearchFields = computed<OptionItem<string>[]>(() => [
 /* 表头筛选 */
 const selectedMemberSource = ref<string | null>(null)
 const memberSourceLabels = computed<Record<LoginMethod, string>>(() => ({
-  ...mapValues(LOGIN_METHOD_LABEL_KEYS, (key) => t(key)),
+  ...LOGIN_METHOD_LABELS,
   [LOGIN_METHOD.LOCAL]: t('user.source.local'),
 }))
 const memberSourceOptions = computed<OptionItem<string>[]>(() => Object.entries(memberSourceLabels.value).map(([value, label]) => ({ label, value })))

@@ -2,6 +2,7 @@
   "relations": {
     "title": "View related resources"
   },
+  "selected": "Selected resource",
   "shared": "Shared",
   "mcpConfig": {
     "title": "MCP server configuration"

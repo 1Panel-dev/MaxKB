@@ -15,7 +15,7 @@ const emit = defineEmits<{ apply: [tool: ToolStoreItem] }>()
 
 const toolTypeLabel = computed(() => {
   const option = TOOL_TYPE_OPTIONS.find(({ value }) => value === props.tool.tool_type)
-  return t(option?.labelKey ?? 'tool.title')
+  return option?.label ?? t('tool.title')
 })
 
 /* 商店详情 */

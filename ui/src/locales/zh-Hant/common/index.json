@@ -11,7 +11,8 @@
     "details": "詳情",
     "basicInfo": "基本資訊",
     "type": "類型",
-    "settings": "設定"
+    "settings": "設定",
+    "example": "範例"
   },
   "name": {
     "label": "名稱",
@@ -30,6 +31,7 @@
     "disabled": "已停用",
     "pending": "排隊中",
     "running": "執行中",
+    "generating": "產生中",
     "success": "成功",
     "failure": "失敗",
     "canceling": "取消中",
@@ -86,14 +88,17 @@
     "manage": "管理",
     "edit": "編輯",
     "rename": "重新命名",
+    "replace": "取代",
     "delete": "刪除",
     "remove": "移除",
     "cancel": "取消",
     "retry": "重試",
+    "regenerate": "重新產生",
     "reload": "重新載入",
     "clear": "清空",
     "reset": "重設",
     "save": "儲存",
+    "publish": "發布",
     "add": "新增",
     "previous": "上一步",
     "next": "下一步",
@@ -127,9 +132,11 @@
   },
   "messages": {
     "saveSuccess": "儲存成功",
+    "publishSuccess": "發布成功",
     "deleteSuccess": "刪除成功",
     "deleteFailed": "刪除失敗",
     "createSuccess": "建立成功",
+    "generateFailed": "產生失敗",
     "duplicateSuccess": "複製成功",
     "addSuccess": "新增成功",
     "removeSuccess": "移除成功",
@@ -161,6 +168,7 @@
     "search": "搜尋"
   },
   "validation": {
+    "formInvalid": "請檢查表單填寫內容",
     "inputRequired": "請輸入",
     "inputFieldRequired": "請輸入 {label}",
     "selectRequired": "請選擇",

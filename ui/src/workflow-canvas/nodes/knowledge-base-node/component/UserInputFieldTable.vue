@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { useI18n } from 'vue-i18n'
 import type { KnowledgeFieldConfig } from '../types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import { DYNAMIC_FORM_TYPES } from '@/components/mk-dynamics-form'
 import TitleSettingDialog from './TitleSettingDialog.vue'
 import UserFieldFormDialog from './UserFieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
-
-const { t } = useI18n({ useScope: 'global' })
 
 const fields = defineModel<FormField[]>({ required: true })
 const config = defineModel<KnowledgeFieldConfig>('config', { required: true })
@@ -18,7 +15,7 @@ const titleDialogRef = useTemplateRef<InstanceType<typeof TitleSettingDialog>>('
 
 function getTypeLabel(inputType: string) {
   const definition = DYNAMIC_FORM_TYPES.find(({ value }) => value === inputType)
-  return definition ? t(definition.labelKey) : inputType
+  return definition ? definition.label : inputType
 }
 
 // 表格只维护列表和重名检查，节点入口统一同步变量。

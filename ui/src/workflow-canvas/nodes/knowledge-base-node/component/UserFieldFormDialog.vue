@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { useI18n } from 'vue-i18n'
 import type { FormField } from '@/components/mk-dynamics-form'
 import { DYNAMIC_FORM_TYPES, MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
-
-const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ submit: [data: FormField, index?: number] }>()
 const constructorRef = useTemplateRef<InstanceType<typeof MkDynamicsFormConstructor>>('constructorRef')
@@ -14,8 +11,8 @@ const editingIndex = ref<number>()
 const currentField = ref<Partial<FormField>>(createField())
 const allowedInputTypes = ['TextInput', 'PasswordInput', 'SingleSelect', 'MultiSelect', 'RadioCard', 'DatePicker', 'SwitchInput']
 const fieldTypeOptions = computed(() =>
-  DYNAMIC_FORM_TYPES.filter(({ value }) => allowedInputTypes.includes(value)).map(({ labelKey, value }) => ({
-    label: t(labelKey),
+  DYNAMIC_FORM_TYPES.filter(({ value }) => allowedInputTypes.includes(value)).map(({ label, value }) => ({
+    label,
     value: `${value}Constructor`,
   })),
 )
