@@ -8,10 +8,14 @@
 
 import re
 
+from django.core.cache import cache
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import Chat, ChatShareLink, ShareLinkType, ChatRecord
+from common.constants.cache_version import Cache_Version
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
 from common.utils.chat_link_code import UUIDEncoder
 from knowledge.models import PublicFileAccess
@@ -36,16 +40,17 @@ class ChatRecordShareLinkRequestSerializer(serializers.Serializer):
         return attrs
 
 
-def extract_oss_file_urls(answer_text_list):
-    """从 answer_text_list 中提取所有 ./oss/file/ 开头的链接"""
+def extract_oss_file_urls(content):
+    """从聊天记录内容中提取所有 ./oss/file/ 开头的链接"""
     file_urls = []
-    for answer_group in answer_text_list:
-        if not isinstance(answer_group, list):
-            answer_group = [answer_group]
-        for item in answer_group:
-            content = item.get("content", "")
-            urls = re.findall(r"\./oss/file/[\w-]+", content)
-            file_urls.extend(urls)
+    if isinstance(content, str):
+        file_urls.extend(re.findall(r"\./oss/file/[\w-]+", content))
+    elif isinstance(content, dict):
+        for value in content.values():
+            file_urls.extend(extract_oss_file_urls(value))
+    elif isinstance(content, (list, tuple)):
+        for value in content:
+            file_urls.extend(extract_oss_file_urls(value))
     return file_urls
 
 
@@ -53,7 +58,7 @@ def save_public_file_access(chat_record_list):
     """提取聊天记录中的所有文件ID并入库 PublicFileAccess"""
     file_ids = set()
     for chat_record in chat_record_list:
-        urls = extract_oss_file_urls(chat_record.answer_text_list)
+        urls = extract_oss_file_urls([chat_record.answer_text_list, chat_record.question, chat_record.messages])
         for url in urls:
             file_id = url.replace("./oss/file/", "")
             if file_id:
@@ -173,8 +178,28 @@ class ChatShareLinkDetailSerializer(serializers.Serializer):
         chat_record_model_list = ChatRecord.objects.filter(
             id__in=share_link_model.chat_record_ids, chat_id=share_link_model.chat_id
         ).order_by("create_time")
+        save_public_file_access(chat_record_model_list)
 
         abstract = Chat.objects.filter(id=share_link_model.chat_id).values_list("abstract", flat=True).first()
         chat_record_list = ShareChatRecordModelSerializer(chat_record_model_list, many=True).data
 
-        return {"abstract": abstract, "chat_record_list": chat_record_list}
+        application_setting_model = DatabaseModelManage.get_model("application_setting")
+        license_is_valid = cache.get(
+            Cache_Version.SYSTEM.get_key(key="license_is_valid"), version=Cache_Version.SYSTEM.get_version()
+        )
+        app_info = {}
+        if application_setting_model is not None and license_is_valid:
+            application_setting = (
+                QuerySet(application_setting_model).filter(application_id=share_link_model.application_id).first()
+            )
+            if application_setting is not None:
+                app_info = {
+                    "avatar": application_setting.avatar,
+                    "show_avatar": application_setting.show_avatar,
+                    "user_avatar": application_setting.user_avatar,
+                    "show_user_avatar": application_setting.show_user_avatar,
+                    "custom_theme": application_setting.custom_theme or {"theme_color": "", "header_font_color": ""},
+                    "chat_background": application_setting.chat_background,
+                }
+
+        return {"abstract": abstract, "chat_record_list": chat_record_list, "app_info": app_info}

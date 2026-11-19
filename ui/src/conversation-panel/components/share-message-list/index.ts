@@ -19,6 +19,7 @@ export function createShareMessageListStore(deps: ShareMessageListDeps) {
   const failed = ref(false)
 
   const title = computed(() => detail.value?.abstract || '分享对话')
+  const appInfo = computed(() => detail.value?.app_info ?? {})
   const messages = computed<ChatMessage[]>(() =>
     (detail.value?.chat_record_list ?? []).flatMap((record): ChatMessage[] => [
       { id: `${record.id}_USER`, role: 'USER', content: record.question ? [record.question] : [] },
@@ -43,7 +44,7 @@ export function createShareMessageListStore(deps: ShareMessageListDeps) {
     }
   }
 
-  return { title, messages, loading, failed, load }
+  return { title, appInfo, messages, loading, failed, load }
 }
 
 export type ShareMessageListStore = ReturnType<typeof createShareMessageListStore>

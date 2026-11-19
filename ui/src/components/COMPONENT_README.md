@@ -1104,14 +1104,16 @@ Chat、Portal 视图创建并 provide `SHARE_LINK_KEY`，组件通过 `useShareL
 `ShareMessageList`。`conversation-panel/view/share/index.vue` 接收 `shareId`，以
 `createSharePanelStore({ shareId })` 创建并 provide `SHARE_PANEL_KEY`，提供 `VIEW_TYPE.SHARE` 与设备类型，
 在挂载及分享 ID 变化时调用 `load()`；面板把内部的消息列表 Store 提供给 `ShareMessageList`。
-分享视图不注入发送能力，表单内容项按只读视图展示。路由页 `views/chat/share/` 只读取地址中的分享 ID 并渲染该视图。
+分享面板按 `app_info.chat_background` 渲染聊天背景；分享视图不注入发送能力，表单内容项按只读视图展示。
+路由页 `views/chat/share/` 只读取地址中的分享 ID 并渲染该视图。
 
 ### ShareMessageList（对话模块）
 
 `conversation-panel/components/share-message-list/` 负责请求公开分享接口并只读展示问答。
-`createShareMessageListStore({ shareId })` 提供标题、消息、加载及失败状态，按记录的 `question`、`messages`
-转换消息，不加载原会话历史、不分页；切换分享 ID 后丢弃旧请求结果。组件通过 `SHARE_MESSAGE_LIST_KEY`
-注入 Store，失败时在空状态提供重试；回答复制提取内容项正文，不传递内容数组给剪贴板。
+`createShareMessageListStore({ shareId })` 提供标题、`appInfo`、消息、加载及失败状态，按记录的
+`question`、`messages` 转换消息，不加载原会话历史、不分页；切换分享 ID 后丢弃旧请求结果。组件通过
+`SHARE_MESSAGE_LIST_KEY` 注入 Store，按 `appInfo` 渲染智能体与用户头像，失败时在空状态提供重试；
+回答复制提取内容项正文，不传递内容数组给剪贴板。
 
 ## 文档维护
 

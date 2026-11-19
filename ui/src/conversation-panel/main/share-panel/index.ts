@@ -13,7 +13,7 @@ export interface SharePanelDeps {
  */
 export function createSharePanelStore(deps: SharePanelDeps) {
   const messageList = createShareMessageListStore({ shareId: deps.shareId })
-  return { title: messageList.title, messageList, load: messageList.load }
+  return { title: messageList.title, appInfo: messageList.appInfo, messageList, load: messageList.load }
 }
 
 export type SharePanelStore = ReturnType<typeof createSharePanelStore>
