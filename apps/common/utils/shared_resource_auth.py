@@ -36,24 +36,18 @@ def _filter_user_authorized_tool_ids(ids: List[str], workspace_id: str, user_id=
     return [str(i) for i in ids if str(i) in authorized_ids]
 
 
-def filter_authorized_ids(resource_type: str, ids: List[str], workspace_id: str, user_id=None,
-                          published_knowledge_ids=None) -> List[str]:
+def filter_authorized_ids(resource_type: str, ids: List[str], workspace_id: str, user_id=None) -> List[str]:
     """
     通用授权过滤函数
 
     @param resource_type: 资源类型 ('model', 'tool', 'knowledge')
     @param ids: 待过滤的ID列表
     @param workspace_id: 工作空间ID
-    @param user_id: 资源执行用户ID，不能用聊天访客身份替代
-    @param published_knowledge_ids: 服务端实际执行的已发布版本绑定的知识库，仍须通过工作空间/共享校验
+    @param user_id: 当前工作空间用户ID（仅 tool 类型会按用户级授权进一步过滤）
     @return: 授权通过的ID列表
     """
 
     if not ids:
-        return []
-    ids = [str(resource_id) for resource_id in ids]
-    published_knowledge_ids = set(map(str, published_knowledge_ids or []))
-    if resource_type == "knowledge" and not user_id and not published_knowledge_ids:
         return []
 
     auth_func = DatabaseModelManage.get_model(f"get_authorized_{resource_type}")
@@ -70,15 +64,6 @@ def filter_authorized_ids(resource_type: str, ids: List[str], workspace_id: str,
     cross_workspace_ids = [i for i in ids if i not in set(map(str, same_workspace_ids))]
 
     authorized_ids = set(map(str, same_workspace_ids))
-    if resource_type == "knowledge" and (not user_id or not is_workspace_manage(user_id, workspace_id)):
-        permissions = QuerySet(WorkspaceUserResourcePermission).filter(
-            workspace_id=workspace_id, user_id=user_id,
-            auth_target_type=AuthTargetType.KNOWLEDGE.value, target__in=authorized_ids,
-        )
-        authorized_ids = (authorized_ids & published_knowledge_ids) | {
-            str(permission.target) for permission in permissions
-            if "VIEW" in permission.permission_list or "ROLE" in permission.permission_list
-        }
 
     if cross_workspace_ids and auth_func is not None:
         cross_queryset = QuerySet(model_class).filter(id__in=cross_workspace_ids)

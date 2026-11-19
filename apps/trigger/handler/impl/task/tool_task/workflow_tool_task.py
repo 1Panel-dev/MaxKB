@@ -102,12 +102,11 @@ class ToolTask(BaseToolTriggerTask):
             work_flow_manage = ToolWorkflowManage(
                 flow,
                 {
-                    **parameters,
                     'chat_record_id': task_record_id,
                     'tool_id': tool_id,
                     'stream': True,
                     'workspace_id': tool.workspace_id,
-                    'user_id': tool.user_id,
+                    **parameters,
                     'default_model_setting': tool_workflow_version.default_model_setting},
                 ToolWorkflowPostHandler(took_execute, tool_id),
                 is_the_task_interrupted=lambda: False,

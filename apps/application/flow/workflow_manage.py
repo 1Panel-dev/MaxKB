@@ -304,22 +304,6 @@ class WorkflowManage:
     def get_body(self):
         return self.params
 
-    def get_resource_user_id(self):
-        parent = getattr(self, 'parentWorkflowManage', None)
-        if parent is not None:
-            return parent.get_resource_user_id()
-        chat_info = getattr(self.work_flow_post_handler, 'chat_info', None)
-        if chat_info is not None:
-            return chat_info.get_resource_user_id()
-        return self.params.get('user_id')
-
-    def get_published_knowledge_ids(self):
-        parent = getattr(self, 'parentWorkflowManage', None)
-        if parent is not None:
-            return parent.get_published_knowledge_ids()
-        chat_info = getattr(self.work_flow_post_handler, 'chat_info', None)
-        return chat_info.get_published_knowledge_ids() if chat_info is not None else []
-
     def is_run(self, timeout=0.5):
         future_list_len = len(self.future_list)
         try:

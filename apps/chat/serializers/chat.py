@@ -506,11 +506,7 @@ class ChatSerializers(serializers.Serializer):
             self.is_valid_chat_user()
         from application.serializers.application import validate_application_resource_permissions
         # 调试使用已认证的平台用户，正式对话使用实际版本发布者，不使用聊天访客身份。
-        validate_application_resource_permissions(
-            chat_info.get_resource_user_id(), chat_info.application,
-            published_knowledge_ids=chat_info.get_published_knowledge_ids(),
-            allow_missing_knowledge=True,
-        )
+        validate_application_resource_permissions(chat_info.get_resource_user_id(), chat_info.application)
         if chat_info.application.type == ApplicationTypeChoices.SIMPLE:
             self.is_valid_application_simple(raise_exception=True, chat_info=chat_info)
             return self.chat_simple(chat_info, instance, base_to_response)
