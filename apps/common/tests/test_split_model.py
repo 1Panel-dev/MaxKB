@@ -65,6 +65,23 @@ class MarkdownHeadingBoundaryTests(SimpleTestCase):
         self.assertTrue(all(len(row["title"]) <= 255 and len(row["content"]) <= 50 for row in result))
         self.assertEqual(result[0]["title"] + "".join(row["content"] for row in result), heading + "\n" + "文" * 120)
 
+    def test_nested_heading_overflow_is_included_once_per_section(self):
+        parent = "甲" * 200
+        child = "乙" * 190
+        full_title = f" {parent}  {child}"
+        limit = 50
+        splitter = get_split_model("guide.md", limit=limit)
+        for body in ("短正文", "逐字核对。\n" * 20, "起" + " " * 100 + "止"):
+            with self.subTest(body_length=len(body)):
+                source = f"# {parent}\n## {child}\n{body}\n## {child}\n第二节"
+                rows = splitter.parse(source)
+                self.assertTrue(all(row["title"] == full_title[:255] for row in rows))
+                self.assertTrue(all(0 < len(row["content"]) <= limit for row in rows))
+                self.assertEqual(
+                    "".join(row["content"] for row in rows),
+                    full_title[255:] + f"\n{body}\n" + full_title[255:] + "\n第二节",
+                )
+
     def test_custom_capture_patterns_use_the_matched_group_position(self):
         result = SplitModel([r"(?m)^Section: (.+)$"], with_filter=False).parse(
             "Heading appears in this introduction.\nSection: Heading\nBody"

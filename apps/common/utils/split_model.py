@@ -13,6 +13,8 @@ from typing import List, Dict
 
 import jieba
 
+MAX_TITLE_LENGTH = 255
+
 
 def get_level_block(text, level_content_list, level_content_index):
     """
@@ -203,7 +205,7 @@ def parse_level(text, pattern: str):
         for group in groups:
             content = match.group(group)
             if content:
-                level_content_list.append({**to_tree_obj(content[:255]), "start": match.start(group)})
+                level_content_list.append({**to_tree_obj(content[:MAX_TITLE_LENGTH]), "start": match.start(group)})
     # 过滤掉空标题或只包含#和空白字符的标题
     filtered_list = [
         item
@@ -329,7 +331,7 @@ def post_handler_paragraph(content: str, limit: int):
     return reduce(lambda x, y: [*x, *y], map(lambda row: re.findall(pattern, row), result), [])
 
 
-def smart_split_paragraph(content: str, limit: int):
+def smart_split_paragraph(content: str, limit: int, *, keep_whitespace=False):
     """
     智能分段:在limit前找到合适的分割点(句号、回车等)
     :param content: 需要分段的文本
@@ -379,7 +381,7 @@ def smart_split_paragraph(content: str, limit: int):
         result.append(content[start:best_split])
         start = best_split
 
-    return [text for text in result if text.strip()]
+    return result if keep_whitespace else [text for text in result if text.strip()]
 
 
 replace_map = {re.compile("\n+"): "\n", re.compile(" +"): " ", re.compile("#+"): "", re.compile("\t+"): ""}
@@ -409,30 +411,34 @@ class SplitModel:
             limit = 50
         self.limit = limit
 
-    def parse_to_tree(self, text: str, index=0):
+    def parse_to_tree(self, text: str, index=0, *, split_blocks=True):
         """
          解析文本
         :param text: 需要解析的文本
         :param index: 从那个正则开始解析
         :return: 解析后的树形结果数据
         """
+
+        def block_nodes(content):
+            parts = smart_split_paragraph(content, self.limit) if split_blocks else [content]
+            return [to_tree_obj(part, "block") for part in parts]
+
         level_content_list = parse_title_level(text, self.content_level_pattern, index)
         if len(level_content_list) == 0:
-            return [to_tree_obj(row, "block") for row in smart_split_paragraph(text, limit=self.limit)]
+            return block_nodes(text)
         cursor = 0
         result = []
         level_title_content_list = [item for item in level_content_list if item.get("state") == "title"]
         for i in range(len(level_title_content_list)):
             start_index = level_title_content_list[i]["start"]
             if cursor < start_index:
-                for row in smart_split_paragraph(text[cursor:start_index], limit=self.limit):
-                    result.append(to_tree_obj(row, "block"))
+                result.extend(block_nodes(text[cursor:start_index]))
 
             result.append(level_title_content_list[i])
             block, cursor = get_level_block(text, level_title_content_list, i)
             if len(block) == 0:
                 continue
-            children = self.parse_to_tree(text=block, index=index + 1)
+            children = self.parse_to_tree(text=block, index=index + 1, split_blocks=split_blocks)
             level_title_content_list[i]["children"] = children
         return result
 
@@ -445,17 +451,28 @@ class SplitModel:
         text = text.replace("\r\n", "\n")
         text = text.replace("\r", "\n")
         text = text.replace("\0", "")
-        result_tree = self.parse_to_tree(text, 0)
-        result = result_tree_to_paragraph(result_tree, [], [], self.with_filter)
-        for e in result:
-            if len(e["content"]) > 4096:
-                pass
-        title_list = list(set([row.get("title") for row in result]))
-        return [
-            item
-            for item in [self.post_reset_paragraph(row, title_list) for row in result]
-            if "content" in item and len(item.get("content").strip()) > 0
-        ]
+        result_tree = self.parse_to_tree(text, split_blocks=False)
+        sections = result_tree_to_paragraph(result_tree, [], [], with_filter=False)
+        title_list = list({section["title"] for section in sections})
+        paragraphs = []
+        for section in sections:
+            body = section["content"]
+            # A capped heading can already have a tail in the body; a long title path
+            # can add another in post_reset_paragraph. Keep this section whole until then.
+            if len(section["title"]) >= MAX_TITLE_LENGTH:
+                parts = [body]
+            else:
+                parts = smart_split_paragraph(body, self.limit)
+            for part in parts:
+                if self.with_filter:
+                    part = filter_special_char(part)
+                paragraph = self.post_reset_paragraph({**section, "content": part}, title_list)
+                if paragraph["content"].strip():
+                    paragraphs.extend(
+                        {**paragraph, "content": chunk}
+                        for chunk in smart_split_paragraph(paragraph["content"], self.limit, keep_whitespace=True)
+                    )
+        return paragraphs
 
     def post_reset_paragraph(self, paragraph: Dict, title_list: List[str]):
         result = self.content_is_null(paragraph, title_list)
@@ -467,11 +484,11 @@ class SplitModel:
     def sub_title(paragraph: Dict):
         if "title" in paragraph:
             title = paragraph.get("title")
-            if len(title) > 255:
+            if len(title) > MAX_TITLE_LENGTH:
                 return {
                     **paragraph,
-                    "title": title[0:255],
-                    "content": title[255 : len(title)] + paragraph.get("content"),
+                    "title": title[:MAX_TITLE_LENGTH],
+                    "content": title[MAX_TITLE_LENGTH:] + paragraph.get("content"),
                 }
         return paragraph
 
