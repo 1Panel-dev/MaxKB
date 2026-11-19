@@ -158,7 +158,7 @@ onMounted(() => {
                   :model="model"
                 />
                 <!-- 资源授权 -->
-                <AuthorizeModelAction v-if="perm.model.workspace.auth(model.id)" :label="t('resource.authorization.title')" :model="model" />
+                <AuthorizeModelAction v-if="perm.model.workspace.auth(model.id)" :label="t('authorization.resource.title')" :model="model" />
                 <!-- 查看关联资源 -->
                 <RelatedResourcesModelAction
                   v-if="perm.model.workspace.relateMap(model.id)"

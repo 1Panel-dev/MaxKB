@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ResourcePermissionOption } from '../types'
 import type SystemResourceAuthorizationApi from '@/api/admin/system/resource-management/resource-authorization'
 import type ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
@@ -17,12 +18,13 @@ const props = defineProps<{
   permissionOptions: ResourcePermissionOption[]
 }>()
 const emit = defineEmits<{ configure: [subjectIds: string[], permission?: ResourcePermission] }>()
+const { t } = useI18n({ useScope: 'global' })
 
 /* 根目录不提供“不授权”，按“查看”展示接口返回的该权限。 */
 const canSelectNotAuth = computed(() => props.permissionOptions.some(({ value }) => value === RESOURCE_PERMISSION.NOT_AUTH))
 
 /* 查询与当前页选择 */
-const searchFields = [{ label: '名称', value: 'name' }]
+const searchFields = computed(() => [{ label: t('common.name.label'), value: 'name' }])
 const loading = ref(false)
 const permissionGroups = ref<ResourceUserGroupPermission[]>([])
 const selectedGroups = ref<ResourceUserGroupPermission[]>([])
@@ -102,7 +104,9 @@ onMounted(() => loadPermissions())
   <div>
     <div class="flex-between mb-4 gap-4">
       <!-- 批量配置权限 -->
-      <el-button type="primary" :disabled="!selectedGroups.length || loading || submitting" @click="handleOpenBatchConfig">配置权限</el-button>
+      <el-button type="primary" :disabled="!selectedGroups.length || loading || submitting" @click="handleOpenBatchConfig">
+        {{ t('authorization.permission.configure') }}
+      </el-button>
       <MkComplexSearch :fields="searchFields" @change="handleSearch" />
     </div>
     <MkTable
@@ -116,16 +120,17 @@ onMounted(() => loadPermissions())
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="40" />
-      <el-table-column prop="name" label="用户组" min-width="160" show-overflow-tooltip />
-      <el-table-column label="成员数" min-width="100">
+      <el-table-column prop="name" :label="t('userGroup.title')" min-width="160" show-overflow-tooltip />
+      <el-table-column :label="t('userGroup.memberCount')" min-width="100">
         <template #default="{ row }">
+          <!-- 查看用户组成员 -->
           <el-link type="primary" @click="handleOpenMembersDrawer(row)">{{ row.count }}</el-link>
         </template>
       </el-table-column>
-      <el-table-column label="操作权限" min-width="340">
+      <el-table-column :label="t('authorization.permission.operationLabel')" min-width="340">
         <template #default="{ row }">
           <el-radio-group :model-value="row.permission" :disabled="submitting" @change="handlePermissionChange($event, row)">
-            <el-radio v-for="option in permissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{ option.label }}</el-radio>
+            <el-radio v-for="option in permissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{ t(option.labelKey) }}</el-radio>
           </el-radio-group>
         </template>
       </el-table-column>

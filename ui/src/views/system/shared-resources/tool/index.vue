@@ -189,7 +189,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   <!-- 授权工作空间 -->
                   <AuthorizedWorkspaceAction
                     v-if="perm.tool.share.authToWorkspace()"
-                    :label="t('resource.workspaceAuthorization.title')"
+                    :label="t('authorization.workspace.title')"
                     :resource="tool"
                     :resource-type="RESOURCE_TYPE.TOOL"
                   />

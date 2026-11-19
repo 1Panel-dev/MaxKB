@@ -315,7 +315,7 @@ function handleBatchDelete() {
                   <!-- 资源授权 -->
                   <AuthorizeKnowledgeAction
                     v-if="perm.knowledge.workspace.auth(knowledge.id)"
-                    :label="t('resource.authorization.title')"
+                    :label="t('authorization.resource.title')"
                     :knowledge="knowledge"
                   />
 

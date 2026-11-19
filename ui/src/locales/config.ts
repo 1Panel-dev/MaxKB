@@ -16,7 +16,7 @@ export const MARKDOWN_LOCALES = {
 } as const satisfies Record<Locale, string>
 
 /** 分类目录不进入业务命名空间，直属 index.json 使用分类目录自身的命名空间。 */
-const LOCALE_CATEGORY_DIRECTORIES = ['system']
+const LOCALE_CATEGORY_DIRECTORIES = ['common', 'system']
 
 /** 跳过分类目录后，由首个业务文件或业务目录名决定命名空间。 */
 export function getLocaleNamespace(file: string): string {

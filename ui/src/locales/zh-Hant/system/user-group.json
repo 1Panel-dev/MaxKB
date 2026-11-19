@@ -10,6 +10,7 @@
     "placeholder": "請輸入使用者群組名稱",
     "requiredMessage": "請輸入使用者群組名稱"
   },
+  "memberCount": "成員數",
   "set": "設定使用者群組",
   "delete": {
     "title": "是否刪除使用者群組",

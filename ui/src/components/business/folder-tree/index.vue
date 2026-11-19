@@ -471,7 +471,7 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
           </MkDropdownItem>
           <MkDropdownItem v-if="folderPermission.folderAuth(row.id)" @click="handleOpenResourceAuthorization(row)">
             <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
-            <span>{{ t('resource.authorization.title') }}</span>
+            <span>{{ t('authorization.resource.title') }}</span>
           </MkDropdownItem>
           <MkDropdownItem v-if="folderPermission.folderDelete(row.id)" divided @click="handleDeleteFolder(row)">
             <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>

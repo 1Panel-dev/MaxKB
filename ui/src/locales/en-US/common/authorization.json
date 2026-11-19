@@ -1,0 +1,49 @@
+{
+  "resource": {
+    "title": "Resource authorization",
+    "permissionTitle": "Resource permission configuration",
+    "byGroup": "By user group",
+    "byUser": "By user",
+    "scope": {
+      "label": "Resource scope",
+      "current": "Current resource only",
+      "includeChildren": "Include all subfolders"
+    }
+  },
+  "permission": {
+    "label": "Permissions",
+    "operationLabel": "Operation permissions",
+    "configure": "Configure permissions",
+    "notAuthorized": {
+      "label": "No access"
+    },
+    "view": {
+      "label": "View",
+      "description": "View and use this resource only"
+    },
+    "manage": {
+      "label": "Manage",
+      "description": "Edit and delete this resource"
+    },
+    "role": {
+      "label": "By user role",
+      "description": "Grant access to this resource based on the user's role permissions"
+    }
+  },
+  "workspace": {
+    "title": "Authorize workspaces"
+  },
+  "chatUser": {
+    "title": "Chat users",
+    "byGroup": "By user group",
+    "name": "Name",
+    "username": "Username",
+    "source": {
+      "label": "User source",
+      "local": "Created locally"
+    },
+    "autoAuthorization": "Auto authorization",
+    "authorized": "Authorized",
+    "authorize": "Authorize"
+  }
+}

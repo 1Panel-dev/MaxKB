@@ -92,7 +92,7 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
             path: 'chat-user',
             name: 'workspace-shared-knowledge-chat-user',
             component: () => import('@/views/knowledge-detail/chat-user/index.vue'),
-            meta: { title: 'resource.chatUserAuthorization.title', order: 10 },
+            meta: { title: 'authorization.chatUser.title', order: 10 },
           },
           {
             path: 'external-retrieval',

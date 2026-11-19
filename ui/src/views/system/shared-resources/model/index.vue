@@ -154,7 +154,7 @@ onMounted(() => {
                 <!-- 授权工作空间 -->
                 <AuthorizedWorkspaceAction
                   v-if="perm.model.share.authToWorkspace()"
-                  :label="t('resource.workspaceAuthorization.title')"
+                  :label="t('authorization.workspace.title')"
                   :resource="model"
                   :resource-type="RESOURCE_TYPE.MODEL"
                 />

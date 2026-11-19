@@ -278,7 +278,7 @@ function handleBatchDelete() {
                   <!-- 资源授权 -->
                   <AuthorizeApplicationAction
                     v-if="perm.application.workspace.auth(application.id)"
-                    :label="t('resource.authorization.title')"
+                    :label="t('authorization.resource.title')"
                     :application="application"
                   />
                   <!-- 查看关联资源 -->

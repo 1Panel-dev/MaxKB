@@ -269,7 +269,7 @@ onMounted(() => {
                 />
 
                 <!-- 资源授权 -->
-                <AuthorizeToolAction v-if="perm.tool.system.auth()" :label="t('resource.authorization.title')" :tool="row" />
+                <AuthorizeToolAction v-if="perm.tool.system.auth()" :label="t('authorization.resource.title')" :tool="row" />
                 <!-- 查看 MCP 配置 -->
                 <McpConfigAction
                   v-if="row.tool_type === TOOL_TYPE.MCP"

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FolderItem, ResourceAuthorizationTargetType, ResourcePermission } from '@/api/types'
 import { RESOURCE_AUTHORIZATION_TARGET_TYPE as TARGET, RESOURCE_PERMISSION } from '@/api/enums'
 import SystemResourceAuthorizationApi from '@/api/admin/system/resource-management/resource-authorization'
@@ -23,6 +24,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ closed: [] }>()
 const { auth } = useStore()
+const { t } = useI18n({ useScope: 'global' })
 
 /* 抽屉和当前授权对象 */
 const drawerVisible = ref(false)
@@ -119,7 +121,7 @@ function submitPermissions(permission: ResourcePermission, includeChildren: bool
       )
   return request
     .then(() => {
-      MsgSuccess('提交成功')
+      MsgSuccess(t('common.messages.submitSuccess'))
       configDialogRef.value?.close()
       pendingSubjectIds.value = []
       return authorizationRef?.refresh()
@@ -153,10 +155,17 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="drawerVisible" title="资源授权" class="mk-drawer-with-tabs" contentClass="pt-0" :size="920" @closed="handleClosed">
+  <MkDrawer
+    v-model="drawerVisible"
+    :title="t('authorization.resource.title')"
+    class="mk-drawer-with-tabs"
+    contentClass="pt-0"
+    :size="920"
+    @closed="handleClosed"
+  >
     <el-tabs v-model="targetType" :before-leave="() => !submitting">
-      <el-tab-pane label="按用户组" name="user-group" />
-      <el-tab-pane label="按用户" name="user" />
+      <el-tab-pane :label="t('authorization.resource.byGroup')" name="user-group" />
+      <el-tab-pane :label="t('authorization.resource.byUser')" name="user" />
     </el-tabs>
     <div class="mt-6">
       <UserGroupAuthorization

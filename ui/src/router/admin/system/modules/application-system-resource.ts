@@ -81,7 +81,7 @@ export const systemResourceApplicationRoutes: RouteRecordRaw[] = [
         name: 'system-resource-application-chat-user',
         component: () => import('@/views/application-detail/chat-user/index.vue'),
         meta: {
-          title: 'resource.chatUserAuthorization.title',
+          title: 'authorization.chatUser.title',
           icon: 'icon_contacts_outlined',
           activeIcon: 'icon_contacts_filled',
           order: 40,

@@ -79,8 +79,8 @@ const savedAuthorization = ref<Record<string, boolean>>({})
 const chatUserSearchQuery = ref<Dict<unknown>>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchFields = computed<OptionItem<string>[]>(() => [
-  { label: t('resource.chatUserAuthorization.name'), value: 'nick_name' },
-  { label: t('resource.chatUserAuthorization.username'), value: 'username' },
+  { label: t('authorization.chatUser.name'), value: 'nick_name' },
+  { label: t('authorization.chatUser.username'), value: 'username' },
 ])
 
 // 表头用户来源筛选
@@ -94,7 +94,7 @@ const chatUserQuery = computed<Dict<unknown>>(() => ({
 }))
 
 function formatUserSource(source: string) {
-  if (source === LOGIN_METHOD.LOCAL) return t('resource.chatUserAuthorization.source.local')
+  if (source === LOGIN_METHOD.LOCAL) return t('authorization.chatUser.source.local')
   if (source === 'OAUTH2') return LOGIN_METHOD_LABELS[LOGIN_METHOD.OAUTH2]
   if (source === LOGIN_METHOD.DINGTALK || source === LOGIN_METHOD.LARK || source === LOGIN_METHOD.WECOM) {
     return t(`auth.login.options.${source}`)
@@ -191,7 +191,7 @@ onMounted(() => loadChatUserGroups())
   <div v-loading="loading" :inert="loading" class="-mx-6 -mb-6 flex min-h-0 flex-1">
     <aside class="flex-column h-layout-content w-sidebar-expanded shrink-0 border-r">
       <div class="shrink-0 p-4">
-        <h4>{{ t('resource.chatUserAuthorization.byGroup') }}</h4>
+        <h4>{{ t('authorization.chatUser.byGroup') }}</h4>
       </div>
       <!-- 搜索并切换用户组 -->
       <MkSearchList :data="chatUserGroups" :default-active="currentGroup?.id" @click="handleSelectGroup">
@@ -199,9 +199,7 @@ onMounted(() => loadChatUserGroups())
           <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>
           <span class="shrink-0 font-normal text-N500">
             （{{
-              row.is_auth
-                ? t('resource.chatUserAuthorization.autoAuthorization')
-                : `${t('resource.chatUserAuthorization.authorized')} ${row.authorized_count ?? 0}`
+              row.is_auth ? t('authorization.chatUser.autoAuthorization') : `${t('authorization.chatUser.authorized')} ${row.authorized_count ?? 0}`
             }}）
           </span>
         </template>
@@ -225,7 +223,7 @@ onMounted(() => loadChatUserGroups())
             <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
             <!-- 设置用户组自动授权 -->
             <div class="flex-align-center shrink-0 gap-2">
-              <span>{{ t('resource.chatUserAuthorization.autoAuthorization') }}</span>
+              <span>{{ t('authorization.chatUser.autoAuthorization') }}</span>
               <el-switch
                 :disabled="isWorkspaceSharedResource() || !knowledgeChatUserPermission('knowledgeChatUserEdit')"
                 :model-value="currentGroup.is_auth"
@@ -252,14 +250,14 @@ onMounted(() => loadChatUserGroups())
           @size-change="refreshChatUsers"
           @current-change="refreshChatUsers"
         >
-          <el-table-column prop="nick_name" :label="t('resource.chatUserAuthorization.name')" show-overflow-tooltip />
-          <el-table-column prop="username" :label="t('resource.chatUserAuthorization.username')" show-overflow-tooltip />
-          <el-table-column prop="source" :label="t('resource.chatUserAuthorization.source.label')" show-overflow-tooltip>
+          <el-table-column prop="nick_name" :label="t('authorization.chatUser.name')" show-overflow-tooltip />
+          <el-table-column prop="username" :label="t('authorization.chatUser.username')" show-overflow-tooltip />
+          <el-table-column prop="source" :label="t('authorization.chatUser.source.label')" show-overflow-tooltip>
             <template #header>
               <MkTableFilter
                 mode="single"
                 v-model="selectedSource"
-                :label="t('resource.chatUserAuthorization.source.label')"
+                :label="t('authorization.chatUser.source.label')"
                 :options="sourceOptions"
                 @change="handleSourceChange"
               />
@@ -275,7 +273,7 @@ onMounted(() => loadChatUserGroups())
                 :disabled="authorizationDisabled || !knowledgeChatUserPermission('knowledgeChatUserEdit')"
                 @change="handleCheckAll"
               >
-                {{ t('resource.chatUserAuthorization.authorize') }}
+                {{ t('authorization.chatUser.authorize') }}
               </el-checkbox>
             </template>
             <template #default="{ row }">

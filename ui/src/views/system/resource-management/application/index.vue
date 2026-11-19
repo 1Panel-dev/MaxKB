@@ -228,7 +228,7 @@ onMounted(() => {
 
               <MkTableMoreDropdown>
                 <!-- 资源授权 -->
-                <AuthorizeApplicationAction v-if="perm.application.system.auth()" :label="t('resource.authorization.title')" :application="row" />
+                <AuthorizeApplicationAction v-if="perm.application.system.auth()" :label="t('authorization.resource.title')" :application="row" />
                 <!-- 智能体触发器 -->
                 <TriggerApplicationAction
                   v-if="perm.application.system.triggerRead()"

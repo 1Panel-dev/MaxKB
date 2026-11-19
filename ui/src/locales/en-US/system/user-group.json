@@ -10,6 +10,7 @@
     "placeholder": "Enter a user group name",
     "requiredMessage": "Enter a user group name"
   },
+  "memberCount": "Member count",
   "set": "Set user groups",
   "delete": {
     "title": "Delete user group",

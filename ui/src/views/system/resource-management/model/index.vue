@@ -210,7 +210,7 @@ onMounted(() => {
               />
 
               <!-- 资源授权 -->
-              <AuthorizeModelAction v-if="perm.model.system.auth()" display="button" :label="t('resource.authorization.title')" :model="row" />
+              <AuthorizeModelAction v-if="perm.model.system.auth()" display="button" :label="t('authorization.resource.title')" :model="row" />
               <!-- 更多模型操作 -->
               <MkTableMoreDropdown>
                 <!-- 模型参数设置 -->
