@@ -10,7 +10,7 @@ from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage, Sys
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, MessagesState, StateGraph
 
-from application.workflow.common import WorkflowType
+from application.workflow.common import CancelledException, WorkflowType
 from application.workflow.message.aggregator import AggregationManager
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.message.struct.tool_content import ToolContent
@@ -20,6 +20,28 @@ from application.workflow.status import Status
 
 
 class AIChatToolOutputTests(SimpleTestCase):
+    def test_cancelled_agent_persists_partial_answer_and_token_counts(self):
+        node = self._new_node(mock_final_context=False)
+        node.async_runner.cancel_event.is_set.return_value = True
+        error = CancelledException()
+
+        module = "application.workflow.nodes.ai_chat_node.ai_chat_node"
+        with (
+            patch(f"{module}.count_local_tokens", return_value=(4, 2)) as count_local_tokens,
+            self.assertRaises(CancelledException) as raised,
+        ):
+            self._run_messages(
+                [AIMessageChunk(content="partial answer")],
+                node=node,
+                complete_error=error,
+            )
+
+        self.assertIs(raised.exception, error)
+        self.assertEqual((node.data["message_tokens"], node.data["answer_tokens"]), (4, 2))
+        self.assertEqual(node.data["reasoning_content"], "")
+        self.assertEqual(node.write_context.call_args.args, ("answer", "partial answer"))
+        count_local_tokens.assert_called_once_with([], "partial answer")
+
     def test_model_content_blocks_and_complete_tool_calls_preserve_answer_and_history(self):
         for message_type in (AIMessage, AIMessageChunk):
             with self.subTest(message_type=message_type):
@@ -43,15 +65,23 @@ class AIChatToolOutputTests(SimpleTestCase):
                 self.assertEqual(cards[1].content, "晴")
                 self.assertEqual(message.model_dump(), before)
 
-    def _run_messages(self, messages=(), *, enabled=True, emit=None):
+    def _new_node(self, *, mock_final_context=True):
         node = AIChatNode.__new__(AIChatNode)
         node.async_runner = MagicMock()
         node.get_workflow_parameters = MagicMock(return_value={"application_id": "application"})
         node.get_node_id = MagicMock(return_value="ai")
         node.get_node_name = MagicMock(return_value="AI")
         node._check_cancelled = MagicMock()
-        node._write_final_context = MagicMock()
         node.write = MagicMock()
+        if mock_final_context:
+            node._write_final_context = MagicMock()
+        else:
+            node.data = {}
+            node.write_context = MagicMock()
+        return node
+
+    def _run_messages(self, messages=(), *, enabled=True, emit=None, node=None, complete_error=None):
+        node = node or self._new_node()
 
         def run_agent(_model, _system, _messages, _servers, callback, *_args, **_kwargs):
             if emit:
@@ -59,7 +89,7 @@ class AIChatToolOutputTests(SimpleTestCase):
             else:
                 for message in messages:
                     callback.on_next(message)
-            callback.on_complete(None)
+            callback.on_complete(complete_error)
 
         module = "application.workflow.nodes.ai_chat_node.ai_chat_node"
         with (

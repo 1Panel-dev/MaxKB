@@ -701,9 +701,9 @@ class AIChatNode(INode):
                         )
 
             def on_complete(error):
+                self._write_final_context(chat_model, message_list, question.content, state["answer"], "")
                 if error:
                     raise error
-                self._write_final_context(chat_model, message_list, question.content, state["answer"], "")
                 self.write(
                     TextContent(
                         tool_stream.get_tool_uuid("text"),
