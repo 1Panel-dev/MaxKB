@@ -1,4 +1,4 @@
-FROM node:24-alpine AS web-build
+FROM node:24-trixie-slim AS web-build
 COPY ui ui
 RUN cd ui && ls -la && if [ -d "dist" ]; then exit 0; fi && \
     npm install --prefer-offline --no-audit && \
