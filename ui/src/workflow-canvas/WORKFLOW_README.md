@@ -509,8 +509,8 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 | `addNode`         | 在画布中心添加指定节点                          |
 | `getLogicFlow`    | 获取主画布 LogicFlow 实例，供 AI 生成适配层使用 |
 | `getGraphData`    | 获取规范化后的图数据                            |
-| `renderGraphData` | 创建新的 LogicFlow 实例并渲染图数据             |
-| `render`          | 使用现有实例重新渲染图数据                      |
+| `renderGraphData` | 销毁当前实例后创建新的 LogicFlow 实例并渲染     |
+| `render`          | 整图替换，等同 `renderGraphData`                |
 | `clearGraphData`  | 清空画布                                        |
 | `fitView`         | 调整画布到合适视口                              |
 | `validate`        | 并行调用节点校验，返回 Promise                  |
@@ -520,8 +520,10 @@ MkFormList 的排序、增删均以 `cloneDeep` 回写；MkTable 保留普通行
 有实例时调用 `core/validate.ts` 的 `validateWorkflow()` 汇总节点各自的校验，不额外执行顶层图结构校验；
 AI 生成的 validate 工具复用同一入口（`collectWorkflowValidationErrors()` 取全部失败原因）。
 
-当前 `renderGraphData()` 不主动销毁上一实例；普通数据加载使用 `render()`，不要将前者当作
-已封装完整清理的重置方法。画布卸载时销毁当前实例并清理 Teleport。
+整图替换（详情加载、版本预览与恢复、应用默认模型）必须重建实例：LogicFlow 按节点 id 复用视图，
+节点 Vue 组件在首次挂载时绑定 model，直接在现有实例上 `lf.render()` 会让同 id 节点（如基本信息、
+开始节点）继续显示旧数据。重建前销毁上一实例并按 flowId 清理 Teleport；画布卸载时同样清理。
+重建会重置撤销历史与视口，调用方按需 `fitView()`。
 
 ## 节点维护流程
 

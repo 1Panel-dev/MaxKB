@@ -10,7 +10,7 @@ import type { GraphModel } from '@logicflow/core'
 import AppEdge from '@/workflow-canvas/core/edge/index'
 import LoopEdge from '@/workflow-canvas/core/edge/loop-edge'
 import { initDefaultShortcut } from '@/workflow-canvas/core/shortcut'
-import { disconnectAll, getTeleport } from '@/workflow-canvas/core/teleport'
+import { disconnectAll, disconnectByFlow, getTeleport } from '@/workflow-canvas/core/teleport'
 import { validateWorkflow } from '@/workflow-canvas/core/validate'
 import Dagre from '@/workflow-canvas/plugins/dagre'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
@@ -44,10 +44,22 @@ const flowId = ref('')
 
 let fitViewTimer: ReturnType<typeof setTimeout> | undefined
 
+// 销毁当前实例并清理其节点 Teleport，避免同 id 节点复用旧视图和旧 model。
+function destroyLogicFlow() {
+  if (fitViewTimer) clearTimeout(fitViewTimer)
+  fitViewTimer = undefined
+  const currentLogicFlow = lf.value
+  if (!currentLogicFlow) return
+  const currentFlowId = currentLogicFlow.graphModel.flowId ?? ''
+  currentLogicFlow.destroy()
+  if (currentFlowId) disconnectByFlow(currentFlowId)
+}
+
 function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
   const container = containerRef.value
   if (!container) return
 
+  destroyLogicFlow()
   lf.value = new LogicFlow({
     plugins: [Dagre, SelectionSelect],
     textEdit: false,
@@ -123,8 +135,9 @@ function getGraphData(): LogicFlow.GraphData | undefined {
   }
 }
 
+// 整图替换（加载、版本预览/恢复）需重建实例：LogicFlow 按节点 id 复用视图，节点 Vue 组件不会感知新 model。
 function render(data: LogicFlow.GraphConfigData) {
-  lf.value?.render(data)
+  renderGraphData(data)
 }
 
 function validate() {
@@ -181,8 +194,7 @@ function fitView() {
 
 onMounted(() => renderGraphData())
 onBeforeUnmount(() => {
-  if (fitViewTimer) clearTimeout(fitViewTimer)
-  lf.value?.destroy()
+  destroyLogicFlow()
   disconnectAll()
 })
 
