@@ -158,7 +158,7 @@ function handleSearchChange(query?: Dict<unknown>) {
                   <!-- 授权工作空间 -->
                   <AuthorizedWorkspaceAction
                     v-if="perm.knowledge.share.authToWorkspace()"
-                    :label="t('resource.workspaceAuthorization.title')"
+                    :label="t('authorization.workspace.title')"
                     :resource="knowledge"
                     :resource-type="RESOURCE_TYPE.KNOWLEDGE"
                   />

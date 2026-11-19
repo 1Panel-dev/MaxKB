@@ -8,27 +8,32 @@
 按“业务域 → 对象或场景 → 文案用途”组织；文件按业务域划分，不对应组件目录。
 各语言使用相同的业务文件或目录结构。
 
-| 业务域      | 内容                                             |
-| ----------- | ------------------------------------------------ |
-| common      | 无业务含义的操作、基础校验、界面偏好和通用错误页 |
-| upload      | 文件选择、上传提示、校验、状态、后缀与头像上传   |
-| auth        | 登录、退出、找回密码、身份认证                   |
-| application | 智能体创建、配置、发布、版本                     |
-| knowledge   | 知识库、文档、分段、问题、标签、检索             |
-| model       | 模型、供应商、模型参数与连接测试                 |
-| dynamicForm | 动态表单控件类型及配置器的固定界面文案           |
-| resource    | 跨资源授权、关联关系及共享状态等公共业务         |
-| folder      | 文件夹操作、排序、表单提示和删除确认             |
-| tool        | 工具、MCP、Skill 管理                            |
-| trigger     | 触发器、定时与事件配置、执行任务                 |
-| workflow    | 画布、节点、变量、调试与执行展示                 |
-| chat        | 对话输入、消息操作、历史会话与对话状态           |
-| workspace   | 工作空间、成员、空间级设置                       |
-| user        | 系统用户属性、用户管理及角色分配                 |
-| userGroup   | 系统与对话用户组、组成员、分配及继承权限说明     |
-| chatUser    | 对话用户管理、本地来源及 Token 配额              |
-| role        | 系统角色管理、角色类型及权限配置                 |
-| system      | 系统分组菜单及系统管理内共用文案                 |
+| 业务域        | 内容                                             |
+| ------------- | ------------------------------------------------ |
+| common        | 无业务含义的操作、基础校验、界面偏好和通用错误页 |
+| upload        | 文件选择、上传提示、校验、状态、后缀与头像上传   |
+| auth          | 登录、退出、找回密码、身份认证                   |
+| authorization | 资源权限、工作空间授权及对话用户授权             |
+| application   | 智能体创建、配置、发布、版本                     |
+| knowledge     | 知识库、文档、分段、问题、标签、检索             |
+| model         | 模型、供应商、模型参数与连接测试                 |
+| dynamicForm   | 动态表单控件类型及配置器的固定界面文案           |
+| resource      | 关联关系、共享状态、MCP 配置及执行记录等公共业务 |
+| folder        | 文件夹操作、排序、表单提示和删除确认             |
+| tool          | 工具、MCP、Skill 管理                            |
+| trigger       | 触发器、定时与事件配置、执行任务                 |
+| workflow      | 画布、节点、变量、调试与执行展示                 |
+| chat          | 对话输入、消息操作、历史会话与对话状态           |
+| workspace     | 工作空间、成员、空间级设置                       |
+| user          | 系统用户属性、用户管理及角色分配                 |
+| userGroup     | 系统与对话用户组、组成员、分配及继承权限说明     |
+| chatUser      | 对话用户管理、本地来源及 Token 配额              |
+| role          | 系统角色管理、角色类型及权限配置                 |
+| system        | 系统分组菜单及系统管理内共用文案                 |
+
+`common/` 是平台公共能力的分类目录，包含 `index.json`、`upload.json`、`dynamic-form.json`、`auth.json` 和 `authorization.json`。`common/index.json` 只维护通用操作、标签、状态和提示，其他文件分别使用 `upload`、`dynamicForm`、`auth`、`authorization` 命名空间，不增加 `common` 前缀。文件夹、资源及其他业务模块保持独立，不因多处复用就移入 `common/`。
+
+`common/auth.json` 负责身份认证，`common/authorization.json` 负责授权。授权文案按 `resource`、`permission`、`workspace`、`chatUser` 分组，分别维护资源授权界面、操作权限、工作空间授权和对话用户授权；引用为 `authorization.<分组>.<用途>`。用户与用户组的共用字段仍复用 `user`、`userGroup`。
 
 翻译 key 最多四层，包含业务域命名空间。业务域内部的共用字段使用 `<业务域>.fields.<字段>.<用途>`，
 场景专属字段使用 `<业务域>.<场景>.<字段>.<用途>`；不同时叠加场景、fields 和 validation。
@@ -55,7 +60,7 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 流程步骤的“上一步／下一步”使用 `common.actions.previous` / `next`，记录切换的“上一个／下一个”使用 `common.actions.previousItem` / `nextItem`。
 通用日期范围预设及起止日期占位归 `common.dateRange`，音视频播放失败提示归 `common.messages`。
 通用周期、星期、间隔单位与 Cron 字段及校验归 `common.schedule`；日期数字、时刻及间隔数值在使用处组合。
-通用文件选择、上传提示和校验归 `upload.json`，上传进度和结果汇总归 `upload.status`。
+通用文件选择、上传提示和校验归 `common/upload.json`，上传进度和结果汇总归 `upload.status`。
 头像设置、图片上传说明及校验归 `upload.avatar`；文件后缀编辑的操作和提示归 `upload.extension`。
 业务模板、文件内容要求和导入说明归各自业务域。
 “请输入模型名称”等指明业务对象的提示，以及发布状态、任务处理阶段等业务选项归对应业务域。
@@ -65,22 +70,27 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 
 ## 目录与命名空间
 
-分类目录只整理文件，业务名称决定翻译命名空间。分类目录在配置中显式登记，目前只有 `system/`；
+分类目录只整理文件，业务名称决定翻译命名空间。分类目录在配置中显式登记，目前为 `common/` 和 `system/`；
 `knowledge/`、`application/` 等仍是业务目录，不自动忽略目录层级。
 
-- 分类目录直属的 `index.json` 使用分类目录自身的命名空间，例如 `system/index.json` → `system`。
-- 其他文件跳过分类目录后，使用第一个业务文件或业务目录名作为命名空间，例如 `system/user.json`、`system/user/password.json` → `user`。
-- 普通单文件使用文件名，普通业务目录使用目录名，例如 `common.json` → `common`、`knowledge/document.json` → `knowledge`。
+- 分类目录直属的 `index.json` 使用分类目录自身的命名空间，例如 `common/index.json` → `common`、`system/index.json` → `system`。
+- 其他文件跳过分类目录后，使用第一个业务文件或业务目录名作为命名空间，例如 `common/upload.json` → `upload`，`system/user.json`、`system/user/password.json` → `user`。
+- 普通单文件使用文件名，普通业务目录使用目录名，例如 `model.json` → `model`、`knowledge/document.json` → `knowledge`。
 - 去掉 `.json` 后将短横线命名转换为驼峰，例如 `system/user-group.json` → `userGroup`。
 - 命名空间之后的 key 由 JSON 内容决定，子文件名不自动增加层级。JSON 不重复包裹命名空间，分文件可按业务对象组织字段。
 
-| 文件位置                    | JSON 内容示例                      | 调用 key                   |
-| --------------------------- | ---------------------------------- | -------------------------- |
-| `system/index.json`         | `{ "menu": { "identity": "…" } }`  | `system.menu.identity`     |
-| `system/user.json`          | `{ "username": { "label": "…" } }` | `user.username.label`      |
-| `system/workspace.json`     | `{ "title": "…" }`                 | `workspace.title`          |
-| `system/user/password.json` | `{ "password": { "label": "…" } }` | `user.password.label`      |
-| `knowledge/document.json`   | `{ "document": { "title": "…" } }` | `knowledge.document.title` |
+| 文件位置                    | JSON 内容示例                                   | 调用 key                       |
+| --------------------------- | ----------------------------------------------- | ------------------------------ |
+| `common/index.json`         | `{ "actions": { "save": "…" } }`                | `common.actions.save`          |
+| `common/upload.json`        | `{ "selectFile": "…" }`                         | `upload.selectFile`            |
+| `common/dynamic-form.json`  | `{ "types": { "textInput": "…" } }`             | `dynamicForm.types.textInput`  |
+| `common/auth.json`          | `{ "fields": { "captcha": { "label": "…" } } }` | `auth.fields.captcha.label`    |
+| `common/authorization.json` | `{ "resource": { "title": "…" } }`              | `authorization.resource.title` |
+| `system/index.json`         | `{ "menu": { "identity": "…" } }`               | `system.menu.identity`         |
+| `system/user.json`          | `{ "username": { "label": "…" } }`              | `user.username.label`          |
+| `system/workspace.json`     | `{ "title": "…" }`                              | `workspace.title`              |
+| `system/user/password.json` | `{ "password": { "label": "…" } }`              | `user.password.label`          |
+| `knowledge/document.json`   | `{ "document": { "title": "…" } }`              | `knowledge.document.title`     |
 
 同一业务只保留一个文件或一套分文件目录，不同时保留 `system/user.json` 与 `system/user/`，也不在其他分类下重复定义 `user`。
 同一命名空间内各文件的 JSON 顶层字段不能重复，加载时不会深层合并同名对象。拆文件时保留业务字段结构，调用 key 不变。
@@ -89,7 +99,7 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 ## JSON 键顺序
 
 - 同一语言包的键按含义分组，简体、繁体和英文采用相同的排列顺序，方便逐项对照。
-- `common.json` 的顶层顺序为 `labels` → `name` → `description` → `status` → `dateRange` → `schedule` → `parameters` → `actions` → `dialogs` → `messages` → `placeholders` → `validation` → `empty`。
+- `common/index.json` 的顶层顺序为 `labels` → `name` → `description` → `status` → `dateRange` → `schedule` → `parameters` → `actions` → `dialogs` → `messages` → `placeholders` → `validation` → `empty`。
 - 字段内先放 `label`，再放 `placeholder`，最后放 `requiredMessage` 等校验提示。状态组先放 `label`、`activeLabel`，再放 `enabled`、`disabled`。其他组沿用现有顺序。
 
 ## 使用约定
@@ -148,17 +158,17 @@ Admin 登录与找回密码页面支持三语切换，错误页暂不接入翻�
 
 模型列表分类使用 model.categories，供应商字段使用 model.provider.label / placeholder；
 卡片和下载／删除提示使用 model 语言包，操作按钮引用 common，
-授权和关联资源入口引用 resource。模型类型协议值不变，constants/model.ts 的 MODEL_TYPE_MESSAGE_KEYS 提供共用翻译 key，
+授权入口引用 authorization，关联资源入口引用 resource。模型类型协议值不变，constants/model.ts 的 MODEL_TYPE_MESSAGE_KEYS 提供共用翻译 key，
 类型名称与说明统一维护在 model.types.<类型>.label / description，保持四层结构。
 系统模型页与工作流默认模型设置共用同一类型映射；工作流 LLM 的“AI 模型”场景文案保留。
 内置分类标题按 provider 标识响应式翻译，不改写接口供应商名称。
 供应商选择、模型创建与编辑抽屉、高级参数表及独立参数设置抽屉已接入三语。
-高级参数表的控件类型名称读取 dynamic-form.json，加载到 dynamicForm 命名空间，
+高级参数表的控件类型名称读取 `common/dynamic-form.json`，加载到 dynamicForm 命名空间，
 不改写接口字段描述或已保存的参数配置。切换语言不重取接口、不重新初始化表单，
 也不主动校验；模型创建与编辑通过透传 validate-on-rule-change=false 禁止规则变化自动校验。
 参数表中的参数、显示名称、组件类型、默认值和必填列复用 dynamicForm.fields；动态表单中的模型类型
 复用 model.fields.type 及模型类型翻译映射。系统资源管理与系统共享资源的模型页固定文案同样复用
-model、common、resource，工作空间名称字段标签使用 workspace.title。工作空间模型、系统资源模型、
+model、common、resource、authorization，工作空间名称字段标签使用 workspace.title。工作空间模型、系统资源模型、
 系统共享模型和系统模型授权路由标题复用 model.title；侧栏菜单随当前语言更新，其他业务路由仍按批次处理。
 MkResourceCard、MkComplexSearch、MkEmpty 的默认创建信息、占位和空状态文案使用 common；
 自定义属性、插槽及接口返回内容保持原值。授权、关联资源、工作空间授权弹窗及表头筛选器的内部文案
@@ -194,7 +204,7 @@ MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 
 复制名称按“原名称 + 空格 + `common.name.copySuffix`”组合，并根据当前语言后缀的长度保留 64 字符限制。表单中的用户内容、模板中心返回的名称与描述、创建时写入的默认提示词和工作流模板配置保持原值。
 发布和门户上架状态归 `application.status`，发布时间归 `application.publishTime`，门户上下架操作及提示归 `application.portal`。名称、创建者、创建时间和通用操作复用 `common`，工作空间列复用 `workspace.title`。
 智能体导出入口及 Skills 访问地址提示归 `application.export`，删除确认归 `application.delete`；错误原因、导出文件名和 MCP 配置内容保留原值。
-MCP、资源授权、关联资源和模板中心入口复用 `resource`，触发器入口复用 `trigger.title`，文件夹移动入口复用 `folder`；保存、导入、删除、移动、复制和导出失败提示复用 `common`。
+MCP、关联资源和模板中心入口复用 `resource`，资源授权入口复用 `authorization.resource.title`，触发器入口复用 `trigger.title`，文件夹移动入口复用 `folder`；保存、导入、删除、移动、复制和导出失败提示复用 `common`。
 对话日志的语言文件为 `application/chat-log.json`，使用 `application.chatLog`。工作空间和系统资源管理的日志路由与页面共用 `title`；表头归 `labels`，用户反馈筛选归 `feedback`，来源标签与选项归 `source`。来源通过常量维护协议值到翻译 key 的映射，在展示时统一调用 `t`，Slack 在三语中均保留品牌名；未知来源保留接口原值。
 单个和批量清除策略共用 `cleanStrategy`，标题使用 `title`，天数输入框前后的说明分别使用对应的 `Prefix` / `Suffix`，保留原交互顺序并按天数处理英文单复数。添加到知识库的按钮和弹窗共用 `addKnowledge.title`，知识库与目标文档字段复用 `knowledge.fields.targetKnowledge` / `knowledge.document.target`。通用操作、成功提示和详情翻页复用 `common`；摘要、用户名、知识库与文档名称展示原值。
 发布渠道使用 `application/access.json` 中的 `access` 分组，两种资源范围的菜单共用 `application.access.title`；渠道名称与说明分别归各渠道的 `label` / `description`，配置入口归 `actions`，未配置状态归 `states`，抽屉标题使用 `configurationTitle`。卡片和抽屉通过已有渠道标识 `platform.key` 统一调用 `t`，Slack 同样使用 `label`，三语文案均为品牌名；功能本地 `platforms.ts` 维护平台标识、图标、配置字段与后台链接，不重复维护渠道名称和说明。
@@ -273,7 +283,9 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 角色成员列表的用户名与姓名复用 `user`，工作空间标签复用 `workspace.title`，成员入口和单项／批量移除标题复用 `system.member`；批量移除标题按实际选择数量处理单复数，单项与批量结果共用 `common.messages.removeSuccess`。搜索字段在 computed 中翻译，保留筛选协议值。
 添加角色成员的工作空间选择占位与必填提示复用 `user.workspace`，其余按钮和结果提示复用 `common`；成员及工作空间名称展示接口原文。保留版本与角色类型对应的工作空间显示条件、提交值及原有校验规则，语言切换不重置表单或重新加载选项。
 
-系统资源授权入口、资源权限配置标题及“按用户组／按用户”页签归 `resource.authorization`，提交成功提示复用 `common.messages.submitSuccess`。四类资源的菜单与页签共用各业务的 `title`，功能本地 `RESOURCE_AUTHORIZATION_MESSAGE_KEYS` 维护协议值到标题 key 的映射，选项在 computed 中直接通过 `t` 翻译。
+系统资源授权入口、资源权限配置标题及“按用户组／按用户”页签归 `authorization.resource`，提交成功提示复用 `common.messages.submitSuccess`。四类资源的菜单与页签共用各业务的 `title`，功能本地 `RESOURCE_AUTHORIZATION_MESSAGE_KEYS` 维护协议值到标题 key 的映射，选项在 computed 中直接通过 `t` 翻译。
+共享资源授权抽屉复用同一套标题和页签，生效资源及当前资源／包含子文件夹选项归 `authorization.resource.scope`；权限字段、配置入口、权限选项名称与说明归 `authorization.permission`。`RESOURCE_PERMISSION_OPTIONS` 只维护协议值、`labelKey` 和可选的 `descriptionKey`，抽屉与系统授权页面在模板或 computed 中直接调用 `t`，不维护第二套中文选项。
+授权列表及用户组成员抽屉的用户字段复用 `user`，用户组标签和成员数复用 `userGroup.title` / `memberCount`；登录方式品牌名复用 `auth.login.options`，来源筛选和表格共用响应式标签。通用按钮及结果提示复用 `common`。
 授权对象、资源和工作空间名称保留接口原文；语言切换不重取授权数据、不切换分类或授权对象，保留未提交的权限编辑状态。
 
 ## 知识库详情
@@ -287,7 +299,7 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 自定义分词的标题、用途说明、词语字段及创建入口归 `knowledge.termbase`，在 `knowledge/termbase.json` 维护；英文沿用 v2 的 `term` 用词，标题为 `Custom term`，创建入口为 `Create term`。四种资源范围的菜单与列表共用 `title`，创建按钮和弹窗共用 `actions.create`。词语标签、单行与多行输入占位归 `content`；时间、通用操作及创建／删除／导出成功提示复用 `common`。词语内容和导出文件名保持原值。
 检索参数、模式名称及说明归 `knowledge.retrieval`；召回测试标题、输入、结果及空状态归 `knowledge.hitTest`，两组在 `knowledge/retrieval.json` 维护。召回测试菜单与页面共用 `knowledge.hitTest.title`。召回测试、智能体设置与工作流知识库检索节点共用 `KNOWLEDGE_SEARCH_MODE_OPTIONS`，在模板或 computed 中直接通过 `t` 翻译 `labelKey` / `descriptionKey`，提交仍使用协议值。图片上传限制、格式标签、校验及失败状态复用 `upload`，结果分段详情标题复用 `knowledge.paragraph.detailTitle`；查询内容与接口返回的分段、文档名称保留原文。
 翻译按业务含义归属，不与页面目录一一对应：分段字段和操作归 `knowledge.paragraph`，文档字段、操作及流程说明归 `knowledge.document`，页面可交叉引用。
-对话用户授权属于跨资源业务，标题、用户组分组、用户字段、来源标签及授权状态归 `resource.chatUserAuthorization`。智能体的工作空间／系统资源管理菜单与知识库四种资源范围的菜单共用其 `title`；保存按钮和成功提示复用 `common`，钉钉、飞书和企业微信名称复用 `auth.login.options`。搜索与来源筛选的选项在 computed 中生成；用户名、用户组名称和未知来源保留原文，筛选与授权请求使用原协议值。已授权人数在模板中按“已授权 数量”组合，不建立数量格式翻译键。
+对话用户授权属于跨资源业务，标题、用户组分组、用户字段、来源标签及授权状态归 `authorization.chatUser`。智能体的工作空间／系统资源管理菜单与知识库四种资源范围的菜单共用其 `title`；保存按钮和成功提示复用 `common`，钉钉、飞书和企业微信名称复用 `auth.login.options`。搜索与来源筛选的选项在 computed 中生成；用户名、用户组名称和未知来源保留原文，筛选与授权请求使用原协议值。已授权人数在模板中按“已授权 数量”组合，不建立数量格式翻译键。
 外部检索服务的标题、开关及说明、API 调用示例标签和加载失败提示归 `knowledge.externalRetrieval`，在 `knowledge/retrieval.json` 维护；四种资源范围的菜单共用 `title`。MCP 配置标题复用 `resource.mcpConfig.title`，重新加载、保存和复制成功提示复用 `common`。接口返回的 API 示例及 MCP 配置保持原文，只按既有规则对齐访问地址；调用复制工具时传入当前语言的成功提示。
 导入预览删除分段使用 `knowledge.paragraph.delete.confirm`；继续导入前的编辑未完成提示保留在 `knowledge.document.preview`。文档召回处理和删除文档的影响说明仍归 `knowledge.document`。
 跨对象共用的召回次数、最后一次召回时间归 `knowledge.stats.retrievalCount` / `lastRetrievedAt`，文档列表和分段预览共用。
@@ -302,12 +314,12 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 `folder.json` 的 actions 维护创建文件夹、创建子文件夹、编辑文件夹等操作。将文件夹或资源移动到目标文件夹时，菜单、批量操作和弹窗标题统一使用 `folder.actions.moveTo`。
 sort 维护目录树排序选项，
 delete 维护删除确认。名称与描述的表单提示、通用按钮、字段标签、搜索占位和成功提示复用 common，
-资源授权入口复用 resource。目录树与列表标题复用 application、knowledge 或 tool 的 categories.all / shared，
+资源授权入口复用 authorization.resource.title。目录树与列表标题复用 application、knowledge 或 tool 的 categories.all / shared，
 每个分类名称按完整短语翻译；用户创建的文件夹名称和描述按原值展示。
 
 ## 动态表单
 
-`dynamic-form.json` 挂载为 `dynamicForm`，维护配置器基本信息、控件类型、选项配置、显隐条件、
+`common/dynamic-form.json` 挂载为 `dynamicForm`，维护配置器基本信息、控件类型、选项配置、显隐条件、
 固定帮助文案，以及运行时控件的缺省提示；通用操作、结果提示和对话框标题复用 common。
 同一字段的标签、占位和校验集中到 fields；通用占位提示复用 common.placeholders，
 缺省必填提示根据实际控件使用 common.validation 中带字段名的输入或选择提示。

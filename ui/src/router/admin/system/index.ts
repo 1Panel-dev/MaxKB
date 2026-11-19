@@ -76,7 +76,7 @@ export const systemRoutes: RouteRecordRaw = {
           name: 'system-authorization',
           redirect: { name: 'system-authorization-applications' },
           meta: {
-            title: 'resource.authorization.title',
+            title: 'authorization.resource.title',
             activeMenu: '/system/identity/authorization',
             order: 50,
             permission: () => {

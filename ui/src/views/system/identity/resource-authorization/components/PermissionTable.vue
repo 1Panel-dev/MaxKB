@@ -23,7 +23,12 @@ const { t } = useI18n({ useScope: 'global' })
 
 const permissionSearchFields = computed<OptionItem<string>[]>(() => [
   { label: t('common.name.label'), value: 'name' },
-  { label: t('resource.permission.label'), multiple: true, options: getPermissionOptions(), value: 'permission' },
+  {
+    label: t('authorization.permission.label'),
+    multiple: true,
+    options: getPermissionOptions().map(({ labelKey, value }) => ({ label: t(labelKey), value })),
+    value: 'permission',
+  },
 ])
 
 /* 搜索与展开 */
@@ -170,7 +175,7 @@ watch(
         <!-- 批量配置权限 -->
         <el-button type="primary" :disabled="disabled || batchSelectedResources.length === 0" @click="handleOpenBatchDialog">
           <MkIcon name="icon-lock" />
-          <span>{{ t('resource.permission.configure') }}</span>
+          <span>{{ t('authorization.permission.configure') }}</span>
         </el-button>
       </div>
 
@@ -200,11 +205,11 @@ watch(
           </div>
         </template>
       </el-table-column>
-      <el-table-column :label="t('resource.permission.operationLabel')" width="450">
+      <el-table-column :label="t('authorization.permission.operationLabel')" width="450">
         <template #default="{ row }: { row: ResourcePermissionItem }">
           <el-radio-group :model-value="row.permission" :disabled="disabled" @change="handlePermissionChange($event as ResourcePermission, row)">
             <template v-for="permissionOption in getPermissionOptions()" :key="permissionOption.value">
-              <el-radio :value="permissionOption.value">{{ permissionOption.label }}</el-radio>
+              <el-radio :value="permissionOption.value">{{ t(permissionOption.labelKey) }}</el-radio>
             </template>
           </el-radio-group>
         </template>

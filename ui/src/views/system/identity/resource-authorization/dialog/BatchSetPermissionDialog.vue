@@ -38,12 +38,12 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="t('resource.permission.configure')" @closed="resetData">
+  <MkDialog v-model="visible" :title="t('authorization.permission.configure')" @closed="resetData">
     <el-radio-group v-model="permission" class="mk-radio-group-vertical" :disabled="disabled">
       <el-radio v-for="permissionOption in getPermissionOptions()" :key="permissionOption.value" :value="permissionOption.value">
-        <p>{{ permissionOption.label }}</p>
-        <p v-if="permissionOption.description" class="text-N500 mt-1">
-          {{ permissionOption.description }}
+        <p>{{ t(permissionOption.labelKey) }}</p>
+        <p v-if="permissionOption.descriptionKey" class="text-N500 mt-1">
+          {{ t(permissionOption.descriptionKey) }}
         </p>
       </el-radio>
     </el-radio-group>

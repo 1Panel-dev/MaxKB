@@ -980,11 +980,18 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 用户与用户组查询、保存均由入口按 `isSystemResource()` 选择当前范围完整 requestApi，
 Workspace 使用 Workspace API，System 资源管理使用 System API；不以路由工作空间代替资源 workspaceId。
 
+标题、页签及生效范围文案归 `authorization.resource`，权限字段与配置入口归 `authorization.permission`。
+内部列表和配置弹窗接收 `RESOURCE_PERMISSION_OPTIONS` 的协议值与翻译 key，在使用处直接调用 `t`；
+搜索选项在 computed 中翻译。语言切换保留当前页、搜索条件、选中项及待提交配置，不重新请求授权数据。
+用户字段复用 `user`，用户组标签与成员数复用 `userGroup`，通用按钮和结果提示复用 `common`。
+
 ### UserGroupMembersDrawer
 
 手动导入 `business/resource-authorization-drawer/user-group/UserGroupMembersDrawer.vue`，通过 `open(userGroup)` 传入
 `SystemUserGroup`，按其 `workspace_id` 查询成员。支持姓名、用户名搜索，用户来源表头筛选和分页，角色使用
 `MkTagGroup` 展示；供系统资源授权页面和资源授权抽屉共同复用。
+用户字段及本地来源复用 `user`，登录方式品牌名复用 `auth.login.options`；来源筛选和表格共用响应式标签。
+用户组、成员及角色名称保留接口原文，语言切换不重置查询与分页。
 
 ### RelatedResourcesDrawer
 

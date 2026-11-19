@@ -91,7 +91,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
             path: 'chat-user',
             name: 'workspace-application-chat-user',
             component: () => import('@/views/application-detail/chat-user/index.vue'),
-            meta: { title: 'resource.chatUserAuthorization.title',
+            meta: { title: 'authorization.chatUser.title',
               icon: 'icon_contacts_outlined',
               activeIcon: 'icon_contacts_filled', order: 40,
               permission: ({ params }) => perm.application.workspace.chatUserRead(String(params.applicationId)),

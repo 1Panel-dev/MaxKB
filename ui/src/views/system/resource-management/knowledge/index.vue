@@ -231,7 +231,7 @@ onMounted(() => {
                   v-if="perm.knowledge.system.mcpConfig()"
                 />
                 <!-- 资源授权 -->
-                <AuthorizeKnowledgeAction v-if="perm.knowledge.system.auth()" :label="t('resource.authorization.title')" :knowledge="row" />
+                <AuthorizeKnowledgeAction v-if="perm.knowledge.system.auth()" :label="t('authorization.resource.title')" :knowledge="row" />
                 <!-- 查看关联资源 -->
                 <RelatedResourcesKnowledgeAction
                   v-if="perm.knowledge.system.relateMap()"

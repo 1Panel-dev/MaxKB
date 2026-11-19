@@ -10,6 +10,7 @@
     "placeholder": "请输入用户组名称",
     "requiredMessage": "请输入用户组名称"
   },
+  "memberCount": "成员数",
   "set": "设置用户组",
   "delete": {
     "title": "是否删除用户组",

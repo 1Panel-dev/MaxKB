@@ -336,7 +336,7 @@ onMounted(() => {
                     :tool="tool"
                   />
                   <!-- 资源授权 -->
-                  <AuthorizeToolAction v-if="perm.tool.workspace.auth(tool.id)" :label="t('resource.authorization.title')" :tool="tool" />
+                  <AuthorizeToolAction v-if="perm.tool.workspace.auth(tool.id)" :label="t('authorization.resource.title')" :tool="tool" />
 
                   <!-- 工具触发器 -->
                   <TriggerToolAction

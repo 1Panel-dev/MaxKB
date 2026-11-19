@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, LoginMethod, OptionItem, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import UserGroupsApi from '@/api/admin/system/user-groups'
@@ -7,6 +8,7 @@ import { LOGIN_METHOD_LABELS } from '@/constants'
 import { useStore } from '@/stores'
 
 defineOptions({ name: 'UserGroupMembersDrawer' })
+const { t } = useI18n({ useScope: 'global' })
 
 /* 成员查询与分页 */
 const { auth } = useStore()
@@ -17,17 +19,21 @@ const userGroupMembers = ref<SystemUserGroupMember[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields = computed<OptionItem<string>[]>(() => [
-  { label: '姓名', value: 'nick_name' },
-  { label: '用户名', value: 'username' },
-  ...(auth.isEE || auth.isPE ? [{ label: '角色', value: 'role' }] : []),
+  { label: t('user.name.label'), value: 'nick_name' },
+  { label: t('user.username.label'), value: 'username' },
+  ...(auth.isEE || auth.isPE ? [{ label: t('user.role.label'), value: 'role' }] : []),
 ])
 
 /* 表头筛选 */
 const selectedMemberSource = ref<string | null>(null)
-const memberSourceOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
-  label: value === LOGIN_METHOD.LOCAL ? '系统用户' : label,
-  value,
+const memberSourceLabels = computed<Record<LoginMethod, string>>(() => ({
+  ...LOGIN_METHOD_LABELS,
+  [LOGIN_METHOD.LOCAL]: t('user.source.local'),
+  [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
+  [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
+  [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
 }))
+const memberSourceOptions = computed<OptionItem<string>[]>(() => Object.entries(memberSourceLabels.value).map(([value, label]) => ({ label, value })))
 const memberListQuery = computed<Dict<unknown>>(() => ({
   ...memberSearchQuery.value,
   ...(selectedMemberSource.value !== null ? { source: selectedMemberSource.value } : {}),
@@ -102,23 +108,23 @@ defineExpose({ open })
       @current-change="loadUserGroupMembers"
       @size-change="loadUserGroupMembers"
     >
-      <el-table-column prop="nick_name" label="姓名" show-overflow-tooltip />
-      <el-table-column prop="username" label="用户名" show-overflow-tooltip />
-      <el-table-column prop="source" label="用户来源">
+      <el-table-column prop="nick_name" :label="t('user.name.label')" show-overflow-tooltip />
+      <el-table-column prop="username" :label="t('user.username.label')" show-overflow-tooltip />
+      <el-table-column prop="source" :label="t('user.source.label')">
         <template #header>
           <MkTableFilter
             mode="single"
             v-model="selectedMemberSource"
-            label="用户来源"
+            :label="t('user.source.label')"
             :options="memberSourceOptions"
             @change="handleMemberFilterChange"
           />
         </template>
         <template #default="{ row }">
-          {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
+          {{ memberSourceLabels[row.source as LoginMethod] ?? row.source }}
         </template>
       </el-table-column>
-      <el-table-column v-if="auth.isEE || auth.isPE" label="角色">
+      <el-table-column v-if="auth.isEE || auth.isPE" :label="t('user.role.label')">
         <template #default="{ row }">
           <MkTagGroup v-if="row.roles?.length" :tags="row.roles" />
           <span v-else>-</span>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ResourcePermissionOption } from './types'
 import type SystemResourceAuthorizationApi from '@/api/admin/system/resource-management/resource-authorization'
 import type ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
@@ -18,18 +19,24 @@ const props = defineProps<{
   permissionOptions: ResourcePermissionOption[]
 }>()
 const emit = defineEmits<{ configure: [subjectIds: string[], permission?: ResourcePermission] }>()
+const { t } = useI18n({ useScope: 'global' })
 
 /* 根目录不提供“不授权”，按“查看”展示接口返回的该权限。 */
 const canSelectNotAuth = computed(() => props.permissionOptions.some(({ value }) => value === RESOURCE_PERMISSION.NOT_AUTH))
 
 /* 查询与当前页选择 */
 const { auth } = useStore()
-const searchPermissionOptions = computed(() => RESOURCE_PERMISSION_OPTIONS.filter(({ value }) => !auth.isCE || value !== RESOURCE_PERMISSION.ROLE))
+const searchPermissionOptions = computed(() =>
+  RESOURCE_PERMISSION_OPTIONS.filter(({ value }) => !auth.isCE || value !== RESOURCE_PERMISSION.ROLE).map(({ labelKey, value }) => ({
+    label: t(labelKey),
+    value,
+  })),
+)
 const searchFields = computed(() => [
-  { label: '姓名', value: 'nick_name' },
-  { label: '用户名', value: 'username' },
-  { label: '权限', value: 'permission', multiple: true, options: searchPermissionOptions.value },
-  ...(auth.isEE || auth.isPE ? [{ label: '角色', value: 'role' }] : []),
+  { label: t('user.name.label'), value: 'nick_name' },
+  { label: t('user.username.label'), value: 'username' },
+  { label: t('authorization.permission.label'), value: 'permission', multiple: true, options: searchPermissionOptions.value },
+  ...(auth.isEE || auth.isPE ? [{ label: t('user.role.label'), value: 'role' }] : []),
 ])
 const loading = ref(false)
 const permissionUsers = ref<ResourceUserPermission[]>([])
@@ -101,7 +108,9 @@ onMounted(() => loadPermissions())
   <div>
     <div class="flex-between mb-4 gap-4">
       <!-- 批量配置权限 -->
-      <el-button type="primary" :disabled="!selectedUsers.length || loading || submitting" @click="handleOpenBatchConfig">配置权限</el-button>
+      <el-button type="primary" :disabled="!selectedUsers.length || loading || submitting" @click="handleOpenBatchConfig">
+        {{ t('authorization.permission.configure') }}
+      </el-button>
       <MkComplexSearch :fields="searchFields" @change="handleSearch" />
     </div>
     <MkTable
@@ -115,18 +124,18 @@ onMounted(() => loadPermissions())
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="40" />
-      <el-table-column prop="nick_name" label="姓名" min-width="120" show-overflow-tooltip />
-      <el-table-column prop="username" label="用户名" min-width="120" show-overflow-tooltip />
-      <el-table-column v-if="auth.isEE || auth.isPE" label="角色" width="160">
+      <el-table-column prop="nick_name" :label="t('user.name.label')" min-width="120" show-overflow-tooltip />
+      <el-table-column prop="username" :label="t('user.username.label')" min-width="120" show-overflow-tooltip />
+      <el-table-column v-if="auth.isEE || auth.isPE" :label="t('user.role.label')" width="160">
         <template #default="{ row }">
           <MkTagGroup v-if="row.role_name?.length" :tags="row.role_name" />
           <span v-else>-</span>
         </template>
       </el-table-column>
-      <el-table-column label="权限" min-width="340">
+      <el-table-column :label="t('authorization.permission.label')" min-width="340">
         <template #default="{ row }">
           <el-radio-group :model-value="row.permission" :disabled="submitting" @change="handlePermissionChange($event, row)">
-            <el-radio v-for="option in permissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{ option.label }}</el-radio>
+            <el-radio v-for="option in permissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{ t(option.labelKey) }}</el-radio>
           </el-radio-group>
         </template>
       </el-table-column>
