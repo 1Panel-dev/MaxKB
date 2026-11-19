@@ -1,5 +1,6 @@
 import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/workflow-node'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
+import agent from './agent'
 import LlmNodeDetail from './details/index.vue'
 import LlmNodeVue from './index.vue'
 
@@ -22,4 +23,5 @@ export default {
   model: LlmNodeModel,
   view: LlmNodeView,
   details: LlmNodeDetail,
+  agent,
 }
