@@ -74,7 +74,7 @@ watch([() => props.workspaceIds, () => props.workspaceOptions], refreshUserGroup
       :show-all-levels="false"
       clearable
       filterable
-      :placeholder="t('system.user.userGroup.placeholder')"
+      :placeholder="t('userGroup.placeholder')"
       fit-input-width
     />
   </el-form-item>

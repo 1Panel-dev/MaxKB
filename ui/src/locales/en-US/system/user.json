@@ -1,61 +1,80 @@
 {
-  "user": {
-    "title": "User management",
-    "createTitle": "Create user",
-    "editTitle": "Edit user",
-    "username": {
-      "label": "Username",
-      "placeholder": "Enter a username",
-      "requiredMessage": "Enter a username"
-    },
-    "name": {
-      "label": "Name",
-      "placeholder": "Enter a name",
-      "requiredMessage": "Enter a name"
-    },
-    "email": {
-      "label": "Email",
-      "placeholder": "Enter an email address",
-      "requiredMessage": "Enter an email address",
-      "invalidMessage": "Enter a valid email address"
-    },
-    "phone": {
-      "label": "Phone number",
-      "placeholder": "Enter a phone number",
-      "invalidMessage": "Enter a valid phone number"
-    },
-    "password": {
-      "defaultLabel": "Default password",
-      "changeTitle": "Change user password"
-    },
-    "role": {
-      "label": "Role",
-      "placeholder": "Select a role",
-      "requiredMessage": "Select a role",
-      "settingsTitle": "Role settings",
-      "add": "Add role",
-      "set": "Set roles"
-    },
-    "workspace": {
-      "placeholder": "Select a workspace",
-      "requiredMessage": "Select a workspace"
-    },
-    "userGroup": {
-      "label": "User group",
-      "placeholder": "Select a user group"
-    },
-    "activeStatus": "Enabled status",
-    "source": {
-      "label": "User source",
-      "local": "System user"
-    },
-    "import": {
-      "title": "Import users"
-    },
-    "delete": {
-      "title": "Delete user",
-      "batchTitle": "Delete the {count} selected user | Delete the {count} selected users",
-      "description": "Deleting this user will not delete the resources they created (agents, knowledge, and models). Proceed with caution."
-    }
+  "title": "User management",
+  "createTitle": "Create user",
+  "editTitle": "Edit user",
+  "placeholder": "Select a username or name",
+  "username": {
+    "label": "Username",
+    "placeholder": "Enter a username",
+    "requiredMessage": "Enter a username",
+    "existsMessage": "Username already exists"
+  },
+  "name": {
+    "label": "Name",
+    "placeholder": "Enter a name",
+    "requiredMessage": "Enter a name",
+    "existsMessage": "Name already exists"
+  },
+  "email": {
+    "label": "Email",
+    "placeholder": "Enter an email address",
+    "requiredMessage": "Enter an email address",
+    "invalidMessage": "Enter a valid email address",
+    "existsMessage": "Email already exists"
+  },
+  "phone": {
+    "label": "Phone",
+    "placeholder": "Enter a phone",
+    "invalidMessage": "Enter a valid phone"
+  },
+  "password": {
+    "label": "New password",
+    "placeholder": "Enter a new password",
+    "requiredMessage": "Enter a new password",
+    "defaultLabel": "Default password",
+    "changeTitle": "Change user password",
+    "changeSuccess": "Password changed successfully"
+  },
+  "confirmPassword": {
+    "label": "Confirm password",
+    "placeholder": "Re-enter the new password",
+    "requiredMessage": "Confirm the password",
+    "mismatchMessage": "Passwords do not match"
+  },
+  "role": {
+    "label": "Role",
+    "placeholder": "Select a role",
+    "requiredMessage": "Select a role",
+    "settingsTitle": "Role settings",
+    "add": "Add role",
+    "set": "Set roles",
+    "methodLabel": "Assignment method",
+    "append": "Append",
+    "replace": "Replace"
+  },
+  "workspace": {
+    "placeholder": "Select a workspace",
+    "requiredMessage": "Select a workspace"
+  },
+  "activeStatus": "Enabled status",
+  "source": {
+    "label": "User source",
+    "requiredMessage": "Select a user source",
+    "local": "System user",
+    "localFile": "Local file"
+  },
+  "import": {
+    "title": "Import users",
+    "onlyNewHint": "Only new users will be imported",
+    "downloadTemplate": "Download template",
+    "formatMessage": "Only xlsx files can be uploaded",
+    "successMessage": "Successfully imported {count} user | Successfully imported {count} users",
+    "skippedMessage": "Skipped {count} user | Skipped {count} users",
+    "conflictMessage": "{type} conflict"
+  },
+  "delete": {
+    "title": "Delete user",
+    "batchTitle": "Delete the {count} selected user | Delete the {count} selected users",
+    "description": "Deleting this user will not delete the resources they created (agents, knowledge, and models). Proceed with caution."
   }
 }

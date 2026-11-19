@@ -19,7 +19,7 @@ function handleOpenDialog() {
   <!-- 导入用户 -->
   <el-button plain @click="handleOpenDialog">
     <MkIcon name="icon_import_outlined" />
-    <span>{{ t('system.user.import.title') }}</span>
+    <span>{{ t('user.import.title') }}</span>
   </el-button>
   <ImportUsersDialog ref="dialogRef" @refresh="emit('refresh')" />
 </template>

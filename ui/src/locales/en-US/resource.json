@@ -1,6 +1,9 @@
 {
   "authorization": {
-    "title": "Resource authorization"
+    "title": "Resource authorization",
+    "permissionTitle": "Resource permission configuration",
+    "byGroup": "By user group",
+    "byUser": "By user"
   },
   "relations": {
     "title": "View related resources"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { BatchSetUserWorkspaceRolesRequest, ListItem, SystemUserRoleAssignment } from '@/api/types'
 import type { FormInstance } from 'element-plus'
 import { ROLE_TYPE } from '@/api/enums'
@@ -11,6 +12,7 @@ import { MsgSuccess } from '@/utils/message'
 defineOptions({ name: 'BatchSetUserRoleDialog' })
 
 const { auth } = useStore()
+const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ refresh: [] }>()
 
@@ -84,7 +86,7 @@ function submitBatchSetUserRoles() {
 
     return request
       .then(() => {
-        MsgSuccess('设置成功')
+        MsgSuccess(t('common.messages.saveSuccess'))
         emit('refresh')
         dialogVisible.value = false
       })
@@ -113,37 +115,38 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="设置角色" @closed="resetData">
+  <MkDialog v-model="dialogVisible" :title="t('user.role.set')" @closed="resetData">
     <el-form
       ref="batchRoleFormRef"
       :model="batchRoleForm"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent="submitBatchSetUserRoles"
     >
-      <el-form-item label="设置方式">
+      <el-form-item :label="t('user.role.methodLabel')">
         <el-radio-group v-model="batchRoleForm.is_append">
-          <el-radio :value="true">追加</el-radio>
-          <el-radio :value="false">替换</el-radio>
+          <el-radio :value="true">{{ t('user.role.append') }}</el-radio>
+          <el-radio :value="false">{{ t('user.role.replace') }}</el-radio>
         </el-radio-group>
       </el-form-item>
 
       <MkFormList
         v-if="auth.isEE || auth.isPE"
         v-model="batchRoleForm.role_setting"
-        add-text="添加角色"
+        :add-text="t('user.role.add')"
         :default-item="{ role_id: '', workspace_ids: [] }"
       >
         <template #default="{ index, item: roleAssignment }">
           <el-form-item
             class="flex-1 small"
-            :label="index === 0 ? '角色' : ''"
+            :label="index === 0 ? t('user.role.label') : ''"
             :prop="`role_setting.${index}.role_id`"
-            :rules="{ required: true, message: '请选择角色', trigger: 'change' }"
+            :rules="{ required: true, message: t('user.role.requiredMessage'), trigger: 'change' }"
           >
             <el-select
               v-model="roleAssignment.role_id"
-              placeholder="请选择角色"
+              :placeholder="t('user.role.placeholder')"
               :loading="roleSettingOptionsLoading"
               clearable
               filterable
@@ -164,15 +167,17 @@ defineExpose({ open })
           <el-form-item
             v-if="auth.isEE"
             class="flex-1 small"
-            :label="index === 0 ? '工作空间' : ''"
+            :label="index === 0 ? t('workspace.title') : ''"
             :prop="`role_setting.${index}.workspace_ids`"
             :rules="
-              isAdminRole(roleAssignment.role_id) ? [] : { required: true, type: 'array', min: 1, message: '请选择工作空间', trigger: 'change' }
+              isAdminRole(roleAssignment.role_id)
+                ? []
+                : { required: true, type: 'array', min: 1, message: t('user.workspace.requiredMessage'), trigger: 'change' }
             "
           >
             <el-select
               v-model="roleAssignment.workspace_ids"
-              :placeholder="isAdminRole(roleAssignment.role_id) ? '' : '请选择工作空间'"
+              :placeholder="isAdminRole(roleAssignment.role_id) ? '' : t('user.workspace.placeholder')"
               :loading="roleSettingOptionsLoading"
               :disabled="isAdminRole(roleAssignment.role_id)"
               :validate-event="!isAdminRole(roleAssignment.role_id)"
@@ -198,8 +203,10 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" :loading="submitting" @click="submitBatchSetUserRoles">保存</el-button>
+      <!-- 取消设置角色 -->
+      <el-button plain @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存角色设置 -->
+      <el-button type="primary" :loading="submitting" @click="submitBatchSetUserRoles">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

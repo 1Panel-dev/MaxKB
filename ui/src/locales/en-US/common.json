@@ -75,7 +75,9 @@
   "actions": {
     "manage": "Manage",
     "edit": "Edit",
+    "rename": "Rename",
     "delete": "Delete",
+    "remove": "Remove",
     "cancel": "Cancel",
     "retry": "Retry",
     "reload": "Reload",
@@ -122,6 +124,7 @@
     "removeSuccess": "Removed successfully",
     "fetchSuccess": "Fetched successfully",
     "updateSuccess": "Updated successfully",
+    "renameSuccess": "Renamed successfully",
     "moveSuccess": "Moved successfully",
     "importSuccess": "Imported successfully",
     "relateSuccess": "Related successfully",

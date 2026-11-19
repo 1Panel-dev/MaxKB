@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { RoleItem, RoleType, RoleTypeGroup } from '@/api/types'
 import RoleApi from '@/api/admin/system/role'
 import RoleMemberList from './components/RoleMemberList.vue'
 import RolePermissionConfiguration from './components/RolePermissionConfiguration.vue'
 import CreateOrUpdateRoleDialog from './dialog/CreateOrUpdateRoleDialog.vue'
-import { ROLE_TYPE_LABELS } from '@/constants'
+import { ROLE_TYPE_MESSAGE_KEYS } from '@/constants'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
 type RoleDetailTab = 'permission' | 'member'
+const { t } = useI18n({ useScope: 'global' })
 const currentTab = ref<RoleDetailTab>('permission')
 
 /* 角色列表 */
@@ -74,11 +76,11 @@ function handleRoleSaved(role: RoleItem) {
 
 /* 删除角色 */
 function handleDeleteRole(role: RoleItem) {
-  MsgConfirm(`是否刪除角色：${role.role_name}？`, '删除后，该角色下的成员都会被移除，请谨慎操作。')
+  MsgConfirm(`${t('role.delete.title')}: ${role.role_name}?`, t('role.delete.description'))
     .then(() => {
       loadingRoles.value = true
       return RoleApi.deleteRole(role.id).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         return loadRoles(currentRole.value?.id === role.id ? undefined : currentRole.value?.id)
       })
     })
@@ -92,11 +94,11 @@ onMounted(() => loadRoles())
 </script>
 
 <template>
-  <MkViewLayout class="system-identity-roles" :loading="loadingRoles">
+  <MkViewLayout :title="t('role.title')" class="system-identity-roles" :loading="loadingRoles">
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
-        <MkTooltip content="创建角色" placement="top" v-if="perm.system.role.create()">
+        <MkTooltip :content="t('role.createTitle')" placement="top" v-if="perm.system.role.create()">
           <!-- 创建角色 -->
           <el-button class="-mr-1" text type="primary" @click="handleOpenRoleDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
@@ -114,7 +116,7 @@ onMounted(() => loadRoles())
             :key="roleGroup.role_type"
             v-model:expanded="expandedRoleTypes[roleGroup.role_type]"
             :default-expanded="false"
-            :title="ROLE_TYPE_LABELS[roleGroup.role_type]"
+            :title="t(ROLE_TYPE_MESSAGE_KEYS[roleGroup.role_type])"
             trigger-class="text-N500 py-2!"
           >
             <div class="space-y-1">
@@ -129,18 +131,18 @@ onMounted(() => loadRoles())
               >
                 <template #default>
                   <span class="min-w-0 truncate" :title="role.role_name">{{ role.role_name }}</span>
-                  <el-tag type="info" size="small" class="ml-[6px]" v-if="role.internal">系</el-tag>
+                  <el-tag type="info" size="small" class="ml-[6px]" v-if="role.internal">{{ t('role.internalLabel') }}</el-tag>
                 </template>
                 <template v-if="!role.internal" #action-dropdown>
                   <!-- 重命名 -->
                   <MkDropdownItem v-if="perm.system.role.edit()" @click="handleOpenRoleDialog(role)">
                     <template #icon><MkIcon name="icon_rename_outlined" /></template>
-                    重命名
+                    {{ t('common.actions.rename') }}
                   </MkDropdownItem>
                   <!-- 删除 -->
                   <MkDropdownItem v-if="perm.system.role.delete()" @click="handleDeleteRole(role)">
                     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                    删除
+                    {{ t('common.actions.delete') }}
                   </MkDropdownItem>
                 </template>
               </MkListItem>
@@ -157,7 +159,9 @@ onMounted(() => loadRoles())
             <h4 class="min-w-0 truncate" :title="currentRole.role_name">
               {{ currentRole.role_name }}
             </h4>
-            <el-tag type="info" size="small" class="shrink-0">{{ currentRole.internal ? '系' : ROLE_TYPE_LABELS[currentRole.type] }}</el-tag>
+            <el-tag type="info" size="small" class="shrink-0">
+              {{ currentRole.internal ? t('role.internalLabel') : t(ROLE_TYPE_MESSAGE_KEYS[currentRole.type]) }}
+            </el-tag>
             <el-divider class="shrink-0" direction="vertical" />
             <span class="flex-align-center shrink-0 text-N500">
               <MkIcon name="icon_member_filled" class="mr-1" />
@@ -165,8 +169,8 @@ onMounted(() => loadRoles())
             </span>
           </div>
           <el-radio-group v-model="currentTab">
-            <el-radio-button value="permission" label="权限配置" />
-            <el-radio-button value="member" label="成员" />
+            <el-radio-button value="permission" :label="t('role.permission.title')" />
+            <el-radio-button value="member" :label="t('system.member.label')" />
           </el-radio-group>
         </component>
         <!-- 权限配置 -->

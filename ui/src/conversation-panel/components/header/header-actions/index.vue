@@ -29,7 +29,7 @@ export default defineComponent({
           cloneVNode(action, {
             display,
             type: '',
-            class: ['[&.is-disabled_.mk-icon]:text-N400!', display === 'button' ? (action.props?.disabled ? 'text-N400!' : 'text-N900!') : ''],
+            class: display === 'button' ? ['[&.is-disabled_.mk-icon]:text-N400!', action.props?.disabled ? 'text-N400!' : 'text-N900!'] : '',
           }),
         )
 
@@ -47,5 +47,3 @@ export default defineComponent({
   },
 })
 </script>
-
-<style lang="scss"></style>

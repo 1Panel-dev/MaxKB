@@ -1,0 +1,17 @@
+{
+  "menu": {
+    "identity": "身分與權限",
+    "resourceManagement": "資源管理",
+    "sharedResources": "共享資源",
+    "chatManagement": "對話端管理",
+    "settings": "系統設定"
+  },
+  "member": {
+    "label": "成員",
+    "placeholder": "請選擇成員",
+    "requiredMessage": "請選擇成員",
+    "add": "新增成員",
+    "removeTitle": "是否移除成員",
+    "batchRemoveTitle": "是否移除選取的 {count} 位成員"
+  }
+}

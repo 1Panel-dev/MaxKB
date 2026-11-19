@@ -28,7 +28,7 @@ export const systemRoutes: RouteRecordRaw = {
       name: 'system-identity',
       redirect: { name: 'system-users' },
       meta: {
-        title: '身份与权限',
+        title: 'system.menu.identity',
         icon: 'icon_account_outlined',
         activeIcon: 'icon_account_filled',
         order: 10,
@@ -51,32 +51,32 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'users',
           name: 'system-users',
           component: () => import('@/views/system/identity/users/index.vue'),
-          meta: { title: 'system.user.title', order: 10, permission: perm.system.user.read, next: 'system-roles' },
+          meta: { title: 'user.title', order: 10, permission: perm.system.user.read, next: 'system-roles' },
         },
         {
           path: 'workspace',
           name: 'system-workspace',
           component: () => import('@/views/system/identity/workspaces/index.vue'),
-          meta: { title: '工作空间', order: 30, permission: perm.system.workspace.read, next: 'system-groups' },
+          meta: { title: 'workspace.title', order: 30, permission: perm.system.workspace.read, next: 'system-groups' },
         },
         {
           path: 'roles',
           name: 'system-roles',
           component: () => import('@/views/system/identity/roles/index.vue'),
-          meta: { title: '角色管理', order: 20, permission: perm.system.role.read, next: 'system-workspace' },
+          meta: { title: 'role.title', order: 20, permission: perm.system.role.read, next: 'system-workspace' },
         },
         {
           path: 'groups',
           name: 'system-groups',
           component: () => import('@/views/system/identity/groups/index.vue'),
-          meta: { title: '用户组', order: 40, permission: perm.system.userGroup.read, next: 'system-authorization' },
+          meta: { title: 'userGroup.title', order: 40, permission: perm.system.userGroup.read, next: 'system-authorization' },
         },
         {
           path: 'authorization',
           name: 'system-authorization',
           redirect: { name: 'system-authorization-applications' },
           meta: {
-            title: '资源授权',
+            title: 'resource.authorization.title',
             activeMenu: '/system/identity/authorization',
             order: 50,
             permission: () => {
@@ -107,7 +107,7 @@ export const systemRoutes: RouteRecordRaw = {
               name: 'system-authorization-knowledge',
               component: () => import('@/views/system/identity/resource-authorization/index.vue'),
               meta: {
-                title: '知识库',
+                title: 'knowledge.title',
                 order: 20,
                 resource: RESOURCE_TYPE.KNOWLEDGE,
                 permission: perm.system.authorization.knowledge.read,
@@ -119,7 +119,7 @@ export const systemRoutes: RouteRecordRaw = {
               name: 'system-authorization-tools',
               component: () => import('@/views/system/identity/resource-authorization/index.vue'),
               meta: {
-                title: '工具',
+                title: 'tool.title',
                 order: 30,
                 resource: RESOURCE_TYPE.TOOL,
                 permission: perm.system.authorization.tool.read,
@@ -147,7 +147,7 @@ export const systemRoutes: RouteRecordRaw = {
       name: 'system-resource',
       redirect: { name: 'system-resource-applications' },
       meta: {
-        title: '资源管理',
+        title: 'system.menu.resourceManagement',
         icon: 'icon_project-settings-outlined',
         activeIcon: 'icon_project-settings-filled',
 
@@ -191,7 +191,7 @@ export const systemRoutes: RouteRecordRaw = {
       name: 'system-shared',
       redirect: { name: 'system-shared-knowledge' },
       meta: {
-        title: '共享资源',
+        title: 'system.menu.sharedResources',
         icon: 'icon_folder-share_outlined',
         activeIcon: 'icon_folder-share_filled',
         order: 30,
@@ -230,7 +230,7 @@ export const systemRoutes: RouteRecordRaw = {
       name: 'system-chat-management',
       redirect: { name: 'system-chat-users' },
       meta: {
-        title: '对话端管理',
+        title: 'system.menu.chatManagement',
         icon: 'icon_contacts_outlined',
         activeIcon: 'icon_contacts_filled',
         order: 40,
@@ -271,7 +271,7 @@ export const systemRoutes: RouteRecordRaw = {
       name: 'system-settings',
       redirect: { name: 'system-login-authentication' },
       meta: {
-        title: '系统设置',
+        title: 'system.menu.settings',
         icon: 'icon_setting',
         activeIcon: 'icon_setting_filled',
         order: 50,

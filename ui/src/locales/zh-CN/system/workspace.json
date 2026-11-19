@@ -1,0 +1,18 @@
+{
+  "title": "工作空间",
+  "default": "默认工作空间",
+  "createTitle": "创建工作空间",
+  "renameTitle": "重命名工作空间",
+  "name": {
+    "label": "工作空间名称",
+    "placeholder": "请输入工作空间名称",
+    "requiredMessage": "请输入工作空间名称"
+  },
+  "delete": {
+    "title": "确认删除工作空间",
+    "description": "删除后，该空间下的成员都会被移除，请谨慎操作。",
+    "batchRemoveTitle": "是否移除选中记录对应的成员",
+    "batchRemoveDescription": "涉及 {memberCount} 位成员，共 {recordCount} 条记录。",
+    "partialRemoveMessage": "移除成功 {successCount} 个成员，失败 {failedCount} 个"
+  }
+}

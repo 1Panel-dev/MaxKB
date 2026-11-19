@@ -24,7 +24,10 @@
 | workflow    | 画布、节点、变量、调试与执行展示                 |
 | chat        | 对话输入、消息操作、历史会话与对话状态           |
 | workspace   | 工作空间、成员、空间级设置                       |
-| system      | 用户、角色、系统配置、许可证                     |
+| user        | 系统用户属性、用户管理及角色分配                 |
+| userGroup   | 系统用户组、组成员及继承权限说明                 |
+| role        | 系统角色管理、角色类型及权限配置                 |
+| system      | 系统分组菜单及系统管理内共用文案                 |
 
 翻译 key 最多四层，包含业务域命名空间。业务域内部的共用字段使用 `<业务域>.fields.<字段>.<用途>`，
 场景专属字段使用 `<业务域>.<场景>.<字段>.<用途>`；不同时叠加场景、fields 和 validation。
@@ -58,6 +61,29 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 “关联”的英文和翻译 key 统一使用 `relate` 词族：关联操作使用 `Relate` / `relate`，取消关联使用 `Unrelate` / `unrelate`，已关联／未关联标签使用 `Related` / `related`、`Unrelated` / `unrelated`；成功提示使用 `Related successfully` / `Unrelated successfully`，对应 key 为 `relateSuccess` / `unrelateSuccess`。文件名保持不变；网页链接仍使用 `link`。
 用户内容、用户保存的提示词、协议枚举和已保存节点名称保留原文。
 
+## 目录与命名空间
+
+分类目录只整理文件，业务名称决定翻译命名空间。分类目录在配置中显式登记，目前只有 `system/`；
+`knowledge/`、`application/` 等仍是业务目录，不自动忽略目录层级。
+
+- 分类目录直属的 `index.json` 使用分类目录自身的命名空间，例如 `system/index.json` → `system`。
+- 其他文件跳过分类目录后，使用第一个业务文件或业务目录名作为命名空间，例如 `system/user.json`、`system/user/password.json` → `user`。
+- 普通单文件使用文件名，普通业务目录使用目录名，例如 `common.json` → `common`、`knowledge/document.json` → `knowledge`。
+- 去掉 `.json` 后将短横线命名转换为驼峰，例如 `system/user-group.json` → `userGroup`。
+- 命名空间之后的 key 由 JSON 内容决定，子文件名不自动增加层级。JSON 不重复包裹命名空间，分文件可按业务对象组织字段。
+
+| 文件位置                    | JSON 内容示例                      | 调用 key                   |
+| --------------------------- | ---------------------------------- | -------------------------- |
+| `system/index.json`         | `{ "menu": { "identity": "…" } }`  | `system.menu.identity`     |
+| `system/user.json`          | `{ "username": { "label": "…" } }` | `user.username.label`      |
+| `system/workspace.json`     | `{ "title": "…" }`                 | `workspace.title`          |
+| `system/user/password.json` | `{ "password": { "label": "…" } }` | `user.password.label`      |
+| `knowledge/document.json`   | `{ "document": { "title": "…" } }` | `knowledge.document.title` |
+
+同一业务只保留一个文件或一套分文件目录，不同时保留 `system/user.json` 与 `system/user/`，也不在其他分类下重复定义 `user`。
+同一命名空间内各文件的 JSON 顶层字段不能重复，加载时不会深层合并同名对象。拆文件时保留业务字段结构，调用 key 不变。
+三种语言使用相同的分类和业务文件结构，新增文件由 Vite 自动收集，无需逐项维护 import。
+
 ## JSON 键顺序
 
 - 同一语言包的键按含义分组，简体、繁体和英文采用相同的排列顺序，方便逐项对照。
@@ -67,7 +93,7 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 ## 使用约定
 
 - key 使用表达业务含义的英文 camelCase，不使用中文、数字序号或 misc 等模糊分类。
-- Vite 自动收集语言目录下的 JSON。单文件业务使用文件名作为命名空间，如 `dynamic-form.json` 对应 `dynamicForm`。分文件的业务使用第一级目录名，如 `knowledge/document.json` 归入 `knowledge`。分文件直接写各自负责的业务字段，同一业务的顶层字段只在一个文件中定义。
+- 文件归类、命名空间与分文件合并规则见上文“目录与命名空间”。
 - 纯标签、数量单位、固定比例、编号和倒计时只翻译文字，数字、名称及固定格式在使用处组合；
   问号、作为分隔符的冒号不单独翻译，三种语言使用相同的显示格式。只有文件名和错误原因等数据的组合不建立翻译键。
   例如“已选 3/10”只翻译“已选”；单项确认标题翻译操作文字，使用处追加 `: 名称?`。
@@ -201,14 +227,45 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 
 ## 系统管理
 
-`system/` 按业务分文件，用户管理使用 `system/user.json` 中的 `user` 分组，引用为 `system.user`。
-菜单与列表共用 `system.user.title`；创建／编辑标题、用户字段、角色分配、用户组选择和删除确认归该分组，
+`system/` 是分类目录。`system/index.json` 中的 `menu` 维护身份与权限、资源管理、共享资源、对话端管理和系统设置等分组标题，引用为 `system.menu`；已有业务标题继续复用各业务的 `title`。
+同一文件的 `member` 维护系统管理内共用的成员标签、选择占位、必填提示和添加成员入口，使用 `system.member.label`、`placeholder`、`requiredMessage` 和 `add`；单项移除标题使用 `removeTitle`，按成员数量批量移除的标题使用 `batchRemoveTitle`。
+工作空间、系统用户组、角色和对话用户组复用这些文案，添加成员按钮与弹窗标题共用 `system.member.add`；“用户名/姓名”“请选择对话用户”等具体选择说明保留业务含义，不统一替换为成员文案。
+全项目通用操作及结果提示仍归 `common`，系统内共用文案归 `system`，各业务的成员关系、移除影响和权限回收说明保留在所属业务。
+成员关系的移除与人数统计使用“成员”／“成員”／`member`，账号管理及用户名等账号属性保留用户语义。
+用户管理使用 `system/user.json`，JSON 直接维护用户字段，引用为 `user`。
+菜单与列表共用 `user.title`；创建／编辑标题、用户字段、角色分配和删除确认归该分组，
 字段的 label、placeholder 和 requiredMessage 同级维护，不再叠加 fields，翻译 key 保持最多四层。
 通用操作、状态、创建时间和结果提示复用 `common`，字符长度范围复用 `common.validation.lengthRange`，工作空间标签复用 `workspace.title`。
-用户来源复用登录方式常量的协议值及固定英文名称，本地来源使用 `system.user.source.local`，钉钉、飞书和企业微信名称复用 `auth.login.options`；
+用户来源复用登录方式常量的协议值及固定英文名称，本地来源使用 `user.source.local`，钉钉、飞书和企业微信名称复用 `auth.login.options`；
 页面在 computed 中调用 `t` 生成标签，筛选和表格使用同一组文案，不改写共享常量。未知来源及接口返回的角色、工作空间和用户组名称保留原文。
 用户表单规则在 computed 中翻译，使用 `validate-on-rule-change=false`；语言切换不重置表单、不重新请求选项、不主动触发校验。
-导入入口归 `system.user.import`，默认密码与改密入口归 `system.user.password`，角色设置入口归 `system.user.role`。
+用户导入标题、说明、模板和导入结果归 `user.import`，文件选择校验及支持格式标签复用 `upload`；
+重复用户名、姓名及邮箱提示归各字段的 `existsMessage`。成功及跳过人数按实际数量选择单复数，冲突用户名称保留原文。
+导入来源选项在 computed 中翻译；非企业版的内置默认工作空间名称使用 `workspace.default`，接口返回的工作空间名称不替换。
+默认密码、新密码及修改结果归 `user.password`，确认密码及匹配校验归同级的 `user.confirmPassword`；
+角色设置入口、追加／替换方式归 `user.role`。
+
+工作空间管理使用 `system/workspace.json`，菜单与列表标题使用 `workspace.title`，创建／重命名标题和名称字段归 `workspace`，
+删除工作空间与移除成员的专属文案统一归 `workspace.delete`：`title` / `description` 用于删除工作空间，`batchRemoveTitle` / `batchRemoveDescription` / `partialRemoveMessage` 用于按记录批量移除成员；成员单项移除标题复用 `system.member.removeTitle`。
+成员列表的姓名、用户名和角色标签复用 `user`，添加成员的角色选择占位及校验复用 `user.role`；通用操作及结果提示复用 `common`。
+批量移除确认的完整说明使用 `workspace.delete.batchRemoveDescription`，通过 `{memberCount}` 和 `{recordCount}` 展示成员人数与记录数；句中标点随语言维护，成员人数仍按用户 ID 去重，关系记录沿用原有计数方式。
+搜索字段在 computed 中翻译；工作空间名称、成员姓名和角色名称按接口原文显示，不将实际名称替换为默认工作空间译文。
+
+系统用户组使用 `system/user-group.json`，命名空间为 `userGroup`。菜单、列表标题及用户表单中的用户组标签共用 `userGroup.title`，选择提示使用 `userGroup.placeholder`，不在 `user` 下重复维护。
+创建／重命名标题及名称字段归 `userGroup`，删除用户组与移除成员的专属说明统一归 `userGroup.delete`：`title` / `description` 用于删除用户组，`removeDescription` 用于移除成员时的继承权限回收说明；成员单项／批量移除标题复用 `system.member.removeTitle` / `batchRemoveTitle`。
+成员列表的姓名、用户名、角色和来源标签复用 `user`，登录方式品牌名称复用 `auth.login.options`。搜索和来源选项在 computed 中翻译，保留协议值、顺序及筛选状态，未知来源和接口返回的名称展示原文。
+添加成员弹窗的“用户名/姓名”标签由 `user.username.label` 与 `user.name.label` 通过 `/` 组合，完整选择提示使用 `user.placeholder`，必填提示复用 `system.member.requiredMessage`；成员选项姓名保留接口原文，远程搜索和选项缓存沿用原有流程。
+通用操作及结果提示复用 `common`；名称校验保留必填、空白检查和长度限制，语言切换不主动触发校验。
+
+角色管理使用 `system/role.json`，命名空间为 `role`。菜单与列表共用 `role.title`，创建／重命名标题、角色名称字段、继承角色说明、系统内置标记及删除确认归该业务域；权限配置页签标题使用 `role.permission.title`。
+角色类型名称归 `role.types`，列表分组与继承角色选项共用 `ROLE_TYPE_MESSAGE_KEYS`，展示时直接调用 `t`；协议值、选项顺序及接口返回的角色名称保持原样。搜索继续匹配实际角色名称，切换语言不重取角色列表或重置选择。
+继承角色的通用选择占位复用 `user.role.placeholder`，专属必填提示使用 `role.inheritedRole.requiredMessage`；用户角色分配仍归 `user.role`。表单规则在 computed 中翻译，保留空白检查、必填条件和名称长度限制，使用 `validate-on-rule-change=false`。
+权限配置表头归 `role.permission`，保存按钮和成功提示复用 `common`；表格中的分类、模块、操作对象及权限项名称按接口原文显示。语言切换只更新固定界面文案，保留表格状态与未保存的勾选，不重新请求权限数据或重建表格。
+角色成员列表的用户名与姓名复用 `user`，工作空间标签复用 `workspace.title`，成员入口和单项／批量移除标题复用 `system.member`；批量移除标题按实际选择数量处理单复数，单项与批量结果共用 `common.messages.removeSuccess`。搜索字段在 computed 中翻译，保留筛选协议值。
+添加角色成员的工作空间选择占位与必填提示复用 `user.workspace`，其余按钮和结果提示复用 `common`；成员及工作空间名称展示接口原文。保留版本与角色类型对应的工作空间显示条件、提交值及原有校验规则，语言切换不重置表单或重新加载选项。
+
+系统资源授权入口、资源权限配置标题及“按用户组／按用户”页签归 `resource.authorization`，提交成功提示复用 `common.messages.submitSuccess`。四类资源的菜单与页签共用各业务的 `title`，功能本地 `RESOURCE_AUTHORIZATION_MESSAGE_KEYS` 维护协议值到标题 key 的映射，选项在 computed 中直接通过 `t` 翻译。
+授权对象、资源和工作空间名称保留接口原文；语言切换不重取授权数据、不切换分类或授权对象，保留未提交的权限编辑状态。
 
 ## 知识库详情
 

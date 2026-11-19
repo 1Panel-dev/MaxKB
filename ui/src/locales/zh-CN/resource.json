@@ -1,6 +1,9 @@
 {
   "authorization": {
-    "title": "资源授权"
+    "title": "资源授权",
+    "permissionTitle": "资源权限配置",
+    "byGroup": "按用户组",
+    "byUser": "按用户"
   },
   "relations": {
     "title": "查看关联资源"

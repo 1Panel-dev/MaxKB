@@ -1,0 +1,17 @@
+{
+  "menu": {
+    "identity": "身份与权限",
+    "resourceManagement": "资源管理",
+    "sharedResources": "共享资源",
+    "chatManagement": "对话端管理",
+    "settings": "系统设置"
+  },
+  "member": {
+    "label": "成员",
+    "placeholder": "请选择成员",
+    "requiredMessage": "请选择成员",
+    "add": "添加成员",
+    "removeTitle": "是否移除成员",
+    "batchRemoveTitle": "是否移除选中的 {count} 个成员"
+  }
+}

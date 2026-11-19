@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { CommonUserOption } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import CommonSystemApi from '@/api/admin/system/common'
@@ -8,11 +9,14 @@ import { MsgSuccess } from '@/utils/message'
 
 const props = defineProps<{ workspaceId: string; currentGroup?: { id: string; name: string } }>()
 const emit = defineEmits<{ refresh: [] }>()
+const { t } = useI18n({ useScope: 'global' })
 
 const visible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
-const formRules: FormRules = { userIds: [{ required: true, message: '请选择用户', trigger: 'change' }] }
+const formRules = computed<FormRules>(() => ({
+  userIds: [{ required: true, message: t('system.member.requiredMessage'), trigger: 'change' }],
+}))
 const memberForm = reactive<{ userIds: string[] }>({ userIds: [] })
 
 /* 成员选项 */
@@ -60,7 +64,7 @@ function submit() {
     loading.value = true
     UserGroupsApi.postSystemUserGroupMembers(props.workspaceId, groupId, memberForm.userIds)
       .then(() => {
-        MsgSuccess('添加成功')
+        MsgSuccess(t('common.messages.addSuccess'))
         emit('refresh')
         visible.value = false
       })
@@ -92,9 +96,17 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="添加成员" @closed="resetData">
-    <el-form ref="formRef" :model="memberForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="用户名/姓名" prop="userIds">
+  <MkDialog v-model="visible" :title="t('system.member.add')" @closed="resetData">
+    <el-form
+      ref="formRef"
+      :model="memberForm"
+      :rules="formRules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="`${t('user.username.label')}/${t('user.name.label')}`" prop="userIds">
         <el-select
           v-model="memberForm.userIds"
           class="w-full"
@@ -104,15 +116,17 @@ defineExpose({ open })
           multiple
           :remote-method="handleRemoteSearch"
           :loading="optionsLoading"
-          placeholder="请选择用户名或姓名"
+          :placeholder="t('user.placeholder')"
         >
           <el-option v-for="user in userOptions" :key="user.id" :label="user.nick_name" :value="user.id" />
         </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" :loading="loading" @click="submit">添加</el-button>
+      <!-- 取消添加成员 -->
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 添加成员 -->
+      <el-button type="primary" :loading="loading" @click="submit">{{ t('common.actions.add') }}</el-button>
     </template>
   </MkDialog>
 </template>

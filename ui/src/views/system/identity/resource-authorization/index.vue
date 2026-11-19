@@ -20,7 +20,7 @@ import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vu
 import PermissionTable from './components/PermissionTable.vue'
 import UserAuthorizationList from './components/UserAuthorizationList.vue'
 import UserGroupAuthorizationList from './components/user-group/UserGroupAuthorizationList.vue'
-import { RESOURCE_AUTHORIZATION_LABELS } from './constants'
+import { RESOURCE_AUTHORIZATION_MESSAGE_KEYS } from './constants'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import { perm } from '@/permission'
@@ -45,7 +45,7 @@ const resourceTypeOptions = computed<OptionItem<ResourceAuthorizationType>[]>(()
   [RESOURCE_TYPE.APPLICATION, RESOURCE_TYPE.KNOWLEDGE, RESOURCE_TYPE.TOOL, RESOURCE_TYPE.MODEL]
     .filter((value) => resourceReadPermissions[value]())
     .map((value) => ({
-      label: RESOURCE_AUTHORIZATION_LABELS[value],
+      label: t(RESOURCE_AUTHORIZATION_MESSAGE_KEYS[value]),
       value,
     })),
 )
@@ -186,7 +186,7 @@ function handlePermissionsSubmit(permissions: ResourcePermissionPayload[]) {
 
   permissionRequest
     .then(() => {
-      MsgSuccess('提交成功')
+      MsgSuccess(t('common.messages.submitSuccess'))
       return loadResourcePermissions()
     })
     .finally(() => {
@@ -220,8 +220,8 @@ const canEditResourcePermission = computed(() => resourceEditPermissions[resourc
     <template #aside="{ Header }">
       <component :is="Header">
         <el-tabs class="w-full" v-model="targetType" @tab-change="handleTargetTypeChange">
-          <el-tab-pane label="按用户组" name="user-group" />
-          <el-tab-pane label="按用户" name="user" />
+          <el-tab-pane :label="t('resource.authorization.byGroup')" name="user-group" />
+          <el-tab-pane :label="t('resource.authorization.byUser')" name="user" />
         </el-tabs>
       </component>
 
@@ -246,7 +246,7 @@ const canEditResourcePermission = computed(() => resourceEditPermissions[resourc
     <template #default="{ Header }">
       <component :is="Header">
         <div class="w-full">
-          <h4 class="mb-4">资源权限配置</h4>
+          <h4 class="mb-4">{{ t('resource.authorization.permissionTitle') }}</h4>
           <el-tabs v-model="resourceType" class="w-full" @tab-change="loadResourcePermissions">
             <el-tab-pane
               v-for="resourceTypeOption in resourceTypeOptions"

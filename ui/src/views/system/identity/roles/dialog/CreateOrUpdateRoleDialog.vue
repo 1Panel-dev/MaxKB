@@ -1,21 +1,23 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { RoleItem, RolePayload, RoleType } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ROLE_TYPE } from '@/api/enums'
 import RoleApi from '@/api/admin/system/role'
-import { ROLE_TYPE_LABELS } from '@/constants'
+import { ROLE_TYPE_MESSAGE_KEYS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 
 const emit = defineEmits<{ refresh: [role: RoleItem] }>()
+const { t } = useI18n({ useScope: 'global' })
 const visible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
 const roleForm = reactive<RolePayload>({ role_name: '' })
-const rules: FormRules<RolePayload> = {
-  role_name: [{ whitespace: true, required: true, message: '请输入角色名称', trigger: 'blur' }],
-  role_type: [{ required: true, message: '请选择继承角色', trigger: 'change' }],
-}
+const rules = computed<FormRules<RolePayload>>(() => ({
+  role_name: [{ whitespace: true, required: true, message: t('role.name.requiredMessage'), trigger: 'blur' }],
+  role_type: [{ required: true, message: t('role.inheritedRole.requiredMessage'), trigger: 'change' }],
+}))
 const roleTypeOptions = ref<RoleType[]>([ROLE_TYPE.ADMIN, ROLE_TYPE.WORKSPACE_MANAGE, ROLE_TYPE.USER])
 
 function submit() {
@@ -24,7 +26,7 @@ function submit() {
     loading.value = true
     RoleApi.postRole({ ...roleForm })
       .then((role) => {
-        MsgSuccess(roleForm.role_id ? '重命名成功' : '创建成功')
+        MsgSuccess(roleForm.role_id ? t('common.messages.renameSuccess') : t('common.messages.createSuccess'))
         emit('refresh', role)
         visible.value = false
       })
@@ -53,20 +55,32 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="roleForm.role_id ? '重命名角色' : '创建角色'" @closed="resetData">
-    <el-form ref="formRef" :model="roleForm" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="角色名称" prop="role_name">
-        <el-input v-model="roleForm.role_name" maxlength="64" show-word-limit placeholder="请输入角色名称" />
+  <MkDialog v-model="visible" :title="roleForm.role_id ? t('role.renameTitle') : t('role.createTitle')" @closed="resetData">
+    <el-form
+      ref="formRef"
+      :model="roleForm"
+      :rules="rules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('role.name.label')" prop="role_name">
+        <el-input v-model="roleForm.role_name" maxlength="64" show-word-limit :placeholder="t('role.name.placeholder')" />
       </el-form-item>
-      <el-form-item v-if="!roleForm.role_id" label="继承角色" prop="role_type">
-        <el-select v-model="roleForm.role_type" placeholder="请选择角色">
-          <el-option v-for="option in roleTypeOptions" :key="option" :value="option" :label="ROLE_TYPE_LABELS[option]" />
+      <el-form-item v-if="!roleForm.role_id" :label="t('role.inheritedRole.label')" prop="role_type">
+        <el-select v-model="roleForm.role_type" :placeholder="t('user.role.placeholder')">
+          <el-option v-for="option in roleTypeOptions" :key="option" :value="option" :label="t(ROLE_TYPE_MESSAGE_KEYS[option])" />
         </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" :loading="loading" @click="submit">{{ roleForm.role_id ? '保存' : '创建' }}</el-button>
+      <!-- 取消角色编辑 -->
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存或创建角色 -->
+      <el-button type="primary" :loading="loading" @click="submit">
+        {{ roleForm.role_id ? t('common.actions.save') : t('common.actions.create') }}
+      </el-button>
     </template>
   </MkDialog>
 </template>

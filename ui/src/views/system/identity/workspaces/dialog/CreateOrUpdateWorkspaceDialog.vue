@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { WorkspaceItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import WorkspaceApi from '@/api/admin/system/workspace'
@@ -8,12 +9,15 @@ import { MsgSuccess } from '@/utils/message'
 defineOptions({ name: 'CreateOrUpdateWorkspaceDialog' })
 
 const emit = defineEmits<{ refresh: [workspaceId?: string] }>()
+const { t } = useI18n({ useScope: 'global' })
 
 const dialogVisible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
 const workspaceForm = reactive<WorkspaceItem>({ name: '' })
-const workspaceRules: FormRules<WorkspaceItem> = { name: [{ whitespace: true, required: true, message: '请输入工作空间名称', trigger: 'blur' }] }
+const workspaceRules = computed<FormRules<WorkspaceItem>>(() => ({
+  name: [{ whitespace: true, required: true, message: t('workspace.name.requiredMessage'), trigger: 'blur' }],
+}))
 function open(workspace?: WorkspaceItem) {
   if (workspace) {
     workspaceForm.id = workspace?.id
@@ -28,7 +32,7 @@ function submit() {
     loading.value = true
     WorkspaceApi.postWorkspace({ ...workspaceForm })
       .then(() => {
-        MsgSuccess(workspaceForm.id ? '重命名成功' : '创建成功')
+        MsgSuccess(workspaceForm.id ? t('common.messages.renameSuccess') : t('common.messages.createSuccess'))
         emit('refresh', workspaceForm?.id || undefined)
         dialogVisible.value = false
       })
@@ -47,17 +51,27 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" :title="workspaceForm.id ? '重命名工作空间' : '创建工作空间'" @closed="resetData">
-    <el-form ref="formRef" :model="workspaceForm" :rules="workspaceRules" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="工作空间名称" prop="name">
-        <el-input v-model="workspaceForm.name" maxlength="64" placeholder="请输入工作空间名称" show-word-limit />
+  <MkDialog v-model="dialogVisible" :title="workspaceForm.id ? t('workspace.renameTitle') : t('workspace.createTitle')" @closed="resetData">
+    <el-form
+      ref="formRef"
+      :model="workspaceForm"
+      :rules="workspaceRules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('workspace.name.label')" prop="name">
+        <el-input v-model="workspaceForm.name" maxlength="64" :placeholder="t('workspace.name.placeholder')" show-word-limit />
       </el-form-item>
     </el-form>
 
     <template #footer>
-      <el-button plain @click="dialogVisible = false">取消</el-button>
+      <!-- 取消工作空间编辑 -->
+      <el-button plain @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存或创建工作空间 -->
       <el-button type="primary" :loading="loading" @click="submit">
-        {{ workspaceForm.id ? '保存' : '创建' }}
+        {{ workspaceForm.id ? t('common.actions.save') : t('common.actions.create') }}
       </el-button>
     </template>
   </MkDialog>

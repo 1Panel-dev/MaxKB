@@ -1,0 +1,31 @@
+{
+  "title": "Role management",
+  "createTitle": "Create role",
+  "renameTitle": "Rename role",
+  "internalLabel": "System",
+  "name": {
+    "label": "Role name",
+    "placeholder": "Enter a role name",
+    "requiredMessage": "Enter a role name"
+  },
+  "inheritedRole": {
+    "label": "Inherited role",
+    "requiredMessage": "Select an inherited role"
+  },
+  "types": {
+    "admin": "System administrator",
+    "workspaceAdmin": "Workspace administrator",
+    "user": "Standard user"
+  },
+  "permission": {
+    "title": "Permission configuration",
+    "label": "Permissions",
+    "category": "Category",
+    "module": "Module name",
+    "target": "Target"
+  },
+  "delete": {
+    "title": "Delete role",
+    "description": "All members will be removed from this role after deletion. Proceed with caution."
+  }
+}

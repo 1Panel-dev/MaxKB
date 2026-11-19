@@ -6,6 +6,8 @@ defineOptions({ name: 'MkDropdownItem', inheritAttrs: false })
 
 withDefaults(
   defineProps<{
+    /** 是否禁用菜单项 */
+    disabled?: boolean
     /** 左侧 Element Plus 图标组件 */
     icon?: Component
     /** 是否属于可选中菜单；开启后始终预留右侧勾选位 */
@@ -13,7 +15,7 @@ withDefaults(
     /** 当前项是否选中，仅在 selectable 为 true 时生效 */
     selected?: boolean
   }>(),
-  { selectable: false, selected: false },
+  { disabled: false, selectable: false, selected: false },
 )
 
 defineSlots<{
@@ -25,8 +27,13 @@ defineSlots<{
 </script>
 
 <template>
-  <el-dropdown-item class="mk-dropdown-item flex-align-center" :class="{ 'text-primary!': selectable && selected }" v-bind="$attrs">
-    <span v-if="icon || $slots.icon" class="flex-align-center shrink-0 text-N600!">
+  <el-dropdown-item
+    class="mk-dropdown-item flex-align-center"
+    :disabled="disabled"
+    :class="{ 'text-primary!': selectable && selected }"
+    v-bind="$attrs"
+  >
+    <span v-if="icon || $slots.icon" class="flex-align-center shrink-0" :class="disabled ? 'text-N400! [&_.el-icon]:text-N400!' : 'text-N600!'">
       <slot name="icon">
         <MkIcon v-if="icon" :icon="icon" />
       </slot>
@@ -35,7 +42,7 @@ defineSlots<{
       <slot />
     </div>
     <span v-if="selectable" class="size-4 shrink-0">
-      <MkIcon v-if="selected" :icon="Check" />
+      <MkIcon v-if="selected" :icon="Check" :class="{ 'text-N400!': disabled }" />
     </span>
   </el-dropdown-item>
 </template>
