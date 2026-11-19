@@ -94,10 +94,10 @@ onMounted(() => {
         />
 
         <!-- 语音文件 -->
-        <el-form-item prop="audio_list" :rules="{ required: true, message: '请选择', trigger: 'change' }">
+        <el-form-item class="mk-hide-asterisk" prop="audio_list" :rules="{ required: true, message: '请选择', trigger: 'change' }">
           <template #label>
             <span class="flex-align-center gap-1">
-              语音文件
+              <span class="mk-required">语音文件</span>
               <MkTooltip placement="right">
                 <template #content>
                   <div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div>
