@@ -112,6 +112,8 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     uploadFile: api.uploadFile,
     getChatId: () => list.currentChatId.value,
     appInfo,
+    speechAutoplay: true,
+    textToSpeech: (text) => ConversationApi.postTextToSpeech(getApplicationId(), text),
   })
   list.bindLoader(msgs.load)
   const input = createMessageInputStore({

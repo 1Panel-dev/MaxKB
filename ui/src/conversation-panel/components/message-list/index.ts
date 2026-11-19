@@ -1,9 +1,11 @@
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, shallowRef } from 'vue'
 import { nanoid } from 'nanoid'
+import type { TextToSpeech } from '../../core/speech'
 import type { ChatMessage, ChatRecordMeta, ConversationApiAdapter, ConversationAppInfo, SendMessageOptions, StreamChunk } from '../../core/types'
 import type { ChatFeedback, ChatLogRecord, Dict } from '@/api/types'
 import type { InjectionKey, Ref } from 'vue'
 import { aggregators } from '../../core/aggregators'
+import { StreamSpeech, isSpeechSupported } from '../../core/speech'
 import { ConversationStream } from '../../core/stream'
 
 export interface MessageListDeps extends Pick<
@@ -15,6 +17,10 @@ export interface MessageListDeps extends Pick<
   getChatId: () => string
   /** 当前智能体信息：只读，由 view 加载维护。 */
   appInfo: Readonly<Ref<ConversationAppInfo | null>>
+  /** 按智能体的语音播放设置自动朗读流式回答，仅 Chat、门户对话开启。 */
+  speechAutoplay?: boolean
+  /** 模型语音合成；智能体选择浏览器语音或未提供时使用浏览器语音。 */
+  textToSpeech?: TextToSpeech
 }
 
 // 从后端 chat_record(分页项或详情接口,均为 reset_chat_record 结构)提取底部信息栏数据
@@ -183,6 +189,52 @@ export function createMessageListStore(deps: MessageListDeps) {
       })
   }
 
+  // ── 朗读 ─────────────────────────────────────────────
+  // 同一时间只朗读一条回答：底部栏手动朗读整条回答；开启自动播放时每次发送新建朗读，由 onNext 累积正文增量。
+  // 暂停保留进度，再次继续从断点朗读；读别的回答、新发送、切换会话、离开或读完时丢弃。
+  // 智能体选择模型语音且提供合成接口时调用接口，否则使用浏览器语音。
+  let streamSpeech: StreamSpeech | null = null
+  /** 正在朗读（含暂停）的回答，供底部栏显示朗读状态。 */
+  const speakingMessage = shallowRef<ChatMessage | null>(null)
+  const speechPaused = ref(false)
+  const speechTextToSpeech = computed(() => {
+    const ttsType = appInfo.value?.tts_type
+    return ttsType && ttsType !== 'BROWSER' ? deps.textToSpeech : undefined
+  })
+  const speechSupported = computed(() => isSpeechSupported(speechTextToSpeech.value))
+  const stopSpeech = () => streamSpeech?.stop()
+  const pauseSpeech = () => streamSpeech?.pause()
+  const resumeSpeech = () => streamSpeech?.resume()
+  const createSpeech = (message: ChatMessage) => {
+    stopSpeech()
+    if (!speechSupported.value) return null
+    const speech = new StreamSpeech(speechTextToSpeech.value, (state) => {
+      if (streamSpeech !== speech) return
+      speechPaused.value = state === 'paused'
+      if (state !== 'ended') return
+      streamSpeech = null
+      speakingMessage.value = null
+    })
+    streamSpeech = speech
+    speakingMessage.value = message
+    speechPaused.value = false
+    return speech
+  }
+  const startSpeech = (message: ChatMessage) => {
+    const info = appInfo.value
+    if (!deps.speechAutoplay || !info?.tts_model_enable || !info.tts_autoplay) {
+      stopSpeech()
+      return null
+    }
+    return createSpeech(message)
+  }
+  /** 朗读整条回答正文。 */
+  const playSpeech = (message: ChatMessage, text: string) => {
+    const speech = createSpeech(message)
+    speech?.appendText('', text)
+    speech?.finish()
+  }
+
   // ── 发送 / 续跑 ─────────────────────────────────────
   const sendMessage = (opts: SendMessageOptions) => {
     // 新建会话由调用方(message-input)惰性生成后传入 chatId;表单续跑等缺省沿用当前会话
@@ -207,6 +259,7 @@ export function createMessageListStore(deps: MessageListDeps) {
     if (opts.chunkId) payload.chunk_id = opts.chunkId
 
     let replacementStarted = false
+    const speech = startSpeech(target)
     runStream(
       () => chatMessage(cid, payload),
       (chunk) => {
@@ -218,9 +271,12 @@ export function createMessageListStore(deps: MessageListDeps) {
           replacementStarted = true
         }
         appendChunk(target, chunk)
+        speech?.appendChunk(chunk)
         opts.onNext?.(chunk)
       },
       (e) => {
+        // 正常结束或失败都读完已收到的内容
+        speech?.finish()
         target.write_ed = true
         if (!e) getChatRecord(target, cid)
         opts.onComplete?.(e)
@@ -245,6 +301,7 @@ export function createMessageListStore(deps: MessageListDeps) {
   }
   // 硬取消:卸载/离开时断开本地流并通知后端
   const cancel = () => {
+    stopSpeech()
     const cid = getChatId()
     if (closeStream() && cid) cancelApi(cid).catch(() => {})
   }
@@ -253,6 +310,7 @@ export function createMessageListStore(deps: MessageListDeps) {
   // 先清空再拉:无消息时的 loading 即首页加载(整块遮罩),有消息时的 loading 即加载更多
   const load = async () => {
     const cid = getChatId()
+    stopSpeech()
     closeStream()
     resetMessages()
     if (!cid) return
@@ -282,6 +340,14 @@ export function createMessageListStore(deps: MessageListDeps) {
   return {
     feedback: deps.feedback ? (recordId: string, data: ChatFeedback) => deps.feedback!(getChatId(), recordId, data) : undefined,
     appInfo,
+    // computed 保持消息对象原引用，供底部栏按引用比较
+    speakingMessage: computed(() => speakingMessage.value),
+    speechPaused: computed(() => speechPaused.value),
+    speechSupported,
+    playSpeech,
+    pauseSpeech,
+    resumeSpeech,
+    stopSpeech,
     messages,
     messageRecordIds,
     loading,

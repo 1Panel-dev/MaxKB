@@ -60,6 +60,16 @@ const getShareConversation = (shareId: string) => get<ChatShareDetail>(`/share/$
 /** 将语音转换为文字。 */
 const postSpeechToText = (applicationId: string, data: unknown) => post(`${getApplicationPath(applicationId)}/speech_to_text`, data)
 
+/** 将文字合成语音，返回音频 Blob；后端以 JSON 返回失败信息时抛出该信息，由调用方提示。 */
+const postTextToSpeech = async (applicationId: string, text: string) => {
+  const response = await postStream(chatApiBase, `${getApplicationPath(applicationId)}/text_to_speech`, { text })
+  if (!response.ok || response.headers.get('Content-Type')?.includes('application/json')) {
+    const body: { message?: string } | null = await response.json().catch(() => null)
+    throw new Error(body?.message || '语音合成失败')
+  }
+  return response.blob()
+}
+
 /** 清空某个智能体的全部历史对话（当前对话用户）。 */
 const clearConversations = (applicationId: string) => del(`${getApplicationPath(applicationId)}/chat/clear`)
 
@@ -79,5 +89,6 @@ export default {
   postShareConversation,
   getShareConversation,
   postSpeechToText,
+  postTextToSpeech,
   clearConversations,
 }

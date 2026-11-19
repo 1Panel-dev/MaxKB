@@ -31,6 +31,7 @@ const shareLink = useShareLinkStoreOptional()
 const messageList = inject(MESSAGE_LIST_KEY, null)
 const canShare = computed(() => Boolean(messageList?.messages.value.length && !messageList.streamLoading.value))
 const show_exec=computed(()=>messageList?.appInfo.value?.show_exec)
+const tts_model_enable=computed(()=>messageList?.appInfo.value?.tts_model_enable)
 const rightSidebar = useRightSidebarStore()
 
 const EMPTY: ChatRecordMeta = {
@@ -64,32 +65,20 @@ function regenerateAnswer() {
   messageList?.regenerate(props.message)
 }
 
-// 浏览器朗读仅使用回答正文；切换回答或卸载时释放本组件发起的语音。
-const speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window
-const speaking = ref(false)
-let utterance: SpeechSynthesisUtterance | undefined
+// 朗读回答正文，由消息列表统一管理：与自动播放共用状态，同一时间只读一条，按智能体设置选择浏览器或模型语音。
+// 点击在朗读、暂停、继续间切换；底部栏在生成中隐藏，卸载时不停止朗读，新发送、切换会话或离开时由消息列表停止。
+const speechSupported = computed(() => Boolean(messageList?.speechSupported.value))
+const reading = computed(() => Boolean(messageList && messageList.speakingMessage.value === props.message))
+const readingPaused = computed(() => reading.value && Boolean(messageList?.speechPaused.value))
+const readingTip = computed(() => (!reading.value ? '朗读内容' : readingPaused.value ? '继续朗读' : '暂停朗读'))
 function stopReading() {
-  if (utterance) {
-    utterance.onend = null
-    utterance.onerror = null
-    window.speechSynthesis.cancel()
-    utterance = undefined
-  }
-  speaking.value = false
+  if (reading.value) messageList?.stopSpeech()
 }
 function toggleReading() {
-  if (speaking.value) return stopReading()
-  if (!speechSupported || !answerText.value) return
-  window.speechSynthesis.cancel()
-  utterance = new SpeechSynthesisUtterance(answerText.value)
-  utterance.onend = utterance.onerror = () => {
-    speaking.value = false
-    utterance = undefined
-  }
-  speaking.value = true
-  window.speechSynthesis.speak(utterance)
+  if (readingPaused.value) return messageList?.resumeSpeech()
+  if (reading.value) return messageList?.pauseSpeech()
+  if (speechSupported.value && answerText.value) messageList?.playSpeech(props.message, answerText.value)
 }
-onBeforeUnmount(stopReading)
 
 const openExecutionDetail = () => {
   rightSidebar.showExecutionDetail(meta.value.executionDetails || [])
@@ -170,10 +159,10 @@ function openFeedback(status: '0' | '1') {
       </span>
 
       <!-- 朗读回答正文，再次点击停止 -->
-      <span>
-        <MkTooltip :content="speaking ? '停止朗读' : '朗读内容'">
-          <el-button text :disabled="!speechSupported || !answerText" @click="toggleReading">
-            <VoiceWaveIcon v-if="speaking" :size="16" class="text-primary" />
+      <span v-if="tts_model_enable">
+        <MkTooltip :content="readingTip">
+          <el-button text :disabled="!reading && (!speechSupported || !answerText)" @click="toggleReading">
+            <VoiceWaveIcon v-if="reading && !readingPaused" :size="16" class="text-primary" />
             <MkIcon v-else name="icon_speaker_outlined" />
           </el-button>
         </MkTooltip>
