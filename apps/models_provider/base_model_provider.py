@@ -423,8 +423,8 @@ class MaxKBBaseEmbeddingModel(MaxKBBaseModel):
         """归一化图片输入为上游接口可识别的字符串。
 
         - http(s) URL：原样返回
-        - data:image/...;base64,xxx：keep_data_prefix=True 保留 data URI（阿里百炼等），
-          False 只返回 base64 内容（腾讯 TokenHub 等）
+        - data:image/...;base64,xxx：keep_data_prefix=True 保留 data URI（阿里百炼、腾讯 TokenHub 等），
+          False 只返回 base64 内容（使用纯 Base64 输入的提供商）
         - 其它字符串：视为已是目标格式，原样返回
         """
         if url.startswith(("http://", "https://")):
