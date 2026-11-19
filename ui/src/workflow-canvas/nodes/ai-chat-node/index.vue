@@ -11,7 +11,7 @@ import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
 import ThinkingSetting from '@/workflow-canvas/component/ThinkingSetting.vue'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
-import { FILE_REFERENCE_EXAMPLE } from '@/workflow-canvas/config/constants'
+import { FILE_REFERENCE_EXAMPLE, START_NODE_REFERENCES } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
@@ -54,7 +54,7 @@ const defaultForm: AiChatNodeForm = {
   model_id_type: 'default',
   model_params_setting: {},
   model_setting: cloneDeep(defaultThinkingSetting),
-  prompt: '{{开始.question}}',
+  prompt: START_NODE_REFERENCES.question,
   skill_tool_ids: [],
   system: '',
   tool_ids: [],
@@ -128,15 +128,22 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <!-- AI模型 -->
         <NodeModelSelect
           :node-model="model"
           :form-data="formData"
           model-type="LLM"
-          label="AI 模型"
+          :label="t('workflow.model.label')"
           :options="modelOptions"
           :provider-options="providerOptions"
           @update="updateNodeData"
@@ -147,8 +154,8 @@ onMounted(() => {
           <template #label>
             <div class="flex-between">
               <div class="flex-align-center gap-1">
-                <span>系统提示词</span>
-                <MkTooltip content="设定模型扮演的角色或遵循的指令" placement="right">
+                <span>{{ t('workflow.systemPrompt.label') }}</span>
+                <MkTooltip :content="t('workflow.systemPrompt.description')" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </div>
@@ -158,8 +165,8 @@ onMounted(() => {
           </template>
           <MdEditorMagnify
             v-model="formData.system"
-            placeholder="系统提示词，可以引用系统中变量，如{{开始.question}}"
-            title="系统提示词"
+            :placeholder="t('workflow.systemPrompt.placeholder', { reference: START_NODE_REFERENCES.question })"
+            :title="t('workflow.systemPrompt.label')"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
@@ -168,20 +175,20 @@ onMounted(() => {
         <el-form-item
           class="mk-hide-asterisk"
           prop="prompt"
-          :rules="{ whitespace: true, required: true, message: '请输入用户提示词', trigger: 'blur' }"
+          :rules="{ whitespace: true, required: true, message: t('workflow.userPrompt.requiredMessage'), trigger: 'blur' }"
         >
           <template #label>
             <span class="flex-align-center gap-1">
-              <span class="mk-required">用户提示词</span>
-              <MkTooltip content="用户向模型提出的问题或输入的指令" placement="right">
+              <span class="mk-required">{{ t('workflow.userPrompt.label') }}</span>
+              <MkTooltip :content="t('workflow.userPrompt.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </span>
           </template>
           <MdEditorMagnify
             v-model="formData.prompt"
-            placeholder="用户提示词，可以引用系统中变量，如{{开始.question}}"
-            title="用户提示词"
+            :placeholder="t('workflow.userPrompt.placeholder', { reference: START_NODE_REFERENCES.question })"
+            :title="t('workflow.userPrompt.label')"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
@@ -190,10 +197,11 @@ onMounted(() => {
         <el-form-item v-if="showSettings" prop="dialogue_number">
           <template #label>
             <div class="flex-between">
-              <span>历史聊天记录</span>
+              <span>{{ t('workflow.history.label') }}</span>
+              <!-- 选择历史记录来源 -->
               <el-select v-model="formData.dialogue_type" :teleported="false" class="w-18!" size="small">
-                <el-option label="节点" value="NODE" />
-                <el-option label="工作流" value="WORKFLOW" />
+                <el-option :label="t('workflow.node.title')" value="NODE" />
+                <el-option :label="t('workflow.title')" value="WORKFLOW" />
               </el-select>
             </div>
           </template>
@@ -210,14 +218,14 @@ onMounted(() => {
 
         <!-- 视觉-->
         <div class="flex-between mb-4">
-          <span>视觉</span>
+          <span>{{ t('workflow.aiChat.vision') }}</span>
           <el-switch v-model="formData.vision" size="small" />
         </div>
         <template v-if="formData.vision">
           <el-form-item prop="image_list">
             <template #label>
               <span class="flex-align-center gap-1">
-                <span>图片</span>
+                <span>{{ t('upload.types.image') }}</span>
                 <MkTooltip placement="right">
                   <template #content>
                     <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>
@@ -226,13 +234,13 @@ onMounted(() => {
                 </MkTooltip>
               </span>
             </template>
-            <NodeCascader ref="imageCascaderRef" v-model="formData.image_list" :node-model="model" placeholder="请选择" />
+            <NodeCascader ref="imageCascaderRef" v-model="formData.image_list" :node-model="model" :placeholder="t('common.placeholders.select')" />
           </el-form-item>
 
           <el-form-item>
             <template #label>
               <span class="flex-align-center gap-1">
-                视频
+                {{ t('upload.types.video') }}
                 <MkTooltip placement="right">
                   <template #content>
                     <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>
@@ -241,15 +249,15 @@ onMounted(() => {
                 </MkTooltip>
               </span>
             </template>
-            <NodeCascader v-model="formData.video_list" :node-model="model" placeholder="请选择" />
+            <NodeCascader v-model="formData.video_list" :node-model="model" :placeholder="t('common.placeholders.select')" />
           </el-form-item>
         </template>
 
         <!-- 技能 -->
 
         <div class="flex-between w-full gap-3 mb-2">
-          <span>技能</span>
-          <el-checkbox :model-value="formData.mcp_output_enable">输出执行过程</el-checkbox>
+          <span>{{ t('application.skills.label') }}</span>
+          <el-checkbox :model-value="formData.mcp_output_enable">{{ t('application.skills.outputExecution') }}</el-checkbox>
         </div>
         <div class="mk-white-card w-full">
           <ResourceSetting :setting="formData" @update="updateNodeData" />
@@ -257,7 +265,7 @@ onMounted(() => {
 
         <!-- 输出思考 -->
         <div class="flex-between mb-4 mt-4">
-          <span>输出思考</span>
+          <span>{{ t('workflow.thinking.label') }}</span>
           <div class="flex-align-center gap-2">
             <ThinkingSetting v-model="formData.model_setting" v-if="formData.model_setting.reasoning_content_enable" />
             <el-switch v-model="formData.model_setting.reasoning_content_enable" size="small" />
@@ -267,8 +275,8 @@ onMounted(() => {
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showSettings">
           <span class="flex-align-center gap-1">
-            返回内容
-            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            {{ t('workflow.returnContent.label') }}
+            <MkTooltip :content="t('workflow.returnContent.description')" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>

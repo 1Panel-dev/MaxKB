@@ -79,23 +79,25 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 
 `config` 是随业务持续维护的配置层，增加、删除或调整节点时通常会更新：
 
-- `node-data.ts`：节点的静态定义和默认属性，只存放数据。
+- `node-data.ts`：节点定义和默认属性；已接入国际化的默认文案使用响应式配置，不在其中编排节点行为。
 - `node-mapping.ts`：节点类型到配置数据的映射、模式匹配和默认节点集合。知识库的
   `defaultKnowledgeNodes` 使用本地文件数据源；`defaultApplicationNodes` 使用基本信息与开始，
   `defaultToolNodes` 使用工具基本信息与工具开始，均作为空工作流的初始节点。
-- `constants.ts`：比较符选项与文件引用示例；比较符也供动态表单显隐条件复用。
+- `constants.ts`：比较符选项、开始节点引用与文件引用示例；比较符也供动态表单显隐条件复用。
 
 国际化不得更改 `node-data.ts` 的数据属性名或结构，也不得增加 `labelKey`、`descriptionKey` 等属性。
-菜单通过 `node-menu/menu.ts` 的 `WORKFLOW_NODE_DISPLAY` 按原有节点 `type` 读取响应式名称和说明，配置中直接调用 `t`；新增菜单节点时同步补齐展示文案。
-`label`、`text` 继续供 AI 节点目录读取，`properties.stepName` 仍是节点默认名称和变量引用的来源。
-菜单展示与搜索读取响应式文案，不在配置模块加载时固化当前语言，也不修改节点的保存数据。
+菜单名称、说明与搜索直接读取 `node-data.ts` 的 `label`、`text`，与 AI 节点目录共用节点定义，不维护独立的节点展示映射。
+`properties.stepName` 仍是节点默认名称和变量引用的来源，菜单展示与搜索不修改节点的保存数据。
 
-`compareList` 保留比较符协议值和顺序，界面按比较符 `value` 直接调用 `t` 读取 `dynamicForm.operators`；
-`label` 仅供 AI 工具的固定参数说明使用。`FILE_REFERENCE_EXAMPLE` 只保存 JSON 示例字符串，
+`compareList` 保留比较符协议值和顺序，`label` 使用 `reactive` 与 `computed(() => t(...))` 复用 `dynamicForm.operators`，
+调用方可直接读取字符串。AI 条件 schema 的比较符说明同样延迟计算，避免模块加载时读取尚未初始化的翻译。
+`FILE_REFERENCE_EXAMPLE` 只保存 JSON 示例字符串，
 展示处使用 `t('common.labels.example')` 组合提示标题，示例字段、地址和文件 ID 保持原样。
 
-配置数据中的函数应提取到对应职责文件，不把行为逻辑混入 `node-data.ts`。当前尚未接入国际化
-的文案直接使用中文，不从 `@/locales` 引入 `t`。
+配置数据中的函数应提取到对应职责文件，不把行为逻辑混入 `node-data.ts`。已接入国际化的默认文案使用
+`reactive` 与 `computed(() => t(...))`，首次读取在国际化初始化之后。开始节点的用户问题和内置全局字段在初始化或回填时
+直接调用 `t` 生成当前语言的普通数据，保留用户自定义字段；节点实例不随语言切换重写字段。
+开始节点的默认 `stepName` 使用 `workflow.start.label`；默认用户问题引用及提示示例读取 `START_NODE_REFERENCES.question`，长期记忆引用读取 `START_NODE_REFERENCES.memory`。两者通过响应式配置以同一翻译拼接节点名称，调用方直接读取字符串，无需 `.value`。已有名称和已保存提示词沿用原值，引用示例保留双层花括号及字段名，不新增节点类型判断或翻译辅助函数。
 用户输入和表单节点的控件类型名称使用动态表单公开的 DYNAMIC_FORM_TYPES，在响应式展示配置中直接调用 t，组件读取 label；可选范围与顺序沿用节点约束，已保存字段与默认值不随语言变化。
 
 ### `node-menu/`
@@ -104,7 +106,7 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
 `BasicNodeMenu.vue` 负责基础组件搜索和列表；`ResourceNodeMenu.vue` 负责工具、数据源与智能体的文件夹、
 搜索和资源列表；`index.vue` 只负责 Tabs 和事件汇总。`component/NodeAdd.vue` 负责画布左上角的
 悬浮入口与菜单显隐；画布入口传入 `workflowMode` 并完成节点创建。左上角和锚点菜单均支持点击与拖拽添加。
-分组原名称供 AI 目录使用，界面读取 `WORKFLOW_MENU_LABELS` 的响应式文案；搜索按当前语言的节点名称匹配，点击与拖拽向外传递原节点定义。
+各模式的菜单分组直接显示配置中的 `label`，在 `reactive` 配置中使用 `computed(() => t(...))`，调用方无需 `.value` 或额外映射。菜单与 AI 目录共用分组文案和节点定义；搜索按节点定义的 `label` 匹配，点击与拖拽向外传递原节点定义。
 
 工作流 Store 的 `getToolListWithShared` 用于包含已授权共享工具的选项查询，MCP 节点使用
 `tool_type: 'MCP'` 筛选；AI 对话的 `McpSettingDialog` 每次打开通过

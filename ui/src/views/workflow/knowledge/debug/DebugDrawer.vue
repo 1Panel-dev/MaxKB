@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, provide, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { Dict, KnowledgeWorkflowApi, KnowledgeWorkflowDebugPayload } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import type LogicFlow from '@logicflow/core'
@@ -13,6 +14,8 @@ import DataSource from './action/DataSource.vue'
 import KnowledgeBase from './action/KnowledgeBase.vue'
 import Result from './action/Result.vue'
 import { KNOWLEDGE_TYPE_KEY } from '@/constants/knowledge'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'KnowledgeWorkflowDebugDrawer' })
 
@@ -151,7 +154,7 @@ defineExpose({ open, close })
       <div class="flex w-full">
         <h4>调试</h4>
         <el-steps v-if="hasKnowledgeBaseInput" :active="activeStep" finish-status="success" class="absolute-center w-85!">
-          <el-step title="选择数据源" />
+          <el-step :title="t('resource.dataSource.selectTitle')" />
           <el-step :title="userInputTitle" />
         </el-steps>
       </div>

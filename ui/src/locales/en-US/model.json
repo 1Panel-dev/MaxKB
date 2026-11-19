@@ -35,8 +35,8 @@
   },
   "types": {
     "llm": {
-      "label": "Large language model",
-      "description": "Large language model: a reasoning model for AI conversations in agents."
+      "label": "AI model",
+      "description": "AI model: a reasoning model for AI conversations in agents."
     },
     "embedding": {
       "label": "Embedding model",

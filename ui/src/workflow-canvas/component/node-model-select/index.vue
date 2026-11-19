@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { NodeModelData, NodeModelFields, NodeModelSource } from './types'
 import type { DefaultModelType, ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -9,6 +10,8 @@ import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 
 defineOptions({ name: 'NodeModelSelect' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(
   defineProps<{
@@ -51,18 +54,18 @@ function updateModelParams(params: Record<string, unknown>) {
 // 注册到节点的外层表单，引用有效性失败也由同一个表单项展示。
 async function validateModel() {
   if (source.value === 'reference') {
-    if (!reference.value.length) throw new Error('请选择引用变量')
+    if (!reference.value.length) throw new Error(t('workflow.referenceVariable.requiredMessage'))
     await nextTick()
-    if (!modelCascaderRef.value) throw new Error('请选择引用变量')
+    if (!modelCascaderRef.value) throw new Error(t('workflow.referenceVariable.requiredMessage'))
     await modelCascaderRef.value.validate().catch((error: unknown) => {
       throw error instanceof Error ? error : new Error(String(error))
     })
     return
   }
   if (source.value === 'default') {
-    if (!defaultModel.value?.model_id) throw new Error(`请在默认模型设置中选择${props.label}`)
+    if (!defaultModel.value?.model_id) throw new Error(t('workflow.defaultModel.selectRequiredMessage', { label: props.label }))
   } else if (!modelId.value) {
-    throw new Error(`请选择${props.label}`)
+    throw new Error(t('common.validation.selectFieldRequired', { label: props.label }))
   }
 }
 
@@ -76,6 +79,7 @@ onBeforeUnmount(() => anchorGuard.reset())
     <template #label>
       <div class="flex-between gap-3">
         <span class="mk-required">{{ label }}</span>
+        <!-- 选择模型来源 -->
         <el-select
           :model-value="source"
           :teleported="false"
@@ -86,9 +90,9 @@ onBeforeUnmount(() => anchorGuard.reset())
           @visible-change="anchorGuard.setOverlayVisible('model-source', $event)"
           @wheel="handleNodeWheel"
         >
-          <el-option label="默认模型" value="default" />
-          <el-option label="引用变量" value="reference" />
-          <el-option label="自定义" value="custom" />
+          <el-option :label="t('workflow.defaultModel.label')" value="default" />
+          <el-option :label="t('workflow.referenceVariable.label')" value="reference" />
+          <el-option :label="t('workflow.defaultModel.custom')" value="custom" />
         </el-select>
       </div>
     </template>
@@ -99,7 +103,7 @@ onBeforeUnmount(() => anchorGuard.reset())
       :options="options"
       :provider-options="providerOptions"
       disabled
-      placeholder="未配置默认模型"
+      :placeholder="t('workflow.defaultModel.unconfigured')"
     />
     <SelectModel
       v-else-if="source === 'custom'"
@@ -109,7 +113,7 @@ onBeforeUnmount(() => anchorGuard.reset())
       :provider-options="providerOptions"
       :can-edit-params="canEditParams && !!fields.params"
       :can-add="canAdd"
-      :placeholder="`请选择${label}`"
+      :placeholder="t('common.placeholders.selectField', { label })"
       @update:model-value="emit('update', { [fields.id]: $event })"
       @update:model-params="updateModelParams"
       @refresh="emit('refresh')"
@@ -121,7 +125,7 @@ onBeforeUnmount(() => anchorGuard.reset())
       ref="modelCascaderRef"
       :model-value="reference"
       :node-model="nodeModel"
-      placeholder="请选择变量"
+      :placeholder="t('workflow.referenceVariable.placeholder')"
       @update:model-value="emit('update', { [fields.reference]: $event })"
     />
   </el-form-item>

@@ -174,7 +174,7 @@ function handleRefresh() {
         <!-- 创建数据源 -->
         <MkDropdownItem class="py-2!" @click="handleOpenDataSourceForm">
           <template #icon><ToolIcon :type="TOOL_TYPE.DATA_SOURCE" /></template>
-          <span>{{ t('tool.dataSource.label') }}</span>
+          <span>{{ t('resource.dataSource.label') }}</span>
         </MkDropdownItem>
         <!-- 导入创建 -->
         <el-upload

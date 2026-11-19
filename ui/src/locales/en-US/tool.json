@@ -73,7 +73,6 @@
     }
   },
   "dataSource": {
-    "label": "Data source",
     "createTitle": "Create data source",
     "editTitle": "Edit data source",
     "duplicateTitle": "Duplicate data source",

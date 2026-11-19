@@ -1,11 +1,27 @@
 {
+  "node": {
+    "title": "Node"
+  },
+  "start": {
+    "label": "Start",
+    "question": "User question",
+    "currentTime": "Current time",
+    "chatId": "Chat ID",
+    "chatUserId": "Chat user ID",
+    "chatUserType": "Chat user type",
+    "chatUserGroup": "Chat user group",
+    "chatUser": "Chat user"
+  },
   "aiChat": {
     "label": "AI chat",
-    "description": "Chat with a large language model"
+    "description": "Chat with an AI model",
+    "answer": "AI response",
+    "reasoningContent": "Reasoning process",
+    "vision": "Vision"
   },
   "llm": {
     "label": "LLM",
-    "description": "Call a large language model once, optionally providing tool definitions and receiving tool calls"
+    "description": "Call n AI model once, optionally providing tool definitions and receiving tool calls"
   },
   "intent": {
     "label": "Intent classification",

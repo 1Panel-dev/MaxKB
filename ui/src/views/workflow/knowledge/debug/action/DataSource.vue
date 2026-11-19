@@ -117,8 +117,8 @@ defineExpose({ validate, getData })
     :other-params="{ current_workspace_id: getWorkspaceId(), current_knowledge_id: knowledgeId }"
   >
     <template #default>
-      <h4 v-if="hasKnowledgeBaseInput" class="mb-4 mk-title-decoration">{{ t('workflow.dataSource.selectTitle') }}</h4>
-      <el-form-item :label="t('workflow.dataSource.typeLabel')">
+      <h4 v-if="hasKnowledgeBaseInput" class="mb-4 mk-title-decoration">{{ t('resource.dataSource.selectTitle') }}</h4>
+      <el-form-item :label="t('resource.dataSource.typeLabel')">
         <div class="grid w-full grid-cols-3 gap-2">
           <template v-for="node in sourceNodeList" :key="node.id">
             <el-card

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import { useFormItem } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { WorkflowNodeField } from '@/workflow-canvas/types'
 import type { BaseNodeModel } from '@logicflow/core'
@@ -10,6 +11,8 @@ import { WorkflowMode } from '@/workflow-canvas/types'
 import { iconComponent } from '../icons/utils'
 
 defineOptions({ name: 'WorkflowNodeCascader', inheritAttrs: false })
+
+const { t } = useI18n({ useScope: 'global' })
 
 type WorkflowGraphModel = WorkflowNodeModel['graphModel'] & { getUpNodeFieldList?: (containSelf: boolean, useCache: boolean) => WorkflowNodeField[] }
 
@@ -92,14 +95,14 @@ function handleVisibleChange(visible: boolean) {
 }
 
 function validate() {
-  if (selectedValue.value.length === 0) return Promise.reject('请输入引用变量')
-  if (selectedValue.value.length < 2) return Promise.reject('引用变量错误')
+  if (selectedValue.value.length === 0) return Promise.reject(t('workflow.referenceVariable.requiredMessage'))
+  if (selectedValue.value.length < 2) return Promise.reject(t('workflow.referenceVariable.invalidMessage'))
 
   const [nodeId, fieldValue] = selectedValue.value
   const fieldGroup = getOptionsValue().find(({ value }) => value === nodeId)
   if (!fieldGroup?.children?.some(({ value }) => value === fieldValue)) {
     selectedValue.value = []
-    return Promise.reject('引用变量不存在')
+    return Promise.reject(t('workflow.referenceVariable.missingMessage'))
   }
   return Promise.resolve()
 }
@@ -116,6 +119,7 @@ defineExpose({ validate })
 
 <template>
   <div ref="cascaderRootRef" class="contents">
+    <!-- 选择上游变量 -->
     <el-cascader
       ref="cascaderRef"
       v-model="selectedValue"

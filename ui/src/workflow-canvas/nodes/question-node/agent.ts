@@ -10,6 +10,7 @@ import {
   useNodeAgent,
 } from '@/workflow-canvas/ai-generate/tools/node'
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
+import { START_NODE_REFERENCES } from '@/workflow-canvas/config/constants'
 
 /** question-node（问题优化）的 AI 生成配置 */
 
@@ -44,7 +45,7 @@ const returns: JsonObjectSchema = {
 
 function useAgent(context: NodeAgentContext) {
   const question = argReference(context, 'question')
-  const defaultPrompt = question ? promptVariableOf(context, question) : '{{开始.question}}'
+  const defaultPrompt = question ? promptVariableOf(context, question) : START_NODE_REFERENCES.question
   return useNodeAgent(context, {
     prompt: [
       'question-node（问题优化）配置要点：',

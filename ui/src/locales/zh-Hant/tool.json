@@ -73,7 +73,6 @@
     }
   },
   "dataSource": {
-    "label": "資料來源",
     "createTitle": "建立資料來源",
     "editTitle": "編輯資料來源",
     "duplicateTitle": "複製資料來源",

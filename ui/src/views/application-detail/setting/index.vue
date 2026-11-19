@@ -445,9 +445,9 @@ onMounted(() => {
             <MkCollapse trigger-class="mk-gray-card-sm px-2! py-[9px]!">
               <template #label>
                 <div class="flex-between w-full">
-                  <h6>{{ t('application.settings.skills') }}</h6>
+                  <h6>{{ t('application.skills.label') }}</h6>
                   <!-- 控制是否展示技能执行过程 -->
-                  <el-checkbox v-model="settings.mcp_output_enable" @click.stop>{{ t('workflow.skills.outputExecution') }}</el-checkbox>
+                  <el-checkbox v-model="settings.mcp_output_enable" @click.stop>{{ t('application.skills.outputExecution') }}</el-checkbox>
                 </div>
               </template>
               <div class="p-2">

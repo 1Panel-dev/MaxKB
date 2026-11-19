@@ -1,10 +1,45 @@
 {
+  "title": "工作流",
   "menu": {
+    "basicComponents": "基礎元件",
     "aiCapabilities": "AI 能力",
     "businessLogic": "業務邏輯",
     "dataProcessing": "資料處理",
-    "other": "其他",
-    "searchPlaceholder": "依名稱搜尋"
+    "other": "其他"
+  },
+  "nodeSettings": {
+    "title": "節點設定"
+  },
+  "userInput": {
+    "title": "使用者輸入",
+    "currentForm": "目前表單",
+    "exposedFields": {
+      "label": "外置參數設定",
+      "description": "僅支援模型、知識庫、開關、日期、樹狀選擇器、單選框、多選框元件類型"
+    },
+    "menuTitle": {
+      "label": "其他參數收納選單標題"
+    }
+  },
+  "parameters": {
+    "duplicateMessage": "參數已存在",
+    "invalidMessage": "僅支援字母、數字和底線"
+  },
+  "apiParameters": {
+    "title": "介面傳參"
+  },
+  "globalVariables": {
+    "title": "全域變量"
+  },
+  "conversationVariables": {
+    "title": "對話變量"
+  },
+  "referenceVariable": {
+    "label": "引用變量",
+    "placeholder": "請選擇變量",
+    "requiredMessage": "請選擇引用變量",
+    "invalidMessage": "引用變量錯誤",
+    "missingMessage": "引用變量不存在"
   },
   "model": {
     "label": "AI 模型",
@@ -16,15 +51,18 @@
     "custom": "自訂",
     "unconfigured": "未設定預設模型",
     "requiredMessage": "請設定預設模型",
+    "selectRequiredMessage": "請在預設模型設定中選擇{label}",
     "sttRequiredMessage": "請在預設模型設定中選擇語音辨識模型",
     "ttsRequiredMessage": "請在預設模型設定中選擇語音合成模型"
   },
   "systemPrompt": {
     "label": "系統提示詞",
+    "placeholder": "系統提示詞，可以引用系統中的變量，例如{reference}",
     "description": "設定模型扮演的角色或遵循的指令"
   },
   "userPrompt": {
     "label": "使用者提示詞",
+    "placeholder": "使用者提示詞，可以引用系統中的變量，例如{reference}",
     "description": "使用者向模型提出的問題或輸入的指令",
     "requiredMessage": "請輸入使用者提示詞"
   },
@@ -42,18 +80,8 @@
     "start": "開始",
     "end": "結束"
   },
-  "skills": {
-    "outputExecution": "輸出執行過程"
-  },
-  "dataSource": {
-    "label": "資料來源",
-    "selectTitle": "選擇資料來源",
-    "typeLabel": "資料來源類型",
-    "documentsUnavailableMessage": "此知識庫不支援查詢資料來源的檔案"
-  },
-  "executionResult": {
-    "title": "執行結果",
-    "success": "執行成功",
-    "failure": "執行失敗"
+  "returnContent": {
+    "label": "回傳內容",
+    "description": "關閉後，此節點的內容不會輸出給使用者。如需讓使用者看到此節點的輸出內容，請開啟開關。"
   }
 }

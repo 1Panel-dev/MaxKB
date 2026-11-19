@@ -4,6 +4,11 @@
   },
   "selected": "已選資源",
   "shared": "共用",
+  "dataSource": {
+    "label": "資料來源",
+    "selectTitle": "選擇資料來源",
+    "typeLabel": "資料來源類型"
+  },
   "mcpConfig": {
     "title": "MCP 服務設定"
   },

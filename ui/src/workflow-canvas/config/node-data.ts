@@ -1,27 +1,29 @@
+import { computed, reactive } from 'vue'
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
+import { t } from '@/locales'
 
-export const startNode = {
+export const startNode = reactive({
   id: WorkflowNodeType.Start,
   type: WorkflowNodeType.Start,
   x: 846,
   y: 2600,
   properties: {
-    stepName: '开始',
+    stepName: computed(() => t('workflow.start.label')),
     config: {
-      fields: [{ label: '用户问题', value: 'question' }],
+      fields: [{ label: computed(() => t('workflow.start.question')), value: 'question' }],
       globalFields: [
-        { label: '当前时间', value: 'time' },
-        { label: '历史聊天记录', value: 'history_context' },
-        { label: '对话 ID', value: 'aiChat_id' },
-        { label: '对话用户 ID', value: 'chat_user_id' },
-        { label: '对话用户类型', value: 'chat_user_type' },
-        { label: '对话用户组', value: 'chat_user_group' },
-        { label: '对话用户', value: 'chat_user' },
+        { label: computed(() => t('workflow.start.currentTime')), value: 'time' },
+        { label: computed(() => t('workflow.history.label')), value: 'history_context' },
+        { label: computed(() => t('workflow.start.chatId')), value: 'aiChat_id' },
+        { label: computed(() => t('workflow.start.chatUserId')), value: 'chat_user_id' },
+        { label: computed(() => t('workflow.start.chatUserType')), value: 'chat_user_type' },
+        { label: computed(() => t('workflow.start.chatUserGroup')), value: 'chat_user_group' },
+        { label: computed(() => t('workflow.start.chatUser')), value: 'chat_user' },
       ],
     },
     showNode: true,
   },
-}
+})
 
 export const baseNode = {
   id: WorkflowNodeType.Base,
@@ -106,21 +108,21 @@ export const toolStartNode = {
 // 以上是默认基础节点
 
 /* ai对话节点配置数据 */
-export const aiChatNode = {
+export const aiChatNode = reactive({
   type: WorkflowNodeType.AiChat,
-  text: '与 AI 大模型进行对话',
-  label: 'AI 对话',
+  text: computed(() => t('workflow.aiChat.description')),
+  label: computed(() => t('workflow.aiChat.label')),
   properties: {
-    stepName: 'AI 对话',
+    stepName: computed(() => t('workflow.aiChat.label')),
     config: {
       fields: [
-        { label: 'AI 回答内容', value: 'answer' },
-        { label: '思考过程', value: 'reasoning_content' },
-        { label: '历史聊天记录', value: 'history_message' },
+        { label: computed(() => t('workflow.aiChat.answer')), value: 'answer' },
+        { label: computed(() => t('workflow.aiChat.reasoningContent')), value: 'reasoning_content' },
+        { label: computed(() => t('workflow.history.label')), value: 'history_message' },
       ],
     },
   },
-}
+})
 
 /* LLM 节点配置数据 */
 export const llmNode = {

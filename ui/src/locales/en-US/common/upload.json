@@ -7,6 +7,13 @@
   "retryUpload": "Retry upload",
   "limits": "Upload up to {count} file at a time, no larger than {size} MB. | Upload up to {count} files at a time, each no larger than {size} MB.",
   "formats": "Supported formats",
+  "types": {
+    "document": "Documents",
+    "image": "Images",
+    "audio": "Audio",
+    "video": "Video",
+    "other": "Other files"
+  },
   "extension": {
     "add": "Add extension",
     "duplicateMessage": "File extension already exists"

@@ -18,6 +18,7 @@ import {
   useNodeAgent,
 } from '@/workflow-canvas/ai-generate/tools/node'
 import { ErrorResult } from '@/workflow-canvas/ai-generate/tools/result'
+import { START_NODE_REFERENCES } from '@/workflow-canvas/config/constants'
 import { normalizeTool } from './types'
 
 /** llm-node（大语言模型）的 AI 生成配置；node_data 协议以节点视图 index.vue 的 defaultForm 为准 */
@@ -103,7 +104,9 @@ function normalizeTools(value: unknown): LlmTool[] | string {
 function useAgent(context: NodeAgentContext) {
   const { source, id, reference } = LLM_MODEL.fields
   const materialRefs = argReferences(context, 'materials')
-  const defaultPrompt = materialRefs.length ? materialRefs.map((ref) => promptVariableOf(context, ref)).join('\n') : '{{开始.question}}'
+  const defaultPrompt = materialRefs.length
+    ? materialRefs.map((ref) => promptVariableOf(context, ref)).join('\n')
+    : START_NODE_REFERENCES.question
   return useNodeAgent(context, {
     prompt: [
       'llm-node（大语言模型）配置要点：',
