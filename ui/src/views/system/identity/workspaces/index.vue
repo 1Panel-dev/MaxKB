@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, OptionItem, WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
 import type { TableColumnCtx } from 'element-plus'
 import WorkspaceApi from '@/api/admin/system/workspace'
@@ -7,6 +8,8 @@ import AddMemberDrawer from './AddMemberDrawer.vue'
 import CreateOrUpdateWorkspaceDialog from './dialog/CreateOrUpdateWorkspaceDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
+
+const { t } = useI18n({ useScope: 'global' })
 
 /* 添加工作空间表单dialog */
 const workspaceDialogRef = useTemplateRef<InstanceType<typeof CreateOrUpdateWorkspaceDialog>>('workspaceDialogRef')
@@ -46,11 +49,11 @@ function handleWorkspaceDelete(workspace: WorkspaceItem) {
 
   WorkspaceApi.getWorkspaceDeleteCheck(workspace.id)
     .then(() =>
-      MsgConfirm(`确认删除${workspace.name}？`, '删除后，该空间下的成员都会被移除，请谨慎操作。').then(() => {
+      MsgConfirm(`${t('workspace.delete.title')}: ${workspace.name}?`, t('workspace.delete.description')).then(() => {
         workspaceLoading.value = true
         return WorkspaceApi.deleteWorkspace(workspace.id as string)
           .then(() => {
-            MsgSuccess('删除成功')
+            MsgSuccess(t('common.messages.deleteSuccess'))
             // 删除未选中的空间也要刷新列表，并保留当前选中项。
             return loadWorkspaceOptions(currentWorkspace.value?.id)
           })
@@ -67,10 +70,10 @@ function handleWorkspaceDelete(workspace: WorkspaceItem) {
 const workspaceMembersLoading = ref(false)
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
-const memberSearchFields: OptionItem<string>[] = [
-  { label: '姓名', value: 'nick_name' },
-  { label: '用户名', value: 'username' },
-]
+const memberSearchFields = computed<OptionItem<string>[]>(() => [
+  { label: t('user.name.label'), value: 'nick_name' },
+  { label: t('user.username.label'), value: 'username' },
+])
 const workspaceMembers = ref<WorkspaceMemberItem[]>([])
 const workspaceMemberTableRef = useTemplateRef<{ clearSelection: () => void }>('workspaceMemberTableRef')
 function handleMemberSearch(query?: Dict<unknown>) {
@@ -141,11 +144,11 @@ function handleRemoveMember(member: WorkspaceMemberItem) {
   const workspaceId = currentWorkspace.value?.id
   if (!workspaceId) return
 
-  MsgConfirm(`是否移除成员：${member.nick_name}？`, '', { confirmButtonText: '移除' })
+  MsgConfirm(`${t('system.member.removeTitle')}: ${member.nick_name}?`, '', { confirmButtonText: t('common.actions.remove') })
     .then(() => {
       workspaceMembersLoading.value = true
       return WorkspaceApi.postRemoveWorkspaceMember(workspaceId, member.user_relation_id).then(() => {
-        MsgSuccess('移除成功')
+        MsgSuccess(t('common.messages.removeSuccess'))
         return loadWorkspaceMembers()
       })
     })
@@ -163,16 +166,20 @@ function handleBatchDelete() {
   if (!workspaceId || workspaceLoading.value || workspaceMembersLoading.value || !batchSelectedMembers.value.length) return
 
   const selectedMembers = [...batchSelectedMembers.value]
-  const userCount = new Set(selectedMembers.map(({ user_id }) => user_id)).size
+  const memberCount = new Set(selectedMembers.map(({ user_id }) => user_id)).size
   const userRelationIds = [...new Set(selectedMembers.map(({ user_relation_id }) => user_relation_id))]
-  MsgConfirm('是否移除选中记录对应的成员？', `涉及 ${userCount} 位用户，共 ${selectedMembers.length} 条记录。`, { confirmButtonText: '移除' })
+  MsgConfirm(
+    `${t('workspace.delete.batchRemoveTitle')}?`,
+    t('workspace.delete.batchRemoveDescription', { memberCount, recordCount: selectedMembers.length }),
+    { confirmButtonText: t('common.actions.remove') },
+  )
     .then(() => {
       workspaceMembersLoading.value = true
       return WorkspaceApi.postBatchRemoveWorkspaceMembers(workspaceId, userRelationIds).then(({ success_count, failed_count }) => {
         if (failed_count > 0) {
-          MsgSuccess(`移除成功 ${success_count} 个成员，失败 ${failed_count} 个`)
+          MsgSuccess(t('workspace.delete.partialRemoveMessage', { successCount: success_count, failedCount: failed_count }, success_count))
         } else {
-          MsgSuccess('移除成功')
+          MsgSuccess(t('common.messages.removeSuccess'))
         }
         return loadWorkspaceMembers()
       })
@@ -191,12 +198,12 @@ onMounted(() => loadWorkspaceOptions())
 </script>
 
 <template>
-  <MkViewLayout class="system-identity-workspaces" :loading="workspaceLoading">
+  <MkViewLayout :title="t('workspace.title')" class="system-identity-workspaces" :loading="workspaceLoading">
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
         <!-- 创建工作空间 -->
-        <MkTooltip content="创建工作空间" placement="top" v-if="perm.system.workspace.create()">
+        <MkTooltip :content="t('workspace.createTitle')" placement="top" v-if="perm.system.workspace.create()">
           <el-button text type="primary" class="-mr-1" @click="handleOpenWorkspaceDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
@@ -209,14 +216,14 @@ onMounted(() => loadWorkspaceOptions())
             <template #icon>
               <MkIcon name="icon_rename_outlined" />
             </template>
-            <span>重命名</span>
+            <span>{{ t('common.actions.rename') }}</span>
           </MkDropdownItem>
           <!-- 删除工作空间 -->
           <MkDropdownItem v-if="perm.system.workspace.delete()" :disabled="workspace.id === 'default'" @click="handleWorkspaceDelete(workspace)">
             <template #icon>
-              <MkIcon name="icon_delete-trash_outlined" :class="{ 'text-N400!': workspace.id === 'default' }" />
+              <MkIcon name="icon_delete-trash_outlined" />
             </template>
-            <span>删除</span>
+            <span>{{ t('common.actions.delete') }}</span>
           </MkDropdownItem>
         </template>
       </MkSearchList>
@@ -242,7 +249,7 @@ onMounted(() => loadWorkspaceOptions())
             <!-- 添加成员 -->
             <el-button v-if="perm.system.workspace.addMember()" type="primary" @click="handleOpenAddMemberDrawer">
               <MkIcon name="icon_add_outlined" />
-              <span>添加成员</span>
+              <span>{{ t('system.member.add') }}</span>
             </el-button>
           </div>
 
@@ -263,13 +270,13 @@ onMounted(() => loadWorkspaceOptions())
           :row-key="getWorkspaceMemberRowKey"
         >
           <el-table-column type="selection" width="40" />
-          <el-table-column prop="nick_name" label="姓名" />
-          <el-table-column prop="username" label="用户名" />
-          <el-table-column prop="role_name" label="角色" class-name="border-l!" />
-          <el-table-column label="操作" width="70" fixed="right">
+          <el-table-column prop="nick_name" :label="t('user.name.label')" />
+          <el-table-column prop="username" :label="t('user.username.label')" />
+          <el-table-column prop="role_name" :label="t('user.role.label')" class-name="border-l!" />
+          <el-table-column :label="t('common.labels.operation')" width="80" fixed="right">
             <template #default="{ row }">
               <!-- 移除成员 -->
-              <MkTooltip content="移除" placement="top" v-if="perm.system.workspace.removeMember()">
+              <MkTooltip :content="t('common.actions.remove')" placement="top" v-if="perm.system.workspace.removeMember()">
                 <el-button type="primary" text @click="handleRemoveMember(row)">
                   <MkIcon name="icon_assigned_outlined" />
                 </el-button>
@@ -279,7 +286,9 @@ onMounted(() => loadWorkspaceOptions())
 
           <template #footer-batch-actions>
             <!-- 批量移除成员 -->
-            <el-button v-if="perm.system.workspace.removeMember()" type="danger" plain @click="handleBatchDelete">移除</el-button>
+            <el-button v-if="perm.system.workspace.removeMember()" type="danger" plain @click="handleBatchDelete">
+              {{ t('common.actions.remove') }}
+            </el-button>
           </template>
         </MkTable>
       </template>

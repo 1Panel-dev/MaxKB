@@ -75,7 +75,9 @@
   "actions": {
     "manage": "管理",
     "edit": "编辑",
+    "rename": "重命名",
     "delete": "删除",
+    "remove": "移除",
     "cancel": "取消",
     "retry": "重试",
     "reload": "重新加载",
@@ -122,6 +124,7 @@
     "removeSuccess": "移除成功",
     "fetchSuccess": "获取成功",
     "updateSuccess": "修改成功",
+    "renameSuccess": "重命名成功",
     "moveSuccess": "移动成功",
     "importSuccess": "导入成功",
     "relateSuccess": "关联成功",

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { RoleItem, RolePermission, RolePermissionModule, RolePermissionModuleGroup } from '@/api/types'
 import RoleApi from '@/api/admin/system/role'
 import { MsgSuccess } from '@/utils/message'
@@ -16,6 +17,7 @@ interface PermissionTableRow {
 }
 
 const props = defineProps<{ currentRole: RoleItem }>()
+const { t } = useI18n({ useScope: 'global' })
 
 /* 权限数据加载与表格展示 */
 const loading = ref(false)
@@ -127,7 +129,7 @@ function handleSave() {
   loading.value = true
   const permissions = permissionData.value.flatMap((row) => row.permissions.map(({ id, enable }) => ({ id, enable })))
   RoleApi.postRolePermissions(props.currentRole.id, permissions)
-    .then(() => MsgSuccess('保存成功'))
+    .then(() => MsgSuccess(t('common.messages.saveSuccess')))
     .finally(() => {
       loading.value = false
     })
@@ -147,10 +149,10 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
       :data="permissionData"
       v-loading="loading"
     >
-      <el-table-column v-if="showCategory" prop="category" label="分类" width="120" />
-      <el-table-column prop="module" label="模块名称" width="150" />
-      <el-table-column prop="name" label="操作对象" width="150" />
-      <el-table-column label="权限">
+      <el-table-column v-if="showCategory" prop="category" :label="t('role.permission.category')" width="120" />
+      <el-table-column prop="module" :label="t('role.permission.module')" width="150" />
+      <el-table-column prop="name" :label="t('role.permission.target')" width="150" />
+      <el-table-column :label="t('role.permission.label')">
         <template #default="{ row }">
           <div class="flex-wrap">
             <template v-for="permission in row.permissions" :key="permission.id">
@@ -188,13 +190,14 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
     </MkTable>
 
     <footer v-if="!disabled" class="sticky -mb-6 -ml-6 -mr-6 bottom-0 z-10 mt-auto flex shrink-0 justify-end border-t bg-white px-6 py-4">
-      <el-button v-if="perm.system.role.edit()" type="primary" :loading="loading" @click="handleSave">保存</el-button>
+      <!-- 保存角色权限 -->
+      <el-button v-if="perm.system.role.edit()" type="primary" :loading="loading" @click="handleSave">{{ t('common.actions.save') }}</el-button>
     </footer>
   </div>
 </template>
 
 <style scoped lang="scss">
-// TODO
+// TODO checkbox 换行 翻译完事之后再看是否需要调整
 .permission-option {
   :deep(.el-checkbox__input) {
     margin-top: 3px;

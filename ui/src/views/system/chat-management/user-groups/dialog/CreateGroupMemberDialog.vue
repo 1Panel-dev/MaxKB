@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatUserBase, ListItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
@@ -8,6 +9,7 @@ import { MsgSuccess } from '@/utils/message'
 
 const props = defineProps<{ currentGroup?: ListItem }>()
 const emit = defineEmits<{ refresh: [] }>()
+const { t } = useI18n({ useScope: 'global' })
 
 const visible = ref(false)
 const loading = ref(false)
@@ -67,7 +69,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="添加成员" @closed="resetData">
+  <MkDialog v-model="visible" :title="t('system.member.add')" @closed="resetData">
     <el-form ref="formRef" :model="memberForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="对话用户" prop="userIds">
         <el-select

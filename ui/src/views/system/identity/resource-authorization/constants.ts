@@ -4,11 +4,11 @@ import { RESOURCE_PERMISSION_OPTIONS } from '@/constants/resource-authorization'
 import { useStore } from '@/stores'
 const { auth } = useStore()
 
-export const RESOURCE_AUTHORIZATION_LABELS: Record<ResourceAuthorizationType, string> = {
-  [RESOURCE_TYPE.APPLICATION]: '智能体',
-  [RESOURCE_TYPE.KNOWLEDGE]: '知识库',
-  [RESOURCE_TYPE.MODEL]: '模型',
-  [RESOURCE_TYPE.TOOL]: '工具',
+export const RESOURCE_AUTHORIZATION_MESSAGE_KEYS: Record<ResourceAuthorizationType, string> = {
+  [RESOURCE_TYPE.APPLICATION]: 'application.title',
+  [RESOURCE_TYPE.KNOWLEDGE]: 'knowledge.title',
+  [RESOURCE_TYPE.MODEL]: 'model.title',
+  [RESOURCE_TYPE.TOOL]: 'tool.title',
 }
 
 interface PermissionOption extends OptionItem<ResourcePermission> {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, LoginMethod, OptionItem, SystemUserGroup, SystemUserGroupMember, WorkspaceItem } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import UserGroupsApi from '@/api/admin/system/user-groups'
@@ -12,6 +13,7 @@ import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 const { auth, user } = useStore()
+const { t } = useI18n({ useScope: 'global' })
 
 /* 选择工作空间列表 */
 const selectedWorkspaceId = ref(user.userInfo?.workspace_list?.[0]?.id ?? 'default')
@@ -77,10 +79,10 @@ function handleGroupSaved(group: SystemUserGroup) {
 
 /* 删除用户组 */
 function deleteGroup(group: SystemUserGroup) {
-  MsgConfirm(`是否删除用户组：${group.name}？`, '删除后，成员将被移除该用户组，通过该用户组继承的资源权限将被回收，请谨慎操作！')
+  MsgConfirm(`${t('userGroup.delete.title')}: ${group.name}?`, t('userGroup.delete.description'))
     .then(() => {
       return UserGroupsApi.deleteSystemUserGroup(selectedWorkspaceId.value, group.id).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         userGroups.value = userGroups.value.filter(({ id }) => id !== group.id)
         if (currentGroup.value?.id === group.id) {
           currentGroup.value = userGroups.value[0]
@@ -115,17 +117,21 @@ const loadingMembers = ref(false)
 const memberTableRef = useTemplateRef('memberTableRef')
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
-const memberSearchFields: OptionItem<string>[] = [
-  { label: '姓名', value: 'nick_name' },
-  { label: '用户名', value: 'username' },
-]
+const memberSearchFields = computed<OptionItem<string>[]>(() => [
+  { label: t('user.name.label'), value: 'nick_name' },
+  { label: t('user.username.label'), value: 'username' },
+])
 
 /* 表头筛选 */
 const selectedMemberSource = ref<string | null>(null)
-const memberSourceOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
-  label: value === LOGIN_METHOD.LOCAL ? '系统用户' : label,
-  value,
+const memberSourceLabels = computed<Record<LoginMethod, string>>(() => ({
+  ...LOGIN_METHOD_LABELS,
+  [LOGIN_METHOD.LOCAL]: t('user.source.local'),
+  [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
+  [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
+  [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
 }))
+const memberSourceOptions = computed<OptionItem<string>[]>(() => Object.entries(memberSourceLabels.value).map(([value, label]) => ({ label, value })))
 const memberListQuery = computed<Dict<unknown>>(() => ({
   ...memberSearchQuery.value,
   ...(selectedMemberSource.value !== null ? { source: selectedMemberSource.value } : {}),
@@ -159,8 +165,10 @@ function handleRemoveMembers(member?: SystemUserGroupMember) {
   if (!group || !members.length) return
 
   const targetName = member ? member.nick_name || member.username : ''
-  const title = member ? `是否移除用户：${targetName}？` : `是否移除选中的 ${members.length} 个用户？`
-  MsgConfirm(title, '成员移除后，通过该用户组继承的资源权限将被回收，请谨慎操作。', { confirmButtonText: '移除' })
+  const title = member
+    ? `${t('system.member.removeTitle')}: ${targetName}?`
+    : `${t('system.member.batchRemoveTitle', { count: members.length }, members.length)}?`
+  MsgConfirm(title, t('userGroup.delete.removeDescription'), { confirmButtonText: t('common.actions.remove') })
     .then(() => {
       loadingMembers.value = true
       return UserGroupsApi.postRemoveSystemUserGroupMembers(
@@ -168,7 +176,7 @@ function handleRemoveMembers(member?: SystemUserGroupMember) {
         group.id,
         members.map(({ system_user_group_relation_id }) => system_user_group_relation_id),
       ).then(async () => {
-        MsgSuccess('移除成功')
+        MsgSuccess(t('common.messages.removeSuccess'))
         await loadUserGroupMembers()
         memberTableRef.value?.clearSelection()
         return loadUserGroups()
@@ -189,7 +197,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout class="system-identity-groups" :loading="loadingView">
+  <MkViewLayout :title="t('userGroup.title')" class="system-identity-groups" :loading="loadingView">
     <template #top v-if="auth.isEE">
       <WorkspaceDropdown v-model="selectedWorkspaceId" :options="workspaceOptions" @select="handleWorkspaceSelect" />
     </template>
@@ -197,7 +205,7 @@ onMounted(() => {
       <component :is="Header">
         <h4>{{ title }}</h4>
         <!-- 创建用户组 -->
-        <MkTooltip v-if="perm.system.userGroup.create()" content="创建用户组" placement="top">
+        <MkTooltip v-if="perm.system.userGroup.create()" :content="t('userGroup.createTitle')" placement="top">
           <el-button class="-mr-1" text type="primary" @click="handleOpenGroupDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
@@ -210,14 +218,14 @@ onMounted(() => {
             <template #icon>
               <MkIcon name="icon_rename_outlined" />
             </template>
-            <span>重命名</span>
+            <span>{{ t('common.actions.rename') }}</span>
           </MkDropdownItem>
           <!-- 删除用户组 -->
           <MkDropdownItem v-if="perm.system.userGroup.delete()" @click="deleteGroup(row)">
             <template #icon>
               <MkIcon name="icon_delete-trash_outlined" />
             </template>
-            <span>删除</span>
+            <span>{{ t('common.actions.delete') }}</span>
           </MkDropdownItem>
         </template>
       </MkSearchList>
@@ -241,7 +249,7 @@ onMounted(() => {
             <!-- 添加成员 -->
             <el-button v-if="perm.system.userGroup.addMember()" type="primary" @click="handleOpenMemberDialog">
               <MkIcon name="icon_add_outlined" />
-              <span>添加成员</span>
+              <span>{{ t('system.member.add') }}</span>
             </el-button>
           </div>
 
@@ -259,32 +267,32 @@ onMounted(() => {
           @selection-change="handleMemberSelectionChange"
         >
           <el-table-column type="selection" width="40" />
-          <el-table-column prop="nick_name" label="姓名" min-width="198" show-overflow-tooltip />
-          <el-table-column prop="username" label="用户名" min-width="198" show-overflow-tooltip />
-          <el-table-column label="角色" min-width="198">
+          <el-table-column prop="nick_name" :label="t('user.name.label')" min-width="198" show-overflow-tooltip />
+          <el-table-column prop="username" :label="t('user.username.label')" min-width="198" show-overflow-tooltip />
+          <el-table-column :label="t('user.role.label')" min-width="198">
             <template #default="{ row }">
               <MkTagGroup v-if="row.roles?.length" :tags="row.roles" />
               <span v-else>-</span>
             </template>
           </el-table-column>
-          <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip>
+          <el-table-column prop="source" :label="t('user.source.label')" min-width="198" show-overflow-tooltip>
             <template #header>
               <MkTableFilter
                 mode="single"
                 v-model="selectedMemberSource"
-                label="用户来源"
+                :label="t('user.source.label')"
                 :options="memberSourceOptions"
                 @change="handleMemberFilterChange"
               />
             </template>
             <template #default="{ row }">
-              {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
+              {{ memberSourceLabels[row.source as LoginMethod] ?? row.source }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="70" fixed="right">
+          <el-table-column :label="t('common.labels.operation')" width="80" fixed="right">
             <template #default="{ row }">
               <!-- 移除成员 -->
-              <MkTooltip content="移除" placement="top" v-if="perm.system.userGroup.removeMember()">
+              <MkTooltip :content="t('common.actions.remove')" placement="top" v-if="perm.system.userGroup.removeMember()">
                 <el-button type="primary" text @click="handleRemoveMembers(row)">
                   <MkIcon name="icon_assigned_outlined" />
                 </el-button>
@@ -293,7 +301,9 @@ onMounted(() => {
           </el-table-column>
           <template #footer-batch-actions>
             <!-- 批量移除成员 -->
-            <el-button v-if="perm.system.userGroup.removeMember()" type="danger" plain @click="handleRemoveMembers()">移除</el-button>
+            <el-button v-if="perm.system.userGroup.removeMember()" type="danger" plain @click="handleRemoveMembers()">
+              {{ t('common.actions.remove') }}
+            </el-button>
           </template>
         </MkTable>
       </template>

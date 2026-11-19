@@ -192,7 +192,7 @@ Drawer 没有 `MkDialog` 的外壳挂载控制；需要按需挂载时，由业�
 已打开过的多个菜单会分别保留；Dialog、Drawer 仍应点击时挂载并在 `closed` 后卸载。
 `dropdown` 插槽内组合 `MkDropdownMenu`、`MkDropdownItem`，不在业务中重复组装底层组件。
 菜单项通过 `icon` Prop 传 Element Plus 图标，或使用 `icon` 插槽；`selectable` 预留勾选位，
-`selected` 控制选中。触发器遵循单根节点规则。
+`selected` 控制选中。`disabled` 禁用菜单项，左侧图标及选中勾使用 N400。触发器遵循单根节点规则。
 
 `hide-when-empty` 默认关闭。开启后检查 `dropdown` 插槽，展开标准 `MkDropdownMenu` 的默认插槽
 和 Fragment，忽略注释、空白文本；没有有效 VNode 时不渲染下拉入口，不改变 `persistent`。

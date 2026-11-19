@@ -1,0 +1,16 @@
+{
+  "title": "用户组",
+  "createTitle": "创建用户组",
+  "renameTitle": "重命名用户组",
+  "placeholder": "请选择用户组",
+  "name": {
+    "label": "用户组名称",
+    "placeholder": "请输入用户组名称",
+    "requiredMessage": "请输入用户组名称"
+  },
+  "delete": {
+    "title": "是否删除用户组",
+    "description": "删除后，成员将被移除该用户组，通过该用户组继承的资源权限将被回收，请谨慎操作！",
+    "removeDescription": "成员移除后，通过该用户组继承的资源权限将被回收，请谨慎操作。"
+  }
+}

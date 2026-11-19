@@ -1,4 +1,4 @@
-/** 定义当前支持的界面语言与偏好存储规则。 */
+/** 定义界面语言、偏好存储与语言包命名空间规则。 */
 export const LANGUAGE_STORAGE_KEY = 'MaxKB-locale'
 export const DEFAULT_LOCALE = 'zh-CN'
 export const LOCALE_OPTIONS = [
@@ -15,12 +15,14 @@ export const MARKDOWN_LOCALES = {
   'en-US': 'en-US',
 } as const satisfies Record<Locale, string>
 
-/** 语言目录下的文件名或第一级目录名决定业务命名空间。 */
+/** 分类目录不进入业务命名空间，直属 index.json 使用分类目录自身的命名空间。 */
+const LOCALE_CATEGORY_DIRECTORIES = ['system']
+
+/** 跳过分类目录后，由首个业务文件或业务目录名决定命名空间。 */
 export function getLocaleNamespace(file: string): string {
-  return file
-    .split('/')[0]!
-    .replace(/\.json$/, '')
-    .replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase())
+  const [root, business] = file.split('/')
+  const namespace = LOCALE_CATEGORY_DIRECTORIES.includes(root!) && business && business !== 'index.json' ? business : root!
+  return namespace.replace(/\.json$/, '').replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase())
 }
 
 /** 将浏览器或账号语言映射到已支持的界面语言。 */

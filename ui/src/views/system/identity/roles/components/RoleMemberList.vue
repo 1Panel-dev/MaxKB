@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, watch } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, OptionItem, RoleItem, RoleMember } from '@/api/types'
 import { ROLE_TYPE } from '@/api/enums'
 import RoleApi from '@/api/admin/system/role'
@@ -8,14 +9,15 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
 const props = defineProps<{ currentRole: RoleItem }>()
+const { t } = useI18n({ useScope: 'global' })
 const loading = ref(false)
 const members = ref<RoleMember[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchQuery = ref<Dict<unknown>>()
-const searchFields: OptionItem<string>[] = [
-  { label: '用户名', value: 'username' },
-  { label: '姓名', value: 'nick_name' },
-]
+const searchFields = computed<OptionItem<string>[]>(() => [
+  { label: t('user.username.label'), value: 'username' },
+  { label: t('user.name.label'), value: 'nick_name' },
+])
 
 function loadMembers(reset = false) {
   if (reset) paginationConfig.value.currentPage = 1
@@ -48,11 +50,11 @@ function handleMemberAdded() {
 
 // 移除成员
 function handleRemoveMember(member: RoleMember) {
-  MsgConfirm(`确定移除成员“${member.nick_name || member.username}”吗？`, '', { confirmButtonText: '移除' })
+  MsgConfirm(`${t('system.member.removeTitle')}: ${member.nick_name || member.username}?`, '', { confirmButtonText: t('common.actions.remove') })
     .then(() => {
       loading.value = true
       return RoleApi.deleteRoleMember(props.currentRole.id, member.user_relation_id).then(() => {
-        MsgSuccess('移除成功')
+        MsgSuccess(t('common.messages.removeSuccess'))
         return loadMembers()
       })
     })
@@ -65,12 +67,14 @@ function handleRemoveMember(member: RoleMember) {
 /* 批量删除成员 */
 const batchSelectedMembers = ref<RoleMember[]>([])
 function handleBatchDelete() {
-  MsgConfirm(`是否移除选中的 ${batchSelectedMembers.value.length} 个成员？`, '', { confirmButtonText: '移除' })
+  MsgConfirm(`${t('system.member.batchRemoveTitle', { count: batchSelectedMembers.value.length }, batchSelectedMembers.value.length)}?`, '', {
+    confirmButtonText: t('common.actions.remove'),
+  })
     .then(() => {
       loading.value = true
       const memberIds = batchSelectedMembers.value.map((member) => member.user_relation_id)
       return RoleApi.deleteRoleMembers(props.currentRole.id, memberIds).then(() => {
-        MsgSuccess('批量移除成功')
+        MsgSuccess(t('common.messages.removeSuccess'))
         return loadMembers()
       })
     })
@@ -98,7 +102,7 @@ watch(
         <!-- 添加成员 -->
         <el-button type="primary" v-if="perm.system.role.addMember()" @click="handleOpenAddMemberDrawer">
           <MkIcon name="icon_add_outlined" />
-          添加成员
+          {{ t('system.member.add') }}
         </el-button>
       </div>
 
@@ -115,18 +119,26 @@ watch(
       rowKey="user_relation_id"
     >
       <el-table-column type="selection" width="40" />
-      <el-table-column prop="nick_name" label="姓名" min-width="180" show-overflow-tooltip />
-      <el-table-column prop="username" label="用户名" min-width="180" show-overflow-tooltip />
-      <el-table-column v-if="currentRole.type !== ROLE_TYPE.ADMIN" prop="workspace_name" label="工作空间" min-width="180" show-overflow-tooltip />
-      <el-table-column label="操作" width="70" fixed="right">
+      <el-table-column prop="nick_name" :label="t('user.name.label')" min-width="180" show-overflow-tooltip />
+      <el-table-column prop="username" :label="t('user.username.label')" min-width="180" show-overflow-tooltip />
+      <el-table-column
+        v-if="currentRole.type !== ROLE_TYPE.ADMIN"
+        prop="workspace_name"
+        :label="t('workspace.title')"
+        min-width="180"
+        show-overflow-tooltip
+      />
+      <el-table-column :label="t('common.labels.operation')" width="70" fixed="right">
         <template #default="{ row }">
-          <MkTooltip content="移除" placement="top" v-if="perm.system.role.removeMember()">
+          <!-- 移除角色成员 -->
+          <MkTooltip :content="t('common.actions.remove')" placement="top" v-if="perm.system.role.removeMember()">
             <el-button type="primary" text @click="handleRemoveMember(row)"><MkIcon name="icon_assigned_outlined" /></el-button>
           </MkTooltip>
         </template>
       </el-table-column>
       <template #footer-batch-actions>
-        <el-button v-if="perm.system.role.removeMember()" type="danger" plain @click="handleBatchDelete">移除</el-button>
+        <!-- 批量移除角色成员 -->
+        <el-button v-if="perm.system.role.removeMember()" type="danger" plain @click="handleBatchDelete">{{ t('common.actions.remove') }}</el-button>
       </template>
     </MkTable>
   </div>

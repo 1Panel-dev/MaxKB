@@ -36,23 +36,23 @@ const userForm = reactive<SystemUserPayload>({
   user_group_ids: [],
 })
 
-const drawerTitle = computed(() => t(isEdit.value ? 'system.user.editTitle' : 'system.user.createTitle'))
+const drawerTitle = computed(() => t(isEdit.value ? 'user.editTitle' : 'user.createTitle'))
 const submitText = computed(() => t(isEdit.value ? 'common.actions.save' : 'common.actions.create'))
 
 const userFormRules = computed<FormRules<SystemUserPayload>>(() => ({
   username: [
-    { whitespace: true, required: true, message: t('system.user.username.requiredMessage'), trigger: 'blur' },
+    { whitespace: true, required: true, message: t('user.username.requiredMessage'), trigger: 'blur' },
     { min: 4, max: 64, message: t('common.validation.lengthRange', { min: 4, max: 64 }), trigger: 'blur' },
   ],
   nick_name: [
-    { whitespace: true, required: true, message: t('system.user.name.requiredMessage'), trigger: 'blur' },
+    { whitespace: true, required: true, message: t('user.name.requiredMessage'), trigger: 'blur' },
     { min: 1, max: 64, message: t('common.validation.lengthRange', { min: 1, max: 64 }), trigger: 'blur' },
   ],
   email: [
-    { whitespace: true, required: true, message: t('system.user.email.requiredMessage'), trigger: 'blur' },
-    { type: 'email', message: t('system.user.email.invalidMessage'), trigger: 'blur' },
+    { whitespace: true, required: true, message: t('user.email.requiredMessage'), trigger: 'blur' },
+    { type: 'email', message: t('user.email.invalidMessage'), trigger: 'blur' },
   ],
-  phone: [{ pattern: /^1[3-9]\d{9}$/, message: t('system.user.phone.invalidMessage'), trigger: 'blur' }],
+  phone: [{ pattern: /^1[3-9]\d{9}$/, message: t('user.phone.invalidMessage'), trigger: 'blur' }],
 }))
 
 // 角色与工作空间选项
@@ -219,29 +219,29 @@ defineExpose({ open })
     >
       <section>
         <h4 class="mk-title-decoration mb-4">{{ t('common.labels.basicInfo') }}</h4>
-        <el-form-item :label="t('system.user.username.label')" prop="username">
+        <el-form-item :label="t('user.username.label')" prop="username">
           <el-input
             v-model="userForm.username"
             :disabled="isEdit"
             maxlength="64"
             minlength="4"
-            :placeholder="t('system.user.username.placeholder')"
+            :placeholder="t('user.username.placeholder')"
             show-word-limit
           />
         </el-form-item>
-        <el-form-item :label="t('system.user.name.label')" prop="nick_name">
-          <el-input v-model="userForm.nick_name" maxlength="64" :placeholder="t('system.user.name.placeholder')" show-word-limit />
+        <el-form-item :label="t('user.name.label')" prop="nick_name">
+          <el-input v-model="userForm.nick_name" maxlength="64" :placeholder="t('user.name.placeholder')" show-word-limit />
         </el-form-item>
 
-        <el-form-item :label="t('system.user.email.label')" prop="email">
-          <el-input v-model="userForm.email" type="email" :placeholder="t('system.user.email.placeholder')" />
+        <el-form-item :label="t('user.email.label')" prop="email">
+          <el-input v-model="userForm.email" type="email" :placeholder="t('user.email.placeholder')" />
         </el-form-item>
 
-        <el-form-item :label="t('system.user.phone.label')" prop="phone">
-          <el-input v-model="userForm.phone" maxlength="11" :placeholder="t('system.user.phone.placeholder')" />
+        <el-form-item :label="t('user.phone.label')" prop="phone">
+          <el-input v-model="userForm.phone" maxlength="11" :placeholder="t('user.phone.placeholder')" />
         </el-form-item>
 
-        <el-form-item v-if="!isEdit" :label="t('system.user.password.defaultLabel')">
+        <el-form-item v-if="!isEdit" :label="t('user.password.defaultLabel')">
           <el-input v-model="userForm.password" readonly>
             <template #suffix>
               <!-- 复制默认密码 -->
@@ -253,18 +253,18 @@ defineExpose({ open })
         </el-form-item>
       </section>
       <section v-if="auth.isEE || auth.isPE">
-        <h4 class="mk-title-decoration mb-4 mt-4">{{ t('system.user.role.settingsTitle') }}</h4>
-        <MkFormList v-model="userForm.role_setting" :add-text="t('system.user.role.add')" :default-item="{ role_id: '', workspace_ids: [] }">
+        <h4 class="mk-title-decoration mb-4 mt-4">{{ t('user.role.settingsTitle') }}</h4>
+        <MkFormList v-model="userForm.role_setting" :add-text="t('user.role.add')" :default-item="{ role_id: '', workspace_ids: [] }">
           <template #default="{ index, item: roleAssignment }">
             <el-form-item
               class="flex-1 small"
-              :label="index === 0 ? t('system.user.role.label') : ''"
+              :label="index === 0 ? t('user.role.label') : ''"
               :prop="`role_setting.${index}.role_id`"
-              :rules="{ required: true, message: t('system.user.role.requiredMessage'), trigger: 'change' }"
+              :rules="{ required: true, message: t('user.role.requiredMessage'), trigger: 'change' }"
             >
               <el-select
                 v-model="roleAssignment.role_id"
-                :placeholder="t('system.user.role.placeholder')"
+                :placeholder="t('user.role.placeholder')"
                 :loading="roleSettingOptionsLoading"
                 clearable
                 filterable
@@ -290,12 +290,12 @@ defineExpose({ open })
               :rules="
                 isAdminRole(roleAssignment.role_id)
                   ? []
-                  : { required: true, type: 'array', min: 1, message: t('system.user.workspace.requiredMessage'), trigger: 'change' }
+                  : { required: true, type: 'array', min: 1, message: t('user.workspace.requiredMessage'), trigger: 'change' }
               "
             >
               <el-select
                 v-model="roleAssignment.workspace_ids"
-                :placeholder="isAdminRole(roleAssignment.role_id) ? '' : t('system.user.workspace.placeholder')"
+                :placeholder="isAdminRole(roleAssignment.role_id) ? '' : t('user.workspace.placeholder')"
                 :loading="roleSettingOptionsLoading"
                 :disabled="isAdminRole(roleAssignment.role_id)"
                 :validate-event="!isAdminRole(roleAssignment.role_id)"
@@ -320,7 +320,7 @@ defineExpose({ open })
         </MkFormList>
       </section>
       <section v-if="showUserGroup">
-        <h4 class="mk-title-decoration mb-4 mt-4">{{ t('system.user.userGroup.label') }}</h4>
+        <h4 class="mk-title-decoration mb-4 mt-4">{{ t('userGroup.title') }}</h4>
         <UserGroupSetting v-model="userForm.user_group_ids" :workspace-ids="selectedWorkspaceIds" :workspace-options="workspaceOptions" />
       </section>
     </el-form>

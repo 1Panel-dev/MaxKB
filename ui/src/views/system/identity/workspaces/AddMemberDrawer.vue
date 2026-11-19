@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { CreateWorkspaceMemberPayload, ListItem, SystemUserOption, WorkspaceItem } from '@/api/types'
 import type { FormInstance } from 'element-plus'
 import { ROLE_TYPE } from '@/api/enums'
@@ -13,6 +14,7 @@ defineOptions({ name: 'AddWorkspaceMemberDrawer' })
 const props = defineProps<{ currentWorkspace?: WorkspaceItem }>()
 
 const emit = defineEmits<{ refresh: [workspaceId: string] }>()
+const { t } = useI18n({ useScope: 'global' })
 
 const visible = ref(false)
 const loading = ref(false)
@@ -68,7 +70,7 @@ function submit() {
       memberForm.members.map((member) => ({ role_ids: [...member.role_ids], user_ids: [...member.user_ids] })),
     )
       .then(() => {
-        MsgSuccess('添加成功')
+        MsgSuccess(t('common.messages.addSuccess'))
         emit('refresh', workspaceId)
         visible.value = false
       })
@@ -92,15 +94,22 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="添加成员" @closed="resetData">
-    <el-form ref="formRef" :model="memberForm" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <MkFormList v-model="memberForm.members" add-text="添加成员" :default-item="{ role_ids: [], user_ids: [] }">
+  <MkDrawer v-model="visible" :title="t('system.member.add')" @closed="resetData">
+    <el-form
+      ref="formRef"
+      :model="memberForm"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <MkFormList v-model="memberForm.members" :add-text="t('system.member.add')" :default-item="{ role_ids: [], user_ids: [] }">
         <template #default="{ index, item: memberSetting }">
           <el-form-item
             class="flex-1 small"
-            :label="index === 0 ? '成员' : ''"
+            :label="index === 0 ? t('system.member.label') : ''"
             :prop="`members.${index}.user_ids`"
-            :rules="{ required: true, type: 'array', min: 1, message: '请选择成员', trigger: 'change' }"
+            :rules="{ required: true, type: 'array', min: 1, message: t('system.member.requiredMessage'), trigger: 'change' }"
           >
             <el-select
               v-model="memberSetting.user_ids"
@@ -111,7 +120,7 @@ defineExpose({ open })
               filterable
               fit-input-width
               multiple
-              placeholder="请选择成员"
+              :placeholder="t('system.member.placeholder')"
               remote
               :reserve-keyword="false"
             >
@@ -127,9 +136,9 @@ defineExpose({ open })
 
           <el-form-item
             class="flex-1 small"
-            :label="index === 0 ? '角色' : ''"
+            :label="index === 0 ? t('user.role.label') : ''"
             :prop="`members.${index}.role_ids`"
-            :rules="{ required: true, type: 'array', min: 1, message: '请选择角色', trigger: 'change' }"
+            :rules="{ required: true, type: 'array', min: 1, message: t('user.role.requiredMessage'), trigger: 'change' }"
           >
             <el-select
               v-model="memberSetting.role_ids"
@@ -139,7 +148,7 @@ defineExpose({ open })
               filterable
               fit-input-width
               multiple
-              placeholder="请选择角色"
+              :placeholder="t('user.role.placeholder')"
               :reserve-keyword="false"
             >
               <el-option
@@ -156,8 +165,10 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" :loading="loading" @click="submit">添加</el-button>
+      <!-- 取消添加成员 -->
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 添加工作空间成员 -->
+      <el-button type="primary" :loading="loading" @click="submit">{{ t('common.actions.add') }}</el-button>
     </template>
   </MkDrawer>
 </template>

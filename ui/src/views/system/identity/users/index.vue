@@ -34,14 +34,14 @@ const systemUsersData = ref<SystemUser[]>([])
 const orderBy = ref<string>()
 
 const searchFields = computed<OptionItem<string>[]>(() => [
-  { label: t('system.user.name.label'), value: 'nick_name' },
-  { label: t('system.user.username.label'), value: 'username' },
-  { label: t('system.user.email.label'), value: 'email' },
+  { label: t('user.name.label'), value: 'nick_name' },
+  { label: t('user.username.label'), value: 'username' },
+  { label: t('user.email.label'), value: 'email' },
 ])
 const systemUserSearchQuery = ref<Dict<unknown>>()
 const userSourceLabels = computed<Record<LoginMethod, string>>(() => ({
   ...LOGIN_METHOD_LABELS,
-  [LOGIN_METHOD.LOCAL]: t('system.user.source.local'),
+  [LOGIN_METHOD.LOCAL]: t('user.source.local'),
   [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
   [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
   [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
@@ -105,7 +105,7 @@ function handleChangeStatus(systemUser: SystemUser) {
 
 /* 删除用户*/
 function deleteUser(user: SystemUser) {
-  MsgConfirm(`${t('system.user.delete.title')}: ${user.username}?`, t('system.user.delete.description'))
+  MsgConfirm(`${t('user.delete.title')}: ${user.username}?`, t('user.delete.description'))
     .then(() => {
       systemUsersLoading.value = true
       return UserManageApi.deleteUser(user.id).then(() => {
@@ -126,7 +126,7 @@ function handleBatchSelectionChange(selection: unknown[]) {
 }
 function handleBatchDelete() {
   const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
-  MsgConfirm(`${t('system.user.delete.batchTitle', { count: batchSelectedUsers.value.length }, batchSelectedUsers.value.length)}?`)
+  MsgConfirm(`${t('user.delete.batchTitle', { count: batchSelectedUsers.value.length }, batchSelectedUsers.value.length)}?`)
     .then(() => {
       systemUsersLoading.value = true
 
@@ -147,7 +147,7 @@ onMounted(() => loadSystemUsers())
 </script>
 
 <template>
-  <MkViewLayout :title="t('system.user.title')" class="system-identity-users">
+  <MkViewLayout :title="t('user.title')" class="system-identity-users">
     <template #default="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -161,7 +161,7 @@ onMounted(() => loadSystemUsers())
           <!-- 创建用户 -->
           <el-button v-if="perm.system.user.create()" type="primary" @click="handleOpenUserFormDrawer()">
             <MkIcon name="icon_add_outlined" />
-            <span>{{ t('system.user.createTitle') }}</span>
+            <span>{{ t('user.createTitle') }}</span>
           </el-button>
         </div>
       </component>
@@ -177,14 +177,14 @@ onMounted(() => loadSystemUsers())
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="40" />
-        <el-table-column prop="nick_name" :label="t('system.user.name.label')" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="username" :label="t('system.user.username.label')" min-width="150" show-overflow-tooltip />
-        <el-table-column width="140" :label="t('system.user.activeStatus')">
+        <el-table-column prop="nick_name" :label="t('user.name.label')" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="username" :label="t('user.username.label')" min-width="150" show-overflow-tooltip />
+        <el-table-column width="140" :label="t('user.activeStatus')">
           <template #header>
             <MkTableFilter
               mode="single"
               v-model="selectedStatus"
-              :label="t('system.user.activeStatus')"
+              :label="t('user.activeStatus')"
               :options="[
                 { label: t('common.status.enabled'), value: true },
                 { label: t('common.status.disabled'), value: false },
@@ -197,24 +197,24 @@ onMounted(() => loadSystemUsers())
           </template>
         </el-table-column>
 
-        <el-table-column prop="email" :label="t('system.user.email.label')" show-overflow-tooltip min-width="180">
+        <el-table-column prop="email" :label="t('user.email.label')" show-overflow-tooltip min-width="180">
           <template #default="{ row }">
             {{ row.email || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="phone" width="120" :label="t('system.user.phone.label')">
+        <el-table-column prop="phone" width="120" :label="t('user.phone.label')">
           <template #default="{ row }">
             {{ row.phone || '-' }}
           </template>
         </el-table-column>
 
-        <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" :label="t('system.user.role.label')">
+        <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" :label="t('user.role.label')">
           <template #default="{ row }">
             <span v-if="!row.role_workspace?.length">-</span>
             <WorkspaceRelationTags
               v-else
               :columns="[
-                { prop: 'role_name', label: t('system.user.role.label') },
+                { prop: 'role_name', label: t('user.role.label') },
                 { prop: 'workspace', label: t('workspace.title') },
               ]"
               :tags="row.role_name"
@@ -223,13 +223,13 @@ onMounted(() => loadSystemUsers())
           </template>
         </el-table-column>
 
-        <el-table-column prop="user_group_names" width="180" :label="t('system.user.userGroup.label')">
+        <el-table-column prop="user_group_names" width="180" :label="t('userGroup.title')">
           <template #default="{ row }">
             <span v-if="!row.user_group_names?.length">-</span>
             <WorkspaceRelationTags
               v-else
               :columns="[
-                { prop: 'user_group_names', label: t('system.user.userGroup.label') },
+                { prop: 'user_group_names', label: t('userGroup.title') },
                 { prop: 'workspace', label: t('workspace.title') },
               ]"
               :tags="row.user_group_names"
@@ -238,12 +238,12 @@ onMounted(() => loadSystemUsers())
           </template>
         </el-table-column>
 
-        <el-table-column width="120" :label="t('system.user.source.label')">
+        <el-table-column width="120" :label="t('user.source.label')">
           <template #header>
             <MkTableFilter
               mode="single"
               v-model="selectedSource"
-              :label="t('system.user.source.label')"
+              :label="t('user.source.label')"
               :options="sourceFilterOptions"
               @change="handleHeaderFilterChange"
             />

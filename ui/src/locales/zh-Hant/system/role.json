@@ -1,0 +1,31 @@
+{
+  "title": "角色管理",
+  "createTitle": "建立角色",
+  "renameTitle": "重新命名角色",
+  "internalLabel": "系",
+  "name": {
+    "label": "角色名稱",
+    "placeholder": "請輸入角色名稱",
+    "requiredMessage": "請輸入角色名稱"
+  },
+  "inheritedRole": {
+    "label": "繼承角色",
+    "requiredMessage": "請選擇繼承角色"
+  },
+  "types": {
+    "admin": "系統管理員",
+    "workspaceAdmin": "工作空間管理員",
+    "user": "一般使用者"
+  },
+  "permission": {
+    "title": "權限設定",
+    "label": "權限",
+    "category": "分類",
+    "module": "模組名稱",
+    "target": "操作對象"
+  },
+  "delete": {
+    "title": "是否刪除角色",
+    "description": "刪除後，該角色下的成員都會被移除，請謹慎操作。"
+  }
+}

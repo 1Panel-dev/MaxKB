@@ -19,7 +19,7 @@ function handleOpenDialog() {
 
 <template>
   <!-- 修改用户密码 -->
-  <MkTooltip :content="t('system.user.password.changeTitle')" placement="top">
+  <MkTooltip :content="t('user.password.changeTitle')" placement="top">
     <el-button type="primary" text @click.stop="handleOpenDialog">
       <MkIcon name="icon-key_outlined" />
     </el-button>

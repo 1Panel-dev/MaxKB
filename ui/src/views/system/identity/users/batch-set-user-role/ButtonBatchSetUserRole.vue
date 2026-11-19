@@ -18,6 +18,6 @@ function handleOpenDialog() {
 
 <template>
   <!-- 批量设置用户角色 -->
-  <el-button type="primary" plain @click="handleOpenDialog">{{ t('system.user.role.set') }}</el-button>
+  <el-button type="primary" plain @click="handleOpenDialog">{{ t('user.role.set') }}</el-button>
   <BatchSetUserRoleDialog ref="dialogRef" @refresh="emit('refresh')" />
 </template>

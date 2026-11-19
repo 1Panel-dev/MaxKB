@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatUserGroupMember, Dict, ListItem, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import ChatGroupsApi from '@/api/admin/system/chat-management/chat-user-groups.ts'
@@ -8,6 +9,8 @@ import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
+
+const { t } = useI18n({ useScope: 'global' })
 
 /* 添加用户组表单dialog */
 const groupDialogRef = useTemplateRef<InstanceType<typeof CreateOrUpdateGroupDialog>>('groupDialogRef')
@@ -191,7 +194,7 @@ onMounted(() => loadChatUserGroups())
             <!-- 添加成员 -->
             <el-button v-if="perm.system.chatUserGroup.addMember()" type="primary" @click="handleOpenMemberDialog">
               <MkIcon name="icon_add_outlined" />
-              <span>添加成员</span>
+              <span>{{ t('system.member.add') }}</span>
             </el-button>
           </div>
 

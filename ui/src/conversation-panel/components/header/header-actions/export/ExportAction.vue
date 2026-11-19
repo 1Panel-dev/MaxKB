@@ -74,8 +74,8 @@ async function previewPdf() {
       <!-- 桌面端导出图标入口 -->
       <span v-else class="inline-flex">
         <MkTooltip content="导出">
-          <el-button text :disabled="disabled" :loading="loading" class="[&_.mk-icon]:text-N900! [&.is-disabled_.mk-icon]:text-N400!">
-            <MkIcon name="icon_export_outlined" :size="18" />
+          <el-button text :disabled="disabled" :loading="loading">
+            <MkIcon name="icon_export_outlined" :size="18" :class="disabled ? 'text-N400!' : 'text-N900!'" />
           </el-button>
         </MkTooltip>
       </span>

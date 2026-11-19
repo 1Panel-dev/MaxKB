@@ -1,0 +1,17 @@
+{
+  "menu": {
+    "identity": "Identity and access",
+    "resourceManagement": "Resource management",
+    "sharedResources": "Shared resources",
+    "chatManagement": "Chat management",
+    "settings": "System settings"
+  },
+  "member": {
+    "label": "Members",
+    "placeholder": "Select members",
+    "requiredMessage": "Select members",
+    "add": "Add members",
+    "removeTitle": "Remove member",
+    "batchRemoveTitle": "Remove the {count} selected member | Remove the {count} selected members"
+  }
+}

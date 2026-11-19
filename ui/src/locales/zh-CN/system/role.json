@@ -1,0 +1,31 @@
+{
+  "title": "角色管理",
+  "createTitle": "创建角色",
+  "renameTitle": "重命名角色",
+  "internalLabel": "系",
+  "name": {
+    "label": "角色名称",
+    "placeholder": "请输入角色名称",
+    "requiredMessage": "请输入角色名称"
+  },
+  "inheritedRole": {
+    "label": "继承角色",
+    "requiredMessage": "请选择继承角色"
+  },
+  "types": {
+    "admin": "系统管理员",
+    "workspaceAdmin": "工作空间管理员",
+    "user": "普通用户"
+  },
+  "permission": {
+    "title": "权限配置",
+    "label": "权限",
+    "category": "分类",
+    "module": "模块名称",
+    "target": "操作对象"
+  },
+  "delete": {
+    "title": "是否删除角色",
+    "description": "删除后，该角色下的成员都会被移除，请谨慎操作。"
+  }
+}

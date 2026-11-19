@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatUserSyncConflict, ListItem, LoginMethod, SystemUserGroup } from '@/api/types'
 import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
@@ -16,6 +17,7 @@ defineOptions({ name: 'ImportUsersDialog' })
 const emit = defineEmits<{ refresh: [] }>()
 
 const { auth } = useStore()
+const { t } = useI18n({ useScope: 'global' })
 
 const LOCAL_FILE_SOURCE = 'LOCAL_FILE' as const
 const DEFAULT_WORKSPACE_ID = 'default'
@@ -41,9 +43,7 @@ const importUsersFormRef = ref<FormInstance>()
 const dragUploadRef = ref<InstanceType<typeof MkDragUpload>>()
 const importUsersForm = reactive<ImportUsersForm>({ files: [], role: '', source: '', userGroupIds: [], workspaceId: '' })
 const isLocalFileSource = computed(() => importUsersForm.source === LOCAL_FILE_SOURCE)
-const selectedRoleType = computed(
-  () => assignableRoles.value.find((role) => role.id === importUsersForm.role)?.type,
-)
+const selectedRoleType = computed(() => assignableRoles.value.find((role) => role.id === importUsersForm.role)?.type)
 const showWorkspace = computed(() => Boolean(importUsersForm.role) && selectedRoleType.value !== ROLE_TYPE.ADMIN)
 const showUserGroups = computed(() => selectedRoleType.value === ROLE_TYPE.USER)
 const canImport = computed(
@@ -54,16 +54,27 @@ const canImport = computed(
     (!isLocalFileSource.value || importUsersForm.files.length > 0),
 )
 
-const importUsersFormRules: FormRules<ImportUsersForm> = {
-  files: [{ required: true, type: 'array', min: 1, message: '请上传文件', trigger: 'change' }],
-  role: [{ required: true, message: '请选择角色', trigger: 'change' }],
-  source: [{ required: true, message: '请选择用户来源', trigger: 'change' }],
-  workspaceId: [{ required: true, message: '请选择工作空间', trigger: 'change' }],
-}
+const importUsersFormRules = computed<FormRules<ImportUsersForm>>(() => ({
+  files: [{ required: true, type: 'array', min: 1, message: t('upload.requiredMessage'), trigger: 'change' }],
+  role: [{ required: true, message: t('user.role.requiredMessage'), trigger: 'change' }],
+  source: [{ required: true, message: t('user.source.requiredMessage'), trigger: 'change' }],
+  workspaceId: [{ required: true, message: t('user.workspace.requiredMessage'), trigger: 'change' }],
+}))
 
 /* 可导入来源、角色、工作空间与用户组选项 */
 const sourcesLoading = ref(false)
-const sourceOptions = ref<{ label: string; value: string }[]>([])
+const sourceTypes = ref<string[]>([])
+const userSourceLabels = computed<Record<LoginMethod | typeof LOCAL_FILE_SOURCE, string>>(() => ({
+  ...LOGIN_METHOD_LABELS,
+  [LOGIN_METHOD.LOCAL]: t('user.source.local'),
+  [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
+  [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
+  [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
+  [LOCAL_FILE_SOURCE]: t('user.source.localFile'),
+}))
+const sourceOptions = computed(() =>
+  sourceTypes.value.map((source) => ({ label: userSourceLabels.value[source as keyof typeof userSourceLabels.value] ?? source, value: source })),
+)
 const rolesLoading = ref(false)
 const assignableRoles = ref<ListItem[]>([])
 const workspaceLoading = ref(false)
@@ -75,10 +86,7 @@ function loadSourceOptions() {
   sourcesLoading.value = true
   return UserManageApi.getUserManageSyncTypes()
     .then((types) => {
-      sourceOptions.value = [
-        ...types.map((source) => ({ label: source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[source as LoginMethod], value: source })),
-        { label: '本地文件', value: LOCAL_FILE_SOURCE },
-      ]
+      sourceTypes.value = [...types, LOCAL_FILE_SOURCE]
       importUsersForm.source = (sourceOptions.value[0]?.value as ImportUserSource) || ''
     })
     .finally(() => {
@@ -103,7 +111,7 @@ function loadRoleOptions() {
 function loadWorkspaceOptions() {
   workspaceLoading.value = true
   if (!auth.isEE) {
-    workspaceOptions.value = [{ id: DEFAULT_WORKSPACE_ID, name: '默认工作空间' }]
+    workspaceOptions.value = [{ id: DEFAULT_WORKSPACE_ID, name: t('workspace.default') }]
     handleWorkspaceChange(importUsersForm.workspaceId || DEFAULT_WORKSPACE_ID)
     workspaceLoading.value = false
     return Promise.resolve()
@@ -172,7 +180,7 @@ function handleFileChange(file: UploadFile) {
   if (!/\.xlsx$/i.test(file.name)) {
     importUsersForm.files = []
     dragUploadRef.value?.clearFiles()
-    MsgWarning('仅支持上传 xlsx 格式的文件')
+    MsgWarning(t('user.import.formatMessage'))
     return
   }
 
@@ -190,16 +198,14 @@ function handleDownloadTemplate() {
 }
 
 function conflictTypeLabel(type: ChatUserSyncConflict['type']) {
-  if (type === 'username') return '用户名已存在'
-  if (type === 'email') return '邮箱已存在'
-  if (type === 'nick_name') return '姓名已存在'
-  return `${type} 冲突`
+  if (type === 'username') return t('user.username.existsMessage')
+  if (type === 'email') return t('user.email.existsMessage')
+  if (type === 'nick_name') return t('user.name.existsMessage')
+  return t('user.import.conflictMessage', { type })
 }
 
 function formatConflictMessage(conflicts: ChatUserSyncConflict[]) {
-  return conflicts
-    .map((conflict) => `${conflictTypeLabel(conflict.type)}：${conflict.users.join('、')}`)
-    .join('；')
+  return conflicts.map((conflict) => `${conflictTypeLabel(conflict.type)}：${conflict.users.join('、')}`).join('；')
 }
 
 function submitImportUsers() {
@@ -221,8 +227,10 @@ function submitImportUsers() {
         const conflictUsers = result.conflict_users ?? []
         const skippedCount = conflictUsers.reduce((sum, conflict) => sum + conflict.users.length, 0)
         const conflictMessage = formatConflictMessage(conflictUsers)
-        const skipText = skippedCount > 0 ? `，跳过 ${skippedCount} 个用户` : ''
-        MsgSuccess(`成功导入 ${result.success_count} 个用户${skipText}${conflictMessage ? `，${conflictMessage}` : ''}`)
+        const skipText = skippedCount > 0 ? `，${t('user.import.skippedMessage', { count: skippedCount }, skippedCount)}` : ''
+        MsgSuccess(
+          `${t('user.import.successMessage', { count: result.success_count }, result.success_count)}${skipText}${conflictMessage ? `，${conflictMessage}` : ''}`,
+        )
         emit('refresh')
         dialogVisible.value = false
       })
@@ -239,7 +247,7 @@ function open() {
 
 function resetData() {
   Object.assign(importUsersForm, { files: [], role: '', source: '', userGroupIds: [], workspaceId: '' })
-  sourceOptions.value = []
+  sourceTypes.value = []
   assignableRoles.value = []
   workspaceOptions.value = []
   userGroupOptions.value = []
@@ -256,19 +264,25 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="导入用户" @closed="resetData">
-    <template #subtitle>仅导入新增用户</template>
+  <MkDialog v-model="dialogVisible" :title="t('user.import.title')" @closed="resetData">
+    <template #subtitle>{{ t('user.import.onlyNewHint') }}</template>
 
     <el-form
       ref="importUsersFormRef"
       :model="importUsersForm"
       :rules="importUsersFormRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent="submitImportUsers"
     >
-      <el-form-item label="用户来源" prop="source">
-        <el-select v-model="importUsersForm.source" placeholder="请选择" :loading="sourcesLoading" @change="handleSourceChange">
+      <el-form-item :label="t('user.source.label')" prop="source">
+        <el-select
+          v-model="importUsersForm.source"
+          :placeholder="t('common.placeholders.select')"
+          :loading="sourcesLoading"
+          @change="handleSourceChange"
+        >
           <el-option v-for="sourceOption in sourceOptions" :key="sourceOption.value" :label="sourceOption.label" :value="sourceOption.value" />
         </el-select>
       </el-form-item>
@@ -276,22 +290,23 @@ defineExpose({ open })
       <el-form-item v-if="isLocalFileSource" prop="files" class="mk-hide-asterisk">
         <template #label>
           <div class="flex-between w-full">
-            <span class="mk-required">上传文件</span>
-            <el-button link type="primary" @click="handleDownloadTemplate">下载模板</el-button>
+            <span class="mk-required">{{ t('common.actions.uploadFiles') }}</span>
+            <!-- 下载用户导入模板 -->
+            <el-button link type="primary" @click="handleDownloadTemplate">{{ t('user.import.downloadTemplate') }}</el-button>
           </div>
         </template>
         <MkDragUpload
           ref="dragUploadRef"
           v-model="importUsersForm.files"
           accept=".xlsx"
-          tip-text="支持格式：xlsx"
+          :tip-text="`${t('upload.formats')}: xlsx`"
           @change="handleFileChange"
           @remove="handleFileRemove"
         />
       </el-form-item>
 
-      <el-form-item label="角色" prop="role">
-        <el-select v-model="importUsersForm.role" placeholder="请选择角色" :loading="rolesLoading" @change="handleRoleChange">
+      <el-form-item :label="t('user.role.label')" prop="role">
+        <el-select v-model="importUsersForm.role" :placeholder="t('user.role.placeholder')" :loading="rolesLoading" @change="handleRoleChange">
           <el-option
             v-for="roleOption in assignableRoles"
             :key="roleOption.id"
@@ -302,24 +317,24 @@ defineExpose({ open })
         </el-select>
       </el-form-item>
 
-      <el-form-item v-if="showWorkspace" label="工作空间" prop="workspaceId">
+      <el-form-item v-if="showWorkspace" :label="t('workspace.title')" prop="workspaceId">
         <el-select
           :model-value="importUsersForm.workspaceId"
           :loading="workspaceLoading"
-          placeholder="请选择工作空间"
+          :placeholder="t('user.workspace.placeholder')"
           @change="handleWorkspaceChange"
         >
           <el-option
             v-for="workspaceOption in workspaceOptions"
             :key="workspaceOption.id"
-            :label="workspaceOption.name"
+            :label="!auth.isEE && workspaceOption.id === DEFAULT_WORKSPACE_ID ? t('workspace.default') : workspaceOption.name"
             :value="workspaceOption.id"
           />
         </el-select>
       </el-form-item>
 
-      <el-form-item v-if="showUserGroups" label="用户组" prop="userGroupIds">
-        <el-select v-model="importUsersForm.userGroupIds" :loading="userGroupLoading" multiple placeholder="请选择用户组">
+      <el-form-item v-if="showUserGroups" :label="t('userGroup.title')" prop="userGroupIds">
+        <el-select v-model="importUsersForm.userGroupIds" :loading="userGroupLoading" multiple :placeholder="t('userGroup.placeholder')">
           <el-option
             v-for="userGroupOption in userGroupOptions"
             :key="userGroupOption.id"
@@ -331,8 +346,10 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" :loading="importing" :disabled="!canImport" @click="submitImportUsers">导入</el-button>
+      <!-- 取消导入用户 -->
+      <el-button plain @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 导入所选来源的用户 -->
+      <el-button type="primary" :loading="importing" :disabled="!canImport" @click="submitImportUsers">{{ t('common.actions.import') }}</el-button>
     </template>
   </MkDialog>
 </template>

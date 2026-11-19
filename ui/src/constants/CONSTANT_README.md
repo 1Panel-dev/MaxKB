@@ -13,7 +13,8 @@
 
 后端枚举与类型归属统一见 [API_README.md](../api/API_README.md#枚举与类型组织)。`constants` 只维护标签、颜色、选项等前端映射；映射的键应引用
 API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一数据源，`constants/auth.ts`
-只维护它们的展示文案。
+只维护它们的展示文案或翻译 key 映射。
+其中 `ROLE_TYPE_MESSAGE_KEYS` 按 `ROLE_TYPE` 映射到 `role.types`，角色列表分组和继承角色选项在展示时直接调用 `t`；不在常量内保存当前语言的译文，不改变角色类型的协议值。
 
 知识库类型的接口值保持为 `KNOWLEDGE_TYPE` 中的数字。`constants/knowledge.ts` 提供
 `KNOWLEDGE_TYPE_MAP`，将数字转换为 `BASE`、`WEB`、`LARK`、`WORKFLOW` 字符串，
