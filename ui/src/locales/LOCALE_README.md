@@ -25,7 +25,8 @@
 | chat        | 对话输入、消息操作、历史会话与对话状态           |
 | workspace   | 工作空间、成员、空间级设置                       |
 | user        | 系统用户属性、用户管理及角色分配                 |
-| userGroup   | 系统用户组、组成员及继承权限说明                 |
+| userGroup   | 系统与对话用户组、组成员、分配及继承权限说明     |
+| chatUser    | 对话用户管理、本地来源及 Token 配额              |
 | role        | 系统角色管理、角色类型及权限配置                 |
 | system      | 系统分组菜单及系统管理内共用文案                 |
 
@@ -46,7 +47,8 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 不同可以使用不同 key。通用添加、编辑、删除、取消、保存和上传文件操作归 common.actions，
 仅有展示文案的通用标签归 common.labels，例如“创建者”和“操作”。名称与描述直接归 common.name 和 common.description，
 字段的 label、placeholder 和实际使用的 requiredMessage 放在一起，表单、表头和筛选器共用 label。
-`common.status` 维护状态标签 `label`、通用启停选项 `enabled` / `disabled`，以及排队、执行、成功、失败、取消中和已取消等通用状态。
+`common.status` 维护状态标签 `label`、启用状态标签 `activeLabel`、通用启停选项 `enabled` / `disabled`，以及排队、执行、成功、失败、取消中和已取消等通用状态。
+用户、文档和图片中的“启用状态”统一使用 `common.status.activeLabel`，英文为 `Enabled status`；标签表示 `is_active` 的启用／禁用状态。
 文档、同步日志和执行记录复用这些状态文案；索引中、生成中、同步中、触发失败等专属文案保留在所属业务。
 “执行成功／执行失败”等完整结果提示保留业务含义，不替换为“成功／失败”。
 创建时间与更新时间使用 `common.labels.createTime` / `updateTime`，英文为 `Create time` / `Update time`；卡片中“创建于”的说明使用 `common.labels.createdOn`。
@@ -88,7 +90,7 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 
 - 同一语言包的键按含义分组，简体、繁体和英文采用相同的排列顺序，方便逐项对照。
 - `common.json` 的顶层顺序为 `labels` → `name` → `description` → `status` → `dateRange` → `schedule` → `parameters` → `actions` → `dialogs` → `messages` → `placeholders` → `validation` → `empty`。
-- 字段内先放 `label`，再放 `placeholder`，最后放 `requiredMessage` 等校验提示。状态组先放 `label`，再放 `enabled`、`disabled`。其他组沿用现有顺序。
+- 字段内先放 `label`，再放 `placeholder`，最后放 `requiredMessage` 等校验提示。状态组先放 `label`、`activeLabel`，再放 `enabled`、`disabled`。其他组沿用现有顺序。
 
 ## 使用约定
 
@@ -243,7 +245,14 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 重复用户名、姓名及邮箱提示归各字段的 `existsMessage`。成功及跳过人数按实际数量选择单复数，冲突用户名称保留原文。
 导入来源选项在 computed 中翻译；非企业版的内置默认工作空间名称使用 `workspace.default`，接口返回的工作空间名称不替换。
 默认密码、新密码及修改结果归 `user.password`，确认密码及匹配校验归同级的 `user.confirmPassword`；
-角色设置入口、追加／替换方式归 `user.role`。
+角色设置入口归 `user.role`。用户角色与用户组分配的设置方式统一归 `user.assignment`，`label`、`append`、`replace` 分别维护设置方式、追加和替换；实际提交继续使用原有 `is_append` 布尔值。
+
+对话用户管理使用 `system/chat-user.json`，命名空间为 `chatUser`；菜单与列表共用 `chatUser.title`，本地创建来源归 `chatUser.source.local`，配额入口、用量、到期时间及不限标签归 `chatUser.quota`。
+创建／编辑标题、姓名、用户名、邮箱、手机号、默认密码和删除确认复用 `user`，操作、状态、日期及结果提示复用 `common`；来源筛选与表格在 computed 中使用同一组翻译，保留登录方式协议值和固定英文名称。
+对话用户修改密码复用 `user.password` 与 `user.confirmPassword`，密码长度提示复用 `common.validation.lengthRange`；批量用户组分配复用 `user.assignment`，保存按钮及成功提示复用 `common`。
+用量显示只翻译“不限”，数值与 `/` 在使用处组合。表单规则在 computed 中翻译，使用 `validate-on-rule-change=false`，切换语言保留筛选、选择和表单输入。
+配额设置的方式选项、周期及 Tokens 上限字段和校验归 `chatUser.quota`；周期前缀“每”与天／周／月单位复用 `common.schedule.every` 和 `common.schedule.units`，英文单位按当前周期数量选择单复数，周期数值直接由输入控件显示。按钮及保存成功提示复用 `common`，K 单位换算和配额请求参数沿用原有业务规则。
+对话用户导入的专属说明归 `chatUser.import.description`；标题、模板、文件格式要求及成功／跳过人数复用 `user.import`，冲突提示复用用户字段的 `existsMessage`，来源字段与选项复用 `user.source` 及登录方式文案。来源协议值单独保存，选项在 computed 中翻译，切换语言不重选来源或重新请求选项；用户组及冲突用户名称保留原文。结果中的人数按实际数量选择单复数，用户名列表和结果分隔使用当前语言的标点，不为单独标点新增翻译键。
 
 工作空间管理使用 `system/workspace.json`，菜单与列表标题使用 `workspace.title`，创建／重命名标题和名称字段归 `workspace`，
 删除工作空间与移除成员的专属文案统一归 `workspace.delete`：`title` / `description` 用于删除工作空间，`batchRemoveTitle` / `batchRemoveDescription` / `partialRemoveMessage` 用于按记录批量移除成员；成员单项移除标题复用 `system.member.removeTitle`。
@@ -251,10 +260,10 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 批量移除确认的完整说明使用 `workspace.delete.batchRemoveDescription`，通过 `{memberCount}` 和 `{recordCount}` 展示成员人数与记录数；句中标点随语言维护，成员人数仍按用户 ID 去重，关系记录沿用原有计数方式。
 搜索字段在 computed 中翻译；工作空间名称、成员姓名和角色名称按接口原文显示，不将实际名称替换为默认工作空间译文。
 
-系统用户组使用 `system/user-group.json`，命名空间为 `userGroup`。菜单、列表标题及用户表单中的用户组标签共用 `userGroup.title`，选择提示使用 `userGroup.placeholder`，不在 `user` 下重复维护。
-创建／重命名标题及名称字段归 `userGroup`，删除用户组与移除成员的专属说明统一归 `userGroup.delete`：`title` / `description` 用于删除用户组，`removeDescription` 用于移除成员时的继承权限回收说明；成员单项／批量移除标题复用 `system.member.removeTitle` / `batchRemoveTitle`。
+系统用户组和对话用户组统一使用 `system/user-group.json`，命名空间为 `userGroup`。系统用户组菜单、列表标题及各用户表单中的“用户组”标签共用 `userGroup.title`；明确显示“对话用户组”的菜单、列表标题及表头使用 `userGroup.chatTitle`。选择占位、必填提示和设置入口分别使用 `placeholder`、`requiredMessage`、`set`，实际用户组名称保留接口原文。
+创建／重命名标题及名称字段共用 `userGroup`，删除用户组与移除成员的说明统一归 `userGroup.delete`：确认标题共用 `title`，系统用户组的删除说明使用 `description`，对话用户组使用 `chatDescription`；移除成员时的继承权限回收说明共用 `removeDescription`。成员单项／批量移除标题复用 `system.member.removeTitle` / `batchRemoveTitle`，批量标题按实际人数处理单复数。
 成员列表的姓名、用户名、角色和来源标签复用 `user`，登录方式品牌名称复用 `auth.login.options`。搜索和来源选项在 computed 中翻译，保留协议值、顺序及筛选状态，未知来源和接口返回的名称展示原文。
-添加成员弹窗的“用户名/姓名”标签由 `user.username.label` 与 `user.name.label` 通过 `/` 组合，完整选择提示使用 `user.placeholder`，必填提示复用 `system.member.requiredMessage`；成员选项姓名保留接口原文，远程搜索和选项缓存沿用原有流程。
+系统用户组添加成员弹窗的“用户名/姓名”标签由 `user.username.label` 与 `user.name.label` 通过 `/` 组合，完整选择提示使用 `user.placeholder`，必填提示复用 `system.member.requiredMessage`；对话用户组添加成员弹窗的标签与必填提示分别使用 `chatUser.title`、`chatUser.requiredMessage`，选择占位同样复用 `user.placeholder`。添加成员标题均使用 `system.member.add`；成员选项姓名保留接口原文，远程搜索和已选用户缓存沿用原有流程。
 通用操作及结果提示复用 `common`；名称校验保留必填、空白检查和长度限制，语言切换不主动触发校验。
 
 角色管理使用 `system/role.json`，命名空间为 `role`。菜单与列表共用 `role.title`，创建／重命名标题、角色名称字段、继承角色说明、系统内置标记及删除确认归该业务域；权限配置页签标题使用 `role.permission.title`。

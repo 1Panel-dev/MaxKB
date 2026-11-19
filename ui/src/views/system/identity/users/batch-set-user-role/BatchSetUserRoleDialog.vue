@@ -124,10 +124,10 @@ defineExpose({ open })
       require-asterisk-position="right"
       @submit.prevent="submitBatchSetUserRoles"
     >
-      <el-form-item :label="t('user.role.methodLabel')">
+      <el-form-item :label="t('user.assignment.label')">
         <el-radio-group v-model="batchRoleForm.is_append">
-          <el-radio :value="true">{{ t('user.role.append') }}</el-radio>
-          <el-radio :value="false">{{ t('user.role.replace') }}</el-radio>
+          <el-radio :value="true">{{ t('user.assignment.append') }}</el-radio>
+          <el-radio :value="false">{{ t('user.assignment.replace') }}</el-radio>
         </el-radio-group>
       </el-form-item>
 

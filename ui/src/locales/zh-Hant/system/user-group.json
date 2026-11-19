@@ -1,16 +1,20 @@
 {
   "title": "使用者群組",
+  "chatTitle": "對話使用者群組",
   "createTitle": "建立使用者群組",
   "renameTitle": "重新命名使用者群組",
   "placeholder": "請選擇使用者群組",
+  "requiredMessage": "請選擇使用者群組",
   "name": {
     "label": "使用者群組名稱",
     "placeholder": "請輸入使用者群組名稱",
     "requiredMessage": "請輸入使用者群組名稱"
   },
+  "set": "設定使用者群組",
   "delete": {
     "title": "是否刪除使用者群組",
     "description": "刪除後，成員將被移出該使用者群組，透過該群組繼承的資源權限將被收回，請謹慎操作！",
+    "chatDescription": "刪除後，成員將被移出該使用者群組，請謹慎操作。",
     "removeDescription": "移除成員後，透過該使用者群組繼承的資源權限將被收回，請謹慎操作。"
   }
 }

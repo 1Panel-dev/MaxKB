@@ -183,6 +183,8 @@ Workspace 根据目标路由中的 workspaceId、knowledgeId 判断权限，权�
 智能体和知识库各资源范围的对话用户菜单共用 `resource.chatUserAuthorization.title`。
 工作空间触发器菜单与列表共用 `trigger.title`。
 系统用户管理菜单与列表共用 `user.title`。
+系统对话用户管理菜单与列表共用 `chatUser.title`。
+系统对话用户组菜单与列表共用 `userGroup.chatTitle`。
 系统角色管理菜单与列表共用 `role.title`。
 系统工作空间管理菜单与列表共用 `workspace.title`。
 系统用户组菜单与列表共用 `userGroup.title`。

@@ -5,6 +5,26 @@
     "byGroup": "按用户组",
     "byUser": "按用户"
   },
+  "permission": {
+    "label": "权限",
+    "operationLabel": "操作权限",
+    "configure": "配置权限",
+    "notAuthorized": {
+      "label": "不授权"
+    },
+    "view": {
+      "label": "查看",
+      "description": "仅能查看和使用该资源"
+    },
+    "manage": {
+      "label": "管理",
+      "description": "可对该资源进行删改操作"
+    },
+    "role": {
+      "label": "按用户角色",
+      "description": "根据用户角色中的权限授权用户对该资源的操作权限"
+    }
+  },
   "relations": {
     "title": "查看关联资源"
   },

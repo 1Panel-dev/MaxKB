@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatUserQuotaPayload, PeriodType, QuotaType } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { PERIOD_TYPE, QUOTA_TYPE } from '@/api/enums'
@@ -8,6 +9,7 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'QuotaSettingsDialog' })
 
+const { t } = useI18n({ useScope: 'global' })
 const emit = defineEmits<{ refresh: [] }>()
 
 interface QuotaSettingsForm {
@@ -17,11 +19,11 @@ interface QuotaSettingsForm {
   tokenLimit: number
 }
 
-const periodTypeOptions: Array<{ label: string; value: PeriodType }> = [
-  { label: '天', value: PERIOD_TYPE.DAY },
-  { label: '周', value: PERIOD_TYPE.WEEK },
-  { label: '月', value: PERIOD_TYPE.MONTH },
-]
+const periodTypeOptions = computed<Array<{ label: string; value: PeriodType }>>(() => [
+  { label: t('common.schedule.units.days', quotaSettingsForm.periodValue), value: PERIOD_TYPE.DAY },
+  { label: t('common.schedule.units.weeks', quotaSettingsForm.periodValue), value: PERIOD_TYPE.WEEK },
+  { label: t('common.schedule.units.months', quotaSettingsForm.periodValue), value: PERIOD_TYPE.MONTH },
+])
 
 const dialogVisible = ref(false)
 const quotaSettingsFormRef = ref<FormInstance>()
@@ -35,10 +37,10 @@ const quotaSettingsForm = reactive<QuotaSettingsForm>({
   quotaType: QUOTA_TYPE.UNLIMITED,
   tokenLimit: 10_000_000,
 })
-const quotaSettingsRules: FormRules<QuotaSettingsForm> = {
-  periodValue: [{ required: true, message: '请输入周期', trigger: 'change' }],
-  tokenLimit: [{ required: true, message: '请输入 Tokens 上限', trigger: 'change' }],
-}
+const quotaSettingsRules = computed<FormRules<QuotaSettingsForm>>(() => ({
+  periodValue: [{ required: true, message: t('chatUser.quota.period.requiredMessage'), trigger: 'change' }],
+  tokenLimit: [{ required: true, message: t('chatUser.quota.tokenLimit.requiredMessage'), trigger: 'change' }],
+}))
 
 function buildPayload(): ChatUserQuotaPayload {
   if (quotaSettingsForm.quotaType === QUOTA_TYPE.UNLIMITED) {
@@ -66,7 +68,7 @@ function submitQuotaSettings() {
 
     request
       .then(() => {
-        MsgSuccess('配额设置成功')
+        MsgSuccess(t('common.messages.saveSuccess'))
         emit('refresh')
         dialogVisible.value = false
       })
@@ -120,27 +122,28 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="配额设置" @closed="resetData">
+  <MkDialog v-model="dialogVisible" :title="t('chatUser.quota.title')" @closed="resetData">
     <el-form
       ref="quotaSettingsFormRef"
       :model="quotaSettingsForm"
       :rules="quotaSettingsRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       v-loading="loading"
       @submit.prevent
     >
-      <el-form-item label="设置方式">
+      <el-form-item :label="t('chatUser.quota.method.label')">
         <el-radio-group v-model="quotaSettingsForm.quotaType">
-          <el-radio :value="QUOTA_TYPE.UNLIMITED">不限额</el-radio>
-          <el-radio :value="QUOTA_TYPE.PERIODIC">按周期限制</el-radio>
+          <el-radio :value="QUOTA_TYPE.UNLIMITED">{{ t('chatUser.quota.method.unlimited') }}</el-radio>
+          <el-radio :value="QUOTA_TYPE.PERIODIC">{{ t('chatUser.quota.method.periodic') }}</el-radio>
         </el-radio-group>
       </el-form-item>
 
       <template v-if="quotaSettingsForm.quotaType === QUOTA_TYPE.PERIODIC">
-        <el-form-item label="周期" prop="periodValue">
+        <el-form-item :label="t('chatUser.quota.period.label')" prop="periodValue">
           <div class="flex-align-center gap-2">
-            <span>每</span>
+            <span>{{ t('common.schedule.every') }}</span>
             <el-input-number v-model="quotaSettingsForm.periodValue" :min="1" :max="365" class="w-40!" align="left" controls-position="right" />
             <el-select v-model="quotaSettingsForm.periodType" class="w-40!">
               <el-option v-for="periodType in periodTypeOptions" :key="periodType.value" :label="periodType.label" :value="periodType.value" />
@@ -148,15 +151,17 @@ defineExpose({ open })
           </div>
         </el-form-item>
 
-        <el-form-item label="Tokens 上限（单位：K）" prop="tokenLimit">
+        <el-form-item :label="t('chatUser.quota.tokenLimit.label')" prop="tokenLimit">
           <el-input-number v-model="quotaSettingsForm.tokenLimit" :min="1" align="left" controls-position="right" />
         </el-form-item>
       </template>
     </el-form>
 
     <template #footer>
-      <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button :loading="submitting" type="primary" @click="submitQuotaSettings">确定</el-button>
+      <!-- 取消配额设置 -->
+      <el-button plain @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存配额设置 -->
+      <el-button :loading="submitting" type="primary" @click="submitQuotaSettings">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

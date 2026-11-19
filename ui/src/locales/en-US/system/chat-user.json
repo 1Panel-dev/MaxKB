@@ -1,0 +1,29 @@
+{
+  "title": "Chat users",
+  "requiredMessage": "Select a chat user",
+  "source": {
+    "local": "Created locally"
+  },
+  "import": {
+    "description": "Sync chat users from configured user sources. Users with an existing username or name will not be imported again."
+  },
+  "quota": {
+    "title": "Quota settings",
+    "usage": "Tokens used/total",
+    "expiresAt": "Tokens expiry time",
+    "unlimited": "Unlimited",
+    "method": {
+      "label": "Quota mode",
+      "unlimited": "Unlimited",
+      "periodic": "Limit by period"
+    },
+    "period": {
+      "label": "Period",
+      "requiredMessage": "Enter a period"
+    },
+    "tokenLimit": {
+      "label": "Token limit (K)",
+      "requiredMessage": "Enter a token limit"
+    }
+  }
+}

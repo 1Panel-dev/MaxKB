@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ChatUserBase, ListItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -17,7 +17,9 @@ const optionsLoading = ref(false)
 const formRef = ref<FormInstance>()
 const userOptions = ref<ChatUserBase[]>([])
 const memberForm = reactive<{ userIds: string[] }>({ userIds: [] })
-const formRules: FormRules = { userIds: [{ required: true, message: '请选择对话用户', trigger: 'change' }] }
+const formRules = computed<FormRules>(() => ({
+  userIds: [{ required: true, message: t('chatUser.requiredMessage'), trigger: 'change' }],
+}))
 
 function loadUserOptions(keyword = '') {
   optionsLoading.value = true
@@ -47,7 +49,7 @@ function submit() {
     loading.value = true
     ChatGroupsApi.postChatUserGroupMembers(groupId, memberForm.userIds)
       .then(() => {
-        MsgSuccess('添加成功')
+        MsgSuccess(t('common.messages.addSuccess'))
         emit('refresh')
         visible.value = false
       })
@@ -70,8 +72,16 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="visible" :title="t('system.member.add')" @closed="resetData">
-    <el-form ref="formRef" :model="memberForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="对话用户" prop="userIds">
+    <el-form
+      ref="formRef"
+      :model="memberForm"
+      :rules="formRules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('chatUser.title')" prop="userIds">
         <el-select
           v-model="memberForm.userIds"
           class="w-full"
@@ -81,15 +91,17 @@ defineExpose({ open })
           remote
           :remote-method="loadUserOptions"
           :reserve-keyword="false"
-          placeholder="请选择用户名或姓名"
+          :placeholder="t('user.placeholder')"
         >
           <el-option v-for="user in userOptions" :key="user.id" :label="user.nick_name" :value="user.id" />
         </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" :loading="loading" @click="submit">添加</el-button>
+      <!-- 取消添加成员 -->
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 添加成员 -->
+      <el-button type="primary" :loading="loading" @click="submit">{{ t('common.actions.add') }}</el-button>
     </template>
   </MkDialog>
 </template>

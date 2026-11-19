@@ -47,18 +47,20 @@
     "requiredMessage": "請選擇角色",
     "settingsTitle": "角色設定",
     "add": "新增角色",
-    "set": "設定角色",
-    "methodLabel": "設定方式",
-    "append": "追加",
-    "replace": "替換"
+    "set": "設定角色"
   },
   "workspace": {
     "placeholder": "請選擇工作空間",
     "requiredMessage": "請選擇工作空間"
   },
-  "activeStatus": "啟用狀態",
+  "assignment": {
+    "label": "設定方式",
+    "append": "追加",
+    "replace": "替換"
+  },
   "source": {
     "label": "使用者來源",
+    "placeholder": "請選擇使用者來源",
     "requiredMessage": "請選擇使用者來源",
     "local": "系統使用者",
     "localFile": "本機檔案"

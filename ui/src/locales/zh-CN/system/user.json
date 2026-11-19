@@ -47,18 +47,20 @@
     "requiredMessage": "请选择角色",
     "settingsTitle": "角色设置",
     "add": "添加角色",
-    "set": "设置角色",
-    "methodLabel": "设置方式",
-    "append": "追加",
-    "replace": "替换"
+    "set": "设置角色"
   },
   "workspace": {
     "placeholder": "请选择工作空间",
     "requiredMessage": "请选择工作空间"
   },
-  "activeStatus": "启用状态",
+  "assignment": {
+    "label": "设置方式",
+    "append": "追加",
+    "replace": "替换"
+  },
   "source": {
     "label": "用户来源",
+    "placeholder": "请选择用户来源",
     "requiredMessage": "请选择用户来源",
     "local": "系统用户",
     "localFile": "本地文件"

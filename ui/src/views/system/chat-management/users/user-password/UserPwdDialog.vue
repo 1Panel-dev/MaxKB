@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import JSEncrypt from 'jsencrypt'
+import { useI18n } from 'vue-i18n'
 import type { ChatUser, UpdatePasswordForm } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
@@ -11,6 +12,7 @@ defineOptions({ name: 'UserPwdDialog' })
 
 const emit = defineEmits<{ refresh: [] }>()
 
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 
 const dialogVisible = ref(false)
@@ -22,21 +24,21 @@ const userPasswordForm = reactive<UpdatePasswordForm>({ password: '', re_passwor
 
 function validateConfirmPassword(_rule: unknown, value: string, callback: (error?: Error) => void) {
   if (!value) {
-    callback(new Error('请输入确认密码'))
+    callback(new Error(t('user.confirmPassword.requiredMessage')))
   } else if (value !== userPasswordForm.password) {
-    callback(new Error('输入的密码不一致'))
+    callback(new Error(t('user.confirmPassword.mismatchMessage')))
   } else {
     callback()
   }
 }
 
-const userPasswordRules = reactive<FormRules<UpdatePasswordForm>>({
+const userPasswordRules = computed<FormRules<UpdatePasswordForm>>(() => ({
   password: [
-    { required: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '长度应为 6-20 个字符', trigger: 'blur' },
+    { required: true, message: t('user.password.requiredMessage'), trigger: 'blur' },
+    { min: 6, max: 20, message: t('common.validation.lengthRange', { min: 6, max: 20 }), trigger: 'blur' },
   ],
   re_password: [{ validator: validateConfirmPassword, trigger: 'blur' }],
-})
+}))
 
 function open(user: ChatUser) {
   userId.value = user.id
@@ -57,7 +59,7 @@ async function submitPassword() {
 
     return ChatUserApi.putChatUserPassword(userId.value, { encryptedData })
       .then(() => {
-        MsgSuccess('密码修改成功')
+        MsgSuccess(t('user.password.changeSuccess'))
         emit('refresh')
         dialogVisible.value = false
       })
@@ -77,31 +79,32 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="修改用户密码" @closed="resetData">
+  <MkDialog v-model="dialogVisible" :title="t('user.password.changeTitle')" @closed="resetData">
     <el-form
       ref="userPasswordFormRef"
       :model="userPasswordForm"
       :rules="userPasswordRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="新密码" prop="password">
+      <el-form-item :label="t('user.password.label')" prop="password">
         <el-input
           v-model="userPasswordForm.password"
           autocomplete="new-password"
           maxlength="20"
-          placeholder="请输入新密码"
+          :placeholder="t('user.password.placeholder')"
           show-password
           type="password"
         />
       </el-form-item>
-      <el-form-item label="确认密码" prop="re_password">
+      <el-form-item :label="t('user.confirmPassword.label')" prop="re_password">
         <el-input
           v-model="userPasswordForm.re_password"
           autocomplete="new-password"
           maxlength="20"
-          placeholder="请再次输入新密码"
+          :placeholder="t('user.confirmPassword.placeholder')"
           show-password
           type="password"
         />
@@ -109,8 +112,10 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">保存</el-button>
+      <!-- 取消修改密码 -->
+      <el-button plain @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存新密码 -->
+      <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

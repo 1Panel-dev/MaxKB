@@ -182,12 +182,12 @@ defineExpose({ open })
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="is_active" :label="t('knowledge.document.labels.activeStatus')" width="120">
+        <el-table-column prop="is_active" :label="t('common.status.activeLabel')" width="120">
           <template #header>
             <MkTableFilter
               v-model="selectedDocumentActive"
               mode="single"
-              :label="t('knowledge.document.labels.activeStatus')"
+              :label="t('common.status.activeLabel')"
               :options="documentActiveOptions"
               @change="handleDocumentFilterChange"
             />

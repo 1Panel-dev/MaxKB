@@ -17,7 +17,6 @@
       "requiredMessage": "請選擇文件"
     },
     "labels": {
-      "activeStatus": "啟用狀態",
       "characters": "字元數",
       "paragraphs": "分段"
     },

@@ -47,18 +47,20 @@
     "requiredMessage": "Select a role",
     "settingsTitle": "Role settings",
     "add": "Add role",
-    "set": "Set roles",
-    "methodLabel": "Assignment method",
-    "append": "Append",
-    "replace": "Replace"
+    "set": "Set roles"
   },
   "workspace": {
     "placeholder": "Select a workspace",
     "requiredMessage": "Select a workspace"
   },
-  "activeStatus": "Enabled status",
+  "assignment": {
+    "label": "Assignment method",
+    "append": "Append",
+    "replace": "Replace"
+  },
   "source": {
     "label": "User source",
+    "placeholder": "Select a user source",
     "requiredMessage": "Select a user source",
     "local": "System user",
     "localFile": "Local file"

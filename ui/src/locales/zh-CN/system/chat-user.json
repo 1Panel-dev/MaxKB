@@ -1,0 +1,29 @@
+{
+  "title": "对话用户",
+  "requiredMessage": "请选择对话用户",
+  "source": {
+    "local": "本地创建"
+  },
+  "import": {
+    "description": "从已配置的用户来源同步对话用户，已存在的用户名或姓名不会重复导入。"
+  },
+  "quota": {
+    "title": "配额设置",
+    "usage": "Tokens使用量/总量",
+    "expiresAt": "Tokens到期时间",
+    "unlimited": "不限",
+    "method": {
+      "label": "设置方式",
+      "unlimited": "不限额",
+      "periodic": "按周期限制"
+    },
+    "period": {
+      "label": "周期",
+      "requiredMessage": "请输入周期"
+    },
+    "tokenLimit": {
+      "label": "Tokens 上限（单位：K）",
+      "requiredMessage": "请输入 Tokens 上限"
+    }
+  }
+}

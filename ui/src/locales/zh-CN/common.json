@@ -25,6 +25,7 @@
   },
   "status": {
     "label": "状态",
+    "activeLabel": "启用状态",
     "enabled": "已启用",
     "disabled": "已禁用",
     "pending": "排队中",
@@ -46,6 +47,7 @@
     "weekly": "每周",
     "monthly": "每月",
     "interval": "按间隔",
+    "every": "每",
     "day": "日",
     "weekdays": {
       "monday": "周一",
@@ -57,6 +59,9 @@
       "sunday": "周日"
     },
     "units": {
+      "days": "天",
+      "weeks": "周",
+      "months": "月",
       "hours": "小时",
       "minutes": "分钟"
     },

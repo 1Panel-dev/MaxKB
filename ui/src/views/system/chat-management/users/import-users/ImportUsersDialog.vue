@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatUserSyncConflict, ListItem, LoginMethod, OptionItem } from '@/api/types'
 import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
@@ -12,6 +13,7 @@ import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ImportUsersDialog' })
 
+const { locale, t } = useI18n({ useScope: 'global' })
 const emit = defineEmits<{ refresh: [] }>()
 
 const LOCAL_FILE_SOURCE = 'LOCAL_FILE' as const
@@ -27,30 +29,39 @@ const dialogVisible = ref(false)
 const importing = ref(false)
 const importUsersFormRef = ref<FormInstance>()
 const dragUploadRef = ref<InstanceType<typeof MkDragUpload>>()
-const syncTypeOptions = ref<OptionItem<string>[]>([])
+const availableSyncTypes = ref<string[]>([])
 const importUsersForm = reactive<ImportUsersForm>({ files: [], syncType: '', userGroupId: '' })
-const importUsersFormRules: FormRules<ImportUsersForm> = {
-  files: [{ required: true, type: 'array', min: 1, message: '请上传文件', trigger: 'change' }],
-  syncType: [{ required: true, message: '请选择用户来源', trigger: 'change' }],
-  userGroupId: [{ required: true, message: '请选择用户组', trigger: 'change' }],
-}
+const importUsersFormRules = computed<FormRules<ImportUsersForm>>(() => ({
+  files: [{ required: true, type: 'array', min: 1, message: t('upload.requiredMessage'), trigger: 'change' }],
+  syncType: [{ required: true, message: t('user.source.requiredMessage'), trigger: 'change' }],
+  userGroupId: [{ required: true, message: t('userGroup.requiredMessage'), trigger: 'change' }],
+}))
 const isLocalFileSource = computed(() => importUsersForm.syncType === LOCAL_FILE_SOURCE)
 const canImport = computed(() => Boolean(importUsersForm.syncType) && (!isLocalFileSource.value || importUsersForm.files.length > 0))
 
 /* 获取导入用户的来源类型 */
 const syncTypesLoading = ref(false)
+const userSourceLabels = computed<Record<LoginMethod | typeof LOCAL_FILE_SOURCE, string>>(() => ({
+  ...LOGIN_METHOD_LABELS,
+  [LOGIN_METHOD.LOCAL]: t('user.source.local'),
+  [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
+  [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
+  [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
+  [LOCAL_FILE_SOURCE]: t('user.source.localFile'),
+}))
+const syncTypeOptions = computed<OptionItem<string>[]>(() =>
+  availableSyncTypes.value.map((syncType) => ({
+    label: userSourceLabels.value[syncType as keyof typeof userSourceLabels.value] ?? syncType,
+    value: syncType,
+  })),
+)
+
 function loadSyncTypes() {
   syncTypesLoading.value = true
   return ChatUserApi.getChatUserSyncTypes()
     .then((syncTypes) => {
-      syncTypeOptions.value = [
-        ...syncTypes.map((syncType) => ({
-          label: syncType === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[syncType as LoginMethod],
-          value: syncType,
-        })),
-        { label: '本地文件', value: LOCAL_FILE_SOURCE },
-      ]
-      importUsersForm.syncType = syncTypeOptions.value[0]?.value ?? ''
+      availableSyncTypes.value = [...syncTypes, LOCAL_FILE_SOURCE]
+      importUsersForm.syncType = availableSyncTypes.value[0] ?? ''
     })
     .finally(() => {
       syncTypesLoading.value = false
@@ -75,7 +86,7 @@ function handleFileChange(file: UploadFile) {
   if (!/\.xlsx$/i.test(file.name)) {
     importUsersForm.files = []
     dragUploadRef.value?.clearFiles()
-    MsgWarning('仅支持上传 xlsx 格式的文件')
+    MsgWarning(t('user.import.formatMessage'))
     return
   }
 
@@ -89,16 +100,17 @@ function handleFileRemove() {
 }
 
 function conflictTypeLabel(type: string) {
-  if (type === 'username') return '用户名已存在'
-  if (type === 'email') return '邮箱已存在'
-  if (type === 'nick_name') return '姓名已存在'
-  return `${type} 冲突`
+  if (type === 'username') return t('user.username.existsMessage')
+  if (type === 'email') return t('user.email.existsMessage')
+  if (type === 'nick_name') return t('user.name.existsMessage')
+  return t('user.import.conflictMessage', { type })
 }
 
 function formatConflictMessage(conflicts: ChatUserSyncConflict[]) {
+  const isEnglish = locale.value === 'en-US'
   return conflicts
-    .map((conflict) => `${conflictTypeLabel(conflict.type)}：${conflict.users.join('、')}`)
-    .join('；')
+    .map((conflict) => `${conflictTypeLabel(conflict.type)}: ${conflict.users.join(isEnglish ? ', ' : '、')}`)
+    .join(isEnglish ? '; ' : '；')
 }
 
 function handleDownloadTemplate() {
@@ -123,8 +135,11 @@ function submitImportUsers() {
         const conflictUsers = result.conflict_users ?? []
         const skippedCount = conflictUsers.reduce((sum, conflict) => sum + conflict.users.length, 0)
         const conflictMessage = formatConflictMessage(conflictUsers)
-        const skipText = skippedCount > 0 ? `，跳过 ${skippedCount} 个用户` : ''
-        MsgSuccess(`成功导入 ${result.success_count} 个用户${skipText}${conflictMessage ? `，${conflictMessage}` : ''}`)
+        const resultSeparator = locale.value === 'en-US' ? ', ' : '，'
+        const skipText = skippedCount > 0 ? `${resultSeparator}${t('user.import.skippedMessage', { count: skippedCount }, skippedCount)}` : ''
+        MsgSuccess(
+          `${t('user.import.successMessage', { count: result.success_count }, result.success_count)}${skipText}${conflictMessage ? `${resultSeparator}${conflictMessage}` : ''}`,
+        )
         emit('refresh')
         dialogVisible.value = false
       })
@@ -142,7 +157,7 @@ function open() {
 
 function resetData() {
   Object.assign(importUsersForm, { files: [], syncType: '', userGroupId: '' })
-  syncTypeOptions.value = []
+  availableSyncTypes.value = []
   syncTypesLoading.value = false
   userGroupOptionsLoading.value = false
   userGroupOptions.value = []
@@ -155,19 +170,20 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="导入用户" @closed="resetData">
-    <template #subtitle>从已配置的用户来源同步对话用户，已存在的用户名或姓名不会重复导入。</template>
+  <MkDialog v-model="dialogVisible" :title="t('user.import.title')" @closed="resetData">
+    <template #subtitle>{{ t('chatUser.import.description') }}</template>
 
     <el-form
       ref="importUsersFormRef"
       :model="importUsersForm"
       :rules="importUsersFormRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="用户来源" prop="syncType">
-        <el-select v-model="importUsersForm.syncType" class="w-full" :loading="syncTypesLoading" placeholder="请选择用户来源">
+      <el-form-item :label="t('user.source.label')" prop="syncType">
+        <el-select v-model="importUsersForm.syncType" class="w-full" :loading="syncTypesLoading" :placeholder="t('user.source.placeholder')">
           <el-option
             v-for="syncTypeOption in syncTypeOptions"
             :key="syncTypeOption.value"
@@ -180,28 +196,29 @@ defineExpose({ open })
       <el-form-item v-if="isLocalFileSource" prop="files" class="mk-hide-asterisk">
         <template #label>
           <div class="flex-between w-full">
-            <span class="mk-required">上传文件</span>
-            <el-button link type="primary" @click="handleDownloadTemplate">下载模板</el-button>
+            <span class="mk-required">{{ t('common.actions.uploadFiles') }}</span>
+            <!-- 下载用户导入模板 -->
+            <el-button link type="primary" @click="handleDownloadTemplate">{{ t('user.import.downloadTemplate') }}</el-button>
           </div>
         </template>
         <MkDragUpload
           ref="dragUploadRef"
           v-model="importUsersForm.files"
           accept=".xlsx"
-          tip-text="支持格式：xlsx"
+          :tip-text="`${t('upload.formats')}: xlsx`"
           @change="handleFileChange"
           @remove="handleFileRemove"
         />
       </el-form-item>
 
-      <el-form-item label="用户组" prop="userGroupId">
+      <el-form-item :label="t('userGroup.title')" prop="userGroupId">
         <el-select
           v-model="importUsersForm.userGroupId"
           class="w-full"
           :loading="userGroupOptionsLoading"
           clearable
           filterable
-          placeholder="请选择用户组"
+          :placeholder="t('userGroup.placeholder')"
           fit-input-width
         >
           <el-option v-for="userGroup in userGroupOptions" :key="userGroup.id" :label="userGroup.name" :value="userGroup.id" />
@@ -210,8 +227,10 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" :loading="importing" :disabled="!canImport" @click="submitImportUsers">导入</el-button>
+      <!-- 取消导入用户 -->
+      <el-button plain @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 导入所选来源的用户 -->
+      <el-button type="primary" :loading="importing" :disabled="!canImport" @click="submitImportUsers">{{ t('common.actions.import') }}</el-button>
     </template>
   </MkDialog>
 </template>
