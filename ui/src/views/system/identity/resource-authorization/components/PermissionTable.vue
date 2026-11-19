@@ -179,7 +179,7 @@ watch(
       ref="tableRef"
       :data="filteredResources"
       :expand-row-keys="expandedResourceIds"
-      :max-table-height="300"
+      :max-table-height="350"
       show-overflow-tooltip
       @selection-change="handleSelectionChange"
     >
