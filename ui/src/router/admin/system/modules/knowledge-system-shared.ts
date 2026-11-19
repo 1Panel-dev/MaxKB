@@ -130,7 +130,7 @@ export const systemSharedKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.share.knowledgeChatUserRead(),
               next: 'system-shared-knowledge-external-retrieval',
-              title: 'authorization.chatUser.title',
+              title: 'chatUser.title',
               order: 10,
             },
           },

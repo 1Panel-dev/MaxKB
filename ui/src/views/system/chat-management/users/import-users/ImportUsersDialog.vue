@@ -13,7 +13,7 @@ import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ImportUsersDialog' })
 
-const { locale, t } = useI18n({ useScope: 'global' })
+const { t } = useI18n({ useScope: 'global' })
 const emit = defineEmits<{ refresh: [] }>()
 
 const LOCAL_FILE_SOURCE = 'LOCAL_FILE' as const
@@ -107,10 +107,7 @@ function conflictTypeLabel(type: string) {
 }
 
 function formatConflictMessage(conflicts: ChatUserSyncConflict[]) {
-  const isEnglish = locale.value === 'en-US'
-  return conflicts
-    .map((conflict) => `${conflictTypeLabel(conflict.type)}: ${conflict.users.join(isEnglish ? ', ' : '、')}`)
-    .join(isEnglish ? '; ' : '；')
+  return conflicts.map((conflict) => `${conflictTypeLabel(conflict.type)}: ${conflict.users.join('、')}`).join('；')
 }
 
 function handleDownloadTemplate() {
@@ -135,10 +132,9 @@ function submitImportUsers() {
         const conflictUsers = result.conflict_users ?? []
         const skippedCount = conflictUsers.reduce((sum, conflict) => sum + conflict.users.length, 0)
         const conflictMessage = formatConflictMessage(conflictUsers)
-        const resultSeparator = locale.value === 'en-US' ? ', ' : '，'
-        const skipText = skippedCount > 0 ? `${resultSeparator}${t('user.import.skippedMessage', { count: skippedCount }, skippedCount)}` : ''
+        const skipText = skippedCount > 0 ? `，${t('user.import.skippedMessage', { count: skippedCount }, skippedCount)}` : ''
         MsgSuccess(
-          `${t('user.import.successMessage', { count: result.success_count }, result.success_count)}${skipText}${conflictMessage ? `${resultSeparator}${conflictMessage}` : ''}`,
+          `${t('user.import.successMessage', { count: result.success_count }, result.success_count)}${skipText}${conflictMessage ? `，${conflictMessage}` : ''}`,
         )
         emit('refresh')
         dialogVisible.value = false

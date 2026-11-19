@@ -106,6 +106,7 @@
     "relate": "关联",
     "unrelate": "取消关联",
     "batchSelect": "批量选择",
+    "selectAll": "全选",
     "cancelSelection": "取消选择",
     "enable": "启用",
     "disable": "禁用",

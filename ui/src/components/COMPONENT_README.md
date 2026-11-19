@@ -980,7 +980,7 @@ Skills 场景传入 `[TOOL_TYPE.SKILL]`，并通过 `title` 指定标题。两�
 用户与用户组查询、保存均由入口按 `isSystemResource()` 选择当前范围完整 requestApi，
 Workspace 使用 Workspace API，System 资源管理使用 System API；不以路由工作空间代替资源 workspaceId。
 
-标题、页签及生效范围文案归 `authorization.resource`，权限字段与配置入口归 `authorization.permission`。
+标题及生效范围文案归 `authorization.resource`，页签复用 `authorization.byGroup` / `byUser`，权限字段与配置入口归 `authorization.permission`。
 内部列表和配置弹窗接收 `RESOURCE_PERMISSION_OPTIONS` 的协议值与翻译 key，在使用处直接调用 `t`；
 搜索选项在 computed 中翻译。语言切换保留当前页、搜索条件、选中项及待提交配置，不重新请求授权数据。
 用户字段复用 `user`，用户组标签与成员数复用 `userGroup`，通用按钮和结果提示复用 `common`。

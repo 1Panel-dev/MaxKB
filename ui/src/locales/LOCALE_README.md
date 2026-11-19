@@ -33,7 +33,7 @@
 
 `common/` 是平台公共能力的分类目录，包含 `index.json`、`upload.json`、`dynamic-form.json`、`auth.json` 和 `authorization.json`。`common/index.json` 只维护通用操作、标签、状态和提示，其他文件分别使用 `upload`、`dynamicForm`、`auth`、`authorization` 命名空间，不增加 `common` 前缀。文件夹、资源及其他业务模块保持独立，不因多处复用就移入 `common/`。
 
-`common/auth.json` 负责身份认证，`common/authorization.json` 负责授权。授权文案按 `resource`、`permission`、`workspace`、`chatUser` 分组，分别维护资源授权界面、操作权限、工作空间授权和对话用户授权；引用为 `authorization.<分组>.<用途>`。用户与用户组的共用字段仍复用 `user`、`userGroup`。
+`common/auth.json` 负责身份认证，`common/authorization.json` 负责授权。共用的“按用户组／按用户”使用 `authorization.byGroup` / `byUser`，自动授权、已授权及授权操作使用同级的 `autoAuthorization`、`authorized`、`authorize`。资源授权界面、操作权限和工作空间授权分别归 `resource`、`permission`、`workspace` 分组，引用为 `authorization.<分组>.<用途>`。用户与用户组的共用字段仍复用 `user`、`userGroup`。
 
 翻译 key 最多四层，包含业务域命名空间。业务域内部的共用字段使用 `<业务域>.fields.<字段>.<用途>`，
 场景专属字段使用 `<业务域>.<场景>.<字段>.<用途>`；不同时叠加场景、fields 和 validation。
@@ -109,6 +109,7 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 - 纯标签、数量单位、固定比例、编号和倒计时只翻译文字，数字、名称及固定格式在使用处组合；
   问号、作为分隔符的冒号不单独翻译，三种语言使用相同的显示格式。只有文件名和错误原因等数据的组合不建立翻译键。
   例如“已选 3/10”只翻译“已选”；单项确认标题翻译操作文字，使用处追加 `: 名称?`。
+- 模板和代码中的列表分隔符、括号等固定标点沿用原有写法，不按语言添加判断，也不为标点单独读取 locale；完整翻译句子中的标点随文案维护。
 - 数量限制、校验说明等完整句子整体翻译，必要的动态内容保留命名参数；不机械拆散语句。
   单复数按实际数量选择，展示的数字仍可由模板直接输出。代码示例和提示词协议中的花括号保留原有语义。
 - 英文界面采用简洁、明确的表达。通用输入、选择占位分别使用 Please enter、Please select，
@@ -262,7 +263,7 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 对话用户修改密码复用 `user.password` 与 `user.confirmPassword`，密码长度提示复用 `common.validation.lengthRange`；批量用户组分配复用 `user.assignment`，保存按钮及成功提示复用 `common`。
 用量显示只翻译“不限”，数值与 `/` 在使用处组合。表单规则在 computed 中翻译，使用 `validate-on-rule-change=false`，切换语言保留筛选、选择和表单输入。
 配额设置的方式选项、周期及 Tokens 上限字段和校验归 `chatUser.quota`；周期前缀“每”与天／周／月单位复用 `common.schedule.every` 和 `common.schedule.units`，英文单位按当前周期数量选择单复数，周期数值直接由输入控件显示。按钮及保存成功提示复用 `common`，K 单位换算和配额请求参数沿用原有业务规则。
-对话用户导入的专属说明归 `chatUser.import.description`；标题、模板、文件格式要求及成功／跳过人数复用 `user.import`，冲突提示复用用户字段的 `existsMessage`，来源字段与选项复用 `user.source` 及登录方式文案。来源协议值单独保存，选项在 computed 中翻译，切换语言不重选来源或重新请求选项；用户组及冲突用户名称保留原文。结果中的人数按实际数量选择单复数，用户名列表和结果分隔使用当前语言的标点，不为单独标点新增翻译键。
+对话用户导入的专属说明归 `chatUser.import.description`；标题、模板、文件格式要求及成功／跳过人数复用 `user.import`，冲突提示复用用户字段的 `existsMessage`，来源字段与选项复用 `user.source` 及登录方式文案。来源协议值单独保存，选项在 computed 中翻译，切换语言不重选来源或重新请求选项；用户组及冲突用户名称保留原文。结果中的人数按实际数量选择单复数，用户名列表和结果分隔沿用固定标点，不按语言判断，也不为单独标点新增翻译键。
 
 工作空间管理使用 `system/workspace.json`，菜单与列表标题使用 `workspace.title`，创建／重命名标题和名称字段归 `workspace`，
 删除工作空间与移除成员的专属文案统一归 `workspace.delete`：`title` / `description` 用于删除工作空间，`batchRemoveTitle` / `batchRemoveDescription` / `partialRemoveMessage` 用于按记录批量移除成员；成员单项移除标题复用 `system.member.removeTitle`。
@@ -283,10 +284,12 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 角色成员列表的用户名与姓名复用 `user`，工作空间标签复用 `workspace.title`，成员入口和单项／批量移除标题复用 `system.member`；批量移除标题按实际选择数量处理单复数，单项与批量结果共用 `common.messages.removeSuccess`。搜索字段在 computed 中翻译，保留筛选协议值。
 添加角色成员的工作空间选择占位与必填提示复用 `user.workspace`，其余按钮和结果提示复用 `common`；成员及工作空间名称展示接口原文。保留版本与角色类型对应的工作空间显示条件、提交值及原有校验规则，语言切换不重置表单或重新加载选项。
 
-系统资源授权入口、资源权限配置标题及“按用户组／按用户”页签归 `authorization.resource`，提交成功提示复用 `common.messages.submitSuccess`。四类资源的菜单与页签共用各业务的 `title`，功能本地 `RESOURCE_AUTHORIZATION_MESSAGE_KEYS` 维护协议值到标题 key 的映射，选项在 computed 中直接通过 `t` 翻译。
+系统资源授权入口和资源权限配置标题归 `authorization.resource`，“按用户组／按用户”页签复用 `authorization.byGroup` / `byUser`，提交成功提示复用 `common.messages.submitSuccess`。四类资源的菜单与页签共用各业务的 `title`，功能本地 `RESOURCE_AUTHORIZATION_MESSAGE_KEYS` 维护协议值到标题 key 的映射，选项在 computed 中直接通过 `t` 翻译。
 共享资源授权抽屉复用同一套标题和页签，生效资源及当前资源／包含子文件夹选项归 `authorization.resource.scope`；权限字段、配置入口、权限选项名称与说明归 `authorization.permission`。`RESOURCE_PERMISSION_OPTIONS` 只维护协议值、`labelKey` 和可选的 `descriptionKey`，抽屉与系统授权页面在模板或 computed 中直接调用 `t`，不维护第二套中文选项。
 授权列表及用户组成员抽屉的用户字段复用 `user`，用户组标签和成员数复用 `userGroup.title` / `memberCount`；登录方式品牌名复用 `auth.login.options`，来源筛选和表格共用响应式标签。通用按钮及结果提示复用 `common`。
 授权对象、资源和工作空间名称保留接口原文；语言切换不重取授权数据、不切换分类或授权对象，保留未提交的权限编辑状态。
+
+System 共享知识库、模型、工具的工作空间授权弹窗归 `authorization.workspace`：标题、说明、选择区域标题及白名单／黑名单选项分别使用 `title`、`description`、`select`、`whiteList`、`blackList`。类型标签、全选、清空、取消、保存及操作成功提示复用 `common`；“已选”复用 `common.labels.selected`，直接与冒号及数量组合，不建立数量格式 key。工作空间名称展示接口原文，语言切换保留搜索、名单类型及勾选状态，提交沿用 `WHITE_LIST` / `BLACK_LIST` 协议值与工作空间 ID。
 
 ## 知识库详情
 
@@ -299,7 +302,7 @@ Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传
 自定义分词的标题、用途说明、词语字段及创建入口归 `knowledge.termbase`，在 `knowledge/termbase.json` 维护；英文沿用 v2 的 `term` 用词，标题为 `Custom term`，创建入口为 `Create term`。四种资源范围的菜单与列表共用 `title`，创建按钮和弹窗共用 `actions.create`。词语标签、单行与多行输入占位归 `content`；时间、通用操作及创建／删除／导出成功提示复用 `common`。词语内容和导出文件名保持原值。
 检索参数、模式名称及说明归 `knowledge.retrieval`；召回测试标题、输入、结果及空状态归 `knowledge.hitTest`，两组在 `knowledge/retrieval.json` 维护。召回测试菜单与页面共用 `knowledge.hitTest.title`。召回测试、智能体设置与工作流知识库检索节点共用 `KNOWLEDGE_SEARCH_MODE_OPTIONS`，在模板或 computed 中直接通过 `t` 翻译 `labelKey` / `descriptionKey`，提交仍使用协议值。图片上传限制、格式标签、校验及失败状态复用 `upload`，结果分段详情标题复用 `knowledge.paragraph.detailTitle`；查询内容与接口返回的分段、文档名称保留原文。
 翻译按业务含义归属，不与页面目录一一对应：分段字段和操作归 `knowledge.paragraph`，文档字段、操作及流程说明归 `knowledge.document`，页面可交叉引用。
-对话用户授权属于跨资源业务，标题、用户组分组、用户字段、来源标签及授权状态归 `authorization.chatUser`。智能体的工作空间／系统资源管理菜单与知识库四种资源范围的菜单共用其 `title`；保存按钮和成功提示复用 `common`，钉钉、飞书和企业微信名称复用 `auth.login.options`。搜索与来源筛选的选项在 computed 中生成；用户名、用户组名称和未知来源保留原文，筛选与授权请求使用原协议值。已授权人数在模板中按“已授权 数量”组合，不建立数量格式翻译键。
+对话用户授权属于跨资源业务，自动授权、已授权及授权操作复用 `authorization.autoAuthorization`、`authorization.authorized`、`authorization.authorize`；智能体的工作空间／系统资源管理菜单与知识库四种资源范围的菜单共用 `chatUser.title`，用户组分组标题复用 `authorization.byGroup`。姓名、用户名和用户来源标签复用 `user.name.label`、`user.username.label`、`user.source.label`，本地创建来源复用 `chatUser.source.local`；保存按钮和成功提示复用 `common`，钉钉、飞书和企业微信名称复用 `auth.login.options`。搜索与来源标签在 computed 中直接调用 `t`，筛选与表格共用同一组标签，不新增格式化翻译函数；保留 OAuth2 来源的兼容值和未知来源原文。用户名和用户组名称保留原文，筛选与授权请求使用原协议值；切换语言不重取用户列表或清空未保存的授权勾选。已授权人数在模板中按“已授权 数量”组合，不建立数量格式翻译键。
 外部检索服务的标题、开关及说明、API 调用示例标签和加载失败提示归 `knowledge.externalRetrieval`，在 `knowledge/retrieval.json` 维护；四种资源范围的菜单共用 `title`。MCP 配置标题复用 `resource.mcpConfig.title`，重新加载、保存和复制成功提示复用 `common`。接口返回的 API 示例及 MCP 配置保持原文，只按既有规则对齐访问地址；调用复制工具时传入当前语言的成功提示。
 导入预览删除分段使用 `knowledge.paragraph.delete.confirm`；继续导入前的编辑未完成提示保留在 `knowledge.document.preview`。文档召回处理和删除文档的影响说明仍归 `knowledge.document`。
 跨对象共用的召回次数、最后一次召回时间归 `knowledge.stats.retrievalCount` / `lastRetrievedAt`，文档列表和分段预览共用。

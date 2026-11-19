@@ -7,7 +7,7 @@ import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ButtonImportTags' })
-const { locale, t } = useI18n({ useScope: 'global' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ knowledgeId: string; api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['tags']; disabled?: boolean }>()
 const emit = defineEmits<{ refresh: [] }>()
@@ -121,7 +121,7 @@ function handleImport() {
           ref="dragUploadRef"
           v-model="importForm.files"
           accept=".xls,.xlsx"
-          :tip-text="`${t('upload.formats')}: ${['XLS', 'XLSX'].join(locale === 'en-US' ? ', ' : '、')}`"
+          :tip-text="`${t('upload.formats')}: ${['XLS', 'XLSX'].join('、')}`"
           @change="handleFileChange"
           @remove="handleFileRemove"
         />

@@ -9,7 +9,7 @@ import { KNOWLEDGE_IMAGE_ACCEPT, KNOWLEDGE_IMAGE_EXTENSIONS } from '@/constants/
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ReplaceDocumentAction' })
-const { locale, t } = useI18n({ useScope: 'global' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: ReturnType<typeof useKnowledgeDetailContext>['resourceApi']['document']
   knowledgeId: string
@@ -24,7 +24,7 @@ const accept = computed(() => (isImage.value ? KNOWLEDGE_IMAGE_ACCEPT : ''))
 function handleReplace(file: UploadFile) {
   if (!file.raw || loading.value) return
   if (isImage.value && !KNOWLEDGE_IMAGE_EXTENSIONS.includes(file.raw.name.split('.').pop()?.toUpperCase() ?? '')) {
-    const formats = KNOWLEDGE_IMAGE_EXTENSIONS.join(locale.value === 'en-US' ? ', ' : '、')
+    const formats = KNOWLEDGE_IMAGE_EXTENSIONS.join('、')
     MsgWarning(t('knowledge.image.unsupportedFormatMessage', { formats }))
     return
   }
