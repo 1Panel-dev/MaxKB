@@ -127,7 +127,7 @@ defineExpose({ open })
     <div v-loading="loading" class="min-h-30">
       <div class="space-y-2">
         <template v-for="trigger in triggersData" :key="trigger.id">
-          <el-card shadow="never" class="small">
+          <el-card shadow="never" class="small cursor-pointer hover:border-primary!" @click="handleOpenForm(trigger.id)">
             <div class="flex-between gap-3">
               <div class="flex-align-center min-w-0 flex-1 gap-2">
                 <TriggerIcon :type="trigger.trigger_type" :size="20" class="shrink-0" />
@@ -139,11 +139,11 @@ defineExpose({ open })
               <div class="flex-align-center shrink-0">
                 <!-- 编辑触发器 -->
 
-                <el-button text :disabled="loading" @click="handleOpenForm(trigger.id)"><MkIcon name="icon_edit_outlined" /></el-button>
+                <el-button text :disabled="loading" @click.stop="handleOpenForm(trigger.id)"><MkIcon name="icon_edit_outlined" /></el-button>
 
                 <!-- 移除当前资源的触发器 -->
 
-                <el-button v-if="toolTriggerPermission('triggerDelete')" text :disabled="loading" @click="handleRemoveTrigger(trigger)">
+                <el-button v-if="toolTriggerPermission('triggerDelete')" text :disabled="loading" @click.stop="handleRemoveTrigger(trigger)">
                   <MkIcon name="icon_close_outlined" />
                 </el-button>
               </div>
