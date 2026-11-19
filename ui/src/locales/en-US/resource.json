@@ -5,6 +5,26 @@
     "byGroup": "By user group",
     "byUser": "By user"
   },
+  "permission": {
+    "label": "Permissions",
+    "operationLabel": "Operation permissions",
+    "configure": "Configure permissions",
+    "notAuthorized": {
+      "label": "No access"
+    },
+    "view": {
+      "label": "View",
+      "description": "View and use this resource only"
+    },
+    "manage": {
+      "label": "Manage",
+      "description": "Edit and delete this resource"
+    },
+    "role": {
+      "label": "By user role",
+      "description": "Grant access to this resource based on the user's role permissions"
+    }
+  },
   "relations": {
     "title": "View related resources"
   },

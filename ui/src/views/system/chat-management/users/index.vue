@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatUser, Dict, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD, QUOTA_TYPE } from '@/api/enums'
 import ChatUserApi from '@/api/admin/system/chat-management/chat-user.ts'
@@ -15,6 +16,8 @@ import { formatTokenNumber } from '@/utils/number'
 import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission/index.ts'
 
+const { t } = useI18n({ useScope: 'global' })
+
 /* 添加编辑用户表单drawer */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
 
@@ -28,24 +31,28 @@ const chatUsersLoading = ref(false)
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const chatUsersData = ref<ChatUser[]>([])
 const orderBy = ref<string>()
-const searchFields: OptionItem<string>[] = [
-  { label: '姓名', value: 'nick_name' },
-  { label: '用户名', value: 'username' },
-  { label: '邮箱', value: 'email' },
-]
+const searchFields = computed<OptionItem<string>[]>(() => [
+  { label: t('user.name.label'), value: 'nick_name' },
+  { label: t('user.username.label'), value: 'username' },
+  { label: t('user.email.label'), value: 'email' },
+])
 const chatUserSearchQuery = ref<Dict<unknown>>()
 
 /* 表头筛选 */
 const selectedStatus = ref<boolean | null>(null)
-const statusOptions: OptionItem<boolean>[] = [
-  { label: '已启用', value: true },
-  { label: '已禁用', value: false },
-]
+const statusOptions = computed<OptionItem<boolean>[]>(() => [
+  { label: t('common.status.enabled'), value: true },
+  { label: t('common.status.disabled'), value: false },
+])
 const selectedSource = ref<string | null>(null)
-const sourceOptions: OptionItem<string>[] = Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
-  label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label,
-  value,
+const userSourceLabels = computed<Record<LoginMethod, string>>(() => ({
+  ...LOGIN_METHOD_LABELS,
+  [LOGIN_METHOD.LOCAL]: t('chatUser.source.local'),
+  [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
+  [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
+  [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
 }))
+const sourceOptions = computed<OptionItem<string>[]>(() => Object.entries(userSourceLabels.value).map(([value, label]) => ({ label, value })))
 const chatUserQuery = computed<Dict<unknown>>(() => ({
   ...chatUserSearchQuery.value,
   order_by: orderBy.value,
@@ -54,9 +61,9 @@ const chatUserQuery = computed<Dict<unknown>>(() => ({
 }))
 
 function formatQuotaUsage(tokenQuota?: ChatUser['token_quota']) {
-  if (!tokenQuota) return '0 / 不限'
+  if (!tokenQuota) return `0 / ${t('chatUser.quota.unlimited')}`
   const used = formatTokenNumber(tokenQuota.used_tokens)
-  if (tokenQuota.quota_type === QUOTA_TYPE.UNLIMITED) return `${used} / 不限`
+  if (tokenQuota.quota_type === QUOTA_TYPE.UNLIMITED) return `${used} / ${t('chatUser.quota.unlimited')}`
   return `${used} / ${formatTokenNumber(tokenQuota.token_limit)}`
 }
 
@@ -100,7 +107,7 @@ function handleChangeStatus(user: ChatUser) {
 
   return ChatUserApi.putChatUser(user.id, { is_active: nextActive })
     .then(() => {
-      MsgSuccess(nextActive ? '启用成功' : '禁用成功')
+      MsgSuccess(t(nextActive ? 'common.messages.enableSuccess' : 'common.messages.disableSuccess'))
       return true
     })
     .catch(() => false)
@@ -108,11 +115,11 @@ function handleChangeStatus(user: ChatUser) {
 
 /* 删除用户 */
 function deleteUser(user: ChatUser) {
-  MsgConfirm(`确定删除用户：${user.username}？`)
+  MsgConfirm(`${t('user.delete.title')}: ${user.username}?`)
     .then(() => {
       chatUsersLoading.value = true
       return ChatUserApi.deleteChatUser(user.id).then(() => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         return loadChatUsers()
       })
     })
@@ -131,12 +138,12 @@ function handleBatchSelectionChange(selection: unknown[]) {
 
 function handleBatchDelete() {
   const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
-  MsgConfirm(`是否删除选中的 ${batchSelectedUsers.value.length} 个用户？`)
+  MsgConfirm(`${t('user.delete.batchTitle', { count: selectedUserIds.length }, selectedUserIds.length)}?`)
     .then(() => {
       chatUsersLoading.value = true
 
       return ChatUserApi.postBatchDeleteChatUsers(selectedUserIds).then(async () => {
-        MsgSuccess('删除成功')
+        MsgSuccess(t('common.messages.deleteSuccess'))
         await loadChatUsers()
         userTableRef.value?.clearSelection()
       })
@@ -151,7 +158,7 @@ onMounted(() => loadChatUsers())
 </script>
 
 <template>
-  <MkViewLayout class="system-chat-users" :loading="chatUsersLoading">
+  <MkViewLayout class="system-chat-users" :title="t('chatUser.title')" :loading="chatUsersLoading">
     <template #default="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -165,7 +172,7 @@ onMounted(() => loadChatUsers())
           <!-- 创建用户 -->
           <el-button v-if="perm.system.chatUser.create()" type="primary" @click="handleOpenUserFormDrawer()">
             <MkIcon name="icon_add_outlined" />
-            <span>创建用户</span>
+            <span>{{ t('user.createTitle') }}</span>
           </el-button>
         </div>
       </component>
@@ -181,62 +188,74 @@ onMounted(() => loadChatUsers())
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="40" />
-        <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="username" label="用户名" min-width="150" show-overflow-tooltip />
-        <el-table-column width="100" label="状态">
+        <el-table-column prop="nick_name" :label="t('user.name.label')" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="username" :label="t('user.username.label')" min-width="150" show-overflow-tooltip />
+        <el-table-column width="100" :label="t('common.status.label')">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="statusOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedStatus"
+              :label="t('common.status.label')"
+              :options="statusOptions"
+              @change="handleFilterChange"
+            />
           </template>
           <template #default="{ row }">
             <MkStatusLabel :active="row.is_active" />
           </template>
         </el-table-column>
 
-        <el-table-column prop="email" label="邮箱" show-overflow-tooltip min-width="180">
+        <el-table-column prop="email" :label="t('user.email.label')" show-overflow-tooltip min-width="180">
           <template #default="{ row }">
             {{ row.email || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="phone" width="120" label="手机号">
+        <el-table-column prop="phone" width="120" :label="t('user.phone.label')">
           <template #default="{ row }">
             {{ row.phone || '-' }}
           </template>
         </el-table-column>
 
-        <el-table-column prop="user_group_names" width="180" label="对话用户组">
+        <el-table-column prop="user_group_names" width="180" :label="t('userGroup.chatTitle')">
           <template #default="{ row }">
             <MkTagGroup v-if="row.user_group_names?.length" :tags="row.user_group_names" />
             <span v-else>-</span>
           </template>
         </el-table-column>
 
-        <el-table-column label="用户来源" width="120">
+        <el-table-column :label="t('user.source.label')" width="120">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedSource" label="用户来源" :options="sourceOptions" @change="handleFilterChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedSource"
+              :label="t('user.source.label')"
+              :options="sourceOptions"
+              @change="handleFilterChange"
+            />
           </template>
           <template #default="{ row }">
-            {{ row.source === LOGIN_METHOD.LOCAL ? '本地创建' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
+            {{ userSourceLabels[row.source as LoginMethod] ?? row.source }}
           </template>
         </el-table-column>
 
-        <el-table-column prop="token_quota.used_tokens" label="Tokens使用量/总量" width="180" min-width="170" sortable>
+        <el-table-column prop="token_quota.used_tokens" :label="t('chatUser.quota.usage')" width="180" min-width="170" sortable>
           <template #default="{ row }">
             {{ formatQuotaUsage(row.token_quota) }}
           </template>
         </el-table-column>
 
-        <el-table-column label="Tokens到期时间" min-width="180">
+        <el-table-column :label="t('chatUser.quota.expiresAt')" min-width="180">
           <template #default="{ row }">
             {{ row.token_quota?.period_end ? datetimeFormat(row.token_quota?.period_end) : '-' }}
           </template>
         </el-table-column>
 
-        <el-table-column prop="create_time" label="创建时间" width="180" sortable>
+        <el-table-column prop="create_time" :label="t('common.labels.createTime')" width="180" sortable>
           <template #default="{ row }">
             {{ datetimeFormat(row.create_time) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="160" fixed="right">
+        <el-table-column :label="t('common.labels.operation')" width="160" fixed="right">
           <template #default="{ row }">
             <div class="flex-align-center">
               <!-- 修改状态 -->
@@ -250,7 +269,7 @@ onMounted(() => loadChatUsers())
 
               <div class="flex">
                 <!-- 编辑 -->
-                <MkTooltip content="编辑" placement="top" v-if="perm.system.chatUser.edit()">
+                <MkTooltip :content="t('common.actions.edit')" placement="top" v-if="perm.system.chatUser.edit()">
                   <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <MkIcon name="icon_edit_outlined" />
                   </el-button>
@@ -266,7 +285,7 @@ onMounted(() => loadChatUsers())
                     <template #icon>
                       <MkIcon name="icon_delete-trash_outlined" />
                     </template>
-                    <span>删除</span>
+                    <span>{{ t('common.actions.delete') }}</span>
                   </MkDropdownItem>
                 </MkTableMoreDropdown>
               </div>
@@ -288,7 +307,7 @@ onMounted(() => loadChatUsers())
             @refresh="loadChatUsers()"
           />
           <!-- 批量删除-->
-          <el-button v-if="perm.system.chatUser.delete()" type="danger" plain @click="handleBatchDelete">删除</el-button>
+          <el-button v-if="perm.system.chatUser.delete()" type="danger" plain @click="handleBatchDelete">{{ t('common.actions.delete') }}</el-button>
         </template>
       </MkTable>
     </template>

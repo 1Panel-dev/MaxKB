@@ -378,7 +378,7 @@ onBeforeUnmount(() => {
         <MkTableFilter
           v-model="selectedDocumentActive"
           mode="single"
-          :label="t('knowledge.document.labels.activeStatus')"
+          :label="t('common.status.activeLabel')"
           :options="documentActiveOptions"
           @change="handleDocumentFilterChange"
         />

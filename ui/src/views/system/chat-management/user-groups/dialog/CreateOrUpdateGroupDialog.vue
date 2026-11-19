@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ListItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatGroupsApi from '@/api/admin/system/chat-management/chat-user-groups'
 import { MsgSuccess } from '@/utils/message'
 
+const { t } = useI18n({ useScope: 'global' })
 const emit = defineEmits<{ refresh: [groupId?: string] }>()
 
 const visible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
 const groupForm = reactive<{ id?: string; name: string }>({ name: '' })
-const formRules: FormRules = { name: [{ whitespace: true, required: true, message: '请输入用户组名称', trigger: 'blur' }] }
+const formRules = computed<FormRules>(() => ({
+  name: [{ whitespace: true, required: true, message: t('userGroup.name.requiredMessage'), trigger: 'blur' }],
+}))
 
 function open(group?: ListItem) {
   if (group) {
@@ -28,7 +32,7 @@ function submit() {
     loading.value = true
     ChatGroupsApi.postChatUserGroup({ ...groupForm })
       .then(() => {
-        MsgSuccess(groupForm.id ? '重命名成功' : '创建成功')
+        MsgSuccess(t(groupForm.id ? 'common.messages.renameSuccess' : 'common.messages.createSuccess'))
         emit('refresh', groupForm?.id || undefined)
         visible.value = false
       })
@@ -48,16 +52,18 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="groupForm.id ? '重命名用户组' : '创建用户组'" @closed="resetData">
-    <el-form ref="formRef" :model="groupForm" :rules="formRules" label-position="top" @submit.prevent>
-      <el-form-item label="用户组名称" prop="name">
-        <el-input v-model="groupForm.name" maxlength="128" placeholder="请输入用户组名称" show-word-limit />
+  <MkDialog v-model="visible" :title="t(groupForm.id ? 'userGroup.renameTitle' : 'userGroup.createTitle')" @closed="resetData">
+    <el-form ref="formRef" :model="groupForm" :rules="formRules" :validate-on-rule-change="false" label-position="top" @submit.prevent>
+      <el-form-item :label="t('userGroup.name.label')" prop="name">
+        <el-input v-model="groupForm.name" maxlength="128" :placeholder="t('userGroup.name.placeholder')" show-word-limit />
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
+      <!-- 取消用户组编辑 -->
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存或创建用户组 -->
       <el-button type="primary" :loading="loading" @click="submit">
-        {{ groupForm.id ? '保存' : '创建' }}
+        {{ t(groupForm.id ? 'common.actions.save' : 'common.actions.create') }}
       </el-button>
     </template>
   </MkDialog>

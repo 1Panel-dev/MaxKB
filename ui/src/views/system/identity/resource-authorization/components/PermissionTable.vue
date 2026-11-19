@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type {
   Dict,
   ModelProviderItem,
@@ -18,10 +19,11 @@ defineOptions({ name: 'ResourcePermissionTable' })
 
 const props = defineProps<{ data: ResourcePermissionItem[]; resourceType: ResourceAuthorizationType; disabled: boolean }>()
 const emit = defineEmits<{ submit: [permissions: ResourcePermissionPayload[]] }>()
+const { t } = useI18n({ useScope: 'global' })
 
 const permissionSearchFields = computed<OptionItem<string>[]>(() => [
-  { label: '名称', value: 'name' },
-  { label: '权限', multiple: true, options: getPermissionOptions(), value: 'permission' },
+  { label: t('common.name.label'), value: 'name' },
+  { label: t('resource.permission.label'), multiple: true, options: getPermissionOptions(), value: 'permission' },
 ])
 
 /* 搜索与展开 */
@@ -168,7 +170,7 @@ watch(
         <!-- 批量配置权限 -->
         <el-button type="primary" :disabled="disabled || batchSelectedResources.length === 0" @click="handleOpenBatchDialog">
           <MkIcon name="icon-lock" />
-          <span>配置权限</span>
+          <span>{{ t('resource.permission.configure') }}</span>
         </el-button>
       </div>
 
@@ -184,7 +186,7 @@ watch(
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="40" reserve-selection :selectable="() => !disabled" />
-      <el-table-column class-name="expand-name-column" label="名称" min-width="260" prop="name">
+      <el-table-column class-name="expand-name-column" :label="t('common.name.label')" min-width="260" prop="name">
         <template #default="{ row }: { row: ResourcePermissionItem }">
           <div class="flex-align-center min-w-0 flex-1 gap-2">
             <MkIcon v-if="row.resource_type === 'folder'" name="icon_file-folder_colorful" :size="18" />
@@ -198,7 +200,7 @@ watch(
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作权限" width="450">
+      <el-table-column :label="t('resource.permission.operationLabel')" width="450">
         <template #default="{ row }: { row: ResourcePermissionItem }">
           <el-radio-group :model-value="row.permission" :disabled="disabled" @change="handlePermissionChange($event as ResourcePermission, row)">
             <template v-for="permissionOption in getPermissionOptions()" :key="permissionOption.value">

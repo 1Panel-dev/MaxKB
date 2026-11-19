@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import JSEncrypt from 'jsencrypt'
+import { useI18n } from 'vue-i18n'
 import type { ChatUser, ChatUserPayload, ListItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
@@ -12,6 +13,7 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'UserFromDrawer' })
 
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 
 const emit = defineEmits<{
@@ -25,22 +27,22 @@ const editingUserId = ref('')
 const userSubmitting = ref(false)
 const userForm = reactive<ChatUserPayload>({ email: '', nick_name: '', password: '', phone: '', user_group_ids: [], username: '' })
 
-const drawerTitle = computed(() => (isEdit.value ? '编辑用户' : '创建用户'))
-const submitText = computed(() => (isEdit.value ? '保存' : '创建'))
+const drawerTitle = computed(() => t(isEdit.value ? 'user.editTitle' : 'user.createTitle'))
+const submitText = computed(() => t(isEdit.value ? 'common.actions.save' : 'common.actions.create'))
 
-const userFormRules = reactive<FormRules<ChatUserPayload>>({
+const userFormRules = computed<FormRules<ChatUserPayload>>(() => ({
   username: [
-    { whitespace: true, required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 4, max: 64, message: '长度应为 4-64 个字符', trigger: 'blur' },
+    { whitespace: true, required: true, message: t('user.username.requiredMessage'), trigger: 'blur' },
+    { min: 4, max: 64, message: t('common.validation.lengthRange', { min: 4, max: 64 }), trigger: 'blur' },
   ],
   nick_name: [
-    { whitespace: true, required: true, message: '请输入姓名', trigger: 'blur' },
-    { min: 1, max: 64, message: '长度应为 1-64 个字符', trigger: 'blur' },
+    { whitespace: true, required: true, message: t('user.name.requiredMessage'), trigger: 'blur' },
+    { min: 1, max: 64, message: t('common.validation.lengthRange', { min: 1, max: 64 }), trigger: 'blur' },
   ],
-  email: [{ type: 'email', message: '请输入正确的邮箱', trigger: 'blur' }],
-  phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
-  user_group_ids: [{ type: 'array', required: true, message: '请选择用户组', trigger: 'change' }],
-})
+  email: [{ type: 'email', message: t('user.email.invalidMessage'), trigger: 'blur' }],
+  phone: [{ pattern: /^1[3-9]\d{9}$/, message: t('user.phone.invalidMessage'), trigger: 'blur' }],
+  user_group_ids: [{ type: 'array', required: true, message: t('userGroup.requiredMessage'), trigger: 'change' }],
+}))
 
 /* 用户组选项 */
 const userGroupOptions = ref<ListItem[]>([])
@@ -78,7 +80,7 @@ async function submitUser() {
           user_group_ids: userForm.user_group_ids,
         })
           .then(() => {
-            MsgSuccess('编辑成功')
+            MsgSuccess(t('common.messages.saveSuccess'))
             emit('refresh', false)
             drawerVisible.value = false
           })
@@ -91,7 +93,7 @@ async function submitUser() {
         const encryptedPassword = encryptor.encrypt(userForm.password as string)
         ChatUserApi.postChatUser({ ...userForm, encrypted: true, password: encryptedPassword as string })
           .then(() => {
-            MsgSuccess('创建成功')
+            MsgSuccess(t('common.messages.createSuccess'))
             emit('refresh', true)
             drawerVisible.value = false
           })
@@ -137,27 +139,43 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="drawerVisible" :title="drawerTitle" @closed="resetData">
-    <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form
+      ref="userFormRef"
+      :model="userForm"
+      :rules="userFormRules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <section>
-        <h4 class="mk-title-decoration mb-4">基本信息</h4>
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="userForm.username" :disabled="isEdit" maxlength="64" minlength="4" placeholder="请输入用户名" show-word-limit />
+        <h4 class="mk-title-decoration mb-4">{{ t('common.labels.basicInfo') }}</h4>
+        <el-form-item :label="t('user.username.label')" prop="username">
+          <el-input
+            v-model="userForm.username"
+            :disabled="isEdit"
+            maxlength="64"
+            minlength="4"
+            :placeholder="t('user.username.placeholder')"
+            show-word-limit
+          />
         </el-form-item>
-        <el-form-item label="姓名" prop="nick_name">
-          <el-input v-model="userForm.nick_name" maxlength="64" placeholder="请输入姓名" show-word-limit />
+        <el-form-item :label="t('user.name.label')" prop="nick_name">
+          <el-input v-model="userForm.nick_name" maxlength="64" :placeholder="t('user.name.placeholder')" show-word-limit />
         </el-form-item>
 
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="userForm.email" type="email" placeholder="请输入邮箱" />
+        <el-form-item :label="t('user.email.label')" prop="email">
+          <el-input v-model="userForm.email" type="email" :placeholder="t('user.email.placeholder')" />
         </el-form-item>
 
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="userForm.phone" maxlength="11" placeholder="请输入手机号" />
+        <el-form-item :label="t('user.phone.label')" prop="phone">
+          <el-input v-model="userForm.phone" maxlength="11" :placeholder="t('user.phone.placeholder')" />
         </el-form-item>
 
-        <el-form-item v-if="!isEdit" label="默认密码">
+        <el-form-item v-if="!isEdit" :label="t('user.password.defaultLabel')">
           <el-input v-model="userForm.password" readonly>
             <template #suffix>
+              <!-- 复制默认密码 -->
               <el-button text @click="copyText(userForm.password)" class="-mr-1">
                 <MkIcon name="icon_copy_outlined" />
               </el-button>
@@ -166,8 +184,8 @@ defineExpose({ open })
         </el-form-item>
       </section>
       <section>
-        <h4 class="mk-title-decoration mb-4 mt-4">用户组</h4>
-        <el-form-item label="用户组" prop="user_group_ids">
+        <h4 class="mk-title-decoration mb-4 mt-4">{{ t('userGroup.title') }}</h4>
+        <el-form-item :label="t('userGroup.title')" prop="user_group_ids">
           <el-select
             v-model="userForm.user_group_ids"
             class="w-full"
@@ -175,7 +193,7 @@ defineExpose({ open })
             clearable
             filterable
             multiple
-            placeholder="请选择用户组"
+            :placeholder="t('userGroup.placeholder')"
             fit-input-width
           >
             <el-option v-for="userGroup in userGroupOptions" :key="userGroup.id" :label="userGroup.name" :value="userGroup.id" />
@@ -185,7 +203,9 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain @click="drawerVisible = false">取消</el-button>
+      <!-- 取消编辑 -->
+      <el-button plain @click="drawerVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 提交用户 -->
       <el-button :loading="userSubmitting" type="primary" @click="submitUser">
         {{ submitText }}
       </el-button>

@@ -244,13 +244,18 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'users',
           name: 'system-chat-users',
           component: () => import('@/views/system/chat-management/users/index.vue'),
-          meta: { title: '对话用户', order: 10, permission: perm.system.chatUser.read, next: 'system-chat-management-groups' },
+          meta: { title: 'chatUser.title', order: 10, permission: perm.system.chatUser.read, next: 'system-chat-management-groups' },
         },
         {
           path: 'groups',
           name: 'system-chat-groups',
           component: () => import('@/views/system/chat-management/user-groups/index.vue'),
-          meta: { title: '对话用户组', order: 20, permission: perm.system.chatUserGroup.read, next: 'system-chat-management-authentication' },
+          meta: {
+            title: 'userGroup.chatTitle',
+            order: 20,
+            permission: perm.system.chatUserGroup.read,
+            next: 'system-chat-management-authentication',
+          },
         },
         {
           path: 'authentication',

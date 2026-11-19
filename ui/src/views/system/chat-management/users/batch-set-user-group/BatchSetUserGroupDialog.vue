@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { BatchSetChatUserGroupsRequest, ListItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
@@ -8,6 +9,7 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'BatchSetUserGroupDialog' })
 
+const { t } = useI18n({ useScope: 'global' })
 const emit = defineEmits<{ refresh: [] }>()
 
 const batchGroupFormRef = ref<FormInstance>()
@@ -16,9 +18,9 @@ const submitting = ref(false)
 const userGroupOptionsLoading = ref(false)
 const userGroupOptions = ref<ListItem[]>([])
 const batchGroupForm = reactive<BatchSetChatUserGroupsRequest>({ ids: [], is_append: true, user_group_ids: [] })
-const batchGroupFormRules: FormRules<BatchSetChatUserGroupsRequest> = {
-  user_group_ids: [{ required: true, type: 'array', min: 1, message: '请选择用户组', trigger: 'change' }],
-}
+const batchGroupFormRules = computed<FormRules<BatchSetChatUserGroupsRequest>>(() => ({
+  user_group_ids: [{ required: true, type: 'array', min: 1, message: t('userGroup.requiredMessage'), trigger: 'change' }],
+}))
 
 /* 用户组选项 */
 function loadUserGroupOptions() {
@@ -42,7 +44,7 @@ function submitBatchSetUserGroups() {
     submitting.value = true
     return ChatUserApi.postBatchSetChatUserGroups({ ...batchGroupForm })
       .then(() => {
-        MsgSuccess('设置成功')
+        MsgSuccess(t('common.messages.saveSuccess'))
         emit('refresh')
         dialogVisible.value = false
       })
@@ -70,22 +72,23 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="设置用户组" @closed="resetData">
+  <MkDialog v-model="dialogVisible" :title="t('userGroup.set')" @closed="resetData">
     <el-form
       ref="batchGroupFormRef"
       :model="batchGroupForm"
       :rules="batchGroupFormRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="设置方式">
+      <el-form-item :label="t('user.assignment.label')">
         <el-radio-group v-model="batchGroupForm.is_append">
-          <el-radio :value="true">追加</el-radio>
-          <el-radio :value="false">替换</el-radio>
+          <el-radio :value="true">{{ t('user.assignment.append') }}</el-radio>
+          <el-radio :value="false">{{ t('user.assignment.replace') }}</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="用户组" prop="user_group_ids">
+      <el-form-item :label="t('userGroup.title')" prop="user_group_ids">
         <el-select
           v-model="batchGroupForm.user_group_ids"
           class="w-full"
@@ -93,7 +96,7 @@ defineExpose({ open })
           clearable
           filterable
           multiple
-          placeholder="请选择用户组"
+          :placeholder="t('userGroup.placeholder')"
           fit-input-width
         >
           <el-option v-for="userGroup in userGroupOptions" :key="userGroup.id" :label="userGroup.name" :value="userGroup.id" />
@@ -102,8 +105,10 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" :loading="submitting" @click="submitBatchSetUserGroups">保存</el-button>
+      <!-- 取消批量设置用户组 -->
+      <el-button plain @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存用户组设置 -->
+      <el-button type="primary" :loading="submitting" @click="submitBatchSetUserGroups">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

@@ -17,7 +17,6 @@
       "requiredMessage": "请选择文档"
     },
     "labels": {
-      "activeStatus": "启用状态",
       "characters": "字符数",
       "paragraphs": "分段"
     },

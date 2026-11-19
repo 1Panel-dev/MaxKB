@@ -17,7 +17,6 @@
       "requiredMessage": "Select a document"
     },
     "labels": {
-      "activeStatus": "Activation status",
       "characters": "Characters",
       "paragraphs": "Segments"
     },

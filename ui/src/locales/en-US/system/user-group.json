@@ -1,16 +1,20 @@
 {
   "title": "User group",
+  "chatTitle": "Chat user groups",
   "createTitle": "Create user group",
   "renameTitle": "Rename user group",
   "placeholder": "Select a user group",
+  "requiredMessage": "Select a user group",
   "name": {
     "label": "User group name",
     "placeholder": "Enter a user group name",
     "requiredMessage": "Enter a user group name"
   },
+  "set": "Set user groups",
   "delete": {
     "title": "Delete user group",
     "description": "Deleting this group removes its members from the group and revokes resource permissions inherited through it. Proceed with caution.",
+    "chatDescription": "Deleting this group removes its members from the group. Proceed with caution.",
     "removeDescription": "Removing members revokes their resource permissions inherited through this user group. Proceed with caution."
   }
 }
