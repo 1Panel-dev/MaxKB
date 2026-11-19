@@ -15271,6 +15271,16 @@ msgstr "Check if the fields are correct"
 msgid "This Bot ID is already in use by the agent named \"{name}\"."
 msgstr "This Bot ID is already in use by the agent named \"{name}\"."
 
+#: apps/xpack/serializers/platform_serializer.py:21
+#, python-brace-format
+msgid "This App ID is already in use by the agent named \"{name}\"."
+msgstr "This App ID is already in use by the agent named \"{name}\"."
+
+#: apps/xpack/serializers/platform_serializer.py:22
+#, python-brace-format
+msgid "This Client ID is already in use by the agent named \"{name}\"."
+msgstr "This Client ID is already in use by the agent named \"{name}\"."
+
 #: apps/xpack/serializers/platform_serializer.py:204
 #, python-brace-format
 msgid "The platform configuration corresponding to {type} was not found"
