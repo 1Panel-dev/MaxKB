@@ -28,7 +28,6 @@
     "description": "Import content from Lark documents."
   },
   "workflow": {
-    "title": "Workflow",
     "label": "Workflow knowledge",
     "createTitle": "Create workflow knowledge",
     "description": "Use a custom workflow to build knowledge."

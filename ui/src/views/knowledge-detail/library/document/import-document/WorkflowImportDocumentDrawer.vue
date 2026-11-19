@@ -141,7 +141,7 @@ defineExpose({ open })
       <div class="flex w-full">
         <h4>{{ t('knowledge.document.import.title') }}</h4>
         <el-steps v-if="hasKnowledgeBaseInput" :active="activeStep" finish-status="success" class="absolute-center w-85!">
-          <el-step :title="t('workflow.dataSource.selectTitle')" />
+          <el-step :title="t('resource.dataSource.selectTitle')" />
           <el-step :title="userInputTitle" />
         </el-steps>
       </div>

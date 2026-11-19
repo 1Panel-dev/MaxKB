@@ -1,0 +1,10 @@
+{
+  "dataSource": {
+    "documentsUnavailableMessage": "当前知识库不支持数据源文件查询"
+  },
+  "executionResult": {
+    "title": "执行结果",
+    "success": "执行成功",
+    "failure": "执行失败"
+  }
+}

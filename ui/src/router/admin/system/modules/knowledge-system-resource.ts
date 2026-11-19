@@ -97,7 +97,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
         meta: {
           permission: () => perm.knowledge.system.debug(),
           next: 'system-resource-knowledge-retrieval',
-          title: 'knowledge.workflow.title',
+          title: 'workflow.title',
           icon: 'icon_ticket-flow_outlined',
           order: 20,
         },

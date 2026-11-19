@@ -7,6 +7,13 @@
   "retryUpload": "重新上傳",
   "limits": "每次最多上傳 {count} 個檔案，每個檔案不超過 {size} MB",
   "formats": "支援格式",
+  "types": {
+    "document": "文件",
+    "image": "圖片",
+    "audio": "音訊",
+    "video": "影片",
+    "other": "其他檔案"
+  },
   "extension": {
     "add": "新增副檔名",
     "duplicateMessage": "副檔名已存在"

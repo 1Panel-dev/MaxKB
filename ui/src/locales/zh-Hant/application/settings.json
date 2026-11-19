@@ -1,7 +1,6 @@
 {
   "settings": {
     "model": "模型設定",
-    "skills": "技能",
     "advanced": "進階設定",
     "unsavedMessage": "設定有尚未儲存的修改，儲存後於除錯時生效"
   },
@@ -26,6 +25,10 @@
       "label": "問題最佳化",
       "defaultValue": "()裡面是使用者問題，根據上下文回答推測使用者問題({question})。要求：輸出一個補全問題，並且放在{dataTags}標籤中"
     }
+  },
+  "skills": {
+    "label": "技能",
+    "outputExecution": "輸出執行過程"
   },
   "prologue": {
     "label": "開場白",
@@ -56,6 +59,20 @@
       "placeholder": "請選擇觸發週期",
       "requiredMessage": "請選擇觸發週期"
     }
+  },
+  "fileUpload": {
+    "label": "檔案上傳",
+    "title": "檔案上傳設定",
+    "description": "開啟後，問答頁面會顯示上傳檔案的按鈕。",
+    "method": {
+      "label": "上傳方式",
+      "local": "本機上傳",
+      "url": "URL 上傳",
+      "requiredMessage": "請至少選擇一種上傳方式"
+    },
+    "maxFiles": "單次最多上傳檔案數",
+    "fileSize": "每個檔案最大",
+    "allowedTypes": "允許上傳的檔案類型"
   },
   "speechInput": {
     "label": "語音輸入",

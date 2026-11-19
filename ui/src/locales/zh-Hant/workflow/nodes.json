@@ -1,7 +1,23 @@
 {
+  "node": {
+    "title": "節點"
+  },
+  "start": {
+    "label": "開始",
+    "question": "使用者問題",
+    "currentTime": "目前時間",
+    "chatId": "對話 ID",
+    "chatUserId": "對話使用者 ID",
+    "chatUserType": "對話使用者類型",
+    "chatUserGroup": "對話使用者群組",
+    "chatUser": "對話使用者"
+  },
   "aiChat": {
     "label": "AI 對話",
-    "description": "與 AI 大語言模型進行對話"
+    "description": "與 AI 大語言模型進行對話",
+    "answer": "AI 回答內容",
+    "reasoningContent": "思考過程",
+    "vision": "視覺"
   },
   "llm": {
     "label": "LLM",

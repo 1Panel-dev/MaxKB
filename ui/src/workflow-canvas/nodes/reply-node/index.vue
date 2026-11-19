@@ -3,6 +3,7 @@ import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vu
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
+import { START_NODE_REFERENCES } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import { REPLY_CONTENT_TYPE_LABELS } from './constant'
@@ -47,8 +48,8 @@ const formData = computed<ReplyNodeForm>({
 
 const contentPlaceholder = computed(() => {
   if (formData.value.content_type === 'TOOL') return '[{"id": "call_1", "name": "get_weather", "arguments": "{}", "content": "晴"}]'
-  if (formData.value.content_type === 'HTML') return '<p>HTML 内容，可以引用系统中变量，如 {{开始.question}}</p>'
-  return '回复内容，可以引用系统中变量，如 {{开始.question}}'
+  if (formData.value.content_type === 'HTML') return `<p>HTML 内容，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}</p>`
+  return `回复内容，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`
 })
 
 async function validate() {

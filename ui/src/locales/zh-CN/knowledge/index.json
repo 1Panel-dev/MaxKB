@@ -28,7 +28,6 @@
     "description": "通过飞书文档构建知识库"
   },
   "workflow": {
-    "title": "工作流",
     "label": "工作流知识库",
     "createTitle": "创建工作流知识库",
     "description": "通过自定义工作流方式构建知识库"

@@ -165,7 +165,9 @@
     "input": "请输入",
     "inputField": "请输入 {label}",
     "select": "请选择",
-    "search": "搜索"
+    "selectField": "请选择 {label}",
+    "search": "搜索",
+    "searchByName": "按名称搜索"
   },
   "validation": {
     "formInvalid": "请检查表单填写内容",

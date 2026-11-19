@@ -6,7 +6,7 @@ import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
-import { FILE_REFERENCE_EXAMPLE } from '@/workflow-canvas/config/constants'
+import { FILE_REFERENCE_EXAMPLE, START_NODE_REFERENCES } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
@@ -44,7 +44,7 @@ const defaultForm: ImageToVideoNodeForm = {
   model_id: '',
   model_id_type: 'default',
   model_id_reference: [],
-  prompt: '{{开始.question}}',
+  prompt: START_NODE_REFERENCES.question,
   negative_prompt: '',
   dialogue_number: 0,
   dialogue_type: 'NODE',

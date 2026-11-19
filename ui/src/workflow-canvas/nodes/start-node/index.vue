@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowNodeField } from '@/workflow-canvas/types'
 import type { BaseNodeModel } from '@logicflow/core'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
@@ -8,6 +9,8 @@ import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'WorkflowStartNode' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 interface SourceField {
   field?: string
@@ -24,14 +27,8 @@ interface BaseNodeData {
   long_term_enable?: boolean
 }
 
-const fileUploadFields: Array<{ label: string; value: FileUploadField }> = [
-  { label: '文档', value: 'document' },
-  { label: '图片', value: 'image' },
-  { label: '音频', value: 'audio' },
-  { label: '视频', value: 'video' },
-  { label: '其他', value: 'other' },
-]
-const fileUploadFieldValues = new Set<FileUploadField>(fileUploadFields.map(({ value }) => value))
+const fileUploadFields: FileUploadField[] = ['document', 'image', 'audio', 'video', 'other']
+const fileUploadFieldValues = new Set<FileUploadField>(fileUploadFields)
 
 const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel()
@@ -54,7 +51,7 @@ function getBaseNode() {
 }
 
 function refreshStartQuestionField() {
-  const questionFields = [{ label: '用户问题', value: 'question' }]
+  const questionFields = [{ label: t('workflow.start.question'), value: 'question' }]
   nodeConfig.fields = questionFields
   model.properties.fields = questionFields
 }
@@ -74,13 +71,13 @@ function getRefreshFieldList() {
 
 function refreshFieldList() {
   nodeConfig.globalFields = [
-    { label: '当前时间', value: 'time' },
-    { label: '历史聊天记录', value: 'history_context' },
-    { label: '对话 ID', value: 'chat_id' },
-    { label: '对话用户 ID', value: 'chat_user_id' },
-    { label: '对话用户类型', value: 'chat_user_type' },
-    { label: '对话用户组', value: 'chat_user_group' },
-    { label: '对话用户', value: 'chat_user' },
+    { label: t('workflow.start.currentTime'), value: 'time' },
+    { label: t('workflow.history.label'), value: 'history_context' },
+    { label: t('workflow.start.chatId'), value: 'chat_id' },
+    { label: t('workflow.start.chatUserId'), value: 'chat_user_id' },
+    { label: t('workflow.start.chatUserType'), value: 'chat_user_type' },
+    { label: t('workflow.start.chatUserGroup'), value: 'chat_user_group' },
+    { label: t('workflow.start.chatUser'), value: 'chat_user' },
     ...getRefreshFieldList(),
   ]
 }
@@ -103,14 +100,16 @@ function refreshFileUploadConfig() {
     return
   }
 
-  const enabledFileFields = fileUploadFields.filter(({ value }) => baseNodeData.file_upload_setting?.[value])
+  const enabledFileFields = fileUploadFields
+    .filter((value) => baseNodeData.file_upload_setting?.[value])
+    .map((value) => ({ label: t(`upload.types.${value}`), value }))
   nodeConfig.fields = [...fields, ...enabledFileFields]
 }
 
 function refreshLongTermConfig() {
   const fields = (cloneDeep(nodeConfig.fields ?? []) as WorkflowNodeField[]).filter(({ value }) => value !== 'memory')
   const baseNodeData = getBaseNode()?.properties.node_data as BaseNodeData | undefined
-  nodeConfig.fields = baseNodeData?.long_term_enable ? [...fields, { label: '长期记忆', value: 'memory' }] : fields
+  nodeConfig.fields = baseNodeData?.long_term_enable ? [...fields, { label: t('application.longTermMemory.label'), value: 'memory' }] : fields
 }
 
 onMounted(() => {
@@ -135,11 +134,12 @@ onBeforeUnmount(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">全局变量</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.globalVariables.title') }}</h6>
     <div class="mk-gray-card space-y-4">
       <template v-for="field in globalFields" :key="field.value">
         <div class="group flex-between">
           <span class="break-all">{{ field.label }} {{ formatFieldReference(field.value) }}</span>
+          <!-- 复制全局变量引用 -->
           <el-button class="group-hover-visible" link @click="copyField('global', field.value)">
             <MkIcon name="icon_copy_outlined" />
           </el-button>
@@ -148,11 +148,12 @@ onBeforeUnmount(() => {
     </div>
 
     <template v-if="chatFields.length">
-      <h6 class="mk-title-decoration my-2">会话变量</h6>
+      <h6 class="mk-title-decoration my-2">{{ t('workflow.conversationVariables.title') }}</h6>
       <div class="mk-gray-card space-y-4">
         <template v-for="field in chatFields" :key="field.value">
           <div class="group flex-between">
             <span class="break-all">{{ field.label }} {{ formatFieldReference(field.value) }}</span>
+            <!-- 复制会话变量引用 -->
             <el-button class="group-hover-visible" link @click="copyField('chat', field.value)">
               <MkIcon name="icon_copy_outlined" />
             </el-button>

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { NodeMenuItem, NodeMenuTab } from './types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import BasicNodeMenu from './BasicNodeMenu.vue'
 import ResourceNodeMenu from './ResourceNodeMenu.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'NodeMenu' })
 
@@ -33,11 +36,15 @@ function handleDragStart(node: NodeMenuItem, event: PointerEvent) {
     @mousemove.stop
   >
     <el-tabs v-model="activeTab" class="small p-4 pb-0">
-      <el-tab-pane label="基础组件" name="basic" />
-      <el-tab-pane label="数据源" name="data-source" v-if="workflowMode === WorkflowMode.Knowledge || workflowMode === WorkflowMode.KnowledgeLoop" />
-      <el-tab-pane label="工具" name="tool" />
+      <el-tab-pane :label="t('workflow.menu.basicComponents')" name="basic" />
       <el-tab-pane
-        label="智能体"
+        :label="t('resource.dataSource.label')"
+        name="data-source"
+        v-if="workflowMode === WorkflowMode.Knowledge || workflowMode === WorkflowMode.KnowledgeLoop"
+      />
+      <el-tab-pane :label="t('tool.title')" name="tool" />
+      <el-tab-pane
+        :label="t('application.title')"
         name="application"
         v-if="workflowMode === WorkflowMode.Application || workflowMode === WorkflowMode.ApplicationLoop"
       />

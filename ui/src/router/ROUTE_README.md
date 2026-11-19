@@ -181,6 +181,7 @@ Workspace 根据目标路由中的 workspaceId、knowledgeId 判断权限，权�
 工作空间智能体列表、系统资源管理智能体列表和资源授权中的智能体分类共用 `application.title`；两种范围的对话日志路由共用 `application.chatLog.title`，发布渠道路由共用 `application.access.title`。
 两种范围的简易设置与高级工作流设置菜单共用 `common.labels.settings`；简易设置页面通过详情布局接收已翻译的标题。
 工作空间、系统资源管理和系统共享资源的知识库列表路由，以及工作空间知识库菜单共用 `knowledge.title`。
+知识库四种资源范围的工作流入口菜单共用 `workflow.title`。
 智能体和知识库各资源范围的对话用户菜单共用 `chatUser.title`。
 工作空间触发器菜单与列表共用 `trigger.title`。
 系统用户管理菜单与列表共用 `user.title`。

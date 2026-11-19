@@ -73,7 +73,6 @@
     }
   },
   "dataSource": {
-    "label": "数据源",
     "createTitle": "创建数据源",
     "editTitle": "编辑数据源",
     "duplicateTitle": "复制数据源",

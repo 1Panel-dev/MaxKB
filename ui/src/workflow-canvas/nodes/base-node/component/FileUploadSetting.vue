@@ -28,17 +28,17 @@ const rules: FormRules<FileUploadSettingData> = {
       required: true,
       trigger: 'change',
       validator: (_rule, _value, callback) => {
-        callback(formData.value.local_upload || formData.value.url_upload ? undefined : new Error(t('workflow.fileUpload.method.requiredMessage')))
+        callback(formData.value.local_upload || formData.value.url_upload ? undefined : new Error(t('application.fileUpload.method.requiredMessage')))
       },
     },
   ],
 }
 
 const fileTypes = reactive([
-  { field: 'document', label: computed(() => t('workflow.fileUpload.types.document')), icon: documentIcon, extensions: DOCUMENT_EXTENSIONS },
-  { field: 'image', label: computed(() => t('workflow.fileUpload.types.image')), icon: imageIcon, extensions: IMAGE_EXTENSIONS },
-  { field: 'audio', label: computed(() => t('workflow.fileUpload.types.audio')), icon: audioIcon, extensions: AUDIO_EXTENSIONS },
-  { field: 'video', label: computed(() => t('workflow.fileUpload.types.video')), icon: videoIcon, extensions: VIDEO_EXTENSIONS },
+  { field: 'document', label: computed(() => t('upload.types.document')), icon: documentIcon, extensions: DOCUMENT_EXTENSIONS },
+  { field: 'image', label: computed(() => t('upload.types.image')), icon: imageIcon, extensions: IMAGE_EXTENSIONS },
+  { field: 'audio', label: computed(() => t('upload.types.audio')), icon: audioIcon, extensions: AUDIO_EXTENSIONS },
+  { field: 'video', label: computed(() => t('upload.types.video')), icon: videoIcon, extensions: VIDEO_EXTENSIONS },
 ] as const)
 
 const presetExtensions = fileTypes.flatMap(({ extensions }) => extensions)
@@ -67,7 +67,7 @@ function resetData() {
   <el-button text type="primary" @click="open">
     <MkIcon name="icon_setting" />
   </el-button>
-  <MkDialog v-model="visible" :title="t('workflow.fileUpload.title')" @closed="resetData">
+  <MkDialog v-model="visible" :title="t('application.fileUpload.title')" @closed="resetData">
     <el-form
       :validate-on-rule-change="false"
       ref="formRef"
@@ -77,21 +77,21 @@ function resetData() {
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item :label="t('workflow.fileUpload.method.label')" prop="local_upload">
+      <el-form-item :label="t('application.fileUpload.method.label')" prop="local_upload">
         <div class="flex w-full flex-wrap gap-6">
-          <el-checkbox v-model="formData.local_upload">{{ t('workflow.fileUpload.method.local') }}</el-checkbox>
-          <el-checkbox v-model="formData.url_upload">{{ t('workflow.fileUpload.method.url') }}</el-checkbox>
+          <el-checkbox v-model="formData.local_upload">{{ t('application.fileUpload.method.local') }}</el-checkbox>
+          <el-checkbox v-model="formData.url_upload">{{ t('application.fileUpload.method.url') }}</el-checkbox>
         </div>
       </el-form-item>
-      <el-form-item :label="t('workflow.fileUpload.maxFiles')">
+      <el-form-item :label="t('application.fileUpload.maxFiles')">
         <MkSlider v-model="formData.maxFiles" :max="100" :min="1" />
       </el-form-item>
 
-      <el-form-item :label="`${t('workflow.fileUpload.fileSize')} (MB)`">
+      <el-form-item :label="`${t('application.fileUpload.fileSize')} (MB)`">
         <MkSlider v-model="formData.fileLimit" :max="1000" :min="1" />
       </el-form-item>
 
-      <el-form-item :label="t('workflow.fileUpload.allowedTypes')">
+      <el-form-item :label="t('application.fileUpload.allowedTypes')">
         <div class="w-full space-y-2">
           <template v-for="fileType in fileTypes" :key="fileType.field">
             <MkCardCheckbox v-model="formData[fileType.field]" :label="fileType.label">
@@ -105,11 +105,11 @@ function resetData() {
             </MkCardCheckbox>
           </template>
 
-          <MkCardCheckbox v-model="formData.other" :label="t('workflow.fileUpload.types.other')">
+          <MkCardCheckbox v-model="formData.other" :label="t('upload.types.other')">
             <div class="flex-align-center min-w-0 gap-3">
               <img class="shrink-0 w-6" src="@/assets/file-type/unknown-icon.svg" />
               <div class="min-w-0 flex-1">
-                <h6 class="mb-2">{{ t('workflow.fileUpload.types.other') }}</h6>
+                <h6 class="mb-2">{{ t('upload.types.other') }}</h6>
                 <MkTagsEdit v-model="formData.otherExtensions" :preset-extensions="presetExtensions" />
               </div>
             </div>

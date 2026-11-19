@@ -10,5 +10,5 @@ export const TOOL_TYPE_OPTIONS = reactive([
   { label: computed(() => t('tool.skill.label')), value: TOOL_TYPE.SKILL },
   { label: computed(() => t('tool.workflow.label')), value: TOOL_TYPE.WORKFLOW },
   { label: computed(() => t('tool.mcp.label')), value: TOOL_TYPE.MCP },
-  { label: computed(() => t('tool.dataSource.label')), value: TOOL_TYPE.DATA_SOURCE },
+  { label: computed(() => t('resource.dataSource.label')), value: TOOL_TYPE.DATA_SOURCE },
 ]) satisfies { label: string; value: ToolType | '' }[]
