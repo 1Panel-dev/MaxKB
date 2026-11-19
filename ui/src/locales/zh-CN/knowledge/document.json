@@ -11,10 +11,10 @@
       "placeholder": "请输入文档地址，一行一个，地址不正确文档会导入失败。",
       "requiredMessage": "请输入文档地址"
     },
-    "target": {
-      "label": "保存到文档",
-      "placeholder": "请选择文档",
-      "requiredMessage": "请选择文档"
+    "targetDocument": {
+      "label": "目标文档",
+      "placeholder": "请选择目标文档",
+      "requiredMessage": "请选择目标文档"
     },
     "labels": {
       "characters": "字符数",

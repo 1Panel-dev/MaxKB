@@ -50,7 +50,7 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
       />
       <HeaderActions :collapse="deviceType === DEVICE_TYPE.MOBILE">
         <!-- 进入分享模式，勾选要分享的对话 -->
-        <MkAction v-if="showShare" label="分享" icon="icon_share_outlined" :disabled="!canShare" @click="shareLink?.enterShare()" />
+        <MkAction v-if="showShare" label="分享" :size="18" icon="icon_share_outlined" :disabled="!canShare" @click="shareLink?.enterShare()" />
         <!-- 导出对话 -->
         <ExportAction />
         <slot />

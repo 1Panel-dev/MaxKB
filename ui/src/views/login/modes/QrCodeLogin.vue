@@ -4,10 +4,10 @@ import { useI18n } from 'vue-i18n'
 import type { LoginService } from '../types'
 import type { LoginConfig, QrCodeConfig, QrCodeProvider } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
-import { LOGIN_METHOD_LABEL_KEYS } from '../constants'
 import DingTalkQrCode from '../scanComponents/dingtalkQrCode.vue'
 import LarkQrCode from '../scanComponents/larkQrCode.vue'
 import WecomQrCode from '../scanComponents/wecomQrCode.vue'
+import { LOGIN_METHOD_LABEL_KEYS } from '@/constants/auth'
 
 defineOptions({ name: 'QrCodeLogin' })
 

@@ -165,7 +165,7 @@ defineExpose({ validate, reset })
                     </el-button>
                   </div>
                 </template>
-                <div class="my-2">
+                <div class="mt-2 mb-1">
                   <TaskParameterForm
                     ref="parameterRefs"
                     v-model="task.parameter"

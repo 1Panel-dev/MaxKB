@@ -1,0 +1,31 @@
+{
+  "title": "Portal access settings",
+  "name": {
+    "default": "Agent portal",
+    "placeholder": "Enter a portal name",
+    "requiredMessage": "Enter a portal name"
+  },
+  "access": {
+    "title": "Access settings",
+    "web": {
+      "label": "Web access",
+      "description": "Allow access to the portal page through its URL"
+    },
+    "agentApi": {
+      "label": "Agent chat API",
+      "description": "Allow chat users to use their API keys to chat with agents through the API"
+    },
+    "agentMcp": {
+      "label": "Agent MCP service",
+      "description": "Allow chat users to use their API keys to call agent MCP services"
+    },
+    "knowledgeMcp": {
+      "label": "Knowledge MCP service",
+      "description": "Allow chat users to use their API keys to call MCP services for knowledge retrieval"
+    }
+  },
+  "cors": {
+    "title": "Cross-origin settings",
+    "placeholder": "Enter the allowed origins. When enabled, leaving this empty allows all origins.\nEnter one origin per line, for example:\nhttp://127.0.0.1:5678\nhttps://dataease.io"
+  }
+}

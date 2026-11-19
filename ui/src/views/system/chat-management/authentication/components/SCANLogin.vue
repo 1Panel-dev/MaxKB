@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { QrCodeProvider, QrLoginPlatform, QrLoginPlatformPayload } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import ChatUserAuthScanApi from '@/api/admin/system/chat-management/chat-user-auth-scan.ts'
@@ -7,9 +8,10 @@ import dingtalkLogo from '@/assets/logo/logo_dingtalk.svg'
 import enterpriseWechatLogo from '@/assets/logo/logo_enterprise-wechat.svg'
 import larkLogo from '@/assets/logo/logo_lark.svg'
 import EditSCANDrawer from '../EditSCANDrawer.vue'
-import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
+
+const { t } = useI18n({ useScope: 'global' })
 
 interface QrLoginPlatformView extends QrLoginPlatformPayload {
   isValid: boolean
@@ -55,7 +57,7 @@ function loadQrPlatforms() {
 function handlePlatformStatusChange(platform: QrLoginPlatformView) {
   loading.value = true
   return ChatUserAuthScanApi.postQrLoginPlatform({ key: platform.key, config: platform.config, isActive: platform.isActive })
-    .then(() => MsgSuccess('保存成功'))
+    .then(() => MsgSuccess(t('common.messages.saveSuccess')))
     .catch((error) => {
       platform.isActive = !platform.isActive
       throw error
@@ -82,14 +84,16 @@ onMounted(loadQrPlatforms)
       <el-card shadow="hover" @click="handleEditPlatform(platform)">
         <div class="flex-between">
           <div class="flex-align-center gap-2">
-            <img :src="platform.logo" :alt="LOGIN_METHOD_LABELS[platform.key]" class="h-6 w-6" />
-            <h4>{{ LOGIN_METHOD_LABELS[platform.key] }}</h4>
-            <el-tag v-if="platform.isValid" size="small" type="success">有效</el-tag>
+            <img :src="platform.logo" :alt="t(`auth.methods.${platform.key}`)" class="h-6 w-6" />
+            <h4>{{ t(`auth.methods.${platform.key}`) }}</h4>
+            <el-tag v-if="platform.isValid" size="small" type="success">{{ t('auth.qrCode.valid') }}</el-tag>
           </div>
 
           <div class="flex-align-center gap-4">
             <!-- 配置扫码登录平台 -->
-            <el-button :disabled="!perm.system.chatAuth.edit()" plain @click.stop="handleEditPlatform(platform)">{{ platform.isValid ? '配置' : '未配置' }}</el-button>
+            <el-button :disabled="!perm.system.chatAuth.edit()" plain @click.stop="handleEditPlatform(platform)">
+              {{ platform.isValid ? t('common.configuration.label') : t('common.configuration.unconfigured') }}
+            </el-button>
             <template v-if="platform.isValid">
               <el-divider direction="vertical" />
               <!-- 启停扫码登录，阻止点击打开配置 -->

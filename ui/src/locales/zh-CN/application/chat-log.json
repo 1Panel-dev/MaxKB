@@ -18,13 +18,9 @@
       "label": "来源",
       "online": "线上使用",
       "apiCall": "API 调用",
-      "enterpriseWechat": "企业微信",
       "wechatPublicAccount": "微信公众号",
-      "lark": "飞书",
-      "dingtalk": "钉钉",
       "enterpriseWechatRobot": "企业微信机器人",
-      "trigger": "触发器",
-      "slack": "Slack"
+      "trigger": "触发器"
     },
     "cleanStrategy": {
       "title": "清除策略",

@@ -18,13 +18,9 @@
       "label": "Source",
       "online": "Web app",
       "apiCall": "API call",
-      "enterpriseWechat": "WeCom",
       "wechatPublicAccount": "WeChat Official Account",
-      "lark": "Lark",
-      "dingtalk": "DingTalk",
       "enterpriseWechatRobot": "WeCom bot",
-      "trigger": "Trigger",
-      "slack": "Slack"
+      "trigger": "Trigger"
     },
     "cleanStrategy": {
       "title": "Cleanup policy",

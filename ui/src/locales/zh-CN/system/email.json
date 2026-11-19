@@ -1,0 +1,24 @@
+{
+  "title": "邮箱设置",
+  "account": {
+    "label": "SMTP 账户",
+    "placeholder": "请输入 SMTP 账户",
+    "requiredMessage": "请输入 SMTP 账户"
+  },
+  "senderEmail": {
+    "label": "发件人邮箱",
+    "placeholder": "请输入发件人邮箱",
+    "requiredMessage": "请输入发件人邮箱"
+  },
+  "password": {
+    "placeholder": "请输入发件人密码"
+  },
+  "ssl": {
+    "label": "启用 SSL",
+    "description": "如果 SMTP 端口是 465，通常需要启用 SSL"
+  },
+  "tls": {
+    "label": "启用 TLS",
+    "description": "如果 SMTP 端口是 587，通常需要启用 TLS"
+  }
+}

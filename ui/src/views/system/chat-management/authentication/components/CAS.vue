@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { AuthProviderSettingPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
@@ -9,6 +10,7 @@ import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
 
 defineOptions({ name: 'CasAuthenticationSetting' })
+const { t } = useI18n({ useScope: 'global' })
 
 const defaultRedirectUrl = `${window.location.origin}${CHAT_API_BASE_PATH}/auth/cas`
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
@@ -18,11 +20,11 @@ const form = reactive<AuthProviderSettingPayload>({
   config: { ldpUri: '', validateUrl: '', redirectUrl: defaultRedirectUrl },
   is_active: false,
 })
-const rules = reactive<FormRules<AuthProviderSettingPayload>>({
-  'config.ldpUri': [{ whitespace: true, required: true, message: '请输入 ldpUri', trigger: 'blur' }],
-  'config.validateUrl': [{ whitespace: true, required: true, message: '请输入验证地址', trigger: 'blur' }],
-  'config.redirectUrl': [{ whitespace: true, required: true, message: '请输入回调地址', trigger: 'blur' }],
-})
+const rules = computed<FormRules<AuthProviderSettingPayload>>(() => ({
+  'config.ldpUri': [{ whitespace: true, required: true, message: t('common.validation.inputFieldRequired', { label: 'ldpUri' }), trigger: 'blur' }],
+  'config.validateUrl': [{ whitespace: true, required: true, message: t('auth.cas.validateUrl.requiredMessage'), trigger: 'blur' }],
+  'config.redirectUrl': [{ whitespace: true, required: true, message: t('auth.fields.callbackUrl.requiredMessage'), trigger: 'blur' }],
+}))
 
 function loadSetting() {
   loading.value = true
@@ -51,7 +53,7 @@ function submit() {
     if (!valid) return
     loading.value = true
     ChatUserAuthApi.putAuthSetting(form.auth_type, form)
-      .then(() => MsgSuccess('保存成功'))
+      .then(() => MsgSuccess(t('common.messages.saveSuccess')))
       .finally(() => (loading.value = false))
   })
 }
@@ -66,23 +68,27 @@ onMounted(() => loadSetting())
     class="max-w-200"
     :model="form"
     :rules="rules"
+    :validate-on-rule-change="false"
     label-position="top"
     require-asterisk-position="right"
     @submit.prevent
   >
-    <el-form-item label="ldpUri" prop="config.ldpUri"><el-input v-model="form.config.ldpUri" placeholder="请输入 ldpUri" /></el-form-item>
-    <el-form-item label="验证地址" prop="config.validateUrl">
-      <el-input v-model="form.config.validateUrl" placeholder="请输入验证地址" />
+    <el-form-item label="ldpUri" prop="config.ldpUri">
+      <el-input v-model="form.config.ldpUri" :placeholder="t('common.placeholders.inputField', { label: 'ldpUri' })" />
     </el-form-item>
-    <el-form-item label="回调地址" prop="config.redirectUrl">
-      <el-input v-model="form.config.redirectUrl" placeholder="请输入回调地址" />
+    <el-form-item :label="t('auth.cas.validateUrl.label')" prop="config.validateUrl">
+      <el-input v-model="form.config.validateUrl" :placeholder="t('auth.cas.validateUrl.placeholder')" />
+    </el-form-item>
+    <el-form-item :label="t('auth.fields.callbackUrl.label')" prop="config.redirectUrl">
+      <el-input v-model="form.config.redirectUrl" :placeholder="t('auth.fields.callbackUrl.placeholder')" />
     </el-form-item>
     <el-form-item>
       <div class="flex-column">
-        <span>启用 CAS 认证</span>
+        <span>{{ t('auth.enableAuthentication', { provider: LOGIN_METHOD.CAS }) }}</span>
         <el-switch v-model="form.is_active" class="self-start" />
       </div>
     </el-form-item>
-    <el-button v-if="perm.system.chatAuth.edit()" type="primary" @click="submit">保存</el-button>
+    <!-- 保存 -->
+    <el-button v-if="perm.system.chatAuth.edit()" type="primary" @click="submit">{{ t('common.actions.save') }}</el-button>
   </el-form>
 </template>

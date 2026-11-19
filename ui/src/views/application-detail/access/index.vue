@@ -93,7 +93,7 @@ watch(
             <div class="flex-align-center shrink-0 gap-4">
               <!-- 配置发布渠道 -->
               <el-button v-if="applicationAccessPermission('accessEdit')" plain @click.stop="handleOpenPlatform(platform)">
-                {{ platformStatus[platform.key]?.[0] ? t('application.access.actions.configure') : t('application.access.states.unconfigured') }}
+                {{ platformStatus[platform.key]?.[0] ? t('common.configuration.label') : t('common.configuration.unconfigured') }}
               </el-button>
               <template v-if="platformStatus[platform.key]?.[0]">
                 <el-divider direction="vertical" />

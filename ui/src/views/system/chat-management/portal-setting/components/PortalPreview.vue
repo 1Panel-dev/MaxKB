@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n({ useScope: 'global' })
 defineProps<{ name: string; logo: string | null }>()
 </script>
 
@@ -12,22 +15,22 @@ defineProps<{ name: string; logo: string | null }>()
       </div>
       <div class="flex-align-center gap-2 text-primary p-2 py-[9px] bg-primary/10 rounded-md">
         <MkIcon name="icon_card_filled" :size="18" />
-        <h6>智能体</h6>
+        <h6>{{ t('application.title') }}</h6>
       </div>
       <div class="flex-align-center gap-2 px-2 py-[9px]">
         <MkIcon name="icon_new-chat_outlined" :size="18" />
-        <span>新建对话</span>
+        <span>{{ t('chat.newChat') }}</span>
       </div>
       <div class="flex-align-center mt-auto gap-2 px-2">
         <el-avatar :size="32" class="shrink-0 bg-primary-gradient!">
           <img src="@/assets/mk_icon_user_gradient.svg" alt="" style="width: 54%" />
         </el-avatar>
-        <span>姓名</span>
+        <span>{{ t('user.name.label') }}</span>
       </div>
     </div>
     <div class="min-w-0 flex-1 p-6">
       <div class="flex-between">
-        <h4 class="shrink-0">全部智能体</h4>
+        <h4 class="shrink-0">{{ t('application.categories.all') }}</h4>
         <MkSearchInput readonly class="w-60! max-w-full" />
       </div>
     </div>

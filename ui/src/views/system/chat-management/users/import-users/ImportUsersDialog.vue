@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from 'vue'
+import { mapValues } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { ChatUserSyncConflict, ListItem, LoginMethod, OptionItem } from '@/api/types'
 import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
@@ -8,7 +9,7 @@ import ChatUserApi from '@/api/admin/system/chat-management/chat-user'
 import ChatUserGroupsApi from '@/api/admin/system/chat-management/chat-user-groups'
 import UserManageApi from '@/api/admin/system/user-manage'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
-import { LOGIN_METHOD_LABELS } from '@/constants'
+import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ImportUsersDialog' })
@@ -42,11 +43,8 @@ const canImport = computed(() => Boolean(importUsersForm.syncType) && (!isLocalF
 /* 获取导入用户的来源类型 */
 const syncTypesLoading = ref(false)
 const userSourceLabels = computed<Record<LoginMethod | typeof LOCAL_FILE_SOURCE, string>>(() => ({
-  ...LOGIN_METHOD_LABELS,
+  ...mapValues(LOGIN_METHOD_LABEL_KEYS, (key) => t(key)),
   [LOGIN_METHOD.LOCAL]: t('user.source.local'),
-  [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
-  [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
-  [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
   [LOCAL_FILE_SOURCE]: t('user.source.localFile'),
 }))
 const syncTypeOptions = computed<OptionItem<string>[]>(() =>

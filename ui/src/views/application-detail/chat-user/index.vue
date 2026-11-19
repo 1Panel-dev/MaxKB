@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { mapValues } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { ChatUserAuthorization, ChatUserAuthorizationGroup, ChatUserAuthorizationResource, Dict, OptionItem } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import type { CheckboxValueType } from 'element-plus'
 import { LOGIN_METHOD, RESOURCE_TYPE } from '@/api/enums'
 import { useApplicationDetailContext } from '../context'
-import { LOGIN_METHOD_LABELS } from '@/constants'
+import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 import { isSystemResource } from '@/utils/resource-context'
 import perm from '@/permission'
@@ -81,15 +82,12 @@ const searchFields = computed<OptionItem<string>[]>(() => [
 // 表头用户来源筛选
 const selectedSource = ref<string | null>(null)
 const userSourceLabels = computed<Record<string, string>>(() => ({
-  ...LOGIN_METHOD_LABELS,
+  ...mapValues(LOGIN_METHOD_LABEL_KEYS, (key) => t(key)),
   [LOGIN_METHOD.LOCAL]: t('chatUser.source.local'),
-  [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
-  [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
-  [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
-  OAUTH2: LOGIN_METHOD_LABELS[LOGIN_METHOD.OAUTH2],
+  OAUTH2: t(LOGIN_METHOD_LABEL_KEYS[LOGIN_METHOD.OAUTH2]),
 }))
 const sourceOptions = computed<OptionItem<string>[]>(() =>
-  Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({ label: userSourceLabels.value[value] ?? label, value })),
+  Object.entries(LOGIN_METHOD_LABEL_KEYS).map(([value, key]) => ({ label: userSourceLabels.value[value] ?? t(key), value })),
 )
 const chatUserQuery = computed<Dict<unknown>>(() => ({
   ...chatUserSearchQuery.value,

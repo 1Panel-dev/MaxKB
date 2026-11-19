@@ -48,9 +48,9 @@
       "requiredMessage": "请选择向量模型"
     },
     "targetKnowledge": {
-      "label": "选择知识库",
-      "placeholder": "请选择知识库",
-      "requiredMessage": "请选择知识库"
+      "label": "目标知识库",
+      "placeholder": "请选择目标知识库",
+      "requiredMessage": "请选择目标知识库"
     },
     "webRootUrl": {
       "label": "Web 根地址",

@@ -7,7 +7,7 @@ import type { AccountLoginForm, LoginService } from '../types'
 import type { LoginConfig, LoginMethod } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
-import { LOGIN_METHOD_LABEL_KEYS } from '../constants'
+import { LOGIN_METHOD_LABEL_KEYS } from '@/constants/auth'
 
 defineOptions({ name: 'AccountLogin' })
 
@@ -168,12 +168,12 @@ onMounted(() => {
         </div>
         <el-form-item>
           <!-- 提交账号登录 -->
-          <el-button :loading="isSubmitting" native-type="submit" type="primary" class="w-full">{{ t('auth.login.actions.submit') }}</el-button>
+          <el-button :loading="isSubmitting" native-type="submit" type="primary" class="w-full">{{ t('auth.login.label') }}</el-button>
         </el-form-item>
       </el-form>
       <!-- 忘记密码 -->
       <el-button v-if="loginService.forgotPassword" size="default" class="mt-3" link type="primary" @click="loginService.forgotPassword()">
-        {{ t('auth.login.actions.forgotPassword') }}?
+        {{ t('auth.forgotPassword.label') }}?
       </el-button>
     </div>
     <div v-if="accountLoginMethods.length" class="third-login flex-col-center gap-4">

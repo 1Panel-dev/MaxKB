@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { computed, onActivated, reactive, ref, useTemplateRef } from 'vue'
 import { pick } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ListItem, LoginAuthSettingPayload, LoginMethod, SystemUserGroup } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import { LOGIN_METHOD_LABELS } from '@/constants'
+import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
 
 defineOptions({ name: 'AuthenticationSetting' })
+const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
@@ -36,12 +38,12 @@ const form = reactive<Omit<LoginAuthSettingPayload, 'system_options'>>({
   workspace_id: 'default',
   group_ids: [],
 })
-const rules: FormRules<LoginAuthSettingPayload> = {
-  default_value: [{ required: true, message: '请选择默认登录方式', trigger: 'change' }],
-  login_methods: [{ required: true, message: '请选择登录方式', trigger: 'change' }],
-  role_id: [{ required: true, message: '请选择角色', trigger: 'change' }],
-  workspace_id: [{ required: true, message: '请选择工作空间', trigger: 'change' }],
-}
+const rules = computed<FormRules<LoginAuthSettingPayload>>(() => ({
+  default_value: [{ required: true, message: t('auth.loginSettings.defaultMethod.requiredMessage'), trigger: 'change' }],
+  login_methods: [{ required: true, message: t('auth.loginSettings.method.requiredMessage'), trigger: 'change' }],
+  role_id: [{ required: true, message: t('user.role.requiredMessage'), trigger: 'change' }],
+  workspace_id: [{ required: true, message: t('user.workspace.requiredMessage'), trigger: 'change' }],
+}))
 
 /* 登录方式加载与提交 */
 const loginMethodOptions = ref<NonNullable<LoginAuthSettingPayload['system_options']>>([])
@@ -144,7 +146,7 @@ function submit() {
 
     loading.value = true
     AuthSettingApi.putLoginSetting(pick(form, loginSettingFields))
-      .then(() => MsgSuccess('保存成功'))
+      .then(() => MsgSuccess(t('common.messages.saveSuccess')))
       .finally(() => {
         loading.value = false
       })
@@ -165,39 +167,48 @@ onActivated(() => {
     class="max-w-200"
     :model="form"
     :rules="rules"
+    :validate-on-rule-change="false"
     label-position="top"
     require-asterisk-position="right"
     @submit.prevent
   >
-    <el-form-item label="登录方式" prop="login_methods">
+    <el-form-item :label="t('auth.loginSettings.method.label')" prop="login_methods">
       <el-checkbox-group v-model="form.login_methods" @change="handleLoginMethodsChange" class="flex-wrap">
         <el-checkbox v-for="loginMethodOption in loginMethodOptions" :key="loginMethodOption.value" :value="loginMethodOption.value" class="w-40">
-          {{ LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] || loginMethodOption.label }}
+          {{
+            LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod]
+              ? t(LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod])
+              : loginMethodOption.label
+          }}
         </el-checkbox>
       </el-checkbox-group>
     </el-form-item>
 
-    <el-form-item label="默认登录方式" prop="default_value">
+    <el-form-item :label="t('auth.loginSettings.defaultMethod.label')" prop="default_value">
       <el-select v-model="form.default_value">
         <el-option
           v-for="loginMethodOption in defaultLoginMethodOptions"
           :key="loginMethodOption.value"
           :value="loginMethodOption.value"
-          :label="LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] || loginMethodOption.label"
+          :label="
+            LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod]
+              ? t(LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod])
+              : loginMethodOption.label
+          "
         />
       </el-select>
     </el-form-item>
 
-    <el-form-item label="账号登录验证码设置" required>
+    <el-form-item :label="t('auth.loginSettings.captcha.label')" required>
       <div class="w-full mk-gray-card-lg">
         <div class="flex-align-center gap-2">
-          <span>登录失败</span>
+          <span>{{ t('auth.loginSettings.failurePrefix') }}</span>
           <el-input-number v-model="form.max_attempts" class="w-40!" :max="10" :min="-1" :step="1" :value-on-clear="-1" />
-          <span>次显示验证码</span>
-          <span class="text-N500">(值为-1时，不显示验证码)</span>
+          <span>{{ t('auth.loginSettings.captcha.failureSuffix', form.max_attempts) }}</span>
+          <span class="text-N500">({{ t('auth.loginSettings.captcha.disabledHint') }})</span>
         </div>
         <div class="flex-align-center gap-2 mt-4">
-          <span>登录失败</span>
+          <span>{{ t('auth.loginSettings.failurePrefix') }}</span>
           <el-input-number
             v-model="form.failed_attempts"
             class="w-40!"
@@ -207,8 +218,8 @@ onActivated(() => {
             :value-on-clear="-1"
             @change="form.failed_attempts = normalizeNonZeroNumber($event)"
           />
-          <span>次，</span>
-          <span>锁定账号</span>
+          <span>{{ t('auth.loginSettings.lockout.failureSuffix', form.failed_attempts) }}</span>
+          <span>{{ t('auth.loginSettings.lockout.durationPrefix') }}</span>
           <el-input-number
             class="w-40!"
             v-model="form.lock_time"
@@ -217,42 +228,51 @@ onActivated(() => {
             :value-on-clear="1"
             @change="form.lock_time = normalizeNonZeroNumber($event)"
           />
-          <span>分钟</span>
+          <span>{{ t('common.schedule.units.minutes') }}</span>
         </div>
       </div>
     </el-form-item>
-    <p class="mb-2">第三方用户默认角色分配</p>
+    <p class="mb-2">{{ t('auth.loginSettings.defaultRole') }}</p>
     <div class="w-full mk-gray-card-lg">
-      <el-form-item label="角色" prop="role_id">
+      <el-form-item :label="t('user.role.label')" prop="role_id">
         <el-select
           v-model="form.role_id"
           :loading="roleSettingOptionsLoading"
           filterable
           clearable
-          placeholder="请选择角色"
+          :placeholder="t('user.role.placeholder')"
           @change="handleRoleChange"
         >
           <el-option v-for="role in roleOptions" :key="role.id" :label="role.name" :value="role.id" />
         </el-select>
       </el-form-item>
-      <el-form-item label="工作空间" prop="workspace_id" v-if="auth.isEE && showWorkspaceSelector">
+      <el-form-item :label="t('workspace.title')" prop="workspace_id" v-if="auth.isEE && showWorkspaceSelector">
         <el-select
           v-model="form.workspace_id"
           :loading="roleSettingOptionsLoading"
           filterable
           clearable
-          placeholder="请选择工作空间"
+          :placeholder="t('user.workspace.placeholder')"
           @change="handleWorkspaceChange"
         >
           <el-option v-for="workspace in workspaceOptions" :key="workspace.id" :label="workspace.name" :value="workspace.id" />
         </el-select>
       </el-form-item>
-      <el-form-item label="用户组" v-if="form.workspace_id && selectedRoleType === ROLE_TYPE.USER">
-        <el-select filterable clearable multiple v-model="form.group_ids" :loading="loadingGroups" placeholder="请选择用户组" class="w-240">
+      <el-form-item :label="t('userGroup.title')" v-if="form.workspace_id && selectedRoleType === ROLE_TYPE.USER">
+        <el-select
+          filterable
+          clearable
+          multiple
+          v-model="form.group_ids"
+          :loading="loadingGroups"
+          :placeholder="t('userGroup.placeholder')"
+          class="w-240"
+        >
           <el-option v-for="userGroup in userGroups" :key="userGroup.id" :label="userGroup.name" :value="userGroup.id" />
         </el-select>
       </el-form-item>
     </div>
-    <el-button v-if="perm.system.loginAuth.edit()" class="mt-4" type="primary" @click="submit">保存</el-button>
+    <!-- 保存 -->
+    <el-button v-if="perm.system.loginAuth.edit()" class="mt-4" type="primary" @click="submit">{{ t('common.actions.save') }}</el-button>
   </el-form>
 </template>

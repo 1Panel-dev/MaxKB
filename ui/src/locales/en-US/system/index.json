@@ -4,7 +4,10 @@
     "resourceManagement": "Resource management",
     "sharedResources": "Shared resources",
     "chatManagement": "Chat management",
-    "settings": "System settings"
+    "chatUserGroup": "Chat user groups",
+    "chatUserAuthentication": "Chat user authentication",
+    "settings": "System settings",
+    "userAuthentication": "User authentication"
   },
   "member": {
     "label": "Members",

@@ -11,10 +11,10 @@
       "placeholder": "請輸入文件網址，每行一個。網址有誤的文件將無法匯入。",
       "requiredMessage": "請輸入文件網址"
     },
-    "target": {
-      "label": "儲存至文件",
-      "placeholder": "請選擇文件",
-      "requiredMessage": "請選擇文件"
+    "targetDocument": {
+      "label": "目標文件",
+      "placeholder": "請選擇目標文件",
+      "requiredMessage": "請選擇目標文件"
     },
     "labels": {
       "characters": "字元數",

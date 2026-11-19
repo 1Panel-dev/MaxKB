@@ -54,7 +54,7 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
     </MkTooltip>
     <HeaderActions :collapse="deviceType === DEVICE_TYPE.MOBILE">
       <!-- 进入分享模式，勾选要分享的对话 -->
-      <MkAction v-if="showShare" label="分享" icon="icon_share_outlined" :disabled="!canShare" @click="emit('share')" />
+      <MkAction v-if="showShare" label="分享" icon="icon_share_outlined" :size="18" :disabled="!canShare" @click="emit('share')" />
       <!-- 导出当前对话 -->
       <ExportAction />
       <slot />

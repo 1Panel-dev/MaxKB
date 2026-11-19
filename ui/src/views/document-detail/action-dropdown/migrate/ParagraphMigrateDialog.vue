@@ -37,7 +37,7 @@ const formRef = useTemplateRef<FormInstance>('formRef')
 const migrateForm = reactive({ knowledge_id: '', document_id: '' })
 const rules = computed<FormRules<typeof migrateForm>>(() => ({
   knowledge_id: [{ required: true, message: t('knowledge.fields.targetKnowledge.requiredMessage'), trigger: 'change' }],
-  document_id: [{ required: true, message: t('knowledge.document.target.requiredMessage'), trigger: 'change' }],
+  document_id: [{ required: true, message: t('knowledge.document.targetDocument.requiredMessage'), trigger: 'change' }],
 }))
 
 function open(paragraphIds: string[]) {
@@ -148,12 +148,12 @@ defineExpose({ open })
           </template>
         </el-select>
       </el-form-item>
-      <el-form-item :label="t('knowledge.document.target.label')" prop="document_id">
+      <el-form-item :label="t('knowledge.document.targetDocument.label')" prop="document_id">
         <el-select
           v-model="migrateForm.document_id"
           fit-input-width
           filterable
-          :placeholder="t('knowledge.document.target.placeholder')"
+          :placeholder="t('knowledge.document.targetDocument.placeholder')"
           :loading="documentLoading"
           :disabled="!migrateForm.knowledge_id"
         >

@@ -4,7 +4,10 @@
     "resourceManagement": "资源管理",
     "sharedResources": "共享资源",
     "chatManagement": "对话端管理",
-    "settings": "系统设置"
+    "chatUserGroup": "对话用户组",
+    "chatUserAuthentication": "对话用户认证",
+    "settings": "系统设置",
+    "userAuthentication": "系统用户认证"
   },
   "member": {
     "label": "成员",

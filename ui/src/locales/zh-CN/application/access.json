@@ -1,13 +1,6 @@
 {
   "access": {
     "title": "发布渠道",
-    "configurationTitle": "{name}配置",
-    "actions": {
-      "configure": "配置"
-    },
-    "states": {
-      "unconfigured": "未配置"
-    },
     "connection": {
       "label": "连接方式",
       "longConnection": "使用长连接",

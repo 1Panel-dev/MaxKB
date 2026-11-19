@@ -199,7 +199,7 @@ onMounted(() => {
         <el-form-item class="mk-hide-asterisk" prop="image_list" :rules="{ required: true, message: '请选择', trigger: 'change' }">
           <template #label>
             <span class="flex-align-center gap-1">
-              <span class="mk-required">选择图片</span>
+              <span class="mk-required">图片</span>
               <MkTooltip placement="right">
                 <template #content>
                   <div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div>

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { mapValues } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { ChatUserGroupMember, Dict, ListItem, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import ChatGroupsApi from '@/api/admin/system/chat-management/chat-user-groups.ts'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
-import { LOGIN_METHOD_LABELS } from '@/constants'
+import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
@@ -75,11 +76,8 @@ const memberSearchFields = computed<OptionItem<string>[]>(() => [
 /* 表头筛选 */
 const selectedMemberSource = ref<string | null>(null)
 const memberSourceLabels = computed<Record<LoginMethod, string>>(() => ({
-  ...LOGIN_METHOD_LABELS,
+  ...mapValues(LOGIN_METHOD_LABEL_KEYS, (key) => t(key)),
   [LOGIN_METHOD.LOCAL]: t('user.source.local'),
-  [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
-  [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
-  [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
 }))
 const memberSourceOptions = computed<OptionItem<string>[]>(() => Object.entries(memberSourceLabels.value).map(([value, label]) => ({ label, value })))
 const memberListQuery = computed<Dict<unknown>>(() => ({
@@ -156,7 +154,7 @@ onMounted(() => loadChatUserGroups())
 </script>
 
 <template>
-  <MkViewLayout class="system-chat-groups" :title="t('userGroup.chatTitle')" :loading="groupsLoading">
+  <MkViewLayout class="system-chat-groups" :title="t('system.menu.chatUserGroup')" :loading="groupsLoading">
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>

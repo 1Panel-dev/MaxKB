@@ -16,7 +16,7 @@ const initialize = async () => {
   if (!props.config.app_key) return
   await loadLoginScript('https://lf-package-cn.feishucdn.com/obj/feishu-static/lark/passport/qrcode/LarkSSOSDKWebQRCode-1.0.3.js', 'lark-login-sdk')
   await nextTick()
-  if (!window.QRLogin) throw new Error(t('auth.qrCode.messages.sdkLoadFailed', { provider: t('auth.login.options.lark') }))
+  if (!window.QRLogin) throw new Error(t('auth.qrCode.messages.sdkLoadFailed', { provider: t('auth.methods.lark') }))
 
   const authorizeUrl = new URL('https://passport.feishu.cn/suite/passport/oauth/authorize')
   authorizeUrl.search = new URLSearchParams({
@@ -56,7 +56,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="mt-6 flex-center">
     <img src="@/assets/logo/logo_lark.svg" alt="" width="24px" class="mr-2" />
-    <h2>{{ t('auth.qrCode.title', { provider: t('auth.login.options.lark') }) }}</h2>
+    <h2>{{ t('auth.qrCode.title', { provider: t('auth.methods.lark') }) }}</h2>
   </div>
   <div id="lark-qr-code" />
 </template>
