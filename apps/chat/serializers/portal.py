@@ -83,7 +83,9 @@ class PortalApplicationAuthMixin:
                 .filter(Exists(public_apps))
                 .values_list("id", flat=True)
             )
-        authed_token_exists = ApplicationAccessToken.objects.filter(application_id=OuterRef("id"), authentication=True)
+        authed_token_exists = ApplicationAccessToken.objects.filter(
+            application_id=OuterRef("id"), authentication=True, is_active=True
+        )
         direct_auth = ResourceChatUserAuthorize.objects.filter(
             resource_id=OuterRef("id"), resource_type=ResourceType.APPLICATION.value, is_auth=True, user_id=user_id
         )
