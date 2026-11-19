@@ -20,3 +20,5 @@ class ContentType(Enum):
     BREAK = "BREAK"
     FORM = "FORM"
     PROGRESS = "PROGRESS"
+    # 模型调用的 token 用量，仅供节点内部统计，不输出给前端
+    USAGE = "USAGE"
