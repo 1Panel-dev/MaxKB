@@ -111,20 +111,16 @@ class IntentNode(INode):
         chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id, **(model_params_setting or {}))
 
         history_message = self._get_history_message(history_chat_record, dialogue_number)
-        self.write_context(
-            "history_message",
-            [{"content": message.content, "role": message.type} for message in (history_message or [])],
-        )
+        self.data["history_message"] = [
+            {"content": message.content, "role": message.type} for message in (history_message or [])
+        ]
 
-        self.write_context("user_input", str(user_input))
+        self.data["user_input"] = str(user_input)
 
         prompt = self._build_classification_prompt(str(user_input), branch)
         system = self._build_system_prompt()
         message_list = self._generate_message_list(system, prompt, history_message)
-        self.write_context(
-            "message_list",
-            [{"content": m.content, "role": m.type} for m in message_list],
-        )
+        self.data["message_list"] = [{"content": m.content, "role": m.type} for m in message_list]
 
         try:
             self._check_cancelled()
@@ -134,10 +130,10 @@ class IntentNode(INode):
 
             message_tokens = chat_model.get_num_tokens_from_messages(message_list)
             answer_tokens = chat_model.get_num_tokens(r.content)
-            self.write_context("message_tokens", message_tokens)
-            self.write_context("answer_tokens", answer_tokens)
-            self.write_context("answer", r.content)
-            self.write_context("branch_id", matched_branch["id"])
+            self.data["message_tokens"] = message_tokens
+            self.data["answer_tokens"] = answer_tokens
+            self.data["answer"] = r.content
+            self.data["branch_id"] = matched_branch["id"]
             self.write_context("reason", self._parse_result_reason(r.content))
             self.write_context("category", matched_branch.get("content", matched_branch["id"]))
 
@@ -148,9 +144,9 @@ class IntentNode(INode):
         except Exception as e:
             other_branch = self._find_other_branch(branch)
             if other_branch:
-                self.write_context("branch_id", other_branch["id"])
+                self.data["branch_id"] = other_branch["id"]
                 self.write_context("category", other_branch.get("content", other_branch["id"]))
-                self.write_context("error", str(e))
+                self.data["error"] = str(e)
                 self.complete(Status.SUCCESS, [self.branch_anchor(other_branch["id"])])
             else:
                 raise Exception(f"error: {str(e)}")
@@ -256,13 +252,15 @@ class IntentNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "user_input": self.get_context("user_input"),
-                "answer": self.get_context("answer"),
-                "branch_id": self.get_context("branch_id"),
+                "question": self.data.get("user_input"),
+                "user_input": self.data.get("user_input"),
+                "answer": self.data.get("answer"),
+                "branch_id": self.data.get("branch_id"),
                 "category": self.get_context("category"),
                 "reason": self.get_context("reason"),
-                "message_tokens": self.get_context("message_tokens"),
-                "answer_tokens": self.get_context("answer_tokens"),
+                "message_tokens": self.data.get("message_tokens"),
+                "answer_tokens": self.data.get("answer_tokens"),
+                "history_message": self.data.get("history_message"),
             }
         )
         return details
