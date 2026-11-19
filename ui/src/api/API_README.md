@@ -835,9 +835,10 @@ Workspace 和 System 资源管理的 `getKnowledgeDetail(knowledgeId, section?)`
 
 `chat/conversation.ts` 的 `getShareConversation(shareId)` 请求 Chat API 下的 `GET /share/<shareId>`，
 不需要 accessToken 或 applicationId。响应类型 `ChatShareDetail` 经 `@/api/types` 导出，包含
-`abstract` 和按时间正序排列的 `chat_record_list`。记录包含 V3 `question`、`messages`，
-同时保留旧版 `problem_text`、`answer_text`、`answer_text_list`；分享页使用 `question`、`messages`，
-不通过原会话接口补查内容。
+`abstract`、按时间正序排列的 `chat_record_list` 和 `app_info`。`app_info` 包含分享页所需的
+`avatar`、`show_avatar`、`user_avatar`、`show_user_avatar`、`custom_theme`、`chat_background` 展示设置。记录包含
+V3 `question`、`messages`，同时保留旧版 `problem_text`、`answer_text`、`answer_text_list`；
+分享页使用 `question`、`messages`，不通过原会话接口补查内容。
 
 ### 对话回答反馈
 
