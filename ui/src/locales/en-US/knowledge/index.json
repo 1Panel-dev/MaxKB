@@ -47,9 +47,9 @@
       "requiredMessage": "Select an embedding model"
     },
     "targetKnowledge": {
-      "label": "Destination knowledge",
-      "placeholder": "Select a destination",
-      "requiredMessage": "Select a destination"
+      "label": "Target knowledge",
+      "placeholder": "Select the target knowledge",
+      "requiredMessage": "Select the target knowledge"
     },
     "webRootUrl": {
       "label": "Website root URL",

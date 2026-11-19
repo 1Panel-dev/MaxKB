@@ -214,7 +214,7 @@ onMounted(() => {
           <el-form-item prop="image_list">
             <template #label>
               <span class="flex-align-center gap-1">
-                <span>选择图片</span>
+                <span>图片</span>
                 <MkTooltip placement="right">
                   <template #content>
                     <div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div>
@@ -229,7 +229,7 @@ onMounted(() => {
           <el-form-item>
             <template #label>
               <span class="flex-align-center gap-1">
-                选择视频
+                视频
                 <MkTooltip placement="right">
                   <template #content>
                     <div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div>

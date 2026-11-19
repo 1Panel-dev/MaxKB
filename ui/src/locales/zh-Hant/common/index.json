@@ -77,6 +77,11 @@
     "add": "新增參數",
     "edit": "編輯參數"
   },
+  "configuration": {
+    "label": "配置",
+    "title": "{name}配置",
+    "unconfigured": "未配置"
+  },
   "actions": {
     "manage": "管理",
     "edit": "編輯",
@@ -141,6 +146,7 @@
     "exportFailed": "匯出失敗",
     "copied": "已複製",
     "connectionSuccess": "連線成功",
+    "testSuccess": "測試成功",
     "replaceSuccess": "取代成功",
     "submitSuccess": "提交成功",
     "taskSubmitted": "任務已提交",

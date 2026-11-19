@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { PortalSetting, PortalSettingPayload } from '@/api/types'
 import PortalApi from '@/api/admin/system/chat-management/portal-setting.ts'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
@@ -14,9 +15,10 @@ import { perm } from '@/permission'
 
 type AccessField = 'enable_public_access' | 'enable_api' | 'enable_agent_mcp_service' | 'enable_knowledge_base_api' | 'enable_auth' | 'enable_cors'
 
+const { t } = useI18n({ useScope: 'global' })
 const portalSetting = reactive<PortalSetting>({
   id: '',
-  name: '智能体门户',
+  name: t('portal.name.default'),
   description: '',
   logo: '',
   enable_public_access: true,
@@ -37,7 +39,6 @@ const loading = ref(false)
 const saving = ref(false)
 const { auth } = useStore()
 const portalAccessUrl = new URL(`${CHAT_API_BASE_PATH.replace(/\/api$/, '')}/portal`, window.location.origin).href
-const portalApiUrl = new URL(`${CHAT_API_BASE_PATH}/portal`, window.location.origin).href
 
 /* 进入页面加载门户配置，失败时保留默认配置 */
 function loadPortalSetting() {
@@ -57,7 +58,7 @@ function savePortalSetting(payload: PortalSettingPayload | FormData): Promise<vo
   return PortalApi.putPortalSetting(payload)
     .then((setting) => {
       Object.assign(portalSetting, setting)
-      MsgSuccess('保存成功')
+      MsgSuccess(t('common.messages.saveSuccess'))
     })
     .finally(() => {
       saving.value = false
@@ -110,7 +111,7 @@ const canEditLogo = computed(() => perm.system.portal.edit() && (auth.isPE || au
 </script>
 
 <template>
-  <MkViewLayout title="门户访问设置" :loading="loading">
+  <MkViewLayout :title="t('portal.title')" :loading="loading">
     <div class="flex min-w-215 flex-1 gap-4">
       <div class="w-95 shrink-0 space-y-4">
         <el-card shadow="never">
@@ -131,12 +132,12 @@ const canEditLogo = computed(() => perm.system.portal.edit() && (auth.isPE || au
         </el-card>
         <el-card shadow="never">
           <div class="space-y-4">
-            <h4>访问设置</h4>
+            <h4>{{ t('portal.access.title') }}</h4>
             <!-- 门户公开访问链接 -->
             <div>
               <div class="flex-between mb-2 gap-2">
-                <MkTooltip placement="right" content="控制门户页面链接是否可访问">
-                  <span>Web 访问</span>
+                <MkTooltip placement="right" :content="t('portal.access.web.description')">
+                  <span>{{ t('portal.access.web.label') }}</span>
                 </MkTooltip>
                 <el-switch
                   :disabled="!canEditPortal || saving"
@@ -158,8 +159,8 @@ const canEditLogo = computed(() => perm.system.portal.edit() && (auth.isPE || au
 
             <div class="flex-between gap-2">
               <span class="flex-align-center gap-1">
-                智能体对话 API
-                <MkTooltip placement="right" content="控制是否允许通过对话用户的 API Key 调用 API 进行智能体对话">
+                {{ t('portal.access.agentApi.label') }}
+                <MkTooltip placement="right" :content="t('portal.access.agentApi.description')">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </span>
@@ -175,8 +176,8 @@ const canEditLogo = computed(() => perm.system.portal.edit() && (auth.isPE || au
 
             <div class="flex-between gap-2">
               <span class="flex-align-center gap-1">
-                智能体 MCP 服务
-                <MkTooltip placement="right" content="控制是否允许通过对话用户的 API Key 调用智能体的 MCP 服务">
+                {{ t('portal.access.agentMcp.label') }}
+                <MkTooltip placement="right" :content="t('portal.access.agentMcp.description')">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </span>
@@ -192,8 +193,8 @@ const canEditLogo = computed(() => perm.system.portal.edit() && (auth.isPE || au
 
             <div class="flex-between gap-2">
               <span class="flex-align-center gap-1">
-                知识库 MCP 服务
-                <MkTooltip placement="right" content="控制是否允许通过对话用户的 API Key 调用知识库检索的 MCP 服务">
+                {{ t('portal.access.knowledgeMcp.label') }}
+                <MkTooltip placement="right" :content="t('portal.access.knowledgeMcp.description')">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </span>
@@ -206,7 +207,7 @@ const canEditLogo = computed(() => perm.system.portal.edit() && (auth.isPE || au
             </div>
 
             <div class="flex-between gap-2" v-if="auth.isPE || auth.isEE">
-              <span>登录设置</span>
+              <span>{{ t('auth.loginSettings.title') }}</span>
               <div class="flex-align-center gap-2">
                 <!-- 配置登录设置 -->
                 <ButtonPortalAuthSetting
@@ -219,7 +220,7 @@ const canEditLogo = computed(() => perm.system.portal.edit() && (auth.isPE || au
               </div>
             </div>
             <div class="flex-between gap-2">
-              <span>跨域设置</span>
+              <span>{{ t('portal.cors.title') }}</span>
               <div class="flex-align-center gap-2">
                 <!-- 配置跨域地址 -->
                 <ButtonPortalCorsSetting v-model="portalCorsOrigins" :saving="saving" :disabled="!canEditPortal" :save="savePortalCorsSetting" />

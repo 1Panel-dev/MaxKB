@@ -1,0 +1,24 @@
+{
+  "title": "郵件設定",
+  "account": {
+    "label": "SMTP 帳號",
+    "placeholder": "請輸入 SMTP 帳號",
+    "requiredMessage": "請輸入 SMTP 帳號"
+  },
+  "senderEmail": {
+    "label": "寄件者信箱",
+    "placeholder": "請輸入寄件者信箱",
+    "requiredMessage": "請輸入寄件者信箱"
+  },
+  "password": {
+    "placeholder": "請輸入寄件者密碼"
+  },
+  "ssl": {
+    "label": "啟用 SSL",
+    "description": "如果 SMTP 連接埠是 465，通常需要啟用 SSL"
+  },
+  "tls": {
+    "label": "啟用 TLS",
+    "description": "如果 SMTP 連接埠是 587，通常需要啟用 TLS"
+  }
+}

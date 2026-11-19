@@ -1,13 +1,6 @@
 {
   "access": {
     "title": "Publishing channels",
-    "configurationTitle": "{name} configuration",
-    "actions": {
-      "configure": "Configure"
-    },
-    "states": {
-      "unconfigured": "Not configured"
-    },
     "connection": {
       "label": "Connection method",
       "longConnection": "Use a persistent connection",

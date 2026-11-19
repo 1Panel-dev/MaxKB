@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { mapValues } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { ChatUser, Dict, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD, QUOTA_TYPE } from '@/api/enums'
@@ -9,7 +10,7 @@ import ButtonBatchSetUserGroup from './batch-set-user-group/ButtonBatchSetUserGr
 import ButtonImportUsers from './import-users/ButtonImportUsers.vue'
 import ButtonQuotaSettings from './quota-settings/ButtonQuotaSettings.vue'
 import ButtonChangeUserPassword from './user-password/ButtonChangeUserPassword.vue'
-import { LOGIN_METHOD_LABELS } from '@/constants'
+import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
 import { toOrderBy } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { formatTokenNumber } from '@/utils/number'
@@ -46,11 +47,8 @@ const statusOptions = computed<OptionItem<boolean>[]>(() => [
 ])
 const selectedSource = ref<string | null>(null)
 const userSourceLabels = computed<Record<LoginMethod, string>>(() => ({
-  ...LOGIN_METHOD_LABELS,
+  ...mapValues(LOGIN_METHOD_LABEL_KEYS, (key) => t(key)),
   [LOGIN_METHOD.LOCAL]: t('chatUser.source.local'),
-  [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
-  [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
-  [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
 }))
 const sourceOptions = computed<OptionItem<string>[]>(() => Object.entries(userSourceLabels.value).map(([value, label]) => ({ label, value })))
 const chatUserQuery = computed<Dict<unknown>>(() => ({
@@ -216,7 +214,7 @@ onMounted(() => loadChatUsers())
           </template>
         </el-table-column>
 
-        <el-table-column prop="user_group_names" width="180" :label="t('userGroup.chatTitle')">
+        <el-table-column prop="user_group_names" width="180" :label="t('system.menu.chatUserGroup')">
           <template #default="{ row }">
             <MkTagGroup v-if="row.user_group_names?.length" :tags="row.user_group_names" />
             <span v-else>-</span>

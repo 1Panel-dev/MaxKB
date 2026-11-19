@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { EmailSettingPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import EmailSettingApi from '@/api/admin/system/settings/email-setting'
 import { MsgSuccess } from '@/utils/message'
 import perm from '@/permission'
 
+const { t } = useI18n({ useScope: 'global' })
 const defaultEmailSetting: EmailSettingPayload = {
   email_host: '',
   email_host_password: '',
@@ -19,13 +21,13 @@ const defaultEmailSetting: EmailSettingPayload = {
 const emailFormRef = useTemplateRef<FormInstance>('emailFormRef')
 const emailSetting = reactive<EmailSettingPayload>({ ...defaultEmailSetting })
 const loading = ref(false)
-const rules: FormRules<EmailSettingPayload> = {
-  email_host: [{ whitespace: true, required: true, message: '请输入 SMTP Host', trigger: 'blur' }],
-  email_port: [{ whitespace: true, required: true, message: '请输入 SMTP Port', trigger: 'blur' }],
-  email_host_user: [{ whitespace: true, required: true, message: '请输入 SMTP 账户', trigger: 'blur' }],
-  email_host_password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  from_email: [{ whitespace: true, required: true, message: '请输入发件人邮箱', trigger: 'blur' }],
-}
+const rules = computed<FormRules<EmailSettingPayload>>(() => ({
+  email_host: [{ whitespace: true, required: true, message: t('common.validation.inputFieldRequired', { label: 'SMTP Host' }), trigger: 'blur' }],
+  email_port: [{ whitespace: true, required: true, message: t('common.validation.inputFieldRequired', { label: 'SMTP Port' }), trigger: 'blur' }],
+  email_host_user: [{ whitespace: true, required: true, message: t('email.account.requiredMessage'), trigger: 'blur' }],
+  email_host_password: [{ required: true, message: t('auth.fields.password.requiredMessage'), trigger: 'blur' }],
+  from_email: [{ whitespace: true, required: true, message: t('email.senderEmail.requiredMessage'), trigger: 'blur' }],
+}))
 
 /* 邮箱设置加载与提交 */
 function loadEmailSetting() {
@@ -50,7 +52,7 @@ function submitEmailSetting(action: 'save' | 'test') {
     const request = action === 'test' ? EmailSettingApi.postEmailSettingTest(emailSetting) : EmailSettingApi.putEmailSetting(emailSetting)
 
     request
-      .then(() => MsgSuccess(action === 'test' ? '测试成功' : '保存成功'))
+      .then(() => MsgSuccess(action === 'test' ? t('common.messages.testSuccess') : t('common.messages.saveSuccess')))
       .finally(() => {
         loading.value = false
       })
@@ -61,55 +63,62 @@ onMounted(() => loadEmailSetting())
 </script>
 
 <template>
-  <MkViewLayout class="system-settings-email" :loading="loading">
+  <MkViewLayout :title="t('email.title')" class="system-settings-email" :loading="loading">
     <el-form
       class="max-w-200"
       ref="emailFormRef"
       :model="emailSetting"
       :rules="rules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
       <el-form-item label="SMTP Host" prop="email_host">
-        <el-input v-model="emailSetting.email_host" placeholder="请输入 SMTP Host" />
+        <el-input v-model="emailSetting.email_host" :placeholder="t('common.placeholders.inputField', { label: 'SMTP Host' })" />
       </el-form-item>
       <el-form-item label="SMTP Port" prop="email_port">
-        <el-input v-model="emailSetting.email_port" placeholder="请输入 SMTP Port" />
+        <el-input v-model="emailSetting.email_port" :placeholder="t('common.placeholders.inputField', { label: 'SMTP Port' })" />
       </el-form-item>
 
-      <el-form-item label="SMTP 账户" prop="email_host_user">
-        <el-input v-model="emailSetting.email_host_user" placeholder="请输入 SMTP 账户" />
+      <el-form-item :label="t('email.account.label')" prop="email_host_user">
+        <el-input v-model="emailSetting.email_host_user" :placeholder="t('email.account.placeholder')" />
       </el-form-item>
-      <el-form-item label="发件人邮箱" prop="from_email">
-        <el-input v-model="emailSetting.from_email" type="email" placeholder="请输入发件人邮箱" />
+      <el-form-item :label="t('email.senderEmail.label')" prop="from_email">
+        <el-input v-model="emailSetting.from_email" type="email" :placeholder="t('email.senderEmail.placeholder')" />
       </el-form-item>
-      <el-form-item label="密码" prop="email_host_password">
+      <el-form-item :label="t('auth.fields.password.label')" prop="email_host_password">
         <el-input
           v-model="emailSetting.email_host_password"
           type="password"
           autocomplete="new-password"
           show-password
-          placeholder="请输入发件人密码"
+          :placeholder="t('email.password.placeholder')"
         />
       </el-form-item>
       <el-form-item>
         <div class="flex-column">
-          <p>启用 SSL<span class="text-N500">（如果 SMTP 端口是 465，通常需要启用 SSL）</span></p>
+          <p>
+            {{ t('email.ssl.label') }}
+            <span class="text-N500">（{{ t('email.ssl.description') }}）</span>
+          </p>
           <el-switch v-model="emailSetting.email_use_ssl" class="self-start" />
         </div>
       </el-form-item>
       <el-form-item>
         <div class="flex-column">
-          <p>启用 TLS<span class="text-N500">（如果 SMTP 端口是 587，通常需要启用 TL）</span></p>
+          <p>
+            {{ t('email.tls.label') }}
+            <span class="text-N500">（{{ t('email.tls.description') }}）</span>
+          </p>
           <el-switch v-model="emailSetting.email_use_tls" class="self-start" />
         </div>
       </el-form-item>
 
       <!-- 保存 -->
-      <el-button v-if="perm.system.email.edit()" type="primary" @click="submitEmailSetting('save')">保存</el-button>
+      <el-button v-if="perm.system.email.edit()" type="primary" @click="submitEmailSetting('save')">{{ t('common.actions.save') }}</el-button>
       <!-- 测试连接 -->
-      <el-button plain @click="submitEmailSetting('test')">测试连接</el-button>
+      <el-button plain @click="submitEmailSetting('test')">{{ t('common.actions.testConnection') }}</el-button>
     </el-form>
   </MkViewLayout>
 </template>

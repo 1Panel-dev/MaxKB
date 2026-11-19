@@ -1,0 +1,31 @@
+{
+  "title": "门户访问设置",
+  "name": {
+    "default": "智能体门户",
+    "placeholder": "请输入门户名称",
+    "requiredMessage": "请输入门户名称"
+  },
+  "access": {
+    "title": "访问设置",
+    "web": {
+      "label": "Web 访问",
+      "description": "控制门户页面链接是否可访问"
+    },
+    "agentApi": {
+      "label": "智能体对话 API",
+      "description": "控制是否允许通过对话用户的 API Key 调用 API 进行智能体对话"
+    },
+    "agentMcp": {
+      "label": "智能体 MCP 服务",
+      "description": "控制是否允许通过对话用户的 API Key 调用智能体的 MCP 服务"
+    },
+    "knowledgeMcp": {
+      "label": "知识库 MCP 服务",
+      "description": "控制是否允许通过对话用户的 API Key 调用知识库检索的 MCP 服务"
+    }
+  },
+  "cors": {
+    "title": "跨域设置",
+    "placeholder": "请输入允许的跨域地址，开启后不输入跨域地址则不限制。\n跨域地址一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io"
+  }
+}

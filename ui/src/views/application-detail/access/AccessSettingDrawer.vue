@@ -97,7 +97,7 @@ onMounted(loadPlatformConfig)
   <MkDrawer
     v-model="visible"
     :title="
-      t('application.access.configurationTitle', {
+      t('common.configuration.title', {
         name: t(`application.access.${platform.key}.label`),
       })
     "

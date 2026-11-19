@@ -11,10 +11,10 @@
       "placeholder": "Enter one document URL per line. Documents with invalid URLs cannot be imported.",
       "requiredMessage": "Enter a document URL"
     },
-    "target": {
-      "label": "Save to document",
-      "placeholder": "Select a document",
-      "requiredMessage": "Select a document"
+    "targetDocument": {
+      "label": "Target document",
+      "placeholder": "Select the target document",
+      "requiredMessage": "Select the target document"
     },
     "labels": {
       "characters": "Characters",

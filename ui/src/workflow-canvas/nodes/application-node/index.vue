@@ -91,7 +91,6 @@ function formatFieldLabel(label: FieldLabel) {
   return typeof label === 'object' && label !== null ? (label.label ?? '') : label
 }
 
-
 // 根据关联智能体配置同步输入字段，按字段标识保留已选变量。
 function syncUploadField(field: UploadField, enabled: boolean) {
   const listKey: UploadListKey = `${field}_list`
@@ -162,11 +161,8 @@ function refreshApplicationFields() {
 }
 
 async function validate() {
-  return formRef.value?.validate().catch((error) =>
-    Promise.reject({ node: model, errMessage: error }),
-  )
+  return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
-
 
 onMounted(() => {
   refreshApplicationFields()
@@ -184,19 +180,19 @@ onMounted(() => {
           <NodeCascader ref="questionCascaderRef" v-model="formData.question_reference_address" :node-model="model" placeholder="请选择用户问题" />
         </el-form-item>
 
-        <el-form-item v-if="formData.document_list !== undefined" label="选择文档" prop="document_list">
+        <el-form-item v-if="formData.document_list !== undefined" label="文档" prop="document_list">
           <NodeCascader v-model="formData.document_list" :node-model="model" placeholder="请选择文档" />
         </el-form-item>
 
-        <el-form-item v-if="formData.image_list !== undefined" label="选择图片" prop="image_list">
+        <el-form-item v-if="formData.image_list !== undefined" label="图片" prop="image_list">
           <NodeCascader v-model="formData.image_list" :node-model="model" placeholder="请选择图片" />
         </el-form-item>
 
-        <el-form-item v-if="formData.audio_list !== undefined" label="选择音频" prop="audio_list">
+        <el-form-item v-if="formData.audio_list !== undefined" label="音频" prop="audio_list">
           <NodeCascader v-model="formData.audio_list" :node-model="model" placeholder="请选择音频" />
         </el-form-item>
 
-        <el-form-item v-if="formData.video_list !== undefined" label="选择视频" prop="video_list">
+        <el-form-item v-if="formData.video_list !== undefined" label="视频" prop="video_list">
           <NodeCascader v-model="formData.video_list" :node-model="model" placeholder="请选择视频" />
         </el-form-item>
 

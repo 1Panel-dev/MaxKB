@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { reactive, ref, useTemplateRef } from 'vue'
+import { computed, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { PortalSetting } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import MkEditAvatar from '@/components/mk-edit-avatar/index.vue'
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   disabled: boolean
   logoDisabled?: boolean
@@ -18,9 +20,9 @@ const portalFormRef = useTemplateRef<FormInstance>('portalFormRef')
 const portalForm = reactive({ name: '', logo: '' })
 const logoFile = ref<File | null>(null)
 const logoChanged = ref(false)
-const portalRules: FormRules = {
-  name: [{ required: true, whitespace: true, message: '请输入门户名称', trigger: 'blur' }],
-}
+const portalRules = computed<FormRules>(() => ({
+  name: [{ required: true, whitespace: true, message: t('portal.name.requiredMessage'), trigger: 'blur' }],
+}))
 
 function handleOpenPortalEdit() {
   if (props.disabled || props.saving) return
@@ -62,32 +64,33 @@ function handleClosePortalEdit() {
   <el-button text :disabled="disabled || saving" @click="handleOpenPortalEdit">
     <MkIcon name="icon_edit_outlined" />
   </el-button>
-  <MkDialog v-model="editVisible" title="编辑" @closed="handleClosePortalEdit">
+  <MkDialog v-model="editVisible" :title="t('common.actions.edit')" @closed="handleClosePortalEdit">
     <el-form
       v-loading="saving"
       ref="portalFormRef"
       :model="portalForm"
       :rules="portalRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item class="mk-form-item-with-avatar" label="名称" prop="name">
+      <el-form-item class="mk-form-item-with-avatar" :label="t('common.name.label')" prop="name">
         <div class="flex-align-center w-full gap-3">
           <MkEditAvatar v-model="portalForm.logo" @change="handleLogoChange" :size="32" :disabled="logoDisabled">
             <template #default="{ icon }">
               <PortalIcon :icon="icon" />
             </template>
           </MkEditAvatar>
-          <el-input v-model="portalForm.name" maxlength="64" show-word-limit placeholder="请输入门户名称" />
+          <el-input v-model="portalForm.name" maxlength="64" show-word-limit :placeholder="t('portal.name.placeholder')" />
         </div>
       </el-form-item>
     </el-form>
     <template #footer>
       <!-- 取消编辑 -->
-      <el-button plain :disabled="saving" @click="editVisible = false">取消</el-button>
+      <el-button plain :disabled="saving" @click="editVisible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存门户信息 -->
-      <el-button type="primary" :loading="saving" @click="handleSavePortalInfo">保存</el-button>
+      <el-button type="primary" :loading="saving" @click="handleSavePortalInfo">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

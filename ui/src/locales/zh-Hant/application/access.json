@@ -1,13 +1,6 @@
 {
   "access": {
     "title": "發布管道",
-    "configurationTitle": "{name}設定",
-    "actions": {
-      "configure": "設定"
-    },
-    "states": {
-      "unconfigured": "未設定"
-    },
     "connection": {
       "label": "連線方式",
       "longConnection": "使用長連線",

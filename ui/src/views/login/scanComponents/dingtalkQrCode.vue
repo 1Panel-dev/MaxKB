@@ -15,7 +15,7 @@ const initialize = async () => {
   if (!props.config.app_key || !props.config.corp_id) return
   await loadLoginScript('https://g.alicdn.com/dingding/h5-dingtalk-login/0.21.0/ddlogin.js', 'dingtalk-login-sdk')
   await nextTick()
-  if (!window.DTFrameLogin) throw new Error(t('auth.qrCode.messages.sdkLoadFailed', { provider: t('auth.login.options.dingtalk') }))
+  if (!window.DTFrameLogin) throw new Error(t('auth.qrCode.messages.sdkLoadFailed', { provider: t('auth.methods.dingtalk') }))
   window.DTFrameLogin(
     { id: 'dingtalk-qr-code', width: 280, height: 280 },
     {
@@ -45,7 +45,7 @@ watch(
 <template>
   <div class="mt-6 flex-center">
     <img src="@/assets/logo/logo_dingtalk.svg" alt="" width="24px" class="mr-2" />
-    <h2>{{ t('auth.qrCode.title', { provider: t('auth.login.options.dingtalk') }) }}</h2>
+    <h2>{{ t('auth.qrCode.title', { provider: t('auth.methods.dingtalk') }) }}</h2>
   </div>
   <div class="ding-talk-layout">
     <div id="dingtalk-qr-code" />

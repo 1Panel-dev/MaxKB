@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { LoginMethod, PortalAuthConfig, PortalSetting, PortalSettingPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
-import { LOGIN_METHOD_LABELS } from '@/constants'
+import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ disabled: boolean; setting: PortalSetting; saving: boolean; save: (payload: PortalSettingPayload) => Promise<void> }>()
 
 /* 登录方式选项来自 system_options，默认登录方式仅允许选择草稿中已选的 login_value */
@@ -24,10 +26,10 @@ const authForm = reactive({
   lock_time: 10,
 })
 
-const authRules: FormRules<typeof authForm> = {
-  login_value: [{ type: 'array', required: true, min: 1, message: '请选择至少一种登录方式', trigger: 'change' }],
-  type: [{ required: true, message: '请选择默认登录方式', trigger: 'change' }],
-}
+const authRules = computed<FormRules<typeof authForm>>(() => ({
+  login_value: [{ type: 'array', required: true, min: 1, message: t('auth.loginSettings.method.minSelectionMessage'), trigger: 'change' }],
+  type: [{ required: true, message: t('auth.loginSettings.defaultMethod.requiredMessage'), trigger: 'change' }],
+}))
 
 /* 登录方式变化时，确保默认登录方式仍为已启用的方式 */
 function handleLoginMethodsChange(loginMethods: string[]) {
@@ -103,55 +105,67 @@ defineExpose({ open })
   <el-button text type="primary" :disabled="disabled || saving" @click="handleOpenAuthSetting">
     <MkIcon name="icon_setting" />
   </el-button>
-  <MkDrawer v-model="authVisible" title="登录设置" @closed="handleClosed">
+  <MkDrawer v-model="authVisible" size="720" :title="t('auth.loginSettings.title')" @closed="handleClosed">
     <el-form
       v-loading="saving"
       ref="authFormRef"
       :model="authForm"
       :rules="authRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="登录方式" prop="login_value">
+      <el-form-item :label="t('auth.loginSettings.method.label')" prop="login_value">
         <el-checkbox-group v-model="authForm.login_value" @change="handleLoginMethodsChange" class="flex-wrap">
           <el-checkbox v-for="loginMethodOption in loginMethodOptions" :key="loginMethodOption.value" :value="loginMethodOption.value" class="w-32">
-            {{ LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] || loginMethodOption.label }}
+            {{
+              LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod]
+                ? t(LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod])
+                : loginMethodOption.label
+            }}
           </el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="默认登录方式" prop="type">
+      <el-form-item :label="t('auth.loginSettings.defaultMethod.label')" prop="type">
         <el-select v-model="authForm.type">
           <el-option
             v-for="loginMethodOption in defaultLoginMethodOptions"
             :key="loginMethodOption.value"
             :value="loginMethodOption.value"
-            :label="LOGIN_METHOD_LABELS[loginMethodOption.value as LoginMethod] || loginMethodOption.label"
+            :label="
+              LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod]
+                ? t(LOGIN_METHOD_LABEL_KEYS[loginMethodOption.value as LoginMethod])
+                : loginMethodOption.label
+            "
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="账号登录验证码设置" required>
+      <el-form-item :label="t('auth.loginSettings.captcha.label')" required>
         <div class="mk-gray-card-lg w-full space-y-4">
-          <div class="flex-align-center gap-2">
-            <span class="shrink-0">登录失败</span>
+          <div class="flex-align-center flex-wrap gap-2">
+            <span class="shrink-0">{{ t('auth.loginSettings.failurePrefix') }}</span>
             <el-input-number v-model="authForm.max_attempts" class="w-32!" :min="-1" :max="100" :precision="0" :value-on-clear="1" />
-            <span class="shrink-0">次显示验证码</span>
+            <span class="shrink-0">{{ t('auth.loginSettings.captcha.failureSuffix', authForm.max_attempts) }}</span>
           </div>
-          <div class="flex-align-center gap-2">
-            <span class="shrink-0">登录失败</span>
+          <div class="flex-align-center flex-wrap gap-2">
+            <span class="shrink-0">{{ t('auth.loginSettings.failurePrefix') }}</span>
             <el-input-number v-model="authForm.failed_attempts" class="w-32!" :min="-1" :max="100" :precision="0" :value-on-clear="5" />
-            <span class="shrink-0">次，锁定账号</span>
+            <span class="shrink-0">
+              {{ t('auth.loginSettings.lockout.failureSuffix', authForm.failed_attempts) }}
+              {{ t('auth.loginSettings.lockout.durationPrefix') }}
+            </span>
             <el-input-number v-model="authForm.lock_time" class="w-32!" :min="1" :max="1440" :precision="0" :value-on-clear="10" />
-            <span class="shrink-0">分钟</span>
+            <span class="shrink-0">{{ t('common.schedule.units.minutes') }}</span>
           </div>
         </div>
       </el-form-item>
     </el-form>
     <template #footer>
       <!-- 取消认证设置 -->
-      <el-button plain :disabled="saving" @click="authVisible = false">取消</el-button>
+      <el-button plain :disabled="saving" @click="authVisible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存认证设置 -->
-      <el-button type="primary" :loading="saving" :disabled="saving" @click="handleSaveAuthSetting">保存</el-button>
+      <el-button type="primary" :loading="saving" :disabled="saving" @click="handleSaveAuthSetting">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDrawer>
 </template>

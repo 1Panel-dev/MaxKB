@@ -77,6 +77,11 @@
     "add": "Add parameter",
     "edit": "Edit parameter"
   },
+  "configuration": {
+    "label": "Configure",
+    "title": "{name} configuration",
+    "unconfigured": "Not configured"
+  },
   "actions": {
     "manage": "Manage",
     "edit": "Edit",
@@ -141,6 +146,7 @@
     "exportFailed": "Export failed",
     "copied": "Copied",
     "connectionSuccess": "Connection successful",
+    "testSuccess": "Test successful",
     "replaceSuccess": "Replaced successfully",
     "submitSuccess": "Submitted successfully",
     "taskSubmitted": "Task submitted",

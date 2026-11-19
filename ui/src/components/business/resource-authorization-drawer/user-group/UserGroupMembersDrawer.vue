@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { mapValues } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { Dict, LoginMethod, OptionItem, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import { LOGIN_METHOD_LABELS } from '@/constants'
+import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
 import { useStore } from '@/stores'
 
 defineOptions({ name: 'UserGroupMembersDrawer' })
@@ -27,11 +28,8 @@ const memberSearchFields = computed<OptionItem<string>[]>(() => [
 /* 表头筛选 */
 const selectedMemberSource = ref<string | null>(null)
 const memberSourceLabels = computed<Record<LoginMethod, string>>(() => ({
-  ...LOGIN_METHOD_LABELS,
+  ...mapValues(LOGIN_METHOD_LABEL_KEYS, (key) => t(key)),
   [LOGIN_METHOD.LOCAL]: t('user.source.local'),
-  [LOGIN_METHOD.DINGTALK]: t('auth.login.options.dingtalk'),
-  [LOGIN_METHOD.LARK]: t('auth.login.options.lark'),
-  [LOGIN_METHOD.WECOM]: t('auth.login.options.wecom'),
 }))
 const memberSourceOptions = computed<OptionItem<string>[]>(() => Object.entries(memberSourceLabels.value).map(([value, label]) => ({ label, value })))
 const memberListQuery = computed<Dict<unknown>>(() => ({

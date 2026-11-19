@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Component } from 'vue'
 import { LOGIN_METHOD } from '@/api/enums'
 import CAS from './components/CAS.vue'
@@ -14,19 +15,20 @@ interface AuthenticationTab {
   name: string
 }
 
+const { t } = useI18n({ useScope: 'global' })
 const activeName = ref(LOGIN_METHOD.LDAP)
-const authenticationTabs: AuthenticationTab[] = [
+const authenticationTabs = computed<AuthenticationTab[]>(() => [
   { label: 'LDAP', name: LOGIN_METHOD.LDAP, component: LDAP },
   { label: 'CAS', name: LOGIN_METHOD.CAS, component: CAS },
   { label: 'OIDC', name: LOGIN_METHOD.OIDC, component: OIDC },
   { label: 'OAuth2', name: LOGIN_METHOD.OAUTH2, component: OAuth2 },
-  { label: '扫码登录', name: 'SCAN', component: SCAN },
-]
-const activeAuthenticationComponent = computed(() => authenticationTabs.find((tab) => tab.name === activeName.value)?.component)
+  { label: t('auth.qrCode.label'), name: 'SCAN', component: SCAN },
+])
+const activeAuthenticationComponent = computed(() => authenticationTabs.value.find((tab) => tab.name === activeName.value)?.component)
 </script>
 
 <template>
-  <MkViewLayout class="system-settings-authentication">
+  <MkViewLayout :title="t('system.menu.chatUserAuthentication')" class="system-settings-authentication">
     <template #default="{ title, Header }">
       <component :is="Header">
         <div class="w-full">

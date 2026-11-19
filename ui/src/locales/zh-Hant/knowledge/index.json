@@ -47,9 +47,9 @@
       "requiredMessage": "請選擇向量模型"
     },
     "targetKnowledge": {
-      "label": "選擇知識庫",
-      "placeholder": "請選擇知識庫",
-      "requiredMessage": "請選擇知識庫"
+      "label": "目標知識庫",
+      "placeholder": "請選擇目標知識庫",
+      "requiredMessage": "請選擇目標知識庫"
     },
     "webRootUrl": {
       "label": "網站根網址",

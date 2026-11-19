@@ -127,7 +127,7 @@ onMounted(() => {
       <span>{{ t('auth.forgotPassword.actions.backToLogin') }}</span>
     </el-button>
 
-    <h2 class="mt-4">{{ t('auth.forgotPassword.title') }}</h2>
+    <h2 class="mt-4">{{ t('auth.forgotPassword.changePassword') }}</h2>
 
     <el-form
       ref="forgotPasswordFormRef"
@@ -175,7 +175,7 @@ onMounted(() => {
       </el-form-item>
 
       <!-- 提交密码重置 -->
-      <el-button native-type="submit" type="primary" class="w-full" :loading="isSubmitting">{{ t('auth.forgotPassword.actions.submit') }}</el-button>
+      <el-button native-type="submit" type="primary" class="w-full" :loading="isSubmitting">{{ t('auth.forgotPassword.changePassword') }}</el-button>
     </el-form>
   </LoginLayout>
 </template>

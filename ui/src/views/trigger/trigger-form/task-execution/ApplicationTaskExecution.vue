@@ -28,7 +28,7 @@ defineExpose({ validate })
           <span class="truncate" :title="props.application?.name || task.source_id">{{ props.application?.name || task.source_id }}</span>
         </div>
       </template>
-      <div class="my-2">
+      <div class="mt-2 mb-1">
         <TaskParameterForm
           ref="parameterRef"
           v-model="task.parameter"

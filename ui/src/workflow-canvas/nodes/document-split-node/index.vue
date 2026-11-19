@@ -91,7 +91,7 @@ onBeforeUnmount(() => anchorGuard.reset())
     <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
         <!-- 选择文档 -->
-        <el-form-item label="选择文档" prop="document_list" :rules="{ type: 'array', required: true, message: '请选择文档', trigger: 'change' }">
+        <el-form-item label="文档" prop="document_list" :rules="{ type: 'array', required: true, message: '请选择文档', trigger: 'change' }">
           <NodeCascader :node-model="model" class="w-full!" placeholder="请选择文档" v-model="formData.document_list" />
         </el-form-item>
         <!-- 分段策略 -->

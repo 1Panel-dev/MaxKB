@@ -1,23 +1,22 @@
 import type { LoginMethod, RoleType } from '@/api/types'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
 
-export const LOGIN_METHOD_LABELS: Record<LoginMethod, string> = {
-  [LOGIN_METHOD.CAS]: 'CAS',
-  [LOGIN_METHOD.LDAP]: 'LDAP',
-  [LOGIN_METHOD.LOCAL]: '账号登录',
-  [LOGIN_METHOD.OAUTH2]: 'OAuth2',
-  [LOGIN_METHOD.OIDC]: 'OIDC',
-  [LOGIN_METHOD.SAML2]: 'SAML2',
-  [LOGIN_METHOD.DINGTALK]: '钉钉',
-  [LOGIN_METHOD.LARK]: '飞书',
-  [LOGIN_METHOD.WECOM]: '企业微信',
-}
+export const LOGIN_METHOD_LABEL_KEYS = {
+  [LOGIN_METHOD.CAS]: 'auth.methods.cas',
+  [LOGIN_METHOD.LDAP]: 'auth.methods.ldap',
+  [LOGIN_METHOD.LOCAL]: 'auth.methods.local',
+  [LOGIN_METHOD.OAUTH2]: 'auth.methods.oauth2',
+  [LOGIN_METHOD.OIDC]: 'auth.methods.oidc',
+  [LOGIN_METHOD.SAML2]: 'auth.methods.saml2',
+  [LOGIN_METHOD.DINGTALK]: 'auth.methods.dingtalk',
+  [LOGIN_METHOD.LARK]: 'auth.methods.lark',
+  [LOGIN_METHOD.WECOM]: 'auth.methods.wecom',
+} as const satisfies Record<LoginMethod, string>
 
 export const SCAN_FIELD_LABELS: Record<string, string> = {
   agent_id: 'Agent ID',
   app_key: 'App Key',
   app_secret: 'App Secret',
-  callback_url: '回调地址',
   corp_id: 'Corp ID',
 }
 

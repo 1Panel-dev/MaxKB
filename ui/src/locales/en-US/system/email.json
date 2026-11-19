@@ -1,0 +1,24 @@
+{
+  "title": "Email settings",
+  "account": {
+    "label": "SMTP account",
+    "placeholder": "Enter the SMTP account",
+    "requiredMessage": "Enter the SMTP account"
+  },
+  "senderEmail": {
+    "label": "Sender email",
+    "placeholder": "Enter the sender email address",
+    "requiredMessage": "Enter the sender email address"
+  },
+  "password": {
+    "placeholder": "Enter the sender password"
+  },
+  "ssl": {
+    "label": "Enable SSL",
+    "description": "SSL is usually required when the SMTP port is 465"
+  },
+  "tls": {
+    "label": "Enable TLS",
+    "description": "TLS is usually required when the SMTP port is 587"
+  }
+}
