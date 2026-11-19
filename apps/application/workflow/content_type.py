@@ -20,3 +20,4 @@ class ContentType(Enum):
     BREAK = "BREAK"
     FORM = "FORM"
     PROGRESS = "PROGRESS"
+    USAGE = "USAGE"

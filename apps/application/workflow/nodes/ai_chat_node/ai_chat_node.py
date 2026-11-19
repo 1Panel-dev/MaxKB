@@ -7,7 +7,6 @@
 @desc:
 """
 
-import asyncio
 import base64
 import contextlib
 import json
@@ -33,7 +32,9 @@ from application.workflow.message.struct.content import NodeInfo, Position, Cont
 from application.workflow.message.struct.reasoning_content import ReasoningContent
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.message.struct.tool_content import ToolContent
+from application.workflow.message.struct.usage_content import UsageContent
 from application.workflow.nodes.ai_chat_node.agent import create_agent, ToolCallStreamManagement, _get_tool_call_id
+from application.workflow.nodes.ai_chat_node.token_ledger import TokenLedger
 from application.workflow.nodes.ai_chat_node.tools import (
     get_application_tools,
     get_mcp_servers,
@@ -42,7 +43,7 @@ from application.workflow.nodes.ai_chat_node.tools import (
 from application.workflow.status import Status
 from application.workflow.tools import Reasoning
 from common.utils.common import guess_image_format
-from common.utils.count_tokens import count_local_tokens
+from common.utils.logger import maxkb_logger
 from common.utils.messages_util import to_ai_message_list, to_human_message_list
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
@@ -270,18 +271,52 @@ class AIChatNode(INode):
     def __init__(self, node, workflow_manage, get_node_parameters):
         super().__init__(node, workflow_manage, get_node_parameters)
         self.async_runner = AsyncRunner()
+        self.token_ledger = TokenLedger()
+        self.display_setting = {"text": False, "reasoning": False, "tool": True}
 
     def cancel(self):
         self.async_runner.cancel()
         super().cancel()
 
     def write(self, message: Content):
+        """节点所有输出（包括不展示的）的唯一出口：先记入 token 账本，再按展示开关决定是否输出。"""
+        self.token_ledger.record(message)
+        if not self._should_display(message):
+            return
         super().write(message)
         if not self.data.get("messages"):
             self.data["messages"] = []
         self.data["messages"].append(message)
 
+    def _should_display(self, message: Content):
+        if isinstance(message, UsageContent):
+            return False
+        if isinstance(message, TextContent):
+            return self.display_setting["text"]
+        if isinstance(message, ReasoningContent):
+            return self.display_setting["reasoning"]
+        if isinstance(message, ToolContent):
+            return self.display_setting["tool"]
+        return True
+
     def execute(self):
+        self.token_ledger = TokenLedger()
+        try:
+            self._execute()
+        finally:
+            # 无论正常结束、报错还是被取消，都按账本写入 token
+            self._write_token_usage()
+
+    def _write_token_usage(self):
+        try:
+            message_tokens, answer_tokens = self.token_ledger.summarize()
+        except Exception as e:
+            maxkb_logger.error(f"AI chat node token statistics failed: {e}")
+            return
+        self.data["message_tokens"] = message_tokens
+        self.data["answer_tokens"] = answer_tokens
+
+    def _execute(self):
         workflow_params = self.get_workflow_parameters()
         node_params = self.get_parameters()
         reasoning_content_id = str(uuid.uuid7())
@@ -349,6 +384,11 @@ class AIChatNode(INode):
                 "reasoning_content_start": "<think>",
             }
         self.data["model_setting"] = model_setting
+        self.display_setting = {
+            "text": is_result,
+            "reasoning": model_setting.get("reasoning_content_enable", False),
+            "tool": mcp_output_enable,
+        }
 
         chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id, **(model_params_setting or {}))
 
@@ -365,6 +405,7 @@ class AIChatNode(INode):
         self.data["system"] = system
 
         message_list = [*history_message, question]
+        self.token_ledger.set_base_messages([SystemMessage(system), *message_list])
 
         all_tool_ids = list(
             set(
@@ -388,7 +429,6 @@ class AIChatNode(INode):
             tool_ids,
             application_ids,
             skill_tool_ids,
-            mcp_output_enable,
             chat_model,
             SystemMessage(system),
             message_list,
@@ -396,28 +436,30 @@ class AIChatNode(INode):
             chat_id,
             workspace_id,
             workflow_type,
-            is_result=is_result,
         )
         if not mcp_handled:
             message_list_with_system = [SystemMessage(system)] + message_list
+            # 模型调用开始即登记这一轮，被中断时也能计入输入
+            self.write(
+                UsageContent(
+                    text_content_id,
+                    None,
+                    NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING),
+                    Position(self.get_node_id()),
+                )
+            )
 
             if stream:
                 self.async_runner.run_async(
                     lambda: self._stream_response(
                         chat_model.astream(message_list_with_system),
-                        chat_model,
-                        message_list_with_system,
-                        question.content,
                         reasoning_content_id,
                         text_content_id,
-                        is_result=is_result,
                     )
                 )
             else:
                 r = chat_model.invoke(message_list_with_system)
-                self._invoke_response(
-                    r, chat_model, message_list_with_system, question.content, is_result, text_content_id
-                )
+                self._invoke_response(r, text_content_id)
 
     def _generate_prompt_question(self, question_str, model, vision, image_list, video_list):
         images = []
@@ -435,10 +477,7 @@ class AIChatNode(INode):
         self.data["video_list"] = _video_list
         return HumanMessage(content=[*videos, *images, {"type": "text", "text": question_str}])
 
-    async def _stream_response(
-        self, response, chat_model, message_list, question, reasoning_content_id, text_content_id, is_result=None
-    ):
-
+    async def _stream_response(self, response, reasoning_content_id, text_content_id):
         reasoning_setting = {"reasoning_end": False, "is_reasoning": False}
         answer = ""
         reasoning_content = ""
@@ -450,9 +489,12 @@ class AIChatNode(INode):
                 model_setting.get("reasoning_content_end", "</think>"),
             )
             response_reasoning_content = False
+            usages = []
 
             async for chunk in response:
                 self._check_cancelled()
+                if chunk.usage_metadata:
+                    usages.append(chunk.usage_metadata)
                 reasoning_chunk = reasoning.get_reasoning_content(chunk)
                 content_chunk = reasoning_chunk.get("content")
                 if "reasoning_content" in chunk.additional_kwargs:
@@ -469,16 +511,23 @@ class AIChatNode(INode):
                     if not reasoning_setting.get("reasoning_end") and reasoning_setting.get("is_reasoning"):
                         self.write(
                             ReasoningContent(
-                                reasoning_content_id, "", Status.SUCCESS, node_info, Position(self.get_node_id())
+                                reasoning_content_id,
+                                "",
+                                Status.SUCCESS,
+                                node_info,
+                                Position(self.get_node_id()),
                             )
                         )
-                    if is_result:
-                        self.write(
-                            TextContent(
-                                text_content_id, content_chunk, Status.RUNNING, node_info, Position(self.get_node_id())
-                            )
+                    self.write(
+                        TextContent(
+                            text_content_id,
+                            content_chunk,
+                            Status.RUNNING,
+                            node_info,
+                            Position(self.get_node_id()),
                         )
-                if reasoning_content_chunk and model_setting.get("reasoning_content_enable", False):
+                    )
+                if reasoning_content_chunk:
                     reasoning_setting["is_reasoning"] = True
                     self.write(
                         ReasoningContent(
@@ -507,7 +556,7 @@ class AIChatNode(INode):
                         Position(self.get_node_id()),
                     )
                 )
-            if reasoning_content_chunk and model_setting.get("reasoning_content_enable", False):
+            if reasoning_content_chunk:
                 self.write(
                     ReasoningContent(
                         reasoning_content_id,
@@ -517,16 +566,17 @@ class AIChatNode(INode):
                         Position(self.get_node_id()),
                     )
                 )
+            # 用量在全部回复之后写入，标志这次调用已完成
+            for usage in usages:
+                self.write(UsageContent(text_content_id, usage, node_info, Position(self.get_node_id())))
 
         # 无论正常结束、抛异常还是被取消中断,都落盘已累积内容并关闭 LLM 流式响应底层连接
         finally:
-            await asyncio.to_thread(
-                self._write_final_context, chat_model, message_list, question, answer, reasoning_content
-            )
+            self._write_final_context(answer, reasoning_content)
             with contextlib.suppress(Exception):
                 await response.aclose()
 
-    def _invoke_response(self, response, chat_model, message_list, question, is_result=False, text_content_id=None):
+    def _invoke_response(self, response, text_content_id=None):
         model_setting = self.get_context("model_setting") or {}
         reasoning = Reasoning(
             model_setting.get("reasoning_content_start", "<think>"),
@@ -542,20 +592,12 @@ class AIChatNode(INode):
             reasoning_content = (reasoning_result.get("reasoning_content") or "") + (
                 reasoning_result_end.get("reasoning_content") or ""
             )
-        self._write_final_context(chat_model, message_list, question, content, reasoning_content)
-        if is_result:
-            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-            self.write(TextContent(text_content_id, content, Status.SUCCESS, node_info, Position(self.get_node_id())))
+        self._write_final_context(content, reasoning_content)
+        node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
+        self.write(TextContent(text_content_id, content, Status.SUCCESS, node_info, Position(self.get_node_id())))
+        self.write(UsageContent(text_content_id, response.usage_metadata, node_info, Position(self.get_node_id())))
 
-    def _write_final_context(self, chat_model, message_list, question, answer, reasoning_content):
-        # 中断时模型已不可用，只能走本地 tokenizer 计算
-        message_tokens, answer_tokens = (
-            count_local_tokens(message_list, answer)
-            if self.async_runner.cancel_event.is_set()
-            else (chat_model.get_num_tokens_from_messages(message_list), chat_model.get_num_tokens(answer))
-        )
-        self.data["message_tokens"] = message_tokens
-        self.data["answer_tokens"] = answer_tokens
+    def _write_final_context(self, answer, reasoning_content):
         self.write_context("answer", answer)
         self.data["reasoning_content"] = reasoning_content
 
@@ -568,7 +610,6 @@ class AIChatNode(INode):
         tool_ids,
         application_ids,
         skill_tool_ids,
-        mcp_output_enable,
         chat_model,
         system_prompt,
         message_list,
@@ -576,7 +617,6 @@ class AIChatNode(INode):
         chat_id,
         workspace_id,
         workflow_type,
-        is_result=False,
     ):
         # 工具记录来源（source_type / source_id）
         if workflow_type == WorkflowType.KNOWLEDGE:
@@ -615,9 +655,9 @@ class AIChatNode(INode):
             tool_stream = ToolCallStreamManagement()
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.RUNNING)
 
-            def on_next(chunk):
-                self._check_cancelled()
-                if mcp_output_enable and isinstance(chunk, AIMessage):
+            def write_chunk(chunk):
+                # 所有内容都 write，展示与否由 write 按开关决定
+                if isinstance(chunk, AIMessage):
                     if tool_chunks := getattr(chunk, "tool_call_chunks", None):
                         for tc in tool_chunks:
                             tool_id = tool_stream.get_tool_id(tc.get("index"), tc.get("id"))
@@ -665,8 +705,6 @@ class AIChatNode(INode):
 
                 if isinstance(chunk, ToolMessage):
                     # Tool results belong to the agent context, never to the model's answer text.
-                    if not mcp_output_enable:
-                        return
                     tool_id = _get_tool_call_id(chunk.tool_call_id) or chunk.tool_call_id
                     tool_name = tool_stream.get_tool_name(tool_id) or chunk.name or ""
                     tool_result = _tool_result_for_display(_parse_tool_result(chunk.content))
@@ -689,7 +727,7 @@ class AIChatNode(INode):
                     # only text blocks belong in the displayed answer.
                     text = chunk.text
                     state["answer"] = state["answer"] + text
-                    if is_result and text:
+                    if text:
                         self.write(
                             TextContent(
                                 tool_stream.get_tool_uuid(chunk.id),
@@ -700,8 +738,16 @@ class AIChatNode(INode):
                             )
                         )
 
+            def on_next(chunk):
+                self._check_cancelled()
+                write_chunk(chunk)
+                # 用量在本 chunk 的内容之后写入，标志这次调用已完成
+                if isinstance(chunk, AIMessage) and chunk.usage_metadata:
+                    self.write(UsageContent(chunk.id, chunk.usage_metadata, node_info, Position(self.get_node_id())))
+
             def on_complete(error):
-                self._write_final_context(chat_model, message_list, question.content, state["answer"], "")
+                # 先落盘已累积的回答，被取消或报错时也不丢
+                self._write_final_context(state["answer"], "")
                 if error:
                     raise error
                 self.write(
