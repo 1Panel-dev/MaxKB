@@ -33,10 +33,10 @@ http.createServer(async (request, response) => {
       if (image.startsWith("https://")) {
         embedding = [1, 0];
       } else {
-        if (tencent ? image.startsWith("data:") : !image.startsWith("data:image/png;base64,")) {
+        if (!image.startsWith("data:image/png;base64,")) {
           return send(400, { error: { message: "Unexpected provider image encoding" } });
         }
-        const png = Buffer.from(tencent ? image : image.split(",", 2)[1], "base64");
+        const png = Buffer.from(image.split(",", 2)[1], "base64");
         if (png.length < 24 || png.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a") {
           return send(400, { error: { message: "Expected rendered PNG" } });
         }

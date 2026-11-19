@@ -85,14 +85,14 @@ class TencentEmbeddingModel(MaxKBBaseEmbeddingModel):
 
     @staticmethod
     def _to_base64_content(url: str) -> str:
-        """TokenHub 的 image_url.url 接受 URL 或 base64 内容。
+        """TokenHub 的 image_url.url 接受 URL 或 data URL。
 
         MaxKB 传入的图片是 data:image/...;base64,xxx 形式的 data URL，
-        这里剥掉 data: 前缀，转换为纯 base64 内容再交给接口。
+        这里保留 data: 前缀，直接交给接口。
         """
         # TokenHub limits image area rather than declaring a minimum side length.
         image = prepare_embedding_image(url, min_pixels=4096, max_svg_pixels=1843200)
-        return MaxKBBaseEmbeddingModel.normalize_image_input(image, keep_data_prefix=False)
+        return MaxKBBaseEmbeddingModel.normalize_image_input(image, keep_data_prefix=True)
 
     def _embed_multimodal(self, items: list) -> List[float]:
         payload = {"model": self.model_name, "input": items, "encoding_format": "float", **self.params}
