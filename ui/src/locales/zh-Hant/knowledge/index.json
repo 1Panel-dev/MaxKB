@@ -28,7 +28,6 @@
     "description": "透過飛書文件建立知識庫"
   },
   "workflow": {
-    "title": "工作流程",
     "label": "工作流程知識庫",
     "createTitle": "建立工作流程知識庫",
     "description": "透過自訂工作流程建立知識庫"

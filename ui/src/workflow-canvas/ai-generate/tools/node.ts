@@ -1,4 +1,4 @@
-import { nextTick } from 'vue'
+import { computed, nextTick, reactive } from 'vue'
 import type { AgentTool, JsonObjectSchema, JsonSchema, NodeAgentContext, NodeAgentModule, NodeReference, RunnableAgent } from '../type'
 import type { KnowledgeItem } from '@/api/types'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
@@ -243,19 +243,19 @@ export const getKnowledgeListTool: AgentTool = {
 export const VALUE_LESS_COMPARES = ['is_null', 'is_not_null', 'is_true', 'is_not_true']
 
 /** 条件项 schema：判断器分支、Break/Continue 条件共用 */
-export const CONDITION_SCHEMA = {
+export const CONDITION_SCHEMA = reactive({
   type: 'object',
   properties: {
     field: { type: 'array', items: { type: 'string' }, description: '被比较的变量 [节点ID, 字段]，从 get_field_options 取' },
     compare: {
       type: 'string',
       enum: compareList.map((item) => item.value),
-      description: compareList.map((item) => `${item.value}=${item.label}`).join('，'),
+      description: computed(() => compareList.map((item) => `${item.value}=${item.label}`).join('，')),
     },
     value: { type: 'string', description: '比较值；为空/不为空/为真/不为真无需比较值' },
   },
   required: ['field', 'compare'],
-}
+})
 
 export interface ConditionItem {
   field: string[]

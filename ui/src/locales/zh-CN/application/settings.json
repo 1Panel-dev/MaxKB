@@ -1,7 +1,6 @@
 {
   "settings": {
     "model": "模型设置",
-    "skills": "技能",
     "advanced": "高级设置",
     "unsavedMessage": "设置有未保存的修改，保存后调试生效"
   },
@@ -26,6 +25,10 @@
       "label": "问题优化",
       "defaultValue": "()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在{dataTags}标签中"
     }
+  },
+  "skills": {
+    "label": "技能",
+    "outputExecution": "输出执行过程"
   },
   "prologue": {
     "label": "开场白",
@@ -56,6 +59,20 @@
       "placeholder": "请选择触发周期",
       "requiredMessage": "请选择触发周期"
     }
+  },
+  "fileUpload": {
+    "label": "文件上传",
+    "title": "文件上传设置",
+    "description": "开启后，问答页面会显示上传文件的按钮。",
+    "method": {
+      "label": "上传方式",
+      "local": "本地上传",
+      "url": "URL 上传",
+      "requiredMessage": "请至少选择一种上传方式"
+    },
+    "maxFiles": "单次最多上传文件数",
+    "fileSize": "每个文件最大",
+    "allowedTypes": "允许上传的文件类型"
   },
   "speechInput": {
     "label": "语音输入",

@@ -4,6 +4,11 @@
   },
   "selected": "Selected resource",
   "shared": "Shared",
+  "dataSource": {
+    "label": "Data source",
+    "selectTitle": "Select a data source",
+    "typeLabel": "Data source type"
+  },
   "mcpConfig": {
     "title": "MCP server configuration"
   },

@@ -1,0 +1,10 @@
+{
+  "dataSource": {
+    "documentsUnavailableMessage": "You cannot browse data source files here."
+  },
+  "executionResult": {
+    "title": "Execution result",
+    "success": "Execution succeeded",
+    "failure": "Execution failed"
+  }
+}

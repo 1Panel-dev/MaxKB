@@ -4,6 +4,7 @@ import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
+import { START_NODE_REFERENCES } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
@@ -41,7 +42,7 @@ const defaultForm: QuestionNodeForm = {
     '# 角色\n你是一位问题优化大师，擅长根据上下文精准揣测用户意图，并对用户提出的问题进行优化。\n\n' +
     '## 技能\n### 技能 1: 优化问题\n2. 接收用户输入的问题。\n3. 依据上下文仔细分析问题含义。\n4. 输出优化后的问题。\n\n' +
     '## 限制:\n - 仅返回优化后的问题，不进行额外解释或说明。\n - 确保优化后的问题准确反映原始问题意图，不得改变原意。',
-  prompt: '{{开始.question}}',
+  prompt: START_NODE_REFERENCES.question,
   dialogue_number: 1,
   is_result: false,
   model_params_setting: {},
@@ -118,7 +119,7 @@ onMounted(() => {
           <MdEditorMagnify
             v-model="formData.system"
             title="系统提示词"
-            placeholder="系统提示词，可以引用系统中变量，如 {{开始.question}}"
+            :placeholder="`系统提示词，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
@@ -141,7 +142,7 @@ onMounted(() => {
           <MdEditorMagnify
             v-model="formData.prompt"
             title="用户提示词"
-            placeholder="用户提示词，可以引用系统中变量，如 {{开始.question}}"
+            :placeholder="`用户提示词，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`"
             @wheel="handleNodeWheel"
           />
         </el-form-item>

@@ -7,6 +7,13 @@
   "retryUpload": "重新上传",
   "limits": "每次最多上传 {count} 个文件，每个文件不超过 {size} MB",
   "formats": "支持格式",
+  "types": {
+    "document": "文档",
+    "image": "图片",
+    "audio": "音频",
+    "video": "视频",
+    "other": "其他文件"
+  },
   "extension": {
     "add": "添加后缀名",
     "duplicateMessage": "文件后缀已存在"

@@ -54,7 +54,7 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
             }
           }
         },
-        meta: { title: 'knowledge.workflow.title', icon: 'icon_ticket-flow_outlined', order: 20 },
+        meta: { title: 'workflow.title', icon: 'icon_ticket-flow_outlined', order: 20 },
       },
       {
         path: 'retrieval',

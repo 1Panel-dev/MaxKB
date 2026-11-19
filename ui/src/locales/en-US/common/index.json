@@ -165,7 +165,9 @@
     "input": "Please enter",
     "inputField": "Enter {label}",
     "select": "Please select",
-    "search": "Search"
+    "selectField": "Select {label}",
+    "search": "Search",
+    "searchByName": "Search by name"
   },
   "validation": {
     "formInvalid": "Please check the form entries",

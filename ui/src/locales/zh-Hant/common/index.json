@@ -165,7 +165,9 @@
     "input": "請輸入",
     "inputField": "請輸入 {label}",
     "select": "請選擇",
-    "search": "搜尋"
+    "selectField": "請選擇 {label}",
+    "search": "搜尋",
+    "searchByName": "依名稱搜尋"
   },
   "validation": {
     "formInvalid": "請檢查表單填寫內容",

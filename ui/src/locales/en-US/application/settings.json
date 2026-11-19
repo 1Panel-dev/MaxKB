@@ -1,7 +1,6 @@
 {
   "settings": {
     "model": "Model settings",
-    "skills": "Skills",
     "advanced": "Advanced settings",
     "unsavedMessage": "Settings have unsaved changes. Save them to apply them when debugging."
   },
@@ -26,6 +25,10 @@
       "label": "Question optimization",
       "defaultValue": "The text in () is the user's question. Use the conversation context to infer the user's intended question ({question}). Output one complete question enclosed in {dataTags} tags."
     }
+  },
+  "skills": {
+    "label": "Skills",
+    "outputExecution": "Show execution process"
   },
   "prologue": {
     "label": "Prologue",
@@ -56,6 +59,20 @@
       "placeholder": "Select a trigger schedule",
       "requiredMessage": "Select a trigger schedule"
     }
+  },
+  "fileUpload": {
+    "label": "File upload",
+    "title": "File upload settings",
+    "description": "When enabled, a file upload button appears on the chat page.",
+    "method": {
+      "label": "Upload method",
+      "local": "Local upload",
+      "url": "URL upload",
+      "requiredMessage": "Select at least one upload method"
+    },
+    "maxFiles": "Maximum files per upload",
+    "fileSize": "Maximum size per file",
+    "allowedTypes": "Allowed file types"
   },
   "speechInput": {
     "label": "Voice input",

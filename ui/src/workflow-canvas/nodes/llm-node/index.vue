@@ -7,6 +7,7 @@ import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
+import { START_NODE_REFERENCES } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel, isLastNode } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
@@ -45,7 +46,7 @@ const defaultForm: LlmNodeForm = {
   model_id_reference: [],
   model_params_setting: {},
   system: '',
-  prompt: '{{开始.question}}',
+  prompt: START_NODE_REFERENCES.question,
   enable_context: false,
   context_variable: [],
   tools: { location: 'customize', reference: [], tools: [] },
@@ -140,7 +141,7 @@ onMounted(() => {
           <MdEditorMagnify
             v-model="formData.system"
             title="系统提示词"
-            placeholder="系统提示词，可以引用系统中变量，如 {{开始.question}}"
+            :placeholder="`系统提示词，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
@@ -162,7 +163,7 @@ onMounted(() => {
           <MdEditorMagnify
             v-model="formData.prompt"
             title="用户提示词"
-            placeholder="用户提示词，可以引用系统中变量，如 {{开始.question}}"
+            :placeholder="`用户提示词，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`"
             @wheel="handleNodeWheel"
           />
         </el-form-item>

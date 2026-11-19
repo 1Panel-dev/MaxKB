@@ -7,6 +7,7 @@ import type { FormField } from '@/components/mk-dynamics-form'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
 import SelectModel from '@/components/business/select-model/index.vue'
+import { START_NODE_REFERENCES } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
@@ -153,7 +154,7 @@ function validateUserFieldReferences() {
       if (!condition.field?.[0] || !condition.field?.[1]) continue
       const isCurrentForm = condition.field[0] === model.id || (model.id === 'base-node' && condition.field[0] === 'global')
       if (isCurrentForm && !userInputFields.value.some(({ field }) => field === condition.field[1])) {
-        return Promise.reject(t('workflow.userInput.referenceMissingMessage'))
+        return Promise.reject(t('workflow.referenceVariable.missingMessage'))
       }
     }
   }
@@ -266,7 +267,7 @@ onMounted(() => {
             <span class="flex-align-center gap-1">
               <span :class="formData.long_term_enable ? 'mk-required' : ''">{{ t('application.longTermMemory.label') }}</span>
 
-              <MkTooltip :content="t('application.longTermMemory.description', { memory: '{{开始.memory}}' })" placement="right">
+              <MkTooltip :content="t('application.longTermMemory.description', { memory: START_NODE_REFERENCES.memory })" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </span>
@@ -290,8 +291,8 @@ onMounted(() => {
         <template #label>
           <div class="flex-between w-full">
             <span class="flex-align-center gap-1">
-              {{ t('workflow.fileUpload.label') }}
-              <MkTooltip :content="t('workflow.fileUpload.description')" placement="right">
+              {{ t('application.fileUpload.label') }}
+              <MkTooltip :content="t('application.fileUpload.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </span>

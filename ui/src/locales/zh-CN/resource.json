@@ -4,6 +4,11 @@
   },
   "selected": "已选资源",
   "shared": "共享",
+  "dataSource": {
+    "label": "数据源",
+    "selectTitle": "选择数据源",
+    "typeLabel": "数据源类型"
+  },
   "mcpConfig": {
     "title": "MCP 服务配置"
   },

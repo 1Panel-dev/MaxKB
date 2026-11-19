@@ -2,6 +2,7 @@
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { NodeMenuItem, NodeMenuResourceSource } from './types'
 import type { ApplicationDetail, ApplicationType, FolderItem, ToolItem, ToolType } from '@/api/types'
 import type { Ref } from 'vue'
@@ -15,6 +16,8 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowKind } from '@/workflow-canvas/types'
 import { FOLDER_ENTRY_ID } from '@/constants'
 import { isWorkFlow } from '@/utils/common'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ResourceNodeMenu' })
 
@@ -153,7 +156,7 @@ onMounted(() => {
 
     <section v-loading="loading" class="flex-column min-w-0 flex-1">
       <div class="shrink-0 p-3">
-        <MkSearchInput v-model="searchKeyword" placeholder="按名称搜索" />
+        <MkSearchInput v-model="searchKeyword" :placeholder="t('common.placeholders.searchByName')" />
       </div>
 
       <el-scrollbar class="min-h-0 flex-1">
@@ -161,6 +164,7 @@ onMounted(() => {
           <template v-for="resource in filteredResourceItems" :key="resource.id">
             <el-popover placement="right" :width="280" :show-after="TOOLTIP_SHOW_DELAY" :persistent="false">
               <template #reference>
+                <!-- 点击或拖拽添加资源节点 -->
                 <el-card
                   class="small cursor-pointer hover:border-primary!"
                   shadow="never"
@@ -180,7 +184,7 @@ onMounted(() => {
                   <ApplicationIcon v-else :icon="resource.icon" :size="24" />
                   <p class="min-w-0 flex-1 break-all truncate" :title="resource.name">{{ resource.name }}</p>
                   <el-tag v-if="resource.applicationType" size="small" :type="isWorkFlow(resource.applicationType) ? 'warning' : 'primary'">
-                    {{ isWorkFlow(resource.applicationType) ? '高级' : '简易' }}
+                    {{ isWorkFlow(resource.applicationType) ? t('application.advanced.shortLabel') : t('application.simple.shortLabel') }}
                   </el-tag>
                 </div>
                 <p v-if="resource.desc" class="mt-2 text-sm text-N600">{{ resource.desc }}</p>

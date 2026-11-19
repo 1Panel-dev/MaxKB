@@ -1,10 +1,45 @@
 {
+  "title": "Workflow",
   "menu": {
+    "basicComponents": "Basic components",
     "aiCapabilities": "AI capabilities",
     "businessLogic": "Business logic",
     "dataProcessing": "Data processing",
-    "other": "Other",
-    "searchPlaceholder": "Search by name"
+    "other": "Other"
+  },
+  "nodeSettings": {
+    "title": "Node settings"
+  },
+  "userInput": {
+    "title": "User input",
+    "currentForm": "Current form",
+    "exposedFields": {
+      "label": "Exposed parameters",
+      "description": "Only model, knowledge, switch, date, tree select, single-select, and multi-select controls are supported"
+    },
+    "menuTitle": {
+      "label": "Menu title for other parameters"
+    }
+  },
+  "parameters": {
+    "duplicateMessage": "Parameter already exists",
+    "invalidMessage": "Only letters, numbers, and underscores are allowed"
+  },
+  "apiParameters": {
+    "title": "API parameters"
+  },
+  "globalVariables": {
+    "title": "Global variables"
+  },
+  "conversationVariables": {
+    "title": "Conversation variables"
+  },
+  "referenceVariable": {
+    "label": "Variable reference",
+    "placeholder": "Select a variable",
+    "requiredMessage": "Select a variable reference",
+    "invalidMessage": "Invalid variable reference",
+    "missingMessage": "The referenced variable does not exist"
   },
   "model": {
     "label": "AI model",
@@ -16,15 +51,18 @@
     "custom": "Custom",
     "unconfigured": "No default model configured",
     "requiredMessage": "Configure a default model",
+    "selectRequiredMessage": "Select {label} in the default model settings",
     "sttRequiredMessage": "Select a speech-to-text model in the default model settings",
     "ttsRequiredMessage": "Select a text-to-speech model in the default model settings"
   },
   "systemPrompt": {
     "label": "System prompt",
+    "placeholder": "System prompt. You can reference system variables, such as {reference}",
     "description": "Define the role the model plays or the instructions it follows"
   },
   "userPrompt": {
     "label": "User prompt",
+    "placeholder": "User prompt. You can reference system variables, such as {reference}",
     "description": "The question or instructions the user sends to the model",
     "requiredMessage": "Enter a user prompt"
   },
@@ -42,18 +80,8 @@
     "start": "Start",
     "end": "End"
   },
-  "skills": {
-    "outputExecution": "Show execution process"
-  },
-  "dataSource": {
-    "label": "Data source",
-    "selectTitle": "Select a data source",
-    "typeLabel": "Data source type",
-    "documentsUnavailableMessage": "You cannot browse data source files here."
-  },
-  "executionResult": {
-    "title": "Execution result",
-    "success": "Execution succeeded",
-    "failure": "Execution failed"
+  "returnContent": {
+    "label": "Return content",
+    "description": "When disabled, this node's content is not shown to the user. Enable it to show the node's output."
   }
 }

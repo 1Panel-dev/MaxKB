@@ -1,10 +1,45 @@
 {
+  "title": "工作流",
   "menu": {
+    "basicComponents": "基础组件",
     "aiCapabilities": "AI 能力",
     "businessLogic": "业务逻辑",
     "dataProcessing": "数据处理",
-    "other": "其他",
-    "searchPlaceholder": "按名称搜索"
+    "other": "其他"
+  },
+  "nodeSettings": {
+    "title": "节点设置"
+  },
+  "userInput": {
+    "title": "用户输入",
+    "currentForm": "当前表单",
+    "exposedFields": {
+      "label": "外置参数设置",
+      "description": "仅支持模型、知识库、开关、日期、树形选项器、单选框、多选框组件类型"
+    },
+    "menuTitle": {
+      "label": "其他参数收纳菜单标题"
+    }
+  },
+  "parameters": {
+    "duplicateMessage": "参数已存在",
+    "invalidMessage": "仅支持字母、数字和下划线"
+  },
+  "apiParameters": {
+    "title": "接口传参"
+  },
+  "globalVariables": {
+    "title": "全局变量"
+  },
+  "conversationVariables": {
+    "title": "会话变量"
+  },
+  "referenceVariable": {
+    "label": "引用变量",
+    "placeholder": "请选择变量",
+    "requiredMessage": "请选择引用变量",
+    "invalidMessage": "引用变量错误",
+    "missingMessage": "引用变量不存在"
   },
   "model": {
     "label": "AI 模型",
@@ -16,15 +51,18 @@
     "custom": "自定义",
     "unconfigured": "未配置默认模型",
     "requiredMessage": "请配置默认模型",
+    "selectRequiredMessage": "请在默认模型设置中选择{label}",
     "sttRequiredMessage": "请在默认模型设置中选择语音识别模型",
     "ttsRequiredMessage": "请在默认模型设置中选择语音合成模型"
   },
   "systemPrompt": {
     "label": "系统提示词",
+    "placeholder": "系统提示词，可以引用系统中变量，如{reference}",
     "description": "设定模型扮演的角色或遵循的指令"
   },
   "userPrompt": {
     "label": "用户提示词",
+    "placeholder": "用户提示词，可以引用系统中变量，如{reference}",
     "description": "用户向模型提出的问题或输入的指令",
     "requiredMessage": "请输入用户提示词"
   },
@@ -42,18 +80,8 @@
     "start": "开始",
     "end": "结束"
   },
-  "skills": {
-    "outputExecution": "输出执行过程"
-  },
-  "dataSource": {
-    "label": "数据源",
-    "selectTitle": "选择数据源",
-    "typeLabel": "数据源类型",
-    "documentsUnavailableMessage": "当前知识库不支持数据源文件查询"
-  },
-  "executionResult": {
-    "title": "执行结果",
-    "success": "执行成功",
-    "failure": "执行失败"
+  "returnContent": {
+    "label": "返回内容",
+    "description": "关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。"
   }
 }

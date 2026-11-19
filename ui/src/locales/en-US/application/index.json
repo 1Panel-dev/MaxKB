@@ -6,13 +6,13 @@
   },
   "simple": {
     "label": "Simple agent",
-    "shortLabel": "Simple",
+    "shortLabel": "SIMPLE",
     "createTitle": "Create simple agent",
     "description": "Quickly build an agent with basic features using form settings."
   },
   "advanced": {
     "label": "Advanced agent",
-    "shortLabel": "Advanced",
+    "shortLabel": "WORKFLOW",
     "createTitle": "Create advanced agent",
     "description": "Build feature-rich agents with complex logic using a low-code drag-and-drop editor."
   },

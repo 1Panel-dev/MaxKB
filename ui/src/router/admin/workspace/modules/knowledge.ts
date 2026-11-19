@@ -90,7 +90,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: ({ params }) => perm.knowledge.workspace.debug(String(params.knowledgeId)),
               next: 'workspace-knowledge-hit-test',
-              title: 'knowledge.workflow.title',
+              title: 'workflow.title',
               icon: 'icon_ticket-flow_outlined',
               order: 20,
             },
