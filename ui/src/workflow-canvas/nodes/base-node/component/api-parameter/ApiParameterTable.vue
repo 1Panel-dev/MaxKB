@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ApiInputField } from '../../types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import ApiParameterDialog from './ApiParameterDialog.vue'
 import { MsgError } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ userFields: FormField[] }>()
 const inputFields = defineModel<ApiInputField[]>({ required: true })
@@ -20,7 +23,7 @@ function saveField(data: ApiInputField, index?: number) {
     inputFields.value.some((field, fieldIndex) => field.variable === data.variable && fieldIndex !== index) ||
     props.userFields.some(({ field }) => field === data.variable)
   ) {
-    MsgError(`参数已存在：${data.variable}`)
+    MsgError(`${t('workflow.parameters.duplicateMessage')}：${data.variable}`)
     return
   }
   const fields = cloneDeep(inputFields.value)
@@ -38,7 +41,7 @@ function deleteField(index: number) {
 <template>
   <div class="w-full">
     <div class="flex-between">
-      <span>接口传参</span>
+      <span>{{ t('workflow.apiParameters.title') }}</span>
       <!-- 添加接口参数 -->
       <el-button text type="primary" @click="openDialog()"><MkIcon name="icon_add_outlined" /></el-button>
     </div>
@@ -51,25 +54,25 @@ function deleteField(index: number) {
       row-key="variable"
       :max-height="undefined"
     >
-      <el-table-column label="参数" prop="variable" min-width="120">
+      <el-table-column :label="t('dynamicForm.fields.parameter.label')" prop="variable" min-width="120">
         <template #default="{ row }">
           <span class="block truncate" :title="row.variable">{{ row.variable }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="描述" prop="desc" min-width="120">
+      <el-table-column :label="t('common.description.label')" prop="desc" min-width="120">
         <template #default="{ row }">
           <span class="block truncate" :title="row.desc">{{ row.desc }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="默认值" prop="default_value" min-width="100">
+      <el-table-column :label="t('dynamicForm.fields.defaultValue.label')" prop="default_value" min-width="100">
         <template #default="{ row }">
           <span class="block truncate" :title="row.default_value">{{ row.default_value }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="必填" width="55">
+      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="90">
         <template #default="{ row }"><el-switch :model-value="Boolean(row.is_required)" disabled size="small" /></template>
       </el-table-column>
-      <el-table-column label="操作" width="80">
+      <el-table-column :label="t('common.labels.operation')" width="80">
         <template #default="{ row, $index }">
           <!-- 编辑 -->
           <el-button text type="primary" @click="openDialog(row, $index)"><MkIcon name="icon_edit_outlined" /></el-button>

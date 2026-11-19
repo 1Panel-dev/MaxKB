@@ -113,7 +113,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
           <h4>{{ t('tool.categories.all') }}</h4>
           <el-divider direction="vertical" />
           <el-select v-model="toolType" class="w-30!" :empty-values="[null, undefined]" @change="refreshTools">
-            <el-option v-for="option in TOOL_TYPE_OPTIONS" :key="option.value" :label="t(option.labelKey)" :value="option.value" />
+            <el-option v-for="option in TOOL_TYPE_OPTIONS" :key="option.value" :label="option.label" :value="option.value" />
           </el-select>
         </div>
         <div class="flex-align-center gap-3">

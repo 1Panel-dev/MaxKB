@@ -45,7 +45,7 @@ function formatFieldType(type: TriggerBodyField['type']) {
       </el-button>
     </div>
     <MkTable v-if="fields.length > 0" :data="fields" row-key="field" size="small" class="mt-2 border" :max-height="undefined">
-      <el-table-column :label="t('dynamicForm.fields.field.label')">
+      <el-table-column :label="t('dynamicForm.fields.parameter.label')">
         <template #default="{ row }">
           <span class="block truncate" :title="row.field">{{ row.field }}</span>
         </template>

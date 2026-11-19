@@ -27,8 +27,8 @@ const canSelectNotAuth = computed(() => props.permissionOptions.some(({ value })
 /* 查询与当前页选择 */
 const { auth } = useStore()
 const searchPermissionOptions = computed(() =>
-  RESOURCE_PERMISSION_OPTIONS.filter(({ value }) => !auth.isCE || value !== RESOURCE_PERMISSION.ROLE).map(({ labelKey, value }) => ({
-    label: t(labelKey),
+  RESOURCE_PERMISSION_OPTIONS.filter(({ value }) => !auth.isCE || value !== RESOURCE_PERMISSION.ROLE).map(({ label, value }) => ({
+    label,
     value,
   })),
 )
@@ -135,7 +135,7 @@ onMounted(() => loadPermissions())
       <el-table-column :label="t('authorization.permission.label')" min-width="340">
         <template #default="{ row }">
           <el-radio-group :model-value="row.permission" :disabled="submitting" @change="handlePermissionChange($event, row)">
-            <el-radio v-for="option in permissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{ t(option.labelKey) }}</el-radio>
+            <el-radio v-for="option in permissionOptions" :key="option.value" :value="option.value" class="mr-4!">{{ option.label }}</el-radio>
           </el-radio-group>
         </template>
       </el-table-column>

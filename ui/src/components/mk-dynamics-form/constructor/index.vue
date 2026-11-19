@@ -44,8 +44,8 @@ const props = withDefaults(
 const inputTypeOptions = computed(
   () =>
     props.fieldTypeOptions ??
-    DYNAMIC_FORM_TYPES.map(({ labelKey, value }) => ({
-      label: t(labelKey),
+    DYNAMIC_FORM_TYPES.map(({ label, value }) => ({
+      label,
       value: `${value}Constructor`,
     })),
 )

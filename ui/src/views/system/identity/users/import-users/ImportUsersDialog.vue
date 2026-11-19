@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from 'vue'
-import { mapValues } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { ChatUserSyncConflict, ListItem, LoginMethod, SystemUserGroup } from '@/api/types'
 import type { FormInstance, FormRules, UploadFile, UploadUserFile } from 'element-plus'
@@ -9,7 +8,7 @@ import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserGroupApi from '@/api/admin/system/user-groups'
 import UserManageApi from '@/api/admin/system/user-manage'
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
-import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { useStore } from '@/stores'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
@@ -66,7 +65,7 @@ const importUsersFormRules = computed<FormRules<ImportUsersForm>>(() => ({
 const sourcesLoading = ref(false)
 const sourceTypes = ref<string[]>([])
 const userSourceLabels = computed<Record<LoginMethod | typeof LOCAL_FILE_SOURCE, string>>(() => ({
-  ...mapValues(LOGIN_METHOD_LABEL_KEYS, (key) => t(key)),
+  ...LOGIN_METHOD_LABELS,
   [LOGIN_METHOD.LOCAL]: t('user.source.local'),
   [LOCAL_FILE_SOURCE]: t('user.source.localFile'),
 }))

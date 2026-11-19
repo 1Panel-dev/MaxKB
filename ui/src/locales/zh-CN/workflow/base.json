@@ -1,0 +1,45 @@
+{
+  "userInput": {
+    "title": "用户输入",
+    "currentForm": "当前表单",
+    "referenceMissingMessage": "引用变量不存在",
+    "exposedFields": {
+      "label": "外置参数设置",
+      "description": "仅支持模型、知识库、开关、日期、树形选项器、单选框、多选框组件类型"
+    },
+    "menuTitle": {
+      "label": "其他参数收纳菜单标题"
+    }
+  },
+  "parameters": {
+    "duplicateMessage": "参数已存在",
+    "invalidMessage": "仅支持字母、数字和下划线"
+  },
+  "apiParameters": {
+    "title": "接口传参"
+  },
+  "conversationVariables": {
+    "title": "会话变量"
+  },
+  "fileUpload": {
+    "label": "文件上传",
+    "title": "文件上传设置",
+    "description": "开启后，问答页面会显示上传文件的按钮。",
+    "method": {
+      "label": "上传方式",
+      "local": "本地上传",
+      "url": "URL 上传",
+      "requiredMessage": "请至少选择一种上传方式"
+    },
+    "maxFiles": "单次最多上传文件数",
+    "fileSize": "每个文件最大",
+    "allowedTypes": "允许上传的文件类型",
+    "types": {
+      "document": "文档",
+      "image": "图片",
+      "audio": "音频",
+      "video": "视频",
+      "other": "其他文件"
+    }
+  }
+}

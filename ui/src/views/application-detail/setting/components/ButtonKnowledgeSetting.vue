@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 import type { ApplicationSettings } from '../settings'
 import type { FormInstance } from 'element-plus'
 import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
-import { DEFAULT_DESIGNATED_ANSWER, createSettings } from '../settings'
+import { createSettings } from '../settings'
 import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 
 defineOptions({ name: 'ButtonKnowledgeSetting' })
@@ -15,13 +15,14 @@ const props = defineProps<{ setting: ApplicationSettings }>()
 const emit = defineEmits<{ submit: [settings: Partial<ApplicationSettings>] }>()
 const visible = ref(false)
 const formData = ref(createSettings())
-const noReferenceAnswers = ref<Record<string, string>>({ ai_questioning: '{question}', designated_answer: DEFAULT_DESIGNATED_ANSWER })
+const noReferenceAnswers = ref<Record<string, string>>({})
 function changeNoReferenceStatus(status: string | number | boolean | undefined) {
   formData.value.knowledge_setting.no_references_setting.value = noReferenceAnswers.value[String(status)] ?? '{question}'
 }
 const formRef = useTemplateRef<FormInstance>('formRef')
 function open() {
   formData.value = cloneDeep(props.setting)
+  noReferenceAnswers.value = { ai_questioning: '{question}', designated_answer: t('application.knowledgeSetting.noReferences.defaultValue') }
   const responseSetting = props.setting.knowledge_setting.no_references_setting
   const answer = responseSetting.value || noReferenceAnswers.value[responseSetting.status] || '{question}'
   noReferenceAnswers.value[responseSetting.status] = answer
@@ -50,7 +51,7 @@ function submit() {
 function resetData() {
   formRef.value?.clearValidate()
   formData.value = createSettings()
-  noReferenceAnswers.value = { ai_questioning: '{question}', designated_answer: DEFAULT_DESIGNATED_ANSWER }
+  noReferenceAnswers.value = {}
 }
 </script>
 
@@ -59,16 +60,16 @@ function resetData() {
   <el-button text type="primary" @click.stop="open">
     <MkIcon name="icon_setting" />
   </el-button>
-  <MkDialog v-model="visible" title="参数设置" @closed="resetData">
-    <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="检索模式">
+  <MkDialog v-model="visible" :title="t('application.knowledgeSetting.settingsTitle')" @closed="resetData">
+    <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form-item :label="t('knowledge.retrieval.mode')">
         <!-- 选择检索模式 -->
         <el-radio-group v-model="formData.knowledge_setting.search_mode" class="space-y-2" @change="changeSearchMode">
           <template v-for="mode in KNOWLEDGE_SEARCH_MODE_OPTIONS" :key="mode.value">
             <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': formData.knowledge_setting.search_mode === mode.value }">
               <el-radio :value="mode.value" class="mk-card-radio">
-                <h6>{{ t(mode.labelKey) }}</h6>
-                <span class="block text-sm text-N600">{{ t(mode.descriptionKey) }}</span>
+                <h6>{{ mode.label }}</h6>
+                <span class="block text-sm text-N600">{{ mode.description }}</span>
               </el-radio>
             </el-card>
           </template>
@@ -78,8 +79,10 @@ function resetData() {
         <el-form-item>
           <template #label>
             <span class="flex-align-center gap-1">
-              相似度高于
-              <MkTooltip content="相似度越高相关性越强。" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip>
+              {{ t('knowledge.retrieval.similarity.label') }}
+              <MkTooltip :content="t('knowledge.retrieval.similarity.description')" placement="right">
+                <MkIcon name="icon_info_outlined" class="text-N600!" />
+              </MkTooltip>
             </span>
           </template>
           <el-input-number
@@ -93,7 +96,7 @@ function resetData() {
             align="left"
           />
         </el-form-item>
-        <el-form-item label="召回分段数 TOP">
+        <el-form-item :label="t('knowledge.retrieval.topNumber')">
           <el-input-number
             v-model="formData.knowledge_setting.top_n"
             :min="1"
@@ -105,24 +108,24 @@ function resetData() {
           />
         </el-form-item>
       </div>
-      <el-form-item label="最多引用字符数">
+      <el-form-item :label="t('knowledge.retrieval.maxReferenceCharacters')">
         <MkSlider v-model="formData.knowledge_setting.max_paragraph_char_number" :min="500" :max="100000" />
       </el-form-item>
-      <el-form-item label="无引用知识库分段时">
+      <el-form-item :label="t('application.knowledgeSetting.noReferences.label')">
         <el-radio-group
           :model-value="formData.knowledge_setting.no_references_setting.status"
           @change="changeNoReferenceStatus"
           @update:model-value="formData.knowledge_setting.no_references_setting.status = String($event)"
         >
-          <el-radio value="ai_questioning">继续向 AI 提问</el-radio>
-          <el-radio value="designated_answer">指定回答</el-radio>
+          <el-radio value="ai_questioning">{{ t('application.knowledgeSetting.noReferences.askAI') }}</el-radio>
+          <el-radio value="designated_answer">{{ t('application.knowledgeSetting.noReferences.designatedAnswer') }}</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item
         class="-mt-2"
         v-if="formData.knowledge_setting.no_references_setting.status === 'designated_answer'"
         prop="knowledge_setting.no_references_setting.value"
-        :rules="{ required: true, whitespace: true, message: '请输入回答内容', trigger: 'blur' }"
+        :rules="{ required: true, whitespace: true, message: t('application.knowledgeSetting.noReferences.requiredMessage'), trigger: 'blur' }"
       >
         <el-input
           v-model="formData.knowledge_setting.no_references_setting.value"
@@ -130,23 +133,25 @@ function resetData() {
           type="textarea"
           :rows="3"
           maxlength="2048"
-          :placeholder="DEFAULT_DESIGNATED_ANSWER"
+          :placeholder="t('application.knowledgeSetting.noReferences.defaultValue')"
         />
       </el-form-item>
-      <el-form-item label="问题优化"><el-switch v-model="formData.problem_optimization" size="small" /></el-form-item>
-      <el-form-item v-if="formData.problem_optimization" label="用户提示词" prop="problem_optimization_prompt">
+      <el-form-item :label="t('application.knowledgeSetting.problemOptimization.label')">
+        <el-switch v-model="formData.problem_optimization" size="small" />
+      </el-form-item>
+      <el-form-item v-if="formData.problem_optimization" :label="t('workflow.userPrompt.label')" prop="problem_optimization_prompt">
         <MdEditorMagnify
-          placeholder="用户提示词，可以引用系统中变量，如{{开始.question}}"
+          :placeholder="t('application.knowledgeSetting.problemOptimization.defaultValue', { question: '{question}', dataTags: '<data></data>' })"
           v-model="formData.problem_optimization_prompt"
-          title="用户提示词"
+          :title="t('workflow.userPrompt.label')"
         />
       </el-form-item>
     </el-form>
     <template #footer>
       <!-- 取消配置 -->
-      <el-button plain @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 确认配置，暂存到页面草稿 -->
-      <el-button type="primary" @click="submit">保存</el-button>
+      <el-button type="primary" @click="submit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

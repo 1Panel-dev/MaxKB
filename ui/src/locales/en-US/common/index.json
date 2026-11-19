@@ -11,7 +11,8 @@
     "details": "Details",
     "basicInfo": "Basic information",
     "type": "Type",
-    "settings": "Settings"
+    "settings": "Settings",
+    "example": "Example"
   },
   "name": {
     "label": "Name",
@@ -30,6 +31,7 @@
     "disabled": "Disabled",
     "pending": "Queued",
     "running": "Running",
+    "generating": "Generating",
     "success": "Succeeded",
     "failure": "Failed",
     "canceling": "Canceling",
@@ -86,14 +88,17 @@
     "manage": "Manage",
     "edit": "Edit",
     "rename": "Rename",
+    "replace": "Replace",
     "delete": "Delete",
     "remove": "Remove",
     "cancel": "Cancel",
     "retry": "Retry",
+    "regenerate": "Regenerate",
     "reload": "Reload",
     "clear": "Clear",
     "reset": "Reset",
     "save": "Save",
+    "publish": "Publish",
     "add": "Add",
     "previous": "Previous",
     "next": "Next",
@@ -127,9 +132,11 @@
   },
   "messages": {
     "saveSuccess": "Saved successfully",
+    "publishSuccess": "Published successfully",
     "deleteSuccess": "Deleted successfully",
     "deleteFailed": "Deletion failed",
     "createSuccess": "Created successfully",
+    "generateFailed": "Generation failed",
     "duplicateSuccess": "Duplicated successfully",
     "addSuccess": "Added successfully",
     "removeSuccess": "Removed successfully",
@@ -161,6 +168,7 @@
     "search": "Search"
   },
   "validation": {
+    "formInvalid": "Please check the form entries",
     "inputRequired": "This field is required",
     "inputFieldRequired": "Enter {label}",
     "selectRequired": "This field is required",

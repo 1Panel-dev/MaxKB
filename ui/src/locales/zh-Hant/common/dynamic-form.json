@@ -23,12 +23,12 @@
     "label": "頁籤"
   },
   "fields": {
-    "field": {
+    "parameter": {
       "label": "參數",
       "placeholder": "請輸入參數",
       "requiredMessage": "請輸入參數"
     },
-    "label": {
+    "displayName": {
       "label": "顯示名稱",
       "placeholder": "請輸入顯示名稱",
       "requiredMessage": "請輸入顯示名稱"

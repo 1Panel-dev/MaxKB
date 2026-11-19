@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
 import type { LoginService } from '../types'
 import type { LoginConfig, QrCodeConfig, QrCodeProvider } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import DingTalkQrCode from '../scanComponents/dingtalkQrCode.vue'
 import LarkQrCode from '../scanComponents/larkQrCode.vue'
 import WecomQrCode from '../scanComponents/wecomQrCode.vue'
-import { LOGIN_METHOD_LABEL_KEYS } from '@/constants/auth'
+import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 
 defineOptions({ name: 'QrCodeLogin' })
 
-const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ loginConfig: LoginConfig; loginService: LoginService }>()
 const qrCodeLoginMethods = computed(() => props.loginConfig.login_methods ?? [])
 
@@ -33,7 +31,7 @@ onMounted(() => {
 <template>
   <div class="qr-login">
     <el-tabs v-model="qrCodeProvider" class="provider-tabs">
-      <el-tab-pane v-for="provider in qrCodeLoginMethods" :key="provider" :label="t(LOGIN_METHOD_LABEL_KEYS[provider])" :name="provider" />
+      <el-tab-pane v-for="provider in qrCodeLoginMethods" :key="provider" :label="LOGIN_METHOD_LABELS[provider]" :name="provider" />
     </el-tabs>
     <component :is="currentProviderComponent" v-if="currentConfig" :config="currentConfig" :login-service="loginService" />
   </div>

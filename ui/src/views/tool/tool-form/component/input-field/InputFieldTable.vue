@@ -44,7 +44,7 @@ function handleDeleteInputField(index: number) {
       </el-button>
     </div>
     <MkTable :data="inputFields" size="small">
-      <el-table-column :label="t('dynamicForm.fields.field.label')" prop="name" min-width="140" />
+      <el-table-column :label="t('dynamicForm.fields.parameter.label')" prop="name" min-width="140" />
       <el-table-column :label="t('tool.inputParams.dataType.label')" prop="type" min-width="100">
         <template #default="{ row }">
           <el-tag size="small" type="info">{{ row.type }}</el-tag>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, ref, useTemplateRef } from 'vue'
+import { computed, inject, reactive, ref, useTemplateRef } from 'vue'
 import { DROPDOWN_INJECTION_KEY } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import type SystemResourceKnowledgeApi from '@/api/admin/system/resource-management/knowledge/knowledge'
@@ -25,11 +25,11 @@ const exportTriggerRef = useTemplateRef<HTMLDivElement>('exportTriggerRef')
 const exportMenuContainer = computed(() => exportTriggerRef.value?.closest<HTMLElement>('.el-dropdown__popper'))
 
 /* 知识库导出菜单 */
-const exportOptions = [
-  { labelKey: 'knowledge.export.documentsExcel', method: 'exportKnowledgeExcel' },
-  { labelKey: 'knowledge.export.documentsZip', method: 'exportKnowledgeZip' },
-  { labelKey: 'knowledge.export.title', method: 'exportKnowledge' },
-] as const
+const exportOptions = reactive([
+  { label: computed(() => t('knowledge.export.documentsExcel')), method: 'exportKnowledgeExcel' },
+  { label: computed(() => t('knowledge.export.documentsZip')), method: 'exportKnowledgeZip' },
+  { label: computed(() => t('knowledge.export.title')), method: 'exportKnowledge' },
+] as const)
 
 const exportDialogVisible = ref(false)
 const withSourceFile = ref(false)
@@ -89,7 +89,7 @@ function handleExportDialogClosed() {
             :disabled="loading"
             @click="handleExportKnowledge(exportOption.method)"
           >
-            {{ t(exportOption.labelKey) }}
+            {{ exportOption.label }}
           </MkDropdownItem>
         </MkDropdownMenu>
       </template>

@@ -1,0 +1,59 @@
+{
+  "menu": {
+    "aiCapabilities": "AI capabilities",
+    "businessLogic": "Business logic",
+    "dataProcessing": "Data processing",
+    "other": "Other",
+    "searchPlaceholder": "Search by name"
+  },
+  "model": {
+    "label": "AI model",
+    "placeholder": "Select an AI model",
+    "requiredMessage": "Select an AI model"
+  },
+  "defaultModel": {
+    "label": "Default model",
+    "custom": "Custom",
+    "unconfigured": "No default model configured",
+    "requiredMessage": "Configure a default model",
+    "sttRequiredMessage": "Select a speech-to-text model in the default model settings",
+    "ttsRequiredMessage": "Select a text-to-speech model in the default model settings"
+  },
+  "systemPrompt": {
+    "label": "System prompt",
+    "description": "Define the role the model plays or the instructions it follows"
+  },
+  "userPrompt": {
+    "label": "User prompt",
+    "description": "The question or instructions the user sends to the model",
+    "requiredMessage": "Enter a user prompt"
+  },
+  "promptGeneration": {
+    "title": "Generate prompt",
+    "placeholder": "Enter a prompt topic",
+    "empty": "The generated prompt appears here"
+  },
+  "history": {
+    "label": "Chat history"
+  },
+  "thinking": {
+    "label": "Show reasoning",
+    "description": "Set the reasoning tags returned by the model. Content between these tags will be treated as reasoning.",
+    "start": "Start",
+    "end": "End"
+  },
+  "skills": {
+    "outputExecution": "Show execution process"
+  },
+  "dataSource": {
+    "label": "Data source",
+    "selectTitle": "Select a data source",
+    "typeLabel": "Data source type",
+    "documentsUnavailableMessage": "You cannot browse data source files here."
+  },
+  "executionResult": {
+    "title": "Execution result",
+    "success": "Execution succeeded",
+    "failure": "Execution failed"
+  }
+}

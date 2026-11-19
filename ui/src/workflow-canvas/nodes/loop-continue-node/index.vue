@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { compareList } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'WorkflowLoopContinueNode' })
 const getModel = inject('getModel') as () => BaseNodeModel
@@ -98,7 +101,12 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible(`${index}:compare`, $event)"
                 @wheel="handleNodeWheel"
               >
-                <el-option v-for="comparison in compareList" :key="comparison.value" :label="comparison.label" :value="comparison.value" />
+                <el-option
+                  v-for="comparison in compareList"
+                  :key="comparison.value"
+                  :label="t(`dynamicForm.operators.${comparison.value}`)"
+                  :value="comparison.value"
+                />
               </el-select>
             </el-form-item>
             <div class="min-w-0 flex-1">

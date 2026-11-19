@@ -30,8 +30,8 @@ const ruleFormRef = ref<FormInstance>()
 const componentFormRef = ref<DynamicFormConstructorExpose>()
 
 const rules = computed<FormRules<DynamicFormConstructorState>>(() => ({
-  label: [{ whitespace: true, required: true, message: t('dynamicForm.fields.label.requiredMessage') }],
-  field: [{ whitespace: true, required: true, message: t('dynamicForm.fields.field.requiredMessage') }],
+  label: [{ whitespace: true, required: true, message: t('dynamicForm.fields.displayName.requiredMessage') }],
+  field: [{ whitespace: true, required: true, message: t('dynamicForm.fields.parameter.requiredMessage') }],
   input_type: [{ required: true, message: t('dynamicForm.fields.inputType.requiredMessage') }],
 }))
 
@@ -83,11 +83,11 @@ defineExpose({ validate, getData, render })
 </script>
 <template>
   <el-form @submit.prevent ref="ruleFormRef" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" :model="form">
-    <el-form-item :label="t('dynamicForm.fields.field.label')" prop="field" :rules="rules.field">
-      <el-input v-model="form.field" :maxlength="64" :placeholder="t('dynamicForm.fields.field.placeholder')" show-word-limit />
+    <el-form-item :label="t('dynamicForm.fields.parameter.label')" prop="field" :rules="rules.field">
+      <el-input v-model="form.field" :maxlength="64" :placeholder="t('dynamicForm.fields.parameter.placeholder')" show-word-limit />
     </el-form-item>
-    <el-form-item :label="t('dynamicForm.fields.label.label')" prop="label" :rules="rules.label">
-      <el-input v-model="form.label" :maxlength="64" show-word-limit :placeholder="t('dynamicForm.fields.label.placeholder')" />
+    <el-form-item :label="t('dynamicForm.fields.displayName.label')" prop="label" :rules="rules.label">
+      <el-input v-model="form.label" :maxlength="64" show-word-limit :placeholder="t('dynamicForm.fields.displayName.placeholder')" />
     </el-form-item>
     <el-form-item :label="t('dynamicForm.fields.tooltip.label')">
       <el-input v-model="form.tooltip" :maxlength="128" show-word-limit :placeholder="t('dynamicForm.fields.tooltip.placeholder')" />

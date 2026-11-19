@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, reactive, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ModelItem, ModelProviderItem, PromptGenerateMessage } from '@/api/types'
 import type { ScrollbarInstance } from 'element-plus'
 import SelectModel from '@/components/business/select-model/index.vue'
@@ -8,6 +9,7 @@ import { ConversationStream } from '@/conversation-panel/core/stream'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'GenerateContent' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(
   defineProps<{
@@ -76,7 +78,7 @@ function generateContent(regenerate = false) {
     if (error) {
       messages.value = messages.value.filter((message) => message !== answer)
       if (!(error instanceof Error) || error.name !== 'StreamRequestError') {
-        MsgError(error instanceof Error ? error.message : '生成失败')
+        MsgError(error instanceof Error ? error.message : t('common.messages.generateFailed'))
       }
     }
     conversationStream = undefined
@@ -149,7 +151,7 @@ onBeforeUnmount(stopGenerate)
       </el-scrollbar>
       <div v-else-if="loading" class="flex-align-center gap-2">
         <LoadingIcon :size="16" />
-        <span class="mk-dotting">生成中</span>
+        <span class="mk-dotting">{{ t('common.status.generating') }}</span>
       </div>
       <p v-else class="flex-align-center gap-2">
         <MkIcon name="icon_star" class="text-primary!" />
@@ -157,9 +159,9 @@ onBeforeUnmount(stopGenerate)
       </p>
       <div v-if="!loading && latestAnswer">
         <!-- 替换当前内容 -->
-        <el-button type="primary" @click="replaceContent">替换</el-button>
+        <el-button type="primary" @click="replaceContent">{{ t('common.actions.replace') }}</el-button>
         <!-- 重新生成内容 -->
-        <el-button plain :disabled="disabled || generateDisabled" @click="generateContent(true)">重新生成</el-button>
+        <el-button plain :disabled="disabled || generateDisabled" @click="generateContent(true)">{{ t('common.actions.regenerate') }}</el-button>
       </div>
       <div class="mk-input-box border transition-colors hover:border-primary focus-within:border-primary">
         <el-input

@@ -91,7 +91,7 @@ watch(
             <MkStatusLabel
               v-if="EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state]"
               :type="EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state].type"
-              :label="t(EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state].labelKey)"
+              :label="EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state].label"
               :icon="EXECUTION_STATUS_OPTIONS[detail?.state ?? record.state].icon"
             />
             <span v-else>{{ detail?.state ?? record.state }}</span>

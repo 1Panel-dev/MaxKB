@@ -26,7 +26,7 @@ const permissionSearchFields = computed<OptionItem<string>[]>(() => [
   {
     label: t('authorization.permission.label'),
     multiple: true,
-    options: getPermissionOptions().map(({ labelKey, value }) => ({ label: t(labelKey), value })),
+    options: getPermissionOptions().map(({ label, value }) => ({ label, value })),
     value: 'permission',
   },
 ])
@@ -209,7 +209,7 @@ watch(
         <template #default="{ row }: { row: ResourcePermissionItem }">
           <el-radio-group :model-value="row.permission" :disabled="disabled" @change="handlePermissionChange($event as ResourcePermission, row)">
             <template v-for="permissionOption in getPermissionOptions()" :key="permissionOption.value">
-              <el-radio :value="permissionOption.value">{{ t(permissionOption.labelKey) }}</el-radio>
+              <el-radio :value="permissionOption.value">{{ permissionOption.label }}</el-radio>
             </template>
           </el-radio-group>
         </template>

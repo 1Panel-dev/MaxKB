@@ -50,8 +50,7 @@ const searchFields = computed(() => [
   { label: t('common.name.label'), value: 'name' },
   { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
-const translatedToolTypes = computed(() => TOOL_TYPE_OPTIONS.map(({ value, labelKey }) => ({ value, label: t(labelKey) })))
-const toolTypeOptions = computed(() => translatedToolTypes.value.filter(({ value }) => value))
+const toolTypeOptions = computed(() => TOOL_TYPE_OPTIONS.filter(({ value }) => value))
 const sourceOptions = computed(() => [
   { label: t('tool.store.title'), value: 'TOOL_STORE' },
   { label: t('tool.source.custom'), value: 'CUSTOM' },
@@ -60,7 +59,7 @@ const statusOptions = computed(() => [
   { label: t('common.status.enabled'), value: 'enabled' },
   { label: t('common.status.disabled'), value: 'disabled' },
 ])
-const toolTypeLabels = computed(() => new Map(translatedToolTypes.value.map(({ value, label }) => [value, label])))
+const toolTypeLabels = computed(() => new Map(TOOL_TYPE_OPTIONS.map(({ value, label }) => [value, label])))
 
 function loadCreatorOptions(keyword: string) {
   return SystemCommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {

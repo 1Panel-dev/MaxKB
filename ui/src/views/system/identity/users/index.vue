@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
-import { mapValues } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { Dict, LoginMethod, OptionItem, SystemUser } from '@/api/types'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
@@ -10,7 +9,7 @@ import UserFromDrawer from './UserFromDrawer.vue'
 import ButtonBatchSetUserRole from './batch-set-user-role/ButtonBatchSetUserRole.vue'
 import ButtonImportUsers from './import-users/ButtonImportUsers.vue'
 import ButtonChangeUserPassword from './user-password/ButtonChangeUserPassword.vue'
-import { LOGIN_METHOD_LABEL_KEYS } from '@/constants/auth.ts'
+import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import { useStore } from '@/stores'
 import { toOrderBy } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
@@ -41,7 +40,7 @@ const searchFields = computed<OptionItem<string>[]>(() => [
 ])
 const systemUserSearchQuery = ref<Dict<unknown>>()
 const userSourceLabels = computed<Record<LoginMethod, string>>(() => ({
-  ...mapValues(LOGIN_METHOD_LABEL_KEYS, (key) => t(key)),
+  ...LOGIN_METHOD_LABELS,
   [LOGIN_METHOD.LOCAL]: t('user.source.local'),
 }))
 const sourceFilterOptions = computed<OptionItem<string>[]>(() => Object.entries(userSourceLabels.value).map(([value, label]) => ({ label, value })))

@@ -1,0 +1,78 @@
+{
+  "settings": {
+    "model": "模型設定",
+    "skills": "技能",
+    "advanced": "進階設定",
+    "unsavedMessage": "設定有尚未儲存的修改，儲存後於除錯時生效"
+  },
+  "prompt": {
+    "systemPlaceholder": "系統提示詞，可以引用系統中的變量：{data} 是命中知識庫中的分段；{question} 是使用者提出的問題，{memory} 為開啟長期記憶後的使用者記憶。",
+    "userPlaceholder": "使用者提示詞，可以引用系統中的變量：{data} 是命中知識庫中的分段；{question} 是使用者提出的問題。",
+    "userDefaultValue": "已知資訊：{data}\n使用者問題：{question}\n回答要求：\n- 請使用中文回答使用者問題",
+    "references": "引用知識庫",
+    "noReferences": "無引用知識庫"
+  },
+  "knowledgeSetting": {
+    "settingsTitle": "參數設定",
+    "empty": "關聯的知識庫顯示在這裡",
+    "noReferences": {
+      "label": "無引用知識庫分段時",
+      "askAI": "繼續向 AI 提問",
+      "designatedAnswer": "指定回答",
+      "defaultValue": "你好，我是 XXX 小助手，我的知識庫只包含了 XXX 產品相關知識，請重新描述您的問題。",
+      "requiredMessage": "請輸入回答內容"
+    },
+    "problemOptimization": {
+      "label": "問題最佳化",
+      "defaultValue": "()裡面是使用者問題，根據上下文回答推測使用者問題({question})。要求：輸出一個補全問題，並且放在{dataTags}標籤中"
+    }
+  },
+  "prologue": {
+    "label": "開場白",
+    "defaultValue": "您好，我是 XXX 小助手，您可以向我提出 XXX 使用問題。\n- XXX 主要功能有什麼？\n- XXX 如何收費？\n- 需要轉人工服務"
+  },
+  "longTermMemory": {
+    "label": "長期記憶",
+    "title": "長期記憶設定",
+    "description": "開啟後，從開啟時間記錄新對話並按週期產生記憶，可透過 {memory} 變量在系統提示詞中呼叫。關閉後，將清空對話使用者的長期記憶，再次開啟將重新從開啟時點開始累積。",
+    "model": {
+      "placeholder": "請選擇長期記憶模型",
+      "requiredMessage": "請選擇長期記憶模型"
+    },
+    "trigger": {
+      "label": "觸發方式",
+      "requiredMessage": "請選擇觸發方式",
+      "rounds": "按輪次觸發",
+      "roundsDescription": "累積到 N 輪後，自動提煉 N 輪對話，產生記憶",
+      "scheduled": "定時觸發",
+      "scheduledDescription": "到設定時間後，自動提煉週期內所有對話，產生記憶"
+    },
+    "rounds": {
+      "label": "觸發間隔",
+      "invalidMessage": "請輸入 5–100 之間的整數輪次"
+    },
+    "period": {
+      "label": "觸發週期",
+      "placeholder": "請選擇觸發週期",
+      "requiredMessage": "請選擇觸發週期"
+    }
+  },
+  "speechInput": {
+    "label": "語音輸入",
+    "autoSend": "自動傳送",
+    "model": {
+      "placeholder": "請選擇語音輸入模型",
+      "requiredMessage": "請選擇語音輸入模型"
+    }
+  },
+  "speechPlayback": {
+    "label": "語音播放",
+    "autoPlay": "自動播放",
+    "browser": "瀏覽器播放（免費）",
+    "custom": "自訂",
+    "model": {
+      "placeholder": "請選擇語音播放模型",
+      "requiredMessage": "請選擇語音播放模型"
+    }
+  }
+}

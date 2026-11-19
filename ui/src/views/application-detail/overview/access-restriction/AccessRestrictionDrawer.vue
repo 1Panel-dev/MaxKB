@@ -1,20 +1,18 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { useI18n } from 'vue-i18n'
 import type { ApplicationAccessTokenPayload, ApplicationAuthenticationConfig, LoginMethod, OptionItem } from '@/api/types'
 import type { ApplicationAccessToken } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
 import ChatUserAuthApi from '@/api/admin/system/chat-management/chat-user-auth'
 import { useApplicationDetailContext } from '../../context'
-import { LOGIN_METHOD_LABEL_KEYS } from '@/constants/auth'
+import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import { useStore } from '@/stores/admin'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'AccessRestrictionDrawer' })
 
-const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ initialConfig?: ApplicationAccessToken }>()
 const emit = defineEmits<{ closed: []; updated: [config: ApplicationAccessToken] }>()
 const { auth } = useStore()
@@ -54,8 +52,7 @@ function loadAccessRestriction() {
   if (loading.value) return
   loading.value = true
   // 优先复用概览页已获取的配置，避免重复请求 access_token 接口。
-  const fetchConfig = () =>
-    props.initialConfig ? Promise.resolve(props.initialConfig) : resourceApi.application.getAccessToken(applicationId.value)
+  const fetchConfig = () => (props.initialConfig ? Promise.resolve(props.initialConfig) : resourceApi.application.getAccessToken(applicationId.value))
   return fetchConfig()
     .then((config) => {
       Object.assign(form, {
@@ -159,7 +156,7 @@ onMounted(loadAccessRestriction)
             <el-checkbox-group v-model="form.authentication_value.login_value" class="flex-wrap gap-x-6" @change="handleLoginMethodsChange">
               <template v-for="option in loginMethodOptions" :key="option.value">
                 <el-checkbox :value="option.value" :disabled="option.disabled" class="w-32">
-                  {{ LOGIN_METHOD_LABEL_KEYS[option.value as LoginMethod] ? t(LOGIN_METHOD_LABEL_KEYS[option.value as LoginMethod]) : option.label }}
+                  {{ LOGIN_METHOD_LABELS[option.value as LoginMethod] ?? option.label }}
                 </el-checkbox>
               </template>
             </el-checkbox-group>
@@ -167,12 +164,7 @@ onMounted(loadAccessRestriction)
           <el-form-item label="默认登录方式" prop="authentication_value.default_value">
             <el-select v-model="form.authentication_value.default_value" placeholder="请选择默认登录方式">
               <template v-for="option in defaultLoginMethodOptions" :key="option.value">
-                <el-option
-                  :value="option.value"
-                  :label="
-                    LOGIN_METHOD_LABEL_KEYS[option.value as LoginMethod] ? t(LOGIN_METHOD_LABEL_KEYS[option.value as LoginMethod]) : option.label
-                  "
-                />
+                <el-option :value="option.value" :label="LOGIN_METHOD_LABELS[option.value as LoginMethod] ?? option.label" />
               </template>
             </el-select>
           </el-form-item>

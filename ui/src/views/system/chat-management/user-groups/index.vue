@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
-import { mapValues } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { ChatUserGroupMember, Dict, ListItem, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import ChatGroupsApi from '@/api/admin/system/chat-management/chat-user-groups.ts'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
-import { LOGIN_METHOD_LABEL_KEYS } from '@/constants'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
@@ -76,7 +75,7 @@ const memberSearchFields = computed<OptionItem<string>[]>(() => [
 /* 表头筛选 */
 const selectedMemberSource = ref<string | null>(null)
 const memberSourceLabels = computed<Record<LoginMethod, string>>(() => ({
-  ...mapValues(LOGIN_METHOD_LABEL_KEYS, (key) => t(key)),
+  ...LOGIN_METHOD_LABELS,
   [LOGIN_METHOD.LOCAL]: t('user.source.local'),
 }))
 const memberSourceOptions = computed<OptionItem<string>[]>(() => Object.entries(memberSourceLabels.value).map(([value, label]) => ({ label, value })))

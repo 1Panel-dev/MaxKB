@@ -1,0 +1,126 @@
+{
+  "aiChat": {
+    "label": "AI 对话",
+    "description": "与 AI 大模型进行对话"
+  },
+  "llm": {
+    "label": "LLM",
+    "description": "单次调用大模型，可传入工具定义并输出工具调用"
+  },
+  "intent": {
+    "label": "意图识别",
+    "description": "将用户问题与用户预设的意图分类进行匹配"
+  },
+  "speechToText": {
+    "label": "语音转文本",
+    "description": "将音频通过语音识别模型转换为文本"
+  },
+  "textToSpeech": {
+    "label": "文本转语音",
+    "description": "将文本通过语音合成模型转换为音频"
+  },
+  "imageGenerate": {
+    "label": "图片生成",
+    "description": "根据提供的文本内容生成图片"
+  },
+  "imageToVideo": {
+    "label": "图生视频",
+    "description": "根据提供的图片生成视频"
+  },
+  "textToVideo": {
+    "label": "文生视频",
+    "description": "根据提供的文本内容生成视频"
+  },
+  "imageUnderstand": {
+    "label": "图片理解",
+    "description": "识别出图片中的对象、场景等信息回答用户问题"
+  },
+  "videoUnderstand": {
+    "label": "视频理解",
+    "description": "识别出视频中的对象、场景等信息回答用户问题"
+  },
+  "questionOptimization": {
+    "label": "问题优化",
+    "description": "根据历史聊天记录优化完善当前问题，更利于匹配知识库分段"
+  },
+  "reply": {
+    "label": "指定回复",
+    "description": "指定回复内容，引用变量会转换为字符串进行输出"
+  },
+  "condition": {
+    "label": "判断器",
+    "description": "根据不同条件执行不同的节点"
+  },
+  "form": {
+    "label": "表单收集",
+    "description": "在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程"
+  },
+  "variableAssign": {
+    "label": "变量赋值",
+    "description": "更新全局变量的值"
+  },
+  "variableAggregation": {
+    "label": "变量聚合",
+    "description": "按聚合策略聚合每组的变量"
+  },
+  "variableSplitting": {
+    "label": "变量拆分",
+    "description": "通过配置JSON Path 表达式，对输入的 JSON 格式变量进行解析和拆分"
+  },
+  "parameterExtraction": {
+    "label": "参数提取",
+    "description": "利用 AI 模型提取结构化参数"
+  },
+  "searchKnowledge": {
+    "label": "知识库检索",
+    "description": "关联知识库，查找与问题相关的分段"
+  },
+  "searchDocument": {
+    "label": "文档标签检索",
+    "description": "从设定的检索范围中，根据文档标签检索出满足条件的文档"
+  },
+  "documentExtract": {
+    "label": "文档内容提取",
+    "description": "解析输入文档，输出结构化文档内容"
+  },
+  "reranker": {
+    "label": "多路召回",
+    "description": "使用重排模型对多个知识库的检索结果进行二次召回"
+  },
+  "mcp": {
+    "label": "MCP 调用",
+    "description": "通过 SSE/Streamable HTTP 方式执行MCP服务中的工具"
+  },
+  "customTool": {
+    "label": "自定义工具",
+    "description": "通过执行自定义脚本，实现数据处理"
+  },
+  "loop": {
+    "label": "循环节点",
+    "description": "通过设置循环次数和逻辑，重复执行一系列任务"
+  },
+  "loopContinue": {
+    "label": "Continue",
+    "description": "用于终止当前循环，执行下次循环"
+  },
+  "loopBreak": {
+    "label": "Break",
+    "description": "终止当前循环，跳出循环体"
+  },
+  "documentSplit": {
+    "label": "文档分段",
+    "description": "按分段策略拆分输入文档内容，输出分段文本列表"
+  },
+  "localFile": {
+    "label": "本地文件",
+    "description": "上传本地文档，输出文档列表（不解析内容，需配合 “文档内容提取” 节点解析）"
+  },
+  "webSource": {
+    "label": "Web 站点",
+    "description": "输入根地址自动抓取 Web 数据（单链接对应单文档），输出含内容的文档列表"
+  },
+  "knowledgeWrite": {
+    "label": "知识库写入",
+    "description": "将输入的分段列表写入当前知识库，并完成向量化处理"
+  }
+}

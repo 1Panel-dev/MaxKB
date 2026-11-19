@@ -10,7 +10,7 @@ import ProviderApi from '@/api/admin/model-provider'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import ModelAdvancedSettings from '@/views/model/advanced-settings-table/AdvancedSettingsTable.vue'
 import { loadCachedBaseModelOptions, loadCachedOrBuiltinBaseModelOptions } from '@/views/model/base-model-options'
-import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
+import { MODEL_TYPE_LABELS } from '@/constants/model'
 import { useStore } from '@/stores'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
 
@@ -280,7 +280,7 @@ defineExpose({ open })
           <!-- 选择模型类型 -->
           <el-select v-model="modelType" class="w-full" @change="loadModelProviders">
             <el-option :label="t('model.categories.all')" value="all" />
-            <el-option v-for="(key, value) in MODEL_TYPE_MESSAGE_KEYS" :key="value" :label="t(key)" :value="value" />
+            <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
           </el-select>
         </component>
 
@@ -362,7 +362,7 @@ defineExpose({ open })
                   <el-option
                     v-for="option in modelTypeOptions"
                     :key="option.value"
-                    :label="MODEL_TYPE_MESSAGE_KEYS[option.value] ? t(MODEL_TYPE_MESSAGE_KEYS[option.value]!) : option.key"
+                    :label="MODEL_TYPE_LABELS[option.value] ?? option.key"
                     :value="option.value"
                   />
                 </el-select>

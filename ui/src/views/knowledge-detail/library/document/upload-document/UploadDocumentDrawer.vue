@@ -149,7 +149,7 @@ defineExpose({ open })
   <MkDrawer v-model="visible" direction="btt" size="100%" :content-class="previewVisible ? 'h-full p-0!' : undefined" @closed="emit('closed')">
     <template #header>
       <div class="flex w-full">
-        <h4>{{ t(uploadOption.titleKey) }}</h4>
+        <h4>{{ uploadOption.title }}</h4>
         <el-steps v-if="mode === 'text'" :active="activeStep" finish-status="success" class="absolute-center w-85!">
           <el-step :title="t('knowledge.document.upload.title')" />
           <el-step :title="t('knowledge.documentStrategy.title')" />

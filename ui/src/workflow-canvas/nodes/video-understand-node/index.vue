@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { ReasoningSettingData } from '@/workflow-canvas/types'
@@ -8,11 +9,13 @@ import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
 import ThinkingSetting from '@/workflow-canvas/component/ThinkingSetting.vue'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
-import { fileTooltip } from '@/workflow-canvas/config/constants'
+import { FILE_REFERENCE_EXAMPLE } from '@/workflow-canvas/config/constants'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'WorkflowVideoUnderstandNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
@@ -201,7 +204,7 @@ onMounted(() => {
               <span class="mk-required">视频</span>
               <MkTooltip placement="right">
                 <template #content>
-                  <div class="font-mono whitespace-pre-wrap">{{ fileTooltip }}</div>
+                  <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>
                 </template>
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>

@@ -1,20 +1,22 @@
+import { computed, reactive } from 'vue'
+import { t } from '@/locales'
 /** 文档上传入口及文件选择范围，仅用于本页面。 */
-export const DOCUMENT_UPLOAD_OPTIONS = {
+export const DOCUMENT_UPLOAD_OPTIONS = reactive({
   text: {
-    titleKey: 'knowledge.document.upload.textTitle',
+    title: computed(() => t('knowledge.document.upload.textTitle')),
     accept: '.txt,.md,.markdown,.pdf,.docx,.html,.htm,.xls,.xlsx,.csv,.zip',
     formats: ['TXT', 'Markdown', 'PDF', 'DOCX', 'HTML', 'XLS', 'XLSX', 'CSV', 'ZIP'],
   },
   table: {
-    titleKey: 'knowledge.document.upload.tableTitle',
+    title: computed(() => t('knowledge.document.upload.tableTitle')),
     accept: '.xls,.xlsx,.csv',
     formats: ['XLS', 'XLSX', 'CSV'],
   },
   qa: {
-    titleKey: 'knowledge.document.upload.qaTitle',
+    title: computed(() => t('knowledge.document.upload.qaTitle')),
     accept: '.xls,.xlsx,.csv,.zip',
     formats: ['XLS', 'XLSX', 'CSV', 'ZIP'],
   },
-} as const
+} as const)
 
 export type DocumentUploadMode = keyof typeof DOCUMENT_UPLOAD_OPTIONS

@@ -1,3 +1,4 @@
+// label 用于 AI 工具的固定参数说明，界面直接按比较符 value 调用 t。
 export const compareList = [
   { value: 'is_null', label: '为空' },
   { value: 'is_not_null', label: '不为空' },
@@ -22,4 +23,8 @@ export const compareList = [
   { value: 'wildcard', label: '通配符匹配' },
 ]
 
-export const fileTooltip = `示例：\n${JSON.stringify([{ name: 'File Name', url: './oss/file/019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4', file_id: '019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4' }], null, 2)}`
+export const FILE_REFERENCE_EXAMPLE = JSON.stringify(
+  [{ name: 'File Name', url: './oss/file/019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4', file_id: '019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4' }],
+  null,
+  2,
+)

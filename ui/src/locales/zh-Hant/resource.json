@@ -2,6 +2,7 @@
   "relations": {
     "title": "查看關聯資源"
   },
+  "selected": "已選資源",
   "shared": "共用",
   "mcpConfig": {
     "title": "MCP 服務設定"

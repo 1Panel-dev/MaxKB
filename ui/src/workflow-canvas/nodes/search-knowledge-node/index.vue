@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { useI18n } from 'vue-i18n'
 import type { SearchKnowledgeNodeForm } from './types'
 import type { KnowledgeItem } from '@/api/types'
 import type { NodeSearchScopeData } from '@/workflow-canvas/component/node-search-scope/types'
@@ -16,7 +15,6 @@ import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 
 defineOptions({ name: 'WorkflowSearchKnowledgeNode' })
 
-const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const model = getModel()
 const formRef = useTemplateRef<FormInstance>('formRef')
@@ -76,7 +74,7 @@ const settingRows = computed(() => {
   return [
     {
       label: '检索模式',
-      value: searchMode ? t(searchMode.labelKey) : formData.value.knowledge_setting.search_mode,
+      value: searchMode ? searchMode.label : formData.value.knowledge_setting.search_mode,
     },
     { label: '相似度高于', value: formData.value.knowledge_setting.similarity.toFixed(3) },
     { label: '召回分段数 TOP', value: formData.value.knowledge_setting.top_n },

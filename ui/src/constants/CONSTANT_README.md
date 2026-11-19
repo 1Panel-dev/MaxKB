@@ -13,10 +13,13 @@
 
 后端枚举与类型归属统一见 [API_README.md](../api/API_README.md#枚举与类型组织)。`constants` 只维护标签、颜色、选项等前端映射；映射的键应引用
 API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一数据源，`constants/auth.ts`
-只维护它们的展示文案或翻译 key 映射。
-登录方式共用 `LOGIN_METHOD_LABEL_KEYS`，按 `LOGIN_METHOD` 映射到 `auth.methods`，登录页、用户来源及认证配置在模板或 computed 中直接调用 `t`。用户来源的本地创建／本地导入名称由对应业务覆盖，未知来源保留接口原文；筛选选项保留协议值与既有顺序。
+只维护它们的展示文案。
+共享展示配置使用 `reactive` 包裹对象或数组，动态文案属性直接使用 `computed(() => t('...'))`。
+调用方按普通属性读取译文，无需 `.value` 或再次调用 `t`；不增加翻译 key 属性、平行 key 映射或翻译辅助函数。
+配置只读，首次读取文案必须在入口完成 `createAppI18n` 之后；依赖语言的复制、映射应留在 computed 或执行时，不能在模块顶层取出文案快照。
+登录方式共用 `LOGIN_METHOD_LABELS`，角色类型共用 `ROLE_TYPE_LABELS`，分别按 API 枚举读取 `auth.methods` 和 `role.types`。
+用户来源的本地创建／本地导入名称由对应业务覆盖，未知来源保留接口原文；筛选选项保留协议值与既有顺序。
 `SCAN_FIELD_LABELS` 只维护扫码配置中的固定英文参数名；回调地址单独展示并直接使用 `auth.fields.callbackUrl.label`。
-其中 `ROLE_TYPE_MESSAGE_KEYS` 按 `ROLE_TYPE` 映射到 `role.types`，角色列表分组和继承角色选项在展示时直接调用 `t`；不在常量内保存当前语言的译文，不改变角色类型的协议值。
 
 知识库类型的接口值保持为 `KNOWLEDGE_TYPE` 中的数字。`constants/knowledge.ts` 提供
 `KNOWLEDGE_TYPE_MAP`，将数字转换为 `BASE`、`WEB`、`LARK`、`WORKFLOW` 字符串，
@@ -24,23 +27,14 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 `knowledge.web`、`knowledge.lark` 和 `knowledge.workflow` 的翻译。提交接口时仍使用数字枚举值。
 字符串标识统一由 `KNOWLEDGE_TYPE_KEY` 维护，映射、文案和业务判断均引用该常量，避免重复写裸字符串。
 
-`model.ts` 的 `MODEL_TYPE_MESSAGE_KEYS` 是模型类型的共用翻译 key 映射，供模型业务、系统模型页、
-工作流默认模型设置和动态表单模型控件使用。调用方通过当前应用的 `t` 翻译，依赖语言的
-选项在 computed 中生成；不在常量内绑定入口国际化实例，不改变类型协议值。
+`model.ts` 的 `MODEL_TYPE_LABELS` 提供模型类型的响应式名称，供模型业务、系统模型页、工作流默认模型设置和动态表单模型控件使用；协议值保持不变。
 
-`tool.ts` 的 `TOOL_TYPE_OPTIONS` 为工作空间及系统工具列表提供有序的 `value` 和 `labelKey`。
-调用方展示时翻译 `labelKey`，筛选继续使用原 `value`，“全部”对应空字符串。
+`tool.ts` 的 `TOOL_TYPE_OPTIONS` 为工作空间及系统工具列表提供有序的 `value` 和 `label`，筛选继续使用原 `value`，“全部”对应空字符串。
 
-`resource-authorization.ts` 的 `RESOURCE_PERMISSION_OPTIONS` 统一维护权限协议值、`labelKey` 和可选的 `descriptionKey`；
-资源授权页面与资源用户授权抽屉按版本和根目录约束筛选选项，在模板或 computed 中直接通过 `t` 翻译。
-名称和说明归 `authorization.permission`，常量不保存中文标签或当前语言的译文。
+`resource-authorization.ts` 的 `RESOURCE_PERMISSION_OPTIONS` 统一维护权限协议值、`label` 和可选的 `description`；资源授权页面与抽屉按版本和根目录约束筛选，名称和说明归 `authorization.permission`。
 
-`knowledge.ts` 的 `KNOWLEDGE_SYNC_OPTIONS` 提供同步方式的协议值、`labelKey` 和 `descriptionKey`。
-手动同步、定时同步和同步日志在展示时翻译，提交时使用协议值。
-
-`knowledge.ts` 的 `KNOWLEDGE_SEARCH_MODE_OPTIONS` 统一维护向量、全文和混合检索的 `value`、`labelKey` 和 `descriptionKey`，
-选项值引用 `KNOWLEDGE_SEARCH_MODE`。召回测试页、智能体设置与工作流知识库检索节点在模板或 computed 中通过 `t` 翻译；
-文案归 `knowledge.retrieval`，常量不保存中文或当前语言的译文。
+`knowledge.ts` 的 `KNOWLEDGE_SYNC_OPTIONS` 提供同步方式的协议值、响应式名称和说明；手动同步、定时同步和同步日志共用。
+`KNOWLEDGE_SEARCH_MODE_OPTIONS` 统一维护向量、全文和混合检索的 `value`、`label` 和 `description`，选项值引用 `KNOWLEDGE_SEARCH_MODE`，文案归 `knowledge.retrieval`；召回测试、智能体设置与工作流知识库检索节点直接读取。
 
 `knowledge.ts` 的 `KNOWLEDGE_IMAGE_EXTENSIONS` 维护知识库上传和召回测试支持的图片扩展名，
 `KNOWLEDGE_IMAGE_ACCEPT` 和 `KNOWLEDGE_IMAGE_TYPE_LABEL` 由它派生，供文件选择、校验与提示使用。
@@ -48,23 +42,16 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 
 `schedule.ts` 的 `SCHEDULE_OPTION` 统一提供触发器、长期记忆与知识库定时同步的周期级联选项，
 包含周期文案、执行时间和间隔数值；使用方只读，配置回填与校验仍由各自组件维护。
-周期、星期及间隔单位提供可选 `labelKey`。已接入国际化的调用方在 computed 中通过 `t` 生成标签，
-每月日期由数字和日期单位组合；未接入的调用方继续读取 `label`，不修改共享选项及其子项。
+周期、星期及间隔单位的 `label` 随语言更新，每月日期由数字和日期单位组合；调用方直接读取，不重复映射翻译或修改共享选项及其子项。
 周期类型统一使用 `api/enums/schedule.ts` 的 `SCHEDULE_TYPE`，经 `@/api/enums` 导入。
 
-`state.ts` 的 `EXECUTION_STATUS_OPTIONS` 维护触发器、工具和知识库工作流执行记录共用的
-翻译键 `labelKey` 与图标类型，仅包含 `PENDING`、`STARTED`、`SUCCESS`、`FAILURE`、`REVOKE`、
-`REVOKED`、`TRIGGER_ERROR` 七种接口状态，列表筛选及执行详情复用该配置。通用状态文案归 `common.status`，
-触发失败归 `resource.executionRecords.status.triggerFailed`；调用方在模板或 computed 中直接通过 `t` 翻译 `labelKey`，
-常量不保存中文 `label` 或当前语言的翻译结果。
-新增状态只需在业务配置中补齐展示，
-不修改 `MkStatusLabel`。文档任务使用 `views/knowledge-detail/library/document/status.ts` 的独立配置，
-筛选查询仍映射 `DOCUMENT_TASK_STATE` 与 `DOCUMENT_TASK_TYPE`，不提交展示状态键。
+`state.ts` 的 `EXECUTION_STATUS_OPTIONS` 维护触发器、工具和知识库工作流执行记录共用的响应式 `label` 与图标类型，包含 `PENDING`、`STARTED`、`SUCCESS`、`FAILURE`、`REVOKE`、`REVOKED`、`TRIGGER_ERROR` 七种接口状态。
+通用状态文案归 `common.status`，触发失败归 `resource.executionRecords.status.triggerFailed`。新增状态在业务配置中补齐展示，不修改 `MkStatusLabel`。
+文档任务使用 `views/knowledge-detail/library/document/status.ts` 的独立配置，筛选查询仍映射 `DOCUMENT_TASK_STATE` 与 `DOCUMENT_TASK_TYPE`，不提交展示状态键。
 
-`document.ts` 的 `DOCUMENT_HIT_HANDLING_MESSAGE_KEYS` 按 API 枚举 `DOCUMENT_HIT_HANDLING` 提供翻译键，文档和图片的列表筛选、表格单元格及文档设置共用。
-`DOCUMENT_SPLIT_PATTERN_OPTIONS` 维护文档分段标识的完整选项与正则值，知识库文档策略表单和工作流分段节点共同引用。
-表单和节点通过当前应用的 `t` 翻译可选的 `labelKey`；`#`、`-` 等纯符号直接展示 `label`。
-`label` 保留为工作流 Agent 的固定参数识别值，不随界面语言变化；提交分段策略时使用正则 `value`。
+`document.ts` 的 `DOCUMENT_HIT_HANDLING_LABELS` 按 API 枚举 `DOCUMENT_HIT_HANDLING` 提供响应式名称，文档和图片的列表筛选、表格单元格及文档设置共用。
+`DOCUMENT_SPLIT_PATTERNS` 保存与后端一致的固定标识及正则值，供工作流 Agent 识别参数，不随语言变化。
+`DOCUMENT_SPLIT_PATTERN_OPTIONS` 在同一文件提供文档策略表单与工作流分段节点共用的响应式标签，正则值引用固定定义；`#`、`-` 等纯符号原样展示，提交时使用正则 `value`。
 
 `file-type.ts` 维护图片、文档、视频和音频的文件扩展名常量，扩展名统一使用大写。
 使用方判断文件类型时先将后缀转换为大写，再与对应常量匹配。

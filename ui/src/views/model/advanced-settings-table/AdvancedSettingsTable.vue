@@ -23,7 +23,7 @@ function handleOpenParamDialog(field?: DynamicFormField, index?: number) {
 
 function getTypeLabel(inputType: string) {
   const definition = DYNAMIC_FORM_TYPES.find(({ value }) => value === inputType)
-  return definition ? t(definition.labelKey) : inputType
+  return definition ? definition.label : inputType
 }
 
 function handleSubmitParam(field: FormField) {
@@ -68,8 +68,8 @@ function handleDeleteParam(index: number) {
   </div>
 
   <MkTable :data="modelParams" size="small">
-    <el-table-column :label="t('dynamicForm.fields.field.label')" prop="field" min-width="130" show-overflow-tooltip />
-    <el-table-column :label="t('dynamicForm.fields.label.label')" min-width="130" show-overflow-tooltip>
+    <el-table-column :label="t('dynamicForm.fields.parameter.label')" prop="field" min-width="130" show-overflow-tooltip />
+    <el-table-column :label="t('dynamicForm.fields.displayName.label')" min-width="130" show-overflow-tooltip>
       <template #default="{ row }">
         <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{ row.label.label }}</span>
         <span v-else>{{ row.label }}</span>

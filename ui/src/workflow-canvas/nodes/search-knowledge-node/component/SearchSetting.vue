@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { useI18n } from 'vue-i18n'
 import type { KnowledgeSearchSetting } from '../types'
 import type { FormInstance } from 'element-plus'
 import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
@@ -10,7 +9,6 @@ import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 
 defineOptions({ name: 'SearchKnowledgeSetting' })
 
-const { t } = useI18n({ useScope: 'global' })
 const setting = defineModel<KnowledgeSearchSetting>({ required: true })
 const visible = ref(false)
 const formData = ref<KnowledgeSearchSetting>(cloneDeep(defaultSearchSetting))
@@ -48,8 +46,8 @@ function resetData() {
           <template v-for="option in KNOWLEDGE_SEARCH_MODE_OPTIONS" :key="option.value">
             <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': formData.search_mode === option.value }">
               <el-radio :value="option.value" class="mk-card-radio">
-                <h6>{{ t(option.labelKey) }}</h6>
-                <span class="block text-sm text-N600">{{ t(option.descriptionKey) }}</span>
+                <h6>{{ option.label }}</h6>
+                <span class="block text-sm text-N600">{{ option.description }}</span>
               </el-radio>
             </el-card>
           </template>

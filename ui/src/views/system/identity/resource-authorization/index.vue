@@ -20,7 +20,7 @@ import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vu
 import PermissionTable from './components/PermissionTable.vue'
 import UserAuthorizationList from './components/UserAuthorizationList.vue'
 import UserGroupAuthorizationList from './components/user-group/UserGroupAuthorizationList.vue'
-import { RESOURCE_AUTHORIZATION_MESSAGE_KEYS } from './constants'
+import { RESOURCE_AUTHORIZATION_LABELS } from './constants'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import { perm } from '@/permission'
@@ -45,7 +45,7 @@ const resourceTypeOptions = computed<OptionItem<ResourceAuthorizationType>[]>(()
   [RESOURCE_TYPE.APPLICATION, RESOURCE_TYPE.KNOWLEDGE, RESOURCE_TYPE.TOOL, RESOURCE_TYPE.MODEL]
     .filter((value) => resourceReadPermissions[value]())
     .map((value) => ({
-      label: t(RESOURCE_AUTHORIZATION_MESSAGE_KEYS[value]),
+      label: RESOURCE_AUTHORIZATION_LABELS[value],
       value,
     })),
 )

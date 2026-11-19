@@ -6,7 +6,7 @@ import type ModelApi from '@/api/admin/workspace/model'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
 import ModelDownloadStatus from './ModelDownloadStatus.vue'
-import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
+import { MODEL_TYPE_LABELS } from '@/constants/model'
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -26,8 +26,7 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
 defineSlots<{ 'action-dropdown'?: () => unknown }>()
 
 const modelTypeLabel = computed(() => {
-  const key = MODEL_TYPE_MESSAGE_KEYS[props.model.model_type]
-  return key ? t(key) : props.model.model_type
+  return MODEL_TYPE_LABELS[props.model.model_type] ?? props.model.model_type
 })
 
 const errMessage = computed(() => {

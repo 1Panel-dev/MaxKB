@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ReasoningSettingData } from '@/workflow-canvas/types'
 import type { FormInstance } from 'element-plus'
 
 defineOptions({ name: 'ThinkingSetting' })
+const { t } = useI18n({ useScope: 'global' })
 
 const setting = defineModel<ReasoningSettingData>({ required: true })
 
@@ -41,23 +43,26 @@ function resetData() {
 </script>
 
 <template>
+  <!-- 打开思考标签设置 -->
   <el-button text type="primary" @click="open">
     <MkIcon name="icon_setting" />
   </el-button>
-  <MkDialog v-model="visible" title="设置" @closed="resetData">
-    <template #subtitle>请根据模型返回的思考标签设置，标签中间的内容将会认定为思考过程</template>
+  <MkDialog v-model="visible" :title="t('common.labels.settings')" @closed="resetData">
+    <template #subtitle>{{ t('workflow.thinking.description') }}</template>
     <el-form ref="formRef" :model="formData" class="grid grid-cols-2 gap-4" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="开始">
+      <el-form-item :label="t('workflow.thinking.start')">
         <el-input v-model="formData.reasoning_content_start" type="textarea" :rows="5" placeholder="<think>" />
       </el-form-item>
-      <el-form-item label="结束">
+      <el-form-item :label="t('workflow.thinking.end')">
         <el-input v-model="formData.reasoning_content_end" type="textarea" :rows="5" placeholder="</think>" />
       </el-form-item>
     </el-form>
 
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="submit">保存</el-button>
+      <!-- 取消思考标签设置 -->
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存思考标签设置 -->
+      <el-button type="primary" @click="submit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

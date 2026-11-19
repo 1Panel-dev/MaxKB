@@ -13,7 +13,7 @@ import ModelCard from '@/views/model/model-card/ModelCard.vue'
 import { DeleteModelAction, ParamSettingAction, RelatedResourcesModelAction } from '@/views/model/model-card/action-dropdown'
 import EditModelDrawer from '@/views/model/model-card/action-dropdown/edit-model-action/EditModelDrawer.vue'
 import AuthorizedWorkspaceAction from '../authorized-workspace-action/index.vue'
-import { MODEL_TYPE_MESSAGE_KEYS } from '@/constants/model'
+import { MODEL_TYPE_LABELS } from '@/constants/model'
 import perm from '@/permission'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -44,7 +44,7 @@ const searchFields = computed(() => [
   {
     label: t('model.fields.type.label'),
     value: 'model_type',
-    options: Object.entries(MODEL_TYPE_MESSAGE_KEYS).map(([value, key]) => ({ label: t(key), value })),
+    options: Object.entries(MODEL_TYPE_LABELS).map(([value, label]) => ({ label, value })),
   },
   { label: t('common.labels.creator'), value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])

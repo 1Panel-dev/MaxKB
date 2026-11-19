@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { DocumentStatusMeta, DocumentTaskState, DocumentTaskType } from '@/api/types'
 import { DOCUMENT_TASK_STATE, DOCUMENT_TASK_TYPE, STATE_TYPES } from '@/api/enums'
@@ -10,12 +10,12 @@ defineOptions({ name: 'DocumentStatus' })
 const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ status: string; statusMeta?: DocumentStatusMeta | null }>()
 
-const DOCUMENT_TASKS = [
-  { type: DOCUMENT_TASK_TYPE.EMBEDDING, label: 'knowledge.actions.generateEmbeddings', startedStatus: 'EMBEDDING' },
-  { type: DOCUMENT_TASK_TYPE.GENERATE_PROBLEM, label: 'knowledge.generateQuestions.title', startedStatus: 'GENERATE' },
-  { type: DOCUMENT_TASK_TYPE.SYNC, label: 'knowledge.sync.label', startedStatus: 'SYNC' },
-  { type: DOCUMENT_TASK_TYPE.TOKENIZE, label: 'knowledge.actions.buildKeywordIndex', startedStatus: 'TOKENIZE' },
-] as const
+const DOCUMENT_TASKS = reactive([
+  { type: DOCUMENT_TASK_TYPE.EMBEDDING, label: computed(() => t('knowledge.actions.generateEmbeddings')), startedStatus: 'EMBEDDING' },
+  { type: DOCUMENT_TASK_TYPE.GENERATE_PROBLEM, label: computed(() => t('knowledge.generateQuestions.title')), startedStatus: 'GENERATE' },
+  { type: DOCUMENT_TASK_TYPE.SYNC, label: computed(() => t('knowledge.sync.label')), startedStatus: 'SYNC' },
+  { type: DOCUMENT_TASK_TYPE.TOKENIZE, label: computed(() => t('knowledge.actions.buildKeywordIndex')), startedStatus: 'TOKENIZE' },
+] as const)
 
 const DOCUMENT_STATUS_PRIORITY = [
   DOCUMENT_TASK_STATE.REVOKE,
@@ -108,7 +108,7 @@ const aggregateStatus = computed(() => getAggregateDocumentStatus(taskStatuses.v
         <MkStatusLabel
           v-if="aggregateStatus"
           :type="DOCUMENT_STATUS_OPTIONS[aggregateStatus.displayStatus].type"
-          :label="t(DOCUMENT_STATUS_OPTIONS[aggregateStatus.displayStatus].labelKey)"
+          :label="DOCUMENT_STATUS_OPTIONS[aggregateStatus.displayStatus].label"
         />
         <span v-else>-</span>
       </span>
@@ -116,8 +116,8 @@ const aggregateStatus = computed(() => getAggregateDocumentStatus(taskStatuses.v
     <div v-if="visible" class="space-y-2 p-3">
       <template v-for="task in taskStatuses" :key="task.type">
         <div class="flex-align-center gap-3 whitespace-nowrap">
-          <span>{{ t(task.label) }}:</span>
-          <MkStatusLabel :type="DOCUMENT_STATUS_OPTIONS[task.displayStatus].type" :label="t(DOCUMENT_STATUS_OPTIONS[task.displayStatus].labelKey)" />
+          <span>{{ task.label }}:</span>
+          <MkStatusLabel :type="DOCUMENT_STATUS_OPTIONS[task.displayStatus].type" :label="DOCUMENT_STATUS_OPTIONS[task.displayStatus].label" />
           <span :class="task.failed ? 'text-danger' : ''">{{ t('knowledge.document.status.progress') }} {{ task.completed }}/{{ task.total }}</span>
           <span v-if="task.time" class="text-N500">{{ task.time }}</span>
         </div>

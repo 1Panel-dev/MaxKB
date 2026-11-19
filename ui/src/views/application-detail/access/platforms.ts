@@ -1,37 +1,38 @@
 /** 发布渠道的展示信息、配置字段与平台后台指引。 */
-import { APPLICATION_ACCESS_PLATFORM } from '@/api/enums'
+import { computed, reactive } from 'vue'
 import type { ApplicationAccessPlatform } from '@/api/types'
+import { APPLICATION_ACCESS_PLATFORM } from '@/api/enums'
 import dingtalkLogo from '@/assets/logo/logo_dingtalk.svg'
 import wecomBotLogo from '@/assets/logo/logo_enterprise-wechat-bot.svg'
 import wecomLogo from '@/assets/logo/logo_enterprise-wechat.svg'
 import larkLogo from '@/assets/logo/logo_lark.svg'
 import slackLogo from '@/assets/logo/logo_slack.svg'
 import wechatLogo from '@/assets/logo/logo_wechat.svg'
+import { t } from '@/locales'
 
 interface AccessField {
   key: string
   label?: string
-  labelKey?: string
   secret?: boolean
   required?: boolean
 }
 
 interface AccessModeOption {
   value: string
-  labelKey: string
-  tipKey: string
+  label: string
+  tip: string
 }
 
 export interface AccessPlatformDefinition {
   key: ApplicationAccessPlatform
   logo: string
   fields: AccessField[]
-  modeField?: { key: string; default: string; options: AccessModeOption[]; fields?: Record<string, AccessField[]> }
+  modeField?: { key: string; default: string; options: AccessModeOption[]; fields?: Partial<Record<string, AccessField[]>> }
   consoleUrl?: string
-  consoleNameKey?: string
+  consoleName?: string
 }
 
-export const accessPlatforms: AccessPlatformDefinition[] = [
+export const accessPlatforms: AccessPlatformDefinition[] = reactive([
   {
     key: APPLICATION_ACCESS_PLATFORM.WECOM_BOT,
     logo: wecomBotLogo,
@@ -43,8 +44,16 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       key: 'mode',
       default: 'ws',
       options: [
-        { value: 'ws', labelKey: 'application.access.connection.longConnection', tipKey: 'application.access.wecomBot.longConnectionHint' },
-        { value: 'callback', labelKey: 'application.access.connection.callback', tipKey: 'application.access.connection.callbackHint' },
+        {
+          value: 'ws',
+          label: computed(() => t('application.access.connection.longConnection')),
+          tip: computed(() => t('application.access.wecomBot.longConnectionHint')),
+        },
+        {
+          value: 'callback',
+          label: computed(() => t('application.access.connection.callback')),
+          tip: computed(() => t('application.access.connection.callbackHint')),
+        },
       ],
       fields: {
         ws: [
@@ -58,20 +67,20 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       },
     },
     consoleUrl: 'https://work.weixin.qq.com/wework_admin/frame#/manageTools',
-    consoleNameKey: 'application.access.consoles.wecom',
+    consoleName: computed(() => t('application.access.consoles.wecom')),
   },
   {
     key: APPLICATION_ACCESS_PLATFORM.WECOM,
     logo: wecomLogo,
     fields: [
-      { key: 'app_id', labelKey: 'application.access.wecom.corporationId' },
+      { key: 'app_id', label: computed(() => t('application.access.wecom.corporationId')) },
       { key: 'agent_id', label: 'Agent ID' },
       { key: 'secret', label: 'Secret', secret: true },
       { key: 'token', label: 'Token' },
       { key: 'encoding_aes_key', label: 'EncodingAESKey' },
     ],
     consoleUrl: 'https://work.weixin.qq.com/wework_admin/frame#apps',
-    consoleNameKey: 'application.access.consoles.wecom',
+    consoleName: computed(() => t('application.access.consoles.wecom')),
   },
   {
     key: APPLICATION_ACCESS_PLATFORM.DINGTALK,
@@ -84,8 +93,16 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       key: 'mode',
       default: 'stream',
       options: [
-        { value: 'stream', labelKey: 'application.access.connection.longConnection', tipKey: 'application.access.dingtalk.longConnectionHint' },
-        { value: 'callback', labelKey: 'application.access.connection.callback', tipKey: 'application.access.connection.callbackHint' },
+        {
+          value: 'stream',
+          label: computed(() => t('application.access.connection.longConnection')),
+          tip: computed(() => t('application.access.dingtalk.longConnectionHint')),
+        },
+        {
+          value: 'callback',
+          label: computed(() => t('application.access.connection.callback')),
+          tip: computed(() => t('application.access.connection.callbackHint')),
+        },
       ],
       fields: {
         stream: [
@@ -99,19 +116,19 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       },
     },
     consoleUrl: 'https://open-dev.dingtalk.com/fe/app?hash=%23%2Fcorp%2Fapp#/corp/app',
-    consoleNameKey: 'application.access.consoles.dingtalk',
+    consoleName: computed(() => t('application.access.consoles.dingtalk')),
   },
   {
     key: APPLICATION_ACCESS_PLATFORM.WECHAT,
     logo: wechatLogo,
     fields: [
-      { key: 'app_id', labelKey: 'application.access.wechat.developerId' },
-      { key: 'app_secret', labelKey: 'application.access.wechat.developerSecret', secret: true },
-      { key: 'token', labelKey: 'application.access.wechat.token' },
-      { key: 'encoding_aes_key', labelKey: 'application.access.wechat.encodingAesKey' },
+      { key: 'app_id', label: computed(() => t('application.access.wechat.developerId')) },
+      { key: 'app_secret', label: computed(() => t('application.access.wechat.developerSecret')), secret: true },
+      { key: 'token', label: computed(() => t('application.access.wechat.token')) },
+      { key: 'encoding_aes_key', label: computed(() => t('application.access.wechat.encodingAesKey')) },
     ],
     consoleUrl: 'https://mp.weixin.qq.com/advanced/advanced?action=dev&t=advanced/dev',
-    consoleNameKey: 'application.access.consoles.wechat',
+    consoleName: computed(() => t('application.access.consoles.wechat')),
   },
   {
     key: APPLICATION_ACCESS_PLATFORM.LARK,
@@ -124,8 +141,16 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       key: 'mode',
       default: 'ws',
       options: [
-        { value: 'ws', labelKey: 'application.access.connection.longConnection', tipKey: 'application.access.lark.longConnectionHint' },
-        { value: 'callback', labelKey: 'application.access.connection.callback', tipKey: 'application.access.lark.callbackHint' },
+        {
+          value: 'ws',
+          label: computed(() => t('application.access.connection.longConnection')),
+          tip: computed(() => t('application.access.lark.longConnectionHint')),
+        },
+        {
+          value: 'callback',
+          label: computed(() => t('application.access.connection.callback')),
+          tip: computed(() => t('application.access.lark.callbackHint')),
+        },
       ],
       fields: {
         ws: [
@@ -140,7 +165,7 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       },
     },
     consoleUrl: 'https://open.feishu.cn/app/',
-    consoleNameKey: 'application.access.consoles.lark',
+    consoleName: computed(() => t('application.access.consoles.lark')),
   },
   {
     key: APPLICATION_ACCESS_PLATFORM.SLACK,
@@ -150,4 +175,4 @@ export const accessPlatforms: AccessPlatformDefinition[] = [
       { key: 'bot_user_token', label: 'Bot User Token', secret: true },
     ],
   },
-]
+])

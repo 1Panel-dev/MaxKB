@@ -7,7 +7,7 @@ import type { AccountLoginForm, LoginService } from '../types'
 import type { LoginConfig, LoginMethod } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
-import { LOGIN_METHOD_LABEL_KEYS } from '@/constants/auth'
+import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 
 defineOptions({ name: 'AccountLogin' })
 
@@ -120,7 +120,7 @@ onMounted(() => {
   <div class="account-login flex-column h-full" :class="{ 'is-preview': preview }">
     <div class="min-h-0 flex-1">
       <h2 class="mb-4">
-        {{ t(LOGIN_METHOD_LABEL_KEYS[loginMethod]) }}
+        {{ LOGIN_METHOD_LABELS[loginMethod] }}
       </h2>
 
       <el-form

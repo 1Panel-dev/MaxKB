@@ -53,14 +53,23 @@
     "editTitle": "Edit MCP tool",
     "duplicateTitle": "Duplicate MCP tool",
     "serviceTitle": "MCP server",
+    "settingsTitle": "MCP settings",
+    "reference": "Reference MCP",
+    "customService": "Custom MCP server",
     "name": {
       "placeholder": "Enter an MCP tool name",
       "requiredMessage": "Enter an MCP tool name"
     },
     "config": {
-      "description": "(Only SSE and Streamable HTTP are supported)",
+      "description": "Only SSE and Streamable HTTP are supported",
       "requiredMessage": "Enter the MCP server configuration",
-      "invalidMessage": "Enter the MCP server configuration as a valid JSON object."
+      "invalidMessage": "Enter the MCP server configuration as a valid JSON object.",
+      "invalidJsonMessage": "The MCP server configuration must be valid JSON."
+    },
+    "tools": {
+      "label": "MCP tools",
+      "placeholder": "Select MCP tools",
+      "requiredMessage": "Select MCP tools"
     }
   },
   "dataSource": {

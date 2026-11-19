@@ -1,0 +1,78 @@
+{
+  "settings": {
+    "model": "模型设置",
+    "skills": "技能",
+    "advanced": "高级设置",
+    "unsavedMessage": "设置有未保存的修改，保存后调试生效"
+  },
+  "prompt": {
+    "systemPlaceholder": "系统提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题，{memory}开启长期记忆后的用户记忆。",
+    "userPlaceholder": "用户提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题。",
+    "userDefaultValue": "已知信息：{data}\n用户问题：{question}\n回答要求：\n- 请使用中文回答用户问题",
+    "references": "引用知识库",
+    "noReferences": "无引用知识库"
+  },
+  "knowledgeSetting": {
+    "settingsTitle": "参数设置",
+    "empty": "关联的知识库显示在这里",
+    "noReferences": {
+      "label": "无引用知识库分段时",
+      "askAI": "继续向 AI 提问",
+      "designatedAnswer": "指定回答",
+      "defaultValue": "你好，我是 XXX 小助手，我的知识库只包含了 XXX 产品相关知识，请重新描述您的问题。",
+      "requiredMessage": "请输入回答内容"
+    },
+    "problemOptimization": {
+      "label": "问题优化",
+      "defaultValue": "()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在{dataTags}标签中"
+    }
+  },
+  "prologue": {
+    "label": "开场白",
+    "defaultValue": "您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务"
+  },
+  "longTermMemory": {
+    "label": "长期记忆",
+    "title": "长期记忆设置",
+    "description": "开启后，从开启时间记录新对话并按周期生成记忆，可通过 {memory} 变量在系统提示词中调用。关闭后，将清空对话用户的长期记忆，再次开启将重新从开启时点开始累积。",
+    "model": {
+      "placeholder": "请选择长期记忆模型",
+      "requiredMessage": "请选择长期记忆模型"
+    },
+    "trigger": {
+      "label": "触发方式",
+      "requiredMessage": "请选择触发方式",
+      "rounds": "按轮次触发",
+      "roundsDescription": "累计到 N 轮后，自动提炼 N 轮对话，生成记忆",
+      "scheduled": "定时触发",
+      "scheduledDescription": "到设定时间后，自动提炼周期内所有对话，生成记忆"
+    },
+    "rounds": {
+      "label": "触发间隔",
+      "invalidMessage": "请输入 5–100 之间的整数轮次"
+    },
+    "period": {
+      "label": "触发周期",
+      "placeholder": "请选择触发周期",
+      "requiredMessage": "请选择触发周期"
+    }
+  },
+  "speechInput": {
+    "label": "语音输入",
+    "autoSend": "自动发送",
+    "model": {
+      "placeholder": "请选择语音输入模型",
+      "requiredMessage": "请选择语音输入模型"
+    }
+  },
+  "speechPlayback": {
+    "label": "语音播放",
+    "autoPlay": "自动播放",
+    "browser": "浏览器播放（免费）",
+    "custom": "自定义",
+    "model": {
+      "placeholder": "请选择语音播放模型",
+      "requiredMessage": "请选择语音播放模型"
+    }
+  }
+}

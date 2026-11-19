@@ -36,7 +36,7 @@ export const systemResourceApplicationRoutes: RouteRecordRaw[] = [
         name: 'system-resource-application-simple-setting',
         component: () => import('@/views/application-detail/setting/index.vue'),
         meta: {
-          title: '设置',
+          title: 'common.labels.settings',
           icon: 'icon_setting',
           activeIcon: 'icon_setting_filled',
           order: 20,
@@ -54,7 +54,7 @@ export const systemResourceApplicationRoutes: RouteRecordRaw[] = [
           query: to.query,
         }),
         meta: {
-          title: '设置',
+          title: 'common.labels.settings',
           icon: 'icon_setting',
           activeIcon: 'icon_setting_filled',
           order: 20,

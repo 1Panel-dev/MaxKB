@@ -23,12 +23,12 @@
     "label": "页签"
   },
   "fields": {
-    "field": {
+    "parameter": {
       "label": "参数",
       "placeholder": "请输入参数",
       "requiredMessage": "请输入参数"
     },
-    "label": {
+    "displayName": {
       "label": "显示名称",
       "placeholder": "请输入显示名称",
       "requiredMessage": "请输入显示名称"

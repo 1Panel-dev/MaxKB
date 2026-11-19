@@ -51,8 +51,8 @@ defineExpose({ open, close })
   >
     <el-radio-group v-if="!scopeOnly" v-model="permission" class="mk-radio-group-vertical" :disabled="loading">
       <el-radio v-for="option in options" :key="option.value" :value="option.value">
-        <p>{{ t(option.labelKey) }}</p>
-        <p v-if="option.descriptionKey" class="mt-1 text-N500">{{ t(option.descriptionKey) }}</p>
+        <p>{{ option.label }}</p>
+        <p v-if="option.description" class="mt-1 text-N500">{{ option.description }}</p>
       </el-radio>
     </el-radio-group>
     <div v-if="isFolder">

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { inject, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { McpSetting, McpSource } from '../../types'
 import type { ToolItem } from '@/api/types'
 import type { FormInstance } from 'element-plus'
@@ -10,6 +11,7 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'AiChatNodeMcpSettingDialog' })
+const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ submit: [setting: McpSetting]; loaded: [tools: ToolItem[]] }>()
 const resourceScope = inject<string>('resourceScope', 'workspace')
@@ -70,7 +72,7 @@ function submit() {
       try {
         JSON.parse(formData.value.mcp_servers)
       } catch {
-        MsgError('MCP 服务配置必须是合法的 JSON')
+        MsgError(t('tool.mcp.config.invalidJsonMessage'))
         return
       }
     }
@@ -90,27 +92,34 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="MCP 设置" @closed="resetData">
-    <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+  <MkDialog v-model="visible" :title="t('tool.mcp.settingsTitle')" @closed="resetData">
+    <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item>
         <el-radio-group :model-value="formData.mcp_source" @update:model-value="changeSource">
-          <el-radio value="referencing">引用 MCP</el-radio>
-          <el-radio value="custom">自定义</el-radio>
+          <el-radio value="referencing">{{ t('tool.mcp.reference') }}</el-radio>
+          <el-radio value="custom">{{ t('tool.source.custom') }}</el-radio>
         </el-radio-group>
       </el-form-item>
 
       <el-form-item
         v-if="formData.mcp_source === 'referencing'"
-        label="MCP 工具"
+        :label="t('tool.mcp.tools.label')"
         prop="mcp_tool_ids"
-        :rules="{ type: 'array', required: true, message: '请选择 MCP 工具', trigger: 'change' }"
+        :rules="{ type: 'array', required: true, message: t('tool.mcp.tools.requiredMessage'), trigger: 'change' }"
       >
-        <el-select v-model="formData.mcp_tool_ids" class="w-full" :loading="loading" filterable multiple placeholder="请选择 MCP 工具">
+        <el-select
+          v-model="formData.mcp_tool_ids"
+          class="w-full"
+          :loading="loading"
+          filterable
+          multiple
+          :placeholder="t('tool.mcp.tools.placeholder')"
+        >
           <el-option v-for="option in mcpOptions" :key="option.id" :label="option.name" :value="option.id">
             <div class="flex-align-center gap-2">
               <ToolIcon :icon="option.icon" :size="20" :type="option.tool_type" />
               <span>{{ option.name }}</span>
-              <el-tag v-if="option.source === 'shared'" size="small" type="info">共享</el-tag>
+              <el-tag v-if="option.source === 'shared'" size="small" type="info">{{ t('resource.shared') }}</el-tag>
             </div>
           </el-option>
         </el-select>
@@ -120,19 +129,21 @@ defineExpose({ open })
         v-else
         class="mk-hide-asterisk"
         prop="mcp_servers"
-        :rules="{ whitespace: true, required: true, message: '请输入 MCP 服务配置', trigger: 'blur' }"
+        :rules="{ whitespace: true, required: true, message: t('tool.mcp.config.requiredMessage'), trigger: 'blur' }"
       >
         <template #label>
-          <span class="mk-required">MCP 服务配置</span>
-          <span class="text-N600">（仅支持 SSE、Streamable HTTP 调用方式）</span>
+          <span class="mk-required">{{ t('resource.mcpConfig.title') }}</span>
+          <span class="text-N600">（{{ t('tool.mcp.config.description') }}）</span>
         </template>
         <el-input v-model="formData.mcp_servers" :placeholder="MCP_SERVER_EXAMPLE" :rows="10" type="textarea" />
       </el-form-item>
     </el-form>
 
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="submit">确定</el-button>
+      <!-- 取消 MCP 设置 -->
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 确认 MCP 设置 -->
+      <el-button type="primary" @click="submit">{{ t('common.actions.confirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

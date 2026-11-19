@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -23,6 +24,8 @@ import {
   type LongTermSetting as LongTermSettingData,
   type UserInputSetting,
 } from './types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'WorkflowBaseNode' })
 
@@ -50,7 +53,7 @@ const defaultForm: BaseNodeForm = {
   long_term_trigger_setting: { rounds: 10 },
   long_term_trigger_type: 'ROUND',
   name: '',
-  prologue: '您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务',
+  prologue: t('application.prologue.defaultValue'),
   stt_autosend: false,
   stt_model_enable: false,
   stt_model_id: '',
@@ -133,7 +136,12 @@ const userInputFields = computed({
 })
 const userInputSetting = computed<UserInputSetting>({
   get: () =>
-    cloneDeep((model.properties.user_input_field_list_setting as UserInputSetting | undefined) ?? { exposed_fields: [], menu_title: '用户输入' }),
+    cloneDeep(
+      (model.properties.user_input_field_list_setting as UserInputSetting | undefined) ?? {
+        exposed_fields: [],
+        menu_title: t('workflow.userInput.title'),
+      },
+    ),
   set: (setting) => {
     model.properties.user_input_field_list_setting = cloneDeep(setting)
   },
@@ -145,7 +153,7 @@ function validateUserFieldReferences() {
       if (!condition.field?.[0] || !condition.field?.[1]) continue
       const isCurrentForm = condition.field[0] === model.id || (model.id === 'base-node' && condition.field[0] === 'global')
       if (isCurrentForm && !userInputFields.value.some(({ field }) => field === condition.field[1])) {
-        return Promise.reject('引用变量不存在')
+        return Promise.reject(t('workflow.userInput.referenceMissingMessage'))
       }
     }
   }
@@ -202,7 +210,7 @@ onMounted(() => {
   if (!Array.isArray(model.properties.user_input_field_list)) model.properties.user_input_field_list = []
   if (!Array.isArray(model.properties.api_input_field_list)) model.properties.api_input_field_list = []
   if (!Array.isArray(model.properties.chat_input_field_list)) model.properties.chat_input_field_list = []
-  if (!model.properties.user_input_config) model.properties.user_input_config = { title: '用户输入' }
+  if (!model.properties.user_input_config) model.properties.user_input_config = { title: t('workflow.userInput.title') }
 
   store.getModelListWithShared({ model_type: 'STT' }).then((models) => (sttModelOptions.value = models))
   store.getModelListWithShared({ model_type: 'LLM' }).then((models) => (longTermModelOptions.value = models))
@@ -213,23 +221,34 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="名称" prop="name" :rules="{ whitespace: true, required: true, message: '请输入智能体名称', trigger: 'blur' }">
+    <el-form :validate-on-rule-change="false" ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form-item
+        :label="t('common.name.label')"
+        prop="name"
+        :rules="{ whitespace: true, required: true, message: t('application.fields.name.requiredMessage'), trigger: 'blur' }"
+      >
         <el-input
           v-model="formData.name"
           maxlength="64"
-          placeholder="请输入智能体名称"
+          :placeholder="t('application.fields.name.placeholder')"
           show-word-limit
           @blur="formData.name = formData.name.trim()"
         />
       </el-form-item>
 
-      <el-form-item label="描述">
-        <el-input v-model="formData.desc" maxlength="256" placeholder="描述该智能体的应用场景及用途" :rows="3" show-word-limit type="textarea" />
+      <el-form-item :label="t('common.description.label')">
+        <el-input
+          v-model="formData.desc"
+          maxlength="256"
+          :placeholder="t('application.fields.description.placeholder')"
+          :rows="3"
+          show-word-limit
+          type="textarea"
+        />
       </el-form-item>
 
-      <el-form-item label="开场白">
-        <MdEditorMagnify v-model="formData.prologue" title="开场白" @wheel="handleNodeWheel" />
+      <el-form-item :label="t('application.prologue.label')">
+        <MdEditorMagnify v-model="formData.prologue" :title="t('application.prologue.label')" @wheel="handleNodeWheel" />
       </el-form-item>
 
       <!-- 长期记忆 -->
@@ -238,19 +257,16 @@ onMounted(() => {
         prop="long_term_model_id"
         :rules="{
           required: formData.long_term_enable && formData.long_term_model_id_type === 'custom',
-          message: '请选择长期记忆模型',
+          message: t('application.longTermMemory.model.requiredMessage'),
           trigger: 'change',
         }"
       >
         <template #label>
           <div class="flex-between">
             <span class="flex-align-center gap-1">
-              <span :class="formData.long_term_enable ? 'mk-required' : ''">长期记忆</span>
+              <span :class="formData.long_term_enable ? 'mk-required' : ''">{{ t('application.longTermMemory.label') }}</span>
 
-              <MkTooltip
-                content="开启后，从开启时间记录新对话并按周期生成记忆，可通过 {{开始.memory}} 变量在系统提示词中调用。关闭后，将清空对话用户的长期记忆，再次开启将重新从开启时点开始累积。"
-                placement="right"
-              >
+              <MkTooltip :content="t('application.longTermMemory.description', { memory: '{{开始.memory}}' })" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </span>
@@ -274,8 +290,8 @@ onMounted(() => {
         <template #label>
           <div class="flex-between w-full">
             <span class="flex-align-center gap-1">
-              文件上传
-              <MkTooltip content="开启后，问答页面会显示上传文件的按钮。" placement="right">
+              {{ t('workflow.fileUpload.label') }}
+              <MkTooltip :content="t('workflow.fileUpload.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </span>
@@ -302,9 +318,9 @@ onMounted(() => {
 
       <!-- 语音输入 -->
       <div class="flex-between">
-        <span :class="formData.stt_model_enable ? 'mk-required' : ''">语音输入</span>
+        <span :class="formData.stt_model_enable ? 'mk-required' : ''">{{ t('application.speechInput.label') }}</span>
         <span class="flex-align-center gap-3">
-          <el-checkbox v-if="formData.stt_model_enable" v-model="formData.stt_autosend">自动发送</el-checkbox>
+          <el-checkbox v-if="formData.stt_model_enable" v-model="formData.stt_autosend">{{ t('application.speechInput.autoSend') }}</el-checkbox>
           <el-switch v-model="formData.stt_model_enable" size="small" @change="changeSpeechInputEnabled" />
         </span>
       </div>
@@ -316,11 +332,11 @@ onMounted(() => {
           trigger: 'change',
           validator: (_rule: unknown, _value: unknown, callback: (error?: Error) => void) => {
             if (formData.stt_model_id_type === 'custom' && !formData.stt_model_id) {
-              callback(new Error('请选择语音输入模型'))
+              callback(new Error(t('application.speechInput.model.requiredMessage')))
               return
             }
             if (formData.stt_model_id_type === 'default' && !defaultSttModelSetting?.model_id) {
-              callback(new Error('请在默认模型设置中选择语音识别模型'))
+              callback(new Error(t('workflow.defaultModel.sttRequiredMessage')))
               return
             }
             callback()
@@ -328,8 +344,8 @@ onMounted(() => {
         }"
       >
         <el-radio-group v-model="formData.stt_model_id_type" class="mb-2">
-          <el-radio value="default">默认模型</el-radio>
-          <el-radio value="custom">自定义</el-radio>
+          <el-radio value="default">{{ t('workflow.defaultModel.label') }}</el-radio>
+          <el-radio value="custom">{{ t('workflow.defaultModel.custom') }}</el-radio>
         </el-radio-group>
         <SelectModel
           v-if="formData.stt_model_id_type === 'default'"
@@ -338,7 +354,7 @@ onMounted(() => {
           disabled
           :options="sttModelOptions"
           :provider-options="providerOptions"
-          placeholder="未配置默认模型"
+          :placeholder="t('workflow.defaultModel.unconfigured')"
         />
         <SelectModel
           v-else
@@ -352,9 +368,11 @@ onMounted(() => {
 
       <!-- 语音播放 -->
       <div class="flex-between mt-4">
-        <span :class="formData.tts_model_enable && formData.tts_type !== 'BROWSER' ? 'mk-required' : ''">语音播放</span>
+        <span :class="formData.tts_model_enable && formData.tts_type !== 'BROWSER' ? 'mk-required' : ''">
+          {{ t('application.speechPlayback.label') }}
+        </span>
         <span class="flex-align-center gap-3">
-          <el-checkbox v-if="formData.tts_model_enable" v-model="formData.tts_autoplay">自动播放</el-checkbox>
+          <el-checkbox v-if="formData.tts_model_enable" v-model="formData.tts_autoplay">{{ t('application.speechPlayback.autoPlay') }}</el-checkbox>
           <el-switch v-model="formData.tts_model_enable" size="small" @change="changeSpeechPlaybackEnabled" />
         </span>
       </div>
@@ -367,11 +385,11 @@ onMounted(() => {
           trigger: 'change',
           validator: (_rule: unknown, _value: unknown, callback: (error?: Error) => void) => {
             if (formData.tts_type === 'CUSTOM' && !formData.tts_model_id) {
-              callback(new Error('请选择语音播放模型'))
+              callback(new Error(t('application.speechPlayback.model.requiredMessage')))
               return
             }
             if (formData.tts_type === 'DEFAULT' && !defaultTtsModelSetting?.model_id) {
-              callback(new Error('请在默认模型设置中选择语音合成模型'))
+              callback(new Error(t('workflow.defaultModel.ttsRequiredMessage')))
               return
             }
             callback()
@@ -379,9 +397,9 @@ onMounted(() => {
         }"
       >
         <el-radio-group v-model="formData.tts_type" class="mb-2">
-          <el-radio value="BROWSER">浏览器播放(免费)</el-radio>
-          <el-radio value="DEFAULT">默认模型</el-radio>
-          <el-radio value="CUSTOM">自定义</el-radio>
+          <el-radio value="BROWSER">{{ t('application.speechPlayback.browser') }}</el-radio>
+          <el-radio value="DEFAULT">{{ t('workflow.defaultModel.label') }}</el-radio>
+          <el-radio value="CUSTOM">{{ t('workflow.defaultModel.custom') }}</el-radio>
         </el-radio-group>
         <SelectModel
           v-if="formData.tts_type === 'DEFAULT'"
@@ -390,7 +408,7 @@ onMounted(() => {
           disabled
           :options="ttsModelOptions"
           :provider-options="providerOptions"
-          placeholder="未配置默认模型"
+          :placeholder="t('workflow.defaultModel.unconfigured')"
         />
         <SelectModel
           v-else-if="formData.tts_type === 'CUSTOM'"

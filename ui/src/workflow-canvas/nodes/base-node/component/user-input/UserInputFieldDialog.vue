@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FormField, VisibilityFieldOption } from '@/components/mk-dynamics-form'
 import { MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
 import { MsgError } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ formFields: FormField[]; nodeId: string }>()
 const emit = defineEmits<{ submit: [data: FormField, index?: number] }>()
@@ -23,7 +26,7 @@ const visibilityOptions = computed<VisibilityFieldOption[]>(() => [
         option_list: field.option_list,
         value: field.field,
       })),
-    label: '当前表单',
+    label: t('workflow.userInput.currentForm'),
     self: true,
     value: props.nodeId,
   },
@@ -51,7 +54,7 @@ function submitField() {
     .then(() => {
       const field = constructor.getData()
       if (!field.field || !/^[a-zA-Z0-9_]+$/.test(field.field)) {
-        MsgError('参数仅支持字母、数字和下划线')
+        MsgError(t('workflow.parameters.invalidMessage'))
         return
       }
       emit('submit', cloneDeep(field), editingIndex.value)
@@ -71,11 +74,17 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="fieldDialogVisible" :title="editingIndex === undefined ? '添加参数' : '编辑参数'" @closed="resetData">
+  <MkDialog
+    v-model="fieldDialogVisible"
+    :title="editingIndex === undefined ? t('common.parameters.add') : t('common.parameters.edit')"
+    @closed="resetData"
+  >
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" enable-visibility :left-options="visibilityOptions" />
     <template #footer>
-      <el-button plain @click="fieldDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="submitField">{{ editingIndex === undefined ? '添加' : '保存' }}</el-button>
+      <!-- 取消参数编辑 -->
+      <el-button plain @click="fieldDialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 确认参数编辑 -->
+      <el-button type="primary" @click="submitField">{{ editingIndex === undefined ? t('common.actions.add') : t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>
