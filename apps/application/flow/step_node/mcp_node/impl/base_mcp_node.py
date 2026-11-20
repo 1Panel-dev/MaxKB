@@ -47,6 +47,12 @@ class BaseMcpNode(IMcpNode):
 
         backend = SandboxMCPBackend(servers)
         res = asyncio.run(backend.call_tool(mcp_server, mcp_tool, params))
+        # A failed MCP tool call is still a normal JSON-RPC result with isError set and the
+        # error text in content. Raise like the other nodes do, so the run stops (or takes
+        # the exception branch) instead of passing the error text downstream as a result.
+        if res.isError:
+            message = '\n'.join(content.text for content in res.content if getattr(content, 'text', None))
+            raise Exception(f"MCP tool {mcp_tool} execution failed" + (f': {message}' if message else ''))
         return NodeResult(
             {'result': [content.text for content in res.content], 'tool_params': params, 'mcp_tool': mcp_tool}, {})
 
