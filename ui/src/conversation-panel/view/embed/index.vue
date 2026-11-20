@@ -1,0 +1,106 @@
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from 'vue'
+import type { AxiosProgressEvent } from 'axios'
+import { FILE_SOURCE_TYPE } from '@/api/enums'
+import FileApi from '@/api/chat/file'
+import EmbedHeader from '../../components/header/embed/index.vue'
+import { MESSAGE_INPUT_KEY } from '../../components/message-input/index'
+import { MESSAGE_LIST_KEY } from '../../components/message-list/index'
+import { SHARE_LINK_KEY } from '../../components/message-list/share/index'
+import ConversationLayout from '../../core/layout/index.vue'
+import { CONVERSATION_LIST_KEY } from '../../left-sidebar/conversation-list/index'
+import ConversationList from '../../left-sidebar/conversation-list/index.vue'
+import ChatPanel from '../../main/chat-panel/index.vue'
+import { RIGHT_SIDEBAR_KEY } from '../../right-sidebar/index'
+import RightSidebar from '../../right-sidebar/index.vue'
+import { createChatUserProfileGetter } from '../chat/index'
+import { CHAT_USER_PROFILE_KEY, DEVICE_KEY, SHOW_SHARE_KEY, VIEW_KEY, VIEW_TYPE, createDeviceType } from '../index.ts'
+import { createEmbedConversation } from './index'
+
+defineOptions({ name: 'EmbedConversation' })
+
+const bundle = createEmbedConversation()
+
+// 动态表单上传使用当前会话，兼容文件字段的地址包装与取消操作。
+provide('upload', (file: File, onProgress?: (percent: number, event: AxiosProgressEvent) => void) => {
+  const upload = FileApi.postUploadFile(
+    file,
+    bundle.list.currentChatId.value,
+    FILE_SOURCE_TYPE.CHAT,
+    typeof onProgress === 'function' ? onProgress : undefined,
+  )
+  return Object.assign(
+    upload.request.then((url) => ({ data: url })),
+    { abort: upload.abort },
+  )
+})
+
+// 各组件 store 由本视图 provide；行为与 chat 视图一致
+provide(CONVERSATION_LIST_KEY, bundle.list)
+provide(MESSAGE_LIST_KEY, bundle.msgs)
+provide(MESSAGE_INPUT_KEY, bundle.input)
+provide(RIGHT_SIDEBAR_KEY, bundle.rightSidebar)
+provide(SHARE_LINK_KEY, bundle.share)
+provide(VIEW_KEY, VIEW_TYPE.EMBED)
+// 智能体开启「允许分享对话记录」时显示会话菜单、提问与回答上的分享入口
+provide(
+  SHOW_SHARE_KEY,
+  computed(() => Boolean(bundle.list.appInfo.value?.show_share)),
+)
+// HTML 内容 iframe 内 chatUserProfile() 取当前对话用户
+provide(CHAT_USER_PROFILE_KEY, createChatUserProfileGetter())
+
+// 响应式：按 iframe 宽度切换，窄屏 drawer，宽屏 push
+const BREAKPOINT = 768
+const isMobile = ref(window.innerWidth < BREAKPOINT)
+const onResize = () => (isMobile.value = window.innerWidth < BREAKPOINT)
+const leftMode = computed(() => (isMobile.value ? 'drawer' : 'push'))
+bundle.list.bindLeftSideMode(leftMode)
+const rightMode = computed(() => (isMobile.value ? 'drawer' : 'push'))
+// 左栏为抽屉即手机端
+provide(DEVICE_KEY, createDeviceType(leftMode))
+
+const closeDrawers = () => {
+  if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
+  if (rightMode.value === 'drawer') bundle.rightSidebar.rightSideOpen.value = false
+}
+
+onMounted(() => {
+  window.addEventListener('resize', onResize)
+  if (isMobile.value) bundle.list.leftSideOpen.value = false
+  bundle.list.loadConversations()
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', onResize)
+  bundle.msgs.cancel()
+})
+
+watch(isMobile, (m) => (bundle.list.leftSideOpen.value = !m))
+// 新建或重新选择会话时，即使会话 ID 不变也收起左侧抽屉。
+watch([() => bundle.list.currentChatId.value, () => bundle.list.composerResetSignal.value], () => {
+  if (leftMode.value === 'drawer') bundle.list.leftSideOpen.value = false
+})
+</script>
+
+<template>
+  <!-- embed 视图：与 chat 视图相同的装配与三区布局，头部替换为嵌入头部 -->
+  <ConversationLayout
+    :left-open="bundle.list.leftSideOpen.value"
+    :right-open="bundle.rightSidebar.rightSideOpen.value"
+    :left-mode="leftMode"
+    :right-mode="rightMode"
+    @mask-click="closeDrawers"
+  >
+    <template #left><ConversationList /></template>
+    <template #main>
+      <ChatPanel>
+        <template #header><EmbedHeader /></template>
+      </ChatPanel>
+    </template>
+    <template #right><RightSidebar /></template>
+  </ConversationLayout>
+</template>
+
+<style lang="scss">
+@use '../../index.scss';
+</style>
