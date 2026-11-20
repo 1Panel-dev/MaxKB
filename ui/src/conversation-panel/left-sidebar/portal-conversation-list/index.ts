@@ -8,6 +8,7 @@ export interface PortalApplicationGroup {
   id: string
   name: string
   icon: string
+  show_history?: boolean
   conversations: Conversation[]
   count: number
   expanded: boolean
