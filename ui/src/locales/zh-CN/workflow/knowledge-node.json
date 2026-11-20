@@ -1,0 +1,100 @@
+{
+  "searchKnowledge": {
+    "label": "知识库检索",
+    "description": "关联知识库，查找与问题相关的分段",
+    "image": {
+      "label": "检索图片",
+      "placeholder": "请选择检索图片"
+    },
+    "segmentList": "检索结果的分段列表",
+    "directAnswerSegments": "满足直接回答的分段列表",
+    "result": "检索结果",
+    "directAnswerContent": "满足直接回答的分段内容"
+  },
+  "searchDocument": {
+    "label": "文档标签检索",
+    "description": "从设定的检索范围中，根据文档标签检索出满足条件的文档",
+    "searchMode": {
+      "label": "检索设置",
+      "auto": "自动",
+      "autoDescription": "根据检索问题自动匹配文档标签",
+      "manual": "手动",
+      "manualDescription": "手动设置标签过滤条件"
+    },
+    "value": {
+      "placeholder": "值或变量"
+    },
+    "knowledgeList": "知识库列表",
+    "documentList": "文档列表"
+  },
+  "documentExtract": {
+    "label": "文档内容提取",
+    "description": "解析输入文档，输出结构化文档内容",
+    "content": "文档内容",
+    "documentList": "文档列表"
+  },
+  "reranker": {
+    "label": "多路召回",
+    "description": "使用重排模型对多个知识库的检索结果进行二次召回",
+    "content": {
+      "label": "重排内容",
+      "placeholder": "请选择重排内容",
+      "requiredMessage": "请选择重排内容"
+    },
+    "score": {
+      "label": "Score 高于",
+      "description": "Score 越高相关性越强。"
+    },
+    "resultList": "重排结果列表",
+    "result": "重排结果",
+    "directAnswerSegments": "满足直接回答的分段列表",
+    "maxReferenceCharacters": "最大引用字符数"
+  },
+  "documentSplit": {
+    "label": "文档分段",
+    "description": "按分段策略拆分输入文档内容，输出分段文本列表",
+    "strategy": {
+      "label": "分段策略",
+      "placeholder": "请选择分段策略",
+      "requiredMessage": "请选择分段策略"
+    },
+    "childChunkLength": {
+      "label": "子分块长度",
+      "description": "核心目标是平衡检索精度与召回效率",
+      "tooShortHint": "避免过短拆分：单块＜50 字易导致语义碎片化，检索时可能因缺少上下文无法匹配查询意图",
+      "tooLongHint": "避免过长拆分：单块＞500 字会增加冗余信息，降低检索精准度，且占用更多存储和计算资源"
+    },
+    "titleAsQuestion": "分段标题设置为分段的关联问题",
+    "documentNameAsQuestion": "文档名称设置为分段的关联问题",
+    "segmentList": "分段列表"
+  },
+  "localFile": {
+    "label": "本地文件",
+    "description": "上传本地文档，输出文档列表（不解析内容，需配合 “文档内容提取” 节点解析）",
+    "format": {
+      "label": "文件格式",
+      "placeholder": "请选择文件格式",
+      "requiredMessage": "请选择文件格式"
+    },
+    "fileCount": {
+      "label": "最多上传文件数",
+      "rangeMessage": "请输入 {min}–{max} 的文件数量"
+    },
+    "fileSize": {
+      "label": "单个文件大小上限",
+      "rangeMessage": "请输入 {min}–{max} MB 的文件大小"
+    },
+    "fileList": "文件列表"
+  },
+  "webSource": {
+    "label": "Web 站点",
+    "description": "输入根地址自动抓取 Web 数据（单链接对应单文档），输出含内容的文档列表",
+    "noConfiguration": "暂无配置项",
+    "documentList": "文档列表"
+  },
+  "knowledgeWrite": {
+    "label": "知识库写入",
+    "description": "将输入的分段列表写入当前知识库，并完成向量化处理",
+    "content": "写入内容"
+  }
+}

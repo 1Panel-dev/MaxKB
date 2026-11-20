@@ -66,7 +66,7 @@ function getTypeLabel(inputType: string) {
         </template>
       </el-table-column>
       <el-table-column :label="t('dynamicForm.fields.defaultValue.label')" prop="default_value" show-overflow-tooltip></el-table-column>
-      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" min-width="80">
+      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="90">
         <template #default="{ row }">
           <el-switch v-model="row.required" size="small" disabled />
         </template>

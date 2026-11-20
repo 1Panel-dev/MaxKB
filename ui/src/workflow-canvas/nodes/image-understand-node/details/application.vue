@@ -26,7 +26,7 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.history') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.history') }}</h6>
       <div class="space-y-2">
         <template v-if="data.history_message?.length > 0">
           <div v-for="(history, historyIndex) in data.history_message" :key="historyIndex" class="mb-2 last:mb-0">
@@ -56,7 +56,7 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.currentChat') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.currentChat') }}</h6>
       <div class="whitespace-pre-wrap space-y-2">
         <div v-if="data.image_list?.length > 0" class="flex flex-wrap gap-2">
           <!-- 查看本次对话图片 -->

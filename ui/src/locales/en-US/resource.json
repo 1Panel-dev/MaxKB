@@ -7,7 +7,8 @@
   "dataSource": {
     "label": "Data source",
     "selectTitle": "Select a data source",
-    "typeLabel": "Data source type"
+    "typeLabel": "Data source type",
+    "documentsUnavailableMessage": "You cannot browse data source files here."
   },
   "mcpConfig": {
     "title": "MCP server configuration"
@@ -17,17 +18,6 @@
     "searchResults": "{count} matching template | {count} matching templates",
     "apply": "Use template",
     "missingDownloadUrl": "This template cannot be used because its download URL is missing."
-  },
-  "executionRecords": {
-    "title": "Execution history",
-    "detailTitle": "Execution details",
-    "view": "View execution history",
-    "resourceType": "Resource type",
-    "executionTime": "Execution time",
-    "errorMessage": "Error message",
-    "status": {
-      "triggerFailed": "Trigger failed"
-    }
   },
   "messages": {
     "unsupportedScope": "This operation is not supported in the current resource scope."

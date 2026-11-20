@@ -13,7 +13,8 @@
     "basicInfo": "基本資訊",
     "type": "類型",
     "settings": "設定",
-    "example": "範例"
+    "example": "範例",
+    "question": "問題"
   },
   "name": {
     "label": "名稱",
@@ -40,7 +41,9 @@
   },
   "options": {
     "yes": "是",
-    "no": "否"
+    "no": "否",
+    "reference": "引用",
+    "custom": "自訂"
   },
   "dateRange": {
     "lastDays": "過去 {days} 天",

@@ -119,8 +119,8 @@ onBeforeUnmount(() => anchorGuard.reset())
         @update:model-value="updateSetting({ location: $event })"
         @visible-change="anchorGuard.setOverlayVisible('tools-location', $event)"
       >
-        <el-option :label="t('workflow.llm.tools.custom')" value="customize" />
-        <el-option :label="t('workflow.llm.tools.reference')" value="reference" />
+        <el-option :label="t('common.options.custom')" value="customize" />
+        <el-option :label="t('common.options.reference')" value="reference" />
       </el-select>
     </div>
   </div>

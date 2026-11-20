@@ -56,7 +56,7 @@ watch(paragraphList, () => {
 
     <!-- 输入参数 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.inputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.inputParams') }}</h6>
       <div class="space-y-2">
         <div>
           <span class="text-N600">{{ t('workflow.documentSplit.strategy.label') }}：</span>
@@ -84,7 +84,7 @@ watch(paragraphList, () => {
     <!-- 输出参数 -->
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">
-        {{ t('workflow.executionResult.outputParams') }}
+        {{ t('execution.details.outputParams') }}
         <span class="text-N600 font-normal">（{{ t('workflow.document.paragraphPreviewHint', { count: 5 }) }}）</span>
       </h6>
       <MkHorizontalScroll v-if="paragraphList.length" class="mb-2">

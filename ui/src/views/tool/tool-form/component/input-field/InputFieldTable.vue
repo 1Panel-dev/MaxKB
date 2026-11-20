@@ -55,7 +55,7 @@ function handleDeleteInputField(index: number) {
           {{ row.source === 'custom' ? t('tool.source.custom') : t('tool.source.reference') }}
         </template>
       </el-table-column>
-      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" min-width="80">
+      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="90">
         <template #default="{ row }">
           <el-switch v-model="row.is_required" size="small" />
         </template>

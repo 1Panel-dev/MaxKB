@@ -21,7 +21,7 @@ defineProps<{
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.inputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.inputParams') }}</h6>
       <div>
         <div v-if="data.audio_list?.length > 0">
           <p class="mb-2 text-N600">{{ t('workflow.audioFile.label') }}：</p>
@@ -47,7 +47,7 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.outputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.outputParams') }}</h6>
       <div class="space-y-2">
         <template v-for="(file_content, index) in data.content" :key="index">
           <el-card shadow="never">

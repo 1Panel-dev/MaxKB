@@ -157,8 +157,8 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('chunk_size_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
-                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
+                <el-option :label="t('common.options.reference')" value="referencing" />
+                <el-option :label="t('common.options.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -212,8 +212,8 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('patterns_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
-                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
+                <el-option :label="t('common.options.reference')" value="referencing" />
+                <el-option :label="t('common.options.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -267,8 +267,8 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('limit_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
-                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
+                <el-option :label="t('common.options.reference')" value="referencing" />
+                <el-option :label="t('common.options.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -318,8 +318,8 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('with_filter_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
-                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
+                <el-option :label="t('common.options.reference')" value="referencing" />
+                <el-option :label="t('common.options.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -359,8 +359,8 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('paragraph_title_relate_problem_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
-                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
+                <el-option :label="t('common.options.reference')" value="referencing" />
+                <el-option :label="t('common.options.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -401,8 +401,8 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('document_name_relate_problem_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
-                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
+                <el-option :label="t('common.options.reference')" value="referencing" />
+                <el-option :label="t('common.options.custom')" value="custom" />
               </el-select>
             </div>
           </template>

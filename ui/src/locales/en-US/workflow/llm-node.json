@@ -12,8 +12,6 @@
       "label": "Tool definitions",
       "description": "Define tools using the OpenAI Function Calling format. The model uses these definitions to decide which tools to call; tools are not executed here. Requests (tool names and arguments) are returned in tool_calls.",
       "placeholder": "Select a tool variable",
-      "custom": "Custom",
-      "reference": "Reference",
       "addTitle": "Add tool",
       "editTitle": "Edit tool"
     },

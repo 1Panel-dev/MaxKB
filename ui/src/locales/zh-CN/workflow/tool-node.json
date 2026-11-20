@@ -1,0 +1,33 @@
+{
+  "mcp": {
+    "label": "MCP 调用",
+    "description": "通过 SSE/Streamable HTTP 方式执行MCP服务中的工具",
+    "serverConfig": {
+      "label": "MCP Server Config",
+      "requiredMessage": "请先配置 MCP Server"
+    },
+    "reference": {
+      "requiredMessage": "请先选择引用的 MCP 工具"
+    },
+    "tools": {
+      "loadSuccess": "获取工具成功",
+      "loadFailed": "获取工具失败，请检查 MCP Server 配置"
+    },
+    "parameters": {
+      "label": "工具参数"
+    },
+    "variables": {
+      "title": "设置变量"
+    }
+  },
+  "customTool": {
+    "label": "自定义工具",
+    "description": "通过执行自定义脚本，实现数据处理"
+  },
+  "tool": {
+    "label": "工具节点"
+  },
+  "toolWorkflow": {
+    "label": "工作流工具"
+  }
+}

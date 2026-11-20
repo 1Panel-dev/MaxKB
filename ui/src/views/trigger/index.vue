@@ -252,7 +252,7 @@ onMounted(() => loadTriggers())
                 </MkTooltip>
 
                 <!-- 查看触发器执行记录 -->
-                <MkTooltip :content="t('resource.executionRecords.title')" placement="top" v-if="perm.trigger.record()">
+                <MkTooltip :content="t('execution.records.title')" placement="top" v-if="perm.trigger.record()">
                   <el-button type="primary" text @click.stop="handleOpenRecordDrawer(row)">
                     <MkIcon name="icon_schedule-report_outlined" />
                   </el-button>
@@ -280,5 +280,5 @@ onMounted(() => loadTriggers())
     </template>
   </MkViewLayout>
   <TriggerTaskRecordDrawer ref="recordDrawerRef" />
-  <TriggerFormDrawer :can-edit="perm.trigger.edit()" ref="triggerDrawerRef" @refresh="loadTriggers" :can-create="perm.trigger.create()"/>
+  <TriggerFormDrawer :can-edit="perm.trigger.edit()" ref="triggerDrawerRef" @refresh="loadTriggers" :can-create="perm.trigger.create()" />
 </template>

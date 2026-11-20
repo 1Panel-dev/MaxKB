@@ -13,7 +13,8 @@
     "basicInfo": "基本信息",
     "type": "类型",
     "settings": "设置",
-    "example": "示例"
+    "example": "示例",
+    "question": "问题"
   },
   "name": {
     "label": "名称",
@@ -40,7 +41,9 @@
   },
   "options": {
     "yes": "是",
-    "no": "否"
+    "no": "否",
+    "reference": "引用",
+    "custom": "自定义"
   },
   "dateRange": {
     "lastDays": "过去 {days} 天",

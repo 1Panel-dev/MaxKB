@@ -85,11 +85,6 @@
   "audioFile": {
     "label": "Audio files"
   },
-  "model": {
-    "label": "AI model",
-    "placeholder": "Select an AI model",
-    "requiredMessage": "Select an AI model"
-  },
   "defaultModel": {
     "label": "Default model",
     "custom": "Custom",

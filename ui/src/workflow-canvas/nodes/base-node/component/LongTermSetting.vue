@@ -155,7 +155,7 @@ function validateCron(_rule: unknown, value: unknown, callback: (error?: Error) 
 
 function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error) => void) {
   if (formData.value.long_term_model_id_type === 'custom' && !formData.value.long_term_model_id) {
-    callback(new Error(t('workflow.model.requiredMessage')))
+    callback(new Error(t('model.ai.requiredMessage')))
     return
   }
   if (formData.value.long_term_model_id_type === 'default' && !props.defaultModelSetting?.model_id) {
@@ -181,11 +181,7 @@ function submit() {
   </el-button>
   <MkDialog v-model="visible" :title="t('application.longTermMemory.title')" @closed="formRef?.clearValidate()">
     <el-form :validate-on-rule-change="false" ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item
-        :label="t('workflow.model.label')"
-        prop="long_term_model_id"
-        :rules="{ required: true, validator: validateModel, trigger: 'change' }"
-      >
+      <el-form-item :label="t('model.ai.label')" prop="long_term_model_id" :rules="{ required: true, validator: validateModel, trigger: 'change' }">
         <el-radio-group v-model="formData.long_term_model_id_type" class="mb-2">
           <el-radio value="default">{{ t('workflow.defaultModel.label') }}</el-radio>
           <el-radio value="custom">{{ t('workflow.defaultModel.custom') }}</el-radio>
@@ -206,7 +202,7 @@ function submit() {
           can-edit-params
           :options="modelOptions"
           :provider-options="providerOptions"
-          :placeholder="t('workflow.model.placeholder')"
+          :placeholder="t('model.ai.placeholder')"
         />
       </el-form-item>
 

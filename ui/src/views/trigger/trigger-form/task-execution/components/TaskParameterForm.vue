@@ -26,16 +26,16 @@ const props = defineProps<{
   body: TriggerBodyField[]
 }>()
 function getApplicationFields(application?: Partial<ApplicationDetail>): TaskParameterField[] {
-  const fields: TaskParameterField[] = [{ path: ['question'], label: t('trigger.taskParameters.question'), required: true, defaultValue: '' }]
+  const fields: TaskParameterField[] = [{ path: ['question'], label: t('common.labels.question'), required: true, defaultValue: '' }]
   const properties = application?.work_flow?.nodes?.find((node) => node.type === 'base-node')?.properties ?? {}
   const nodeData = properties.node_data ?? {}
   if (nodeData.file_upload_enable) {
     const fileLabels = {
-      document: t('trigger.taskParameters.files.document'),
-      image: t('trigger.taskParameters.files.image'),
-      audio: t('trigger.taskParameters.files.audio'),
-      video: t('trigger.taskParameters.files.video'),
-      other: t('trigger.taskParameters.files.other'),
+      document: t('upload.types.document'),
+      image: t('upload.types.image'),
+      audio: t('upload.types.audio'),
+      video: t('upload.types.video'),
+      other: t('upload.types.other'),
     }
     Object.entries(fileLabels).forEach(([type, label]) => {
       if (nodeData.file_upload_setting?.[type]) fields.push({ path: [`${type}_list`], label, required: true, defaultValue: '[]' })
@@ -154,7 +154,7 @@ function getParameterRules(field: TaskParameterField): FormItemRule[] {
             value[0] !== 'body' ||
             !props.body.some(({ field }) => field === value[1]))
         ) {
-          callback(new Error(t('trigger.taskParameters.source.invalidMessage')))
+          callback(new Error(t('trigger.taskExecution.invalidReferenceMessage')))
         } else if (field.required && (Array.isArray(value) ? !value.length : !value?.trim())) {
           callback(new Error(t('common.validation.inputFieldRequired', { label: field.label })))
         } else callback()
@@ -203,8 +203,8 @@ defineExpose({ validate })
             class="w-24!"
             @change="getTaskParameter(parameters, field).value = getTaskParameter(parameters, field).source === 'reference' ? [] : field.defaultValue"
           >
-            <el-option :label="t('trigger.taskParameters.source.reference')" value="reference" />
-            <el-option :label="t('trigger.taskParameters.source.custom')" value="custom" />
+            <el-option :label="t('common.options.reference')" value="reference" />
+            <el-option :label="t('common.options.custom')" value="custom" />
           </el-select>
         </div>
       </template>

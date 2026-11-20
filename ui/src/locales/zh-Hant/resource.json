@@ -7,7 +7,8 @@
   "dataSource": {
     "label": "資料來源",
     "selectTitle": "選擇資料來源",
-    "typeLabel": "資料來源類型"
+    "typeLabel": "資料來源類型",
+    "documentsUnavailableMessage": "此知識庫不支援查詢資料來源的檔案"
   },
   "mcpConfig": {
     "title": "MCP 服務設定"
@@ -17,17 +18,6 @@
     "searchResults": "找到 {count} 個相關範本",
     "apply": "套用",
     "missingDownloadUrl": "範本缺少下載網址，無法使用"
-  },
-  "executionRecords": {
-    "title": "執行記錄",
-    "detailTitle": "執行詳情",
-    "view": "查看執行記錄",
-    "resourceType": "資源類型",
-    "executionTime": "執行時間",
-    "errorMessage": "錯誤資訊",
-    "status": {
-      "triggerFailed": "觸發失敗"
-    }
   },
   "messages": {
     "unsupportedScope": "目前的資源範圍不支援此操作"

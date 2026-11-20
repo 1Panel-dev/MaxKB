@@ -50,7 +50,7 @@ watch(
 
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">
-        <span>{{ t('workflow.executionResult.outputParams') }}</span>
+        <span>{{ t('execution.details.outputParams') }}</span>
         <span class="text-N600 font-normal">（{{ t('workflow.document.characterPreviewHint', { count: 500 }) }}）</span>
       </h6>
 

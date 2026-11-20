@@ -22,10 +22,10 @@ defineProps<{
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.inputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.inputParams') }}</h6>
       <div class="space-y-2">
         <p>
-          <span class="text-N600">{{ t('workflow.executionResult.question') }}：</span>
+          <span class="text-N600">{{ t('common.labels.question') }}：</span>
           {{ data.question || '-' }}
         </p>
 
@@ -116,7 +116,7 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.outputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.outputParams') }}</h6>
       <div class="space-y-2">
         <MdPreview v-if="data.answer" :model-value="data.answer" noImgZoomIn />
         <template v-else>-</template>

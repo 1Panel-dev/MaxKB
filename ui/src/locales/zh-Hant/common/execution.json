@@ -1,9 +1,12 @@
 {
-  "dataSource": {
-    "documentsUnavailableMessage": "此知識庫不支援查詢資料來源的檔案"
+  "records": {
+    "title": "執行記錄",
+    "view": "查看執行記錄",
+    "resourceType": "資源類型",
+    "executionTime": "執行時間"
   },
-  "executionResult": {
-    "title": "執行結果",
+  "details": {
+    "title": "執行詳情",
     "input": "輸入",
     "output": "輸出",
     "inputParams": "輸入參數",
@@ -11,9 +14,12 @@
     "retrievalContent": "檢索內容",
     "currentChat": "本次對話",
     "history": "歷史記錄",
-    "question": "問題",
     "answer": "回答",
-    "errorLog": "錯誤日誌",
+    "errorMessage": "錯誤資訊",
+    "errorLog": "錯誤日誌"
+  },
+  "result": {
+    "title": "執行結果",
     "success": "執行成功",
     "failure": "執行失敗"
   }

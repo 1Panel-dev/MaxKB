@@ -73,7 +73,7 @@ function openSourceDocument(name: string, fileId?: string, sourceUrl?: string) {
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.retrievalContent') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.retrievalContent') }}</h6>
       <div class="space-y-2">
         <div v-if="data.question">{{ data.question }}</div>
         <div v-if="queryImages.length" class="flex flex-wrap gap-2">

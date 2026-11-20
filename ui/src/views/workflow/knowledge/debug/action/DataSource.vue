@@ -59,7 +59,7 @@ provide<DynamicFormTreeLoader>('loadTreeData', (functionName, currentNode) => {
   const toolId = sourceContext.value.current_tool_id
   if (!toolId) return Promise.resolve([])
   const loadDocuments = (props.api ?? WorkflowApi).getKnowledgeDatasourceDocuments
-  if (!loadDocuments) return Promise.reject(new Error(t('workflow.dataSource.documentsUnavailableMessage')))
+  if (!loadDocuments) return Promise.reject(new Error(t('resource.dataSource.documentsUnavailableMessage')))
   return loadDocuments(props.knowledgeId, toolId, functionName, currentNode)
 })
 

@@ -188,7 +188,7 @@ function submit() {
   <MkDialog v-model="visible" :title="t('application.longTermMemory.title')" @closed="resetData">
     <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item
-        :label="t('workflow.model.label')"
+        :label="t('model.ai.label')"
         prop="long_term_model_id"
         :rules="{ required: true, message: t('application.longTermMemory.model.requiredMessage'), trigger: 'change' }"
       >

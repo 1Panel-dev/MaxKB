@@ -19,7 +19,7 @@ defineProps<{
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.outputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.outputParams') }}</h6>
       <div>
         <span class="text-N600">{{ t('workflow.loopContinue.isContinue') }}：</span>
         {{ data.is_continue }}

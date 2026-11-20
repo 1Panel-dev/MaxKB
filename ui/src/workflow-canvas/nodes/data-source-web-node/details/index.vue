@@ -38,7 +38,7 @@ watch(documents, () => {
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.inputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.inputParams') }}</h6>
       <div class="space-y-2">
         <p>
           <span class="mr-1 text-N600">{{ t('knowledge.fields.selector.label') }}：</span>
@@ -53,7 +53,7 @@ watch(documents, () => {
 
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">
-        {{ t('workflow.executionResult.outputParams') }}
+        {{ t('execution.details.outputParams') }}
         <span class="text-N600 font-normal">（{{ t('workflow.document.characterPreviewHint', { count: 500 }) }}）</span>
       </h6>
       <MkHorizontalScroll v-if="documents.length" class="mb-2">

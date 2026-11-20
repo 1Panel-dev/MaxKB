@@ -29,7 +29,7 @@ defineProps<{
 
     <!-- 本次对话 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.currentChat') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.currentChat') }}</h6>
       <div class="whitespace-pre-wrap space-y-2">
         <p class="mb-1 text-N600" v-if="data?.image_list?.length > 0">{{ t('upload.types.image') }}：</p>
         <!-- 查看本次对话图片 -->

@@ -58,11 +58,11 @@ onUnmounted(stopPolling)
 
 <template>
   <div>
-    <h4 class="mb-4 mk-title-decoration">{{ t('workflow.executionResult.title') }}</h4>
+    <h4 class="mb-4 mk-title-decoration">{{ t('execution.result.title') }}</h4>
     <!-- // TODO 这里状态ui没有考虑执行中情况 -->
     <div class="mb-4">
-      <el-alert v-if="state === 'SUCCESS'" :title="t('workflow.executionResult.success')" type="success" show-icon :closable="false" />
-      <el-alert v-else-if="state === 'FAILURE'" :title="t('workflow.executionResult.failure')" type="error" show-icon :closable="false" />
+      <el-alert v-if="state === 'SUCCESS'" :title="t('execution.result.success')" type="success" show-icon :closable="false" />
+      <el-alert v-else-if="state === 'FAILURE'" :title="t('execution.result.failure')" type="error" show-icon :closable="false" />
       <el-alert
         v-else-if="state === 'REVOKE' || state === 'REVOKED'"
         :title="t('common.status.canceled')"

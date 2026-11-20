@@ -19,14 +19,14 @@ defineProps<{
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.inputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.inputParams') }}</h6>
       <div class="whitespace-pre-wrap">
         {{ data.request || '-' }}
       </div>
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.outputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.outputParams') }}</h6>
       <div class="space-y-2">
         <p v-for="(f, i) in data.result" :key="i">
           <span class="text-N600">{{ i }}：</span>

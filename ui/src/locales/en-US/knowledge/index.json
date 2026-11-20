@@ -81,6 +81,16 @@
     "unsuccessful": "Skip previously successful segments",
     "all": "All segments"
   },
+  "generateQuestions": {
+    "title": "Generate questions",
+    "cancel": "Cancel question generation",
+    "prompt": {
+      "label": "Prompt",
+      "description": "The system replaces {data} in the prompt with the segment text and sends it to the AI model.\nAsk the model to wrap each generated question in {questionTags} so the system can relate it to the segment.\nYou can adjust the prompt or choose another model to improve the results.",
+      "requiredMessage": "Enter a prompt",
+      "defaultValue": "Content: {data}\n\nSummarize the content above and use the summary to generate 5 questions.\nOutput requirements:\n- Output only the questions.\n- Wrap each question in {questionTags}."
+    }
+  },
   "import": {
     "embeddingNotice": "Knowledge imported successfully. The documents do not have embeddings yet. Select an embedding model in settings, then generate embeddings for the documents."
   },

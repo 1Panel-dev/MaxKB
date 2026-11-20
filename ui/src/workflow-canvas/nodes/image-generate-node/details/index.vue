@@ -20,7 +20,7 @@ defineProps<{
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.currentChat') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.currentChat') }}</h6>
       <div class="whitespace-pre-wrap">
         {{ data.question || '-' }}
       </div>

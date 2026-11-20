@@ -24,7 +24,7 @@ function handleOpenExecutionRecords() {
     <!-- 查看工作流执行记录 -->
     <el-button plain @click="handleOpenExecutionRecords">
       <MkIcon name="icon_schedule-report_outlined" />
-      <span>{{ t('resource.executionRecords.title') }}</span>
+      <span>{{ t('execution.records.title') }}</span>
     </el-button>
   </span>
   <ExecutionRecordDrawer v-if="drawerMounted" ref="executionRecordDrawerRef" :api="api" :knowledge-id="knowledgeId" @closed="drawerMounted = false" />
