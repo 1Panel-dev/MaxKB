@@ -57,7 +57,7 @@ function handleChange() {
 </script>
 
 <template>
-  <div class="mk-input-group">
+  <div class="mk-input-group w-fit">
     <!-- 选择搜索字段 -->
     <el-select v-model="searchField" class="mk-input-group__prepend w-26!" @change="handleFieldChange" :persistent="false">
       <el-option v-for="field in fields" :key="field.value" :label="field.label" :value="field.value" />

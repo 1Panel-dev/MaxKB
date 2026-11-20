@@ -2,6 +2,7 @@ import { omit } from 'lodash'
 import type { AgentTool, JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getNode, readNodeData, refreshBranchAnchors, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
 import { MODEL_FIELD_SCHEMA, createValidateTool, getModelsTool, resolveModelFields, useNodeAgent } from '@/workflow-canvas/ai-generate/tools/node'
+import { t } from '@/locales'
 import { randomId } from '@/utils/common'
 
 /**
@@ -55,13 +56,13 @@ function useAgent(context: NodeAgentContext) {
     if (Array.isArray(branches) && branches.length) return branches
     return [
       { id: randomId(), content: '', isOther: false },
-      { id: randomId(), content: '其他', isOther: true },
+      { id: randomId(), content: t('workflow.intent.categories.other'), isOther: true },
     ]
   }
 
   /** 写回分类："其他"固定在末尾，并刷新出口锚点 */
   const writeBranches = (branches: IntentBranch[]) => {
-    const other = branches.find((branch) => branch.isOther) ?? { id: randomId(), content: '其他', isOther: true }
+    const other = branches.find((branch) => branch.isOther) ?? { id: randomId(), content: t('workflow.intent.categories.other'), isOther: true }
     writeNodeProperties(node(), {
       node_data: { ...readNodeData<Record<string, unknown>>(node()), branch: [...branches.filter((branch) => !branch.isOther), other] },
     })
@@ -88,7 +89,8 @@ function useAgent(context: NodeAgentContext) {
           node_data: {
             ...nodeData,
             ...modelFields,
-            dialogue_type: args.dialogue_type === 'NODE' || args.dialogue_type === 'WORKFLOW' ? args.dialogue_type : (nodeData.dialogue_type ?? 'WORKFLOW'),
+            dialogue_type:
+              args.dialogue_type === 'NODE' || args.dialogue_type === 'WORKFLOW' ? args.dialogue_type : (nodeData.dialogue_type ?? 'WORKFLOW'),
             dialogue_number: Number(args.dialogue_number ?? nodeData.dialogue_number ?? 1),
           },
         })

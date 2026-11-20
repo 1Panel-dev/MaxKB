@@ -82,25 +82,36 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <NodeModelSelect
           :node-model="model"
           :form-data="formData"
           :fields="{ source: 'stt_model_id_type', id: 'stt_model_id', reference: 'stt_model_id_reference', params: 'model_params_setting' }"
           model-type="STT"
-          label="语音识别模型"
+          :label="t('workflow.speechToText.model.label')"
           :options="modelList"
           :provider-options="providerOptions"
           @update="updateNodeData"
         />
 
-        <!-- 语音文件 -->
-        <el-form-item class="mk-hide-asterisk" prop="audio_list" :rules="{ required: true, message: '请选择', trigger: 'change' }">
+        <!-- 音频文件 -->
+        <el-form-item
+          class="mk-hide-asterisk"
+          prop="audio_list"
+          :rules="{ required: true, message: t('common.validation.selectRequired'), trigger: 'change' }"
+        >
           <template #label>
             <span class="flex-align-center gap-1">
-              <span class="mk-required">语音文件</span>
+              <span class="mk-required">{{ t('workflow.audioFile.label') }}</span>
               <MkTooltip placement="right">
                 <template #content>
                   <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>
@@ -109,17 +120,18 @@ onMounted(() => {
               </MkTooltip>
             </span>
           </template>
-          <NodeCascader ref="contentCascaderRef" v-model="formData.audio_list" :node-model="model" placeholder="请选择" />
+          <NodeCascader ref="contentCascaderRef" v-model="formData.audio_list" :node-model="model" :placeholder="t('common.placeholders.select')" />
         </el-form-item>
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showSettings">
           <span class="flex-align-center gap-1">
-            返回内容
-            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            {{ t('workflow.returnContent.label') }}
+            <MkTooltip :content="t('workflow.returnContent.description')" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>
           <span>
+            <!-- 启用返回内容 -->
             <el-switch v-model="formData.is_result" size="small" />
           </span>
         </div>

@@ -133,7 +133,7 @@ defineExpose({ open })
 <template>
   <MkDrawer v-model="visible" title="执行记录" size="840" @close="closeDetails" @closed="emit('closed')">
     <div class="mb-4">
-      <MkComplexSearch v-if="visible" :fields="searchFields" class="w-76!" @change="searchRecords" />
+      <MkComplexSearch v-if="visible" :fields="searchFields" @change="searchRecords" />
     </div>
     <MkTable
       v-if="visible"

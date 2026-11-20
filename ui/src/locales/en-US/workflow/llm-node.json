@@ -1,0 +1,65 @@
+{
+  "llm": {
+    "label": "LLM",
+    "description": "Call an AI model once, optionally providing tool definitions and receiving tool calls",
+    "context": {
+      "label": "Context",
+      "description": "When enabled, the selected variable is included as context for this call. When disabled, the model replies using only the current input.",
+      "placeholder": "Select a context variable",
+      "requiredMessage": "Select a context variable"
+    },
+    "tools": {
+      "label": "Tool definitions",
+      "description": "Define tools using the OpenAI Function Calling format. The model uses these definitions to decide which tools to call; tools are not executed here. Requests (tool names and arguments) are returned in tool_calls.",
+      "placeholder": "Select a tool variable",
+      "custom": "Custom",
+      "reference": "Reference",
+      "addTitle": "Add tool",
+      "editTitle": "Edit tool"
+    },
+    "toolName": {
+      "label": "Tool name",
+      "placeholder": "Enter a tool name",
+      "requiredMessage": "Enter a tool name",
+      "duplicateMessage": "Tool name already exists",
+      "missingMessage": "No tool name found"
+    },
+    "toolDescription": {
+      "label": "Tool description",
+      "placeholder": "Enter a tool description",
+      "requiredMessage": "Enter a tool description"
+    },
+    "toolParameters": {
+      "label": "Tool parameters",
+      "empty": "No parameters",
+      "nameRequiredMessage": "Enter a parameter name",
+      "nameLengthMessage": "Parameter names cannot exceed {max} characters",
+      "typeMessage": "The data type of parameter {name} is not supported",
+      "descriptionMessage": "The description of parameter {name} must be text with no more than {max} characters"
+    },
+    "dataType": {
+      "label": "Data type",
+      "placeholder": "Select a data type",
+      "requiredMessage": "Select a data type"
+    },
+    "jsonParse": {
+      "label": "JSON parsing",
+      "placeholder": "Enter JSON text to parse",
+      "invalidMessage": "Failed to parse JSON. Check the format",
+      "action": "Parse"
+    },
+    "toolImport": {
+      "title": "Import tools",
+      "placeholder": "Paste JSON in the OpenAI tools format, for example:",
+      "invalidMessage": "No valid tool definitions found",
+      "weatherDescription": "Get the weather",
+      "cityDescription": "City"
+    },
+    "reasoningKey": "Reasoning key",
+    "refusal": "Refusal content",
+    "isRefusal": "Refused",
+    "usage": "Token usage",
+    "toolCalls": "Tool calls",
+    "finishReason": "Finish reason"
+  }
+}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
@@ -11,6 +12,7 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import { randomId } from '@/utils/common'
 
 defineOptions({ name: 'WorkflowIntentNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const model = getModel()
@@ -42,7 +44,7 @@ const providerOptions = ref<Array<ModelProviderItem>>([])
 function defaultBranch(): IntentNodeBranch[] {
   return [
     { id: randomId(), content: '', isOther: false },
-    { id: randomId(), content: '其他', isOther: true },
+    { id: randomId(), content: t('workflow.intent.categories.other'), isOther: true },
   ]
 }
 
@@ -123,32 +125,44 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <NodeModelSelect
           :node-model="model"
           :form-data="formData"
           model-type="LLM"
-          label="AI 模型"
+          :label="t('workflow.model.label')"
           :options="modelList"
           :provider-options="providerOptions"
           @update="updateModelSetting"
         />
 
         <!-- 输入 -->
-        <el-form-item prop="content_list" :rules="{ required: true, message: '请选择', trigger: 'change' }" label="输入">
-          <NodeCascader ref="contentCascaderRef" v-model="formData.content_list" :node-model="model" placeholder="请选择" />
+        <el-form-item
+          prop="content_list"
+          :rules="{ required: true, message: t('common.validation.selectRequired'), trigger: 'change' }"
+          :label="t('workflow.intent.input')"
+        >
+          <NodeCascader ref="contentCascaderRef" v-model="formData.content_list" :node-model="model" :placeholder="t('common.placeholders.select')" />
         </el-form-item>
 
         <!-- 历史聊天记录 -->
         <el-form-item>
           <template #label>
             <div class="flex-between">
-              <span>历史聊天记录</span>
+              <span>{{ t('workflow.history.label') }}</span>
+              <!-- 选择历史记录来源 -->
               <el-select v-model="formData.dialogue_type" :teleported="false" class="w-18!" size="small">
-                <el-option label="节点" value="NODE" />
-                <el-option label="工作流" value="WORKFLOW" />
+                <el-option :label="t('workflow.node.title')" value="NODE" />
+                <el-option :label="t('workflow.title')" value="WORKFLOW" />
               </el-select>
             </div>
           </template>
@@ -166,7 +180,8 @@ onMounted(() => {
         <!-- 意图分类 -->
 
         <div class="flex-between mb-2">
-          <span class="mk-required">意图分类</span>
+          <span class="mk-required">{{ t('workflow.intent.categories.label') }}</span>
+          <!-- 添加意图分类 -->
           <el-button type="primary" text class="-mr-1" @click="addBranch">
             <MkIcon name="icon_add_outlined" />
           </el-button>
@@ -174,14 +189,15 @@ onMounted(() => {
         <template v-for="(item, index) in formData.branch" :key="item.id">
           <el-form-item
             :prop="`branch.${index}.content`"
-            :rules="{ whitespace: true, required: true, message: '请输入', trigger: 'blur' }"
+            :rules="{ whitespace: true, required: true, message: t('common.validation.inputRequired'), trigger: 'blur' }"
             class="small"
           >
             <div class="flex-align-center gap-2 w-full">
               <div class="min-w-0 flex-1">
-                <el-input v-model="item.content" :disabled="item.isOther" placeholder="请输入" />
+                <el-input v-model="item.content" :disabled="item.isOther" :placeholder="t('common.placeholders.input')" />
               </div>
               <div class="flex-align-center w-4 shrink-0 justify-center">
+                <!-- 删除意图分类 -->
                 <el-button
                   v-if="!item.isOther"
                   text

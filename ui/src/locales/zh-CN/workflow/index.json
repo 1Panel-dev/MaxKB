@@ -41,6 +41,9 @@
     "invalidMessage": "引用变量错误",
     "missingMessage": "引用变量不存在"
   },
+  "audioFile": {
+    "label": "音频文件"
+  },
   "model": {
     "label": "AI 模型",
     "placeholder": "请选择 AI 模型",
@@ -66,6 +69,15 @@
     "description": "用户向模型提出的问题或输入的指令",
     "requiredMessage": "请输入用户提示词"
   },
+  "positivePrompt": {
+    "label": "提示词(正向)",
+    "requiredMessage": "请输入正向提示词"
+  },
+  "negativePrompt": {
+    "label": "提示词(负向)",
+    "videoPlaceholder": "请描述不想生成的视频内容，比如：颜色、血腥内容",
+    "description": "反向提示词，用来描述不希望在画面中看到的内容，可以对画面进行限制"
+  },
   "promptGeneration": {
     "title": "生成提示词",
     "placeholder": "请输入提示词主题",
@@ -77,8 +89,12 @@
   "thinking": {
     "label": "输出思考",
     "description": "请根据模型返回的思考标签设置，标签中间的内容将会认定为思考过程",
+    "process": "思考过程",
     "start": "开始",
     "end": "结束"
+  },
+  "answer": {
+    "label": "回答内容"
   },
   "returnContent": {
     "label": "返回内容",

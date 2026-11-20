@@ -4,6 +4,7 @@ import { WorkflowNodeType } from '@/workflow-canvas/types'
 import agent from './agent'
 import IntentNodeDetail from './details/index.vue'
 import IntentNodeViewVue from './index.vue'
+import { t } from '@/locales'
 import { randomId } from '@/utils/common'
 
 interface IntentNodeBranch {
@@ -33,7 +34,7 @@ type UpdatePathEdge = { updatePathByAnchor: () => void }
 function defaultBranch(): IntentNodeBranch[] {
   return [
     { id: randomId(), content: '', isOther: false },
-    { id: randomId(), content: '其他', isOther: true },
+    { id: randomId(), content: t('workflow.intent.categories.other'), isOther: true },
   ]
 }
 

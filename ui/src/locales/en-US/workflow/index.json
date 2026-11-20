@@ -41,6 +41,9 @@
     "invalidMessage": "Invalid variable reference",
     "missingMessage": "The referenced variable does not exist"
   },
+  "audioFile": {
+    "label": "Audio files"
+  },
   "model": {
     "label": "AI model",
     "placeholder": "Select an AI model",
@@ -66,6 +69,15 @@
     "description": "The question or instructions the user sends to the model",
     "requiredMessage": "Enter a user prompt"
   },
+  "positivePrompt": {
+    "label": "Prompt (positive)",
+    "requiredMessage": "Enter a positive prompt"
+  },
+  "negativePrompt": {
+    "label": "Prompt (negative)",
+    "videoPlaceholder": "Describe what to exclude from the video, such as colors or graphic content",
+    "description": "Describe elements to exclude from the generated image or video"
+  },
   "promptGeneration": {
     "title": "Generate prompt",
     "placeholder": "Enter a prompt topic",
@@ -77,8 +89,12 @@
   "thinking": {
     "label": "Show reasoning",
     "description": "Set the reasoning tags returned by the model. Content between these tags will be treated as reasoning.",
+    "process": "Reasoning process",
     "start": "Start",
     "end": "End"
+  },
+  "answer": {
+    "label": "Response content"
   },
   "returnContent": {
     "label": "Return content",

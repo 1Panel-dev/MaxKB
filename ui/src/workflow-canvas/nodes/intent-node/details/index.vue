@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 
 defineOptions({ name: 'IntentNodeDetail' })
+const { t } = useI18n({ useScope: 'global' })
 
 defineProps<{
   data: ExecutionNodeDetail
@@ -18,13 +20,13 @@ defineProps<{
 
     <!-- 系统提示词 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">系统提示词</h6>
+      <h6 class="mb-2">{{ t('workflow.systemPrompt.label') }}</h6>
       <div>{{ data.system || '-' }}</div>
     </div>
 
     <!-- 历史记录 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">历史记录</h6>
+      <h6 class="mb-2">{{ t('workflow.history.label') }}</h6>
       <div class="space-y-2">
         <template v-if="data.history_message?.length > 0">
           <p v-for="(history, historyIndex) in data.history_message" :key="historyIndex">
@@ -38,7 +40,7 @@ defineProps<{
 
     <!-- 本次对话 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">本次对话</h6>
+      <h6 class="mb-2">{{ t('workflow.executionResult.currentChat') }}</h6>
       <div class="whitespace-pre-wrap">
         {{ data.question || '-' }}
       </div>
@@ -46,7 +48,7 @@ defineProps<{
 
     <!-- 回答 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">回答</h6>
+      <h6 class="mb-2">{{ t('workflow.executionResult.answer') }}</h6>
       <div>
         <MdPreview v-if="data.answer" :model-value="data.answer" noImgZoomIn />
         <template v-else>-</template>

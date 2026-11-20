@@ -4,6 +4,11 @@
   },
   "executionResult": {
     "title": "执行结果",
+    "inputParams": "输入参数",
+    "outputParams": "输出参数",
+    "currentChat": "本次对话",
+    "answer": "回答",
+    "errorLog": "错误日志",
     "success": "执行成功",
     "failure": "执行失败"
   }

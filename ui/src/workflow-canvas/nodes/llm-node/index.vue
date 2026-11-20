@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { LlmTool, LlmToolsSetting } from './types'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -14,6 +15,8 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import ToolsSetting from './component/ToolsSetting.vue'
 import { normalizeTool } from './types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'WorkflowLlmNode' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
@@ -94,8 +97,8 @@ function handleContextEnabledChange(enabled: boolean) {
 async function validate() {
   return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
-const userPromptRequired=computed(()=>{
-  return formData.value.enable_context?false:true
+const userPromptRequired = computed(() => {
+  return formData.value.enable_context ? false : true
 })
 onMounted(() => {
   if (formData.value.is_result === undefined && isLastNode(model)) formData.value.is_result = true
@@ -111,14 +114,21 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <NodeModelSelect
           :node-model="model"
           :form-data="formData"
           model-type="LLM"
-          label="AI 模型"
+          :label="t('workflow.model.label')"
           :options="modelList"
           :provider-options="providerOptions"
           @update="updateNodeData"
@@ -129,8 +139,8 @@ onMounted(() => {
           <template #label>
             <div class="flex-between">
               <div class="flex-align-center gap-1">
-                <span>系统提示词</span>
-                <MkTooltip content="设定模型扮演的角色或遵循的指令" placement="right">
+                <span>{{ t('workflow.systemPrompt.label') }}</span>
+                <MkTooltip :content="t('workflow.systemPrompt.description')" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </div>
@@ -140,8 +150,8 @@ onMounted(() => {
           </template>
           <MdEditorMagnify
             v-model="formData.system"
-            title="系统提示词"
-            :placeholder="`系统提示词，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`"
+            :title="t('workflow.systemPrompt.label')"
+            :placeholder="t('workflow.systemPrompt.placeholder', { reference: START_NODE_REFERENCES.question })"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
@@ -150,20 +160,20 @@ onMounted(() => {
         <el-form-item
           class="mk-hide-asterisk"
           prop="prompt"
-          :rules="{ whitespace: true, required: userPromptRequired, message: '请输入用户提示词', trigger: 'blur' }"
+          :rules="{ whitespace: true, required: userPromptRequired, message: t('workflow.userPrompt.requiredMessage'), trigger: 'blur' }"
         >
           <template #label>
             <div class="flex-align-center gap-1">
-              <span class="mk-required">用户提示词</span>
-              <MkTooltip content="用户向模型提出的问题或输入的指令" placement="right">
+              <span class="mk-required">{{ t('workflow.userPrompt.label') }}</span>
+              <MkTooltip :content="t('workflow.userPrompt.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </div>
           </template>
           <MdEditorMagnify
             v-model="formData.prompt"
-            title="用户提示词"
-            :placeholder="`用户提示词，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`"
+            :title="t('workflow.userPrompt.label')"
+            :placeholder="t('workflow.userPrompt.placeholder', { reference: START_NODE_REFERENCES.question })"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
@@ -172,17 +182,22 @@ onMounted(() => {
         <el-form-item
           class="mk-hide-asterisk"
           prop="context_variable"
-          :rules="formData.enable_context ? { type: 'array', required: true, message: '请选择上下文变量', trigger: 'change' } : undefined"
+          :rules="
+            formData.enable_context
+              ? { type: 'array', required: true, message: t('workflow.llm.context.requiredMessage'), trigger: 'change' }
+              : undefined
+          "
         >
           <template #label>
             <div class="flex-between">
               <span class="flex-align-center gap-1">
-                <span :class="{ 'mk-required': formData.enable_context }">上下文</span>
+                <span :class="{ 'mk-required': formData.enable_context }">{{ t('workflow.llm.context.label') }}</span>
 
-                <MkTooltip content="开启后，本次调用会带上所选变量作为上下文；关闭则仅根据本条输入回复" placement="right">
+                <MkTooltip :content="t('workflow.llm.context.description')" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </span>
+              <!-- 启用上下文 -->
               <el-switch v-model="formData.enable_context" size="small" @change="handleContextEnabledChange" />
             </div>
           </template>
@@ -191,7 +206,7 @@ onMounted(() => {
             v-model="formData.context_variable"
             :node-model="model"
             class="w-full!"
-            placeholder="请选择上下文变量"
+            :placeholder="t('workflow.llm.context.placeholder')"
           />
         </el-form-item>
 
@@ -203,12 +218,13 @@ onMounted(() => {
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showSettings">
           <span class="flex-align-center gap-1">
-            返回内容
-            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            {{ t('workflow.returnContent.label') }}
+            <MkTooltip :content="t('workflow.returnContent.description')" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>
           <span>
+            <!-- 启用返回内容 -->
             <el-switch v-model="formData.is_result" size="small" />
           </span>
         </div>

@@ -95,8 +95,10 @@ defineExpose({ open })
         </span>
       </div>
     </template>
+    <div class="mb-4">
+      <MkComplexSearch :fields="memberSearchFields" @change="handleMemberSearch" />
+    </div>
 
-    <MkComplexSearch class="mb-4 w-[50%]" :fields="memberSearchFields" @change="handleMemberSearch" />
     <MkTable
       v-loading="loadingMembers"
       v-model:pagination-config="paginationConfig"

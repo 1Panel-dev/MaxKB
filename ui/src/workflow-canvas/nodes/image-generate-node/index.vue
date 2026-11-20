@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
@@ -11,6 +12,7 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowImageGenerateNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
@@ -89,14 +91,21 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <NodeModelSelect
           :node-model="model"
           :form-data="formData"
           model-type="TTI"
-          label="图片生成模型"
+          :label="t('workflow.imageGenerate.model.label')"
           :options="modelList"
           :provider-options="providerOptions"
           @update="updateNodeData"
@@ -106,34 +115,34 @@ onMounted(() => {
         <el-form-item
           class="mk-hide-asterisk"
           prop="prompt"
-          :rules="{ whitespace: true, required: true, message: '请输入正向提示词', trigger: 'blur' }"
+          :rules="{ whitespace: true, required: true, message: t('workflow.positivePrompt.requiredMessage'), trigger: 'blur' }"
         >
           <template #label>
             <div class="flex-align-center gap-1">
-              <span class="mk-required">提示词(正向)</span>
+              <span class="mk-required">{{ t('workflow.positivePrompt.label') }}</span>
 
-              <MkTooltip content="正向提示词，用来描述生成图像中期望包含的元素和视觉特点" placement="right">
+              <MkTooltip :content="t('workflow.imageGenerate.positivePrompt.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </div>
           </template>
-          <MdEditorMagnify v-model="formData.prompt" title="提示词(正向)" @wheel="handleNodeWheel" />
+          <MdEditorMagnify v-model="formData.prompt" :title="t('workflow.positivePrompt.label')" @wheel="handleNodeWheel" />
         </el-form-item>
 
         <!-- 提示词(负向) -->
         <el-form-item prop="negative_prompt">
           <template #label>
             <div class="flex-align-center gap-1">
-              <span>提示词(负向)</span>
-              <MkTooltip content="反向提示词，用来描述不希望在画面中看到的内容，可以对画面进行限制" placement="right">
+              <span>{{ t('workflow.negativePrompt.label') }}</span>
+              <MkTooltip :content="t('workflow.negativePrompt.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </div>
           </template>
           <MdEditorMagnify
             v-model="formData.negative_prompt"
-            title="提示词(负向)"
-            placeholder="请描述不想生成的图片内容，比如：颜色、血腥内容"
+            :title="t('workflow.negativePrompt.label')"
+            :placeholder="t('workflow.imageGenerate.negativePrompt.placeholder')"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
@@ -141,12 +150,13 @@ onMounted(() => {
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showSettings">
           <span class="flex-align-center gap-1">
-            返回内容
-            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            {{ t('workflow.returnContent.label') }}
+            <MkTooltip :content="t('workflow.returnContent.description')" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>
           <span>
+            <!-- 切换返回内容 -->
             <el-switch v-model="formData.is_result" size="small" />
           </span>
         </div>

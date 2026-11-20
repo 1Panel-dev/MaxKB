@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { LlmTool, LlmToolsSetting } from '../types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
@@ -11,6 +12,7 @@ import { downloadByURL } from '@/utils/common'
 
 defineOptions({ name: 'WorkflowLlmToolsSetting' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ nodeModel: WorkflowNodeModel }>()
 const setting = defineModel<LlmToolsSetting>({ required: true })
 
@@ -63,11 +65,8 @@ onBeforeUnmount(() => anchorGuard.reset())
 <template>
   <div class="flex-between mb-2">
     <span class="flex-align-center gap-1">
-      工具声明
-      <MkTooltip
-        content="按 OpenAI 标准 Function Calling 格式声明工具能力，仅用于模型决策，不在此处执行；调用请求（工具名 + 参数）经参数 tool_calls 返回"
-        placement="right"
-      >
+      {{ t('workflow.llm.tools.label') }}
+      <MkTooltip :content="t('workflow.llm.tools.description')" placement="right">
         <MkIcon name="icon_info_outlined" class="text-N600!" />
       </MkTooltip>
     </span>
@@ -93,12 +92,12 @@ onBeforeUnmount(() => anchorGuard.reset())
               <!-- 批量导入工具 -->
               <MkDropdownItem @click="handleOpenImport">
                 <template #icon><MkIcon name="icon_import_outlined" /></template>
-                导入
+                {{ t('common.actions.import') }}
               </MkDropdownItem>
               <!-- 导出工具 -->
               <MkDropdownItem :disabled="!setting.tools.length" @click="handleExport">
                 <template #icon><MkIcon name="icon_export_outlined" /></template>
-                导出
+                {{ t('common.actions.export') }}
               </MkDropdownItem>
             </MkDropdownMenu>
           </template>
@@ -112,8 +111,8 @@ onBeforeUnmount(() => anchorGuard.reset())
         @update:model-value="updateSetting({ location: $event })"
         @visible-change="anchorGuard.setOverlayVisible('tools-location', $event)"
       >
-        <el-option label="自定义" value="customize" />
-        <el-option label="引用" value="reference" />
+        <el-option :label="t('workflow.llm.tools.custom')" value="customize" />
+        <el-option :label="t('workflow.llm.tools.reference')" value="reference" />
       </el-select>
     </div>
   </div>
@@ -123,24 +122,24 @@ onBeforeUnmount(() => anchorGuard.reset())
     :model-value="setting.reference"
     :node-model="nodeModel"
     class="w-full!"
-    placeholder="请选择工具变量"
+    :placeholder="t('workflow.llm.tools.placeholder')"
     @update:model-value="updateSetting({ reference: $event })"
   />
   <MkTable class="border" v-else-if="setting.tools.length" :data="setting.tools" size="small" row-key="function.name" :max-height="undefined">
-    <el-table-column label="工具名称">
+    <el-table-column :label="t('workflow.llm.toolName.label')">
       <template #default="{ row }">
         <span class="block truncate" :title="row.function.name">{{ row.function.name }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="工具描述">
+    <el-table-column :label="t('workflow.llm.toolDescription.label')">
       <template #default="{ row }">
         <span class="block truncate" :title="row.function.description || '-'">{{ row.function.description || '-' }}</span>
       </template>
     </el-table-column>
-    <el-table-column label="参数">
+    <el-table-column :label="t('dynamicForm.fields.parameter.label')">
       <template #default="{ row }">{{ Object.keys(row.function.parameters?.properties ?? {}).length }}</template>
     </el-table-column>
-    <el-table-column label="操作" width="80">
+    <el-table-column :label="t('common.labels.operation')" width="80">
       <template #default="{ row, $index }">
         <!-- 编辑工具 -->
         <el-button text type="primary" @click="handleOpenToolDrawer(row, $index)">

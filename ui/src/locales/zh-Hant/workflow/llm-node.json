@@ -1,0 +1,65 @@
+{
+  "llm": {
+    "label": "LLM",
+    "description": "單次呼叫大語言模型，可傳入工具定義並輸出工具呼叫",
+    "context": {
+      "label": "上下文",
+      "description": "開啟後，本次呼叫會帶上所選變量作為上下文；關閉則僅根據本次輸入回覆",
+      "placeholder": "請選擇上下文變量",
+      "requiredMessage": "請選擇上下文變量"
+    },
+    "tools": {
+      "label": "工具宣告",
+      "description": "按 OpenAI 標準 Function Calling 格式宣告工具能力，僅用於模型決策，不在此處執行；呼叫請求（工具名稱 + 參數）經參數 tool_calls 回傳",
+      "placeholder": "請選擇工具變量",
+      "custom": "自訂",
+      "reference": "引用",
+      "addTitle": "新增工具",
+      "editTitle": "編輯工具"
+    },
+    "toolName": {
+      "label": "工具名稱",
+      "placeholder": "請輸入工具名稱",
+      "requiredMessage": "請輸入工具名稱",
+      "duplicateMessage": "工具名稱已存在",
+      "missingMessage": "未找到工具名稱"
+    },
+    "toolDescription": {
+      "label": "工具描述",
+      "placeholder": "請輸入工具描述",
+      "requiredMessage": "請輸入工具描述"
+    },
+    "toolParameters": {
+      "label": "工具參數",
+      "empty": "暫無參數",
+      "nameRequiredMessage": "請輸入參數名稱",
+      "nameLengthMessage": "參數名稱不能超過 {max} 字",
+      "typeMessage": "不支援參數 {name} 的資料類型",
+      "descriptionMessage": "參數 {name} 的描述應為不超過 {max} 字的文字"
+    },
+    "dataType": {
+      "label": "資料類型",
+      "placeholder": "請選擇資料類型",
+      "requiredMessage": "請選擇資料類型"
+    },
+    "jsonParse": {
+      "label": "JSON 解析",
+      "placeholder": "請輸入 JSON 格式文字進行解析",
+      "invalidMessage": "JSON 解析失敗，請檢查格式",
+      "action": "解析"
+    },
+    "toolImport": {
+      "title": "匯入工具",
+      "placeholder": "貼上 OpenAI tools 格式 JSON，例如：",
+      "invalidMessage": "未找到有效的工具定義",
+      "weatherDescription": "取得天氣",
+      "cityDescription": "城市"
+    },
+    "reasoningKey": "思考標識",
+    "refusal": "拒答內容",
+    "isRefusal": "是否拒答",
+    "usage": "Token 用量",
+    "toolCalls": "工具呼叫",
+    "finishReason": "結束原因"
+  }
+}

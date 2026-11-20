@@ -99,14 +99,21 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <NodeModelSelect
           :node-model="model"
           :form-data="formData"
           model-type="ITV"
-          label="图生视频模型"
+          :label="t('workflow.imageToVideo.model.label')"
           :options="modelList"
           :provider-options="providerOptions"
           @update="updateNodeData"
@@ -116,43 +123,47 @@ onMounted(() => {
         <el-form-item
           class="mk-hide-asterisk"
           prop="prompt"
-          :rules="{ whitespace: true, required: true, message: '请输入正向提示词', trigger: 'blur' }"
+          :rules="{ whitespace: true, required: true, message: t('workflow.positivePrompt.requiredMessage'), trigger: 'blur' }"
         >
           <template #label>
             <div class="flex-align-center gap-1">
-              <span class="mk-required">提示词(正向)</span>
+              <span class="mk-required">{{ t('workflow.positivePrompt.label') }}</span>
 
-              <MkTooltip content="正向提示词，用来描述基于首帧图片生成视频时的运动和画面变化" placement="right">
+              <MkTooltip :content="t('workflow.imageToVideo.positivePrompt.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </div>
           </template>
-          <MdEditorMagnify v-model="formData.prompt" title="提示词(正向)" @wheel="handleNodeWheel" />
+          <MdEditorMagnify v-model="formData.prompt" :title="t('workflow.positivePrompt.label')" @wheel="handleNodeWheel" />
         </el-form-item>
 
         <!-- 提示词(负向) -->
         <el-form-item prop="negative_prompt">
           <template #label>
             <div class="flex-align-center gap-1">
-              <span>提示词(负向)</span>
-              <MkTooltip content="反向提示词，用来描述不希望在画面中看到的内容，可以对画面进行限制" placement="right">
+              <span>{{ t('workflow.negativePrompt.label') }}</span>
+              <MkTooltip :content="t('workflow.negativePrompt.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </div>
           </template>
           <MdEditorMagnify
             v-model="formData.negative_prompt"
-            title="提示词(负向)"
-            placeholder="请描述不想生成的视频内容，比如：颜色、血腥内容"
+            :title="t('workflow.negativePrompt.label')"
+            :placeholder="t('workflow.negativePrompt.videoPlaceholder')"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
 
         <!-- 首帧图片 -->
-        <el-form-item class="mk-hide-asterisk" prop="first_frame_url" :rules="{ required: true, message: '请选择首帧图片', trigger: 'change' }">
+        <el-form-item
+          class="mk-hide-asterisk"
+          prop="first_frame_url"
+          :rules="{ required: true, message: t('workflow.imageToVideo.firstFrame.requiredMessage'), trigger: 'change' }"
+        >
           <template #label>
             <span class="flex-align-center gap-1">
-              <span class="mk-required">首帧图片</span>
+              <span class="mk-required">{{ t('workflow.imageToVideo.firstFrame.label') }}</span>
               <MkTooltip placement="right">
                 <template #content>
                   <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>
@@ -161,14 +172,14 @@ onMounted(() => {
               </MkTooltip>
             </span>
           </template>
-          <NodeCascader v-model="formData.first_frame_url" :node-model="model" placeholder="请选择首帧图片" />
+          <NodeCascader v-model="formData.first_frame_url" :node-model="model" :placeholder="t('workflow.imageToVideo.firstFrame.placeholder')" />
         </el-form-item>
 
         <!-- 尾帧图片 -->
         <el-form-item prop="last_frame_url">
           <template #label>
             <span class="flex-align-center gap-1">
-              尾帧图片
+              {{ t('workflow.imageToVideo.lastFrame.label') }}
               <MkTooltip placement="right">
                 <template #content>
                   <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>
@@ -177,18 +188,19 @@ onMounted(() => {
               </MkTooltip>
             </span>
           </template>
-          <NodeCascader v-model="formData.last_frame_url" :node-model="model" placeholder="请选择尾帧图片" />
+          <NodeCascader v-model="formData.last_frame_url" :node-model="model" :placeholder="t('workflow.imageToVideo.lastFrame.placeholder')" />
         </el-form-item>
 
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showSettings">
           <span class="flex-align-center gap-1">
-            返回内容
-            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            {{ t('workflow.returnContent.label') }}
+            <MkTooltip :content="t('workflow.returnContent.description')" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>
           <span>
+            <!-- 切换返回内容 -->
             <el-switch v-model="formData.is_result" size="small" />
           </span>
         </div>
