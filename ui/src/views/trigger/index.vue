@@ -280,5 +280,5 @@ onMounted(() => loadTriggers())
     </template>
   </MkViewLayout>
   <TriggerTaskRecordDrawer ref="recordDrawerRef" />
-  <TriggerFormDrawer :can-edit="perm.trigger.edit()" ref="triggerDrawerRef" @refresh="loadTriggers" />
+  <TriggerFormDrawer :can-edit="perm.trigger.edit()" ref="triggerDrawerRef" @refresh="loadTriggers" :can-create="perm.trigger.create()"/>
 </template>

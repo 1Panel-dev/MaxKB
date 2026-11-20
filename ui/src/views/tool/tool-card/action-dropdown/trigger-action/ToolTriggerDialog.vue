@@ -164,5 +164,6 @@ defineExpose({ open })
     @refresh="loadTriggers"
     @closed="handleFormClosed"
     :can-edit="toolTriggerPermission('triggerEdit')"
+    :can-create="toolTriggerPermission('triggerCreate')"
   />
 </template>
