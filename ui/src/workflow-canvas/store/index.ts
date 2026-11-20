@@ -10,6 +10,7 @@ import type {
   PromptGeneratePayload,
   ToolItem,
 } from '@/api/types'
+import { t } from '@/locales'
 
 export interface McpTool {
   args_schema: Record<string, unknown>
@@ -102,7 +103,8 @@ export function useWorkflowStore(resourceScope: string, getResourceWorkspaceId?:
       // 每次生成都需要独立的响应流，不缓存或复用在途请求。
       postPromptGenerate: requestApi.postPromptGenerate,
       postChatCompletion(modelId: string, payload: ChatCompletionPayload, signal?: AbortSignal): Promise<Response> {
-        if (!requestApi.postChatCompletion) return Promise.reject(new Error(`当前资源范围不支持流式补全: ${resourceScope}`))
+        if (!requestApi.postChatCompletion)
+          return Promise.reject(new Error(t('workflow.layout.streamingUnavailableMessage', { scope: resourceScope })))
         return requestApi.postChatCompletion(modelId, payload, signal)
       },
       getAllApplication(query?: Dict<unknown>): Promise<ApplicationDetail[]> {

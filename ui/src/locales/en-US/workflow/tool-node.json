@@ -1,4 +1,7 @@
 {
+  "toolStart": {
+    "outputLabel": "Parameter output"
+  },
   "mcp": {
     "label": "MCP call",
     "description": "Run tools on MCP servers over SSE or Streamable HTTP",

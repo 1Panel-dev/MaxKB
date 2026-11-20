@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ClickOutside as vClickOutside } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import type { NodeMenuItem } from '@/workflow-canvas/node-menu/types'
 import type { WorkflowMode } from '@/workflow-canvas/types'
 import NodeMenu from '@/workflow-canvas/node-menu/index.vue'
 
 defineOptions({ name: 'WorkflowNodeAdd' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineProps<{
   workflowMode: WorkflowMode
@@ -38,7 +41,7 @@ function handleDragStart(node: NodeMenuItem, event: PointerEvent) {
 
 <template>
   <div v-click-outside="() => (menuVisible = false)" class="relative">
-    <MkTooltip content="添加组件" placement="left">
+    <MkTooltip :content="t('workflow.layout.addComponent')" placement="left">
       <el-button text @click="toggleMenu">
         <MkIcon name="icon_more-add_filled" :size="18" />
       </el-button>

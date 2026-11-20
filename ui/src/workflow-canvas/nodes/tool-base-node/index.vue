@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ToolFieldConfig, ToolInputField, ToolOutputField } from './types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
@@ -10,14 +11,16 @@ import OutputFieldTable from './component/output/OutputFieldTable.vue'
 
 defineOptions({ name: 'WorkflowToolBaseNode' })
 
+const { t } = useI18n({ useScope: 'global' })
+
 const getModel = inject<() => WorkflowNodeModel>('getModel')!
 const model = getModel()
 
 // 工具参数保留 properties 顶层协议，初始化时补齐旧节点缺失的列表与标题。
 if (!Array.isArray(model.properties.user_input_field_list)) model.properties.user_input_field_list = []
 if (!Array.isArray(model.properties.user_output_field_list)) model.properties.user_output_field_list = []
-model.properties.user_input_config = { title: '用户输入', ...(model.properties.user_input_config as ToolFieldConfig | undefined) }
-model.properties.user_output_config = { title: '输出参数', ...(model.properties.user_output_config as ToolFieldConfig | undefined) }
+model.properties.user_input_config = { title: t('workflow.userInput.title'), ...(model.properties.user_input_config as ToolFieldConfig | undefined) }
+model.properties.user_output_config = { title: t('tool.outputParams.title'), ...(model.properties.user_output_config as ToolFieldConfig | undefined) }
 
 const inputFields = computed({
   get: () => model.properties.user_input_field_list as ToolInputField[],
@@ -58,7 +61,7 @@ onMounted(refreshFields)
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.node.setting') }}</h6>
     <div class="mk-gray-card space-y-4">
       <!-- 用户输入 -->
       <InputFieldTable v-model="inputFields" v-model:config="inputConfig" />

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ToolInputField } from '../tool-base-node/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
@@ -7,6 +8,8 @@ import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'WorkflowToolStartNode' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const getModel = inject<() => WorkflowNodeModel>('getModel')!
 const model = getModel()
@@ -44,7 +47,7 @@ onBeforeUnmount(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">全局变量</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.globalVariables.title') }}</h6>
     <div class="mk-gray-card space-y-4">
       <template v-for="field in globalFields" :key="field.value">
         <div class="group flex-between">

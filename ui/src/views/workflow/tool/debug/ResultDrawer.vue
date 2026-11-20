@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, provide, ref } from 'vue'
 import { cloneDeep } from 'lodash'
 import { v7 as uuidv7 } from 'uuid'
+import { useI18n } from 'vue-i18n'
 import type { ToolExecutionRecordDetail } from '@/api/types'
 import type { SendMessageOptions } from '@/conversation-panel/core/types'
 import WorkflowApi from '@/api/admin/workspace/tool/workflow'
@@ -15,6 +16,7 @@ import { WorkflowMode } from '@/workflow-canvas/types'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'ToolWorkflowDebugResultDrawer' })
+const { t } = useI18n({ useScope: 'global' })
 interface DebugBlock {
   id: string
   type: string
@@ -63,9 +65,9 @@ async function execute(extra: Record<string, unknown> = {}) {
     }
     if (!response.ok || !response.headers.get('content-type')?.includes('text/event-stream')) {
       const result = await response.json().catch(() => null)
-      throw new Error(result?.message || `调试请求失败（${response.status}）`)
+      throw new Error(result?.message || t('tool.debug.requestFailedMessage', { status: response.status }))
     }
-    if (!response.body) throw new Error('未收到调试响应')
+    if (!response.body) throw new Error(t('tool.debug.noResponseMessage'))
     let streamError: unknown
     stream = new ConversationStream(response, receiveChunk, (error?: unknown) => {
       console.log(error)
@@ -79,7 +81,7 @@ async function execute(extra: Record<string, unknown> = {}) {
     if (visible.value) record.value = result
   } catch (error) {
     if (visible.value) {
-      errorMessage.value = error instanceof Error ? error.message : '调试失败'
+      errorMessage.value = error instanceof Error ? error.message : t('tool.debug.failedMessage')
       MsgError(errorMessage.value)
     }
   } finally {
@@ -93,7 +95,10 @@ function resume(options: SendMessageOptions) {
   return execute({ form_data: options.formData, chat_record_id: options.chatRecordId, chunk_id: options.chunkId, position: options.position })
 }
 // 执行中或抽屉已关闭时不可续跑，表单随之禁用。
-provide(SEND_MESSAGE_KEY, computed(() => (running.value || !visible.value ? null : resume)))
+provide(
+  SEND_MESSAGE_KEY,
+  computed(() => (running.value || !visible.value ? null : resume)),
+)
 
 function open(parameters: Record<string, unknown>) {
   if (running.value) return
@@ -110,47 +115,47 @@ function close() {
   visible.value = false
   stream?.cancel()
 }
-provide(VIEW_KEY,VIEW_TYPE.CHAT)
+provide(VIEW_KEY, VIEW_TYPE.CHAT)
 onBeforeUnmount(close)
 defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="调试结果" class="mk-drawer-with-tabs" contentClass="pt-0" :modal="false" @close="close">
+  <MkDrawer v-model="visible" :title="t('tool.debug.debugResultTitle')" class="mk-drawer-with-tabs" contentClass="pt-0" :modal="false" @close="close">
     <template #header>
       <div class="-ml-2 flex-align-center">
         <!-- 返回输入参数 -->
         <el-button class="mr-1" text @click="visible = false">
           <MkIcon name="icon_arrow-left_outlined" :size="20" />
         </el-button>
-        <h4>调试结果</h4>
+        <h4>{{ t('tool.debug.debugResultTitle') }}</h4>
       </div>
     </template>
     <el-tabs v-model="activeTab">
-      <el-tab-pane label="输出" name="output">
-        <h4 class="mk-title-decoration mb-4 mt-6">回复内容</h4>
+      <el-tab-pane :label="t('execution.details.output')" name="output">
+        <h4 class="mk-title-decoration mb-4 mt-6">{{ t('workflow.reply.content.label') }}</h4>
 
         <el-card class="small" shadow="never">
           <ContentList :content-list="blocks" />
-          <div v-if="running">回答中...</div>
+          <div v-if="running" class="mk-dotting">{{ t('tool.debug.answering') }}</div>
         </el-card>
 
         <template v-if="record">
-          <h4 class="mk-title-decoration my-4">输出参数</h4>
+          <h4 class="mk-title-decoration my-4">{{ t('execution.details.outputParams') }}</h4>
           <el-alert
-            :title="record.state === 'SUCCESS' ? '运行成功' : '运行失败'"
+            :title="record.state === 'SUCCESS' ? t('tool.debug.runSuccess') : t('tool.debug.runFailed')"
             :type="record.state === 'SUCCESS' ? 'success' : 'error'"
             :closable="false"
             show-icon
             class="mb-4"
           />
-          <p class="my-4">输出</p>
+          <p class="my-4">{{ t('execution.details.output') }}</p>
           <el-card class="small whitespace-pre-wrap" shadow="never" :class="{ 'border-danger': record.state !== 'SUCCESS' }">
             {{ output }}
           </el-card>
         </template>
       </el-tab-pane>
-      <el-tab-pane label="执行详情" name="details">
+      <el-tab-pane :label="t('execution.details.title')" name="details">
         <ExecutionDetailContent class="mt-6" :detail="executionDetails" :workflow-mode="WorkflowMode.Tool"></ExecutionDetailContent>
       </el-tab-pane>
     </el-tabs>

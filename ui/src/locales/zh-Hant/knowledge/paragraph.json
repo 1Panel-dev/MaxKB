@@ -1,10 +1,6 @@
 {
   "paragraph": {
     "detailTitle": "分段詳情",
-    "heading": {
-      "label": "標題",
-      "placeholder": "請輸入標題"
-    },
     "content": {
       "label": "內容",
       "placeholder": "請輸入內容",

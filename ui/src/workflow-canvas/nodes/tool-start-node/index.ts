@@ -5,6 +5,7 @@ import { WorkflowNodeModel, WorkflowNodeView } from '@/workflow-canvas/core/work
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import ToolStartNodeDetail from './details/index.vue'
 import ToolStartNode from './index.vue'
+import { t } from '@/locales'
 
 class ToolStartNodeView extends WorkflowNodeView {
   constructor(props: ConstructorParameters<typeof WorkflowNodeView>[0]) {
@@ -17,7 +18,7 @@ class ToolStartNodeModel extends WorkflowNodeModel {
     const result: WorkflowNodeField[] = []
     result.push({
       value: 'global',
-      label: '全局变量',
+      label: t('workflow.globalVariables.title'),
       type: 'global',
       children: this.properties.config?.globalFields || [],
     })
@@ -30,7 +31,7 @@ class ToolStartNodeModel extends WorkflowNodeModel {
 
     result.push({
       value: 'output',
-      label: '参数输出',
+      label: t('workflow.toolStart.outputLabel'),
       type: 'output',
       children: output || [],
     })

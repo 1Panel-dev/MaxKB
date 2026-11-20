@@ -5,7 +5,40 @@
     "delete": {
       "title": "Delete node: {name}?",
       "batchTitle": "Delete the {count} selected node? | Delete the {count} selected nodes?"
-    }
+    },
+    "name": {
+      "label": "Node name",
+      "placeholder": "Enter a node name",
+      "duplicateMessage": "Node name already exists!"
+    },
+    "source": "Source",
+    "disabledMessage": "This node is disabled",
+    "applicationUnavailableMessage": "This agent is unavailable",
+    "toolUnavailableMessage": "This tool is unavailable",
+    "exception": {
+      "label": "Exception catching",
+      "messageLabel": "Exception information"
+    },
+    "executionCondition": {
+      "title": "Execution condition",
+      "prefix": "When",
+      "description": "connected predecessor nodes finish, run this node"
+    },
+    "setting": "Node settings",
+    "validation": {
+      "nextNodeMissing": "The next node does not exist",
+      "outsideFlow": "Nodes outside the workflow:{names}",
+      "unavailable": "Node {name} is unavailable",
+      "branchConnectionRequired": "The {branch} branch of node {name} must be connected",
+      "cannotEnd": "Node {name} cannot be an end node"
+    },
+    "copyDisabledMessage": "{name} cannot be copied",
+    "deleteDisabledMessage": "Node {name} cannot be deleted",
+    "apiParameters": {
+      "title": "API parameters"
+    },
+    "baseRequiredMessage": "A basic information node is required",
+    "baseUniqueMessage": "Only one basic information node is allowed"
   },
   "start": {
     "label": "Start",
@@ -15,7 +48,9 @@
     "chatUserId": "Chat user ID",
     "chatUserType": "Chat user type",
     "chatUserGroup": "Chat user group",
-    "chatUser": "Chat user"
+    "chatUser": "Chat user",
+    "requiredMessage": "A start node is required",
+    "uniqueMessage": "Only one start node is allowed"
   },
   "aiChat": {
     "label": "AI chat",

@@ -130,13 +130,17 @@
     }
   },
   "debug": {
-    "title": "Debug",
     "run": "Run",
     "resultTitle": "Run result",
     "runSuccess": "Run succeeded",
     "runFailed": "Run failed",
     "output": "Output",
-    "failureMessage": "The tool failed to run."
+    "failureMessage": "The tool failed to run.",
+    "debugResultTitle": "Debug result",
+    "answering": "Answering",
+    "requestFailedMessage": "Debug request failed ({status})",
+    "noResponseMessage": "No debug response received",
+    "failedMessage": "Debug failed"
   },
   "delete": {
     "title": "Delete tool: {name}?",

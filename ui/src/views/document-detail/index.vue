@@ -49,7 +49,7 @@ const paragraphTotal = ref(0)
 const loading = ref(false)
 const paragraphQuery = ref<ParagraphQuery>({})
 const searchFields = computed(() => [
-  { label: t('knowledge.paragraph.heading.label'), value: 'title' },
+  { label: t('common.title.label'), value: 'title' },
   { label: t('knowledge.paragraph.content.label'), value: 'content' },
 ])
 

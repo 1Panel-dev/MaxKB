@@ -22,6 +22,11 @@
     "requiredMessage": "請輸入名稱",
     "copySuffix": "副本"
   },
+  "title": {
+    "label": "標題",
+    "placeholder": "請輸入標題",
+    "requiredMessage": "請輸入標題"
+  },
   "description": {
     "label": "描述",
     "placeholder": "請輸入描述"
@@ -132,7 +137,8 @@
     "saveAndEnable": "儲存並啟用",
     "comfirm": "確定",
     "submit": "提交",
-    "testConnection": "測試連線"
+    "testConnection": "測試連線",
+    "debug": "偵錯"
   },
   "dialogs": {
     "notice": "提示",
@@ -191,7 +197,9 @@
     "selectRequired": "請選擇",
     "selectFieldRequired": "請選擇 {label}",
     "jsonFormat": "請輸入正確的 JSON 格式",
-    "lengthRange": "長度應為 {min}-{max} 個字元"
+    "lengthRange": "長度應為 {min}-{max} 個字元",
+    "jsonArrayRequired": "請輸入 JSON 陣列",
+    "jsonObjectRequired": "請輸入 JSON 物件"
   },
   "empty": {
     "default": "暫無資料",

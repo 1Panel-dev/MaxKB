@@ -1,10 +1,6 @@
 {
   "paragraph": {
     "detailTitle": "Segment details",
-    "heading": {
-      "label": "Title",
-      "placeholder": "Enter a title"
-    },
     "content": {
       "label": "Content",
       "placeholder": "Enter segment content",

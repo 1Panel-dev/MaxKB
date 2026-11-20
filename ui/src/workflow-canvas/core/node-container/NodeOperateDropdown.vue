@@ -77,7 +77,7 @@ async function saveNodeName(formInstance: FormInstance | null | undefined) {
       .filter((node) => node.id !== props.model.id)
       .some((node) => node.properties.stepName === nodeNameForm.value.title)
     if (nameExists) {
-      MsgError('节点名称已存在！')
+      MsgError(t('workflow.node.name.duplicateMessage'))
       return
     }
 
@@ -126,41 +126,48 @@ function deleteNode() {
       <MkDropdownMenu class="min-w-36">
         <MkDropdownItem @click="renameNode">
           <template #icon><MkIcon name="icon_rename_outlined" /></template>
-          重命名
+          {{ t('common.actions.rename') }}
         </MkDropdownItem>
         <MkDropdownItem @click="copyNode">
           <template #icon><MkIcon name="icon_copy_outlined" /></template>
-          复制
+          {{ t('common.actions.duplicate') }}
         </MkDropdownItem>
         <div v-if="canChangeEnabled" class="flex-between px-3 py-1" @click.stop>
           <span class="flex-align-center gap-2">
             <MkIcon name="icon_yes_outlined" class="text-N600!" />
-            <span>启用状态</span>
+            <span>{{ t('common.status.activeLabel') }}</span>
           </span>
 
           <el-switch v-model="nodeEnabled" size="small" />
         </div>
         <MkDropdownItem @click="deleteNode">
           <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-          删除
+          {{ t('common.actions.delete') }}
         </MkDropdownItem>
         <div v-if="sourceName" class="border-t mt-1 px-3 py-2" @click.stop>
-          <div class="text-sm text-N500">来源</div>
+          <div class="text-sm text-N500">{{ t('workflow.node.source') }}</div>
           <div class="mt-1 break-all text-N600">{{ sourceName }}</div>
         </div>
       </MkDropdownMenu>
     </template>
   </MkDropdown>
 
-  <MkDialog v-model="nodeNameDialogVisible" title="节点名称" append-to-body>
-    <el-form ref="titleFormRef" :model="nodeNameForm" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item prop="title" :rules="[{ whitespace: true, required: true, message: '请输入', trigger: 'blur' }]">
+  <MkDialog v-model="nodeNameDialogVisible" :title="t('workflow.node.name.label')" append-to-body>
+    <el-form
+      ref="titleFormRef"
+      :model="nodeNameForm"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item prop="title" :rules="[{ whitespace: true, required: true, message: t('common.validation.inputRequired'), trigger: 'blur' }]">
         <el-input v-model="nodeNameForm.title" @blur="nodeNameForm.title = nodeNameForm.title.trim()" />
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button plain @click.prevent="nodeNameDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="saveNodeName(titleFormRef)">保存</el-button>
+      <el-button plain @click.prevent="nodeNameDialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
+      <el-button type="primary" @click="saveNodeName(titleFormRef)">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

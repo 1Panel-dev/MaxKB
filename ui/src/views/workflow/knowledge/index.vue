@@ -142,7 +142,7 @@ function saveKnowledgeWorkflow(graphData = getGraphData(), showMessage = false) 
       savedDefaultModelSetting.value = cloneDeep(defaultModelSetting.value)
       saveTime.value = knowledgeWorkflow.update_time || new Date()
       setSavedWorkflow(workflowSnapshot)
-      if (showMessage) MsgSuccess('保存成功')
+      if (showMessage) MsgSuccess(t('common.messages.saveSuccess'))
       return knowledgeWorkflow
     })
     .catch((error) => {
@@ -201,7 +201,7 @@ const templateStoreButtonRef = useTemplateRef<InstanceType<typeof ButtonTemplate
 function handleUseTemplate(template: WorkflowStoreTemplate) {
   if (loading.value || historyVisible.value) return
 
-  return MsgConfirm('提示', `使用 ${template.name} 将覆盖当前工作流？`, {
+  return MsgConfirm(t('common.dialogs.notice'), t('workflow.layout.overwriteMessage', { name: template.name }), {
     confirmButtonText: t('common.actions.comfirm'),
     confirmButtonType: 'primary',
   })
@@ -210,7 +210,7 @@ function handleUseTemplate(template: WorkflowStoreTemplate) {
       return requestApi.putKnowledgeWorkflow(knowledgeId, { work_flow_template: cloneDeep(template) }).then(() => {
         return loadKnowledgeWorkflow().then(() => {
           templateStoreButtonRef.value?.close()
-          MsgSuccess('应用成功')
+          MsgSuccess(t('workflow.layout.applySuccess'))
         })
       })
     })
@@ -291,7 +291,7 @@ function handlePublish(payload: WorkflowVersionPayload) {
       knowledgeDetail.value = knowledge
       saveTime.value = knowledge.update_time || saveTime.value
       publishDialogRef.value?.close()
-      MsgSuccess('发布成功')
+      MsgSuccess(t('common.messages.publishSuccess'))
     })
     .finally(() => {
       loading.value = false
@@ -305,7 +305,7 @@ const importDocumentDrawerRef = useTemplateRef<InstanceType<typeof WorkflowImpor
 function handleImportDocument() {
   if (loading.value || historyVisible.value || importDocumentDrawerMounted.value || !knowledgeDetail.value) return
   if (!knowledgeDetail.value.is_publish) {
-    MsgWarning('当前知识库的工作流未发布，无法导入文档，请先发布工作流。')
+    MsgWarning(t('knowledge.workflow.documentImportUnavailableMessage'))
     return
   }
   closeDebug()
@@ -321,19 +321,19 @@ function handleImportWorkflow(uploadFile: UploadFile) {
   workflowUploadRef.value?.clearFiles()
   if (!file || loading.value || historyVisible.value) return
   if (!file.name.toLowerCase().endsWith('.kbwf')) {
-    MsgWarning('请选择 .kbwf 格式的工作流文件')
+    MsgWarning(t('workflow.layout.importFormatMessage', { format: '.kbwf' }))
     return
   }
   closeDebug()
   // 确认期间暂停自动保存，避免覆盖流程与旧草稿保存并发。
   loading.value = true
-  return MsgConfirm('提示', `使用 ${file.name.replace(/\.kbwf$/i, '')} 将覆盖当前工作流？`, {
+  return MsgConfirm(t('common.dialogs.notice'), t('workflow.layout.overwriteMessage', { name: file.name.replace(/\.kbwf$/i, '') }), {
     confirmButtonText: t('common.actions.comfirm'),
     confirmButtonType: 'primary',
   })
     .then(() => {
       return requestApi.importKnowledgeWorkflow(knowledgeId, file).then(() => {
-        return loadKnowledgeWorkflow().then(() => MsgSuccess('导入成功'))
+        return loadKnowledgeWorkflow().then(() => MsgSuccess(t('common.messages.importSuccess')))
       })
     })
     .catch(() => {
@@ -352,7 +352,7 @@ async function handleExportWorkflow() {
     if (hasUnsavedChanges()) await saveKnowledgeWorkflow()
     await requestApi.exportKnowledgeWorkflow(knowledgeId, knowledgeDetail.value.name)
   } catch {
-    MsgError('导出工作流失败')
+    MsgError(t('workflow.layout.exportFailedMessage'))
   } finally {
     loading.value = false
   }
@@ -404,9 +404,9 @@ function handleBack() {
 
   // 保存失败时保留当前页面，避免丢失尚未写入服务端的画布数据。
   loading.value = true
-  MsgConfirm('提示', '当前工作流尚未保存，是否保存后退出？', {
-    cancelButtonText: '直接退出',
-    confirmButtonText: '保存并退出',
+  MsgConfirm(t('common.dialogs.notice'), t('workflow.layout.unsavedExitMessage'), {
+    cancelButtonText: t('workflow.layout.exitDirectly'),
+    confirmButtonText: t('workflow.layout.saveAndExit'),
     confirmButtonType: 'primary',
     distinguishCancelAndClose: true,
   })
@@ -449,14 +449,20 @@ onBeforeUnmount(stopAutoSave)
     <template #actions>
       <!-- AI 生成工作流 -->
       <ButtonAiGenerate
-        label="AI 生成"
+        :label="t('workflow.layout.aiGenerate')"
         :disabled="loading || historyVisible"
         :get-logic-flow="() => workflowRef?.getLogicFlow()"
         :default-model-settings="defaultModelSetting"
         @open="closeDebug"
       />
       <!-- 模板中心 -->
-      <ButtonTemplateStore label="模板中心" ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
+      <ButtonTemplateStore
+        :label="t('resource.templateStore.title')"
+        ref="templateStoreButtonRef"
+        v-model:loading="loading"
+        @open="closeDebug"
+        @use="handleUseTemplate"
+      />
       <!-- 默认模型设置 -->
       <ButtonDefaultModelSetting
         :model-value="defaultModelSetting"
@@ -472,7 +478,7 @@ onBeforeUnmount(stopAutoSave)
       <ButtonDebug
         ref="debugButtonRef"
         v-model:loading="loading"
-        label="调试"
+        :label="t('common.actions.debug')"
         :api="requestApi"
         :knowledge-id="knowledgeId"
         :disabled="historyVisible"
@@ -483,24 +489,26 @@ onBeforeUnmount(stopAutoSave)
       />
 
       <!-- 保存 -->
-      <MkTooltip v-if="knowledgeWorkflowPermission('workflowEdit')" content="保存" placement="bottom">
+      <MkTooltip v-if="knowledgeWorkflowPermission('workflowEdit')" :content="t('common.actions.save')" placement="bottom">
         <el-button plain :disabled="loading" @click="handleSave" class="w-8! min-w-8!">
           <MkIcon name="icon_save_outlined" />
         </el-button>
       </MkTooltip>
       <!-- 发布 -->
-      <el-button v-if="knowledgeWorkflowPermission('publish')" type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
+      <el-button v-if="knowledgeWorkflowPermission('publish')" type="primary" :disabled="loading" @click="handleOpenPublish">
+        {{ t('common.actions.publish') }}
+      </el-button>
       <!-- 更多操作 -->
       <MkDropdown trigger="click" placement="bottom-end" class="ml-2" persistent>
         <el-button text class="h-7! w-7! px-0!">
           <MkIcon name="icon_more_outlined" class="rotate-90" :size="20" />
         </el-button>
         <template #dropdown>
-          <MkDropdownMenu class="w-37">
+          <MkDropdownMenu>
             <!-- 导入工作流文档 -->
             <MkDropdownItem :disabled="loading" @click="handleImportDocument">
               <template #icon><MkIcon name="icon_import_outlined" /></template>
-              <span>导入文档</span>
+              <span>{{ t('knowledge.document.import.title') }}</span>
             </MkDropdownItem>
             <!-- 导入工作流 -->
             <el-upload
@@ -515,19 +523,19 @@ onBeforeUnmount(stopAutoSave)
             >
               <MkDropdownItem :disabled="loading" class="w-full">
                 <template #icon><MkIcon name="icon_import_outlined" /></template>
-                <span>导入工作流</span>
+                <span>{{ t('workflow.layout.importWorkflow') }}</span>
               </MkDropdownItem>
             </el-upload>
             <!-- 导出工作流 -->
             <MkDropdownItem v-if="knowledgeWorkflowPermission('workflowExport')" @click="handleExportWorkflow">
               <template #icon><MkIcon name="icon_export_outlined" /></template>
-              <span>导出工作流</span>
+              <span>{{ t('workflow.layout.exportWorkflow') }}</span>
             </MkDropdownItem>
             <!-- 查看执行记录 -->
-            <ButtonExecutionRecord label="执行记录" :api="requestApi" :knowledge-id="knowledgeId" />
+            <ButtonExecutionRecord :label="t('execution.records.title')" :api="requestApi" :knowledge-id="knowledgeId" />
             <!-- 发布历史 -->
             <ButtonPublishHistory
-              label="发布历史"
+              :label="t('workflow.publishHistory.title')"
               :api="requestApi"
               :visible="historyVisible"
               @update:visible="handleHistoryVisibleChange"
@@ -542,7 +550,7 @@ onBeforeUnmount(stopAutoSave)
             <!-- 自动保存 -->
             <MkDropdownItem v-if="knowledgeWorkflowPermission('workflowEdit')" @click.stop>
               <template #icon><MkIcon name="icon_save_outlined" /></template>
-              <span>自动保存</span>
+              <span>{{ t('workflow.layout.autoSave') }}</span>
               <el-switch v-model="autoSaveEnabled" class="ml-auto" size="small" @click.stop @change="handleAutoSaveChange" />
             </MkDropdownItem>
           </MkDropdownMenu>

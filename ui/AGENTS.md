@@ -40,6 +40,7 @@ Pinia 3、Element Plus、Tailwind CSS 4 和 Sass；工作流画布基于 LogicFl
 | `src/router/`                           | Admin / Chat 独立 Router                                 |
 | `src/stores/admin/`、`src/stores/chat/` | 各入口独立 Pinia 实例和 Store                            |
 | `src/permission/`                       | 权限策略、业务权限方法及 Admin `$perm` 插件              |
+| `src/locales/`                          | 三语语言包、命名空间与各入口国际化初始化                 |
 | `src/styles/`                           | 全局样式、主题变量与第三方样式集成                       |
 | `src/constants/`、`src/utils/`          | 跨功能常量与工具                                         |
 | `src/assets/`、`public/`                | 源码导入资源／需要保留原文件名和 URL 的静态文件          |

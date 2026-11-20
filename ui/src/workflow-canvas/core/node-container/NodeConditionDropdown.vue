@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { BaseNodeModel } from '@logicflow/core'
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'NodeConditionDropdown' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ model: BaseNodeModel }>()
 const emit = defineEmits<{
@@ -54,14 +57,14 @@ const condition = computed({
     </el-button>
     <template #dropdown>
       <div class="w-84 px-4 py-3">
-        <h6>执行条件</h6>
+        <h6>{{ t('workflow.node.executionCondition.title') }}</h6>
         <div class="mt-2 flex-align-center gap-2">
-          <span>前置</span>
-          <el-select v-model="condition" size="small" class="w-15!">
-            <el-option label="所有" value="AND" />
-            <el-option label="任一" value="OR" />
+          <span>{{ t('workflow.node.executionCondition.prefix') }}</span>
+          <el-select v-model="condition" size="small" class="w-15! shrink-0">
+            <el-option :label="t('workflow.condition.match.all')" value="AND" />
+            <el-option :label="t('workflow.condition.match.any')" value="OR" />
           </el-select>
-          <span>连线节点执行完，执行当前节点</span>
+          <span>{{ t('workflow.node.executionCondition.description') }}</span>
         </div>
       </div>
     </template>

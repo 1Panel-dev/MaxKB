@@ -85,21 +85,14 @@ LogicFlow 的节点拖拽；仅拦截 `mousedown` 无法隔离当前版本的 Po
   `defaultToolNodes` 使用工具基本信息与工具开始，均作为空工作流的初始节点。
 - `constants.ts`：比较符选项、开始节点引用与文件引用示例；比较符也供动态表单显隐条件复用。
 
-国际化不得更改 `node-data.ts` 的数据属性名或结构，也不得增加 `labelKey`、`descriptionKey` 等属性。
-菜单名称、说明与搜索直接读取 `node-data.ts` 的 `label`、`text`，与 AI 节点目录共用节点定义，不维护独立的节点展示映射。
-`properties.stepName` 仍是节点默认名称和变量引用的来源，菜单展示与搜索不修改节点的保存数据。
+节点展示配置与已保存图数据分开：共享定义只读，创建节点或复制循环使用 cloneDeep。
+菜单、搜索和 AI 目录直接读取同一份 label、text；properties.stepName 和变量引用保留保存值。
+不修改 node-data.ts 的结构，不添加翻译 key 属性或独立展示映射。
 
-`compareList` 保留比较符协议值和顺序，`label` 使用 `reactive` 与 `computed(() => t(...))` 复用 `dynamicForm.operators`，
-调用方可直接读取字符串。AI 条件 schema 的比较符说明同样延迟计算，避免模块加载时读取尚未初始化的翻译。
-`FILE_REFERENCE_EXAMPLE` 只保存 JSON 示例字符串，
-展示处使用 `t('common.labels.example')` 组合提示标题，示例字段、地址和文件 ID 保持原样。
-
-配置数据中的函数应提取到对应职责文件，不把行为逻辑混入 `node-data.ts`。节点默认文案统一使用
-`reactive` 与 `computed(() => t(...))`，首次读取在国际化初始化之后。开始节点的用户问题和内置全局字段在初始化或回填时
-直接调用 `t` 生成当前语言的普通数据，保留用户自定义字段；节点实例不随语言切换重写字段。
-创建节点及复制嵌套循环时使用 `cloneDeep` 获取可编辑的普通数据，不直接修改共享节点定义；默认开场白与表单输出内容按创建时的语言取值，表单占位符 `{{form}}` 原样保留。文案分组与复用规则见 [国际化规则](../locales/LOCALE_README.md#工作流)。
-开始节点的默认 `stepName` 使用 `workflow.start.label`；默认用户问题引用及提示示例读取 `START_NODE_REFERENCES.question`，长期记忆引用读取 `START_NODE_REFERENCES.memory`。两者通过响应式配置以同一翻译拼接节点名称，调用方直接读取字符串，无需 `.value`。已有名称和已保存提示词沿用原值，引用示例保留双层花括号及字段名，不新增节点类型判断或翻译辅助函数。
-用户输入和表单节点的控件类型名称使用动态表单公开的 DYNAMIC_FORM_TYPES，在响应式展示配置中直接调用 t，组件读取 label；可选范围与顺序沿用节点约束，已保存字段与默认值不随语言变化。
+响应式默认文案、比较符、开始节点引用、默认开场白和控件类型的语言处理统一遵循
+[国际化规则](../locales/LOCALE_README.md#工作流)，不在此重复语言 key 清单。
+配置行为放在对应职责文件，初始化按当前语言生成普通数据，语言切换不重写节点实例。
+FILE_REFERENCE_EXAMPLE 只保存 JSON 示例，字段、地址与文件 ID 保持原样。
 
 ### `node-menu/`
 

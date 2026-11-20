@@ -83,8 +83,8 @@ defineExpose({ validate })
     class="min-w-0 flex-1"
     @submit.prevent
   >
-    <el-form-item :label="t('knowledge.paragraph.heading.label')" prop="title">
-      <el-input v-model="paragraphForm.title" maxlength="256" :placeholder="t('knowledge.paragraph.heading.placeholder')" />
+    <el-form-item :label="t('common.title.label')" prop="title">
+      <el-input v-model="paragraphForm.title" maxlength="256" :placeholder="t('common.title.placeholder')" />
     </el-form-item>
     <el-form-item :label="t('knowledge.paragraph.content.label')" prop="content">
       <MdEditor

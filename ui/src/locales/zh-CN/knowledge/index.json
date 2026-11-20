@@ -30,7 +30,8 @@
   "workflow": {
     "label": "工作流知识库",
     "createTitle": "创建工作流知识库",
-    "description": "通过自定义工作流方式构建知识库"
+    "description": "通过自定义工作流方式构建知识库",
+    "documentImportUnavailableMessage": "当前知识库的工作流未发布，无法导入文档，请先发布工作流。"
   },
   "fields": {
     "name": {

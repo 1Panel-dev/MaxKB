@@ -5,7 +5,40 @@
     "delete": {
       "title": "是否刪除節點：{name}？",
       "batchTitle": "是否刪除選取的{count}個節點？"
-    }
+    },
+    "name": {
+      "label": "節點名稱",
+      "placeholder": "請輸入節點名稱",
+      "duplicateMessage": "節點名稱已存在！"
+    },
+    "source": "來源",
+    "disabledMessage": "該節點已停用",
+    "applicationUnavailableMessage": "該智能體不可用",
+    "toolUnavailableMessage": "該工具不可用",
+    "exception": {
+      "label": "異常捕獲",
+      "messageLabel": "異常資訊"
+    },
+    "executionCondition": {
+      "title": "執行條件",
+      "prefix": "前置",
+      "description": "連線節點執行完，執行目前節點"
+    },
+    "setting": "節點設定",
+    "validation": {
+      "nextNodeMissing": "不存在的下一個節點",
+      "outsideFlow": "未在流程中的節點:{names}",
+      "unavailable": "{name} 節點不可用",
+      "branchConnectionRequired": "{name} 節點的{branch}分支需要連接",
+      "cannotEnd": "{name} 節點不能作為結束節點"
+    },
+    "copyDisabledMessage": "{name}不能被複製",
+    "deleteDisabledMessage": "{name}節點不允許刪除",
+    "apiParameters": {
+      "title": "介面傳參"
+    },
+    "baseRequiredMessage": "基本資訊節點必填",
+    "baseUniqueMessage": "基本資訊節點只能有一個"
   },
   "start": {
     "label": "開始",
@@ -15,7 +48,9 @@
     "chatUserId": "對話使用者 ID",
     "chatUserType": "對話使用者類型",
     "chatUserGroup": "對話使用者群組",
-    "chatUser": "對話使用者"
+    "chatUser": "對話使用者",
+    "requiredMessage": "開始節點必填",
+    "uniqueMessage": "開始節點只能有一個"
   },
   "aiChat": {
     "label": "AI 對話",

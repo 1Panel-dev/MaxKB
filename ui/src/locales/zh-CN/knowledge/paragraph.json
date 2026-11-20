@@ -1,10 +1,6 @@
 {
   "paragraph": {
     "detailTitle": "分段详情",
-    "heading": {
-      "label": "标题",
-      "placeholder": "请输入标题"
-    },
     "content": {
       "label": "内容",
       "placeholder": "请输入内容",

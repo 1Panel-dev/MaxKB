@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import type { Dict, ToolExecutionRecord } from '@/api/types'
@@ -22,24 +22,24 @@ const recordData = ref<ToolExecutionRecord[]>([])
 const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchInput = ref<Dict<unknown>>({})
 const orderBy = ref<string>()
-const sourceLabels = {
-  [TOOL_RECORD_SOURCE.APPLICATION]: '智能体',
-  [TOOL_RECORD_SOURCE.KNOWLEDGE]: '知识库',
-  [TOOL_RECORD_SOURCE.TOOL]: '工具',
-  [TOOL_RECORD_SOURCE.TRIGGER]: '触发器',
-}
-const sourceTypeOptions = [
+const sourceLabels = reactive({
+  [TOOL_RECORD_SOURCE.APPLICATION]: computed(() => t('application.title')),
+  [TOOL_RECORD_SOURCE.KNOWLEDGE]: computed(() => t('knowledge.title')),
+  [TOOL_RECORD_SOURCE.TOOL]: computed(() => t('tool.title')),
+  [TOOL_RECORD_SOURCE.TRIGGER]: computed(() => t('trigger.title')),
+})
+const sourceTypeOptions = computed(() => [
   { label: sourceLabels[TOOL_RECORD_SOURCE.APPLICATION], value: TOOL_RECORD_SOURCE.APPLICATION },
   { label: sourceLabels[TOOL_RECORD_SOURCE.KNOWLEDGE], value: TOOL_RECORD_SOURCE.KNOWLEDGE },
   { label: sourceLabels[TOOL_RECORD_SOURCE.TOOL], value: TOOL_RECORD_SOURCE.TOOL },
   { label: sourceLabels[TOOL_RECORD_SOURCE.TRIGGER], value: TOOL_RECORD_SOURCE.TRIGGER },
-]
+])
 const stateOptions = computed(() => [
   { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.SUCCESS].label, value: STATE_TYPES.SUCCESS },
   { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.STARTED].label, value: STATE_TYPES.STARTED },
   { label: EXECUTION_STATUS_OPTIONS[STATE_TYPES.FAILURE].label, value: STATE_TYPES.FAILURE },
 ])
-const searchFields = [{ label: '触发来源', value: 'source_name' }]
+const searchFields = computed(() => [{ label: t('execution.records.triggerSource'), value: 'source_name' }])
 const selectedSourceType = ref<string | null>(null)
 const selectedState = ref<string | null>(null)
 const searchQuery = computed<Dict<unknown>>(() => ({
@@ -131,7 +131,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="执行记录" size="840" @close="closeDetails" @closed="emit('closed')">
+  <MkDrawer v-model="visible" :title="t('execution.records.title')" size="840" @close="closeDetails" @closed="emit('closed')">
     <div class="mb-4">
       <MkComplexSearch v-if="visible" :fields="searchFields" @change="searchRecords" />
     </div>
@@ -145,7 +145,7 @@ defineExpose({ open })
       @size-change="loadRecords()"
       @sort-change="handleSortChange"
     >
-      <el-table-column label="触发来源" min-width="130" show-overflow-tooltip>
+      <el-table-column :label="t('execution.records.triggerSource')" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">
           <div class="flex-align-center gap-2">
             <ApplicationIcon v-if="row.source_type === TOOL_RECORD_SOURCE.APPLICATION" :icon="row.source_icon" :size="20" />
@@ -156,14 +156,20 @@ defineExpose({ open })
           </div>
         </template>
       </el-table-column>
-      <el-table-column v-if="isSystemSharedResource()" prop="workspace_name" label="工作空间" show-overflow-tooltip>
+      <el-table-column v-if="isSystemSharedResource()" prop="workspace_name" :label="t('workspace.title')" show-overflow-tooltip>
         <template #default="{ row }">
           {{ row.workspace_name }}
         </template>
       </el-table-column>
-      <el-table-column label="类型" width="90">
+      <el-table-column :label="t('common.labels.type')" width="90">
         <template #header>
-          <MkTableFilter mode="single" v-model="selectedSourceType" label="类型" :options="sourceTypeOptions" @change="handleFilterChange" />
+          <MkTableFilter
+            mode="single"
+            v-model="selectedSourceType"
+            :label="t('common.labels.type')"
+            :options="sourceTypeOptions"
+            @change="handleFilterChange"
+          />
         </template>
         <template #default="{ row }">{{ sourceLabels[row.source_type as keyof typeof sourceLabels] || '-' }}</template>
       </el-table-column>
@@ -187,16 +193,16 @@ defineExpose({ open })
           <span v-else>{{ row.state }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="耗时" width="90">
+      <el-table-column :label="t('common.labels.duration')" width="90">
         <template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template>
       </el-table-column>
-      <el-table-column label="执行时间" prop="create_time" width="180" sortable>
+      <el-table-column :label="t('execution.records.executionTime')" prop="create_time" width="180" sortable>
         <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="70">
+      <el-table-column :label="t('common.labels.operation')" width="70">
         <template #default="{ row }">
           <!-- 查看执行详情 -->
-          <MkTooltip content="执行详情" placement="top">
+          <MkTooltip :content="t('execution.details.title')" placement="top">
             <el-button text type="primary" @click="showDetails(row)"><MkIcon name="icon_describe_outlined" /></el-button>
           </MkTooltip>
         </template>

@@ -1,4 +1,7 @@
 {
+  "toolStart": {
+    "outputLabel": "参数输出"
+  },
   "mcp": {
     "label": "MCP 调用",
     "description": "通过 SSE/Streamable HTTP 方式执行MCP服务中的工具",

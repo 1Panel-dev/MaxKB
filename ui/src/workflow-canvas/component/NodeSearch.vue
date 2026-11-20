@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type LogicFlow from '@logicflow/core'
 import type { InputInstance } from 'element-plus'
 
 defineOptions({ name: 'WorkflowNodeSearch' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ logicFlow: LogicFlow }>()
 const searchInputRef = useTemplateRef<InputInstance>('searchInputRef')
@@ -87,9 +90,15 @@ onBeforeUnmount(() => {
   </el-button>
   <el-card v-if="searchVisible" shadow="always" class="workflow-search-container" style="--el-card-padding: 8px 12px">
     <div class="flex-align-center gap-1">
-      <el-input ref="searchInputRef" v-model="searchKeyword" clearable placeholder="请输入节点名称" @keyup.enter="searchNext(1)" />
+      <el-input
+        ref="searchInputRef"
+        v-model="searchKeyword"
+        clearable
+        :placeholder="t('workflow.node.name.placeholder')"
+        @keyup.enter="searchNext(1)"
+      />
       <span class="shrink-0">
-        {{ matchedNodes.length ? `${currentIndex + 1}/${matchedNodes.length}` : searchKeyword && '无结果' }}
+        {{ matchedNodes.length ? `${currentIndex + 1}/${matchedNodes.length}` : searchKeyword && t('workflow.layout.noResults') }}
       </span>
       <el-divider direction="vertical" class="mx-2!" />
       <el-button text @click="searchNext(-1)"><MkIcon name="icon_up_outlined" /></el-button>

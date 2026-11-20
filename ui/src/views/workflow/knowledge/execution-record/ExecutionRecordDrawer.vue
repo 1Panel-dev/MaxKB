@@ -22,7 +22,7 @@ const pagination = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchQuery = ref<Dict<unknown>>()
 const orderBy = ref<string>()
 const searchFields = computed(() => [
-  { label: '发起人', value: 'user_name' },
+  { label: t('execution.records.initiator'), value: 'user_name' },
   {
     label: t('common.status.label'),
     value: 'state',
@@ -129,7 +129,7 @@ function closeDetails() {
 /* 取消执行后刷新记录，关闭或卸载时停止轮询。 */
 const cancelling = ref(false)
 function cancelExecution(record: KnowledgeExecutionRecord) {
-  return MsgConfirm('提示', '是否取消当前执行任务？', { confirmButtonText: t('common.actions.comfirm') })
+  return MsgConfirm(t('common.dialogs.notice'), t('execution.cancel.title'), { confirmButtonText: t('common.actions.comfirm') })
     .then(() => {
       cancelling.value = true
       return props.api.postCancelKnowledgeWorkflowAction(props.knowledgeId, record.id).then(() => loadRecords())
@@ -152,7 +152,7 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="执行记录" size="840" @close="close" @closed="emit('closed')">
+  <MkDrawer v-model="visible" :title="t('execution.records.title')" size="840" @close="close" @closed="emit('closed')">
     <div class="mb-4">
       <MkComplexSearch v-if="visible" :fields="searchFields" class="w-76!" @change="searchRecords" />
     </div>
@@ -166,7 +166,7 @@ defineExpose({ open, close })
       @size-change="loadRecords()"
       @sort-change="handleSortChange"
     >
-      <el-table-column label="发起人" min-width="130" show-overflow-tooltip>
+      <el-table-column :label="t('execution.records.initiator')" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">{{ row.meta?.user_name || '-' }}</template>
       </el-table-column>
       <el-table-column :label="t('common.status.label')" width="100">
@@ -180,20 +180,24 @@ defineExpose({ open, close })
           <span v-else>{{ row.state }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="耗时" width="90">
+      <el-table-column :label="t('common.labels.duration')" width="90">
         <template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template>
       </el-table-column>
-      <el-table-column label="执行时间" prop="create_time" width="180" sortable>
+      <el-table-column :label="t('execution.records.executionTime')" prop="create_time" width="180" sortable>
         <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="100">
+      <el-table-column :label="t('common.labels.operation')" width="100">
         <template #default="{ row }">
           <!-- 查看执行详情 -->
-          <MkTooltip content="执行详情" placement="top">
+          <MkTooltip :content="t('execution.details.title')" placement="top">
             <el-button text type="primary" @click="showDetails(row)"><MkIcon name="icon_describe_outlined" /></el-button>
           </MkTooltip>
           <!-- 取消执行 -->
-          <MkTooltip v-if="row.state === STATE_TYPES.PENDING || row.state === STATE_TYPES.STARTED" content="取消执行" placement="top">
+          <MkTooltip
+            v-if="row.state === STATE_TYPES.PENDING || row.state === STATE_TYPES.STARTED"
+            :content="t('execution.cancel.label')"
+            placement="top"
+          >
             <el-button text type="danger" :disabled="cancelling || loading" @click="cancelExecution(row)">
               <MkIcon name="icon_close_outlined" />
             </el-button>

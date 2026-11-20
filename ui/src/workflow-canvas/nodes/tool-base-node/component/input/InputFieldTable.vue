@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ToolFieldConfig, ToolInputField } from '../../types'
 import InputFieldFormDialog from './InputFieldFormDialog.vue'
 import TitleSettingDialog from './TitleSettingDialog.vue'
 import { MsgError } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const fields = defineModel<ToolInputField[]>({ required: true })
 const config = defineModel<ToolFieldConfig>('config', { required: true })
@@ -14,7 +17,7 @@ const titleDialogRef = useTemplateRef<InstanceType<typeof TitleSettingDialog>>('
 // 表格只维护列表和重名检查，节点入口统一同步变量。
 function saveField(data: ToolInputField, index?: number) {
   if (fields.value.some((field, fieldIndex) => field.field === data.field && fieldIndex !== index)) {
-    MsgError(`参数已存在：${data.field}`)
+    MsgError(`${t('workflow.parameters.duplicateMessage')}：${data.field}`)
     return
   }
   const nextFields = cloneDeep(fields.value)
@@ -46,25 +49,25 @@ function saveTitle(data: ToolFieldConfig) {
       </div>
     </div>
     <MkTable v-if="fields.length" v-model:data="fields" size="small" row-key="field" class="mt-2 border" :max-height="undefined">
-      <el-table-column prop="field" label="参数" min-width="100">
+      <el-table-column prop="field" :label="t('dynamicForm.fields.parameter.label')" min-width="100">
         <template #default="{ row }">
           <span class="block truncate" :title="row.field">{{ row.field }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="label" label="显示名称" min-width="100">
+      <el-table-column prop="label" :label="t('dynamicForm.fields.displayName.label')" min-width="100">
         <template #default="{ row }">
           <span class="block truncate" :title="row.label">{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="type" label="数据类型" width="85">
-        <template #default="{ row }"
-          ><el-tag type="info" size="small">{{ row.type }}</el-tag></template
-        >
+      <el-table-column prop="type" :label="t('tool.inputParams.dataType.label')" width="90">
+        <template #default="{ row }">
+          <el-tag type="info" size="small">{{ row.type }}</el-tag>
+        </template>
       </el-table-column>
-      <el-table-column label="必填" width="55">
+      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="90">
         <template #default="{ row }"><el-switch :model-value="Boolean(row.is_required)" disabled size="small" /></template>
       </el-table-column>
-      <el-table-column label="操作" width="80">
+      <el-table-column :label="t('common.labels.operation')" width="80">
         <template #default="{ row, $index }">
           <!-- 编辑参数 -->
           <el-button text type="primary" @click="fieldDialogRef?.open(row, $index)"><MkIcon name="icon_edit_outlined" /></el-button>

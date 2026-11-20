@@ -58,16 +58,16 @@ watch(
         <el-button class="mr-1" text @click="visible = false">
           <MkIcon name="icon_arrow-left_outlined" :size="20" />
         </el-button>
-        <h4>执行详情</h4>
+        <h4>{{ t('execution.details.title') }}</h4>
       </div>
     </template>
     <div v-loading="loading">
       <!-- 执行记录 -->
-      <h4 class="mk-title-decoration mb-4">执行记录</h4>
+      <h4 class="mk-title-decoration mb-4">{{ t('execution.records.title') }}</h4>
       <el-card shadow="never">
         <div class="grid grid-cols-4 gap-4">
           <div class="min-w-0">
-            <p class="mb-1 text-N600">发起人</p>
+            <p class="mb-1 text-N600">{{ t('execution.records.initiator') }}</p>
             <p>{{ detail?.meta?.user_name || record.meta?.user_name || '-' }}</p>
           </div>
           <div>
@@ -81,17 +81,17 @@ watch(
             <span v-else>{{ detail?.state ?? record.state }}</span>
           </div>
           <div>
-            <p class="mb-1 text-N600">耗时</p>
+            <p class="mb-1 text-N600">{{ t('common.labels.duration') }}</p>
             {{ runTime == null ? '-' : `${runTime.toFixed(2)} s` }}
           </div>
           <div>
-            <p class="mb-1 text-N600">执行时间</p>
+            <p class="mb-1 text-N600">{{ t('execution.records.executionTime') }}</p>
             {{ datetimeFormat(record.create_time) }}
           </div>
         </div>
       </el-card>
       <!-- 执行详情 -->
-      <h4 class="mk-title-decoration my-4">执行详情</h4>
+      <h4 class="mk-title-decoration my-4">{{ t('execution.details.title') }}</h4>
 
       <div v-if="detail" class="space-y-2">
         <ExecutionDetailContent v-if="nodeDetails.length" :detail="nodeDetails" :workflow-mode="WorkflowMode.Knowledge" />
@@ -99,9 +99,9 @@ watch(
     </div>
     <template #footer>
       <!-- 浏览上一个执行记录 -->
-      <el-button plain :disabled="previousDisabled || loading" @click="emit('previous')">上一个</el-button>
+      <el-button plain :disabled="previousDisabled || loading" @click="emit('previous')">{{ t('common.actions.previousItem') }}</el-button>
       <!-- 浏览下一个执行记录 -->
-      <el-button plain :disabled="nextDisabled || loading" @click="emit('next')">下一个</el-button>
+      <el-button plain :disabled="nextDisabled || loading" @click="emit('next')">{{ t('common.actions.nextItem') }}</el-button>
     </template>
   </MkDrawer>
 </template>

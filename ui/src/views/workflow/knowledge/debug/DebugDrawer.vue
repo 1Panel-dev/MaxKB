@@ -57,7 +57,7 @@ const knowledgeBaseNode = computed(() => currentWorkflow.value?.nodes?.find((nod
 const hasKnowledgeBaseInput = computed(
   () => ((knowledgeBaseNode.value?.properties?.user_input_field_list as FormField[] | undefined)?.length ?? 0) > 0,
 )
-const userInputTitle = computed(() => knowledgeBaseNode.value?.properties?.user_input_config?.title || '用户输入')
+const userInputTitle = computed(() => knowledgeBaseNode.value?.properties?.user_input_config?.title || t('workflow.userInput.title'))
 const activeStep = computed(() => ({ data_source: 0, knowledge_base: 1, result: 2 })[active.value])
 
 const showNext = computed(() => hasKnowledgeBaseInput.value && active.value === 'data_source')
@@ -152,7 +152,7 @@ defineExpose({ open, close })
   <MkDrawer v-model="visible" direction="btt" @closed="handleClosed">
     <template #header>
       <div class="flex w-full">
-        <h4>调试</h4>
+        <h4>{{ t('common.actions.debug') }}</h4>
         <el-steps v-if="hasKnowledgeBaseInput" :active="activeStep" finish-status="success" class="absolute-center w-85!">
           <el-step :title="t('resource.dataSource.selectTitle')" />
           <el-step :title="userInputTitle" />
@@ -175,17 +175,17 @@ defineExpose({ open, close })
 
     <template #footer>
       <!-- 取消导入 -->
-      <el-button plain v-if="active !== 'result'" :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain v-if="active !== 'result'" :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 继续导入 -->
-      <el-button v-if="active === 'result'" plain @click="continueImporting">继续导入</el-button>
+      <el-button v-if="active === 'result'" plain @click="continueImporting">{{ t('knowledge.document.import.continue') }}</el-button>
       <!-- 返回数据源 -->
-      <el-button v-if="showPrev" plain :disabled="loading" @click="prev">上一步</el-button>
+      <el-button v-if="showPrev" plain :disabled="loading" @click="prev">{{ t('common.actions.previous') }}</el-button>
       <!-- 进入用户输入 -->
-      <el-button v-if="showNext" type="primary" :disabled="loading" @click="next">下一步</el-button>
+      <el-button v-if="showNext" type="primary" :disabled="loading" @click="next">{{ t('common.actions.next') }}</el-button>
       <!-- 开始导入 -->
-      <el-button v-if="showImport" type="primary" :loading="loading" @click="submit">开始导入</el-button>
+      <el-button v-if="showImport" type="primary" :loading="loading" @click="submit">{{ t('knowledge.document.import.start') }}</el-button>
       <!-- 前往工作流知识库文档 -->
-      <el-button v-if="active === 'result'" type="primary" @click="handleGoToDocuments">前往文档</el-button>
+      <el-button v-if="active === 'result'" type="primary" @click="handleGoToDocuments">{{ t('knowledge.document.import.goToDocuments') }}</el-button>
     </template>
   </MkDrawer>
 </template>

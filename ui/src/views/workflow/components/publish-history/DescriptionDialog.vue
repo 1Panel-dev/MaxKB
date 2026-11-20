@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 defineOptions({ name: 'DescriptionDialog' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const visible = ref(false)
 const description = ref('')
@@ -15,8 +18,8 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="更新说明" @closed="description = ''">
-    {{ description || '暂无更新说明' }}
+  <MkDialog v-model="visible" :title="t('workflow.publishHistory.descriptionLabel')" @closed="description = ''">
+    {{ description || t('workflow.publishHistory.emptyDescription') }}
   </MkDialog>
 </template>
 

@@ -2,6 +2,7 @@
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { reaction } from '@logicflow/core'
 import { cloneDeep, escape, escapeRegExp } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { NodeMenuItem } from '@/workflow-canvas/node-menu/types'
 import type { WorkflowNodeField } from '@/workflow-canvas/types'
 import type { BaseNodeModel, Model } from '@logicflow/core'
@@ -14,6 +15,8 @@ import NodeOperateDropdown from './NodeOperateDropdown.vue'
 import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'NodeContainer' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 type NodeContainerProperties = {
   config?: { fields?: WorkflowNodeField[]; output_title?: string }
@@ -140,13 +143,13 @@ const nodeFields = computed(() => {
 })
 
 const output_title = computed(() => {
-  return nodeProperties.value.config?.output_title ?? '输出参数'
+  return nodeProperties.value.config?.output_title ?? t('execution.details.outputParams')
 })
 
 const abnormalNodeFields = computed(() => {
   return [
     {
-      label: '异常信息',
+      label: t('workflow.node.exception.messageLabel'),
       value: 'exception_message',
       globeLabel: `{{${model.properties.stepName}.exception_message}}`,
       globeValue: `{{context['${model.id}'].exception_message}}`,
@@ -297,11 +300,15 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <el-alert v-if="nodeDisabled" class="mt-4!" title="该节点已禁用" type="error" show-icon :closable="false" />
+        <el-alert v-if="nodeDisabled" class="mt-4!" :title="t('workflow.node.disabledMessage')" type="error" show-icon :closable="false" />
         <el-alert
           v-if="node_status != 200"
           class="mt-4!"
-          :title="String(model.type) === WorkflowNodeType.Application ? '该智能体不可用' : '该工具不可用'"
+          :title="
+            String(model.type) === WorkflowNodeType.Application
+              ? t('workflow.node.applicationUnavailableMessage')
+              : t('workflow.node.toolUnavailableMessage')
+          "
           type="error"
           show-icon
           :closable="false"
@@ -313,11 +320,11 @@ onBeforeUnmount(() => {
 
             <!-- 输出参数 -->
             <template v-if="nodeFields.length > 0">
-              <div class="flex-between mt-2">
-                <h6 class="mk-title-decoration my-2">{{ output_title }}</h6>
-                <div v-if="exceptionNodeList.includes(String(model.type))" class="flex-align-center gap-2">
-                  <span>异常捕获</span>
-                  <el-switch v-model="enable_exception" size="small" />
+              <div class="flex-between mt-2 gap-2">
+                <h6 class="mk-title-decoration my-2 shrink-0">{{ output_title }}</h6>
+                <div v-if="exceptionNodeList.includes(String(model.type))" class="min-w-0 flex flex-1 flex-wrap items-center justify-end gap-2">
+                  <span class="whitespace-nowrap">{{ t('workflow.node.exception.label') }}</span>
+                  <el-switch v-model="enable_exception" class="shrink-0" size="small" />
                 </div>
               </div>
               <div class="mk-gray-card space-y-4">

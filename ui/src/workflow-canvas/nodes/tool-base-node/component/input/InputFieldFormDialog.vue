@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ToolInputField } from '../../types'
 import type { FormInstance, FormRules } from 'element-plus'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const typeOptions = ['string', 'int', 'dict', 'array', 'float', 'boolean']
 const emit = defineEmits<{ submit: [data: ToolInputField, index?: number] }>()
@@ -10,10 +13,10 @@ const formRef = useTemplateRef<FormInstance>('formRef')
 const dialogVisible = ref(false)
 const editingIndex = ref<number>()
 const form = ref<ToolInputField>(createField())
-const rules: FormRules<ToolInputField> = {
-  field: [{ whitespace: true, required: true, message: '请输入参数', trigger: 'blur' }],
-  label: [{ whitespace: true, required: true, message: '请输入显示名', trigger: 'blur' }],
-}
+const rules = computed<FormRules<ToolInputField>>(() => ({
+  field: [{ whitespace: true, required: true, message: t('dynamicForm.fields.parameter.requiredMessage'), trigger: 'blur' }],
+  label: [{ whitespace: true, required: true, message: t('dynamicForm.fields.displayName.requiredMessage'), trigger: 'blur' }],
+}))
 
 function createField(): ToolInputField {
   return { field: '', type: 'string', label: '', desc: '', is_required: true }
@@ -47,34 +50,64 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" :title="editingIndex === undefined ? '添加参数' : '编辑参数'" @closed="resetData">
-    <el-form label-position="top" ref="formRef" :rules="rules" :model="form" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="参数" prop="field">
-        <el-input v-model="form.field" placeholder="请输入参数" :maxlength="64" show-word-limit @blur="form.field = form.field.trim()" />
+  <MkDialog
+    v-model="dialogVisible"
+    :title="editingIndex === undefined ? t('common.parameters.add') : t('common.parameters.edit')"
+    @closed="resetData"
+  >
+    <el-form
+      label-position="top"
+      ref="formRef"
+      :rules="rules"
+      :model="form"
+      :validate-on-rule-change="false"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('dynamicForm.fields.parameter.label')" prop="field">
+        <el-input
+          v-model="form.field"
+          :placeholder="t('dynamicForm.fields.parameter.placeholder')"
+          :maxlength="64"
+          show-word-limit
+          @blur="form.field = form.field.trim()"
+        />
       </el-form-item>
-      <el-form-item label="显示名称" prop="label">
-        <el-input v-model="form.label" placeholder="请输入显示名称" :maxlength="128" show-word-limit @blur="form.label = form.label?.trim()" />
+      <el-form-item :label="t('dynamicForm.fields.displayName.label')" prop="label">
+        <el-input
+          v-model="form.label"
+          :placeholder="t('dynamicForm.fields.displayName.placeholder')"
+          :maxlength="128"
+          show-word-limit
+          @blur="form.label = form.label?.trim()"
+        />
       </el-form-item>
-      <el-form-item label="描述">
-        <el-input v-model="form.desc" placeholder="请输入描述" :maxlength="128" show-word-limit @blur="form.desc = form.desc?.trim()" />
+      <el-form-item :label="t('common.description.label')">
+        <el-input
+          v-model="form.desc"
+          :placeholder="t('common.description.placeholder')"
+          :maxlength="128"
+          show-word-limit
+          @blur="form.desc = form.desc?.trim()"
+        />
       </el-form-item>
-      <el-form-item label="数据类型">
+      <el-form-item :label="t('tool.inputParams.dataType.label')">
         <el-select v-model="form.type">
           <el-option v-for="fieldType in typeOptions" :key="fieldType" :label="fieldType" :value="fieldType" />
         </el-select>
       </el-form-item>
 
-      <el-form-item label="必填">
+      <el-form-item :label="t('dynamicForm.fields.required.columnLabel')">
         <el-switch size="small" v-model="form.is_required" />
       </el-form-item>
     </el-form>
     <template #footer>
       <span>
         <!-- 取消编辑 -->
-        <el-button plain @click="dialogVisible = false">取消</el-button>
+        <el-button plain @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
         <!-- 提交参数 -->
         <el-button type="primary" @click="submitField">
-          {{ editingIndex === undefined ? '添加' : '保存' }}
+          {{ editingIndex === undefined ? t('common.actions.add') : t('common.actions.save') }}
         </el-button>
       </span>
     </template>

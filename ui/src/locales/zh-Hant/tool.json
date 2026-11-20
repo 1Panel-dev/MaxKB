@@ -130,13 +130,17 @@
     }
   },
   "debug": {
-    "title": "偵錯",
     "run": "執行",
     "resultTitle": "執行結果",
     "runSuccess": "執行成功",
     "runFailed": "執行失敗",
     "output": "輸出",
-    "failureMessage": "工具執行失敗"
+    "failureMessage": "工具執行失敗",
+    "debugResultTitle": "除錯結果",
+    "answering": "回答中",
+    "requestFailedMessage": "除錯請求失敗（{status}）",
+    "noResponseMessage": "未收到除錯回應",
+    "failedMessage": "除錯失敗"
   },
   "delete": {
     "title": "是否刪除工具：{name}？",

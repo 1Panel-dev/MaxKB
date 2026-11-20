@@ -33,9 +33,12 @@ Vite 仅扫描 `src/components/global`，当前没有 `globsExclude` 配置；�
 
 Element Plus 已在 Admin、Chat 入口注册。使用前先检查原生 API，避免重复实现已有能力。
 
-手动组件从具体入口导入；动态表单通过自己的公开入口导入：
+手动组件从具体入口导入；动态表单通过 `@/components/mk-dynamics-form` 的公开入口导入。
 
 ## 通用规则
+
+组件内部文案的分类、语言状态和响应式翻译统一见
+[国际化规则](../locales/LOCALE_README.md)。本页维护组件接口与交互边界。
 
 - 按钮组件统一使用 `Button` 前缀：操作按钮按 `Button + 动作 + 对象` 命名，例如
   `ButtonAddModel`、`ButtonImportUsers`；功能入口按 `Button + 功能名称` 命名，例如
