@@ -108,7 +108,11 @@ class WorkflowManage:
         with self._lock:
             from application.workflow.nodes import get_node_class
 
-            instances = [get_node_class(n.type, self.workflow_type)(n, self, get_node_parameters) for n in nodes]
+            instances = [
+                get_node_class(n.type, self.workflow_type)(n, self, get_node_parameters)
+                for n in nodes
+                if (n.properties.get("disabled") != True)
+            ]
             self.nodes.extend(instances)
             for node in instances:
                 self.node_dict[node.node.id] = node
