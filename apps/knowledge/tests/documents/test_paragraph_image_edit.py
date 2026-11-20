@@ -66,6 +66,7 @@ class ParagraphImageEditTests(SimpleTestCase):
         self.assets = [self.original_asset]
         self.enterContext(patch("django.db.transaction.Atomic.__enter__"))
         self.enterContext(patch("django.db.transaction.Atomic.__exit__", return_value=False))
+        self.enterContext(patch.object(Document, "objects"))
         self.enterContext(patch("knowledge.services.paragraph_assets.validate_paragraph_file_references"))
         self.enterContext(patch.object(ParagraphAsset, "save", autospec=True, side_effect=self.save_asset))
         self.enterContext(patch.object(Paragraph, "save", autospec=True))

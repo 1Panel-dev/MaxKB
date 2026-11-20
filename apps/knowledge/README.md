@@ -134,8 +134,9 @@ Moving shared images to another knowledge base separates their file ownership re
 reusing the stored bytes, so access checks and later paragraph deletion remain independent.
 
 Moving paragraphs between documents places them at the start of the target document in source
-order. The target treats them as manual paragraphs during synchronization. Their image assets
-keep their IDs and recognition results and receive keys independent of the source document.
+order. Web incremental sync keeps these manual paragraphs at the front and includes their text
+in the document character count. Their image assets keep their IDs and recognition results and
+receive keys independent of the source document.
 
 ## Paragraph deletion
 

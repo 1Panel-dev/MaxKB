@@ -1,6 +1,14 @@
-from django.test import TestCase
+from concurrent.futures import ThreadPoolExecutor
+from queue import Queue
+from time import monotonic, sleep
 
-from knowledge.models import ContentOrigin, Document, Embedding, File, FileSourceType, Knowledge, Paragraph
+from common.exception.app_exception import AppApiException
+from django.db import connection, connections, transaction
+from django.test import TestCase, TransactionTestCase
+from django.utils.translation import gettext as _
+
+from knowledge.models import ContentOrigin, Document, Embedding, File, FileSourceType, Knowledge, KnowledgeFolder
+from knowledge.models import KnowledgeType, LocalState, Paragraph
 from knowledge.models import Problem, ProblemParagraphMapping, SourceType
 from knowledge.serializers.paragraph import ParagraphSerializers
 from knowledge.services.incremental_sync import IncrementalDocumentSync, prepare_remote_paragraphs
@@ -144,3 +152,162 @@ class ParagraphMigrationTests(TestCase):
         self.assertEqual(
             [(item.id, item.file_id, item.description) for item in synced], [(asset.id, image.id, "Recognized image")]
         )
+
+    def test_batch_stays_at_start_after_web_source_changes_and_replaces_headings(self):
+        target = Document.objects.create(knowledge=self.knowledge, name="Web", type=KnowledgeType.WEB, char_length=0)
+        sync = IncrementalDocumentSync(target)
+        sync.merge([{"title": "Old heading", "content": "Old"}])
+        first = self.imported_paragraph(self.source, "First")
+        second = Paragraph.objects.create(knowledge=self.knowledge, document=self.source, content="Second", position=2)
+        self.migrate(target, second, first)
+
+        for title in ("Replacement heading", "Another heading"):
+            sync.merge([{"title": title, "content": title}])
+            self.assertEqual(
+                list(
+                    target.paragraph_set.filter(is_active=True).order_by("position").values_list("content", flat=True)
+                ),
+                [first.content, second.content, title],
+            )
+
+    def test_move_into_empty_web_document_stays_before_first_sync(self):
+        target = Document.objects.create(knowledge=self.knowledge, name="Web", type=KnowledgeType.WEB, char_length=0)
+        moved = self.imported_paragraph(self.source, "Moved")
+        self.migrate(target, moved)
+        IncrementalDocumentSync(target).merge([{"content": "First remote paragraph"}])
+        self.assertEqual(target.paragraph_set.earliest("position"), moved)
+
+    def test_web_sync_keeps_user_insertions_ahead_of_a_previously_moved_paragraph(self):
+        target = Document.objects.create(knowledge=self.knowledge, name="Web", type=KnowledgeType.WEB, char_length=0)
+        self.imported_paragraph(target, "Old")
+        moved = self.imported_paragraph(self.source, "Moved")
+        self.migrate(target, moved)
+        ParagraphSerializers.Create(
+            data={"workspace_id": "default", "knowledge_id": str(self.knowledge.id), "document_id": str(target.id)}
+        ).save({"content": "New note"}, with_embedding=False)
+
+        IncrementalDocumentSync(target).merge([{"content": "Updated"}])
+        self.assertEqual(
+            list(target.paragraph_set.order_by("position").values_list("content", flat=True)),
+            ["New note", "Moved", "Updated"],
+        )
+
+    def test_web_sync_preserves_existing_unanchored_prefix_and_trailing_note(self):
+        target = Document.objects.create(knowledge=self.knowledge, name="Web", type=KnowledgeType.WEB, char_length=0)
+        remote = self.imported_paragraph(target, "Original")
+        remote.position = 2
+        remote.save(update_fields=["position"])
+        for position, content in [(1, "Previously moved"), (3, "Trailing note")]:
+            Paragraph.objects.create(knowledge=self.knowledge, document=target, content=content, position=position)
+
+        IncrementalDocumentSync(target).merge([{"content": "Updated"}])
+        self.assertEqual(
+            list(target.paragraph_set.order_by("position").values_list("content", flat=True)),
+            ["Previously moved", "Updated", "Trailing note"],
+        )
+
+    def test_web_sync_counts_moved_and_disabled_content_and_excludes_local_deletions(self):
+        target = Document.objects.create(knowledge=self.knowledge, name="Web", type=KnowledgeType.WEB, char_length=0)
+        self.imported_paragraph(target, "Old")
+        moved = self.imported_paragraph(self.source, "迁入段落")
+        self.migrate(target, moved)
+        Paragraph.objects.create(knowledge=self.knowledge, document=target, content="Disabled", is_active=False)
+        Paragraph.objects.create(
+            knowledge=self.knowledge,
+            document=target,
+            content="Deleted",
+            local_state=LocalState.DELETED,
+            is_active=False,
+        )
+
+        IncrementalDocumentSync(target).merge([{"content": "Changed"}])
+        target.refresh_from_db()
+        self.assertEqual(target.char_length, len("迁入段落DisabledChanged"))
+
+    def test_batch_delete_from_stale_source_keeps_both_documents_intact(self):
+        moved = self.imported_paragraph(self.source, "Moved")
+        remaining = Paragraph.objects.create(knowledge=self.knowledge, document=self.source, content="Keep")
+        target = Document.objects.create(knowledge=self.knowledge, name="Target", char_length=0)
+        self.migrate(target, moved)
+        batch = ParagraphSerializers.Batch(
+            data={"workspace_id": "default", "knowledge_id": str(self.knowledge.id), "document_id": str(self.source.id)}
+        )
+        with self.assertRaises(AppApiException):
+            batch.batch_delete({"id_list": [str(moved.id), str(remaining.id)]})
+        self.assertEqual(target.paragraph_set.get(), moved)
+        self.assertEqual(self.source.paragraph_set.get(), remaining)
+
+
+class ConcurrentParagraphMigrationTests(TransactionTestCase):
+    def setUp(self):
+        KnowledgeFolder.objects.get_or_create(id="default", defaults={"name": "Root"})
+        self.knowledge = Knowledge.objects.create(name="Knowledge")
+        self.source = Document.objects.create(knowledge=self.knowledge, name="Source", char_length=0)
+        self.target = Document.objects.create(knowledge=self.knowledge, name="Target", char_length=0)
+        self.paragraph = Paragraph.objects.create(knowledge=self.knowledge, document=self.source, content="Original")
+        self.scope = {
+            "workspace_id": "default",
+            "knowledge_id": str(self.knowledge.id),
+            "document_id": str(self.source.id),
+        }
+
+    def migrate(self):
+        ParagraphSerializers.Migrate(
+            data={
+                **self.scope,
+                "target_knowledge_id": str(self.knowledge.id),
+                "target_document_id": str(self.target.id),
+                "paragraph_id_list": [str(self.paragraph.id)],
+            }
+        ).migrate()
+
+    def edit(self):
+        ParagraphSerializers.Operate(data={**self.scope, "paragraph_id": str(self.paragraph.id)}).edit(
+            {"title": "Edit", "is_active": True}
+        )
+
+    def start_blocked_operation(self, pool, operation):
+        worker_pid = Queue()
+
+        def run():
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT pg_backend_pid()")
+                    worker_pid.put(cursor.fetchone()[0])
+                operation()
+            finally:
+                connections.close_all()
+
+        future = pool.submit(run)
+        pid = worker_pid.get(timeout=5)
+        with connection.cursor() as cursor:
+            deadline = monotonic() + 5
+            while monotonic() < deadline:
+                cursor.execute("SELECT pg_backend_pid() = ANY(pg_blocking_pids(%s))", [pid])
+                if cursor.fetchone()[0]:
+                    return future
+                if future.done():
+                    future.result()
+                    break
+                sleep(0.01)
+        self.fail("The concurrent operation did not wait for the transaction")
+
+    def test_edit_waits_for_migration_and_rejects_the_stale_source_document(self):
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            with transaction.atomic():
+                Document.objects.select_for_update().get(id=self.source.id)
+                future = self.start_blocked_operation(pool, self.edit)
+                self.migrate()
+            with self.assertRaisesMessage(AppApiException, _("Paragraph id does not exist")):
+                future.result(timeout=5)
+        self.paragraph.refresh_from_db()
+        self.assertEqual((self.paragraph.document_id, self.paragraph.title), (self.target.id, ""))
+
+    def test_migration_waits_for_edit_and_moves_the_edited_content(self):
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            with transaction.atomic():
+                self.edit()
+                future = self.start_blocked_operation(pool, self.migrate)
+            future.result(timeout=5)
+        self.paragraph.refresh_from_db()
+        self.assertEqual((self.paragraph.document_id, self.paragraph.title), (self.target.id, "Edit"))

@@ -55,6 +55,11 @@ from knowledge.task.embedding import (
 from knowledge.task.generate import generate_related_by_paragraph_id_list
 
 
+def _lock_paragraph_documents(*document_ids):
+    # Match incremental sync's document-first lock order, including moves in opposite directions.
+    list(Document.objects.select_for_update().filter(id__in=document_ids).order_by("id").values_list("id", flat=True))
+
+
 class NullCharacterStrippedCharField(serializers.CharField):
     def to_internal_value(self, data):
         if isinstance(data, str):
@@ -254,7 +259,7 @@ class ParagraphSerializers(serializers.Serializer):
         # 文档id
         document_id = serializers.UUIDField(required=True, label=_("document id"))
 
-        def is_valid(self, *, raise_exception=True):
+        def is_valid(self, *, raise_exception=True, lock_document=False):
             super().is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
             query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
@@ -262,6 +267,8 @@ class ParagraphSerializers(serializers.Serializer):
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
+            if lock_document:
+                _lock_paragraph_documents(self.data["document_id"])
             if (
                 not QuerySet(Paragraph)
                 .filter(
@@ -288,7 +295,7 @@ class ParagraphSerializers(serializers.Serializer):
         @post(post_embedding)
         @transaction.atomic
         def edit(self, instance: Dict):
-            self.is_valid()
+            self.is_valid(lock_document=True)
             EditParagraphSerializers(data=instance).is_valid(raise_exception=True)
             if instance.get("content") is not None:
                 validate_paragraph_file_references(self.data.get("knowledge_id"), [instance["content"]])
@@ -384,12 +391,17 @@ class ParagraphSerializers(serializers.Serializer):
                 "problem_list": self.get_problem_list(),
             }
 
+        @transaction.atomic
         def delete(self, with_valid=False):
             if with_valid:
-                self.is_valid(raise_exception=True)
+                self.is_valid(raise_exception=True, lock_document=True)
+            else:
+                _lock_paragraph_documents(self.data["document_id"])
             paragraph_id = self.data.get("paragraph_id")
-            paragraph = Paragraph.objects.filter(id=paragraph_id).first()
-            if paragraph and paragraph.origin == ContentOrigin.SYNCED:
+            paragraph = Paragraph.objects.filter(id=paragraph_id, document_id=self.data["document_id"]).first()
+            if paragraph is None:
+                return
+            if paragraph.origin == ContentOrigin.SYNCED:
                 paragraph.local_state = LocalState.DELETED
                 paragraph.is_active = False
                 paragraph.save(update_fields=["local_state", "is_active", "update_time"])
@@ -424,6 +436,7 @@ class ParagraphSerializers(serializers.Serializer):
             validate_paragraph_file_references(knowledge_id, [instance.get("content")])
 
             # 先将同一文档中的所有段落位置向下移动一位
+            _lock_paragraph_documents(document_id)
             Paragraph.objects.filter(document_id=document_id).update(position=F("position") + 1)
 
             paragraph_problem_model = self.get_paragraph_problem_model(knowledge_id, document_id, instance)
@@ -653,7 +666,11 @@ class ParagraphSerializers(serializers.Serializer):
                 BatchSerializer(data=instance).is_valid(model=Paragraph, raise_exception=True)
                 self.is_valid(raise_exception=True)
             paragraph_id_list = instance.get("id_list")
-            paragraph_query_set = QuerySet(Paragraph).filter(id__in=paragraph_id_list)
+            document_id = self.data["document_id"]
+            _lock_paragraph_documents(document_id)
+            paragraph_query_set = QuerySet(Paragraph).filter(id__in=paragraph_id_list, document_id=document_id)
+            if paragraph_query_set.count() != len(set(paragraph_id_list)):
+                raise AppApiException(500, _("Paragraph id does not exist"))
             manual_ids = list(paragraph_query_set.exclude(origin=ContentOrigin.SYNCED).values_list("id", flat=True))
             paragraph_query_set.filter(origin=ContentOrigin.SYNCED).update(
                 local_state=LocalState.DELETED, is_active=False
@@ -741,13 +758,7 @@ class ParagraphSerializers(serializers.Serializer):
             document_id = self.data.get("document_id")
             target_document_id = self.data.get("target_document_id")
             paragraph_id_list = self.data.get("paragraph_id_list")
-            # Synchronization also locks the document before updating its paragraphs.
-            list(
-                Document.objects.select_for_update()
-                .filter(id__in=[document_id, target_document_id])
-                .order_by("id")
-                .values_list("id", flat=True)
-            )
+            _lock_paragraph_documents(document_id, target_document_id)
             source_paragraphs = (
                 Paragraph.objects.select_for_update()
                 .filter(knowledge_id=knowledge_id, document_id=document_id, id__in=paragraph_id_list)
@@ -816,6 +827,7 @@ class ParagraphSerializers(serializers.Serializer):
                 source_updated_at=None,
                 sync_state=SyncState.ACTIVE,
                 anchor_paragraph=None,
+                placement="before",
                 update_time=Now(),
             )
             for position, paragraph in enumerate(paragraphs, 1):
@@ -880,6 +892,7 @@ class ParagraphSerializers(serializers.Serializer):
                 new_position = int(new_position)
             except (TypeError, ValueError):
                 raise serializers.ValidationError(_("new_position must be an integer"))
+            _lock_paragraph_documents(self.data["document_id"])
             # 获取当前段落
             paragraph = Paragraph.objects.get(
                 id=self.data.get("paragraph_id"),

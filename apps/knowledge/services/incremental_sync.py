@@ -7,6 +7,8 @@ from typing import Dict, Iterable, List, Optional
 import uuid_utils.compat as uuid
 from common.chunk import text_to_chunk
 from django.db import transaction
+from django.db.models import Sum
+from django.db.models.functions import Length
 from django.utils import timezone
 
 from knowledge.models import (
@@ -278,10 +280,33 @@ class IncrementalDocumentSync:
             paragraph.save(update_fields=["sync_state", "is_active", "update_time"])
 
     def _reorder(self, ordered_synced: List[Paragraph], all_existing: List[Paragraph]):
+        # Older moves only stored the position. Keep an existing unanchored prefix at the front.
+        old_first_position = next(
+            (
+                p.position
+                for p in all_existing
+                if p.origin == ContentOrigin.SYNCED and p.local_state != LocalState.DELETED
+            ),
+            None,
+        )
         active_synced = [p for p in ordered_synced if p.sync_state != SyncState.REMOTE_DELETED]
-        manual = [p for p in all_existing if p.origin == ContentOrigin.MANUAL and p.local_state != LocalState.DELETED]
-        sequence = list(active_synced)
-        for item in sorted(manual, key=lambda p: p.position):
+        new_first_id = active_synced[0].id if active_synced else None
+        sequence, remaining_manual = [], []
+        for item in all_existing:  # locked in position order before merging
+            if item.origin != ContentOrigin.MANUAL or item.local_state == LocalState.DELETED:
+                continue
+            if item.anchor_paragraph_id:
+                at_front = item.placement == "before" and item.anchor_paragraph_id == new_first_id
+            else:
+                at_front = item.placement == "before" or (
+                    old_first_position is not None and item.position < old_first_position
+                )
+            if at_front:
+                sequence.append(item)
+            else:
+                remaining_manual.append(item)
+        sequence.extend(active_synced)
+        for item in remaining_manual:
             if item.anchor_paragraph_id:
                 anchor_index = next((i for i, p in enumerate(sequence) if p.id == item.anchor_paragraph_id), None)
                 if anchor_index is not None:
@@ -428,11 +453,17 @@ class IncrementalDocumentSync:
                     result.updated_ids.append(value)
         self.document.doc_strategy = self.strategy
         self.document.source_hash = document_source_hash(remote_list)
-        self.document.char_length = (
-            sum(len(paragraph.content) for paragraph in ordered_synced)
-            if self.source_authoritative or self.document.type == KnowledgeType.WEB
-            else sum(len(item["content"]) for item in remote_list)
-        )
+        if is_web:
+            # Use the same locally retained content as paragraph edits, including manual and disabled rows.
+            self.document.char_length = (
+                Paragraph.objects.filter(document=self.document)
+                .exclude(local_state=LocalState.DELETED)
+                .aggregate(total=Sum(Length("content"), default=0))["total"]
+            )
+        elif self.source_authoritative:
+            self.document.char_length = sum(len(paragraph.content) for paragraph in ordered_synced)
+        else:
+            self.document.char_length = sum(len(item["content"]) for item in remote_list)
         self.document.sync_version += 1
         self.document.last_sync_time = timezone.now()
         for key, value in hashes.items():
