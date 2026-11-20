@@ -7,6 +7,7 @@ import RenameConversation from '../../components/rename/index.vue'
 import { useConversationListStore } from '../conversation-list/index'
 import { usePortalConversationListStore } from './index'
 import { relativeTimeFormat } from '@/utils/time'
+import { useShowShare } from '../../view/index'
 
 defineOptions({ name: 'HistoryConversationDrawer' })
 const props = defineProps<{ applicationId: string }>()
@@ -15,6 +16,8 @@ const portalList = usePortalConversationListStore()
 const conversationList = useConversationListStore()
 const msgs = useMessageListStore()
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value && !msgs.loading.value)
+const showShare = useShowShare()
+const historyEnabledGroups = computed(() => portalList.applicationGroups.value.filter((group) => group.show_history !== false))
 
 // 激活所选会话并全选分享，成功后关闭历史抽屉。
 const handleShareConversation = async (conversation: PortalConversationSummary) => {
@@ -72,7 +75,7 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
             <span class="truncate">{{ label }}</span>
           </span>
         </template>
-        <el-option v-for="group in portalList.applicationGroups.value" :key="group.id" :label="group.name" :value="group.id">
+        <el-option v-for="group in historyEnabledGroups" :key="group.id" :label="group.name" :value="group.id">
           <span class="flex-align-center gap-2">
             <ApplicationIcon :icon="group.icon" :size="18" />
             {{ group.name }}
@@ -108,6 +111,7 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
                 <MkDropdownMenu>
                   <!-- 激活所选对话并全选分享 -->
                   <MkDropdownItem
+                    v-if="selectedApplicationId === portalList.currentApplicationId.value && showShare"
                     :disabled="msgs.loading.value || (isActiveConversation(conversation) && !canShare)"
                     @click="handleShareConversation(conversation)"
                   >

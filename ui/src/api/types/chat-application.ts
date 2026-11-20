@@ -55,7 +55,7 @@ export interface PortalConversationSummary {
   update_time: string
 }
 
-/** 门户历史对话按智能体分组，每个智能体最多返回最近 5 条会话；未开启历史记录的智能体不返回会话。 */
+/** 门户历史对话按智能体分组，每个智能体最多返回最近 5 条会话；是否展示由前端按 show_history 控制。 */
 export interface PortalApplicationConversations {
   id: string
   name: string

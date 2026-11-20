@@ -4,7 +4,12 @@ from unittest.mock import patch
 from django.test import TestCase
 
 from application.models import Application, ApplicationFolder, Chat, ChatRecord, ChatShareLink
-from application.serializers.application_chat_link import ChatShareLinkDetailSerializer, save_public_file_access
+from application.serializers.application_chat_link import (
+    ChatRecordShareLinkSerializer,
+    ChatShareLinkDetailSerializer,
+    save_public_file_access,
+)
+from common.exception.app_exception import AppApiException
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.utils.chat_link_code import UUIDEncoder
 from knowledge.models import PublicFileAccess
@@ -119,3 +124,71 @@ class ChatShareLinkAvatarTests(TestCase):
                 "chat_background": "./oss/file/chat-background",
             },
         )
+
+
+class ChatShareLinkSettingTests(TestCase):
+    def setUp(self):
+        DatabaseModelManage.init()
+        folder, _ = ApplicationFolder.objects.get_or_create(id="default", defaults={"name": "默认分组"})
+        self.application = Application.objects.create(name="测试应用", folder=folder)
+        self.user_id = "01a1f6cf-9369-77d2-abf6-70f9db09c494"
+        self.chat = Chat.objects.create(
+            application=self.application,
+            abstract="分享对话",
+            chat_user_id=self.user_id,
+        )
+
+    def test_generate_link_rejects_disabled_share_setting_with_valid_license(self):
+        ApplicationSetting.objects.create(application=self.application, show_share=False)
+
+        with patch("django.core.cache.cache.get", return_value=True):
+            with self.assertRaises(AppApiException):
+                ChatRecordShareLinkSerializer(
+                    data={
+                        "application_id": self.application.id,
+                        "chat_id": self.chat.id,
+                        "user_id": self.user_id,
+                    }
+                ).generate_link({"is_current_all": True})
+
+        self.assertFalse(ChatShareLink.objects.filter(chat=self.chat).exists())
+
+    def test_generate_link_keeps_sharing_when_license_is_invalid(self):
+        ApplicationSetting.objects.create(application=self.application, show_share=False)
+
+        with patch("django.core.cache.cache.get", return_value=False):
+            result = ChatRecordShareLinkSerializer(
+                data={
+                    "application_id": self.application.id,
+                    "chat_id": self.chat.id,
+                    "user_id": self.user_id,
+                }
+            ).generate_link({"is_current_all": True})
+
+        self.assertTrue(result["link"])
+        self.assertTrue(ChatShareLink.objects.filter(chat=self.chat).exists())
+
+    def test_community_without_application_setting_model_keeps_sharing_available(self):
+        with patch.dict(DatabaseModelManage.model_dict, {"application_setting": None}):
+            result = ChatRecordShareLinkSerializer(
+                data={
+                    "application_id": self.application.id,
+                    "chat_id": self.chat.id,
+                    "user_id": self.user_id,
+                }
+            ).generate_link({"is_current_all": True})
+            detail = ChatShareLinkDetailSerializer(data={"link": result["link"]}).get_record_list()
+
+        self.assertEqual(detail["app_info"], {})
+
+    def test_opening_share_link_rejects_disabled_share_setting_with_valid_license(self):
+        ApplicationSetting.objects.create(application=self.application, show_share=False)
+        share_link = ChatShareLink.objects.create(
+            chat=self.chat,
+            application=self.application,
+            chat_record_ids=[],
+        )
+
+        with patch("django.core.cache.cache.get", return_value=True):
+            with self.assertRaises(AppApiException):
+                ChatShareLinkDetailSerializer(data={"link": UUIDEncoder.encode(share_link.id)}).get_record_list()
