@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 
 defineOptions({ name: 'LoopContinueNodeDetail' })
+const { t } = useI18n({ useScope: 'global' })
 
 defineProps<{
   data: ExecutionNodeDetail
@@ -17,8 +19,11 @@ defineProps<{
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">输出参数</h6>
-      <div><span class="text-N600">是否继续：</span>{{ data.is_continue }}</div>
+      <h6 class="mb-2">{{ t('workflow.executionResult.outputParams') }}</h6>
+      <div>
+        <span class="text-N600">{{ t('workflow.loopContinue.isContinue') }}：</span>
+        {{ data.is_continue }}
+      </div>
     </div>
   </DetailContainer>
 </template>

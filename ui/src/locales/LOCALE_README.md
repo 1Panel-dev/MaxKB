@@ -236,7 +236,10 @@ MCP、关联资源和模板中心入口复用 `resource`，资源授权入口复
 `index.json` 维护菜单分组、共用的输入与变量配置，以及模型与默认模型来源、提示词、历史记录和输出思考文案。菜单中的 AI 能力、业务逻辑、数据处理和其他分组归 `workflow.menu`，数据源与知识库分组分别复用 `resource.dataSource.label`、`knowledge.title`；用户输入设置、参数校验、接口传参、全局变量及会话变量分别使用 `userInput`、`parameters`、`apiParameters`、`globalVariables`、`conversationVariables`。
 `execution.json` 维护工作流数据源查询的专属提示及执行结果文案，分别使用 `dataSource`、`executionResult`；数据源名称和选择文案复用 `resource.dataSource`。节点详情共用的“输入参数／输出参数”和“本次对话／回答”标题分别使用 `workflow.executionResult.inputParams` / `outputParams` 和 `currentChat` / `answer`；公共容器的“错误日志”标题使用 `workflow.executionResult.errorLog`，错误正文保留接口原文。
 `nodes.json` 集中维护未单独拆分的节点文案，按节点职责分组维护菜单名称、说明、内置字段及节点专属配置，例如 `workflow.aiChat.label`、`workflow.aiChat.description` 和 `workflow.start.question`，不额外增加 `nodes` 层级。`llm-node.json` 完整维护 LLM 节点的 `llm` 分组，调用仍使用 `workflow.llm.*`，不在 `nodes.json` 重复定义。同一节点跨智能体、知识库和工具模式复用同一组文案，模式只决定可用节点范围。
+`loop-node.json` 集中维护循环相关的 `loop`、`loopStart`、`loopBody`、`loopContinue`、`loopBreak` 五组专属文案，调用仍为 `workflow.<分组>.*`，不增加 `loopNode` 层级，也不在 `nodes.json` 重复定义。条件匹配、参数字段和通用操作继续复用原有分组。
 节点共用的“结果”标签归 `workflow.node.result`；专属输出字段随节点分组维护，图片和视频类型复用 `upload.types`。循环开始的名称、下标与循环元素统一归 `workflow.loopStart`，循环内嵌定义与独立定义共用；循环体名称归 `workflow.loopBody`。
+循环开始的变量标题和内置参数禁用提示归 `workflow.loopStart.variables`。参数、显示名称复用 `dynamicForm.fields`，添加／编辑及按钮复用 `common`，参数格式与重名提示复用 `workflow.parameters`。内置字段常量通过响应式配置直接调用 `t`，输出区及详情共用 `loopStart.index`、`item`；字段选择器的循环变量分组在读取时调用 `t`。保留 `index`、`item`、`loop` 协议值、用户字段及复制引用，语言切换不重置表单或主动校验。
+循环节点的类型、数组、次数和设置／详情标题归 `workflow.loop`，配置与执行详情共用文案。详情按循环类型显示数组或次数标签，已知类型使用 `type` 中的名称，未知类型保留原值；数组内容、次数、轮次编号及子节点执行数据保持原样，变量选择占位复用 `workflow.referenceVariable.placeholder`。无限循环缺少 Break 的提示归 `workflow.loop.validation.breakRequired`，在原有校验分支中直接调用 `t`。语言切换不重置循环配置或主动校验。
 节点输出字段及执行详情中的“回答内容”统一使用 `index.json` 中的 `workflow.answer.label`；需要“AI 回答内容”时，在使用处直接拼接固定前缀 `AI `，不增加翻译 key 或辅助函数。LLM 直接使用共用标签，数据字段的 `answer`、`content` 协议值和已有节点内容保持原样。
 节点输出字段及执行详情中的“思考过程”共用 `workflow.thinking.process`，与输出思考开关和标签设置一起归 `index.json` 的 `thinking`；`reasoning_content` 数据字段保持原样。
 工作流配置与执行详情中的音频文件字段共用 `workflow.audioFile.label`（`index.json`）；缺省音频名称复用 `upload.types.audio`，实际文件名、URL、图标后缀及文件引用示例保持原样。语音转文本和文本转语音的模型标签分别归 `workflow.speechToText.model.label`、`workflow.textToSpeech.model.label`；文本转语音的输入内容标签归 `workflow.textToSpeech.content.label`，配置和执行详情共用。节点设置、返回内容和选择校验复用现有共用文案，语言切换不重置配置或自动触发校验。
@@ -262,6 +265,7 @@ AI 对话、图片理解及视频理解的智能体与知识库执行详情中�
 节点缺省开场白与用户输入标题分别复用 `application.prologue.defaultValue`、`workflow.userInput.title`，默认定义通过响应式配置读取，组件初始化时直接调用 `t`；基本信息名称复用 `common.labels.basicInfo`。表单默认输出内容归 `workflow.form.defaultContent`，通过命名参数原样传入 `{{form}}`。创建节点时复制为普通数据；已有图数据、模板内配置、节点名称及变量引用路径保留原文。长期记忆说明中的默认引用示例读取 `START_NODE_REFERENCES.memory`，再通过参数传入文案。
 文件上传配置的类型名称在响应式展示配置中直接调用 `t`；开始节点在刷新文件字段时复用 `upload.types`，长期记忆字段复用 `application.longTermMemory.label`，只写入当前语言的普通字符串。文件后缀、大小单位、数量与原有拼接标点保持原样。
 判断器及 Break／Continue 的比较符复用 `dynamicForm.operators`；`compareList` 的 `label` 通过响应式配置直接调用 `t`，按当前语言提供名称，比较符值与顺序保持原样。AI 条件 schema 的比较符说明延迟读取这些名称，不在模块初始化时固化译文。文件引用示例的标题复用 `common.labels.example`，JSON 数据由 `FILE_REFERENCE_EXAMPLE` 提供，不进入语言包。
+判断器及 Break／Continue 的条件匹配和添加条件操作共用 `workflow.condition.match`、`workflow.condition.actions.addCondition`；匹配文案前后分别调用 `t`，中间保留所有／任一下拉框。判断器的添加分支和结果标题归同组的 `actions.addBranch`、`result`。变量选择复用 `workflow.referenceVariable`，比较值的占位与校验分别复用 `dynamicForm.fields.comparisonValue.placeholder`、`requiredMessage`；比较符选项直接读取 `compareList.label`。Break／Continue 执行详情的输出参数标题复用 `workflow.executionResult.outputParams`，是否退出／继续分别归 `workflow.loopBreak.isBreak`、`workflow.loopContinue.isContinue`。分支类型、ID、比较符与逻辑协议值、比较值及执行结果保持原值，语言切换不重置条件或自动校验。
 
 ## 触发器
 

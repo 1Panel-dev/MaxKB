@@ -3,6 +3,7 @@ import { inject, onMounted, onUnmounted, shallowRef, useTemplateRef } from 'vue'
 import LogicFlow from '@logicflow/core'
 import { SelectionSelect } from '@logicflow/extension'
 import { cloneDeep, set } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ModelItem } from '@/api/types'
 import type { ShapeItem } from '@/workflow-canvas/types'
 import type { BaseNodeModel, GraphModel } from '@logicflow/core'
@@ -16,6 +17,7 @@ import { WorkflowMode } from '@/workflow-canvas/types'
 import LoopBodyContainer from './LoopBodyContainer.vue'
 
 defineOptions({ name: 'WorkflowLoopBodyNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel()
 
@@ -73,7 +75,7 @@ const validate = () => {
         workflow.is_loop_valid()
         const nodeData = loopNode?.properties.node_data as { loop_type?: string } | undefined
         if (nodeData?.loop_type === 'LOOP' && !workflow.exist_break_node()) {
-          return Promise.reject({ node: loopNode, errMessage: '循环节点需要包含Break节点' })
+          return Promise.reject({ node: loopNode, errMessage: t('workflow.loop.validation.breakRequired') })
         }
         return Promise.resolve({})
       } catch (error) {

@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 
 defineOptions({ name: 'LoopStartNodeDetail' })
+const { t } = useI18n({ useScope: 'global' })
 
 defineProps<{
   data: ExecutionNodeDetail
@@ -17,10 +19,16 @@ defineProps<{
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">输入参数</h6>
+      <h6 class="mb-2">{{ t('workflow.executionResult.inputParams') }}</h6>
       <div class="space-y-2">
-        <p><span class="text-N600">循环项：</span>{{ data.current_item }}</p>
-        <p><span class="text-N600">循环下标：</span>{{ data.current_index }}</p>
+        <p>
+          <span class="text-N600">{{ t('workflow.loopStart.item') }}：</span>
+          {{ data.current_item }}
+        </p>
+        <p>
+          <span class="text-N600">{{ t('workflow.loopStart.index') }}：</span>
+          {{ data.current_index }}
+        </p>
       </div>
     </div>
   </DetailContainer>

@@ -1,0 +1,42 @@
+{
+  "loop": {
+    "label": "Loop",
+    "description": "Repeat a series of tasks using the configured iteration count and logic",
+    "type": {
+      "label": "Loop type",
+      "requiredMessage": "Select a loop type",
+      "array": "Array loop",
+      "number": "Counted loop",
+      "infinite": "Infinite loop"
+    },
+    "array": "Loop array",
+    "number": "Iterations",
+    "settings": "Loop settings",
+    "details": "Loop details",
+    "validation": {
+      "breakRequired": "The loop must contain a Break node"
+    }
+  },
+  "loopStart": {
+    "label": "Loop start",
+    "index": "Index",
+    "item": "Loop item",
+    "variables": {
+      "label": "Loop variables",
+      "reservedMessage": "This parameter is reserved by the loop engine"
+    }
+  },
+  "loopBody": {
+    "label": "Loop body"
+  },
+  "loopContinue": {
+    "label": "Continue",
+    "description": "End the current iteration and continue with the next one",
+    "isContinue": "Continue loop"
+  },
+  "loopBreak": {
+    "label": "Break",
+    "description": "Stop the loop and exit its body",
+    "isBreak": "Exit loop"
+  }
+}

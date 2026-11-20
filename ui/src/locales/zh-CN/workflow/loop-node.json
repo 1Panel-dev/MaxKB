@@ -1,0 +1,42 @@
+{
+  "loop": {
+    "label": "循环节点",
+    "description": "通过设置循环次数和逻辑，重复执行一系列任务",
+    "type": {
+      "label": "循环类型",
+      "requiredMessage": "请选择循环类型",
+      "array": "数组循环",
+      "number": "次数循环",
+      "infinite": "无限循环"
+    },
+    "array": "循环数组",
+    "number": "循环次数",
+    "settings": "循环设置",
+    "details": "循环详情",
+    "validation": {
+      "breakRequired": "循环节点需要包含 Break 节点"
+    }
+  },
+  "loopStart": {
+    "label": "循环开始",
+    "index": "下标",
+    "item": "循环元素",
+    "variables": {
+      "label": "循环变量",
+      "reservedMessage": "此参数为循环引擎内置，不可使用"
+    }
+  },
+  "loopBody": {
+    "label": "循环体"
+  },
+  "loopContinue": {
+    "label": "Continue",
+    "description": "用于终止当前循环，执行下次循环",
+    "isContinue": "是否继续"
+  },
+  "loopBreak": {
+    "label": "Break",
+    "description": "终止当前循环，跳出循环体",
+    "isBreak": "是否退出"
+  }
+}

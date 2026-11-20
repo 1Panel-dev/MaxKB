@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
@@ -7,6 +8,7 @@ import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vu
 import { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'LoopNodeDetail' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(
   defineProps<{
@@ -48,11 +50,22 @@ const currentLoopDetail = computed<ExecutionNodeDetail[]>(() => loopRounds.value
 
     <!-- 循环设置 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">循环设置</h6>
+      <h6 class="mb-2">{{ t('workflow.loop.settings') }}</h6>
       <div class="space-y-2">
-        <p><span class="text-N600">循环类型：</span>{{ loopType || '-' }}</p>
         <p>
-          <span class="text-N600">循环数组：</span>
+          <span class="text-N600">{{ t('workflow.loop.type.label') }}：</span>
+          {{
+            loopType === 'ARRAY'
+              ? t('workflow.loop.type.array')
+              : loopType === 'NUMBER'
+                ? t('workflow.loop.type.number')
+                : loopType === 'LOOP'
+                  ? t('workflow.loop.type.infinite')
+                  : loopType || '-'
+          }}
+        </p>
+        <p>
+          <span class="text-N600">{{ loopType === 'NUMBER' || loopType === 'LOOP' ? t('workflow.loop.number') : t('workflow.loop.array') }}：</span>
           {{ loopSetting }}
         </p>
       </div>
@@ -60,11 +73,12 @@ const currentLoopDetail = computed<ExecutionNodeDetail[]>(() => loopRounds.value
 
     <!-- 循环详情 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">循环详情</h6>
+      <h6 class="mb-2">{{ t('workflow.loop.details') }}</h6>
       <div class="space-y-2">
         <template v-if="loopKeys.length > 0">
+          <!-- 选择循环轮次 -->
           <el-radio-group v-model="currentLoop" class="mb-2 bg-white!">
-            <el-radio-button v-for="key in loopKeys" :key="key" :value="key"> {{ Number(key) + 1 }} </el-radio-button>
+            <el-radio-button v-for="key in loopKeys" :key="key" :value="key">{{ Number(key) + 1 }}</el-radio-button>
           </el-radio-group>
           <ExecutionDetailContent :detail="currentLoopDetail" :workflow-mode="workflowMode" />
         </template>

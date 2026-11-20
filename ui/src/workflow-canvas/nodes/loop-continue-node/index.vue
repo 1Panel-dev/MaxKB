@@ -61,10 +61,11 @@ onBeforeUnmount(() => anchorGuard.reset())
 
 <template>
   <NodeContainer :node-model="model">
-    <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" @submit.prevent>
       <div class="mk-gray-card">
         <div v-if="conditions.length > 1" class="mb-2 flex-align-center gap-2 text-N600">
-          <span>符合以下</span>
+          <span>{{ t('workflow.condition.match.prefix') }}</span>
+          <!-- 选择条件匹配方式 -->
           <el-select
             v-model="formData.condition"
             :teleported="false"
@@ -73,40 +74,41 @@ onBeforeUnmount(() => anchorGuard.reset())
             @visible-change="anchorGuard.setOverlayVisible('condition', $event)"
             @wheel="handleNodeWheel"
           >
-            <el-option label="所有" value="and" />
-            <el-option label="任一" value="or" />
+            <el-option :label="t('workflow.condition.match.all')" value="and" />
+            <el-option :label="t('workflow.condition.match.any')" value="or" />
           </el-select>
-          <span>条件</span>
+          <span>{{ t('workflow.condition.match.suffix') }}</span>
         </div>
 
-        <MkFormList v-model="conditions" :default-item="createCondition" :min-rows="0" :first-row-has-label="false" add-text="添加条件">
+        <MkFormList
+          v-model="conditions"
+          :default-item="createCondition"
+          :min-rows="0"
+          :first-row-has-label="false"
+          :add-text="t('workflow.condition.actions.addCondition')"
+        >
           <template #default="{ item: condition, index }">
             <el-form-item
               class="small min-w-0 flex-2"
               :prop="`condition_list.${index}.field`"
-              :rules="{ type: 'array', required: true, message: '请选择变量', trigger: 'change' }"
+              :rules="{ type: 'array', required: true, message: t('workflow.referenceVariable.requiredMessage'), trigger: 'change' }"
             >
-              <NodeCascader v-model="condition.field" :node-model="model" placeholder="请选择变量" />
+              <NodeCascader v-model="condition.field" :node-model="model" :placeholder="t('workflow.referenceVariable.placeholder')" />
             </el-form-item>
             <el-form-item
               class="small min-w-0 flex-1"
               :prop="`condition_list.${index}.compare`"
-              :rules="{ required: true, message: '请选择', trigger: 'change' }"
+              :rules="{ required: true, message: t('common.validation.selectRequired'), trigger: 'change' }"
             >
               <el-select
                 v-model="condition.compare"
                 :teleported="false"
-                placeholder="请选择"
+                :placeholder="t('common.placeholders.select')"
                 clearable
                 @visible-change="anchorGuard.setOverlayVisible(`${index}:compare`, $event)"
                 @wheel="handleNodeWheel"
               >
-                <el-option
-                  v-for="comparison in compareList"
-                  :key="comparison.value"
-                  :label="t(`dynamicForm.operators.${comparison.value}`)"
-                  :value="comparison.value"
-                />
+                <el-option v-for="comparison in compareList" :key="comparison.value" :label="comparison.label" :value="comparison.value" />
               </el-select>
             </el-form-item>
             <div class="min-w-0 flex-1">
@@ -114,9 +116,9 @@ onBeforeUnmount(() => anchorGuard.reset())
                 v-if="!valueLessComparisons.has(condition.compare)"
                 class="small"
                 :prop="`condition_list.${index}.value`"
-                :rules="{ required: true, message: '请输入比较值', trigger: 'blur' }"
+                :rules="{ required: true, message: t('dynamicForm.fields.comparisonValue.requiredMessage'), trigger: 'blur' }"
               >
-                <el-input v-model="condition.value" placeholder="请输入比较值" />
+                <el-input v-model="condition.value" :placeholder="t('dynamicForm.fields.comparisonValue.placeholder')" />
               </el-form-item>
             </div>
           </template>

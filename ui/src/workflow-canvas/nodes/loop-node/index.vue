@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef, watch } from 'vue'
 import { cloneDeep, set, throttle } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
@@ -9,6 +10,7 @@ import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowLoopNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel()
 
@@ -113,18 +115,35 @@ onMounted(() => {
 <template>
   <NodeContainer :node-model="model">
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item label="循环类型" prop="loop_type" :rules="{ required: true, message: '请选择循环类型', trigger: 'change' }">
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
+        <el-form-item
+          :label="t('workflow.loop.type.label')"
+          prop="loop_type"
+          :rules="{ required: true, message: t('workflow.loop.type.requiredMessage'), trigger: 'change' }"
+        >
+          <!-- 选择循环类型 -->
           <el-select v-model="formData.loop_type" :teleported="false" class="w-full">
-            <el-option label="数组循环" value="ARRAY" />
-            <el-option label="次数循环" value="NUMBER" />
-            <el-option label="无限循环" value="LOOP" />
+            <el-option :label="t('workflow.loop.type.array')" value="ARRAY" />
+            <el-option :label="t('workflow.loop.type.number')" value="NUMBER" />
+            <el-option :label="t('workflow.loop.type.infinite')" value="LOOP" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="formData.loop_type === 'ARRAY'" label="循环数组" prop="array">
-          <NodeCascader ref="nodeCascaderRef" v-model="formData.array" :node-model="model" placeholder="请选择变量" />
+        <el-form-item v-if="formData.loop_type === 'ARRAY'" :label="t('workflow.loop.array')" prop="array">
+          <NodeCascader
+            ref="nodeCascaderRef"
+            v-model="formData.array"
+            :node-model="model"
+            :placeholder="t('workflow.referenceVariable.placeholder')"
+          />
         </el-form-item>
-        <el-form-item v-else-if="formData.loop_type === 'NUMBER'" label="循环次数" prop="number">
+        <el-form-item v-else-if="formData.loop_type === 'NUMBER'" :label="t('workflow.loop.number')" prop="number">
           <el-input-number v-model="formData.number" :min="1" :step="1" controls-position="right" align="left" />
         </el-form-item>
       </el-form>

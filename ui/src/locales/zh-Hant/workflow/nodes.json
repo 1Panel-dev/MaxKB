@@ -127,7 +127,18 @@
   "condition": {
     "label": "判斷器",
     "description": "根據不同條件執行不同的節點",
-    "branchName": "分支名稱"
+    "branchName": "分支名稱",
+    "match": {
+      "prefix": "符合以下",
+      "all": "所有",
+      "any": "任一",
+      "suffix": "條件"
+    },
+    "actions": {
+      "addCondition": "新增條件",
+      "addBranch": "新增分支"
+    },
+    "result": "條件結果"
   },
   "form": {
     "label": "表單收集",
@@ -194,26 +205,6 @@
   },
   "toolWorkflow": {
     "label": "工作流工具"
-  },
-  "loop": {
-    "label": "循環節點",
-    "description": "設定循環次數與邏輯，重複執行一系列任務"
-  },
-  "loopStart": {
-    "label": "循環開始",
-    "index": "索引",
-    "item": "循環元素"
-  },
-  "loopBody": {
-    "label": "循環體"
-  },
-  "loopContinue": {
-    "label": "Continue",
-    "description": "結束目前這一輪循環，執行下一輪"
-  },
-  "loopBreak": {
-    "label": "Break",
-    "description": "終止目前循環並離開循環體"
   },
   "documentSplit": {
     "label": "文件分段",
