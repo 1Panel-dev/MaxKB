@@ -7,7 +7,9 @@ from tools.models import Tool, ToolScope
 
 def validate_resource_references(instance, workspace_id, user_id, created_tool_ids=()):
     # Import lazily: application and tool serializers both use this boundary.
-    from application.serializers.application import get_bound_tool_ids, validate_import_resource_permissions
+    from application.serializers.application import (
+        get_bound_application_ids, get_bound_tool_ids, validate_bound_tool_permissions,
+    )
 
     if not user_id:
         raise AppUnauthorizedFailed(403, 'No permission to access')
@@ -16,7 +18,10 @@ def validate_resource_references(instance, workspace_id, user_id, created_tool_i
     visible_ids = set(filter_authorized_ids('tool', tool_ids, workspace_id))
     if any(value not in visible_ids for value in tool_ids):
         raise AppUnauthorizedFailed(403, 'No permission to access')
-    validate_import_resource_permissions(user_id, workspace_id, [instance], created_tool_ids)
+    validate_bound_tool_permissions(user_id, workspace_id, {
+        'tool_ids': tool_ids,
+        'application_ids': get_bound_application_ids(instance),
+    })
 
 
 def get_exportable_tools(tool_ids, workspace_id, user_id):
