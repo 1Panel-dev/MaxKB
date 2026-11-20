@@ -235,6 +235,7 @@ MCP、关联资源和模板中心入口复用 `resource`，资源授权入口复
 `index.json` 维护菜单分组、共用的输入与变量配置，以及模型与默认模型来源、提示词、历史记录和输出思考文案。菜单中的 AI 能力、业务逻辑、数据处理和其他分组归 `workflow.menu`，数据源与知识库分组分别复用 `resource.dataSource.label`、`knowledge.title`；用户输入设置、参数校验、接口传参、全局变量及会话变量分别使用 `userInput`、`parameters`、`apiParameters`、`globalVariables`、`conversationVariables`。
 `execution.json` 维护工作流数据源查询的专属提示及执行结果文案，分别使用 `dataSource`、`executionResult`；数据源名称和选择文案复用 `resource.dataSource`。
 `nodes.json` 保持单文件，按节点职责分组维护菜单名称、说明、内置字段及节点专属配置，例如 `workflow.aiChat.label`、`workflow.aiChat.description` 和 `workflow.start.question`，不额外增加 `nodes` 层级。同一节点跨智能体、知识库和工具模式复用同一组文案，模式只决定可用节点范围。
+节点共用的“结果”标签归 `workflow.node.result`；专属输出字段随节点分组维护，图片和视频类型复用 `upload.types`。循环开始的名称、下标与循环元素统一归 `workflow.loopStart`，循环内嵌定义与独立定义共用；循环体名称归 `workflow.loopBody`。
 按已处理的业务范围增加文件；知识库、工具专属节点与画布控制、执行详情分别按职责归组，不为每个组件新建文件。
 节点配置文案归 `workflow`，资源实体名称、创建和管理操作仍复用 `application`、`knowledge`、`tool`；同名中文不作为归类依据。
 节点设置标题与返回内容开关归 `workflow.nodeSettings`、`workflow.returnContent`；历史记录来源选项复用 `workflow.node.title`（`nodes.json`）和 `workflow.title`（`index.json`），保留 `NODE`、`WORKFLOW` 协议值。知识库四种资源范围的工作流入口菜单共用 `workflow.title`。节点系统／用户提示词的占位使用 `workflow.systemPrompt.placeholder`、`workflow.userPrompt.placeholder`，通过 `{reference}` 原样传入 `START_NODE_REFERENCES.question`。AI 对话的视觉开关归 `workflow.aiChat.vision`，图片／视频标签复用 `upload.types`，技能标题与输出执行过程复用 `application.skills`；语言切换只更新展示，不重置已保存提示词和节点配置。
@@ -245,7 +246,7 @@ MCP、关联资源和模板中心入口复用 `resource`，资源授权入口复
 
 智能体基本信息的名称、描述、开场白、长期记忆和语音设置复用 `application`；用户输入、接口参数和会话变量的字段标签、占位及必填提示复用 `dynamicForm.fields`，添加／编辑参数复用 `common.parameters`。
 参数重复提示仅翻译文字，参数名和分隔符在调用处组合。周期选项直接读取 `SCHEDULE_OPTION` 的响应式标签，保留保存协议；切换语言不重新校验表单。
-节点缺省开场白与用户输入标题在使用处直接调用 `t`；已有图数据、模板内配置、节点名称及变量引用路径保留原文。长期记忆说明中的默认引用示例读取 `START_NODE_REFERENCES.memory`，再通过参数传入文案。
+节点缺省开场白与用户输入标题分别复用 `application.prologue.defaultValue`、`workflow.userInput.title`，默认定义通过响应式配置读取，组件初始化时直接调用 `t`；基本信息名称复用 `common.labels.basicInfo`。表单默认输出内容归 `workflow.form.defaultContent`，通过命名参数原样传入 `{{form}}`。创建节点时复制为普通数据；已有图数据、模板内配置、节点名称及变量引用路径保留原文。长期记忆说明中的默认引用示例读取 `START_NODE_REFERENCES.memory`，再通过参数传入文案。
 文件上传配置的类型名称在响应式展示配置中直接调用 `t`；开始节点在刷新文件字段时复用 `upload.types`，长期记忆字段复用 `application.longTermMemory.label`，只写入当前语言的普通字符串。文件后缀、大小单位、数量与原有拼接标点保持原样。
 判断器及 Break／Continue 的比较符复用 `dynamicForm.operators`；`compareList` 的 `label` 通过响应式配置直接调用 `t`，按当前语言提供名称，比较符值与顺序保持原样。AI 条件 schema 的比较符说明延迟读取这些名称，不在模块初始化时固化译文。文件引用示例的标题复用 `common.labels.example`，JSON 数据由 `FILE_REFERENCE_EXAMPLE` 提供，不进入语言包。
 

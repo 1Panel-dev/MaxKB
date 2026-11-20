@@ -1,6 +1,7 @@
 {
   "node": {
-    "title": "Node"
+    "title": "Node",
+    "result": "Result"
   },
   "start": {
     "label": "Start",
@@ -21,11 +22,21 @@
   },
   "llm": {
     "label": "LLM",
-    "description": "Call n AI model once, optionally providing tool definitions and receiving tool calls"
+    "description": "Call an AI model once, optionally providing tool definitions and receiving tool calls",
+    "content": "Response content",
+    "reasoningContent": "Reasoning process",
+    "reasoningKey": "Reasoning key",
+    "refusal": "Refusal content",
+    "isRefusal": "Refused",
+    "usage": "Token usage",
+    "toolCalls": "Tool calls",
+    "finishReason": "Finish reason"
   },
   "intent": {
     "label": "Intent classification",
-    "description": "Match user questions to predefined intent categories"
+    "description": "Match user questions to predefined intent categories",
+    "category": "Category",
+    "reason": "Reason"
   },
   "speechToText": {
     "label": "Speech to text",
@@ -37,7 +48,8 @@
   },
   "imageGenerate": {
     "label": "Image generation",
-    "description": "Generate images from the provided text"
+    "description": "Generate images from the provided text",
+    "answer": "AI response"
   },
   "imageToVideo": {
     "label": "Image to video",
@@ -49,27 +61,34 @@
   },
   "imageUnderstand": {
     "label": "Image understanding",
-    "description": "Identify objects and scenes in images to answer user questions"
+    "description": "Identify objects and scenes in images to answer user questions",
+    "answer": "AI response"
   },
   "videoUnderstand": {
     "label": "Video understanding",
-    "description": "Identify objects and scenes in videos to answer user questions"
+    "description": "Identify objects and scenes in videos to answer user questions",
+    "answer": "AI response"
   },
   "questionOptimization": {
     "label": "Question optimization",
-    "description": "Refine the current question using conversation history to better match knowledge segments"
+    "description": "Refine the current question using conversation history to better match knowledge segments",
+    "result": "Optimized question"
   },
   "reply": {
     "label": "Specified reply",
-    "description": "Return the specified content, converting referenced variables to strings"
+    "description": "Return the specified content, converting referenced variables to strings",
+    "content": "Content"
   },
   "condition": {
     "label": "Condition",
-    "description": "Run different nodes based on conditions"
+    "description": "Run different nodes based on conditions",
+    "branchName": "Branch name"
   },
   "form": {
     "label": "Form collection",
-    "description": "Collect user information during a conversation and use the form data in subsequent steps"
+    "description": "Collect user information during a conversation and use the form data in subsequent steps",
+    "formData": "All form data",
+    "defaultContent": "Hello, please complete the form below:\n{form}\nWhen finished, click [Submit] to submit."
   },
   "variableAssign": {
     "label": "Variable assignment",
@@ -89,19 +108,30 @@
   },
   "searchKnowledge": {
     "label": "Knowledge retrieval",
-    "description": "Relate knowledge and find segments relevant to the question"
+    "description": "Relate knowledge and find segments relevant to the question",
+    "segmentList": "Retrieved segment list",
+    "directAnswerSegments": "Segments eligible for direct answers",
+    "result": "Retrieval results",
+    "directAnswerContent": "Segment content eligible for direct answers"
   },
   "searchDocument": {
     "label": "Document tag retrieval",
-    "description": "Find documents matching the specified tags within the configured search scope"
+    "description": "Find documents matching the specified tags within the configured search scope",
+    "knowledgeList": "Knowledge list",
+    "documentList": "Document list"
   },
   "documentExtract": {
     "label": "Document content extraction",
-    "description": "Parse input documents and output structured content"
+    "description": "Parse input documents and output structured content",
+    "content": "Document content",
+    "documentList": "Document list"
   },
   "reranker": {
     "label": "Multi-source retrieval",
-    "description": "Rerank retrieval results from multiple knowledge sources using a reranking model"
+    "description": "Rerank retrieval results from multiple knowledge sources using a reranking model",
+    "resultList": "Reranked result list",
+    "result": "Reranked results",
+    "directAnswerSegments": "Segments eligible for direct answers"
   },
   "mcp": {
     "label": "MCP call",
@@ -111,9 +141,26 @@
     "label": "Custom tool",
     "description": "Process data by running custom scripts"
   },
+  "application": {
+    "label": "Agent node"
+  },
+  "tool": {
+    "label": "Tool node"
+  },
+  "toolWorkflow": {
+    "label": "Workflow tool"
+  },
   "loop": {
     "label": "Loop",
     "description": "Repeat a series of tasks using the configured iteration count and logic"
+  },
+  "loopStart": {
+    "label": "Loop start",
+    "index": "Index",
+    "item": "Loop item"
+  },
+  "loopBody": {
+    "label": "Loop body"
   },
   "loopContinue": {
     "label": "Continue",
@@ -125,15 +172,18 @@
   },
   "documentSplit": {
     "label": "Document segmentation",
-    "description": "Split input document content into a list of segments using the segmentation strategy"
+    "description": "Split input document content into a list of segments using the segmentation strategy",
+    "segmentList": "Segment list"
   },
   "localFile": {
     "label": "Local files",
-    "description": "Upload local documents and output a document list. Use the Document content extraction node to parse their contents"
+    "description": "Upload local documents and output a document list. Use the Document content extraction node to parse their contents",
+    "fileList": "File list"
   },
   "webSource": {
     "label": "Web site",
-    "description": "Crawl web data from a root URL and output documents with content, with one document per URL"
+    "description": "Crawl web data from a root URL and output documents with content, with one document per URL",
+    "documentList": "Document list"
   },
   "knowledgeWrite": {
     "label": "Write to knowledge",
