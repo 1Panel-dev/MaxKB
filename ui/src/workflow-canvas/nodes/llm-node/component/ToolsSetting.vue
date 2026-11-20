@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { LlmTool, LlmToolsSetting } from '../types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
+import type { FormItemRule } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { createAnchorGuard } from '@/workflow-canvas/core/utils'
 import ToolFunctionDrawer from './ToolFunctionDrawer.vue'
@@ -18,8 +19,15 @@ const setting = defineModel<LlmToolsSetting>({ required: true })
 
 const toolDrawerRef = useTemplateRef<InstanceType<typeof ToolFunctionDrawer>>('toolDrawerRef')
 const toolImportDialogRef = useTemplateRef<InstanceType<typeof ToolImportDialog>>('toolImportDialogRef')
+const referenceCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('referenceCascaderRef')
 const anchorGuard = createAnchorGuard(props.nodeModel)
 const existingNames = computed(() => setting.value.tools.map((tool) => tool.function.name))
+
+// 表单项仅在引用来源时渲染，切回自定义后随表单项卸载移出外层表单校验。
+const referenceRules: FormItemRule[] = [
+  { type: 'array', required: true, message: t('workflow.referenceVariable.requiredMessage'), trigger: 'change' },
+  { asyncValidator: () => referenceCascaderRef.value?.validate() ?? Promise.resolve(), trigger: 'change' },
+]
 
 function updateSetting(value: Partial<LlmToolsSetting>) {
   setting.value = { ...setting.value, ...value }
@@ -117,14 +125,17 @@ onBeforeUnmount(() => anchorGuard.reset())
     </div>
   </div>
 
-  <NodeCascader
-    v-if="setting.location === 'reference'"
-    :model-value="setting.reference"
-    :node-model="nodeModel"
-    class="w-full!"
-    :placeholder="t('workflow.llm.tools.placeholder')"
-    @update:model-value="updateSetting({ reference: $event })"
-  />
+  <!-- 引用来源时加入节点外层表单，校验必填与引用有效性 -->
+  <el-form-item v-if="setting.location === 'reference'" class="mb-0!" prop="tools.reference" :rules="referenceRules">
+    <NodeCascader
+      ref="referenceCascaderRef"
+      :model-value="setting.reference"
+      :node-model="nodeModel"
+      class="w-full!"
+      :placeholder="t('workflow.llm.tools.placeholder')"
+      @update:model-value="updateSetting({ reference: $event })"
+    />
+  </el-form-item>
   <MkTable class="border" v-else-if="setting.tools.length" :data="setting.tools" size="small" row-key="function.name" :max-height="undefined">
     <el-table-column :label="t('workflow.llm.toolName.label')">
       <template #default="{ row }">
