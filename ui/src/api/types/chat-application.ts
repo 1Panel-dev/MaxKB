@@ -60,6 +60,7 @@ export interface PortalApplicationConversations {
   id: string
   name: string
   icon: string
+  show_history?: boolean
   conversations: PortalConversationSummary[]
   count: number
 }

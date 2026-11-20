@@ -44,8 +44,11 @@ const isCurrentApplication = (group: PortalApplicationGroup) => group.id === cur
 const groupConversationCount = (group: PortalApplicationGroup) =>
   Math.max(group.count, isCurrentApplication(group) ? conversations.value.length : group.conversations.length)
 
+// 智能体关闭“显示历史记录”时，门户侧栏不展示其会话。
+const historyEnabledGroups = computed(() => applicationGroups.value.filter((group) => group.show_history !== false))
+
 // 所有智能体的对话总数超过 20 条时，才显示分组的查看更多入口。
-const totalConversationCount = computed(() => applicationGroups.value.reduce((total, group) => total + groupConversationCount(group), 0))
+const totalConversationCount = computed(() => historyEnabledGroups.value.reduce((total, group) => total + groupConversationCount(group), 0))
 
 // 当前智能体以会话列表 Store 为准；无需查看更多时展示全部已加载会话。
 const groupConversations = (group: PortalApplicationGroup) => {
@@ -54,7 +57,7 @@ const groupConversations = (group: PortalApplicationGroup) => {
 }
 
 // 仅展示有历史记录的智能体，随当前会话的新建、删除同步更新。
-const historyApplicationGroups = computed(() => applicationGroups.value.filter((group) => groupConversations(group).length > 0))
+const historyApplicationGroups = computed(() => historyEnabledGroups.value.filter((group) => groupConversations(group).length > 0))
 
 const isActiveConversation = (group: PortalApplicationGroup, conversation: Conversation) =>
   isCurrentApplication(group) && currentChatId.value === conversation.id
