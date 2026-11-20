@@ -18,7 +18,7 @@ from models_provider.tools import get_model_instance_by_model_workspace_id
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
                    reasoning_content: str):
-    chat_model = node_variable.get('chat_model')
+    chat_model = node._token_count_model
     message_tokens = chat_model.get_num_tokens_from_messages(node_variable.get('message_list'))
     answer_tokens = chat_model.get_num_tokens(answer)
     node.context['message_tokens'] = message_tokens
@@ -178,15 +178,16 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
         self.generate_context_image(image)
         self.context['dialogue_type'] = dialogue_type
         # 归还链接到连接池
+        self._token_count_model = image_model
         connection.close()
         if stream:
             r = image_model.stream(message_list)
-            return NodeResult({'result': r, 'chat_model': image_model, 'message_list': message_list,
+            return NodeResult({'result': r, 'message_list': message_list,
                                'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context_stream)
         else:
             r = image_model.invoke(message_list)
-            return NodeResult({'result': r, 'chat_model': image_model, 'message_list': message_list,
+            return NodeResult({'result': r, 'message_list': message_list,
                                'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context)
 

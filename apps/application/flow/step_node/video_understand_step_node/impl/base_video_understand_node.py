@@ -17,7 +17,7 @@ from models_provider.tools import get_model_instance_by_model_workspace_id
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
                    reasoning_content: str):
-    chat_model = node_variable.get('chat_model')
+    chat_model = node._token_count_model
     message_tokens = node_variable['usage_metadata']['output_tokens'] if 'usage_metadata' in node_variable else 0
     answer_tokens = chat_model.get_num_tokens(answer)
     node.context['message_tokens'] = message_tokens
@@ -179,15 +179,16 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
         self.context['message_list'] = message_list
         self.generate_context_video(video)
         self.context['dialogue_type'] = dialogue_type
+        self._token_count_model = video_model
         connection.close()
         if stream:
             r = video_model.stream(message_list)
-            return NodeResult({'result': r, 'chat_model': video_model, 'message_list': message_list,
+            return NodeResult({'result': r, 'message_list': message_list,
                                'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context_stream)
         else:
             r = video_model.invoke(message_list)
-            return NodeResult({'result': r, 'chat_model': video_model, 'message_list': message_list,
+            return NodeResult({'result': r, 'message_list': message_list,
                                'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context)
 

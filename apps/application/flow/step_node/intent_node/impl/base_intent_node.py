@@ -25,7 +25,7 @@ def get_default_model_params_setting(model_id):
 
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str):
-    chat_model = node_variable.get('chat_model')
+    chat_model = node._token_count_model
     message_tokens = chat_model.get_num_tokens_from_messages(node_variable.get('message_list'))
     answer_tokens = chat_model.get_num_tokens(answer)
 
@@ -104,9 +104,9 @@ class BaseIntentNode(IIntentNode):
             matched_branch = self.parse_classification_result(classification_result, branch)
 
             #  返回结果
+            self._token_count_model = chat_model
             return NodeResult({
                 'result': r,
-                'chat_model': chat_model,
                 'message_list': message_list,
                 'history_message': history_message,
                 'user_input': user_input,

@@ -38,7 +38,7 @@ from application.models import Application, ApplicationAccessToken, ApplicationA
 def _write_context(
     node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str, reasoning_content: str
 ):
-    chat_model = node_variable.get("chat_model")
+    chat_model = node._token_count_model
     message_tokens = chat_model.get_num_tokens_from_messages(node_variable.get("message_list"))
     answer_tokens = chat_model.get_num_tokens(answer)
     node.context["message_tokens"] = message_tokens
@@ -223,6 +223,7 @@ class BaseChatNode(IChatNode):
         self.context["model_setting"] = model_setting
         workspace_id = self.workflow_manage.get_body().get("workspace_id")
         chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id, **(model_params_setting or {}))
+        self._token_count_model = chat_model
         history_message = self.get_history_message(
             history_chat_record, dialogue_number, dialogue_type, self.runtime_node_id
         )
@@ -285,7 +286,7 @@ class BaseChatNode(IChatNode):
         if stream:
             r = chat_model.stream(message_list)
             return NodeResult(
-                {"result": r, "chat_model": chat_model, "message_list": message_list, "question": question.content},
+                {"result": r, "message_list": message_list, "question": question.content},
                 {},
                 _write_context=write_context_stream,
             )
@@ -294,7 +295,6 @@ class BaseChatNode(IChatNode):
             return NodeResult(
                 {
                     "result": r,
-                    "chat_model": chat_model,
                     "message_list": message_list,
                     "history_message": [
                         {"content": message.content, "role": message.type}
@@ -462,7 +462,6 @@ class BaseChatNode(IChatNode):
             return NodeResult(
                 {
                     "result": r,
-                    "chat_model": chat_model,
                     "message_list": message_list,
                     "history_message": [
                         {"content": message.content, "role": message.type}
