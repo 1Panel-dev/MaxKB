@@ -45,10 +45,6 @@
       "label": "API 服務",
       "description": "開啟後，允許對話使用者透過 APIKey 呼叫 API 檢索目前知識庫"
     },
-    "authentication": {
-      "label": "對話使用者授權",
-      "description": "開啟後，僅允許已授權的對話使用者透過 APIKey 檢索目前知識庫"
-    },
     "apiExample": "API 呼叫範例",
     "loadFailed": "外部檢索服務載入失敗"
   }

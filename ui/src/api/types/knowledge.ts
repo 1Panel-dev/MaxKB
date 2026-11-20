@@ -31,6 +31,7 @@ export type KnowledgeHitUnitType = (typeof KNOWLEDGE_HIT_UNIT_TYPE)[keyof typeof
 
 export interface KnowledgeItem {
   application_mapping_count?: number
+  authentication?: boolean
   char_length?: number | null
   create_time?: string
   desc?: string | null
