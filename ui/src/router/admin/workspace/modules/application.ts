@@ -40,7 +40,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
               order: 10,
               canAccess: (params) => perm.application.workspace.overviewRead(String(params.applicationId)),
               permission: ({ params }) => perm.application.workspace.overviewRead(String(params.applicationId)),
-              next: 'workspace-application-simple-setting',
+              next: 'workspace-application-workflow-setting',
             },
           },
           {
