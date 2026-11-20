@@ -1145,7 +1145,7 @@ class SendEmailSerializer(serializers.Serializer):
                                               code=ExceptionCodeConstants.EMAIL_FORMAT_ERROR.value.code)])
 
     type = serializers.CharField(required=True, label=_("Type"), validators=[
-        validators.RegexValidator(regex=re.compile("^register|reset_password$"),
+        validators.RegexValidator(regex=re.compile("^(register|reset_password)$"),
                                   message=_("The type only supports register|reset_password"), code=500)
     ])
 
@@ -1231,7 +1231,7 @@ class CheckCodeSerializer(serializers.Serializer):
     type = serializers.CharField(required=True,
                                  label=_("Type"),
                                  validators=[
-                                     validators.RegexValidator(regex=re.compile("^register|reset_password$"),
+                                     validators.RegexValidator(regex=re.compile("^(register|reset_password)$"),
                                                                message=_(
                                                                    "The type only supports register|reset_password"),
                                                                code=500)

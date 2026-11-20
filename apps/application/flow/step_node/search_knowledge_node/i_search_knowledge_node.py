@@ -26,7 +26,7 @@ class DatasetSettingSerializer(serializers.Serializer):
     similarity = serializers.FloatField(required=True, max_value=2, min_value=0,
                                         label=_('similarity'))
     search_mode = serializers.CharField(required=True, validators=[
-        validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
+        validators.RegexValidator(regex=re.compile("^(embedding|keywords|blend)$"),
                                   message=_("The type only supports embedding|keywords|blend"), code=500)
     ], label=_("Retrieval Mode"))
     max_paragraph_char_number = serializers.IntegerField(required=True,

@@ -35,7 +35,7 @@ model_message_dict = {
 
 class ValidSerializer(serializers.Serializer):
     valid_type = serializers.CharField(required=True, label=_('type'), validators=[
-        validators.RegexValidator(regex=re.compile("^application|knowledge|user$"),
+        validators.RegexValidator(regex=re.compile("^(application|knowledge|user)$"),
                                   message="类型只支持:application|knowledge|user", code=500)
     ])
     valid_count = serializers.IntegerField(required=True, label=_('check quantity'))
