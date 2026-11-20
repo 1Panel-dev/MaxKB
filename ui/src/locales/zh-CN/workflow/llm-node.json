@@ -1,0 +1,65 @@
+{
+  "llm": {
+    "label": "LLM",
+    "description": "单次调用大模型，可传入工具定义并输出工具调用",
+    "context": {
+      "label": "上下文",
+      "description": "开启后，本次调用会带上所选变量作为上下文；关闭则仅根据本条输入回复",
+      "placeholder": "请选择上下文变量",
+      "requiredMessage": "请选择上下文变量"
+    },
+    "tools": {
+      "label": "工具声明",
+      "description": "按 OpenAI 标准 Function Calling 格式声明工具能力，仅用于模型决策，不在此处执行；调用请求（工具名 + 参数）经参数 tool_calls 返回",
+      "placeholder": "请选择工具变量",
+      "custom": "自定义",
+      "reference": "引用",
+      "addTitle": "添加工具",
+      "editTitle": "编辑工具"
+    },
+    "toolName": {
+      "label": "工具名称",
+      "placeholder": "请输入工具名称",
+      "requiredMessage": "请输入工具名称",
+      "duplicateMessage": "工具名称已存在",
+      "missingMessage": "未找到工具名称"
+    },
+    "toolDescription": {
+      "label": "工具描述",
+      "placeholder": "请输入工具描述",
+      "requiredMessage": "请输入工具描述"
+    },
+    "toolParameters": {
+      "label": "工具参数",
+      "empty": "暂无参数",
+      "nameRequiredMessage": "请输入参数名称",
+      "nameLengthMessage": "参数名称不能超过 {max} 字",
+      "typeMessage": "参数 {name} 的数据类型不支持",
+      "descriptionMessage": "参数 {name} 的描述应为不超过 {max} 字的文本"
+    },
+    "dataType": {
+      "label": "数据类型",
+      "placeholder": "请选择数据类型",
+      "requiredMessage": "请选择数据类型"
+    },
+    "jsonParse": {
+      "label": "JSON 解析",
+      "placeholder": "请输入 JSON 格式文本进行解析",
+      "invalidMessage": "JSON 解析失败，请检查格式",
+      "action": "解析"
+    },
+    "toolImport": {
+      "title": "导入工具",
+      "placeholder": "粘贴 OpenAI tools 格式 JSON，例如：",
+      "invalidMessage": "未找到有效的工具定义",
+      "weatherDescription": "获取天气",
+      "cityDescription": "城市"
+    },
+    "reasoningKey": "思考标识",
+    "refusal": "拒答内容",
+    "isRefusal": "是否拒答",
+    "usage": "Token 用量",
+    "toolCalls": "工具调用",
+    "finishReason": "结束原因"
+  }
+}

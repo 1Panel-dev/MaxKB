@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { LlmTool, LlmToolFunction, LlmToolParameter } from '../types'
 import type { FormInstance, FormItemRule } from 'element-plus'
 import { normalizeTool, toolParameterTypes } from '../types'
@@ -9,6 +10,7 @@ import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowLlmToolFunctionDrawer' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ existingNames: string[] }>()
 const emit = defineEmits<{ submit: [tool: LlmTool, index?: number] }>()
 
@@ -27,17 +29,17 @@ const functionForm = ref<ToolFunctionForm>({ name: '', description: '', paramete
 const parseJson = ref('')
 const parseError = ref('')
 
-const nameRules: FormItemRule[] = [
-  { whitespace: true, required: true, message: '请输入工具名称', trigger: 'blur' },
+const nameRules = computed<FormItemRule[]>(() => [
+  { whitespace: true, required: true, message: t('workflow.llm.toolName.requiredMessage'), trigger: 'blur' },
   {
     validator: (_rule, value: string, callback) => {
       const name = value.trim()
       const duplicated = props.existingNames.includes(name) && !(currentIndex.value !== undefined && name === editingName.value)
-      callback(duplicated ? new Error('工具名称已存在') : undefined)
+      callback(duplicated ? new Error(t('workflow.llm.toolName.duplicateMessage')) : undefined)
     },
     trigger: 'blur',
   },
-]
+])
 
 function toParameters(parameters?: LlmToolFunction['parameters']): LlmToolParameter[] {
   const required = parameters?.required ?? []
@@ -82,11 +84,12 @@ function getParameterError(parameters: LlmToolParameter[]): string {
   const names = new Set<string>()
   for (const parameter of parameters) {
     const name = parameter.name.trim()
-    if (!name) return '请输入参数名称'
-    if (name.length > 64) return `参数名称不能超过 64 字：${name}`
-    if (names.has(name)) return `参数已存在：${name}`
-    if (!toolParameterTypes.includes(parameter.type)) return `参数 ${name} 的数据类型不支持`
-    if (typeof parameter.description !== 'string' || parameter.description.length > 256) return `参数 ${name} 的描述应为不超过 256 字的文本`
+    if (!name) return t('workflow.llm.toolParameters.nameRequiredMessage')
+    if (name.length > 64) return `${t('workflow.llm.toolParameters.nameLengthMessage', { max: 64 })}：${name}`
+    if (names.has(name)) return `${t('workflow.parameters.duplicateMessage')}：${name}`
+    if (!toolParameterTypes.includes(parameter.type)) return t('workflow.llm.toolParameters.typeMessage', { name })
+    if (typeof parameter.description !== 'string' || parameter.description.length > 256)
+      return t('workflow.llm.toolParameters.descriptionMessage', { name, max: 256 })
     names.add(name)
   }
   return ''
@@ -97,7 +100,7 @@ function parseFromJson() {
   try {
     const tool = normalizeTool(JSON.parse(parseJson.value))
     if (!tool) {
-      parseError.value = '未找到工具名称'
+      parseError.value = t('workflow.llm.toolName.missingMessage')
       return
     }
     const parameters = toParameters(tool.function.parameters)
@@ -110,7 +113,7 @@ function parseFromJson() {
     }
     formRef.value?.clearValidate()
   } catch {
-    parseError.value = 'JSON 解析失败，请检查格式'
+    parseError.value = t('workflow.llm.jsonParse.invalidMessage')
   }
 }
 
@@ -120,7 +123,7 @@ function handleOpenParameter(parameter?: LlmToolParameter, index?: number) {
 
 function saveParameter(parameter: LlmToolParameter, index?: number) {
   if (functionForm.value.parameters.some((field, fieldIndex) => fieldIndex !== index && field.name === parameter.name)) {
-    MsgError(`参数已存在：${parameter.name}`)
+    MsgError(`${t('workflow.parameters.duplicateMessage')}：${parameter.name}`)
     return
   }
   const parameters = functionForm.value.parameters
@@ -168,53 +171,82 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" :title="currentIndex !== undefined ? '编辑工具' : '添加工具'" @closed="resetData">
-    <el-form ref="formRef" :model="functionForm" label-position="top" require-asterisk-position="right" @submit.prevent @paste.stop>
-      <el-form-item label="JSON 解析" :error="parseError">
-        <el-input v-model="parseJson" type="textarea" :rows="8" placeholder="请输入 JSON 格式文本进行解析" />
-        <!-- 从 JSON 回填工具 -->
+  <MkDrawer
+    v-model="visible"
+    :title="currentIndex !== undefined ? t('workflow.llm.tools.editTitle') : t('workflow.llm.tools.addTitle')"
+    @closed="resetData"
+  >
+    <el-form
+      ref="formRef"
+      :model="functionForm"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+      @paste.stop
+    >
+      <el-form-item :label="t('workflow.llm.jsonParse.label')" :error="parseError">
+        <el-input v-model="parseJson" type="textarea" :rows="8" :placeholder="t('workflow.llm.jsonParse.placeholder')" />
       </el-form-item>
-      <el-button class="mb-4" type="primary" @click="parseFromJson">解析</el-button>
-      <el-form-item label="工具名称" prop="name" :rules="nameRules">
+      <!-- 从 JSON 回填工具 -->
+      <el-button class="mb-4" type="primary" @click="parseFromJson">{{ t('workflow.llm.jsonParse.action') }}</el-button>
+      <el-form-item :label="t('workflow.llm.toolName.label')" prop="name" :rules="nameRules">
         <el-input
           v-model="functionForm.name"
           maxlength="64"
           show-word-limit
-          placeholder="请输入工具名称"
+          :placeholder="t('workflow.llm.toolName.placeholder')"
           @blur="functionForm.name = functionForm.name.trim()"
         />
       </el-form-item>
-      <el-form-item label="工具描述" prop="description" :rules="{ whitespace: true, required: true, message: '请输入工具描述', trigger: 'blur' }">
-        <el-input v-model="functionForm.description" type="textarea" :rows="3" maxlength="256" show-word-limit placeholder="请输入工具描述" />
+      <el-form-item
+        :label="t('workflow.llm.toolDescription.label')"
+        prop="description"
+        :rules="{ whitespace: true, required: true, message: t('workflow.llm.toolDescription.requiredMessage'), trigger: 'blur' }"
+      >
+        <el-input
+          v-model="functionForm.description"
+          type="textarea"
+          :rows="3"
+          maxlength="256"
+          show-word-limit
+          :placeholder="t('workflow.llm.toolDescription.placeholder')"
+        />
       </el-form-item>
 
       <div class="flex-between mb-2">
-        <span>工具参数</span>
+        <span>{{ t('workflow.llm.toolParameters.label') }}</span>
         <!-- 添加参数 -->
         <el-button text type="primary" @click="handleOpenParameter()">
           <MkIcon name="icon_add_outlined" />
         </el-button>
       </div>
-      <MkTable :data="functionForm.parameters" size="small" row-key="name" :max-height="undefined" empty-text="暂无参数">
-        <el-table-column label="参数">
+      <MkTable
+        :data="functionForm.parameters"
+        size="small"
+        row-key="name"
+        :max-height="undefined"
+        :empty-text="t('workflow.llm.toolParameters.empty')"
+      >
+        <el-table-column :label="t('dynamicForm.fields.parameter.label')">
           <template #default="{ row }">
             <span class="block truncate" :title="row.name">{{ row.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="数据类型" width="90">
+        <el-table-column :label="t('workflow.llm.dataType.label')" width="90">
           <template #default="{ row }">
             <el-tag type="info" size="small">{{ row.type }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="描述">
+        <el-table-column :label="t('common.description.label')">
           <template #default="{ row }">
             <span class="block truncate" :title="row.description || '-'">{{ row.description || '-' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="必填" width="55">
-          <template #default="{ row }">{{ row.required ? '是' : '否' }}</template>
+        <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="55">
+          <template #default="{ row }">{{ row.required ? t('common.options.yes') : t('common.options.no') }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="80">
+        <el-table-column :label="t('common.labels.operation')" width="80">
           <template #default="{ row, $index }">
             <!-- 编辑参数 -->
             <el-button text type="primary" @click="handleOpenParameter(row, $index)"><MkIcon name="icon_edit_outlined" /></el-button>
@@ -229,9 +261,11 @@ defineExpose({ open, close })
 
     <template #footer>
       <!-- 取消工具编辑 -->
-      <el-button plain @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 提交工具 -->
-      <el-button type="primary" @click="handleSubmit">{{ currentIndex !== undefined ? '保存' : '添加' }}</el-button>
+      <el-button type="primary" @click="handleSubmit">
+        {{ currentIndex !== undefined ? t('common.actions.save') : t('common.actions.add') }}
+      </el-button>
     </template>
   </MkDrawer>
 </template>

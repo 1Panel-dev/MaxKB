@@ -1,14 +1,37 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { LlmTool } from '../types'
 import { normalizeTool } from '../types'
 
 defineOptions({ name: 'WorkflowLlmToolImportDialog' })
 
+const { t } = useI18n({ useScope: 'global' })
 const emit = defineEmits<{ submit: [tools: LlmTool[]] }>()
 const visible = ref(false)
 const importJson = ref('')
 const importError = ref('')
+const importPlaceholder = computed(
+  () => `${t('workflow.llm.toolImport.placeholder')}
+${JSON.stringify(
+  [
+    {
+      type: 'function',
+      function: {
+        name: 'get_weather',
+        description: t('workflow.llm.toolImport.weatherDescription'),
+        parameters: {
+          type: 'object',
+          properties: { location: { type: 'string', description: t('workflow.llm.toolImport.cityDescription') } },
+          required: ['location'],
+        },
+      },
+    },
+  ],
+  null,
+  2,
+)}`,
+)
 
 function open() {
   visible.value = true
@@ -24,12 +47,12 @@ function handleImport() {
     const parsed = JSON.parse(importJson.value) as unknown
     const imported = (Array.isArray(parsed) ? parsed : [parsed]).map(normalizeTool).filter((tool) => tool !== null)
     if (!imported.length) {
-      importError.value = '未找到有效的工具定义'
+      importError.value = t('workflow.llm.toolImport.invalidMessage')
       return
     }
     emit('submit', imported)
   } catch {
-    importError.value = 'JSON 解析失败，请检查格式'
+    importError.value = t('workflow.llm.jsonParse.invalidMessage')
   }
 }
 
@@ -42,34 +65,14 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="导入工具" @closed="resetData">
-    <el-input
-      v-model="importJson"
-      type="textarea"
-      :rows="12"
-      @paste.stop
-      placeholder='粘贴 OpenAI tools 格式 JSON，例如：
-[
-  {
-    "type": "function",
-    "function": {
-      "name": "get_weather",
-      "description": "获取天气",
-      "parameters": {
-        "type": "object",
-        "properties": { "location": { "type": "string", "description": "城市" } },
-        "required": ["location"]
-      }
-    }
-  }
-]'
-    />
+  <MkDialog v-model="visible" :title="t('workflow.llm.toolImport.title')" @closed="resetData">
+    <el-input v-model="importJson" type="textarea" :rows="12" @paste.stop :placeholder="importPlaceholder" />
     <div v-if="importError" class="mt-2 text-sm text-danger">{{ importError }}</div>
     <template #footer>
       <!-- 取消导入 -->
-      <el-button plain @click="close">取消</el-button>
+      <el-button plain @click="close">{{ t('common.actions.cancel') }}</el-button>
       <!-- 批量导入工具 -->
-      <el-button type="primary" @click="handleImport">导入</el-button>
+      <el-button type="primary" @click="handleImport">{{ t('common.actions.import') }}</el-button>
     </template>
   </MkDialog>
 </template>

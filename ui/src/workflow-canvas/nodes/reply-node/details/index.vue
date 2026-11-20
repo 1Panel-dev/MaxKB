@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import DOMPurify from 'dompurify'
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import { REPLY_CONTENT_TYPE_LABELS } from '../constant'
 
 defineOptions({ name: 'ReplyNodeDetail' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   data: ExecutionNodeDetail
@@ -24,13 +26,13 @@ const toolAnswer = computed(() => (contentType.value === 'TOOL' ? JSON.stringify
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">回复格式</h6>
+      <h6 class="mb-2">{{ t('workflow.reply.format.label') }}</h6>
       <div>
         {{ REPLY_CONTENT_TYPE_LABELS[contentType] ?? contentType }}
       </div>
     </div>
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">回复内容</h6>
+      <h6 class="mb-2">{{ t('workflow.reply.content.label') }}</h6>
       <div>
         <el-scrollbar max-height="150">
           <template v-if="!data.answer || (contentType === 'TOOL' && !data.answer.length)">-</template>

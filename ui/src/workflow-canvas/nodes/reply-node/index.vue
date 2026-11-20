@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
@@ -9,6 +10,7 @@ import { createAnchorGuard, handleNodeWheel, isLastNode } from '@/workflow-canva
 import { REPLY_CONTENT_TYPE_LABELS } from './constant'
 
 defineOptions({ name: 'WorkflowReplyNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel()
 const anchorGuard = createAnchorGuard(model)
@@ -47,9 +49,13 @@ const formData = computed<ReplyNodeForm>({
 })
 
 const contentPlaceholder = computed(() => {
-  if (formData.value.content_type === 'TOOL') return '[{"id": "call_1", "name": "get_weather", "arguments": "{}", "content": "晴"}]'
-  if (formData.value.content_type === 'HTML') return `<p>HTML 内容，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}</p>`
-  return `回复内容，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`
+  if (formData.value.content_type === 'TOOL') {
+    return JSON.stringify([{ id: 'call_1', name: 'get_weather', arguments: '{}', content: t('workflow.reply.format.toolExampleContent') }])
+  }
+  if (formData.value.content_type === 'HTML') {
+    return `<p>${t('workflow.reply.content.htmlPlaceholder', { reference: START_NODE_REFERENCES.question })}</p>`
+  }
+  return t('workflow.reply.content.placeholder', { reference: START_NODE_REFERENCES.question })
 })
 
 async function validate() {
@@ -67,9 +73,16 @@ onMounted(() => {
 <template>
   <NodeContainer :node-model="model">
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <!-- 回复类型 -->
-        <el-form-item label="回复类型">
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
+        <!-- 回复格式 -->
+        <el-form-item :label="t('workflow.reply.format.label')">
           <el-select
             v-model="formData.content_type"
             :teleported="false"
@@ -81,7 +94,7 @@ onMounted(() => {
             <el-option :label="REPLY_CONTENT_TYPE_LABELS.TOOL" value="TOOL">
               <div class="flex-align-center gap-1">
                 <span>{{ REPLY_CONTENT_TYPE_LABELS.TOOL }}</span>
-                <MkTooltip content="回复内容为 JSON 对象或数组，元素字段为 id、name、arguments、content" placement="right">
+                <MkTooltip :content="t('workflow.reply.format.toolDescription')" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </div>
@@ -90,23 +103,25 @@ onMounted(() => {
         </el-form-item>
 
         <el-form-item
-          label="回复内容"
+          :label="t('workflow.reply.content.label')"
           class="mk-hide-asterisk"
           :prop="formData.reply_type === 'referencing' ? 'fields' : 'content'"
           :rules="{
             type: formData.reply_type === 'referencing' ? 'array' : 'string',
             required: true,
             whitespace: formData.reply_type !== 'referencing',
-            message: formData.reply_type === 'referencing' ? '请选择变量' : '请输入回复内容',
+            message:
+              formData.reply_type === 'referencing' ? t('workflow.referenceVariable.requiredMessage') : t('workflow.reply.content.requiredMessage'),
             trigger: 'change',
           }"
         >
           <template #label>
             <div class="flex-between">
-              <span class="mk-required">回复内容</span>
+              <span class="mk-required">{{ t('workflow.reply.content.label') }}</span>
+              <!-- 选择回复内容来源 -->
               <el-select v-model="formData.reply_type" :teleported="false" class="w-21!" size="small">
-                <el-option label="引用变量" value="referencing" />
-                <el-option label="自定义" value="content" />
+                <el-option :label="t('workflow.referenceVariable.label')" value="referencing" />
+                <el-option :label="t('workflow.reply.content.custom')" value="content" />
               </el-select>
             </div>
           </template>
@@ -116,17 +131,23 @@ onMounted(() => {
             ref="nodeCascaderRef"
             v-model="formData.fields"
             :node-model="model"
-            placeholder="请选择变量"
+            :placeholder="t('workflow.referenceVariable.placeholder')"
           />
 
-          <MdEditorMagnify v-else @wheel="handleNodeWheel" title="回复内容" v-model="formData.content" :placeholder="contentPlaceholder" />
+          <MdEditorMagnify
+            v-else
+            @wheel="handleNodeWheel"
+            :title="t('workflow.reply.content.label')"
+            v-model="formData.content"
+            :placeholder="contentPlaceholder"
+          />
         </el-form-item>
 
         <!-- 返回内容 -->
         <div class="flex-between w-full">
           <span class="flex-align-center gap-1">
-            返回内容
-            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            {{ t('workflow.returnContent.label') }}
+            <MkTooltip :content="t('workflow.returnContent.description')" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>

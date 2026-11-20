@@ -37,6 +37,10 @@
     "canceling": "取消中",
     "canceled": "已取消"
   },
+  "options": {
+    "yes": "是",
+    "no": "否"
+  },
   "dateRange": {
     "lastDays": "过去 {days} 天",
     "lastHalfYear": "过去半年",

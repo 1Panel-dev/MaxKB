@@ -16,48 +16,77 @@
   "aiChat": {
     "label": "AI 對話",
     "description": "與 AI 大語言模型進行對話",
-    "answer": "AI 回答內容",
-    "reasoningContent": "思考過程",
     "vision": "視覺"
-  },
-  "llm": {
-    "label": "LLM",
-    "description": "單次呼叫大語言模型，可傳入工具定義並輸出工具呼叫",
-    "content": "回答內容",
-    "reasoningContent": "思考過程",
-    "reasoningKey": "思考標識",
-    "refusal": "拒答內容",
-    "isRefusal": "是否拒答",
-    "usage": "Token 用量",
-    "toolCalls": "工具呼叫",
-    "finishReason": "結束原因"
   },
   "intent": {
     "label": "意圖識別",
     "description": "將使用者問題與預設的意圖分類進行比對",
+    "input": "輸入",
+    "categories": {
+      "label": "意圖分類",
+      "other": "其他"
+    },
     "category": "分類",
     "reason": "理由"
   },
   "speechToText": {
     "label": "語音轉文字",
-    "description": "透過語音識別模型將音訊轉換為文字"
+    "description": "透過語音識別模型將音訊轉換為文字",
+    "model": {
+      "label": "語音識別模型"
+    }
   },
   "textToSpeech": {
     "label": "文字轉語音",
-    "description": "透過語音合成模型將文字轉換為音訊"
+    "description": "透過語音合成模型將文字轉換為音訊",
+    "model": {
+      "label": "語音合成模型"
+    },
+    "content": {
+      "label": "文字內容"
+    }
   },
   "imageGenerate": {
     "label": "圖片生成",
     "description": "根據提供的文字內容生成圖片",
-    "answer": "AI 回答內容"
+    "model": {
+      "label": "圖片生成模型"
+    },
+    "positivePrompt": {
+      "description": "正向提示詞，用來描述生成圖片中期望包含的元素與視覺特徵"
+    },
+    "negativePrompt": {
+      "placeholder": "請描述不想生成的圖片內容，例如：顏色、血腥內容"
+    }
   },
   "imageToVideo": {
     "label": "圖生影片",
-    "description": "根據提供的圖片生成影片"
+    "description": "根據提供的圖片生成影片",
+    "model": {
+      "label": "圖生影片模型"
+    },
+    "positivePrompt": {
+      "description": "正向提示詞，用來描述基於首幀圖片生成影片時的運動與畫面變化"
+    },
+    "firstFrame": {
+      "label": "首幀圖片",
+      "placeholder": "請選擇首幀圖片",
+      "requiredMessage": "請選擇首幀圖片"
+    },
+    "lastFrame": {
+      "label": "尾幀圖片",
+      "placeholder": "請選擇尾幀圖片"
+    }
   },
   "textToVideo": {
     "label": "文生影片",
-    "description": "根據提供的文字內容生成影片"
+    "description": "根據提供的文字內容生成影片",
+    "model": {
+      "label": "文生影片模型"
+    },
+    "positivePrompt": {
+      "description": "正向提示詞，用來描述生成影片中期望包含的元素與視覺特徵"
+    }
   },
   "imageUnderstand": {
     "label": "圖片理解",
@@ -72,12 +101,28 @@
   "questionOptimization": {
     "label": "問題最佳化",
     "description": "根據歷史對話記錄完善目前問題，更利於比對知識庫分段",
+    "systemPrompt": {
+      "defaultValue": "# 角色\n你是一位問題最佳化大師，擅長根據上下文精準揣測使用者意圖，並對使用者提出的問題進行最佳化。\n\n## 技能\n### 技能 1: 最佳化問題\n2. 接收使用者輸入的問題。\n3. 依據上下文仔細分析問題含義。\n4. 輸出最佳化後的問題。\n\n## 限制:\n - 僅回傳最佳化後的問題，不進行額外解釋或說明。\n - 確保最佳化後的問題準確反映原始問題意圖，不得改變原意。"
+    },
     "result": "問題最佳化結果"
   },
   "reply": {
     "label": "指定回覆",
     "description": "指定回覆內容，引用變量會轉換為字串輸出",
-    "content": "內容"
+    "format": {
+      "label": "回覆格式",
+      "text": "文字",
+      "tool": "工具",
+      "toolDescription": "回覆內容為 JSON 物件或陣列，元素欄位為 id、name、arguments、content",
+      "toolExampleContent": "晴"
+    },
+    "content": {
+      "label": "回覆內容",
+      "placeholder": "回覆內容，可以引用系統中變量，如 {reference}",
+      "htmlPlaceholder": "HTML 內容，可以引用系統中變量，如 {reference}",
+      "requiredMessage": "請輸入回覆內容",
+      "custom": "自訂"
+    }
   },
   "condition": {
     "label": "判斷器",

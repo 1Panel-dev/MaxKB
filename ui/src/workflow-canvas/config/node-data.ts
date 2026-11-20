@@ -116,8 +116,8 @@ export const aiChatNode = reactive({
     stepName: computed(() => t('workflow.aiChat.label')),
     config: {
       fields: [
-        { label: computed(() => t('workflow.aiChat.answer')), value: 'answer' },
-        { label: computed(() => t('workflow.aiChat.reasoningContent')), value: 'reasoning_content' },
+        { label: computed(() => `AI ${t('workflow.answer.label')}`), value: 'answer' },
+        { label: computed(() => t('workflow.thinking.process')), value: 'reasoning_content' },
         { label: computed(() => t('workflow.history.label')), value: 'history_message' },
       ],
     },
@@ -133,8 +133,8 @@ export const llmNode = reactive({
     stepName: computed(() => t('workflow.llm.label')),
     config: {
       fields: [
-        { label: computed(() => t('workflow.llm.content')), value: 'content' },
-        { label: computed(() => t('workflow.llm.reasoningContent')), value: 'reasoning_content' },
+        { label: computed(() => t('workflow.answer.label')), value: 'content' },
+        { label: computed(() => t('workflow.thinking.process')), value: 'reasoning_content' },
         { label: computed(() => t('workflow.llm.reasoningKey')), value: 'reasoning_key' },
         { label: computed(() => t('workflow.llm.refusal')), value: 'refusal' },
         { label: computed(() => t('workflow.llm.isRefusal')), value: 'is_refusal' },
@@ -193,7 +193,7 @@ export const imageGenerateNode = reactive({
     stepName: computed(() => t('workflow.imageGenerate.label')),
     config: {
       fields: [
-        { label: computed(() => t('workflow.imageGenerate.answer')), value: 'answer' },
+        { label: computed(() => `AI ${t('workflow.answer.label')}`), value: 'answer' },
         { label: computed(() => t('upload.types.image')), value: 'image' },
       ],
     },
@@ -229,7 +229,7 @@ export const imageUnderstandNode = reactive({
   label: computed(() => t('workflow.imageUnderstand.label')),
   properties: {
     stepName: computed(() => t('workflow.imageUnderstand.label')),
-    config: { fields: [{ label: computed(() => t('workflow.imageUnderstand.answer')), value: 'answer' }] },
+    config: { fields: [{ label: computed(() => `AI ${t('workflow.answer.label')}`), value: 'answer' }] },
   },
 })
 
@@ -240,7 +240,7 @@ export const videoUnderstandNode = reactive({
   label: computed(() => t('workflow.videoUnderstand.label')),
   properties: {
     stepName: computed(() => t('workflow.videoUnderstand.label')),
-    config: { fields: [{ label: computed(() => t('workflow.videoUnderstand.answer')), value: 'answer' }] },
+    config: { fields: [{ label: computed(() => `AI ${t('workflow.answer.label')}`), value: 'answer' }] },
   },
 })
 
@@ -262,7 +262,7 @@ export const replyNode = reactive({
   label: computed(() => t('workflow.reply.label')),
   properties: {
     stepName: computed(() => t('workflow.reply.label')),
-    config: { fields: [{ label: computed(() => t('workflow.reply.content')), value: 'answer' }] },
+    config: { fields: [{ label: computed(() => t('workflow.reply.content.label')), value: 'answer' }] },
   },
 })
 

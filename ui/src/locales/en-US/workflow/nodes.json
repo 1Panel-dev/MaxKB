@@ -16,68 +16,111 @@
   "aiChat": {
     "label": "AI chat",
     "description": "Chat with an AI model",
-    "answer": "AI response",
-    "reasoningContent": "Reasoning process",
     "vision": "Vision"
-  },
-  "llm": {
-    "label": "LLM",
-    "description": "Call an AI model once, optionally providing tool definitions and receiving tool calls",
-    "content": "Response content",
-    "reasoningContent": "Reasoning process",
-    "reasoningKey": "Reasoning key",
-    "refusal": "Refusal content",
-    "isRefusal": "Refused",
-    "usage": "Token usage",
-    "toolCalls": "Tool calls",
-    "finishReason": "Finish reason"
   },
   "intent": {
     "label": "Intent classification",
     "description": "Match user questions to predefined intent categories",
+    "input": "Input",
+    "categories": {
+      "label": "Intent categories",
+      "other": "Other"
+    },
     "category": "Category",
     "reason": "Reason"
   },
   "speechToText": {
     "label": "Speech to text",
-    "description": "Convert audio to text using a speech recognition model"
+    "description": "Convert audio to text using a speech recognition model",
+    "model": {
+      "label": "Speech recognition model"
+    }
   },
   "textToSpeech": {
     "label": "Text to speech",
-    "description": "Convert text to audio using a speech synthesis model"
+    "description": "Convert text to audio using a speech synthesis model",
+    "model": {
+      "label": "Speech synthesis model"
+    },
+    "content": {
+      "label": "Text content"
+    }
   },
   "imageGenerate": {
     "label": "Image generation",
     "description": "Generate images from the provided text",
-    "answer": "AI response"
+    "model": {
+      "label": "Image generation model"
+    },
+    "positivePrompt": {
+      "description": "Describe the elements and visual features you want in the generated image"
+    },
+    "negativePrompt": {
+      "placeholder": "Describe what to exclude from the image, such as colors or graphic content"
+    }
   },
   "imageToVideo": {
     "label": "Image to video",
-    "description": "Generate videos from the provided images"
+    "description": "Generate videos from the provided images",
+    "model": {
+      "label": "Image-to-video model"
+    },
+    "positivePrompt": {
+      "description": "Describe the motion and visual changes in the video generated from the first frame image"
+    },
+    "firstFrame": {
+      "label": "First frame image",
+      "placeholder": "Select a first frame image",
+      "requiredMessage": "Select a first frame image"
+    },
+    "lastFrame": {
+      "label": "Last frame image",
+      "placeholder": "Select a last frame image"
+    }
   },
   "textToVideo": {
     "label": "Text to video",
-    "description": "Generate videos from the provided text"
+    "description": "Generate videos from the provided text",
+    "model": {
+      "label": "Text-to-video model"
+    },
+    "positivePrompt": {
+      "description": "Describe the elements and visual features you want in the generated video"
+    }
   },
   "imageUnderstand": {
-    "label": "Image understanding",
-    "description": "Identify objects and scenes in images to answer user questions",
-    "answer": "AI response"
+    "label": "Image analysis",
+    "description": "Identify objects and scenes in images to answer user questions"
   },
   "videoUnderstand": {
-    "label": "Video understanding",
-    "description": "Identify objects and scenes in videos to answer user questions",
-    "answer": "AI response"
+    "label": "Video analysis",
+    "description": "Identify objects and scenes in videos to answer user questions"
   },
   "questionOptimization": {
     "label": "Question optimization",
     "description": "Refine the current question using conversation history to better match knowledge segments",
+    "systemPrompt": {
+      "defaultValue": "# Role\nYou are an expert in question optimization, skilled at accurately inferring user intent from context and refining users' questions.\n\n## Skills\n### Skill 1: Optimize questions\n2. Receive the user's question.\n3. Carefully analyze the meaning of the question based on context.\n4. Output the optimized question.\n\n## Constraints:\n - Return only the optimized question, without additional explanations or comments.\n - Ensure the optimized question accurately reflects the original intent without changing its meaning."
+    },
     "result": "Optimized question"
   },
   "reply": {
     "label": "Specified reply",
     "description": "Return the specified content, converting referenced variables to strings",
-    "content": "Content"
+    "format": {
+      "label": "Reply format",
+      "text": "Text",
+      "tool": "Tool",
+      "toolDescription": "Reply content must be a JSON object or array with the fields id, name, arguments, and content",
+      "toolExampleContent": "Sunny"
+    },
+    "content": {
+      "label": "Reply content",
+      "placeholder": "Reply content can reference system variables, such as {reference}",
+      "htmlPlaceholder": "HTML content can reference system variables, such as {reference}",
+      "requiredMessage": "Enter reply content",
+      "custom": "Custom"
+    }
   },
   "condition": {
     "label": "Condition",

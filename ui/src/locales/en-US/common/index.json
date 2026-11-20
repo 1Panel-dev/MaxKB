@@ -37,6 +37,10 @@
     "canceling": "Canceling",
     "canceled": "Canceled"
   },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
   "dateRange": {
     "lastDays": "Past {days} days",
     "lastHalfYear": "Past 6 months",

@@ -116,14 +116,21 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <NodeModelSelect
           :node-model="model"
           :form-data="formData"
           model-type="IMAGE"
-          label="视觉模型"
+          :label="t('model.types.image.label')"
           :options="modelList"
           :provider-options="providerOptions"
           @update="updateNodeData"
@@ -134,8 +141,8 @@ onMounted(() => {
           <template #label>
             <div class="flex-between">
               <div class="flex-align-center gap-1">
-                <span>系统提示词</span>
-                <MkTooltip content="设定模型扮演的角色或遵循的指令" placement="right">
+                <span>{{ t('workflow.systemPrompt.label') }}</span>
+                <MkTooltip :content="t('workflow.systemPrompt.description')" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </div>
@@ -147,8 +154,8 @@ onMounted(() => {
           </template>
           <MdEditorMagnify
             v-model="formData.system"
-            title="系统提示词"
-            :placeholder="`系统提示词，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`"
+            :title="t('workflow.systemPrompt.label')"
+            :placeholder="t('workflow.systemPrompt.placeholder', { reference: START_NODE_REFERENCES.question })"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
@@ -157,12 +164,12 @@ onMounted(() => {
         <el-form-item
           class="mk-hide-asterisk"
           prop="prompt"
-          :rules="{ whitespace: true, required: true, message: '请输入用户提示词', trigger: 'blur' }"
+          :rules="{ whitespace: true, required: true, message: t('workflow.userPrompt.requiredMessage'), trigger: 'blur' }"
         >
           <template #label>
             <div class="flex-align-center gap-1">
-              <span class="mk-required">用户提示词</span>
-              <MkTooltip content="用户向模型提出的问题或输入的指令" placement="right">
+              <span class="mk-required">{{ t('workflow.userPrompt.label') }}</span>
+              <MkTooltip :content="t('workflow.userPrompt.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </div>
@@ -170,8 +177,8 @@ onMounted(() => {
 
           <MdEditorMagnify
             v-model="formData.prompt"
-            title="用户提示词"
-            :placeholder="`用户提示词，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`"
+            :title="t('workflow.userPrompt.label')"
+            :placeholder="t('workflow.userPrompt.placeholder', { reference: START_NODE_REFERENCES.question })"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
@@ -180,10 +187,11 @@ onMounted(() => {
         <el-form-item v-if="showSettings">
           <template #label>
             <div class="flex-between">
-              <span>历史聊天记录</span>
+              <span>{{ t('workflow.history.label') }}</span>
+              <!-- 选择历史记录来源 -->
               <el-select v-model="formData.dialogue_type" :teleported="false" class="w-18!" size="small">
-                <el-option label="节点" value="NODE" />
-                <el-option label="工作流" value="WORKFLOW" />
+                <el-option :label="t('workflow.node.title')" value="NODE" />
+                <el-option :label="t('workflow.title')" value="WORKFLOW" />
               </el-select>
             </div>
           </template>
@@ -199,10 +207,14 @@ onMounted(() => {
         </el-form-item>
 
         <!-- 选择图片 -->
-        <el-form-item class="mk-hide-asterisk" prop="image_list" :rules="{ required: true, message: '请选择', trigger: 'change' }">
+        <el-form-item
+          class="mk-hide-asterisk"
+          prop="image_list"
+          :rules="{ required: true, message: t('common.validation.selectRequired'), trigger: 'change' }"
+        >
           <template #label>
             <span class="flex-align-center gap-1">
-              <span class="mk-required">图片</span>
+              <span class="mk-required">{{ t('upload.types.image') }}</span>
               <MkTooltip placement="right">
                 <template #content>
                   <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>
@@ -211,14 +223,15 @@ onMounted(() => {
               </MkTooltip>
             </span>
           </template>
-          <NodeCascader ref="imageCascaderRef" v-model="formData.image_list" :node-model="model" placeholder="请选择" />
+          <NodeCascader ref="imageCascaderRef" v-model="formData.image_list" :node-model="model" :placeholder="t('common.placeholders.select')" />
         </el-form-item>
 
         <!-- 输出思考 -->
         <div class="flex-between mb-4">
-          <span>输出思考</span>
+          <span>{{ t('workflow.thinking.label') }}</span>
           <div class="flex-align-center gap-2">
             <ThinkingSetting v-model="formData.model_setting" v-if="formData.model_setting.reasoning_content_enable" />
+            <!-- 切换输出思考 -->
             <el-switch v-model="formData.model_setting.reasoning_content_enable" size="small" />
           </div>
         </div>
@@ -226,12 +239,13 @@ onMounted(() => {
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showSettings">
           <span class="flex-align-center gap-1">
-            返回内容
-            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            {{ t('workflow.returnContent.label') }}
+            <MkTooltip :content="t('workflow.returnContent.description')" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>
           <span>
+            <!-- 切换返回内容 -->
             <el-switch v-model="formData.is_result" size="small" />
           </span>
         </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
@@ -11,6 +12,7 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowQuestionNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
@@ -38,10 +40,7 @@ const defaultForm: QuestionNodeForm = {
   model_id: '',
   model_id_type: 'default',
   model_id_reference: [],
-  system:
-    '# 角色\n你是一位问题优化大师，擅长根据上下文精准揣测用户意图，并对用户提出的问题进行优化。\n\n' +
-    '## 技能\n### 技能 1: 优化问题\n2. 接收用户输入的问题。\n3. 依据上下文仔细分析问题含义。\n4. 输出优化后的问题。\n\n' +
-    '## 限制:\n - 仅返回优化后的问题，不进行额外解释或说明。\n - 确保优化后的问题准确反映原始问题意图，不得改变原意。',
+  system: t('workflow.questionOptimization.systemPrompt.defaultValue'),
   prompt: START_NODE_REFERENCES.question,
   dialogue_number: 1,
   is_result: false,
@@ -93,14 +92,21 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <NodeModelSelect
           :node-model="model"
           :form-data="formData"
           model-type="LLM"
-          label="AI 模型"
+          :label="t('workflow.model.label')"
           :options="modelList"
           :provider-options="providerOptions"
           @update="updateNodeData"
@@ -110,16 +116,16 @@ onMounted(() => {
         <el-form-item>
           <template #label>
             <div class="flex-align-center gap-1">
-              <span>系统提示词</span>
-              <MkTooltip content="设定模型扮演的角色或遵循的指令" placement="right">
+              <span>{{ t('workflow.systemPrompt.label') }}</span>
+              <MkTooltip :content="t('workflow.systemPrompt.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </div>
           </template>
           <MdEditorMagnify
             v-model="formData.system"
-            title="系统提示词"
-            :placeholder="`系统提示词，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`"
+            :title="t('workflow.systemPrompt.label')"
+            :placeholder="t('workflow.systemPrompt.placeholder', { reference: START_NODE_REFERENCES.question })"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
@@ -128,12 +134,12 @@ onMounted(() => {
         <el-form-item
           class="mk-hide-asterisk"
           prop="prompt"
-          :rules="{ whitespace: true, required: true, message: '请输入用户提示词', trigger: 'blur' }"
+          :rules="{ whitespace: true, required: true, message: t('workflow.userPrompt.requiredMessage'), trigger: 'blur' }"
         >
           <template #label>
             <div class="flex-align-center gap-1">
-              <span class="mk-required">用户提示词</span>
-              <MkTooltip content="用户向模型提出的问题或输入的指令" placement="right">
+              <span class="mk-required">{{ t('workflow.userPrompt.label') }}</span>
+              <MkTooltip :content="t('workflow.userPrompt.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </div>
@@ -141,8 +147,8 @@ onMounted(() => {
 
           <MdEditorMagnify
             v-model="formData.prompt"
-            title="用户提示词"
-            :placeholder="`用户提示词，可以引用系统中变量，如 ${START_NODE_REFERENCES.question}`"
+            :title="t('workflow.userPrompt.label')"
+            :placeholder="t('workflow.userPrompt.placeholder', { reference: START_NODE_REFERENCES.question })"
             @wheel="handleNodeWheel"
           />
         </el-form-item>
@@ -151,10 +157,11 @@ onMounted(() => {
         <el-form-item>
           <template #label>
             <div class="flex-between">
-              <span>历史聊天记录</span>
+              <span>{{ t('workflow.history.label') }}</span>
+              <!-- 选择历史记录来源 -->
               <el-select v-model="formData.dialogue_type" :teleported="false" class="w-18!" size="small">
-                <el-option label="节点" value="NODE" />
-                <el-option label="工作流" value="WORKFLOW" />
+                <el-option :label="t('workflow.node.title')" value="NODE" />
+                <el-option :label="t('workflow.title')" value="WORKFLOW" />
               </el-select>
             </div>
           </template>
@@ -172,12 +179,13 @@ onMounted(() => {
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showSettings">
           <span class="flex-align-center gap-1">
-            返回内容
-            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            {{ t('workflow.returnContent.label') }}
+            <MkTooltip :content="t('workflow.returnContent.description')" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>
           <span>
+            <!-- 切换返回内容 -->
             <el-switch v-model="formData.is_result" size="small" />
           </span>
         </div>

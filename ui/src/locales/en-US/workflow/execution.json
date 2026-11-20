@@ -4,6 +4,11 @@
   },
   "executionResult": {
     "title": "Execution result",
+    "inputParams": "Input parameters",
+    "outputParams": "Output parameters",
+    "currentChat": "Current chat",
+    "answer": "Answer",
+    "errorLog": "Error log",
     "success": "Execution succeeded",
     "failure": "Execution failed"
   }
