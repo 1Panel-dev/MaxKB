@@ -305,7 +305,7 @@ onMounted(() => loadProblems())
     </template>
   </MkTable>
   <ProblemDetailDrawer
-    v-if="detailProblem && knowledgeProblemPermission('problemEdit')"
+    v-if="detailProblem"
     ref="problemDetailDrawerRef"
     v-model="detailProblem"
     :has-previous="hasPrevious"
