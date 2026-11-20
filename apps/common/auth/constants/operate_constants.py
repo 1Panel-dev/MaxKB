@@ -35,7 +35,7 @@ class Operate(Enum):
     VECTOR = ("READ+VECTOR", _("Vector"))
     MIGRATE = ("READ+MIGRATE", _("Migrate"))
     RELATE = ("READ+RELATE", _("Relate"))
-    USER_GROUP = ("READ+USER_GROUP", _("User Group"))
+    USER_GROUP = ("READ+USER_GROUP", _("Set User Group"))
     ANNOTATION = ("READ+ANNOTATION", _("Annotation"))
     CLEAR_POLICY = ("READ+CLEAR_POLICY", _("Clear Policy"))
     EMBED = ("READ+EMBED", _("Embed third party"))
