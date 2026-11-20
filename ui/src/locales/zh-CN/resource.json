@@ -7,7 +7,8 @@
   "dataSource": {
     "label": "数据源",
     "selectTitle": "选择数据源",
-    "typeLabel": "数据源类型"
+    "typeLabel": "数据源类型",
+    "documentsUnavailableMessage": "当前知识库不支持数据源文件查询"
   },
   "mcpConfig": {
     "title": "MCP 服务配置"
@@ -17,17 +18,6 @@
     "searchResults": "找到 {count} 个相关模板",
     "apply": "应用",
     "missingDownloadUrl": "模板缺少下载地址，无法使用"
-  },
-  "executionRecords": {
-    "title": "执行记录",
-    "detailTitle": "执行详情",
-    "view": "查看执行记录",
-    "resourceType": "资源类型",
-    "executionTime": "执行时间",
-    "errorMessage": "错误信息",
-    "status": {
-      "triggerFailed": "触发失败"
-    }
   },
   "messages": {
     "unsupportedScope": "当前资源范围不支持此操作"

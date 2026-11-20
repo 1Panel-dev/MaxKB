@@ -32,7 +32,7 @@ const strategyLabel = (strategy?: string) => {
     </div>
 
     <div v-for="(group, groupI) in data.group_list" :key="groupI" class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ group.label }} {{ t('workflow.executionResult.inputParams') }}</h6>
+      <h6 class="mb-2">{{ group.label }} {{ t('execution.details.inputParams') }}</h6>
       <div class="space-y-2">
         <p v-for="(f, i) in group.variable_list" :key="i">
           <span class="text-N600">{{ `${f.node_name}.${f.field}` }}：</span>
@@ -42,7 +42,7 @@ const strategyLabel = (strategy?: string) => {
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.outputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.outputParams') }}</h6>
       <div class="space-y-2">
         <p v-for="(f, i) in data.result" :key="i">
           <span class="text-N600">{{ i }}：</span>

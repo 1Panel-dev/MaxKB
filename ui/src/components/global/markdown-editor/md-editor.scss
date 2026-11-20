@@ -92,7 +92,7 @@
     p {
       padding: 0 !important;
       margin: 0 !important;
-      line-height: 24px;
+      line-height: 28px;
     }
 
     sup[data-title] {
@@ -144,6 +144,10 @@
 
     ul {
       list-style: circle;
+    }
+    img {
+      max-width: 300px;
+      margin: 0;
     }
   }
 

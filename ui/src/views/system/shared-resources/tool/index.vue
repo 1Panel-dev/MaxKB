@@ -204,7 +204,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   <!-- 查看执行记录 -->
                   <ExecutionRecordToolAction
                     v-if="(tool.tool_type === TOOL_TYPE.CUSTOM || tool.tool_type === TOOL_TYPE.WORKFLOW) && perm.tool.share.record()"
-                    :label="t('resource.executionRecords.view')"
+                    :label="t('execution.records.view')"
                     :api="SystemSharedToolWorkflowApi"
                     :tool="tool"
                   />

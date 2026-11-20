@@ -111,9 +111,9 @@ defineExpose({ open, close })
         {{ promptTip }}
       </el-alert>
       <el-form-item
-        :label="t('knowledge.generateQuestions.model.label')"
+        :label="t('model.ai.label')"
         prop="model_id"
-        :rules="[{ required: true, message: t('knowledge.generateQuestions.model.requiredMessage'), trigger: 'change' }]"
+        :rules="[{ required: true, message: t('model.ai.requiredMessage'), trigger: 'change' }]"
       >
         <SelectModel
           v-model="form.model_id"

@@ -65,16 +65,16 @@ watch(
         <el-button class="mr-1" text @click="visible = false">
           <MkIcon name="icon_arrow-left_outlined" :size="20" />
         </el-button>
-        <h4>{{ t('resource.executionRecords.detailTitle') }}</h4>
+        <h4>{{ t('execution.details.title') }}</h4>
       </div>
     </template>
     <div v-loading="loading">
       <!-- 执行记录 -->
-      <h4 class="mk-title-decoration mb-4">{{ t('resource.executionRecords.title') }}</h4>
+      <h4 class="mk-title-decoration mb-4">{{ t('execution.records.title') }}</h4>
       <el-card shadow="never">
         <div class="grid grid-cols-4 gap-4">
           <div class="min-w-0">
-            <p class="mb-1 text-N600">{{ t('trigger.executionRecords.task') }}</p>
+            <p class="mb-1 text-N600">{{ t('trigger.taskExecution.task') }}</p>
             <div class="flex-align-center gap-2">
               <ToolIcon
                 v-if="isTool"
@@ -101,23 +101,23 @@ watch(
             {{ runTime == null ? '-' : `${runTime.toFixed(2)} s` }}
           </div>
           <div>
-            <p class="mb-1 text-N600">{{ t('resource.executionRecords.executionTime') }}</p>
+            <p class="mb-1 text-N600">{{ t('execution.records.executionTime') }}</p>
             {{ datetimeFormat(record.create_time) }}
           </div>
         </div>
       </el-card>
       <!-- 执行详情 -->
-      <h4 class="mk-title-decoration my-4">{{ t('resource.executionRecords.detailTitle') }}</h4>
+      <h4 class="mk-title-decoration my-4">{{ t('execution.details.title') }}</h4>
 
       <template v-if="triggerFailed">
         <div class="mk-gray-card-sm mb-2">
-          <h6 class="mb-2">{{ t('trigger.executionRecords.input') }}</h6>
+          <h6 class="mb-2">{{ t('trigger.taskExecution.triggerInput') }}</h6>
           <div>
             {{ detail?.meta?.input }}
           </div>
         </div>
         <div class="mk-gray-card-sm">
-          <h6 class="mb-2">{{ t('resource.executionRecords.errorMessage') }}</h6>
+          <h6 class="mb-2">{{ t('execution.details.errorMessage') }}</h6>
           <div>
             {{ detail?.meta?.err_message }}
           </div>

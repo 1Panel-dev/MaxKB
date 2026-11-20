@@ -85,11 +85,6 @@
   "audioFile": {
     "label": "音訊檔案"
   },
-  "model": {
-    "label": "AI 模型",
-    "placeholder": "請選擇 AI 模型",
-    "requiredMessage": "請選擇 AI 模型"
-  },
   "defaultModel": {
     "label": "預設模型",
     "custom": "自訂",

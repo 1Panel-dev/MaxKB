@@ -1,9 +1,12 @@
 {
-  "dataSource": {
-    "documentsUnavailableMessage": "当前知识库不支持数据源文件查询"
+  "records": {
+    "title": "执行记录",
+    "view": "查看执行记录",
+    "resourceType": "资源类型",
+    "executionTime": "执行时间"
   },
-  "executionResult": {
-    "title": "执行结果",
+  "details": {
+    "title": "执行详情",
     "input": "输入",
     "output": "输出",
     "inputParams": "输入参数",
@@ -11,9 +14,12 @@
     "retrievalContent": "检索内容",
     "currentChat": "本次对话",
     "history": "历史记录",
-    "question": "问题",
     "answer": "回答",
-    "errorLog": "错误日志",
+    "errorMessage": "错误信息",
+    "errorLog": "错误日志"
+  },
+  "result": {
+    "title": "执行结果",
     "success": "执行成功",
     "failure": "执行失败"
   }

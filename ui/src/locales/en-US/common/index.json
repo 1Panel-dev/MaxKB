@@ -13,7 +13,8 @@
     "basicInfo": "Basic information",
     "type": "Type",
     "settings": "Settings",
-    "example": "Example"
+    "example": "Example",
+    "question": "Question"
   },
   "name": {
     "label": "Name",
@@ -40,7 +41,9 @@
   },
   "options": {
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "reference": "Reference",
+    "custom": "Custom"
   },
   "dateRange": {
     "lastDays": "Past {days} days",

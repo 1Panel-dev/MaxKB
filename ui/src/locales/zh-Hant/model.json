@@ -9,6 +9,11 @@
   "select": {
     "placeholder": "請選擇模型"
   },
+  "ai": {
+    "label": "AI 模型",
+    "placeholder": "請選擇 AI 模型",
+    "requiredMessage": "請選擇 AI 模型"
+  },
   "provider": {
     "label": "供應商",
     "placeholder": "選擇供應商",

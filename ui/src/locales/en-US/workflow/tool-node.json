@@ -1,0 +1,33 @@
+{
+  "mcp": {
+    "label": "MCP call",
+    "description": "Run tools on MCP servers over SSE or Streamable HTTP",
+    "serverConfig": {
+      "label": "MCP Server Config",
+      "requiredMessage": "Configure the MCP Server first"
+    },
+    "reference": {
+      "requiredMessage": "Select the referenced MCP tool first"
+    },
+    "tools": {
+      "loadSuccess": "Tools retrieved successfully",
+      "loadFailed": "Failed to retrieve tools. Check the MCP Server configuration."
+    },
+    "parameters": {
+      "label": "Tool parameters"
+    },
+    "variables": {
+      "title": "Set variables"
+    }
+  },
+  "customTool": {
+    "label": "Custom tool",
+    "description": "Process data by running custom scripts"
+  },
+  "tool": {
+    "label": "Tool node"
+  },
+  "toolWorkflow": {
+    "label": "Workflow tool"
+  }
+}

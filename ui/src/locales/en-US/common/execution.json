@@ -1,9 +1,12 @@
 {
-  "dataSource": {
-    "documentsUnavailableMessage": "You cannot browse data source files here."
+  "records": {
+    "title": "Execution history",
+    "view": "View execution history",
+    "resourceType": "Resource type",
+    "executionTime": "Execution time"
   },
-  "executionResult": {
-    "title": "Execution result",
+  "details": {
+    "title": "Execution details",
     "input": "Input",
     "output": "Output",
     "inputParams": "Input parameters",
@@ -11,9 +14,12 @@
     "retrievalContent": "Search content",
     "currentChat": "Current chat",
     "history": "History",
-    "question": "Question",
     "answer": "Answer",
-    "errorLog": "Error log",
+    "errorMessage": "Error message",
+    "errorLog": "Error log"
+  },
+  "result": {
+    "title": "Execution result",
     "success": "Execution succeeded",
     "failure": "Execution failed"
   }

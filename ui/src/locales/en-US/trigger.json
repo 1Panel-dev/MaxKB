@@ -46,22 +46,11 @@
   },
   "taskExecution": {
     "label": "Task execution",
-    "requiredMessage": "Select at least one task to run"
-  },
-  "taskParameters": {
-    "question": "Question",
-    "files": {
-      "document": "Document",
-      "image": "Image",
-      "audio": "Audio",
-      "video": "Video",
-      "other": "Other files"
-    },
-    "source": {
-      "reference": "Reference",
-      "custom": "Custom",
-      "invalidMessage": "Select a valid event request parameter or switch to Custom"
-    }
+    "task": "Triggered task",
+    "triggerInput": "Trigger input",
+    "requiredMessage": "Select at least one task to run",
+    "invalidReferenceMessage": "Select a valid event request parameter or switch to Custom",
+    "triggerFailed": "Trigger failed"
   },
   "labels": {
     "task": "Tasks",
@@ -71,9 +60,5 @@
     "title": "Delete trigger: {name}?",
     "batchTitle": "Delete the {count} selected trigger? | Delete the {count} selected triggers?",
     "description": "Deleting this trigger will stop its tasks and delete the related execution records."
-  },
-  "executionRecords": {
-    "task": "Triggered task",
-    "input": "Trigger input"
   }
 }

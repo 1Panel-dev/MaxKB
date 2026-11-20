@@ -18,7 +18,8 @@
 | knowledge     | 知识库、文档、分段、问题、标签、检索             |
 | model         | 模型、供应商、模型参数与连接测试                 |
 | dynamicForm   | 动态表单控件类型及配置器的固定界面文案           |
-| resource      | 关联关系、共享状态、MCP 配置及执行记录等公共业务 |
+| resource      | 关联关系、共享状态、数据源、MCP 配置及模板中心   |
+| execution     | 执行记录、执行详情及执行结果                     |
 | folder        | 文件夹操作、排序、表单提示和删除确认             |
 | tool          | 工具、MCP、Skill 管理                            |
 | trigger       | 触发器、定时与事件配置、执行任务                 |
@@ -33,9 +34,11 @@
 | email         | SMTP 邮箱配置、发件人及加密说明                  |
 | system        | 系统分组菜单及系统管理内共用文案                 |
 
-`common/` 是平台公共能力的分类目录，包含 `index.json`、`upload.json`、`dynamic-form.json`、`auth.json` 和 `authorization.json`。`common/index.json` 只维护通用操作、标签、状态和提示，其他文件分别使用 `upload`、`dynamicForm`、`auth`、`authorization` 命名空间，不增加 `common` 前缀。文件夹、资源及其他业务模块保持独立，不因多处复用就移入 `common/`。
+`common/` 是平台公共能力的分类目录，包含 `index.json`、`upload.json`、`dynamic-form.json`、`auth.json`、`authorization.json` 和 `execution.json`。`common/index.json` 只维护通用操作、标签、状态和提示，其他文件分别使用 `upload`、`dynamicForm`、`auth`、`authorization`、`execution` 命名空间，不增加 `common` 前缀。文件夹、资源及其他业务模块保持独立，不因多处复用就移入 `common/`。
 
 `common/auth.json` 负责身份认证，`common/authorization.json` 负责授权。共用的“按用户组／按用户”使用 `authorization.byGroup` / `byUser`，自动授权、已授权及授权操作使用同级的 `autoAuthorization`、`authorized`、`authorize`。资源授权界面、操作权限和工作空间授权分别归 `resource`、`permission`、`workspace` 分组，引用为 `authorization.<分组>.<用途>`。用户与用户组的共用字段仍复用 `user`、`userGroup`。
+
+`common/execution.json` 维护跨业务执行展示：`records` 包含执行记录入口、资源类型和执行时间，`details` 包含执行详情标题、输入／输出及错误等详情字段，`result` 包含执行结果标题及成功／失败提示。调用使用 `execution.<分组>.<用途>`，工具、知识库、触发器和工作流节点共用。输入与输入参数、输出与输出参数、错误信息与错误日志分别保留原文案；节点专属字段仍归对应节点分组，通用执行状态继续复用 `common.status`。
 
 翻译 key 最多四层，包含业务域命名空间。业务域内部的共用字段使用 `<业务域>.fields.<字段>.<用途>`，
 场景专属字段使用 `<业务域>.<场景>.<字段>.<用途>`；不同时叠加场景、fields 和 validation。
@@ -55,11 +58,11 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 归属以业务含义判断：知识库检索模式归 knowledge，知识库检索节点归 workflow。
 系统资源管理复用原业务域，不复制到 system。多处使用不等于通用；相同中文但业务语义
 不同可以使用不同 key。通用添加、编辑、删除、取消、保存和上传文件操作归 common.actions，
-仅有展示文案的通用标签归 common.labels，例如“创建者”和“操作”。名称与描述直接归 common.name 和 common.description，
+仅有展示文案的通用标签归 common.labels，例如“创建者”“操作”和“问题”。触发器任务输入及执行详情中的“问题”共用 `common.labels.question`；“用户问题”“检索问题”等完整名称保留各自文案。名称与描述直接归 common.name 和 common.description，
 字段的 label、placeholder 和实际使用的 requiredMessage 放在一起，表单、表头和筛选器共用 label。
 通用配置文案集中在 `common.configuration`：`label` 为“配置”，`title` 为带 `{name}` 的配置标题，`unconfigured` 为“未配置”；认证配置与智能体发布渠道共用，不再分别放入 actions、dialogs 和 status。
 `common.status` 维护状态标签 `label`、启用状态标签 `activeLabel`、通用启停选项 `enabled` / `disabled`，以及排队、执行、成功、失败、取消中和已取消等通用状态。
-通用布尔值“是／否”使用 `common.options.yes` / `no`，不替代业务专属的启用／禁用状态。
+通用布尔值“是／否”使用 `common.options.yes` / `no`，不替代业务专属的启用／禁用状态。通用选项“引用／自定义”使用 `common.options.reference` / `custom`，触发器参数、文档分段节点和 LLM 工具声明共用；“引用变量”“引用参数”等完整名称仍归各自业务，不缩写或拼接。
 用户、文档和图片中的“启用状态”统一使用 `common.status.activeLabel`，英文为 `Enabled status`；标签表示 `is_active` 的启用／禁用状态。
 文档、同步日志和执行记录复用这些状态文案；索引中、生成中、同步中、触发失败等专属文案保留在所属业务。
 “执行成功／执行失败”等完整结果提示保留业务含义，不替换为“成功／失败”。
@@ -141,6 +144,7 @@ auth.fields 维护共用的用户名、密码、验证码、邮箱和确认密�
 | `common/dynamic-form.json`  | `{ "types": { "textInput": "…" } }`             | `dynamicForm.types.textInput`  |
 | `common/auth.json`          | `{ "fields": { "captcha": { "label": "…" } } }` | `auth.fields.captcha.label`    |
 | `common/authorization.json` | `{ "resource": { "title": "…" } }`              | `authorization.resource.title` |
+| `common/execution.json`     | `{ "records": { "title": "…" } }`               | `execution.records.title`      |
 | `system/index.json`         | `{ "menu": { "identity": "…" } }`               | `system.menu.identity`         |
 | `system/user.json`          | `{ "username": { "label": "…" } }`              | `user.username.label`          |
 | `system/workspace.json`     | `{ "title": "…" }`                              | `workspace.title`              |
@@ -220,7 +224,8 @@ Admin 登录与找回密码页面支持三语切换，错误页暂不接入翻�
 卡片和下载／删除提示使用 model 语言包，操作按钮引用 common，
 授权入口引用 authorization，关联资源入口引用 resource。模型类型协议值不变，constants/model.ts 的 MODEL_TYPE_LABELS 提供共用响应式名称，
 类型名称与说明统一维护在 model.types.<类型>.label / description，保持四层结构。
-系统模型页与工作流默认模型设置共用同一类型映射；工作流 LLM 的“AI 模型”场景文案保留。
+系统模型页与工作流默认模型设置共用同一类型映射。
+“AI 模型”的标签、占位和必填提示统一归 `model.json` 的 `ai` 分组，工作流、智能体设置、长期记忆设置和生成问题弹窗直接使用 `model.ai.label`、`placeholder`、`requiredMessage`。`model.title` 的“模型”、`model.select.placeholder` 的“请选择模型”以及各业务的长期记忆／语音模型提示保留各自文案；默认模型来源仍归 `workflow.defaultModel`。
 内置分类标题按 provider 标识响应式翻译，不改写接口供应商名称。
 供应商选择、模型创建与编辑抽屉、高级参数表及独立参数设置抽屉已接入三语。
 高级参数表的控件类型名称读取 `common/dynamic-form.json`，加载到 dynamicForm 命名空间，
@@ -237,11 +242,11 @@ MkResourceCard、MkComplexSearch、MkEmpty 的默认创建信息、占位和空�
 ## 工具列表
 
 工作空间、系统资源管理和系统共享资源的工具菜单，以及普通工具类型名称共用 `tool.title`。列表标题“工具”使用 `tool.title`，“全部工具”使用 `tool.categories.all`。
-Skill、工作流和 MCP 的类型名称使用各自分组的 `label`，与表单文案一起维护在 `tool.json` 中。数据源的通用名称、选择标题及类型标签统一归 `resource.dataSource`，分别使用 `label`、`selectTitle`、`typeLabel`；工具类型、创建入口、工作流菜单、导入与调试共用这些文案。
+Skill、工作流和 MCP 的类型名称使用各自分组的 `label`，与表单文案一起维护在 `tool.json` 中。数据源的通用名称、选择标题及类型标签统一归 `resource.dataSource`，分别使用 `label`、`selectTitle`、`typeLabel`；工具类型、创建入口、工作流菜单、导入与调试共用这些文案。知识库工作流导入与调试中不支持查询数据源文件的提示使用同组的 `documentsUnavailableMessage`。
 内置目录用 tool.categories，按文件夹 ID 选择译文。自建文件夹名称、工具名称和描述直接展示接口值，类型筛选和请求使用原协议值。
 工具列表和输入参数共用 `tool.source.label`、`tool.source.custom`。工具列表的“工具商店”复用 `tool.store.title`，输入参数的“引用参数”使用 `tool.source.reference`。
 启停、删除和版本更新的工具专属提示归 tool；通用操作、启停状态和操作结果归 common。
-资源共享标签、MCP 服务配置及执行记录入口归 resource，触发器入口复用 `trigger.title`。
+资源共享标签、MCP 服务配置归 `resource`，执行记录入口复用 `execution.records`，触发器入口复用 `trigger.title`。
 工具商店的内置分类、搜索结果计数和应用工具文案归 `tool.store`。工具名称的专属占位和校验归 `tool.fields.name`。
 商店自定义分类、工具名称、描述和 README 使用接口原文。
 普通工具的创建、编辑、复制标题使用 `tool.createTitle`、`tool.editTitle`、`tool.duplicateTitle`，代码必填提示归 `tool.fields.code`。调试入口、运行状态和缺省错误提示归 `tool.debug`。
@@ -256,9 +261,9 @@ MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 
 参数表头及提示说明复用 `dynamicForm.fields`，模型和工具共用 `common.parameters.add`、`common.parameters.edit`。自定义工具节点原有“参数说明／请输入参数说明”使用 `tool.inputParams.description`，不替换为“参数提示说明”。
 自定义工具节点、工具库节点和工作流工具节点同样复用工具表单文案；参数值的输入与选择提示归 `dynamicForm.fields.parameter`，
 输入使用 `placeholder` / `requiredMessage`，选择使用 `selectPlaceholder` / `selectRequiredMessage`。
-执行详情中的“输入／输出”使用 `workflow.executionResult.input` / `output`，“输入参数／输出参数”使用同组的 `inputParams` / `outputParams`，按原标题选择。
+执行详情中的“输入／输出”使用 `execution.details.input` / `output`，“输入参数／输出参数”使用同组的 `inputParams` / `outputParams`，按原标题选择。
 工作流工具节点的自定义输入标题保留原值，缺省标题使用 `tool.inputParams.title`；来源选项使用 `tool.source`，
-空状态使用 `common.empty.default`，嵌套执行详情标题使用 `resource.executionRecords.detailTitle`。来源中的“引用”使用 `tool.source.referenceShortLabel`，“引用参数”继续使用 `tool.source.reference`。
+空状态使用 `common.empty.default`，嵌套执行详情标题使用 `execution.details.title`。来源中的“引用”使用 `tool.source.referenceShortLabel`，“引用参数”继续使用 `tool.source.reference`。
 参数来源只翻译选项标签，`reference`、`custom` 和数据类型沿用协议值。
 
 ## 智能体
@@ -270,10 +275,10 @@ MCP 工具表单的标题、名称提示、传输方式说明和配置校验归 
 复制名称按“原名称 + 空格 + `common.name.copySuffix`”组合，并根据当前语言后缀的长度保留 64 字符限制。表单中的用户内容、模板中心返回的名称与描述和工作流模板配置保持原值。
 简易智能体创建在提交时直接通过 `t` 读取当前语言的默认内容，与设置缺省值共用 `application/settings.json` 中的开场白、用户提示词和问题优化提示词。用户提示词统一使用 `application.prompt.userDefaultValue`，保留“使用中文回答”的语义；协议变量、标签与换行结构保持原样。
 智能体设置使用 `application/settings.json`：模型设置、高级设置的分区标题与未保存提示归 `application.settings`，开场白标签归 `application.prologue.label`。基本信息中的名称标签复用 `common.name.label`，占位及校验复用 `application.fields.name`；描述标签复用 `common.description.label`，占位复用 `application.fields.description.placeholder`。设置菜单与页面标题共用 `common.labels.settings`；保存、发布按钮及结果提示复用 `common.actions` / `messages`，表单校验失败提示使用 `common.validation.formInvalid`。切换语言不重置设置草稿或主动触发校验。
-模型选择、系统／用户提示词的共用标签、说明及校验归 `workflow.model`、`systemPrompt`、`userPrompt`，历史聊天记录标签归 `workflow.history`，提示词生成界面归 `workflow.promptGeneration`，输出思考及标签设置归 `workflow.thinking`，集中维护在 `workflow/index.json`。简易智能体的提示词变量说明和知识库引用选项归 `application/settings.json` 中的 `application.prompt`；变量通过 `t` 的参数原样传入 `{data}`、`{question}`、`{memory}`。用户已保存的提示词、模型返回内容及提示词生成组件的内置请求模板保持原值。`GenerateContent` 的替换、重新生成、生成中和失败提示分别复用 `common.actions`、`common.status` 与 `common.messages`，服务端错误原文透传。
+AI 模型的共用标签、占位及必填提示归 `model.ai`；系统／用户提示词的共用标签、说明及校验归 `workflow.systemPrompt`、`workflow.userPrompt`，历史聊天记录标签归 `workflow.history`，提示词生成界面归 `workflow.promptGeneration`，输出思考及标签设置归 `workflow.thinking`，这些工作流共用文案集中维护在 `workflow/index.json`。简易智能体的提示词变量说明和知识库引用选项归 `application/settings.json` 中的 `application.prompt`；变量通过 `t` 的参数原样传入 `{data}`、`{question}`、`{memory}`。用户已保存的提示词、模型返回内容及提示词生成组件的内置请求模板保持原值。`GenerateContent` 的替换、重新生成、生成中和失败提示分别复用 `common.actions`、`common.status` 与 `common.messages`，服务端错误原文透传。
 智能体的知识库关联空状态、无引用分段时的回答策略和问题优化归 `application/settings.json` 中的 `application.knowledgeSetting`；通用“参数设置”弹窗标题使用 `common.parameters.settingsTitle`，智能体与工作流共用。检索模式、相似度、召回分段数和最多引用字符数共用 `knowledge.retrieval`，选项直接读取 `KNOWLEDGE_SEARCH_MODE_OPTIONS` 的响应式名称和说明。问题优化的用户提示词标签复用 `workflow.userPrompt.label`；问题优化提示词和指定回答的占位与初始内容共用对应的 `defaultValue`，必填校验独立维护。
 默认开场白、用户提示词、问题优化提示词及指定回答分别归 `application.prologue.defaultValue`、`application.prompt.userDefaultValue`、`application.knowledgeSetting.problemOptimization.defaultValue` 和 `application.knowledgeSetting.noReferences.defaultValue`。通过现有初始化流程或模板直接调用 `t` 读取当前语言，不另存默认内容的翻译 key 常量，不新增翻译辅助函数；`{data}`、`{question}` 及 `<data></data>` 通过参数原样传入。详情回填沿用原有缺省条件，已有内容不重新翻译；指定回答默认值在打开参数弹窗时初始化。语言切换更新占位提示，保留已初始化内容及用户草稿，不重新校验。未保存状态使用详情回填时的配置快照比较，不随语言切换重新生成默认内容。
-长期记忆的开关、说明、弹窗标题、模型提示、触发方式、轮次和周期字段归 `application/settings.json` 的 `application.longTermMemory`，说明中的记忆变量由调用处原样传入。AI 模型标签复用 `workflow.model.label`，周期、星期、间隔单位与 Cron 字段及校验复用 `common.schedule`。触发卡片与周期选项在 computed 中直接调用 `t`，级联选项基于只读的 `SCHEDULE_OPTION` 生成，不改写协议值或共享常量；每月日期按数字与单位组合。保留模型补选、5–100 整数轮次、周期路径与 Cron 五字段校验，以及切换触发方式时已有的校验流程；语言切换不触发校验或重置草稿。
+长期记忆的开关、说明、弹窗标题、模型提示、触发方式、轮次和周期字段归 `application/settings.json` 的 `application.longTermMemory`，说明中的记忆变量由调用处原样传入。AI 模型标签复用 `model.ai.label`，周期、星期、间隔单位与 Cron 字段及校验复用 `common.schedule`。触发卡片与周期选项在 computed 中直接调用 `t`，级联选项基于只读的 `SCHEDULE_OPTION` 生成，不改写协议值或共享常量；每月日期按数字与单位组合。保留模型补选、5–100 整数轮次、周期路径与 Cron 五字段校验，以及切换触发方式时已有的校验流程；语言切换不触发校验或重置草稿。
 智能体的语音输入和播放设置归 `application/settings.json` 的 `application.speechInput`、`application.speechPlayback`：标签、自动发送／播放与播放方式在各组维护，模型占位和必填提示归各组的 `model`。这是智能体对话配置，工作流智能体的同类设置可复用；语音转文本、文本转语音节点自身的文案归 `workflow`。显示文案直接调用 `t`，播放方式协议值、模型筛选和开关清理行为保持原样。
 技能区域的标题和输出执行过程文案集中在 `application.skills`，分别使用 `label`、`outputExecution`；资源分组和选择器标题复用 `tool.title`、`tool.skill.label`、`tool.mcp.label`、`application.title`。缺少名称时，在模板中显示 `resource.selected` 或“已选 MCP”并追加原 ID；这些缺省显示文案不写入资源名称或回显快照，实际资源名称保留原文。MCP 来源及 JSON 配置不随语言切换改变，弹窗不因翻译后的规则更新而重新校验。
 对话文件上传的开关、上传方式、数量与大小配置归 `application/settings.json` 的 `application.fileUpload`；文件类型名称复用 `upload.types`。工作流智能体的基本信息节点同样引用这组智能体配置。
@@ -288,10 +293,13 @@ MCP、关联资源和模板中心入口复用 `resource`，资源授权入口复
 ## 工作流
 
 `workflow/` 是业务目录，统一挂载为 `workflow`；文件名不进入调用 key，不与同级 `workflow.json` 并存。
-`index.json` 维护菜单分组、共用的输入与变量配置，以及模型与默认模型来源、提示词、历史记录和输出思考文案。菜单中的 AI 能力、业务逻辑、数据处理和其他分组归 `workflow.menu`，数据源与知识库分组分别复用 `resource.dataSource.label`、`knowledge.title`；用户输入设置、参数校验、接口传参、全局变量及会话变量分别使用 `userInput`、`parameters`、`apiParameters`、`globalVariables`、`conversationVariables`。
-`execution.json` 维护工作流数据源查询的专属提示及执行结果文案，分别使用 `dataSource`、`executionResult`；数据源名称和选择文案复用 `resource.dataSource`。节点详情中的“输入／输出”“输入参数／输出参数”“历史记录”分别使用 `workflow.executionResult.input` / `output`、`inputParams` / `outputParams`、`history`；“本次对话／回答”使用 `currentChat` / `answer`；公共容器的“错误日志”标题使用 `workflow.executionResult.errorLog`，错误正文保留接口原文。
+`index.json` 维护菜单分组、共用的输入与变量配置，以及默认模型来源、提示词、历史记录和输出思考文案。菜单中的 AI 能力、业务逻辑、数据处理和其他分组归 `workflow.menu`，数据源与知识库分组分别复用 `resource.dataSource.label`、`knowledge.title`；用户输入设置、参数校验、接口传参、全局变量及会话变量分别使用 `userInput`、`parameters`、`apiParameters`、`globalVariables`、`conversationVariables`。
+执行结果及共用详情文案复用 `common/execution.json` 中的 `execution.result`、`execution.details`；数据源名称、选择文案及文件查询不支持提示统一归 `resource.dataSource`。节点详情中的“输入／输出”“输入参数／输出参数”“历史记录”分别使用 `execution.details.input` / `output`、`inputParams` / `outputParams`、`history`；“本次对话／回答”使用 `currentChat` / `answer`；公共容器的“错误日志”标题使用 `execution.details.errorLog`，错误正文保留接口原文。
 `nodes.json` 集中维护未单独拆分的节点文案，按节点职责分组维护菜单名称、说明、内置字段及节点专属配置，例如 `workflow.aiChat.label`、`workflow.aiChat.description` 和 `workflow.start.question`，不额外增加 `nodes` 层级。`llm-node.json` 完整维护 LLM 节点的 `llm` 分组，调用仍使用 `workflow.llm.*`，不在 `nodes.json` 重复定义。同一节点跨智能体、知识库和工具模式复用同一组文案，模式只决定可用节点范围。
 `loop-node.json` 集中维护循环相关的 `loop`、`loopStart`、`loopBody`、`loopContinue`、`loopBreak` 五组专属文案，调用仍为 `workflow.<分组>.*`，不增加 `loopNode` 层级，也不在 `nodes.json` 重复定义。条件匹配、参数字段和通用操作继续复用原有分组。参数提取、循环参数、用户输入参数和变量字段各自的格式提示保留原文，分别使用 `workflow.parameterExtraction.parameters.invalidMessage`、`workflow.loopStart.variables.invalidMessage`、`workflow.userInput.invalidParameterMessage` 和 `workflow.variable.invalidMessage`。
+`tool-node.json` 集中维护工具相关节点的 `mcp`、`customTool`、`tool`、`toolWorkflow` 四组文案，调用仍为 `workflow.<分组>.*`，不增加 `toolNode` 层级，也不在 `nodes.json` 重复定义。工具资源的创建和管理文案仍归 `tool`，LLM 工具声明仍归 `llm-node.json`。
+`knowledge-node.json` 集中维护知识库相关节点的 `searchKnowledge`、`searchDocument`、`documentExtract`、`reranker`、`documentSplit`、`localFile`、`webSource`、`knowledgeWrite` 八组文案，覆盖知识库的文档输入来源、内容处理、写入及检索，调用仍为 `workflow.<分组>.*`，不增加 `knowledgeNode` 层级，也不在 `nodes.json` 重复定义。各工作流模式复用同一组节点文案；知识库资源管理和文档处理策略仍归 `knowledge`，共用的文档字段、检索问题及范围仍归 `index.json`。
+`data-processing-node.json` 集中维护数据处理节点的 `variableAssign`、`variableAggregation`、`variableSplitting`、`parameterExtraction` 四组文案，调用仍为 `workflow.<分组>.*`，不增加 `dataProcessingNode` 层级，也不在 `nodes.json` 重复定义。跨节点共用的变量、引用变量及参数文案继续归 `index.json` 中的 `variable`、`referenceVariable`、`parameters`。
 节点共用的“结果”标签归 `workflow.node.result`；专属输出字段随节点分组维护，图片和视频类型复用 `upload.types`。循环开始的名称、下标与循环元素统一归 `workflow.loopStart`，循环内嵌定义与独立定义共用；循环体名称归 `workflow.loopBody`。
 节点菜单与快捷键的删除确认共用 `workflow.node.delete`，单个展示原节点名称，批量展示实际选中的节点数；节点保护与删除流程保持原样。
 循环开始的变量标题和内置参数禁用提示归 `workflow.loopStart.variables`。参数、显示名称复用 `dynamicForm.fields`，添加／编辑及按钮复用 `common`，重名提示复用 `workflow.parameters`，循环参数格式提示使用 `workflow.loopStart.variables.invalidMessage`。内置字段常量通过响应式配置直接调用 `t`，输出区使用 `loopStart.index`、`item`，详情中的“循环项／循环下标”使用 `currentItem`、`currentIndex`，复制提示使用 `copyParameter`；字段选择器的循环变量分组在读取时调用 `t`。保留 `index`、`item`、`loop` 协议值、用户字段及复制引用，语言切换不重置表单或主动校验。
@@ -299,8 +307,8 @@ MCP、关联资源和模板中心入口复用 `resource`，资源授权入口复
 节点输出字段及执行详情中的“回答内容”统一使用 `index.json` 中的 `workflow.answer.label`；需要“AI 回答内容”时，在使用处直接拼接固定前缀 `AI `，不增加翻译 key 或辅助函数。LLM 直接使用共用标签，数据字段的 `answer`、`content` 协议值和已有节点内容保持原样。
 节点输出字段及执行详情中的“思考过程”共用 `workflow.thinking.process`，与输出思考开关和标签设置一起归 `index.json` 的 `thinking`；`reasoning_content` 数据字段保持原样。
 语音转文本配置中的“语音文件”使用 `workflow.speechToText.audioFile`，执行详情中的“音频文件”使用 `workflow.audioFile.label`（`index.json`）；缺省音频名称复用 `upload.types.audio`，实际文件名、URL、图标后缀及文件引用示例保持原样。语音转文本和文本转语音的模型标签分别归 `workflow.speechToText.model.label`、`workflow.textToSpeech.model.label`；文本转语音的输入内容标签归 `workflow.textToSpeech.content.label`，配置和执行详情共用。节点设置、返回内容和选择校验复用现有共用文案，语言切换不重置配置或自动触发校验。
-意图识别的输入标签及意图分类配置归 `workflow.intent.input`、`workflow.intent.categories`，输出分类仍使用 `workflow.intent.category`。模型、历史记录、占位和校验复用现有共用文案。默认“其他”分类在节点初始化、表单及 AI 配置补齐分支时直接调用 `t`，已有分类内容、ID、`isOther` 标记和连线保持原样，切换语言不重写分支数据或主动校验。
-问题优化节点的内置系统提示词归 `workflow.questionOptimization.systemPrompt.defaultValue`，在节点初始化时直接调用 `t`，按原有缺省条件填入；已有提示词保持原值，编号与换行结构沿用原文。模型、系统／用户提示词、历史记录、返回内容及执行详情标题复用工作流共用文案，用户提示词的默认变量引用仍使用 `START_NODE_REFERENCES.question`；语言切换不重置内容或主动校验。
+意图识别的输入标签及意图分类配置归 `workflow.intent.input`、`workflow.intent.categories`，输出分类仍使用 `workflow.intent.category`。AI 模型标签复用 `model.ai.label`，历史记录、占位和校验复用现有共用文案。默认“其他”分类在节点初始化、表单及 AI 配置补齐分支时直接调用 `t`，已有分类内容、ID、`isOther` 标记和连线保持原样，切换语言不重写分支数据或主动校验。
+问题优化节点的内置系统提示词归 `workflow.questionOptimization.systemPrompt.defaultValue`，在节点初始化时直接调用 `t`，按原有缺省条件填入；已有提示词保持原值，编号与换行结构沿用原文。AI 模型标签复用 `model.ai.label`，系统／用户提示词、历史记录、返回内容及执行详情标题复用相应公共文案，用户提示词的默认变量引用仍使用 `START_NODE_REFERENCES.question`；语言切换不重置内容或主动校验。
 指定回复节点的回复格式与内容归 `workflow.reply.format`、`workflow.reply.content`；配置中的“回复类型”使用 `format.typeLabel`，执行详情中的“回复格式”使用 `format.label`，回复内容共用 `content.label`；引用变量及返回内容复用工作流共用文案。格式选项在原有名称映射中通过响应式配置直接调用 `t`，保留 `TEXT`、`HTML`、`TOOL` 协议值。示例的 JSON 字段和 HTML 标签留在代码中，只翻译说明及示例内容；变量引用通过 `{reference}` 原样传入，已保存回复与执行结果保持原值。
 表单收集的输出内容字段、配置标题和未提交状态归 `workflow.form.content`、`configuration`、`notSubmitted`，输出字段名称复用 `formData`；说明中的 `{ form }` 通过命名参数原样传入。字段表头、添加／编辑及按钮复用 `dynamicForm.fields` 和 `common`，重名与失效引用提示复用 `workflow.parameters.duplicateMessage`、`workflow.referenceVariable.missingMessage`。已有字段、默认值、输出模板及显隐引用保持原值，语言切换不重置配置或主动校验；执行详情保留原提交状态判断和括号格式。
 变量的通用标签、输入占位、必填／重名提示及添加／编辑操作统一归 `index.json` 中的 `workflow.variable`，赋值、聚合和拆分节点直接复用；输入变量标签归 `workflow.variable.input`，参数提取的“请选择输入变量”使用该组的 `requiredMessage`。普通变量选择的占位与校验使用 `workflow.variable.selectPlaceholder` / `selectRequiredMessage`；明确写“请选择引用变量”的位置使用 `workflow.referenceVariable.placeholder` / `requiredMessage`，变量拆分保留“请选择变量”。引用变量继续归 `workflow.referenceVariable`，节点专属的变量列表和配置留在各自节点分组。
@@ -309,7 +317,7 @@ MCP、关联资源和模板中心入口复用 `resource`，资源授权入口复
 变量拆分的拆分变量列表与 JSON Path 提示归 `workflow.variableSplitting`；输入变量、变量字段与添加／编辑操作复用 `workflow.variable`，显示名称、变量格式校验、选择提示及通用按钮复用已有文案。节点创建与编辑变量后的“结果”输出标签共用 `workflow.node.result`，执行详情复用输入／输出参数标题；JSON Path 示例通过命名参数原样传入，表达式、变量标识、用户显示名称、文档链接和执行数据保持原值，语言切换不重置配置或主动校验。
 参数提取的提取参数列表与参数类型归 `workflow.parameterExtraction.parameters`、`type`；参数、显示名称、描述、模型和添加／编辑操作复用已有文案，格式校验使用 `workflow.parameterExtraction.parameters.invalidMessage`，重名校验复用 `workflow.parameters.duplicateMessage`。节点创建与参数编辑后的“结果”输出标签共用 `workflow.node.result`，执行详情复用输入／输出参数标题；`string`、`number`、`object`、`boolean`、`array` 类型值、参数标识、用户显示名称、描述和模型来源规则保持原样，语言切换不重置配置或主动校验。
 知识库检索的图片字段归 `workflow.searchKnowledge.image`；参数摘要与设置弹窗共用 `knowledge.retrieval`，模式选项沿用 `KNOWLEDGE_SEARCH_MODE_OPTIONS`，未知模式值保留原文。知识库检索、文档标签检索与多路召回的问题标签、占位和必填提示共用 `index.json` 中的 `workflow.searchQuestion`；知识来源显示开关共用同文件的 `workflow.showInSources`。范围名称、自定义选项、关联提示和列表来源归 `workflow.searchScope`，引用文案与校验复用 `workflow.referenceVariable`。示例只翻译 `common.labels.example`，JSON 和资源 ID 原样保留。范围协议、选择状态、关联数据、数值范围及检索模式切换时的相似度规则保持原样，语言切换不重置配置或主动校验。
-检索节点执行详情的“检索内容”标题共用 `workflow.executionResult.retrievalContent`，知识库检索结果标题复用 `workflow.searchKnowledge.result`。图片／文本向量标签归 `knowledge.retrieval.imageVector`、`textVector`，召回测试与工作流详情共用；检索问题、分段内容、标题、知识库及文档名称保留接口原文，排序、相似度数值、图片预览和来源文件操作沿用原有规则。
+检索节点执行详情的“检索内容”标题共用 `execution.details.retrievalContent`，知识库检索结果标题复用 `workflow.searchKnowledge.result`。图片／文本向量标签归 `knowledge.retrieval.imageVector`、`textVector`，召回测试与工作流详情共用；检索问题、分段内容、标题、知识库及文档名称保留接口原文，排序、相似度数值、图片预览和来源文件操作沿用原有规则。
 多路召回的重排内容字段与 Score 阈值说明归 `workflow.reranker.content`、`score`，配置、参数摘要、弹窗及详情共用对应标签；重排模型复用 `model.types.reranker.label`，检索参数及召回分段数复用 `knowledge.retrieval`；“最大引用字符数”使用 `workflow.reranker.maxReferenceCharacters`，不替换为检索配置中的“最多引用字符数”。详情复用检索内容与图片／文本向量标签，结果标题沿用 `workflow.reranker.result`。保留模型来源、变量引用、数值范围、检索结果顺序及来源文件操作，语言切换不重置配置或主动校验。
 文档标签检索的自动／手动设置与说明归 `workflow.searchDocument.searchMode`，值或变量占位归 `value.placeholder`；条件匹配和添加条件复用 `workflow.condition`，标签选择复用 `knowledge.tags.key.selectPlaceholder`。比较符名称复用 `dynamicForm.operators`，节点常量使用响应式配置，AI schema 延迟读取比较符说明；选项范围、顺序、`auto`／`custom`、`AND`／`OR` 和比较符协议值保持原样。标签与实际值按接口或用户输入展示，不随语言切换重新查询或清空；执行详情只翻译输出参数标题，`knowledge_list`、`document_list` 及名称分隔格式保留原样。
 文档内容提取与文档分段的文档字段共用 `index.json` 中的 `workflow.document`，旧执行记录的缺省文件名称复用文档字段标签，编号在使用处组合。内容提取与 Web 数据源的预览限制说明共用 `workflow.document.characterPreviewHint`；节点设置、输出参数标题及字符单位复用已有文案。实际文件名、内容、来源及变量引用保持原值，文档内容预览沿用 500 字符限制，语言切换不重置当前文档或主动校验。
@@ -317,13 +325,14 @@ MCP、关联资源和模板中心入口复用 `resource`，资源授权入口复
 知识库写入的输入内容字段归 `index.json` 中的 `workflow.inputContent`，文档分段详情共用其 `label`；写入内容标题归 `workflow.knowledgeWrite.content`。两个节点的文档分段预览限制共用 `workflow.document.paragraphPreviewHint`，字符单位复用 `knowledge.stats.characters`。保留引用有效性校验、旧配置的末端输出默认值和执行数据，规则在 computed 中直接调用 `t`，语言切换不主动校验或重置配置与文档选择。
 本地文件数据源的格式、文件数量及大小限制归 `workflow.localFile.format`、`fileCount`、`fileSize`，执行详情复用同组的 `fileList`。范围校验通过命名参数传入上下限，大小标签的 `MB` 与括号保留在模板中；格式后缀、自定义格式、默认值和 1–1000 整数范围保持原样。规则在 computed 中直接调用 `t`，语言切换不重置配置或主动校验，文件名称及下载行为沿用执行数据。
 Web 数据源的无配置提示归 `workflow.webSource.noConfiguration`，详情的选择器与文档地址复用 `knowledge.fields.selector.label`、`knowledge.document.sourceUrl.label`，输入／输出参数及预览说明复用工作流共用文案。URL、选择器、文档名称和正文保持原值，沿用文档选择与预览截取逻辑，不因语言变化重置选择。
-智能体节点配置中的“用户问题”复用 `workflow.start.question`，执行详情中的“问题”使用 `workflow.executionResult.question`，分别保留原有名称。文档字段复用 `workflow.document`，图片、音频、视频类型及缺省名称复用 `upload.types`，执行详情中的“其他”使用 `common.labels.other`。按字段名称选择的占位及必填提示分别使用 `common.placeholders.selectField`、`common.validation.selectFieldRequired`，动态参数占位复用 `dynamicForm.fields.parameter.selectPlaceholder`。原有字段名称由既有规则读取后直接传入 `{label}`，不翻译用户字段、变量路径或执行内容；语言切换不重新加载智能体配置、重置引用或主动校验。
-图片与视频生成的正向提示词标签、必填提示及负向提示词标签、说明归 `index.json` 中的 `workflow.positivePrompt`、`workflow.negativePrompt`。图片生成的模型标签、正向提示词说明和负向提示词占位分别归 `workflow.imageGenerate.model`、`positivePrompt`、`negativePrompt`；执行详情中的“负向提示词”使用 `workflow.negativePrompt.detailLabel`，配置中的“提示词(负向)”仍使用 `label`；回答内容复用共用标签，本次对话标题复用 `workflow.executionResult.currentChat`。已有提示词、变量引用及生成结果保持原值，语言切换不重置内容或主动校验。
+智能体节点配置中的“用户问题”复用 `workflow.start.question`，执行详情中的“问题”使用 `common.labels.question`，分别保留原有名称。文档字段复用 `workflow.document`，图片、音频、视频类型及缺省名称复用 `upload.types`，执行详情中的“其他”使用 `common.labels.other`。按字段名称选择的占位及必填提示分别使用 `common.placeholders.selectField`、`common.validation.selectFieldRequired`，动态参数占位复用 `dynamicForm.fields.parameter.selectPlaceholder`。原有字段名称由既有规则读取后直接传入 `{label}`，不翻译用户字段、变量路径或执行内容；语言切换不重新加载智能体配置、重置引用或主动校验。
+图片与视频生成的正向提示词标签、必填提示及负向提示词标签、说明归 `index.json` 中的 `workflow.positivePrompt`、`workflow.negativePrompt`。图片生成的模型标签、正向提示词说明和负向提示词占位分别归 `workflow.imageGenerate.model`、`positivePrompt`、`negativePrompt`；执行详情中的“负向提示词”使用 `workflow.negativePrompt.detailLabel`，配置中的“提示词(负向)”仍使用 `label`；回答内容复用共用标签，本次对话标题复用 `execution.details.currentChat`。已有提示词、变量引用及生成结果保持原值，语言切换不重置内容或主动校验。
 视频生成的负向提示词占位共用 `workflow.negativePrompt.videoPlaceholder`。图生视频和文生视频的模型标签、正向提示词说明分别归 `workflow.imageToVideo`、`workflow.textToVideo`。首／尾帧字段归 `workflow.imageToVideo`，配置使用 `firstFrame.label`、`lastFrame.label`，详情标题和图片缺省名称中的“首帧／末帧”使用各字段的 `shortLabel`，首帧必填与尾帧可选规则保持原样。实际文件名、媒体地址、引用路径和文件引用示例不进入语言包。
-LLM 节点的上下文标签、说明、占位及必填提示归 `workflow.llm.context`；模型、系统／用户提示词及返回内容复用工作流共用文案。保留上下文开关与用户提示词必填条件，切换语言不重置节点配置或自动触发表单校验。
+LLM 节点的上下文标签、说明、占位及必填提示归 `workflow.llm.context`；AI 模型标签复用 `model.ai.label`，系统／用户提示词及返回内容复用工作流共用文案。保留上下文开关与用户提示词必填条件，切换语言不重置节点配置或自动触发表单校验。
 LLM 工具声明归 `workflow.llm`：声明及来源使用 `tools`，工具名称、描述、参数和数据类型分别使用 `toolName`、`toolDescription`、`toolParameters`、`dataType`，JSON 解析和导入使用 `jsonParse`、`toolImport`。参数基础字段与必填标签复用 `dynamicForm.fields`，“添加工具参数／编辑工具参数”使用 `workflow.llm.toolParameters.addTitle` / `editTitle`，通用操作复用 `common`，参数重名提示复用 `workflow.parameters.duplicateMessage`。OpenAI 类型值、函数名和 JSON 结构保留原样，导入示例的说明文字直接调用 `t`，不把整段 JSON 放入语言包。
 LLM 执行详情的系统／用户提示词及回答内容标题复用工作流共用字段，上下文、结束原因、拒答内容和工具调用标题复用 `workflow.llm`，不另设详情分组。节点名称、提示词及模型输出正文、消息角色、结束原因协议值和工具调用 JSON 按执行数据原样展示；`tokens`、`s` 和占位符 `-` 保持原样。
-AI 对话、图片理解及视频理解的智能体与知识库执行详情中，思考过程使用 `workflow.thinking.process`，AI 回答内容按共用标签组合；本次对话、系统／用户提示词复用工作流共用字段，“历史记录”使用 `workflow.executionResult.history`，图片／视频标签及缺省名称复用 `upload.types`。各模式保留已有区块与显隐条件，消息角色、正文、实际文件名及媒体地址按执行数据原样展示；视频图标使用的 `video.mp4` 保持原样。图片和视频理解的视觉模型标签复用 `model.types.image.label`，用户提示词、输出思考与返回内容复用工作流共用文案，媒体选择占位和必填提示分别复用 `common.placeholders.select`、`common.validation.selectRequired`；语言切换不重置配置或自动校验。
+MCP 节点的服务配置名称、配置／引用必填提示、获取工具结果提示、工具参数标题和变量设置弹窗标题归 `tool-node.json` 中的 `workflow.mcp`，配置与执行详情共用工具参数标题。原有 `MCP Server Config` 名称保留；引用 MCP、自定义来源及 MCP 工具必填提示复用 `tool.mcp` / `tool.source`，引用变量与选择占位复用工作流共用文案，输入提示、空状态和按钮复用 `common`。工具名称、参数名及说明由 MCP 接口提供，JSON 示例、配置中的变量引用与执行结果保持原值；在原有函数或模板中直接调用 `t`，语言切换不重新请求工具、改写节点数据或主动校验。
+AI 对话、图片理解及视频理解的智能体与知识库执行详情中，思考过程使用 `workflow.thinking.process`，AI 回答内容按共用标签组合；本次对话、系统／用户提示词复用工作流共用字段，“历史记录”使用 `execution.details.history`，图片／视频标签及缺省名称复用 `upload.types`。各模式保留已有区块与显隐条件，消息角色、正文、实际文件名及媒体地址按执行数据原样展示；视频图标使用的 `video.mp4` 保持原样。图片和视频理解的视觉模型标签复用 `model.types.image.label`，用户提示词、输出思考与返回内容复用工作流共用文案，媒体选择占位和必填提示分别复用 `common.placeholders.select`、`common.validation.selectRequired`；语言切换不重置配置或自动校验。
 按已处理的业务范围增加文件；知识库、工具专属节点与画布控制、执行详情分别按职责归组，不为每个组件新建文件。
 节点配置文案归 `workflow`，资源实体名称、创建和管理操作仍复用 `application`、`knowledge`、`tool`；同名中文不作为归类依据。
 节点设置标题与返回内容开关归 `workflow.nodeSettings`、`workflow.returnContent`；历史记录来源选项复用 `workflow.node.title`（`nodes.json`）和 `workflow.title`（`index.json`），保留 `NODE`、`WORKFLOW` 协议值。知识库四种资源范围的工作流入口菜单共用 `workflow.title`。节点系统／用户提示词的占位使用 `workflow.systemPrompt.placeholder`、`workflow.userPrompt.placeholder`，通过 `{reference}` 原样传入 `START_NODE_REFERENCES.question`。AI 对话的视觉开关归 `workflow.aiChat.vision`，图片／视频标签复用 `upload.types`，技能标题与输出执行过程复用 `application.skills`；语言切换只更新展示，不重置已保存提示词和节点配置。
@@ -337,20 +346,20 @@ AI 对话、图片理解及视频理解的智能体与知识库执行详情中�
 节点缺省开场白与用户输入标题分别复用 `application.prologue.defaultValue`、`workflow.userInput.title`，默认定义通过响应式配置读取，组件初始化时直接调用 `t`；基本信息名称复用 `common.labels.basicInfo`。表单默认输出内容归 `workflow.form.defaultContent`，通过命名参数原样传入 `{{form}}`。创建节点时复制为普通数据；已有图数据、模板内配置、节点名称及变量引用路径保留原文。长期记忆说明中的默认引用示例读取 `START_NODE_REFERENCES.memory`，再通过参数传入文案。
 文件上传配置的类型名称在响应式展示配置中直接调用 `t`；开始节点在刷新文件字段时复用 `upload.types`，长期记忆字段复用 `application.longTermMemory.label`，只写入当前语言的普通字符串。文件后缀、大小单位、数量与原有拼接标点保持原样。
 判断器及 Break／Continue 的比较符复用 `dynamicForm.operators`；`compareList` 的 `label` 通过响应式配置直接调用 `t`，按当前语言提供名称，比较符值与顺序保持原样。AI 条件 schema 的比较符说明延迟读取这些名称，不在模块初始化时固化译文。文件引用示例的标题复用 `common.labels.example`，JSON 数据由 `FILE_REFERENCE_EXAMPLE` 提供，不进入语言包。
-判断器及 Break／Continue 的条件匹配和添加条件操作共用 `workflow.condition.match`、`workflow.condition.actions.addCondition`；匹配文案前后分别调用 `t`，中间保留所有／任一下拉框。判断器的添加分支和结果标题归同组的 `actions.addBranch`、`result`。变量选择复用 `workflow.referenceVariable`，比较值的占位与校验分别复用 `dynamicForm.fields.comparisonValue.placeholder`、`requiredMessage`；比较符选项直接读取 `compareList.label`。Break／Continue 执行详情的输出参数标题复用 `workflow.executionResult.outputParams`，是否退出／继续分别归 `workflow.loopBreak.isBreak`、`workflow.loopContinue.isContinue`。分支类型、ID、比较符与逻辑协议值、比较值及执行结果保持原值，语言切换不重置条件或自动校验。
+判断器及 Break／Continue 的条件匹配和添加条件操作共用 `workflow.condition.match`、`workflow.condition.actions.addCondition`；匹配文案前后分别调用 `t`，中间保留所有／任一下拉框。判断器的添加分支和结果标题归同组的 `actions.addBranch`、`result`。变量选择复用 `workflow.referenceVariable`，比较值的占位与校验分别复用 `dynamicForm.fields.comparisonValue.placeholder`、`requiredMessage`；比较符选项直接读取 `compareList.label`。Break／Continue 执行详情的输出参数标题复用 `execution.details.outputParams`，是否退出／继续分别归 `workflow.loopBreak.isBreak`、`workflow.loopContinue.isContinue`。分支类型、ID、比较符与逻辑协议值、比较值及执行结果保持原值，语言切换不重置条件或自动校验。
 
 ## 触发器
 
 `trigger.json` 维护触发器业务，管理列表、工作空间和系统资源管理中的智能体／工具入口及资源触发器弹窗共用 `trigger.title`。
 定时与事件类型分别归 `scheduled` / `event`，名称使用 `label`；任务、下次执行时间等展示标签归 `labels`，删除确认与影响说明归 `delete`。
-名称、描述、创建信息、启停状态、通用操作和成功提示复用 `common`；任务分组名称复用 `application.title` / `tool.title`，执行记录入口复用 `resource.executionRecords.title`。
+名称、描述、创建信息、启停状态、通用操作和成功提示复用 `common`；任务分组名称复用 `application.title` / `tool.title`，执行记录入口复用 `execution.records.title`。
 资源触发器的周期摘要复用 `common.schedule`，只翻译周期、星期和单位，日期数字、时刻和间隔值在使用处组合；Cron 表达式、触发器名称和描述保持原值。
 类型和状态选项响应当前语言，筛选与启停请求仍使用原有协议值；已有周期摘要函数在执行时直接调用 `t`。
 创建／编辑标题使用 `createTitle` / `editTitle`，名称字段归 `fields.name`；触发周期归 `scheduled.period`，事件地址与令牌校验归 `event`。
-请求参数的标题、名称、数据类型及校验归 `requestParameters`，参数与必填表头复用 `dynamicForm.fields`；任务执行标签和必选提示归 `taskExecution`，内置问题、文件类型及参数来源归 `taskParameters`。
+请求参数的标题、名称、数据类型及校验归 `requestParameters`，参数与必填表头复用 `dynamicForm.fields`；任务执行标签和必选提示归 `taskExecution`；内置“问题”复用 `common.labels.question`，文件类型复用 `upload.types`，来源选项复用 `common.options.reference` / `custom`，事件请求参数的无效引用提示归 `taskExecution.invalidReferenceMessage`。
 周期级联选项直接读取 `SCHEDULE_OPTION` 的响应式 `label`，不改写共享常量；Cron 字段与校验复用 `common.schedule.cron`。输入占位与必填提示分别使用 `common.placeholders.inputField` / `common.validation.inputFieldRequired`。
 任务参数只翻译内置展示标签；用户定义的参数名、`body` 路径、数据类型、引用来源值和默认值保持原样。语言切换不初始化任务参数，不自动触发表单校验。
-执行记录与详情标题、资源类型、执行时间、错误信息归 `resource.executionRecords`，触发失败使用 `resource.executionRecords.status.triggerFailed`；触发任务和触发器入参归 `trigger.executionRecords`。
+执行记录标题、资源类型及执行时间归 `execution.records`，详情标题及错误信息归 `execution.details`，触发失败使用 `trigger.taskExecution.triggerFailed`；触发任务和触发器入参分别使用 `trigger.taskExecution.task` / `trigger.taskExecution.triggerInput`。
 触发器、工具和知识库工作流执行记录的状态筛选与展示直接读取 `EXECUTION_STATUS_OPTIONS` 的响应式 `label`，通用状态复用 `common.status`；名称、状态表头、耗时、操作和记录翻页复用 `common`，资源类型名称复用 `application.title` / `tool.title`。
 查询、排序和跨页浏览使用原协议值，未知状态及接口返回的任务名称、入参和错误内容保留原文；节点内部详情文案随工作流节点批次接入。
 
@@ -361,7 +370,7 @@ AI 对话、图片理解及视频理解的智能体与知识库执行详情中�
 工作空间、系统资源管理和系统共享资源的知识库菜单与列表标题共用 `knowledge.title`。四类知识库分别归 `knowledge.base`、`knowledge.web`、`knowledge.lark` 和 `knowledge.workflow`。类型筛选、类型列和创建菜单共用各组的 `label`，菜单说明使用 `description`，创建弹窗标题使用 `createTitle`。筛选请求沿用数字类型值。
 卡片的文档数、字符数和图片数使用 `knowledge.stats`，按实际数量选择单复数。向量化和分词索引归 `knowledge.actions`；同步入口使用 `knowledge.sync.label`。
 跨资源的模板中心文案归 `resource.templateStore`。模板名称、描述和 README 展示接口原文；缺少说明时与工具商店共用 `common.empty.noDetails`。
-手动同步、定时同步及日志共用 `knowledge.sync` 中的同步方式。向量化和生成问题共用的分段范围在 `knowledge/index.json` 中维护，使用 `knowledge.paragraphScope`。生成问题入口、弹窗字段、校验和内置默认提示词归 `knowledge.generateQuestions`；按钮、任务标签与弹窗标题共用 `title`，取消生成使用 `cancel`，均在 `knowledge/generate-questions.json` 维护。无已保存配置时按打开弹窗时的语言填入默认提示词，保留 `{data}` 与 `<question></question>`。提交时使用编辑框中的原文。
+手动同步、定时同步及日志共用 `knowledge.sync` 中的同步方式。向量化和生成问题共用的分段范围在 `knowledge/index.json` 中维护，使用 `knowledge.paragraphScope`。生成问题弹窗的 AI 模型字段复用 `model.ai`，入口、其他字段、校验和内置默认提示词归 `knowledge.generateQuestions`；按钮、任务标签与弹窗标题共用 `title`，取消生成使用 `cancel`，均在 `knowledge/index.json` 维护。无已保存配置时按打开弹窗时的语言填入默认提示词，保留 `{data}` 与 `<question></question>`。提交时使用编辑框中的原文。
 导出格式与源文件说明归 `knowledge.export`，单个及批量删除的确认标题归 `knowledge.delete`。
 Web 创建的根地址与选择器归 `knowledge.fields`。创建、文档上传、导入和设置共用的分段规则、图片处理与索引增强文案归 `knowledge.documentStrategy`。
 分段标识的文字选项归 `knowledge.documentStrategy.splitPatterns`，在 `knowledge/settings.json` 中维护。文档策略表单与工作流分段节点直接读取 `DOCUMENT_SPLIT_PATTERN_OPTIONS` 的响应式 `label`；纯符号与正则 `value` 保留原值，Agent 通过 `DOCUMENT_SPLIT_PATTERNS` 读取固定参数标识。
@@ -435,7 +444,7 @@ System 共享知识库、模型、工具的工作空间授权弹窗归 `authoriz
 
 `knowledge/index.json` 维护列表、知识库类型、创建、共用文案及尚未独立分文件的业务文案。仅有菜单名称、尚未形成独立业务分组的功能集中在 `knowledge.menu`，按菜单显示顺序排列，使用 `knowledge.menu.<名称>`。
 问题管理表头的“最近一次召回时间”使用 `knowledge.question.lastRetrievedAt`，其他位置的“最后一次召回时间”继续使用 `knowledge.stats.lastRetrievedAt`。
-`tag.json` 维护标签管理与文档标签设置，使用 `knowledge.tags`。`document.json` 维护文档列表、上传与预览，使用 `knowledge.document`；图片列表、上传、详情及校验文案同文件存放，使用与 `document` 平级的 `image` 分组，引用为 `knowledge.image`。`paragraph.json` 维护分段字段、校验、关联问题、列表操作及删除确认，使用 `knowledge.paragraph`；分段列表与导入预览共用 `knowledge.paragraph.empty`，数量单位复用 `knowledge.stats`。`settings.json` 维护基础设置与文档处理策略；`sync.json` 按 `sync`、`scheduledSync`、`syncLog` 的顺序维护同步方式、定时同步与同步日志。生成问题弹窗归 `generate-questions.json`。
+`tag.json` 维护标签管理与文档标签设置，使用 `knowledge.tags`。`document.json` 维护文档列表、上传与预览，使用 `knowledge.document`；图片列表、上传、详情及校验文案同文件存放，使用与 `document` 平级的 `image` 分组，引用为 `knowledge.image`。`paragraph.json` 维护分段字段、校验、关联问题、列表操作及删除确认，使用 `knowledge.paragraph`；分段列表与导入预览共用 `knowledge.paragraph.empty`，数量单位复用 `knowledge.stats`。`settings.json` 维护基础设置与文档处理策略；`sync.json` 按 `sync`、`scheduledSync`、`syncLog` 的顺序维护同步方式、定时同步与同步日志。生成问题弹窗文案归 `index.json` 中的 `generateQuestions` 分组。
 基础设置标题、上传限制和更换向量模型确认归 `knowledge.baseSettings`，四种资源范围的基础设置路由共用 `knowledge.baseSettings.title`；类型名称与说明复用知识库类型分组，Web 字段复用 `knowledge.fields`，飞书凭据的固定字段名使用通用输入占位与校验。文档策略的同步生效说明归 `knowledge.documentStrategy.syncHint`。
 同步入口、同步方式与共用提示归 `knowledge.sync`，`label` 用于“同步”按钮及任务标签，`title` 用于“同步知识库”弹窗；定时同步字段、开关说明和业务校验归 `knowledge.scheduledSync`，菜单共用其 `title`；日志表头和已知跳过原因归 `knowledge.syncLog`，同步专属状态与结果计数标签共用 `knowledge.syncLog.status`，均在 `knowledge/sync.json` 维护，成功／失败状态及失败计数标签复用 `common.status`。统计按“文档: 数量 (已同步: 数量, …)”组合，各语言保持顺序和格式一致；接口返回的未知原因与错误详情保留原文。
 标签导入标题、模板和格式限制归 `knowledge.tags.import`，关联文档标题及页签归 `knowledge.tags.documents`；文档字段复用 `knowledge.document`，通用关联操作及结果提示复用 `common`，文件选择校验复用 `upload`。
@@ -451,7 +460,7 @@ System 共享知识库、模型、工具的工作空间授权弹窗归 `authoriz
 四种资源范围的详情菜单和页面标题共用路由中的翻译 key：已整理的业务引用所属分组的 `title`，例如 `knowledge.document.title`、`knowledge.tags.title` 和 `knowledge.documentStrategy.title`；仅有菜单名称的功能引用 `knowledge.menu`，不重复定义标题。“设置”复用 `common.labels.settings`。
 文档列表的文件状态标题、专属处理阶段和进度归 `knowledge.document.status`，通用状态复用 `common.status`；召回处理选项归 `knowledge.document.hitHandling`。筛选项和行内展示共用译文，接口接收原有状态、任务类型和召回处理值。
 图片菜单与页面标题共用 `knowledge.image.title`。图片处理配置复用 `knowledge.documentStrategy`，上传限制、格式说明和上传校验复用 `upload`；文档状态、召回处理及共用文档操作继续引用 `knowledge.document`，统计字段引用 `knowledge.stats`。接口返回的图片名称、标签、模型和工具名称保留原文。
-工作流文档导入的操作归 `knowledge.document.import`。导入与调试共用的数据源选择文案归 `resource.dataSource`，数据源查询的专属提示及执行结果文案归 `workflow/execution.json`，分别使用 `workflow.dataSource`、`workflow.executionResult`；默认用户输入标题使用 `workflow/index.json` 中的 `workflow.userInput`，执行中和已取消复用 `common.status`。
+工作流文档导入的操作归 `knowledge.document.import`。导入与调试共用的数据源选择文案和文件查询不支持提示归 `resource.dataSource`，执行结果文案归 `common/execution.json` 中的 `execution.result`；默认用户输入标题使用 `workflow/index.json` 中的 `workflow.userInput`，执行中和已取消复用 `common.status`。
 
 ## 文件夹
 

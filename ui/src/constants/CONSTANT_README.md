@@ -46,7 +46,7 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 周期类型统一使用 `api/enums/schedule.ts` 的 `SCHEDULE_TYPE`，经 `@/api/enums` 导入。
 
 `state.ts` 的 `EXECUTION_STATUS_OPTIONS` 维护触发器、工具和知识库工作流执行记录共用的响应式 `label` 与图标类型，包含 `PENDING`、`STARTED`、`SUCCESS`、`FAILURE`、`REVOKE`、`REVOKED`、`TRIGGER_ERROR` 七种接口状态。
-通用状态文案归 `common.status`，触发失败归 `resource.executionRecords.status.triggerFailed`。新增状态在业务配置中补齐展示，不修改 `MkStatusLabel`。
+通用状态文案归 `common.status`，触发失败归 `trigger.taskExecution.triggerFailed`。新增状态在业务配置中补齐展示，不修改 `MkStatusLabel`。
 文档任务使用 `views/knowledge-detail/library/document/status.ts` 的独立配置，筛选查询仍映射 `DOCUMENT_TASK_STATE` 与 `DOCUMENT_TASK_TYPE`，不提交展示状态键。
 
 `document.ts` 的 `DOCUMENT_HIT_HANDLING_LABELS` 按 API 枚举 `DOCUMENT_HIT_HANDLING` 提供响应式名称，文档和图片的列表筛选、表格单元格及文档设置共用。

@@ -12,8 +12,6 @@
       "label": "工具声明",
       "description": "按 OpenAI 标准 Function Calling 格式声明工具能力，仅用于模型决策，不在此处执行；调用请求（工具名 + 参数）经参数 tool_calls 返回",
       "placeholder": "请选择工具变量",
-      "custom": "自定义",
-      "reference": "引用",
       "addTitle": "添加工具",
       "editTitle": "编辑工具"
     },

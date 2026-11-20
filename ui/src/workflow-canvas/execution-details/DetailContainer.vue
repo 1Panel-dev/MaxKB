@@ -32,7 +32,7 @@ const showContent = computed(() => isSuccess.value || props.showContentOnError)
       <div v-if="show" class="mt-4 cursor-auto space-y-2 wrap-anywhere" @click.stop>
         <slot v-if="showContent" />
         <div v-else class="mk-gray-card-sm">
-          <h6 class="mb-2">{{ t('workflow.executionResult.errorLog') }}</h6>
+          <h6 class="mb-2">{{ t('execution.details.errorLog') }}</h6>
           <div>{{ data.err_message || '-' }}</div>
         </div>
       </div>

@@ -20,7 +20,7 @@ defineProps<{
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.inputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.inputParams') }}</h6>
       <div class="space-y-2">
         <p class="text-N600">{{ t('workflow.textToSpeech.content.label') }}：</p>
         <MdPreview v-if="data.content" :model-value="data.content" noImgZoomIn />
@@ -28,7 +28,7 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.outputParams') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.outputParams') }}</h6>
       <div class="space-y-2">
         <p class="text-N600">{{ t('workflow.audioFile.label') }}：</p>
         <div v-if="data.answer" v-html="data.answer" />

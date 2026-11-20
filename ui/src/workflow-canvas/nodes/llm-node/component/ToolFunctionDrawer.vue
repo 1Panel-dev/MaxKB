@@ -243,7 +243,7 @@ defineExpose({ open, close })
             <span class="block truncate" :title="row.description || '-'">{{ row.description || '-' }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="55">
+        <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="90">
           <template #default="{ row }">{{ row.required ? t('common.options.yes') : t('common.options.no') }}</template>
         </el-table-column>
         <el-table-column :label="t('common.labels.operation')" width="80">

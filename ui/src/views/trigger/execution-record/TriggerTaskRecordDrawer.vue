@@ -31,7 +31,7 @@ const searchFields = computed(() => [
     ],
   },
   {
-    label: t('resource.executionRecords.resourceType'),
+    label: t('execution.records.resourceType'),
     value: 'source_type',
     options: [
       { label: t('application.title'), value: RESOURCE_TYPE.APPLICATION },
@@ -117,7 +117,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" :title="t('resource.executionRecords.title')" size="840" @close="closeDetails">
+  <MkDrawer v-model="visible" :title="t('execution.records.title')" size="840" @close="closeDetails">
     <div class="mb-4">
       <MkComplexSearch v-if="visible" :fields="searchFields" class="w-76!" @change="searchRecords" />
     </div>
@@ -131,7 +131,7 @@ defineExpose({ open })
       @size-change="loadRecords()"
       @sort-change="handleSortChange"
     >
-      <el-table-column :label="t('trigger.executionRecords.task')" min-width="130" show-overflow-tooltip>
+      <el-table-column :label="t('trigger.taskExecution.task')" min-width="130" show-overflow-tooltip>
         <template #default="{ row }">
           <div class="flex-align-center gap-2">
             <ApplicationIcon v-if="row.source_type === RESOURCE_TYPE.APPLICATION" :icon="row.source_icon" :size="20" />
@@ -157,13 +157,13 @@ defineExpose({ open })
       <el-table-column :label="t('common.labels.duration')" width="90">
         <template #default="{ row }">{{ row.run_time == null ? '-' : `${row.run_time.toFixed(2)} s` }}</template>
       </el-table-column>
-      <el-table-column :label="t('resource.executionRecords.executionTime')" prop="create_time" width="180" sortable>
+      <el-table-column :label="t('execution.records.executionTime')" prop="create_time" width="180" sortable>
         <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
       </el-table-column>
       <el-table-column :label="t('common.labels.operation')" width="70">
         <template #default="{ row }">
           <!-- 查看执行详情 -->
-          <MkTooltip :content="t('resource.executionRecords.detailTitle')" placement="top">
+          <MkTooltip :content="t('execution.details.title')" placement="top">
             <el-button text type="primary" @click="showDetails(row)"><MkIcon name="icon_describe_outlined" /></el-button>
           </MkTooltip>
         </template>

@@ -30,7 +30,7 @@ watch(
 
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">
-        {{ t('workflow.executionResult.outputParams') }}
+        {{ t('execution.details.outputParams') }}
         <span v-if="!data.is_submit" class="text-danger">({{ t('workflow.form.notSubmitted') }})</span>
       </h6>
       <div>

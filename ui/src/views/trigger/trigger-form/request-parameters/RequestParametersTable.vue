@@ -60,7 +60,7 @@ function formatFieldType(type: TriggerBodyField['type']) {
           <span class="block truncate" :title="row.desc || '-'">{{ row.desc || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="64">
+      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="90">
         <template #default="{ row, $index }">
           <!-- 切换参数必填状态 -->
           <el-switch :model-value="Boolean(row.required)" size="small" @change="updateRequired($index, Boolean($event))" />

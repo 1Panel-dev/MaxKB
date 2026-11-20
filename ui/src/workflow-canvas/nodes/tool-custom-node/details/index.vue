@@ -21,7 +21,7 @@ defineProps<{
 
     <!-- 输入 -->
     <div v-if="data.index != 0" class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.input') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.input') }}</h6>
       <div class="break-all">
         {{ data.params || '-' }}
       </div>
@@ -29,7 +29,7 @@ defineProps<{
 
     <!-- 输出 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.executionResult.output') }}</h6>
+      <h6 class="mb-2">{{ t('execution.details.output') }}</h6>
       <div class="break-all">
         {{ data.result || '-' }}
       </div>

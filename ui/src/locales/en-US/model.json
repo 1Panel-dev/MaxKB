@@ -9,6 +9,11 @@
   "select": {
     "placeholder": "Select a model"
   },
+  "ai": {
+    "label": "AI model",
+    "placeholder": "Select an AI model",
+    "requiredMessage": "Select an AI model"
+  },
   "provider": {
     "label": "Provider",
     "placeholder": "Select a provider",

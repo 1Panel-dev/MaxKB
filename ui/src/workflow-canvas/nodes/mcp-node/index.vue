@@ -2,6 +2,7 @@
 import { computed, inject, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { set } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ToolItem } from '@/api/types'
 import type { FormFieldLabel } from '@/components/mk-dynamics-form/type'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -19,6 +20,7 @@ import McpServerInputDialog from './component/McpServerInputDialog.vue'
 import { MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowMcpNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => BaseNodeModel
 const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
@@ -151,7 +153,7 @@ async function getTools() {
   if (!valid) return
   if (form_data.value.mcp_source === 'referencing' && form_data.value.mcp_tool_id) {
     if (!mcpToolSelectOptions.value.find((item) => item.id === form_data.value.mcp_tool_id)) {
-      MsgError('请先选择引用的 MCP 工具')
+      MsgError(t('workflow.mcp.reference.requiredMessage'))
       return
     }
   }
@@ -163,7 +165,7 @@ async function getTools() {
       return
     }
   } catch {
-    MsgError('请先配置 MCP Server')
+    MsgError(t('workflow.mcp.serverConfig.requiredMessage'))
     return
   }
   _getTools(form_data.value.mcp_servers)
@@ -174,10 +176,10 @@ async function _getTools(mcpServers: string) {
   try {
     const tools = await store.getMcpTools(mcpResourceType, mcpResourceId, mcpServers)
     form_data.value.mcp_tools = tools
-    MsgSuccess('获取工具成功')
+    MsgSuccess(t('workflow.mcp.tools.loadSuccess'))
     form_data.value.mcp_server = tools.find((item) => item.name === form_data.value.mcp_tool)?.server ?? ''
   } catch {
-    MsgError('获取工具失败，请检查 MCP Server 配置')
+    MsgError(t('workflow.mcp.tools.loadFailed'))
   } finally {
     loading.value = false
   }
@@ -277,12 +279,12 @@ const validate = () => {
     for (const item of requiredFields) {
       const value = paramsOf()[item.label.label]
       if (value === undefined || value === null || value === '') {
-        vList.push(Promise.reject(`请输入 ${item.label.label}`))
+        vList.push(Promise.reject(t('common.validation.inputFieldRequired', { label: item.label.label })))
       }
     }
   }
   if (dynamicsFormRef.value || mcpNodeFormRef.value) {
-    if (!form_data.value.mcp_tool) vList.push(Promise.reject('请选择 MCP 工具'))
+    if (!form_data.value.mcp_tool) vList.push(Promise.reject(t('tool.mcp.tools.requiredMessage')))
   }
   if (mcpNodeFormRef.value) vList.push(mcpNodeFormRef.value.validate())
   return Promise.all([...vList]).catch((error) => Promise.reject({ node: model, errMessage: error }))
@@ -303,25 +305,33 @@ onMounted(() => {
 </script>
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="mcpNodeFormRef" :model="form_data" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="mcpNodeFormRef"
+        :model="form_data"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <!-- MCP Server Config -->
         <el-form-item
-          label="MCP Server Config"
+          :label="t('workflow.mcp.serverConfig.label')"
           :prop="mcpConfigProp"
           class="mk-hide-asterisk"
           :rules="[
             {
               required: true,
-              message: form_data.mcp_source === 'custom' ? '请先配置 MCP Server' : '请先选择引用的 MCP 工具',
+              message:
+                form_data.mcp_source === 'custom' ? t('workflow.mcp.serverConfig.requiredMessage') : t('workflow.mcp.reference.requiredMessage'),
               trigger: ['change', 'blur'],
             },
           ]"
         >
           <template #label>
             <div class="flex-between">
-              <span class="mk-required">MCP Server Config</span>
+              <span class="mk-required">{{ t('workflow.mcp.serverConfig.label') }}</span>
               <el-select
                 :teleported="false"
                 v-model="form_data.mcp_source"
@@ -330,14 +340,14 @@ onMounted(() => {
                 class="w-23!"
                 @change="changeMcpSource"
               >
-                <el-option label="引用 MCP" value="referencing" />
-                <el-option label="自定义" value="custom" />
+                <el-option :label="t('tool.mcp.reference')" value="referencing" />
+                <el-option :label="t('tool.source.custom')" value="custom" />
               </el-select>
             </div>
           </template>
           <MdEditorMagnify
             v-if="form_data.mcp_source === 'custom'"
-            title="MCP Server Config"
+            :title="t('workflow.mcp.serverConfig.label')"
             v-model="form_data.mcp_servers"
             :placeholder="mcpServerJson"
             @wheel="handleNodeWheel"
@@ -348,7 +358,7 @@ onMounted(() => {
                 <div class="flex-align-center gap-2">
                   <ToolIcon :size="20" :icon="mcpTool.icon" :type="mcpTool.tool_type" />
                   <span>{{ mcpTool.name }}</span>
-                  <el-tag v-if="mcpTool.scope === 'SHARED'" size="small" type="info">共享</el-tag>
+                  <el-tag v-if="mcpTool.scope === 'SHARED'" size="small" type="info">{{ t('resource.shared') }}</el-tag>
                 </div>
               </el-option>
             </template>
@@ -359,7 +369,8 @@ onMounted(() => {
         <el-form-item>
           <template #label>
             <div class="flex-between">
-              <span>工具</span>
+              <span>{{ t('tool.title') }}</span>
+              <!-- 获取 MCP 工具 -->
               <el-button type="primary" text @click="getTools">
                 <MkIcon name="icon_refresh_outlined" />
               </el-button>
@@ -379,7 +390,7 @@ onMounted(() => {
       </el-form>
     </div>
     <!-- 工具参数 -->
-    <h6 class="mk-title-decoration mb-2 mt-2">工具参数</h6>
+    <h6 class="mk-title-decoration mb-2 mt-2">{{ t('workflow.mcp.parameters.label') }}</h6>
     <div class="mk-gray-card">
       <el-form
         v-if="form_data.mcp_tool"
@@ -397,8 +408,8 @@ onMounted(() => {
               <span v-else :class="item.required ? 'mk-required' : ''">{{ item.label.label }}</span>
 
               <el-select :teleported="false" v-model="item.source" size="small" class="w-21!" @change="setParamValue(item, '')">
-                <el-option label="引用变量" value="referencing" />
-                <el-option label="自定义" value="custom" />
+                <el-option :label="t('workflow.referenceVariable.label')" value="referencing" />
+                <el-option :label="t('tool.source.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -406,38 +417,38 @@ onMounted(() => {
             v-if="item.source === 'custom' && item.input_type === 'TextInput'"
             :model-value="paramsOf()[item.label.label]"
             @update:model-value="setParamValue(item, $event)"
-            placeholder="请输入"
+            :placeholder="t('common.placeholders.input')"
           />
           <el-input-number
             v-else-if="item.source === 'custom' && item.input_type === 'NumberInput'"
             :model-value="paramsOf()[item.label.label]"
             @update:model-value="setParamValue(item, $event)"
-            placeholder="请输入"
+            :placeholder="t('common.placeholders.input')"
           />
           <el-switch
             v-else-if="item.source === 'custom' && item.input_type === 'SwitchInput'"
             :model-value="paramsOf()[item.label.label]"
             @update:model-value="setParamValue(item, $event)"
-            placeholder="请输入"
+            :placeholder="t('common.placeholders.input')"
           />
           <el-input
             v-else-if="item.source === 'custom' && item.input_type === 'JsonInput'"
             :model-value="paramsOf()[item.label.label]"
             @update:model-value="setParamValue(item, $event)"
             type="textarea"
-            placeholder="请输入"
+            :placeholder="t('common.placeholders.input')"
           />
           <NodeCascader
             v-if="item.source === 'referencing'"
             :node-model="model"
             class="w-full"
-            placeholder="请选择变量"
+            :placeholder="t('workflow.variable.selectPlaceholder')"
             :model-value="getParamReference(item)"
             @update:model-value="setParamValue(item, $event)"
           />
         </el-form-item>
       </el-form>
-      <el-text v-else type="info">暂无数据</el-text>
+      <el-text v-else type="info">{{ t('common.empty.default') }}</el-text>
     </div>
     <McpServerInputDialog ref="mcpServerInputDialogRef" @refresh="handleMcpVariables" />
   </NodeContainer>

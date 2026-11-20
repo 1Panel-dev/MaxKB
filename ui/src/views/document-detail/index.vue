@@ -458,7 +458,7 @@ onMounted(() => {
                 />
 
                 <h4 class="mb-2 pr-44">{{ paragraph.title || '-' }}</h4>
-                <MdPreview :model-value="paragraph.content" />
+                <MdPreview :model-value="paragraph.content" no-img-zoom-in />
                 <p class="mt-2 text-sm text-N600">{{ paragraph.content.length }} {{ t('knowledge.stats.characters', paragraph.content.length) }}</p>
               </el-card>
             </div>

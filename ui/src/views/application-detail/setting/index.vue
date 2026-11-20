@@ -315,7 +315,7 @@ onMounted(() => {
                 <h6>{{ t('application.settings.model') }}</h6>
               </template>
               <div class="p-2">
-                <el-form-item :label="t('workflow.model.label')">
+                <el-form-item :label="t('model.ai.label')">
                   <SelectModel
                     v-model="settings.model_id"
                     v-model:model-params="settings.model_params_setting"
@@ -325,7 +325,7 @@ onMounted(() => {
                     can-edit-params
                     can-add
                     teleported
-                    :placeholder="t('workflow.model.placeholder')"
+                    :placeholder="t('model.ai.placeholder')"
                     @refresh="loadModels"
                   />
                 </el-form-item>

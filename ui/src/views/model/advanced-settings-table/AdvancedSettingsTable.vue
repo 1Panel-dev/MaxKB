@@ -81,7 +81,7 @@ function handleDeleteParam(index: number) {
       </template>
     </el-table-column>
     <el-table-column :label="t('dynamicForm.fields.defaultValue.label')" min-width="90" prop="default_value" show-overflow-tooltip></el-table-column>
-    <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" min-width="70">
+    <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="90">
       <template #default="{ row }">
         <el-switch :model-value="row.required ?? false" disabled size="small" />
       </template>
