@@ -203,7 +203,7 @@ function handleBatchDelete() {
 
 <template>
   <MkViewLayout :title="t('knowledge.title')" class="workspace-knowledge-view" collapsible resizable>
-    <template #aside="{ title, Header }">
+    <template v-if="perm.knowledge.workspace.folderReadWorkspace()" #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
         <MkTooltip v-if="perm.knowledge.workspace.folderCreateWorkspace()" :content="t('folder.actions.create')" placement="top">
