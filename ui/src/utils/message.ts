@@ -35,7 +35,7 @@ export function MsgError(message: MessageContent, options?: MessageOverrides) {
   return MKMessage('error', message, options)
 }
 
-/** 显示确认对话框，确认时 resolve，取消或关闭时 reject。 */
+/** 显示确认对话框，确定时 resolve，取消或关闭时 reject。 */
 export function MsgConfirm(title: string, message?: ConfirmContent, options?: ConfirmOverrides) {
   return ElMessageBox.confirm(message, title, {
     confirmButtonText: t('common.actions.delete'),

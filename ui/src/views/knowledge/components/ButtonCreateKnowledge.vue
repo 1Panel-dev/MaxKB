@@ -94,7 +94,7 @@ function handleImportCreate(file: UploadFile) {
         emit('refresh')
         return MsgConfirm(t('common.dialogs.notice'), t('knowledge.import.embeddingNotice'), {
           showCancelButton: false,
-          confirmButtonText: t('common.actions.confirm'),
+          confirmButtonText: t('common.actions.comfirm'),
           confirmButtonType: 'primary',
         }).then(() => {
           const routePrefix = isSystemSharedResource() ? 'system-shared-knowledge' : 'workspace-knowledge'

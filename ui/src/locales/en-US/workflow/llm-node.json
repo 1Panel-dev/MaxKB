@@ -31,6 +31,8 @@
     },
     "toolParameters": {
       "label": "Tool parameters",
+      "addTitle": "Add tool parameter",
+      "editTitle": "Edit tool parameter",
       "empty": "No parameters",
       "nameRequiredMessage": "Enter a parameter name",
       "nameLengthMessage": "Parameter names cannot exceed {max} characters",

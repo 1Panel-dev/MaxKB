@@ -111,6 +111,10 @@
     },
     "dataType": {
       "label": "資料類型"
+    },
+    "description": {
+      "label": "參數說明",
+      "placeholder": "請輸入參數說明"
     }
   },
   "outputParams": {
@@ -135,9 +139,9 @@
     "failureMessage": "工具執行失敗"
   },
   "delete": {
-    "title": "確定刪除工具",
+    "title": "是否刪除工具：{name}？",
     "description": "此工具已被 {count} 個資源引用，刪除後這些資源將無法正常執行，請謹慎操作。",
-    "batchTitle": "確定批次刪除 {count} 個工具"
+    "batchTitle": "是否刪除選取的{count}個工具？"
   },
   "disable": {
     "title": "確定停用工具",
@@ -149,7 +153,7 @@
   },
   "updateVersion": {
     "action": "更新版本",
-    "title": "確定更新工具",
+    "title": "是否更新工具：{name}？",
     "description": "更新工具可能會影響正在使用此工具的資源，請謹慎操作。",
     "success": "更新成功"
   }

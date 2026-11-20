@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { VariableField } from './component/variable-field/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { BaseNodeModel } from '@logicflow/core'
@@ -9,6 +10,7 @@ import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import VariableFieldTable from './component/variable-field/VariableFieldTable.vue'
 
 defineOptions({ name: 'WorkflowVariableSplittingNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel() as WorkflowNodeModel
 
@@ -42,7 +44,10 @@ const variableList = computed({
   set: (fields: VariableField[]) => {
     formData.value.variable_list = fields
     model.properties.config ??= {}
-    model.properties.config.fields = [{ label: '结果', value: 'result' }, ...fields.map((field) => ({ label: field.label, value: field.field }))]
+    model.properties.config.fields = [
+      { label: t('workflow.node.result'), value: 'result' },
+      ...fields.map((field) => ({ label: field.label, value: field.field })),
+    ]
     model.clearNextNodeField(false)
   },
 })
@@ -58,15 +63,34 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="variableSplittingFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="variableSplittingFormRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <!-- 输入变量 -->
-        <el-form-item label="输入变量" prop="input_variable" :rules="{ message: '请选择变量', trigger: 'change', required: true }">
-          <NodeCascader ref="nodeCascaderRef" :node-model="model" placeholder="请选择变量" v-model="formData.input_variable" />
+        <el-form-item
+          :label="t('workflow.variable.input.label')"
+          prop="input_variable"
+          :rules="{ message: t('workflow.variable.selectRequiredMessage'), trigger: 'change', required: true }"
+        >
+          <NodeCascader
+            ref="nodeCascaderRef"
+            :node-model="model"
+            :placeholder="t('workflow.variable.selectPlaceholder')"
+            v-model="formData.input_variable"
+          />
         </el-form-item>
         <!-- 拆分变量 -->
-        <el-form-item prop="variable_list" :rules="{ type: 'array', message: '请添加拆分变量', trigger: 'change', required: true }">
+        <el-form-item
+          prop="variable_list"
+          :rules="{ type: 'array', message: t('workflow.variableSplitting.variables.requiredMessage'), trigger: 'change', required: true }"
+        >
           <VariableFieldTable v-model="variableList" />
         </el-form-item>
       </el-form>

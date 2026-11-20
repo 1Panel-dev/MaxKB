@@ -16,7 +16,7 @@ const avatar = defineModel<string>({ default: '' })
 const emit = defineEmits<{ change: [file: File | null] }>()
 defineSlots<{ default(props: { icon: string | undefined }): unknown }>()
 
-// 头像编辑草稿：确认前不修改外部值。
+// 头像编辑草稿：确定前不修改外部值。
 const visible = ref(false)
 const avatarMode = ref<'default' | 'custom'>('default')
 const previewIcon = ref('')
@@ -153,8 +153,8 @@ onBeforeUnmount(() => {
       <div class="mt-4 text-right">
         <!-- 取消头像修改 -->
         <el-button plain @click="close">{{ t('common.actions.cancel') }}</el-button>
-        <!-- 确认头像修改 -->
-        <el-button type="primary" :disabled="avatarMode === 'custom' && !previewIcon" @click="confirm">{{ t('common.actions.confirm') }}</el-button>
+        <!-- 确定头像修改 -->
+        <el-button type="primary" :disabled="avatarMode === 'custom' && !previewIcon" @click="confirm">{{ t('common.actions.comfirm') }}</el-button>
       </div>
     </div>
   </el-popover>

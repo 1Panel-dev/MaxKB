@@ -28,9 +28,8 @@
       "bottom": "Move to bottom"
     },
     "delete": {
-      "title": "Delete segment",
-      "confirm": "Delete this segment",
-      "batchTitle": "Delete {count} selected segment | Delete {count} selected segments"
+      "title": "Delete segment: {name}?",
+      "batchTitle": "Delete the {count} selected segment? | Delete the {count} selected segments?"
     },
     "empty": "No segments"
   }

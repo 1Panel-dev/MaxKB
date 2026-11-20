@@ -160,7 +160,7 @@ function changeSpeechPlaybackEnabled(enabled: boolean | number | string) {
   settings.value.tts_type = 'BROWSER'
 }
 
-/* 资源选择：弹窗只维护临时选择，确认后更新对应 ID 和名称快照。 */
+/* 资源选择：弹窗只维护临时选择，确定后更新对应 ID 和名称快照。 */
 const knowledgeDialogRef = useTemplateRef<InstanceType<typeof SelectKnowledgeDialog>>('knowledgeDialogRef')
 function handleOpenKnowledge() {
   knowledgeDialogRef.value?.open(selectedKnowledge.value)

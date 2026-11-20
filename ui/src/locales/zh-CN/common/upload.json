@@ -21,6 +21,7 @@
   "requiredMessage": "请上传文件",
   "reselectFileMessage": "请重新选择上传文件",
   "emptyFileMessage": "不能上传空文件",
+  "emptyContentMessage": "文件不能为空",
   "sizeLimitMessage": "大小超限",
   "unsupportedFormatMessage": "文件格式不支持",
   "countLimitMessage": "每次最多上传 {count} 个文件",
@@ -31,6 +32,7 @@
     "completed": "已完成",
     "uploading": "上传中",
     "failed": "失败",
+    "uploadFailed": "上传失败",
     "allSucceeded": "全部成功"
   },
   "avatar": {

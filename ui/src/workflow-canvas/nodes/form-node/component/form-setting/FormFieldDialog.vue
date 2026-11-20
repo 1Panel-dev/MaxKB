@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FormField, VisibilityFieldOption } from '@/components/mk-dynamics-form'
 import { MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'WorkflowFormFieldDialog' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   formFields: FormField[]
@@ -69,11 +71,15 @@ defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="currentIndex === undefined ? '添加参数' : '编辑参数'" @closed="resetData">
+  <MkDialog v-model="visible" :title="currentIndex === undefined ? t('common.parameters.add') : t('common.parameters.edit')" @closed="resetData">
     <MkDynamicsFormConstructor ref="dynamicsFormConstructorRef" v-model="formData" enable-visibility :left-options="visibilityFieldOptions" />
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="handleSubmit">{{ currentIndex === undefined ? '添加' : '保存' }}</el-button>
+      <!-- 取消编辑表单参数 -->
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存表单参数 -->
+      <el-button type="primary" @click="handleSubmit">
+        {{ currentIndex === undefined ? t('common.actions.add') : t('common.actions.save') }}
+      </el-button>
     </template>
   </MkDialog>
 </template>

@@ -7,6 +7,7 @@
     "createTime": "建立時間",
     "updateTime": "更新時間",
     "all": "全部",
+    "other": "其他",
     "selected": "已選",
     "details": "詳情",
     "basicInfo": "基本資訊",
@@ -81,7 +82,8 @@
   },
   "parameters": {
     "add": "新增參數",
-    "edit": "編輯參數"
+    "edit": "編輯參數",
+    "settingsTitle": "參數設定"
   },
   "configuration": {
     "label": "配置",
@@ -125,7 +127,7 @@
     "enable": "啟用",
     "disable": "停用",
     "saveAndEnable": "儲存並啟用",
-    "confirm": "確認",
+    "comfirm": "確定",
     "submit": "提交",
     "testConnection": "測試連線"
   },
@@ -136,8 +138,11 @@
   },
   "messages": {
     "saveSuccess": "儲存成功",
+    "editSuccess": "編輯成功",
+    "settingsSuccess": "設定成功",
     "publishSuccess": "發布成功",
     "deleteSuccess": "刪除成功",
+    "batchDeleteSuccess": "批次刪除成功",
     "deleteFailed": "刪除失敗",
     "createSuccess": "建立成功",
     "generateFailed": "產生失敗",
@@ -152,7 +157,9 @@
     "relateSuccess": "關聯成功",
     "unrelateSuccess": "取消關聯成功",
     "enableSuccess": "啟用成功",
+    "batchEnableSuccess": "批次啟用成功",
     "disableSuccess": "停用成功",
+    "batchDisableSuccess": "批次停用成功",
     "exportSuccess": "匯出成功",
     "exportFailed": "匯出失敗",
     "copied": "已複製",
@@ -160,6 +167,7 @@
     "testSuccess": "測試成功",
     "replaceSuccess": "取代成功",
     "submitSuccess": "提交成功",
+    "sendSuccess": "傳送成功",
     "taskSubmitted": "任務已提交",
     "operationSuccess": "操作成功",
     "audioPlaybackFailed": "無法播放，請檢查音訊格式或檔案網址",

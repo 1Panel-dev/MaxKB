@@ -22,11 +22,11 @@ defineProps<{
       <h6 class="mb-2">{{ t('workflow.executionResult.inputParams') }}</h6>
       <div class="space-y-2">
         <p>
-          <span class="text-N600">{{ t('workflow.loopStart.item') }}：</span>
+          <span class="text-N600">{{ t('workflow.loopStart.currentItem') }}：</span>
           {{ data.current_item }}
         </p>
         <p>
-          <span class="text-N600">{{ t('workflow.loopStart.index') }}：</span>
+          <span class="text-N600">{{ t('workflow.loopStart.currentIndex') }}：</span>
           {{ data.current_index }}
         </p>
       </div>

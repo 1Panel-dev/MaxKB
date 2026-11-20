@@ -45,7 +45,7 @@ const historyEnabled = computed(() => appInfo.value?.show_history !== false)
 const clearing = ref(false)
 
 function handleDeleteConversation(conversation: Conversation) {
-  MsgConfirm('确认删除该对话？', '删除后无法恢复。')
+  MsgConfirm('是否删除该对话？', '删除后无法恢复。')
     .then(() => deleteChat(conversation.id))
     .catch(() => {})
 }
@@ -53,7 +53,7 @@ function handleDeleteConversation(conversation: Conversation) {
 // 先加载全部分页，再切到新对话并逐条删除；失败时保留未删除记录。
 function handleClearConversations() {
   if (clearing.value) return
-  MsgConfirm('确认清空全部历史对话？', '清空后无法恢复。', { confirmButtonText: '清空' })
+  MsgConfirm('是否清空全部历史对话？', '清空后无法恢复。', { confirmButtonText: '清空' })
     .then(async () => {
       clearing.value = true
       while (hasMore.value) await loadMore()
@@ -102,60 +102,60 @@ function handleClearConversations() {
         </MkTooltip>
       </div>
 
-    <!-- 历史列表独立滚动，应用信息和新建入口保持固定。 -->
-    <el-scrollbar class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
-      <el-skeleton v-if="initialLoading" animated />
-      <div v-else-if="conversations.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
-      <div v-else class="space-y-1">
-        <template v-for="conversation in conversations" :key="conversation.id">
-          <MkListItem :active="currentChatId === conversation.id" @click="selectConversation(conversation.id)">
-            <template #default="{ active }">
-              <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || '新对话'">
-                {{ conversation.abstract || '新对话' }}
-              </span>
+      <!-- 历史列表独立滚动，应用信息和新建入口保持固定。 -->
+      <el-scrollbar class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
+        <el-skeleton v-if="initialLoading" animated />
+        <div v-else-if="conversations.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
+        <div v-else class="space-y-1">
+          <template v-for="conversation in conversations" :key="conversation.id">
+            <MkListItem :active="currentChatId === conversation.id" @click="selectConversation(conversation.id)">
+              <template #default="{ active }">
+                <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || '新对话'">
+                  {{ conversation.abstract || '新对话' }}
+                </span>
 
-              <!-- 选中、悬停或聚焦列表行时隐藏时间，显示内置更多操作。 -->
-              <span
-                class="-mr-6 shrink-0 text-sm font-normal text-N500 group-hover:invisible group-focus-within:invisible"
-                :class="{ invisible: active }"
-              >
-                {{ conversationTime(conversation) }}
-              </span>
-            </template>
-            <template #action>
-              <MkDropdown trigger="click" persistent>
-                <!-- 打开历史对话操作菜单 -->
-                <el-button text><MkIcon name="icon_more_outlined" /></el-button>
-                <template #dropdown>
-                  <MkDropdownMenu>
-                    <!-- 激活所选对话并全选分享 -->
-                    <MkDropdownItem
-                      v-if="showShare"
-                      :disabled="msgs.loading.value || (currentChatId === conversation.id && !canShare)"
-                      @click="handleShareConversation(conversation)"
-                    >
-                      <template #icon><MkIcon name="icon_share_outlined" /></template>
-                      <span>分享</span>
-                    </MkDropdownItem>
-                    <!-- 重命名 -->
-                    <RenameConversation :conversation="conversation" />
+                <!-- 选中、悬停或聚焦列表行时隐藏时间，显示内置更多操作。 -->
+                <span
+                  class="-mr-6 shrink-0 text-sm font-normal text-N500 group-hover:invisible group-focus-within:invisible"
+                  :class="{ invisible: active }"
+                >
+                  {{ conversationTime(conversation) }}
+                </span>
+              </template>
+              <template #action>
+                <MkDropdown trigger="click" persistent>
+                  <!-- 打开历史对话操作菜单 -->
+                  <el-button text><MkIcon name="icon_more_outlined" /></el-button>
+                  <template #dropdown>
+                    <MkDropdownMenu>
+                      <!-- 激活所选对话并全选分享 -->
+                      <MkDropdownItem
+                        v-if="showShare"
+                        :disabled="msgs.loading.value || (currentChatId === conversation.id && !canShare)"
+                        @click="handleShareConversation(conversation)"
+                      >
+                        <template #icon><MkIcon name="icon_share_outlined" /></template>
+                        <span>分享</span>
+                      </MkDropdownItem>
+                      <!-- 重命名 -->
+                      <RenameConversation :conversation="conversation" />
 
-                    <!-- 删除历史对话 -->
-                    <MkDropdownItem @click="handleDeleteConversation(conversation)">
-                      <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                      <span>删除</span>
-                    </MkDropdownItem>
-                  </MkDropdownMenu>
-                </template>
-              </MkDropdown>
-            </template>
-          </MkListItem>
-        </template>
-      </div>
-    </el-scrollbar>
-  </template>
-  <!-- 关闭历史记录时保留弹性占位，账户入口仍吸底。 -->
-  <div v-else class="min-h-0 flex-1" />
+                      <!-- 删除历史对话 -->
+                      <MkDropdownItem @click="handleDeleteConversation(conversation)">
+                        <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+                        <span>删除</span>
+                      </MkDropdownItem>
+                    </MkDropdownMenu>
+                  </template>
+                </MkDropdown>
+              </template>
+            </MkListItem>
+          </template>
+        </div>
+      </el-scrollbar>
+    </template>
+    <!-- 关闭历史记录时保留弹性占位，账户入口仍吸底。 -->
+    <div v-else class="min-h-0 flex-1" />
     <!-- 账户入口固定在侧栏底部，不随历史列表滚动。 -->
     <div class="mt-3 shrink-0" v-if="SHOW_PROFILE.includes(viewType)">
       <AccountMenu />

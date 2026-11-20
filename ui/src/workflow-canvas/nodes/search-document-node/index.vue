@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { SearchDocumentForm } from './types'
 import type { KnowledgeItem, KnowledgeTagGroup } from '@/api/types'
 import type { NodeSearchScopeData } from '@/workflow-canvas/component/node-search-scope/types'
@@ -14,6 +15,7 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import { compareOptions, defaultSearchCondition } from './constant'
 
 defineOptions({ name: 'WorkflowSearchDocumentNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const store = useWorkflowStore(resourceScope)
@@ -100,9 +102,16 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <!-- 检索范围 -->
         <NodeSearchScope
           :node-model="model"
@@ -112,32 +121,44 @@ onMounted(() => {
           @update:knowledge="updateKnowledge"
         />
         <!-- 检索设置 -->
-        <el-form-item label="检索设置">
+        <el-form-item :label="t('workflow.searchDocument.searchMode.label')">
+          <!-- 选择文档标签检索方式 -->
           <el-radio-group v-model="formData.search_mode">
             <el-radio value="auto">
-              <span class="flex-align-center gap-1"
-                >自动<MkTooltip content="根据检索问题自动匹配文档标签" placement="right"
-                  ><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip
-              ></span>
+              <span class="flex-align-center gap-1">
+                {{ t('workflow.searchDocument.searchMode.auto') }}
+                <MkTooltip :content="t('workflow.searchDocument.searchMode.autoDescription')" placement="right">
+                  <MkIcon name="icon_info_outlined" class="text-N600!" />
+                </MkTooltip>
+              </span>
             </el-radio>
             <el-radio v-if="formData.search_scope_type === 'custom'" value="custom">
-              <span class="flex-align-center gap-1"
-                >手动<MkTooltip content="手动设置标签过滤条件" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip
-              ></span>
+              <span class="flex-align-center gap-1">
+                {{ t('workflow.searchDocument.searchMode.manual') }}
+                <MkTooltip :content="t('workflow.searchDocument.searchMode.manualDescription')" placement="right">
+                  <MkIcon name="icon_info_outlined" class="text-N600!" />
+                </MkTooltip>
+              </span>
             </el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item
           v-if="formData.search_mode === 'auto'"
-          label="检索问题"
+          :label="t('workflow.searchQuestion.label')"
           prop="question_reference"
-          :rules="{ required: true, message: '请选择检索问题', trigger: 'change' }"
+          :rules="{ required: true, message: t('workflow.searchQuestion.requiredMessage'), trigger: 'change' }"
         >
-          <NodeCascader ref="questionCascaderRef" v-model="formData.question_reference" :node-model="model" placeholder="请选择检索问题" />
+          <NodeCascader
+            ref="questionCascaderRef"
+            v-model="formData.question_reference"
+            :node-model="model"
+            :placeholder="t('workflow.searchQuestion.placeholder')"
+          />
         </el-form-item>
         <template v-else>
           <div class="-mt-2 mb-2 flex-align-center gap-2 text-sm text-N600">
-            满足以下
+            {{ t('workflow.condition.match.prefix') }}
+            <!-- 选择标签条件匹配方式 -->
             <el-select
               v-model="formData.search_condition_type"
               :teleported="false"
@@ -146,16 +167,17 @@ onMounted(() => {
               @visible-change="anchorGuard.setOverlayVisible('condition-type', $event)"
               @wheel="handleNodeWheel"
             >
-              <el-option label="所有" value="AND" /><el-option label="任一" value="OR" />
+              <el-option :label="t('workflow.condition.match.all')" value="AND" />
+              <el-option :label="t('workflow.condition.match.any')" value="OR" />
             </el-select>
-            条件
+            {{ t('workflow.condition.match.suffix') }}
           </div>
           <MkFormList
             v-model="formData.search_condition_list"
             :default-item="defaultSearchCondition"
             :min-rows="0"
             :first-row-has-label="false"
-            add-text="添加条件"
+            :add-text="t('workflow.condition.actions.addCondition')"
           >
             <template #default="{ item: condition, index }">
               <el-form-item class="small min-w-0 flex-1">
@@ -165,7 +187,7 @@ onMounted(() => {
                   :filter-method="filterTags"
                   :teleported="false"
                   class="min-w-0 flex-1"
-                  placeholder="请选择标签"
+                  :placeholder="t('knowledge.tags.key.selectPlaceholder')"
                   @visible-change="anchorGuard.setOverlayVisible(`tag-${index}`, $event)"
                   @wheel="handleNodeWheel"
                 >
@@ -183,7 +205,7 @@ onMounted(() => {
                 </el-select>
               </el-form-item>
               <el-form-item class="small min-w-0 flex-1">
-                <el-input v-model="condition.value" placeholder="值或变量" />
+                <el-input v-model="condition.value" :placeholder="t('workflow.searchDocument.value.placeholder')" />
               </el-form-item>
             </template>
           </MkFormList>

@@ -116,7 +116,7 @@ const getProviderItem = (modelId: string) => {
   return { model_id: modelId, model_params_setting: {} }
 }
 
-// 默认模型参数：参数弹窗的默认值使用该模型已保存的参数，确认后同步到可选模型快照。
+// 默认模型参数：参数弹窗的默认值使用该模型已保存的参数，确定后同步到可选模型快照。
 function getSavedModelParamsForm(modelId: string) {
   const provider = formValue.value.provider_list?.find((p: DynamicFormValue) => p.model_id === modelId)
   const settings = provider?.model_params_setting ?? {}

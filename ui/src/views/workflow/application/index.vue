@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDetail, ApplicationStoreTemplate, DefaultModelSettingPayload, WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
@@ -34,6 +35,7 @@ function applicationWorkflowPermission(method: ApplicationWorkflowPermissionMeth
 }
 
 defineOptions({ name: 'ApplicationWorkflowView' })
+const { t } = useI18n({ useScope: 'global' })
 const requestApi = isSystemResource() ? SystemResourceApplicationApi : WorkspaceApplicationApi
 const requestModelApi = isSystemResource() ? SystemResourceModelApi : WorkspaceModelApi
 const requestWorkflowApi = isSystemResource() ? SystemResourceWorkflowApi : WorkspaceWorkflowApi
@@ -191,7 +193,7 @@ function handleUseTemplate(template: ApplicationStoreTemplate) {
   if (loading.value) return
 
   return MsgConfirm('提示', `使用 ${template.name} 将覆盖当前工作流？`, {
-    confirmButtonText: '确认',
+    confirmButtonText: t('common.actions.comfirm'),
     confirmButtonType: 'primary',
   })
     .then(() => {

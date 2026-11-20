@@ -31,6 +31,8 @@
     },
     "toolParameters": {
       "label": "工具参数",
+      "addTitle": "添加工具参数",
+      "editTitle": "编辑工具参数",
       "empty": "暂无参数",
       "nameRequiredMessage": "请输入参数名称",
       "nameLengthMessage": "参数名称不能超过 {max} 字",

@@ -29,7 +29,7 @@ function handleSync() {
   const isWorkflow = isWorkFlow(String(knowledgeType.value ?? ''))
   if ((knowledgeType.value === KNOWLEDGE_TYPE_KEY.WEB || isWorkflow) && !document.meta?.source_url) {
     MsgConfirm(t('common.dialogs.notice'), t('knowledge.document.sync.missingUrlMessage'), {
-      confirmButtonText: t('common.actions.confirm'),
+      confirmButtonText: t('common.actions.comfirm'),
       confirmButtonType: 'primary',
       type: 'warning',
     })
@@ -40,7 +40,7 @@ function handleSync() {
   const documentId = document.id
   const isLark = knowledgeType.value === KNOWLEDGE_TYPE_KEY.LARK
   const message = isWorkflow ? t('knowledge.document.sync.workflowDescription') : t('knowledge.document.sync.description')
-  return MsgConfirm(`${t('knowledge.document.sync.title')}: ${document.name}?`, message, {
+  return MsgConfirm(t('knowledge.document.sync.title', { name: document.name }), message, {
     cancelButtonText: t('common.actions.cancel'),
     confirmButtonText: t('knowledge.sync.label'),
     confirmButtonType: 'primary',

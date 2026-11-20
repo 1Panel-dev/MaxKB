@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
@@ -7,6 +8,7 @@ import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer
 import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'DataSourceWebNodeDetail' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   data: ExecutionNodeDetail
@@ -36,14 +38,14 @@ watch(documents, () => {
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">输入参数</h6>
+      <h6 class="mb-2">{{ t('workflow.executionResult.inputParams') }}</h6>
       <div class="space-y-2">
         <p>
-          <span class="mr-1 text-N600">选择器：</span>
+          <span class="mr-1 text-N600">{{ t('knowledge.fields.selector.label') }}：</span>
           {{ data.selector }}
         </p>
         <p>
-          <span class="mr-1 text-N600">文档地址：</span>
+          <span class="mr-1 text-N600">{{ t('knowledge.document.sourceUrl.label') }}：</span>
           {{ data.source_url }}
         </p>
       </div>
@@ -51,8 +53,8 @@ watch(documents, () => {
 
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">
-        输出参数
-        <span class="text-N600 font-normal">（每个文档仅支持预览 500 字）</span>
+        {{ t('workflow.executionResult.outputParams') }}
+        <span class="text-N600 font-normal">（{{ t('workflow.document.characterPreviewHint', { count: 500 }) }}）</span>
       </h6>
       <MkHorizontalScroll v-if="documents.length" class="mb-2">
         <template v-for="(file, index) in documents" :key="index">
@@ -76,7 +78,7 @@ watch(documents, () => {
           <MdPreview v-if="selectedDocument.content" :model-value="selectedDocument.content.slice(0, 500)" no-img-zoom-in />
           <template v-else>-</template>
         </el-scrollbar>
-        <div class="text-N600 mt-2">500 字符</div>
+        <div class="text-N600 mt-2">500 {{ t('knowledge.stats.characters', 500) }}</div>
       </el-card>
       <template v-else>-</template>
     </div>

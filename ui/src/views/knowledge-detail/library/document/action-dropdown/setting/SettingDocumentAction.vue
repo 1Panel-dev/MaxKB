@@ -42,7 +42,7 @@ function handleSubmit(data: DocumentSettingPayload) {
     props.api
       .putDocument?.(targetKnowledgeId.value, targetDocumentId.value, data)
       .then(() => {
-        MsgSuccess(t('common.messages.saveSuccess'))
+        MsgSuccess(t('common.messages.settingsSuccess'))
         settingDialogRef.value?.close()
         emit('refresh')
       })

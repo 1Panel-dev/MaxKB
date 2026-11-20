@@ -204,13 +204,13 @@ onBeforeUnmount(() => {
                   <el-form-item
                     class="small min-w-0 flex-2"
                     :prop="`branch.${branchIndex}.conditions.${conditionIndex}.field`"
-                    :rules="{ type: 'array', required: true, message: t('workflow.referenceVariable.requiredMessage'), trigger: 'change' }"
+                    :rules="{ type: 'array', required: true, message: t('workflow.variable.selectRequiredMessage'), trigger: 'change' }"
                   >
                     <NodeCascader
                       ref="nodeCascaderRefs"
                       v-model="condition.field"
                       :node-model="model"
-                      :placeholder="t('workflow.referenceVariable.placeholder')"
+                      :placeholder="t('workflow.variable.selectPlaceholder')"
                     />
                   </el-form-item>
                   <el-form-item

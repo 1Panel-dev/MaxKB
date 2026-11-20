@@ -225,8 +225,8 @@ onBeforeUnmount(() => {
             />
           </el-scrollbar>
           <div class="mt-4">
-            <!-- 确认参数 -->
-            <el-button type="primary" @click="confirmHandle">确认</el-button>
+            <!-- 确定参数 -->
+            <el-button type="primary" @click="confirmHandle">确定</el-button>
             <!-- 取消修改 -->
             <el-button plain @click="cancelHandle">取消</el-button>
           </div>

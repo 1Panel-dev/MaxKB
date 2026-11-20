@@ -1,7 +1,11 @@
 {
   "node": {
     "title": "Node",
-    "result": "Result"
+    "result": "Result",
+    "delete": {
+      "title": "Delete node: {name}?",
+      "batchTitle": "Delete the {count} selected node? | Delete the {count} selected nodes?"
+    }
   },
   "start": {
     "label": "Start",
@@ -34,7 +38,8 @@
     "description": "Convert audio to text using a speech recognition model",
     "model": {
       "label": "Speech recognition model"
-    }
+    },
+    "audioFile": "Speech file"
   },
   "textToSpeech": {
     "label": "Text to speech",
@@ -70,11 +75,13 @@
     },
     "firstFrame": {
       "label": "First frame image",
+      "shortLabel": "First frame",
       "placeholder": "Select a first frame image",
       "requiredMessage": "Select a first frame image"
     },
     "lastFrame": {
       "label": "Last frame image",
+      "shortLabel": "Last frame",
       "placeholder": "Select a last frame image"
     }
   },
@@ -109,6 +116,7 @@
     "description": "Return the specified content, converting referenced variables to strings",
     "format": {
       "label": "Reply format",
+      "typeLabel": "Reply type",
       "text": "Text",
       "tool": "Tool",
       "toolDescription": "Reply content must be a JSON object or array with the fields id, name, arguments, and content",
@@ -141,28 +149,81 @@
   "form": {
     "label": "Form collection",
     "description": "Collect user information during a conversation and use the form data in subsequent steps",
+    "content": {
+      "label": "Form output content",
+      "description": "Set the content this node outputs, using {form} as the placeholder for the form",
+      "requiredMessage": "Enter form output content"
+    },
+    "configuration": "Form configuration",
     "formData": "All form data",
+    "notSubmitted": "Not submitted",
     "defaultContent": "Hello, please complete the form below:\n{form}\nWhen finished, click [Submit] to submit."
   },
   "variableAssign": {
     "label": "Variable assignment",
-    "description": "Update the values of global variables"
+    "description": "Update the values of global variables",
+    "value": {
+      "label": "Value",
+      "placeholder": "Enter content",
+      "custom": "Custom"
+    }
   },
   "variableAggregation": {
     "label": "Variable aggregation",
-    "description": "Aggregate each group of variables using the configured strategy"
+    "description": "Aggregate each group of variables using the configured strategy",
+    "strategy": {
+      "label": "Aggregation strategy",
+      "requiredMessage": "Select an aggregation strategy",
+      "firstNonNull": "Return the first non-null value in each group",
+      "firstNonNullDescription": "Return the first non-null value from each group of variables",
+      "array": "Return each group's variables as an array (Array)",
+      "dict": "Return each group's variables as a dictionary (Dict)"
+    },
+    "group": {
+      "add": "Add group",
+      "edit": "Edit group"
+    },
+    "key": {
+      "placeholder": "Enter a key name",
+      "requiredMessage": "Enter a key name"
+    }
   },
   "variableSplitting": {
     "label": "Variable splitting",
-    "description": "Parse and split JSON variables using JSON Path expressions"
+    "description": "Parse and split JSON variables using JSON Path expressions",
+    "variables": {
+      "label": "Split variables",
+      "requiredMessage": "Add a split variable"
+    },
+    "expression": {
+      "label": "Expression",
+      "placeholder": "Enter an expression",
+      "description": "Use a JSON Path expression to split variables, for example: {example}",
+      "requiredMessage": "Enter an expression",
+      "viewDetails": "View details"
+    }
   },
   "parameterExtraction": {
     "label": "Parameter extraction",
-    "description": "Extract structured parameters using an AI model"
+    "description": "Extract structured parameters using an AI model",
+    "parameters": {
+      "label": "Parameters to extract",
+      "requiredMessage": "Add a parameter to extract",
+      "invalidMessage": "Parameters may contain letters, numbers, and underscores"
+    },
+    "type": {
+      "label": "Type",
+      "placeholder": "Select a parameter type",
+      "requiredMessage": "Select a parameter type"
+    }
   },
   "searchKnowledge": {
     "label": "Knowledge retrieval",
     "description": "Relate knowledge and find segments relevant to the question",
+    "image": {
+      "label": "Search images",
+      "placeholder": "Select search images"
+    },
     "segmentList": "Retrieved segment list",
     "directAnswerSegments": "Segments eligible for direct answers",
     "result": "Retrieval results",
@@ -171,6 +232,16 @@
   "searchDocument": {
     "label": "Document tag retrieval",
     "description": "Find documents matching the specified tags within the configured search scope",
+    "searchMode": {
+      "label": "Search settings",
+      "auto": "Automatic",
+      "autoDescription": "Automatically match document tags based on the search question",
+      "manual": "Manual",
+      "manualDescription": "Set tag filter conditions manually"
+    },
+    "value": {
+      "placeholder": "Value or variable"
+    },
     "knowledgeList": "Knowledge list",
     "documentList": "Document list"
   },
@@ -183,9 +254,19 @@
   "reranker": {
     "label": "Multi-source retrieval",
     "description": "Rerank retrieval results from multiple knowledge sources using a reranking model",
+    "content": {
+      "label": "Content to rerank",
+      "placeholder": "Select content to rerank",
+      "requiredMessage": "Select content to rerank"
+    },
+    "score": {
+      "label": "Score higher than",
+      "description": "The higher the score, the stronger the relevance."
+    },
     "resultList": "Reranked result list",
     "result": "Reranked results",
-    "directAnswerSegments": "Segments eligible for direct answers"
+    "directAnswerSegments": "Segments eligible for direct answers",
+    "maxReferenceCharacters": "Maximum reference characters"
   },
   "mcp": {
     "label": "MCP call",
@@ -207,20 +288,52 @@
   "documentSplit": {
     "label": "Document segmentation",
     "description": "Split input document content into a list of segments using the segmentation strategy",
+    "strategy": {
+      "label": "Segmentation strategy",
+      "placeholder": "Select a segmentation strategy",
+      "requiredMessage": "Select a segmentation strategy"
+    },
+    "source": {
+      "reference": "Reference",
+      "custom": "Custom"
+    },
+    "childChunkLength": {
+      "label": "Sub-chunk length",
+      "description": "Balance retrieval accuracy and recall efficiency",
+      "tooShortHint": "Avoid overly short chunks: fewer than 50 characters can fragment meaning and leave too little context to match the query intent",
+      "tooLongHint": "Avoid overly long chunks: more than 500 characters can add redundant information, reduce retrieval accuracy, and require more storage and computing resources"
+    },
+    "titleAsQuestion": "Use the segment title as a related question for the segment",
+    "documentNameAsQuestion": "Use the document name as a related question for the segment",
     "segmentList": "Segment list"
   },
   "localFile": {
     "label": "Local files",
     "description": "Upload local documents and output a document list. Use the Document content extraction node to parse their contents",
+    "format": {
+      "label": "File formats",
+      "placeholder": "Select file formats",
+      "requiredMessage": "Select file formats"
+    },
+    "fileCount": {
+      "label": "Maximum files per upload",
+      "rangeMessage": "Enter a file count from {min} to {max}"
+    },
+    "fileSize": {
+      "label": "Maximum size per file",
+      "rangeMessage": "Enter a file size from {min} to {max} MB"
+    },
     "fileList": "File list"
   },
   "webSource": {
     "label": "Web site",
     "description": "Crawl web data from a root URL and output documents with content, with one document per URL",
+    "noConfiguration": "No configuration options",
     "documentList": "Document list"
   },
   "knowledgeWrite": {
     "label": "Write to knowledge",
-    "description": "Write the input segments to the current knowledge and generate embeddings"
+    "description": "Write the input segments to the current knowledge and generate embeddings",
+    "content": "Written content"
   }
 }

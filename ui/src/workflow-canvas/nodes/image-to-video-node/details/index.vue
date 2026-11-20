@@ -28,19 +28,19 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.negativePrompt.label') }}</h6>
+      <h6 class="mb-2">{{ t('workflow.negativePrompt.detailLabel') }}</h6>
       <div class="whitespace-pre-wrap">
         {{ data.negative_prompt || '-' }}
       </div>
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.imageToVideo.firstFrame.label') }}</h6>
+      <h6 class="mb-2">{{ t('workflow.imageToVideo.firstFrame.shortLabel') }}</h6>
       <div class="whitespace-pre-wrap space-y-2">
         <!-- 查看首帧图片 -->
         <ImageUploadCard
           v-if="typeof data.first_frame_url === 'string'"
-          :file="{ name: t('workflow.imageToVideo.firstFrame.label'), status: 'success' }"
+          :file="{ name: t('workflow.imageToVideo.firstFrame.shortLabel'), status: 'success' }"
           :src="data.first_frame_url"
           :size="58"
           :show-remove="false"
@@ -50,7 +50,7 @@ defineProps<{
           <!-- 查看首帧图片列表 -->
           <template v-for="(file, index) in data.first_frame_url" :key="index">
             <ImageUploadCard
-              :file="{ ...file, name: file.name || t('workflow.imageToVideo.firstFrame.label'), status: 'success' }"
+              :file="{ ...file, name: file.name || t('workflow.imageToVideo.firstFrame.shortLabel'), status: 'success' }"
               :src="file.url"
               :size="58"
               :show-remove="false"
@@ -63,22 +63,22 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.imageToVideo.lastFrame.label') }}</h6>
+      <h6 class="mb-2">{{ t('workflow.imageToVideo.lastFrame.shortLabel') }}</h6>
       <div class="whitespace-pre-wrap space-y-2">
-        <!-- 查看尾帧图片 -->
+        <!-- 查看末帧图片 -->
         <ImageUploadCard
           v-if="typeof data.last_frame_url === 'string'"
-          :file="{ name: t('workflow.imageToVideo.lastFrame.label'), status: 'success' }"
+          :file="{ name: t('workflow.imageToVideo.lastFrame.shortLabel'), status: 'success' }"
           :src="data.last_frame_url"
           :size="58"
           :show-remove="false"
           :preview-src-list="[data.last_frame_url]"
         />
         <div v-else-if="Array.isArray(data.last_frame_url)" class="flex flex-wrap gap-2">
-          <!-- 查看尾帧图片列表 -->
+          <!-- 查看末帧图片列表 -->
           <template v-for="(file, index) in data.last_frame_url" :key="index">
             <ImageUploadCard
-              :file="{ ...file, name: file.name || t('workflow.imageToVideo.lastFrame.label'), status: 'success' }"
+              :file="{ ...file, name: file.name || t('workflow.imageToVideo.lastFrame.shortLabel'), status: 'success' }"
               :src="file.url"
               :size="58"
               :show-remove="false"

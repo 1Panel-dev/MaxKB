@@ -181,8 +181,8 @@ defineExpose({ open })
     <template #footer>
       <!-- 取消添加到知识库 -->
       <el-button plain :disabled="loading || optionLoading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认添加到知识库 -->
-      <el-button type="primary" :loading="loading" :disabled="optionLoading" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定添加到知识库 -->
+      <el-button type="primary" :loading="loading" :disabled="optionLoading" @click="handleSubmit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

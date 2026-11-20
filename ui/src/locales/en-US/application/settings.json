@@ -12,7 +12,6 @@
     "noReferences": "Without knowledge references"
   },
   "knowledgeSetting": {
-    "settingsTitle": "Parameter settings",
     "empty": "Related knowledge appears here",
     "noReferences": {
       "label": "When no knowledge segments are referenced",

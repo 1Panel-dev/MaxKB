@@ -87,7 +87,7 @@ function changeDirection() {
   loadResources()
 }
 
-/* 表头筛选：确认或重置后从第一页查询。 */
+/* 表头筛选：确定或重置后从第一页查询。 */
 const workspaceOptions = ref<OptionItem<string>[]>([])
 const selectedWorkspaceIds = ref<string[]>([])
 function handleFilterChange() {
@@ -193,13 +193,7 @@ defineExpose({ open, close })
         <el-table-column v-if="showWorkspace" prop="workspace_name" label="工作空间" min-width="140" show-overflow-tooltip>
           <template #header>
             <!-- 筛选关联资源所属工作空间 -->
-            <MkTableFilter
-              mode="multiple"
-              v-model="selectedWorkspaceIds"
-              label="工作空间"
-              :options="workspaceOptions"
-              @change="handleFilterChange"
-            />
+            <MkTableFilter mode="multiple" v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleFilterChange" />
           </template>
         </el-table-column>
         <el-table-column prop="username" label="创建者" min-width="100" show-overflow-tooltip />

@@ -12,7 +12,6 @@
     "noReferences": "无引用知识库"
   },
   "knowledgeSetting": {
-    "settingsTitle": "参数设置",
     "empty": "关联的知识库显示在这里",
     "noReferences": {
       "label": "无引用知识库分段时",

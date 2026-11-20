@@ -129,7 +129,7 @@ function closeDetails() {
 /* 取消执行后刷新记录，关闭或卸载时停止轮询。 */
 const cancelling = ref(false)
 function cancelExecution(record: KnowledgeExecutionRecord) {
-  return MsgConfirm('提示', '确认取消当前执行任务？', { confirmButtonText: '确认' })
+  return MsgConfirm('提示', '是否取消当前执行任务？', { confirmButtonText: t('common.actions.comfirm') })
     .then(() => {
       cancelling.value = true
       return props.api.postCancelKnowledgeWorkflowAction(props.knowledgeId, record.id).then(() => loadRecords())

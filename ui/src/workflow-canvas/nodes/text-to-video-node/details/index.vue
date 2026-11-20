@@ -27,7 +27,7 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.negativePrompt.label') }}</h6>
+      <h6 class="mb-2">{{ t('workflow.negativePrompt.detailLabel') }}</h6>
       <div class="whitespace-pre-wrap">
         {{ data.negative_prompt || '-' }}
       </div>

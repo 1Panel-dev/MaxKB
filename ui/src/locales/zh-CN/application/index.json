@@ -61,8 +61,8 @@
     }
   },
   "delete": {
-    "title": "确认删除智能体",
-    "batchTitle": "是否批量删除 {count} 个智能体"
+    "title": "是否删除智能体：{name}？",
+    "batchTitle": "是否删除选中的{count}个智能体？"
   },
   "messages": {
     "missingWorkspace": "智能体缺少所属工作空间信息"

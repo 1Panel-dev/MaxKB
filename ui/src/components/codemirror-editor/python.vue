@@ -107,8 +107,8 @@ function submitEditorDialog() {
     </div>
 
     <template #footer>
-      <!-- 确认代码编辑 -->
-      <el-button type="primary" @click="submitEditorDialog">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定代码编辑 -->
+      <el-button type="primary" @click="submitEditorDialog">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

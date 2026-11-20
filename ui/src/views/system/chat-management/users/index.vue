@@ -112,7 +112,7 @@ function handleChangeStatus(user: ChatUser) {
 
 /* 删除用户 */
 function deleteUser(user: ChatUser) {
-  MsgConfirm(`${t('user.delete.title')}: ${user.username}?`)
+  MsgConfirm(t('user.delete.title', { name: user.username }))
     .then(() => {
       chatUsersLoading.value = true
       return ChatUserApi.deleteChatUser(user.id).then(() => {
@@ -135,7 +135,7 @@ function handleBatchSelectionChange(selection: unknown[]) {
 
 function handleBatchDelete() {
   const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
-  MsgConfirm(`${t('user.delete.batchTitle', { count: selectedUserIds.length }, selectedUserIds.length)}?`)
+  MsgConfirm(t('user.delete.batchTitle', { count: selectedUserIds.length }, selectedUserIds.length))
     .then(() => {
       chatUsersLoading.value = true
 

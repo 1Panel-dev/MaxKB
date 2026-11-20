@@ -79,7 +79,7 @@ function handleGroupSaved(group: SystemUserGroup) {
 
 /* 删除用户组 */
 function deleteGroup(group: SystemUserGroup) {
-  MsgConfirm(`${t('userGroup.delete.title')}: ${group.name}?`, t('userGroup.delete.description'))
+  MsgConfirm(t('userGroup.delete.title', { name: group.name }), t('userGroup.delete.description'))
     .then(() => {
       return UserGroupsApi.deleteSystemUserGroup(selectedWorkspaceId.value, group.id).then(() => {
         MsgSuccess(t('common.messages.deleteSuccess'))
@@ -163,8 +163,8 @@ function handleRemoveMembers(member?: SystemUserGroupMember) {
 
   const targetName = member ? member.nick_name || member.username : ''
   const title = member
-    ? `${t('system.member.removeTitle')}: ${targetName}?`
-    : `${t('system.member.batchRemoveTitle', { count: members.length }, members.length)}?`
+    ? t('system.member.removeTitle', { name: targetName })
+    : t('system.member.batchRemoveTitle', { count: members.length }, members.length)
   MsgConfirm(title, t('userGroup.delete.removeDescription'), { confirmButtonText: t('common.actions.remove') })
     .then(() => {
       loadingMembers.value = true

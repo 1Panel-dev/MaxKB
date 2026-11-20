@@ -48,14 +48,14 @@
       "replaceOriginal": "替换原文档"
     },
     "delete": {
-      "title": "确认删除文档",
+      "title": "是否删除文档：{name}？",
       "description": "此文档下的 {count} 个分段都会被删除，请谨慎操作。",
-      "batchTitle": "是否删除选中的 {count} 个文档",
+      "batchTitle": "是否删除选中的{count}个文档？",
       "batchDescription": "所选文档中的分段会跟随删除，请谨慎操作。"
     },
     "sync": {
-      "title": "是否同步",
-      "batchTitle": "是否同步选中的 {count} 个文档",
+      "title": "是否同步文档：{name}？",
+      "batchTitle": "是否同步选中的{count}个文档？",
       "description": "文档内容无更新时跳过，有更新时会使用新内容更新旧分段内容。",
       "workflowDescription": "将按知识库工作流的提取、分段配置同步当前 Web 文档，其他文档保持不变。",
       "missingUrlMessage": "无法同步，请先去设置文档 URL 地址"
@@ -102,6 +102,12 @@
     "preview": {
       "emptyMessage": "图片预览没有分段，请返回重新生成预览"
     },
-    "unsupportedFormatMessage": "仅支持 {formats} 格式的图片"
+    "unsupportedFormatMessage": "仅支持 {formats} 格式的图片",
+    "delete": {
+      "title": "是否删除图片：{name}？",
+      "batchTitle": "是否删除选中的{count}个图片？",
+      "description": "此图片下的 {count} 个分段都会被删除，请谨慎操作。",
+      "batchDescription": "所选图片中的分段会跟随删除，请谨慎操作。"
+    }
   }
 }

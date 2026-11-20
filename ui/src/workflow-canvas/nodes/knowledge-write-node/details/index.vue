@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
@@ -7,6 +8,7 @@ import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer
 import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'KnowledgeWriteNodeDetail' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   data: ExecutionNodeDetail
@@ -42,7 +44,7 @@ watch(writeContent, () => {
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">写入内容（每个文档仅展示前 5 个分段）</h6>
+      <h6 class="mb-2">{{ t('workflow.knowledgeWrite.content') }}（{{ t('workflow.document.paragraphPreviewHint', { count: 5 }) }}）</h6>
       <MkHorizontalScroll v-if="writeContent.length" class="mb-2">
         <template v-for="(file, index) in writeContent" :key="index">
           <!-- 选择要查看的文档 -->
@@ -67,7 +69,9 @@ watch(writeContent, () => {
               <el-scrollbar max-height="400" class="-mr-4" view-class="pr-4">
                 <MdPreview :model-value="paragraph.content" no-img-zoom-in />
               </el-scrollbar>
-              <div class="text-N600 mt-2">{{ (paragraph.content || '').length }} 字符</div>
+              <div class="text-N600 mt-2">
+                {{ (paragraph.content || '').length }} {{ t('knowledge.stats.characters', (paragraph.content || '').length) }}
+              </div>
             </el-card>
           </template>
         </template>

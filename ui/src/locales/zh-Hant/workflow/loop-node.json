@@ -21,9 +21,13 @@
     "label": "循環開始",
     "index": "索引",
     "item": "循環元素",
+    "currentItem": "循環項",
+    "currentIndex": "循環下標",
+    "copyParameter": "複製參數",
     "variables": {
       "label": "循環變量",
-      "reservedMessage": "此參數為循環引擎內建，不可使用"
+      "reservedMessage": "此參數為循環引擎內建，不可使用",
+      "invalidMessage": "參數只能包含英文字母、數字、底線"
     }
   },
   "loopBody": {

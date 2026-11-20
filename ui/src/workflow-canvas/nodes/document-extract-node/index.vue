@@ -38,17 +38,24 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <el-form-item
           class="mk-hide-asterisk"
           prop="document_list"
-          :rules="{ type: 'array', required: true, message: '请选择文档', trigger: 'change' }"
+          :rules="{ type: 'array', required: true, message: t('workflow.document.requiredMessage'), trigger: 'change' }"
         >
           <template #label>
             <span class="flex-align-center gap-1">
-              <span class="mk-required">选择文档</span>
+              <span class="mk-required">{{ t('workflow.document.label') }}</span>
               <MkTooltip placement="right">
                 <template #content>
                   <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>
@@ -57,7 +64,12 @@ onMounted(() => {
               </MkTooltip>
             </span>
           </template>
-          <NodeCascader ref="documentCascaderRef" v-model="formData.document_list" :node-model="model" placeholder="请选择文档" />
+          <NodeCascader
+            ref="documentCascaderRef"
+            v-model="formData.document_list"
+            :node-model="model"
+            :placeholder="t('workflow.document.placeholder')"
+          />
         </el-form-item>
       </el-form>
     </div>

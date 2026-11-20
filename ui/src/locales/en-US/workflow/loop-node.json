@@ -21,9 +21,13 @@
     "label": "Loop start",
     "index": "Index",
     "item": "Loop item",
+    "currentItem": "Loop item",
+    "currentIndex": "Loop index",
+    "copyParameter": "Copy parameter",
     "variables": {
       "label": "Loop variables",
-      "reservedMessage": "This parameter is reserved by the loop engine"
+      "reservedMessage": "This parameter is reserved by the loop engine",
+      "invalidMessage": "Parameters can only contain English letters, numbers, and underscores"
     }
   },
   "loopBody": {

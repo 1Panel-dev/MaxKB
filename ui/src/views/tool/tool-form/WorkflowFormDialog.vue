@@ -43,7 +43,7 @@ const formRules = computed<FormRules<WorkflowFormModel>>(() => ({
   name: [{ whitespace: true, required: true, message: t('tool.workflow.name.requiredMessage'), trigger: 'blur' }],
 }))
 
-// 暂存确认后的头像文件，恢复默认时清空。
+// 暂存确定后的头像文件，恢复默认时清空。
 const iconFile = ref<File | null>(null)
 function handleIconChange(file: File | null) {
   iconFile.value = file

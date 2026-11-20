@@ -75,8 +75,8 @@
     "conflictMessage": "{type} conflict"
   },
   "delete": {
-    "title": "Delete user",
-    "batchTitle": "Delete the {count} selected user | Delete the {count} selected users",
+    "title": "Delete user: {name}?",
+    "batchTitle": "Delete the {count} selected user? | Delete the {count} selected users?",
     "description": "Deleting this user will not delete the resources they created (agents, knowledge, and models). Proceed with caution."
   }
 }

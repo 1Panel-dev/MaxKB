@@ -131,7 +131,7 @@ async function submitUser() {
       if (isEdit.value) {
         UserManageApi.putUser(userForm.id as string, userForm)
           .then(() => {
-            MsgSuccess(t('common.messages.saveSuccess'))
+            MsgSuccess(t('common.messages.editSuccess'))
             emit('refresh', false)
             drawerVisible.value = false
           })

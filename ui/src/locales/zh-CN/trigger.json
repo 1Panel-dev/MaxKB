@@ -41,7 +41,7 @@
     "dataType": {
       "label": "数据类型",
       "placeholder": "请选择数据类型",
-      "requiredMessage": "请选择数据类型"
+      "requiredMessage": "请选择参数类型"
     }
   },
   "taskExecution": {
@@ -68,8 +68,8 @@
     "nextRunTime": "下次执行时间"
   },
   "delete": {
-    "title": "确定删除触发器",
-    "batchTitle": "是否删除选中的 {count} 个触发器",
+    "title": "是否删除触发器：{name}？",
+    "batchTitle": "是否删除选中的{count}个触发器？",
     "description": "删除后将停止触发任务，并删除相关执行记录。"
   },
   "executionRecords": {

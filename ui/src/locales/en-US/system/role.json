@@ -25,7 +25,7 @@
     "target": "Target"
   },
   "delete": {
-    "title": "Delete role",
+    "title": "Delete role: {name}?",
     "description": "All members will be removed from this role after deletion. Proceed with caution."
   }
 }

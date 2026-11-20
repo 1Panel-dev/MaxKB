@@ -61,8 +61,8 @@
     }
   },
   "delete": {
-    "title": "Delete agent",
-    "batchTitle": "Delete {count} selected agent | Delete {count} selected agents"
+    "title": "Delete agent: {name}?",
+    "batchTitle": "Delete the {count} selected agent? | Delete the {count} selected agents?"
   },
   "messages": {
     "missingWorkspace": "The agent is missing workspace information"

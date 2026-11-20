@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import OperateLogApi from '@/api/admin/system/operate-log'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CleanStrategyDialog' })
+const { t } = useI18n({ useScope: 'global' })
 
 const visible = ref(false)
 const loading = ref(false)
@@ -53,7 +55,7 @@ defineExpose({ open })
 
     <template #footer>
       <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" :loading="submitting" :disabled="loading" @click="handleSubmit">确认</el-button>
+      <el-button type="primary" :loading="submitting" :disabled="loading" @click="handleSubmit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

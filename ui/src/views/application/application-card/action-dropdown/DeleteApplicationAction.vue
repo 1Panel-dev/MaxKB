@@ -16,7 +16,7 @@ const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ delete: [applicationId: string] }>()
 
 function handleDeleteApplication() {
-  return MsgConfirm(`${t('application.delete.title')}: ${props.application.name}?`, t('common.dialogs.deleteWarning'))
+  return MsgConfirm(t('application.delete.title', { name: props.application.name }), t('common.dialogs.deleteWarning'))
     .then(() => {
       loading.value = true
       return props.api

@@ -9,6 +9,7 @@
   },
   "quota": {
     "title": "Quota settings",
+    "saveSuccess": "Quota settings saved successfully",
     "usage": "Tokens used/total",
     "expiresAt": "Tokens expiry time",
     "unlimited": "Unlimited",

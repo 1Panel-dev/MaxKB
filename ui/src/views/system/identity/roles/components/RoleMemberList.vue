@@ -50,7 +50,7 @@ function handleMemberAdded() {
 
 // 移除成员
 function handleRemoveMember(member: RoleMember) {
-  MsgConfirm(`${t('system.member.removeTitle')}: ${member.nick_name || member.username}?`, '', { confirmButtonText: t('common.actions.remove') })
+  MsgConfirm(t('system.member.removeTitle', { name: member.nick_name || member.username }), '', { confirmButtonText: t('common.actions.remove') })
     .then(() => {
       loading.value = true
       return RoleApi.deleteRoleMember(props.currentRole.id, member.user_relation_id).then(() => {
@@ -67,7 +67,7 @@ function handleRemoveMember(member: RoleMember) {
 /* 批量删除成员 */
 const batchSelectedMembers = ref<RoleMember[]>([])
 function handleBatchDelete() {
-  MsgConfirm(`${t('system.member.batchRemoveTitle', { count: batchSelectedMembers.value.length }, batchSelectedMembers.value.length)}?`, '', {
+  MsgConfirm(t('system.member.batchRemoveTitle', { count: batchSelectedMembers.value.length }, batchSelectedMembers.value.length), '', {
     confirmButtonText: t('common.actions.remove'),
   })
     .then(() => {
@@ -128,7 +128,7 @@ watch(
         min-width="180"
         show-overflow-tooltip
       />
-      <el-table-column :label="t('common.labels.operation')" width="70" fixed="right">
+      <el-table-column :label="t('common.labels.operation')" width="80" fixed="right">
         <template #default="{ row }">
           <!-- 移除角色成员 -->
           <MkTooltip :content="t('common.actions.remove')" placement="top" v-if="perm.system.role.removeMember()">

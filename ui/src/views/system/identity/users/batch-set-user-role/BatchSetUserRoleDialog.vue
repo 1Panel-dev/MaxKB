@@ -86,7 +86,7 @@ function submitBatchSetUserRoles() {
 
     return request
       .then(() => {
-        MsgSuccess(t('common.messages.saveSuccess'))
+        MsgSuccess(t('common.messages.settingsSuccess'))
         emit('refresh')
         dialogVisible.value = false
       })

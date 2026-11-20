@@ -14,7 +14,7 @@
     "placeholder": "请选择成员",
     "requiredMessage": "请选择成员",
     "add": "添加成员",
-    "removeTitle": "是否移除成员",
-    "batchRemoveTitle": "是否移除选中的 {count} 个成员"
+    "removeTitle": "是否移除成员：{name}？",
+    "batchRemoveTitle": "是否移除选中的{count}个成员？"
   }
 }

@@ -49,7 +49,7 @@ function handleWorkspaceDelete(workspace: WorkspaceItem) {
 
   WorkspaceApi.getWorkspaceDeleteCheck(workspace.id)
     .then(() =>
-      MsgConfirm(`${t('workspace.delete.title')}: ${workspace.name}?`, t('workspace.delete.description')).then(() => {
+      MsgConfirm(t('workspace.delete.title', { name: workspace.name }), t('workspace.delete.description')).then(() => {
         workspaceLoading.value = true
         return WorkspaceApi.deleteWorkspace(workspace.id as string)
           .then(() => {
@@ -144,7 +144,7 @@ function handleRemoveMember(member: WorkspaceMemberItem) {
   const workspaceId = currentWorkspace.value?.id
   if (!workspaceId) return
 
-  MsgConfirm(`${t('system.member.removeTitle')}: ${member.nick_name}?`, '', { confirmButtonText: t('common.actions.remove') })
+  MsgConfirm(t('system.member.removeTitle', { name: member.nick_name }), '', { confirmButtonText: t('common.actions.remove') })
     .then(() => {
       workspaceMembersLoading.value = true
       return WorkspaceApi.postRemoveWorkspaceMember(workspaceId, member.user_relation_id).then(() => {
@@ -169,7 +169,7 @@ function handleBatchDelete() {
   const memberCount = new Set(selectedMembers.map(({ user_id }) => user_id)).size
   const userRelationIds = [...new Set(selectedMembers.map(({ user_relation_id }) => user_relation_id))]
   MsgConfirm(
-    `${t('workspace.delete.batchRemoveTitle')}?`,
+    t('workspace.delete.batchRemoveTitle'),
     t('workspace.delete.batchRemoveDescription', { memberCount, recordCount: selectedMembers.length }),
     { confirmButtonText: t('common.actions.remove') },
   )

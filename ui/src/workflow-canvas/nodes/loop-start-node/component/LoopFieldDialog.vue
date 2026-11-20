@@ -17,7 +17,7 @@ const form = ref<LoopInputField>({ field: '', label: '' })
 const rules = computed<FormRules<LoopInputField>>(() => ({
   field: [
     { whitespace: true, required: true, message: t('dynamicForm.fields.parameter.requiredMessage'), trigger: 'blur' },
-    { pattern: /^[a-zA-Z0-9_]+$/, message: t('workflow.parameters.invalidMessage'), trigger: 'blur' },
+    { pattern: /^[a-zA-Z0-9_]+$/, message: t('workflow.loopStart.variables.invalidMessage'), trigger: 'blur' },
     {
       validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
         if (isLoopBuiltinField(value)) {

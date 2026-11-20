@@ -113,7 +113,7 @@ function validateFile(file: DragUploadFile) {
     return false
   }
   if (file.raw.size === 0) {
-    MsgWarning(t('upload.emptyFileMessage'))
+    MsgWarning(t('upload.emptyContentMessage'))
     handleRemove(file)
     return false
   }

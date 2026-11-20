@@ -21,6 +21,7 @@
   "requiredMessage": "請上傳檔案",
   "reselectFileMessage": "請重新選擇上傳檔案",
   "emptyFileMessage": "無法上傳空檔案",
+  "emptyContentMessage": "檔案不能為空",
   "sizeLimitMessage": "檔案大小超過上限",
   "unsupportedFormatMessage": "不支援此檔案格式",
   "countLimitMessage": "每次最多上傳 {count} 個檔案",
@@ -31,6 +32,7 @@
     "completed": "已完成",
     "uploading": "上傳中",
     "failed": "失敗",
+    "uploadFailed": "上傳失敗",
     "allSucceeded": "全部成功"
   },
   "avatar": {

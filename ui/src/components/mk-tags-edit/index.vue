@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<{ presetExtensions?: readonly string[] }>
   presetExtensions: () => [],
 })
 
-// 标签编辑：自动聚焦，确认时清理输入并检查重复值。
+// 标签编辑：自动聚焦，确定时清理输入并检查重复值。
 const tagInputVisible = ref(false)
 const tagInput = ref('')
 const inputRef = useTemplateRef<InputInstance>('inputRef')

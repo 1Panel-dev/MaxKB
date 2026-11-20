@@ -60,7 +60,7 @@ function resetData() {
   <el-button text type="primary" @click.stop="open">
     <MkIcon name="icon_setting" />
   </el-button>
-  <MkDialog v-model="visible" :title="t('application.knowledgeSetting.settingsTitle')" @closed="resetData">
+  <MkDialog v-model="visible" :title="t('common.parameters.settingsTitle')" @closed="resetData">
     <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item :label="t('knowledge.retrieval.mode')">
         <!-- 选择检索模式 -->
@@ -150,7 +150,7 @@ function resetData() {
     <template #footer>
       <!-- 取消配置 -->
       <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认配置，暂存到页面草稿 -->
+      <!-- 确定配置，暂存到页面草稿 -->
       <el-button type="primary" @click="submit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>

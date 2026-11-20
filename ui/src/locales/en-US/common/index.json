@@ -7,6 +7,7 @@
     "createTime": "Create time",
     "updateTime": "Update time",
     "all": "All",
+    "other": "Other",
     "selected": "Selected",
     "details": "Details",
     "basicInfo": "Basic information",
@@ -81,7 +82,8 @@
   },
   "parameters": {
     "add": "Add parameter",
-    "edit": "Edit parameter"
+    "edit": "Edit parameter",
+    "settingsTitle": "Parameter settings"
   },
   "configuration": {
     "label": "Configure",
@@ -125,7 +127,7 @@
     "enable": "Enable",
     "disable": "Disable",
     "saveAndEnable": "Save and enable",
-    "confirm": "Confirm",
+    "comfirm": "Ok",
     "submit": "Submit",
     "testConnection": "Test connection"
   },
@@ -136,8 +138,11 @@
   },
   "messages": {
     "saveSuccess": "Saved successfully",
+    "editSuccess": "Edited successfully",
+    "settingsSuccess": "Settings applied successfully",
     "publishSuccess": "Published successfully",
     "deleteSuccess": "Deleted successfully",
+    "batchDeleteSuccess": "Deleted successfully in bulk",
     "deleteFailed": "Deletion failed",
     "createSuccess": "Created successfully",
     "generateFailed": "Generation failed",
@@ -152,7 +157,9 @@
     "relateSuccess": "Related successfully",
     "unrelateSuccess": "Unrelated successfully",
     "enableSuccess": "Enabled successfully",
+    "batchEnableSuccess": "Enabled successfully in bulk",
     "disableSuccess": "Disabled successfully",
+    "batchDisableSuccess": "Disabled successfully in bulk",
     "exportSuccess": "Exported successfully",
     "exportFailed": "Export failed",
     "copied": "Copied",
@@ -160,6 +167,7 @@
     "testSuccess": "Test successful",
     "replaceSuccess": "Replaced successfully",
     "submitSuccess": "Submitted successfully",
+    "sendSuccess": "Sent successfully",
     "taskSubmitted": "Task submitted",
     "operationSuccess": "Operation successful",
     "audioPlaybackFailed": "Unable to play audio. Check the audio format or file URL.",

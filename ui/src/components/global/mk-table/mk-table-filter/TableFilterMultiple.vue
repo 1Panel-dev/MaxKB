@@ -18,7 +18,7 @@ const props = withDefaults(
 const emit = defineEmits<{ select: [value: CheckboxValueType[]]; open: [] }>()
 defineSlots<{ default(): unknown }>()
 
-// 打开时回填草稿，确认或重置后提交。
+// 打开时回填草稿，确定或重置后提交。
 const visible = ref(false)
 const pendingValues = ref<CheckboxValueType[]>([])
 const searchKeyword = ref('')
@@ -90,8 +90,8 @@ function handleConfirm() {
     <div class="p-3 text-right">
       <!-- 清除多选筛选 -->
       <el-button plain class="min-w-12!" size="small" @click="handleReset">{{ t('common.actions.reset') }}</el-button>
-      <!-- 确认多选筛选 -->
-      <el-button class="min-w-12!" size="small" type="primary" @click="handleConfirm">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定多选筛选 -->
+      <el-button class="min-w-12!" size="small" type="primary" @click="handleConfirm">{{ t('common.actions.comfirm') }}</el-button>
     </div>
   </el-popover>
 </template>

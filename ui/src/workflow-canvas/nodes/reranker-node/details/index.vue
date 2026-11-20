@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
@@ -7,6 +8,7 @@ import { downloadByURL, getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'RerankerNodeDetail' })
+const { t } = useI18n({ useScope: 'global' })
 
 defineProps<{
   data: ExecutionNodeDetail
@@ -26,12 +28,12 @@ function openSourceDocument(name: string, fileId?: string, sourceUrl?: string) {
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">检索内容</h6>
+      <h6 class="mb-2">{{ t('workflow.executionResult.retrievalContent') }}</h6>
       <div>{{ data.question || '-' }}</div>
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">重排内容</h6>
+      <h6 class="mb-2">{{ t('workflow.reranker.content.label') }}</h6>
       <div v-if="data.document_list?.length > 0" class="space-y-2">
         <template v-for="(paragraph, paragraphIndex) in data.document_list" :key="paragraphIndex">
           <MkResourceCard :title="paragraph.metadata?.title || '-'" disabled>
@@ -45,7 +47,11 @@ function openSourceDocument(name: string, fileId?: string, sourceUrl?: string) {
             <template #tag>
               <div class="flex-align-center gap-2">
                 <el-tag size="small" type="info">
-                  {{ paragraph.metadata?.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE ? '图片向量' : '文本向量' }}
+                  {{
+                    paragraph.metadata?.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE
+                      ? t('knowledge.retrieval.imageVector')
+                      : t('knowledge.retrieval.textVector')
+                  }}
                 </el-tag>
                 <h6 class="shrink-0 text-primary">
                   {{ paragraph.metadata?.similarity != null ? Number(paragraph.metadata.similarity).toFixed(3) : '' }}
@@ -81,7 +87,7 @@ function openSourceDocument(name: string, fileId?: string, sourceUrl?: string) {
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">重排结果</h6>
+      <h6 class="mb-2">{{ t('workflow.reranker.result') }}</h6>
       <div v-if="data.result_list?.length > 0" class="space-y-2">
         <template v-for="(paragraph, paragraphIndex) in data.result_list" :key="paragraphIndex">
           <MkResourceCard :title="paragraph.metadata?.title || '-'" disabled>
@@ -95,7 +101,11 @@ function openSourceDocument(name: string, fileId?: string, sourceUrl?: string) {
             <template #tag>
               <div class="flex-align-center gap-2">
                 <el-tag size="small" type="info">
-                  {{ paragraph.metadata?.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE ? '图片向量' : '文本向量' }}
+                  {{
+                    paragraph.metadata?.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE
+                      ? t('knowledge.retrieval.imageVector')
+                      : t('knowledge.retrieval.textVector')
+                  }}
                 </el-tag>
                 <h6 class="shrink-0 text-primary">
                   {{ paragraph.metadata?.relevance_score != null ? Number(paragraph.metadata.relevance_score).toFixed(3) : '' }}

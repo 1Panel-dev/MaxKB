@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ParameterField } from './component/parameters-field/types'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -12,6 +13,7 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import ParametersFieldTable from './component/parameters-field/ParametersFieldTable.vue'
 
 defineOptions({ name: 'WorkflowParameterExtractionNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => BaseNodeModel
 const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const model = getModel() as WorkflowNodeModel
@@ -62,7 +64,10 @@ const parameterList = computed({
   set: (fields: ParameterField[]) => {
     formData.value.variable_list = fields
     model.properties.config ??= {}
-    model.properties.config.fields = [{ label: '结果', value: 'result' }, ...fields.map((field) => ({ label: field.label, value: field.field }))]
+    model.properties.config.fields = [
+      { label: t('workflow.node.result'), value: 'result' },
+      ...fields.map((field) => ({ label: field.label, value: field.field })),
+    ]
     model.clearNextNodeField(false)
   },
 })
@@ -88,26 +93,45 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="parameterExtractionFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="parameterExtractionFormRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <NodeModelSelect
           :node-model="model"
           :form-data="formData"
           model-type="LLM"
-          label="AI 模型"
+          :label="t('workflow.model.label')"
           :options="modelList"
           :provider-options="providerOptions"
           @update="updateNodeData"
         />
 
         <!-- 输入变量 -->
-        <el-form-item label="输入变量" prop="input_variable" :rules="{ message: '请选择输入变量', trigger: 'change', required: true }">
-          <NodeCascader ref="inputVariableCascaderRef" v-model="formData.input_variable" :node-model="model" placeholder="请选择变量" />
+        <el-form-item
+          :label="t('workflow.variable.input.label')"
+          prop="input_variable"
+          :rules="{ message: t('workflow.variable.input.requiredMessage'), trigger: 'change', required: true }"
+        >
+          <NodeCascader
+            ref="inputVariableCascaderRef"
+            v-model="formData.input_variable"
+            :node-model="model"
+            :placeholder="t('workflow.variable.selectPlaceholder')"
+          />
         </el-form-item>
 
         <!-- 提取参数 -->
-        <el-form-item prop="variable_list" :rules="{ type: 'array', message: '请添加提取参数', trigger: 'change', required: true }">
+        <el-form-item
+          prop="variable_list"
+          :rules="{ type: 'array', message: t('workflow.parameterExtraction.parameters.requiredMessage'), trigger: 'change', required: true }"
+        >
           <ParametersFieldTable v-model="parameterList" />
         </el-form-item>
       </el-form>

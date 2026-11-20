@@ -19,7 +19,8 @@
     },
     "menuTitle": {
       "label": "Menu title for other parameters"
-    }
+    },
+    "invalidParameterMessage": "Parameters only support letters, numbers, and underscores"
   },
   "parameters": {
     "duplicateMessage": "Parameter already exists",
@@ -27,6 +28,21 @@
   },
   "apiParameters": {
     "title": "API parameters"
+  },
+  "variable": {
+    "label": "Variable",
+    "placeholder": "Enter a variable",
+    "selectPlaceholder": "Select a variable",
+    "requiredMessage": "Enter a variable",
+    "selectRequiredMessage": "Select a variable",
+    "duplicateMessage": "Variable already exists",
+    "invalidMessage": "Variables may contain letters, numbers, and underscores",
+    "add": "Add variable",
+    "edit": "Edit variable",
+    "input": {
+      "label": "Input variable",
+      "requiredMessage": "Select an input variable"
+    }
   },
   "globalVariables": {
     "title": "Global variables"
@@ -36,11 +52,36 @@
   },
   "referenceVariable": {
     "label": "Variable reference",
-    "placeholder": "Select a variable",
+    "placeholder": "Select a variable reference",
     "requiredMessage": "Select a variable reference",
     "invalidMessage": "Invalid variable reference",
     "missingMessage": "The referenced variable does not exist"
   },
+  "inputContent": {
+    "label": "Input content",
+    "placeholder": "Select input content",
+    "requiredMessage": "Select input content"
+  },
+  "document": {
+    "label": "Document",
+    "placeholder": "Select a document",
+    "requiredMessage": "Select a document",
+    "paragraphPreviewHint": "Only the first {count} segments of each document are shown",
+    "characterPreviewHint": "Preview is limited to {count} characters per document"
+  },
+  "searchQuestion": {
+    "label": "Search question",
+    "placeholder": "Select a search question",
+    "requiredMessage": "Select a search question"
+  },
+  "searchScope": {
+    "label": "Retrieval scope",
+    "placeholder": "Select knowledge to relate",
+    "custom": "Custom",
+    "knowledgeList": "Knowledge list",
+    "documentList": "Document list"
+  },
+  "showInSources": "Show results in knowledge sources",
   "audioFile": {
     "label": "Audio files"
   },
@@ -75,6 +116,7 @@
   },
   "negativePrompt": {
     "label": "Prompt (negative)",
+    "detailLabel": "Negative prompt",
     "videoPlaceholder": "Describe what to exclude from the video, such as colors or graphic content",
     "description": "Describe elements to exclude from the generated image or video"
   },

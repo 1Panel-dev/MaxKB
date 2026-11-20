@@ -39,7 +39,7 @@ function handleCancelEmbedding() {
     props.api
       .putCancelTask?.(props.knowledgeId, props.document.id, DOCUMENT_TASK_TYPE.EMBEDDING)
       .then(() => {
-        MsgSuccess(t('common.messages.submitSuccess'))
+        MsgSuccess(t('common.messages.sendSuccess'))
         emit('refresh')
       })
       .catch(() => {}) ?? Promise.resolve()

@@ -87,7 +87,7 @@
     "baseModelsFallback": "未获取到官方模型列表，已展示内置常用模型"
   },
   "delete": {
-    "title": "是否删除模型",
+    "title": "是否删除模型：{name}？",
     "description": "此模型关联 {count} 个资源，删除后无法使用，请谨慎操作。"
   },
   "parameters": {

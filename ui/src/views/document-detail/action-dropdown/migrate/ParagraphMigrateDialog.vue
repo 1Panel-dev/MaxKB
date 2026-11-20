@@ -177,8 +177,8 @@ defineExpose({ open })
     <template #footer>
       <!-- 取消迁移分段 -->
       <el-button plain :disabled="loading || optionLoading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认迁移分段 -->
-      <el-button type="primary" :loading="loading" :disabled="optionLoading" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定迁移分段 -->
+      <el-button type="primary" :loading="loading" :disabled="optionLoading" @click="handleSubmit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

@@ -19,7 +19,9 @@
       "description": "相似度越高相关性越强。"
     },
     "topNumber": "召回分段数 TOP",
-    "maxReferenceCharacters": "最多引用字符数"
+    "maxReferenceCharacters": "最多引用字符数",
+    "imageVector": "图片向量",
+    "textVector": "文本向量"
   },
   "hitTest": {
     "title": "召回测试",
@@ -34,8 +36,6 @@
       "initialEmpty": "召回的知识显示在这里",
       "empty": "未召回相关知识，请调整检索参数内容"
     },
-    "imageVector": "图片向量",
-    "textVector": "文本向量",
     "test": "测试"
   },
   "externalRetrieval": {

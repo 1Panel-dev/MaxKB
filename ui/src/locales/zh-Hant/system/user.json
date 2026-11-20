@@ -75,8 +75,8 @@
     "conflictMessage": "{type} 衝突"
   },
   "delete": {
-    "title": "確定刪除使用者",
-    "batchTitle": "是否刪除選取的 {count} 位使用者",
+    "title": "是否刪除使用者：{name}？",
+    "batchTitle": "是否刪除選取的{count}個使用者？",
     "description": "刪除使用者不會刪除該使用者建立的資源（智慧體、知識庫、模型），請謹慎操作。"
   }
 }

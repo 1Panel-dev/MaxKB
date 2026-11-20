@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ParameterField } from './types'
 import ParametersFieldDialog from './ParametersFieldDialog.vue'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowParameterExtractionFieldTable' })
+const { t } = useI18n({ useScope: 'global' })
 
 const parameterList = defineModel<ParameterField[]>({ required: true })
 const parametersFieldDialogRef = useTemplateRef<InstanceType<typeof ParametersFieldDialog>>('parametersFieldDialogRef')
@@ -20,7 +22,7 @@ function deleteField(index: number) {
 
 function saveField(data: ParameterField, index?: number) {
   if (parameterList.value.some((field, fieldIndex) => field.field === data.field && fieldIndex !== index)) {
-    MsgError(`参数 "${data.field}" 已存在`)
+    MsgError(`${t('workflow.parameters.duplicateMessage')}：${data.field}`)
     return
   }
 
@@ -38,29 +40,30 @@ function saveField(data: ParameterField, index?: number) {
 <template>
   <div class="w-full">
     <div class="flex-between mb-2">
-      <span class="mk-required">提取参数</span>
+      <span class="mk-required">{{ t('workflow.parameterExtraction.parameters.label') }}</span>
+      <!-- 添加提取参数 -->
       <el-button text type="primary" @click="openFieldDialog()">
         <MkIcon name="icon_add_outlined" />
       </el-button>
     </div>
 
     <MkTable v-if="parameterList.length" size="small" class="border" :data="parameterList" row-key="field">
-      <el-table-column prop="field" label="参数">
+      <el-table-column prop="field" :label="t('dynamicForm.fields.parameter.label')">
         <template #default="{ row }">
           <span :title="row.field" class="block truncate">{{ row.field }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="label" label="显示名称">
+      <el-table-column prop="label" :label="t('dynamicForm.fields.displayName.label')">
         <template #default="{ row }">
           <span :title="row.label" class="block truncate">{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="参数类型" width="90">
+      <el-table-column :label="t('workflow.parameterExtraction.type.label')" width="90">
         <template #default="{ row }">
           <el-tag size="small" type="info">{{ row.parameter_type }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="80">
+      <el-table-column :label="t('common.labels.operation')" width="80">
         <template #default="{ row, $index }">
           <!-- 编辑 -->
           <el-button text type="primary" @click="openFieldDialog(row, $index)">

@@ -548,6 +548,7 @@ onBeforeUnmount(() => {
                 :knowledge-id="knowledgeId"
                 v-model:loading="operationLoading"
                 :document="row"
+                :resource-type="DOCUMENT_RESOURCE_TYPE.IMAGE"
                 @refresh="refreshAfterOperation"
               />
             </MkTableMoreDropdown>

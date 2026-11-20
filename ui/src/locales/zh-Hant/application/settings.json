@@ -12,7 +12,6 @@
     "noReferences": "無引用知識庫"
   },
   "knowledgeSetting": {
-    "settingsTitle": "參數設定",
     "empty": "關聯的知識庫顯示在這裡",
     "noReferences": {
       "label": "無引用知識庫分段時",

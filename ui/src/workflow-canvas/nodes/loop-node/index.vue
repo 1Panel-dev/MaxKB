@@ -136,12 +136,7 @@ onMounted(() => {
           </el-select>
         </el-form-item>
         <el-form-item v-if="formData.loop_type === 'ARRAY'" :label="t('workflow.loop.array')" prop="array">
-          <NodeCascader
-            ref="nodeCascaderRef"
-            v-model="formData.array"
-            :node-model="model"
-            :placeholder="t('workflow.referenceVariable.placeholder')"
-          />
+          <NodeCascader ref="nodeCascaderRef" v-model="formData.array" :node-model="model" :placeholder="t('workflow.variable.selectPlaceholder')" />
         </el-form-item>
         <el-form-item v-else-if="formData.loop_type === 'NUMBER'" :label="t('workflow.loop.number')" prop="number">
           <el-input-number v-model="formData.number" :min="1" :step="1" controls-position="right" align="left" />

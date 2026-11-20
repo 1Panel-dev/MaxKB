@@ -132,8 +132,8 @@ defineExpose({ format, validateRules })
     <template #footer>
       <!-- 取消 JSON 编辑 -->
       <el-button plain @click="closeEditorDialog">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认 JSON 编辑 -->
-      <el-button type="primary" @click="submitEditorDialog">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定 JSON 编辑 -->
+      <el-button type="primary" @click="submitEditorDialog">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

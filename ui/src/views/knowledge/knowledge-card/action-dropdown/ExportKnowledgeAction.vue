@@ -48,7 +48,7 @@ function handleExportKnowledge(method: (typeof exportOptions)[number]['method'])
     })
 }
 
-/* 确认知识库压缩包是否包含源文件 */
+/* 确定知识库压缩包是否包含源文件 */
 function handleConfirmExport() {
   if (loading.value) return
   loading.value = true
@@ -105,7 +105,7 @@ function handleExportDialogClosed() {
     <template #footer>
       <!-- 取消导出知识库 -->
       <el-button plain :disabled="loading" @click="exportDialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认导出知识库 -->
+      <!-- 确定导出知识库 -->
       <el-button type="primary" :loading="loading" @click="handleConfirmExport">{{ t('common.actions.export') }}</el-button>
     </template>
   </MkDialog>

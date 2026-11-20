@@ -9,6 +9,7 @@
   },
   "quota": {
     "title": "配額設定",
+    "saveSuccess": "配額設定成功",
     "usage": "Tokens使用量/總量",
     "expiresAt": "Tokens到期時間",
     "unlimited": "不限",

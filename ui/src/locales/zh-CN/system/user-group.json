@@ -12,7 +12,7 @@
   "memberCount": "成员数",
   "set": "设置用户组",
   "delete": {
-    "title": "是否删除用户组",
+    "title": "是否删除用户组：{name}？",
     "description": "删除后，成员将被移除该用户组，通过该用户组继承的资源权限将被回收，请谨慎操作！",
     "chatDescription": "删除后，成员将被移除该用户组，请谨慎操作。",
     "removeDescription": "成员移除后，通过该用户组继承的资源权限将被回收，请谨慎操作。"

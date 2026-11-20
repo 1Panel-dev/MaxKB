@@ -178,7 +178,7 @@ function handleBatchDelete() {
   if (!selectedApplicationCount.value) return
   const applicationIds = [...selectedApplicationIds.value]
 
-  MsgConfirm(`${t('application.delete.batchTitle', { count: applicationIds.length })}?`, t('common.dialogs.deleteWarning'))
+  MsgConfirm(t('application.delete.batchTitle', { count: applicationIds.length }, applicationIds.length), t('common.dialogs.deleteWarning'))
     .then(() => {
       applicationOperationLoading.value = true
       return ApplicationApi.putBatchDeleteApplications(applicationIds).then(() => {

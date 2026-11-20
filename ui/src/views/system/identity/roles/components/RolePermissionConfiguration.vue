@@ -17,7 +17,7 @@ interface PermissionTableRow {
 }
 
 const props = defineProps<{ currentRole: RoleItem }>()
-const { t } = useI18n({ useScope: 'global' })
+const { locale, t } = useI18n({ useScope: 'global' })
 
 /* 权限数据加载与表格展示 */
 const loading = ref(false)
@@ -27,13 +27,28 @@ const showCategory = ref(true)
 const disabled = computed(() => props.currentRole.internal || !perm.system.role.edit())
 const permissionTableKey = computed(() => `${props.currentRole.id}:${disabled.value ? 'readonly' : 'editable'}`)
 
-function loadPermissions() {
+function loadPermissions(preserveSelection = false) {
   loading.value = true
-  permissionData.value = []
-  return RoleApi.getRolePermissionList(props.currentRole.id).then((permissions) => {
-    permissionData.value = transformPermissions(permissions)
-    loading.value = false
-  })
+  if (!preserveSelection) permissionData.value = []
+  return RoleApi.getRolePermissionList(props.currentRole.id)
+    .then((permissions) => {
+      // 语言刷新只更新接口文案，按权限 ID 保留当前角色的勾选。
+      const permissionStates = preserveSelection
+        ? new Map(permissionData.value.flatMap((row) => row.permissions.map(({ id, enable }) => [id, enable] as const)))
+        : undefined
+      const rows = transformPermissions(permissions)
+      if (permissionStates) {
+        rows.forEach((row) => {
+          row.permissions.forEach((permission) => {
+            permission.enable = permissionStates.get(permission.id) ?? permission.enable
+          })
+        })
+      }
+      permissionData.value = rows
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 function transformPermissions(modules: RolePermissionModule[]) {
@@ -135,7 +150,7 @@ function handleSave() {
     })
 }
 
-watch(() => props.currentRole.id, loadPermissions, { immediate: true })
+watch([() => props.currentRole.id, locale], ([roleId], [previousRoleId]) => loadPermissions(roleId === previousRoleId), { immediate: true })
 </script>
 
 <template>

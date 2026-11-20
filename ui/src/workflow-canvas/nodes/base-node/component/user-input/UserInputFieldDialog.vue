@@ -54,7 +54,7 @@ function submitField() {
     .then(() => {
       const field = constructor.getData()
       if (!field.field || !/^[a-zA-Z0-9_]+$/.test(field.field)) {
-        MsgError(t('workflow.parameters.invalidMessage'))
+        MsgError(t('workflow.userInput.invalidParameterMessage'))
         return
       }
       emit('submit', cloneDeep(field), editingIndex.value)
@@ -83,7 +83,7 @@ defineExpose({ open, close })
     <template #footer>
       <!-- 取消参数编辑 -->
       <el-button plain @click="fieldDialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认参数编辑 -->
+      <!-- 确定参数编辑 -->
       <el-button type="primary" @click="submitField">{{ editingIndex === undefined ? t('common.actions.add') : t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>

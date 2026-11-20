@@ -48,14 +48,14 @@
       "replaceOriginal": "Replace original document"
     },
     "delete": {
-      "title": "Delete document",
+      "title": "Delete document: {name}?",
       "description": "This will also delete {count} segment in this document. | This will also delete {count} segments in this document.",
-      "batchTitle": "Delete {count} selected document | Delete {count} selected documents",
+      "batchTitle": "Delete the {count} selected document? | Delete the {count} selected documents?",
       "batchDescription": "All segments in the selected documents will also be deleted."
     },
     "sync": {
-      "title": "Sync",
-      "batchTitle": "Sync {count} selected document | Sync {count} selected documents",
+      "title": "Sync document: {name}?",
+      "batchTitle": "Sync the {count} selected document? | Sync the {count} selected documents?",
       "description": "Sync skips unchanged documents and updates existing segments in documents that have changed.",
       "workflowDescription": "Only this web document will be synced, using the workflow’s extraction and splitting settings.",
       "missingUrlMessage": "Set the document URL before syncing."
@@ -102,6 +102,12 @@
     "preview": {
       "emptyMessage": "The image preview has no segments. Go back and generate the preview again."
     },
-    "unsupportedFormatMessage": "Supported image formats: {formats}."
+    "unsupportedFormatMessage": "Supported image formats: {formats}.",
+    "delete": {
+      "title": "Delete image: {name}?",
+      "batchTitle": "Delete the {count} selected image? | Delete the {count} selected images?",
+      "description": "This will also delete {count} segment in this image. | This will also delete {count} segments in this image.",
+      "batchDescription": "All segments in the selected images will also be deleted."
+    }
   }
 }

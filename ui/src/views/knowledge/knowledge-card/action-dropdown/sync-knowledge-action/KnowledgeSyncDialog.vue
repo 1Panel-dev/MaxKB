@@ -59,8 +59,8 @@ defineExpose({ open })
     <template #footer>
       <!-- 取消同步 -->
       <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认同步 -->
-      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定同步 -->
+      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

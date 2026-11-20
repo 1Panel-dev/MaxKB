@@ -38,8 +38,8 @@
       "unsupportedFormatMessage": "僅支援上傳 XLS、XLSX 格式的檔案"
     },
     "delete": {
-      "title": "確定刪除標籤",
-      "batchTitle": "確定刪除選取的 {count} 個標籤",
+      "title": "是否刪除標籤：{name}？",
+      "batchTitle": "是否刪除選取的{count}個標籤？",
       "description": "刪除標籤時，也會從使用該標籤的資源中移除它，請謹慎操作。"
     },
     "messages": {

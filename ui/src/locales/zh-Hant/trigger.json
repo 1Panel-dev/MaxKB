@@ -41,7 +41,7 @@
     "dataType": {
       "label": "資料類型",
       "placeholder": "請選擇資料類型",
-      "requiredMessage": "請選擇資料類型"
+      "requiredMessage": "請選擇參數類型"
     }
   },
   "taskExecution": {
@@ -68,8 +68,8 @@
     "nextRunTime": "下次執行時間"
   },
   "delete": {
-    "title": "確定刪除觸發器",
-    "batchTitle": "是否刪除選取的 {count} 個觸發器",
+    "title": "是否刪除觸發器：{name}？",
+    "batchTitle": "是否刪除選取的{count}個觸發器？",
     "description": "刪除後將停止觸發任務，並刪除相關執行記錄。"
   },
   "executionRecords": {

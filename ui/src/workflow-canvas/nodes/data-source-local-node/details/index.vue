@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
@@ -7,6 +8,7 @@ import { downloadByURL, getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'DataSourceLocalNodeDetail' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   data: ExecutionNodeDetail
@@ -27,7 +29,7 @@ const fileList = computed<SourceFile[]>(() => (props.data?.file_list as SourceFi
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">文件列表</h6>
+      <h6 class="mb-2">{{ t('workflow.localFile.fileList') }}</h6>
       <div v-if="fileList.length > 0" class="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <template v-for="(file, index) in fileList" :key="file.file_id || index">
           <!-- 下载来源文件 -->

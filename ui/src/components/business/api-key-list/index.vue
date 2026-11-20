@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemApiKeyApi from '@/api/admin/system/api-key'
 import type SystemResourceApiKeyApi from '@/api/admin/system/resource-management/application/api-key'
 import type ApplicationApiKeyApi from '@/api/admin/workspace/application/api-key'
@@ -12,6 +13,7 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'ApiKeyList' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   api: typeof ApplicationApiKeyApi | typeof SystemResourceApiKeyApi | typeof SystemApiKeyApi
@@ -66,7 +68,7 @@ function handleChangeActive(record: ApiKeyRecord) {
 
 function handleDelete(record: ApiKeyRecord) {
   if (loading.value) return
-  return MsgConfirm('是否删除该 API Key？', '删除后，使用该 API Key 的服务将无法访问，请谨慎操作！').then(
+  return MsgConfirm(t('auth.apiKey.delete.title', { name: `******${record.secret_key.slice(-4)}` }), t('auth.apiKey.delete.description')).then(
     () => {
       if (loading.value) return
       loading.value = true

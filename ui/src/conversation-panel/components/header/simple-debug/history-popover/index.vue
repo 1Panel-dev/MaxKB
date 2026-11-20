@@ -31,7 +31,7 @@ function handleSelectConversation(conversation: Conversation) {
 }
 
 function handleDeleteConversation(conversation: Conversation) {
-  MsgConfirm('确认删除该对话？', '删除后无法恢复。')
+  MsgConfirm('是否删除该对话？', '删除后无法恢复。')
     .then(() => conversationList.deleteChat(conversation.id))
     .catch(() => {})
 }
@@ -42,7 +42,7 @@ function handleDeleteConversation(conversation: Conversation) {
  */
 function handleClearConversations() {
   if (clearing.value) return
-  MsgConfirm('确认清空全部历史对话？', '清空后无法恢复。', { confirmButtonText: '清空' })
+  MsgConfirm('是否清空全部历史对话？', '清空后无法恢复。', { confirmButtonText: '清空' })
     .then(async () => {
       clearing.value = true
       while (conversationList.hasMore.value) await conversationList.loadMore()

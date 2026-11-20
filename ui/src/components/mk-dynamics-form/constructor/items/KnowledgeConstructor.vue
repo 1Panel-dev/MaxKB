@@ -58,7 +58,7 @@ function validateKnowledgeSelection() {
   })
 }
 
-// 添加知识库：由公共弹窗管理查询和临时选择，确认后同步可选项及默认值。
+// 添加知识库：由公共弹窗管理查询和临时选择，确定后同步可选项及默认值。
 const knowledgeDialogRef = useTemplateRef<InstanceType<typeof SelectKnowledgeDialog>>('knowledgeDialogRef')
 
 function openAddKnowledgeDialog() {

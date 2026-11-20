@@ -28,9 +28,8 @@
       "bottom": "置於底部"
     },
     "delete": {
-      "title": "是否刪除分段",
-      "confirm": "確定刪除此分段",
-      "batchTitle": "確認刪除選取的 {count} 個分段"
+      "title": "是否刪除分段：{name}？",
+      "batchTitle": "是否刪除選取的{count}個分段？"
     },
     "empty": "暫無分段"
   }

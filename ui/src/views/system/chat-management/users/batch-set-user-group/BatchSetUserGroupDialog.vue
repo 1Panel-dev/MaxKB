@@ -44,7 +44,7 @@ function submitBatchSetUserGroups() {
     submitting.value = true
     return ChatUserApi.postBatchSetChatUserGroups({ ...batchGroupForm })
       .then(() => {
-        MsgSuccess(t('common.messages.saveSuccess'))
+        MsgSuccess(t('common.messages.settingsSuccess'))
         emit('refresh')
         dialogVisible.value = false
       })

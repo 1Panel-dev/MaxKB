@@ -7,6 +7,7 @@
     "createTime": "创建时间",
     "updateTime": "更新时间",
     "all": "全部",
+    "other": "其他",
     "selected": "已选",
     "details": "详情",
     "basicInfo": "基本信息",
@@ -81,7 +82,8 @@
   },
   "parameters": {
     "add": "添加参数",
-    "edit": "编辑参数"
+    "edit": "编辑参数",
+    "settingsTitle": "参数设置"
   },
   "configuration": {
     "label": "配置",
@@ -125,19 +127,22 @@
     "enable": "启用",
     "disable": "禁用",
     "saveAndEnable": "保存并启用",
-    "confirm": "确认",
+    "comfirm": "确定",
     "submit": "提交",
     "testConnection": "测试连接"
   },
   "dialogs": {
     "notice": "提示",
     "deleteWarning": "删除后无法恢复，请谨慎操作。",
-    "unsavedChanges": "当前的更改尚未保存，确认退出吗"
+    "unsavedChanges": "当前的更改尚未保存，确定退出吗"
   },
   "messages": {
     "saveSuccess": "保存成功",
+    "editSuccess": "编辑成功",
+    "settingsSuccess": "设置成功",
     "publishSuccess": "发布成功",
     "deleteSuccess": "删除成功",
+    "batchDeleteSuccess": "批量删除成功",
     "deleteFailed": "删除失败",
     "createSuccess": "创建成功",
     "generateFailed": "生成失败",
@@ -152,7 +157,9 @@
     "relateSuccess": "关联成功",
     "unrelateSuccess": "取消关联成功",
     "enableSuccess": "启用成功",
+    "batchEnableSuccess": "批量启用成功",
     "disableSuccess": "禁用成功",
+    "batchDisableSuccess": "批量禁用成功",
     "exportSuccess": "导出成功",
     "exportFailed": "导出失败",
     "copied": "已复制",
@@ -160,6 +167,7 @@
     "testSuccess": "测试成功",
     "replaceSuccess": "替换成功",
     "submitSuccess": "提交成功",
+    "sendSuccess": "发送成功",
     "taskSubmitted": "任务已提交",
     "operationSuccess": "操作成功",
     "audioPlaybackFailed": "无法播放，请检查音频格式或文件地址",

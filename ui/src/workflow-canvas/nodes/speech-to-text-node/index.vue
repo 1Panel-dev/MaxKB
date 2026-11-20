@@ -111,7 +111,7 @@ onMounted(() => {
         >
           <template #label>
             <span class="flex-align-center gap-1">
-              <span class="mk-required">{{ t('workflow.audioFile.label') }}</span>
+              <span class="mk-required">{{ t('workflow.speechToText.audioFile') }}</span>
               <MkTooltip placement="right">
                 <template #content>
                   <div class="font-mono whitespace-pre-wrap">{{ `${t('common.labels.example')}：\n${FILE_REFERENCE_EXAMPLE}` }}</div>

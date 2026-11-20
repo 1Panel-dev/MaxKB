@@ -13,7 +13,7 @@
           <div class="group flex-between">
             <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
             <!-- 复制循环变量引用 -->
-            <MkTooltip effect="dark" :content="t('common.actions.duplicate')" placement="top">
+            <MkTooltip effect="dark" :content="t('workflow.loopStart.copyParameter')" placement="top">
               <el-button class="group-hover-visible" link @click="copyText(`{{loop.${item.value}}}`)">
                 <MkIcon name="icon_copy_outlined" />
               </el-button>

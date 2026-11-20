@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
 import { APPLICATION_TYPE } from '@/api/enums'
@@ -10,6 +11,8 @@ import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowApplicationNode' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 type FieldLabel = string | { label?: string }
 type UploadField = 'audio' | 'document' | 'image' | 'video'
@@ -172,28 +175,56 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
 
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item label="用户问题" prop="question_reference_address" :rules="{ message: '请选择用户问题', trigger: 'change', required: true }">
-          <NodeCascader ref="questionCascaderRef" v-model="formData.question_reference_address" :node-model="model" placeholder="请选择用户问题" />
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
+        <el-form-item
+          :label="t('workflow.start.question')"
+          prop="question_reference_address"
+          :rules="{ message: t('common.validation.selectFieldRequired', { label: t('workflow.start.question') }), trigger: 'change', required: true }"
+        >
+          <NodeCascader
+            ref="questionCascaderRef"
+            v-model="formData.question_reference_address"
+            :node-model="model"
+            :placeholder="t('common.placeholders.selectField', { label: t('workflow.start.question') })"
+          />
         </el-form-item>
 
-        <el-form-item v-if="formData.document_list !== undefined" label="文档" prop="document_list">
-          <NodeCascader v-model="formData.document_list" :node-model="model" placeholder="请选择文档" />
+        <el-form-item v-if="formData.document_list !== undefined" :label="t('workflow.document.label')" prop="document_list">
+          <NodeCascader v-model="formData.document_list" :node-model="model" :placeholder="t('workflow.document.placeholder')" />
         </el-form-item>
 
-        <el-form-item v-if="formData.image_list !== undefined" label="图片" prop="image_list">
-          <NodeCascader v-model="formData.image_list" :node-model="model" placeholder="请选择图片" />
+        <el-form-item v-if="formData.image_list !== undefined" :label="t('upload.types.image')" prop="image_list">
+          <NodeCascader
+            v-model="formData.image_list"
+            :node-model="model"
+            :placeholder="t('common.placeholders.selectField', { label: t('upload.types.image') })"
+          />
         </el-form-item>
 
-        <el-form-item v-if="formData.audio_list !== undefined" label="音频" prop="audio_list">
-          <NodeCascader v-model="formData.audio_list" :node-model="model" placeholder="请选择音频" />
+        <el-form-item v-if="formData.audio_list !== undefined" :label="t('upload.types.audio')" prop="audio_list">
+          <NodeCascader
+            v-model="formData.audio_list"
+            :node-model="model"
+            :placeholder="t('common.placeholders.selectField', { label: t('upload.types.audio') })"
+          />
         </el-form-item>
 
-        <el-form-item v-if="formData.video_list !== undefined" label="视频" prop="video_list">
-          <NodeCascader v-model="formData.video_list" :node-model="model" placeholder="请选择视频" />
+        <el-form-item v-if="formData.video_list !== undefined" :label="t('upload.types.video')" prop="video_list">
+          <NodeCascader
+            v-model="formData.video_list"
+            :node-model="model"
+            :placeholder="t('common.placeholders.selectField', { label: t('upload.types.video') })"
+          />
         </el-form-item>
 
         <el-form-item
@@ -201,9 +232,13 @@ onMounted(() => {
           :key="`api-input-${index}`"
           :label="formatFieldLabel(field.variable)"
           :prop="`api_input_field_list.${index}.value`"
-          :rules="{ required: field.is_required, message: `请选择${formatFieldLabel(field.variable)}`, trigger: 'change' }"
+          :rules="{
+            required: field.is_required,
+            message: t('common.validation.selectFieldRequired', { label: formatFieldLabel(field.variable) }),
+            trigger: 'change',
+          }"
         >
-          <NodeCascader v-model="field.value" :node-model="model" placeholder="请选择参数" />
+          <NodeCascader v-model="field.value" :node-model="model" :placeholder="t('dynamicForm.fields.parameter.selectPlaceholder')" />
         </el-form-item>
 
         <el-form-item
@@ -211,16 +246,20 @@ onMounted(() => {
           :key="`user-input-${index}`"
           :label="formatFieldLabel(field.label)"
           :prop="`user_input_field_list.${index}.value`"
-          :rules="{ required: field.required, message: `请选择${formatFieldLabel(field.label)}`, trigger: 'change' }"
+          :rules="{
+            required: field.required,
+            message: t('common.validation.selectFieldRequired', { label: formatFieldLabel(field.label) }),
+            trigger: 'change',
+          }"
         >
-          <NodeCascader v-model="field.value" :node-model="model" placeholder="请选择参数" />
+          <NodeCascader v-model="field.value" :node-model="model" :placeholder="t('dynamicForm.fields.parameter.selectPlaceholder')" />
         </el-form-item>
 
         <!-- 返回内容 -->
         <div v-if="showReturnContent" class="flex-between w-full">
           <span class="flex-align-center gap-1">
-            返回内容
-            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            {{ t('workflow.returnContent.label') }}
+            <MkTooltip :content="t('workflow.returnContent.description')" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>

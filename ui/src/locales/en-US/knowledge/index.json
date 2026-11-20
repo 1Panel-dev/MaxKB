@@ -92,8 +92,8 @@
     "sourceFilesDescription": "Include the original files in the ZIP to restore file associations automatically on import. Leave this unchecked to export only the text."
   },
   "delete": {
-    "title": "Delete knowledge",
-    "batchTitle": "Delete selected knowledge"
+    "title": "Delete knowledge: {name}?",
+    "batchTitle": "Delete the {count} selected knowledge?"
   },
   "messages": {
     "missingWorkspace": "Workspace information is missing for this knowledge.",

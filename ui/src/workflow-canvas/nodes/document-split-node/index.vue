@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
@@ -9,6 +10,7 @@ import { DOCUMENT_SPLIT_STRATEGY_LABELS } from './constant'
 import { DOCUMENT_SPLIT_PATTERN_OPTIONS } from '@/constants/document'
 
 defineOptions({ name: 'WorkflowDocumentSplitNode' })
+const { t } = useI18n({ useScope: 'global' })
 
 type ConfigurableField = 'chunk_size' | 'patterns' | 'limit' | 'with_filter' | 'paragraph_title_relate_problem' | 'document_name_relate_problem'
 type DocumentSplitForm = {
@@ -85,16 +87,36 @@ onBeforeUnmount(() => anchorGuard.reset())
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <!-- 选择文档 -->
-        <el-form-item label="文档" prop="document_list" :rules="{ type: 'array', required: true, message: '请选择文档', trigger: 'change' }">
-          <NodeCascader :node-model="model" class="w-full!" placeholder="请选择文档" v-model="formData.document_list" />
+        <el-form-item
+          :label="t('workflow.document.label')"
+          prop="document_list"
+          :rules="{ type: 'array', required: true, message: t('workflow.document.requiredMessage'), trigger: 'change' }"
+        >
+          <NodeCascader :node-model="model" class="w-full!" :placeholder="t('workflow.document.placeholder')" v-model="formData.document_list" />
         </el-form-item>
         <!-- 分段策略 -->
-        <el-form-item label="分段策略" prop="split_strategy" :rules="{ required: true, message: '请选择分段策略', trigger: 'change' }">
-          <el-select v-model="formData.split_strategy" placeholder="请选择分段策略" :teleported="false" @change="clearHiddenValidation">
+        <el-form-item
+          :label="t('workflow.documentSplit.strategy.label')"
+          prop="split_strategy"
+          :rules="{ required: true, message: t('workflow.documentSplit.strategy.requiredMessage'), trigger: 'change' }"
+        >
+          <el-select
+            v-model="formData.split_strategy"
+            :placeholder="t('workflow.documentSplit.strategy.placeholder')"
+            :teleported="false"
+            @change="clearHiddenValidation"
+          >
             <el-option :label="DOCUMENT_SPLIT_STRATEGY_LABELS.auto" value="auto" />
             <el-option :label="DOCUMENT_SPLIT_STRATEGY_LABELS.custom" value="custom" />
             <el-option :label="DOCUMENT_SPLIT_STRATEGY_LABELS.qa" value="qa" />
@@ -104,19 +126,25 @@ onBeforeUnmount(() => anchorGuard.reset())
         <el-form-item
           class="mk-hide-asterisk"
           :prop="formData.chunk_size_type === 'referencing' ? 'chunk_size_reference' : 'chunk_size'"
-          :rules="formData.chunk_size_type === 'referencing' ? [{ type: 'array', required: true, message: '请选择引用变量', trigger: 'change' }] : []"
+          :rules="
+            formData.chunk_size_type === 'referencing'
+              ? [{ type: 'array', required: true, message: t('workflow.referenceVariable.requiredMessage'), trigger: 'change' }]
+              : []
+          "
         >
           <template #label>
             <div class="flex-between w-full gap-2">
               <span class="flex-align-center gap-1">
-                <span :class="formData.chunk_size_type === 'referencing' ? 'mk-required' : ''">子分块长度</span>
+                <span :class="formData.chunk_size_type === 'referencing' ? 'mk-required' : ''">
+                  {{ t('workflow.documentSplit.childChunkLength.label') }}
+                </span>
                 <MkTooltip effect="dark" placement="right">
                   <template #content>
-                    核心目标是平衡检索精度与召回效率
+                    {{ t('workflow.documentSplit.childChunkLength.description') }}
                     <br />
-                    避免过短拆分：单块＜50 字易导致语义碎片化，检索时可能因缺少上下文无法匹配查询意图
+                    {{ t('workflow.documentSplit.childChunkLength.tooShortHint') }}
                     <br />
-                    避免过长拆分：单块＞500 字会增加冗余信息，降低检索精准度，且占用更多存储和计算资源
+                    {{ t('workflow.documentSplit.childChunkLength.tooLongHint') }}
                   </template>
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
@@ -129,8 +157,8 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('chunk_size_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option label="引用" value="referencing" />
-                <el-option label="自定义" value="custom" />
+                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
+                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -146,7 +174,13 @@ onBeforeUnmount(() => anchorGuard.reset())
             :step="1"
             :step-strictly="true"
           />
-          <NodeCascader v-else :node-model="model" class="w-full!" placeholder="请选择引用变量" v-model="formData.chunk_size_reference" />
+          <NodeCascader
+            v-else
+            :node-model="model"
+            class="w-full!"
+            :placeholder="t('workflow.referenceVariable.placeholder')"
+            v-model="formData.chunk_size_reference"
+          />
         </el-form-item>
 
         <!-- 分段标识 -->
@@ -154,13 +188,19 @@ onBeforeUnmount(() => anchorGuard.reset())
           class="mk-hide-asterisk"
           v-if="formData.split_strategy === 'custom'"
           :prop="formData.patterns_type === 'referencing' ? 'patterns_reference' : 'patterns'"
-          :rules="formData.patterns_type === 'referencing' ? [{ type: 'array', required: true, message: '请选择引用变量', trigger: 'change' }] : []"
+          :rules="
+            formData.patterns_type === 'referencing'
+              ? [{ type: 'array', required: true, message: t('workflow.referenceVariable.requiredMessage'), trigger: 'change' }]
+              : []
+          "
         >
           <template #label>
             <div class="flex-between w-full gap-2">
               <div class="flex-align-center gap-1">
-                <span :class="formData.patterns_type === 'referencing' ? 'mk-required' : ''">分段标识</span>
-                <MkTooltip effect="dark" content="按照所选符号先后顺序做递归分割，分割结果超出分段长度将截取至分段长度。" placement="right">
+                <span :class="formData.patterns_type === 'referencing' ? 'mk-required' : ''">
+                  {{ t('knowledge.documentStrategy.delimiter.label') }}
+                </span>
+                <MkTooltip effect="dark" :content="t('knowledge.documentStrategy.delimiter.description')" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </div>
@@ -172,8 +212,8 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('patterns_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option label="引用" value="referencing" />
-                <el-option label="自定义" value="custom" />
+                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
+                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -186,7 +226,7 @@ onBeforeUnmount(() => anchorGuard.reset())
             allow-create
             default-first-option
             filterable
-            placeholder="请选择分段标识"
+            :placeholder="t('knowledge.documentStrategy.delimiter.placeholder')"
             @visible-change="anchorGuard.setOverlayVisible('patterns', $event)"
           >
             <el-option
@@ -196,7 +236,13 @@ onBeforeUnmount(() => anchorGuard.reset())
               :value="pattern.value"
             ></el-option>
           </el-select>
-          <NodeCascader v-else :node-model="model" class="w-full!" placeholder="请选择引用变量" v-model="formData.patterns_reference" />
+          <NodeCascader
+            v-else
+            :node-model="model"
+            class="w-full!"
+            :placeholder="t('workflow.referenceVariable.placeholder')"
+            v-model="formData.patterns_reference"
+          />
         </el-form-item>
 
         <!-- 分段长度 -->
@@ -204,11 +250,15 @@ onBeforeUnmount(() => anchorGuard.reset())
           class="mk-hide-asterisk"
           v-if="formData.split_strategy === 'custom'"
           :prop="formData.limit_type === 'referencing' ? 'limit_reference' : 'limit'"
-          :rules="formData.limit_type === 'referencing' ? [{ type: 'array', required: true, message: '请选择引用变量', trigger: 'change' }] : []"
+          :rules="
+            formData.limit_type === 'referencing'
+              ? [{ type: 'array', required: true, message: t('workflow.referenceVariable.requiredMessage'), trigger: 'change' }]
+              : []
+          "
         >
           <template #label>
             <div class="flex-between w-full gap-2">
-              <span :class="formData.limit_type === 'referencing' ? 'mk-required' : ''">分段长度</span>
+              <span :class="formData.limit_type === 'referencing' ? 'mk-required' : ''">{{ t('knowledge.documentStrategy.paragraphLength') }}</span>
               <el-select
                 v-model="formData.limit_type"
                 size="small"
@@ -217,8 +267,8 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('limit_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option label="引用" value="referencing" />
-                <el-option label="自定义" value="custom" />
+                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
+                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -234,21 +284,29 @@ onBeforeUnmount(() => anchorGuard.reset())
             :step="1"
             :step-strictly="true"
           />
-          <NodeCascader v-else :node-model="model" class="w-full!" placeholder="请选择引用变量" v-model="formData.limit_reference" />
+          <NodeCascader
+            v-else
+            :node-model="model"
+            class="w-full!"
+            :placeholder="t('workflow.referenceVariable.placeholder')"
+            v-model="formData.limit_reference"
+          />
         </el-form-item>
         <!-- 自动清洗 -->
         <el-form-item
           v-if="formData.split_strategy === 'custom'"
           :prop="formData.with_filter_type === 'referencing' ? 'with_filter_reference' : 'with_filter'"
           :rules="
-            formData.with_filter_type === 'referencing' ? [{ type: 'array', required: true, message: '请选择引用变量', trigger: 'change' }] : []
+            formData.with_filter_type === 'referencing'
+              ? [{ type: 'array', required: true, message: t('workflow.referenceVariable.requiredMessage'), trigger: 'change' }]
+              : []
           "
         >
           <template #label>
             <div class="flex-between w-full gap-2">
               <div class="flex-align-center gap-1">
-                <span>自动清洗</span>
-                <MkTooltip effect="dark" content="去掉重复多余符号空格、空行、制表符" placement="right">
+                <span>{{ t('knowledge.documentStrategy.autoClean.label') }}</span>
+                <MkTooltip effect="dark" :content="t('knowledge.documentStrategy.autoClean.description')" placement="right">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
                 </MkTooltip>
               </div>
@@ -260,13 +318,19 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('with_filter_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option label="引用" value="referencing" />
-                <el-option label="自定义" value="custom" />
+                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
+                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
               </el-select>
             </div>
           </template>
           <el-switch v-if="formData.with_filter_type === 'custom'" size="small" v-model="formData.with_filter" />
-          <NodeCascader v-else :node-model="model" class="w-full!" placeholder="请选择引用变量" v-model="formData.with_filter_reference" />
+          <NodeCascader
+            v-else
+            :node-model="model"
+            class="w-full!"
+            :placeholder="t('workflow.referenceVariable.placeholder')"
+            v-model="formData.with_filter_reference"
+          />
         </el-form-item>
 
         <!-- 分段标题设置为分段的关联问题 -->
@@ -280,13 +344,13 @@ onBeforeUnmount(() => anchorGuard.reset())
           "
           :rules="
             formData.paragraph_title_relate_problem_type === 'referencing'
-              ? [{ type: 'array', required: true, message: '请选择引用变量', trigger: 'change' }]
+              ? [{ type: 'array', required: true, message: t('workflow.referenceVariable.requiredMessage'), trigger: 'change' }]
               : []
           "
         >
           <template #label>
             <div class="flex-between w-full gap-2">
-              <span class="mk-required">分段标题设置为分段的关联问题</span>
+              <span class="mk-required">{{ t('workflow.documentSplit.titleAsQuestion') }}</span>
               <el-select
                 v-model="formData.paragraph_title_relate_problem_type"
                 size="small"
@@ -295,8 +359,8 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('paragraph_title_relate_problem_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option label="引用" value="referencing" />
-                <el-option label="自定义" value="custom" />
+                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
+                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -309,7 +373,7 @@ onBeforeUnmount(() => anchorGuard.reset())
             v-else
             :node-model="model"
             class="w-full!"
-            placeholder="请选择引用变量"
+            :placeholder="t('workflow.referenceVariable.placeholder')"
             v-model="formData.paragraph_title_relate_problem_reference"
           />
         </el-form-item>
@@ -322,13 +386,13 @@ onBeforeUnmount(() => anchorGuard.reset())
           "
           :rules="
             formData.document_name_relate_problem_type === 'referencing'
-              ? [{ type: 'array', required: true, message: '请选择引用变量', trigger: 'change' }]
+              ? [{ type: 'array', required: true, message: t('workflow.referenceVariable.requiredMessage'), trigger: 'change' }]
               : []
           "
         >
           <template #label>
             <div class="flex-between w-full gap-2">
-              <span class="mk-required">文档名称设置为分段的关联问题</span>
+              <span class="mk-required">{{ t('workflow.documentSplit.documentNameAsQuestion') }}</span>
               <el-select
                 v-model="formData.document_name_relate_problem_type"
                 size="small"
@@ -337,8 +401,8 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @visible-change="anchorGuard.setOverlayVisible('document_name_relate_problem_type', $event)"
                 @change="clearHiddenValidation"
               >
-                <el-option label="引用" value="referencing" />
-                <el-option label="自定义" value="custom" />
+                <el-option :label="t('workflow.documentSplit.source.reference')" value="referencing" />
+                <el-option :label="t('workflow.documentSplit.source.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -347,7 +411,7 @@ onBeforeUnmount(() => anchorGuard.reset())
             v-else
             :node-model="model"
             class="w-full!"
-            placeholder="请选择引用变量"
+            :placeholder="t('workflow.referenceVariable.placeholder')"
             v-model="formData.document_name_relate_problem_reference"
           />
         </el-form-item>

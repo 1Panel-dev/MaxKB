@@ -61,8 +61,8 @@
     }
   },
   "delete": {
-    "title": "確認刪除智慧體",
-    "batchTitle": "是否批次刪除 {count} 個智慧體"
+    "title": "是否刪除智慧體：{name}？",
+    "batchTitle": "是否刪除選取的{count}個智慧體？"
   },
   "messages": {
     "missingWorkspace": "智慧體缺少所屬工作空間資訊"

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ToolFieldConfig, ToolInputField, ToolOutputField } from '../tool-base-node/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
@@ -12,6 +13,8 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowToolWorkflowLibNode' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 type WorkflowToolInputField = ToolInputField & ({ source: 'reference'; value: string[] } | { source: 'custom'; value: unknown })
 
@@ -49,7 +52,7 @@ const formData = computed({
   get: () => model.properties.node_data as ToolWorkflowLibNodeForm,
   set: (value: ToolWorkflowLibNodeForm) => (model.properties.node_data = value),
 })
-const inputTitle = computed(() => formData.value.input_title || '输入参数')
+const inputTitle = computed(() => formData.value.input_title || t('tool.inputParams.title'))
 const showReturnContent = computed(() =>
   [WorkflowMode.Application, WorkflowMode.ApplicationLoop, WorkflowMode.Tool, WorkflowMode.ToolLoop].includes(workflowMode),
 )
@@ -129,9 +132,9 @@ onBeforeUnmount(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" hide-required-asterisk @submit.prevent>
+      <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" hide-required-asterisk @submit.prevent>
         <h6 class="mb-2">{{ inputTitle }}</h6>
         <div v-if="formData.input_field_list.length" class="mk-white-card">
           <template v-for="(field, index) in formData.input_field_list" :key="field.field">
@@ -139,7 +142,10 @@ onBeforeUnmount(() => {
               :prop="`input_field_list.${index}.value`"
               :rules="{
                 required: field.is_required,
-                message: field.source === 'reference' ? '请选择参数' : '请输入参数',
+                message:
+                  field.source === 'reference'
+                    ? t('dynamicForm.fields.parameter.selectRequiredMessage')
+                    : t('dynamicForm.fields.parameter.requiredMessage'),
                 trigger: field.source === 'reference' ? 'change' : 'blur',
               }"
             >
@@ -154,6 +160,7 @@ onBeforeUnmount(() => {
                     </MkTooltip>
                     <el-tag size="small" type="info">{{ field.type }}</el-tag>
                   </div>
+                  <!-- 选择参数来源 -->
                   <el-select
                     :model-value="field.source"
                     :teleported="false"
@@ -162,12 +169,17 @@ onBeforeUnmount(() => {
                     @change="changeSource(field, $event, index)"
                     @visible-change="anchorGuard.setOverlayVisible(field.field, $event)"
                   >
-                    <el-option label="引用" value="reference" />
-                    <el-option label="自定义" value="custom" />
+                    <el-option :label="t('tool.source.reference')" value="reference" />
+                    <el-option :label="t('tool.source.custom')" value="custom" />
                   </el-select>
                 </div>
               </template>
-              <NodeCascader v-if="field.source === 'reference'" v-model="field.value" :node-model="model" placeholder="请选择参数" />
+              <NodeCascader
+                v-if="field.source === 'reference'"
+                v-model="field.value"
+                :node-model="model"
+                :placeholder="t('dynamicForm.fields.parameter.selectPlaceholder')"
+              />
               <template v-else>
                 <el-switch v-if="field.type === 'boolean'" :model-value="field.value" size="small" @update:model-value="field.value = $event" />
                 <el-input-number
@@ -179,18 +191,23 @@ onBeforeUnmount(() => {
                   @update:model-value="field.value = $event"
                 />
                 <JsonInput v-else-if="field.type === 'array' || field.type === 'dict'" v-model="field.value" @wheel="handleNodeWheel" />
-                <el-input v-else :model-value="field.value" placeholder="请输入参数" @update:model-value="field.value = $event" />
+                <el-input
+                  v-else
+                  :model-value="field.value"
+                  :placeholder="t('dynamicForm.fields.parameter.placeholder')"
+                  @update:model-value="field.value = $event"
+                />
               </template>
             </el-form-item>
           </template>
         </div>
-        <span v-else>暂无数据</span>
+        <span v-else>{{ t('common.empty.default') }}</span>
 
         <!-- 返回内容 -->
         <div v-if="showReturnContent" class="flex-between mt-4 w-full">
           <span class="flex-align-center gap-1">
-            返回内容
-            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            {{ t('workflow.returnContent.label') }}
+            <MkTooltip :content="t('workflow.returnContent.description')" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>

@@ -1,7 +1,11 @@
 {
   "node": {
     "title": "節點",
-    "result": "結果"
+    "result": "結果",
+    "delete": {
+      "title": "是否刪除節點：{name}？",
+      "batchTitle": "是否刪除選取的{count}個節點？"
+    }
   },
   "start": {
     "label": "開始",
@@ -34,7 +38,8 @@
     "description": "透過語音識別模型將音訊轉換為文字",
     "model": {
       "label": "語音識別模型"
-    }
+    },
+    "audioFile": "語音檔案"
   },
   "textToSpeech": {
     "label": "文字轉語音",
@@ -70,11 +75,13 @@
     },
     "firstFrame": {
       "label": "首幀圖片",
+      "shortLabel": "首幀",
       "placeholder": "請選擇首幀圖片",
       "requiredMessage": "請選擇首幀圖片"
     },
     "lastFrame": {
       "label": "尾幀圖片",
+      "shortLabel": "末幀",
       "placeholder": "請選擇尾幀圖片"
     }
   },
@@ -90,13 +97,11 @@
   },
   "imageUnderstand": {
     "label": "圖片理解",
-    "description": "識別圖片中的物件、場景等資訊，回答使用者問題",
-    "answer": "AI 回答內容"
+    "description": "識別圖片中的物件、場景等資訊，回答使用者問題"
   },
   "videoUnderstand": {
     "label": "影片理解",
-    "description": "識別影片中的物件、場景等資訊，回答使用者問題",
-    "answer": "AI 回答內容"
+    "description": "識別影片中的物件、場景等資訊，回答使用者問題"
   },
   "questionOptimization": {
     "label": "問題最佳化",
@@ -111,6 +116,7 @@
     "description": "指定回覆內容，引用變量會轉換為字串輸出",
     "format": {
       "label": "回覆格式",
+      "typeLabel": "回覆類型",
       "text": "文字",
       "tool": "工具",
       "toolDescription": "回覆內容為 JSON 物件或陣列，元素欄位為 id、name、arguments、content",
@@ -143,28 +149,81 @@
   "form": {
     "label": "表單收集",
     "description": "在對話過程中收集使用者資訊，根據收集到的表單資料執行後續流程",
+    "content": {
+      "label": "表單輸出內容",
+      "description": "設定執行此節點輸出的內容，{form} 為表單的佔位符",
+      "requiredMessage": "請填寫表單輸出內容"
+    },
+    "configuration": "表單配置",
     "formData": "表單全部內容",
+    "notSubmitted": "未提交",
     "defaultContent": "你好，請先填寫下方表單內容：\n{form}\n填寫後請點擊【提交】按鈕進行提交。"
   },
   "variableAssign": {
     "label": "變量賦值",
-    "description": "更新全域變量的值"
+    "description": "更新全域變量的值",
+    "value": {
+      "label": "賦值",
+      "placeholder": "請輸入內容",
+      "custom": "自訂"
+    }
   },
   "variableAggregation": {
     "label": "變量聚合",
-    "description": "按聚合策略聚合每組變量"
+    "description": "按聚合策略聚合每組變量",
+    "strategy": {
+      "label": "聚合策略",
+      "requiredMessage": "請選擇聚合策略",
+      "firstNonNull": "返回每組的第一個非空值",
+      "firstNonNullDescription": "傳回每組變量的第一個非空值",
+      "array": "返回每組變量的陣列（Array）",
+      "dict": "返回每組變量的字典（Dict）"
+    },
+    "group": {
+      "add": "新增分組",
+      "edit": "編輯分組"
+    },
+    "key": {
+      "placeholder": "請輸入鍵名",
+      "requiredMessage": "請輸入鍵名"
+    }
   },
   "variableSplitting": {
     "label": "變量拆分",
-    "description": "透過 JSON Path 運算式解析與拆分 JSON 格式的輸入變量"
+    "description": "透過 JSON Path 運算式解析與拆分 JSON 格式的輸入變量",
+    "variables": {
+      "label": "拆分變量",
+      "requiredMessage": "請新增拆分變量"
+    },
+    "expression": {
+      "label": "運算式",
+      "placeholder": "請輸入運算式",
+      "description": "請使用 JSON Path 運算式拆分變量，例如：{example}",
+      "requiredMessage": "請輸入運算式",
+      "viewDetails": "點擊查看詳情"
+    }
   },
   "parameterExtraction": {
     "label": "參數提取",
-    "description": "利用 AI 模型提取結構化參數"
+    "description": "利用 AI 模型提取結構化參數",
+    "parameters": {
+      "label": "提取參數",
+      "requiredMessage": "請新增提取參數",
+      "invalidMessage": "參數可由字母、數字、底線組成"
+    },
+    "type": {
+      "label": "參數類型",
+      "placeholder": "請選擇參數類型",
+      "requiredMessage": "請選擇參數類型"
+    }
   },
   "searchKnowledge": {
     "label": "知識庫檢索",
     "description": "關聯知識庫，尋找與問題相關的分段",
+    "image": {
+      "label": "檢索圖片",
+      "placeholder": "請選擇檢索圖片"
+    },
     "segmentList": "檢索結果的分段列表",
     "directAnswerSegments": "滿足直接回答的分段列表",
     "result": "檢索結果",
@@ -173,6 +232,16 @@
   "searchDocument": {
     "label": "文件標籤檢索",
     "description": "在設定的檢索範圍內，根據文件標籤檢索符合條件的文件",
+    "searchMode": {
+      "label": "檢索設定",
+      "auto": "自動",
+      "autoDescription": "根據檢索問題自動比對文件標籤",
+      "manual": "手動",
+      "manualDescription": "手動設定標籤篩選條件"
+    },
+    "value": {
+      "placeholder": "值或變量"
+    },
     "knowledgeList": "知識庫列表",
     "documentList": "文件列表"
   },
@@ -185,9 +254,19 @@
   "reranker": {
     "label": "多路召回",
     "description": "使用重排模型對多個知識庫的檢索結果進行二次召回",
+    "content": {
+      "label": "重排內容",
+      "placeholder": "請選擇重排內容",
+      "requiredMessage": "請選擇重排內容"
+    },
+    "score": {
+      "label": "Score 高於",
+      "description": "Score 越高相關性越強。"
+    },
     "resultList": "重排結果列表",
     "result": "重排結果",
-    "directAnswerSegments": "滿足直接回答的分段列表"
+    "directAnswerSegments": "滿足直接回答的分段列表",
+    "maxReferenceCharacters": "最大引用字元數"
   },
   "mcp": {
     "label": "MCP 呼叫",
@@ -209,20 +288,52 @@
   "documentSplit": {
     "label": "文件分段",
     "description": "按分段策略拆分輸入文件內容，輸出分段文字列表",
+    "strategy": {
+      "label": "分段策略",
+      "placeholder": "請選擇分段策略",
+      "requiredMessage": "請選擇分段策略"
+    },
+    "source": {
+      "reference": "引用",
+      "custom": "自訂"
+    },
+    "childChunkLength": {
+      "label": "子分塊長度",
+      "description": "核心目標是平衡檢索精度與召回效率",
+      "tooShortHint": "避免過短拆分：單塊＜50 字易導致語意碎片化，檢索時可能因缺少上下文無法符合查詢意圖",
+      "tooLongHint": "避免過長拆分：單塊＞500 字會增加冗餘資訊，降低檢索精準度，且占用更多儲存和運算資源"
+    },
+    "titleAsQuestion": "將分段標題設為分段的關聯問題",
+    "documentNameAsQuestion": "將文件名稱設為分段的關聯問題",
     "segmentList": "分段列表"
   },
   "localFile": {
     "label": "本機檔案",
     "description": "上傳本機文件並輸出文件列表（不解析內容，需搭配「文件內容提取」節點解析）",
+    "format": {
+      "label": "檔案格式",
+      "placeholder": "請選擇檔案格式",
+      "requiredMessage": "請選擇檔案格式"
+    },
+    "fileCount": {
+      "label": "最多上傳檔案數",
+      "rangeMessage": "請輸入 {min}–{max} 的檔案數量"
+    },
+    "fileSize": {
+      "label": "單一檔案大小上限",
+      "rangeMessage": "請輸入 {min}–{max} MB 的檔案大小"
+    },
     "fileList": "檔案列表"
   },
   "webSource": {
     "label": "Web 站點",
     "description": "輸入根網址自動擷取 Web 資料（每個連結對應一份文件），輸出包含內容的文件列表",
+    "noConfiguration": "暫無設定項目",
     "documentList": "文件列表"
   },
   "knowledgeWrite": {
     "label": "知識庫寫入",
-    "description": "將輸入的分段列表寫入目前知識庫，並完成向量化處理"
+    "description": "將輸入的分段列表寫入目前知識庫，並完成向量化處理",
+    "content": "寫入內容"
   }
 }
