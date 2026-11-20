@@ -12,7 +12,7 @@ import { perm } from '@/permission'
 /**
  * 知识库「问题」权限判断
  */
-type KnowledgeQuestionPermissionMethod = 'problemRead' | 'problemEdit'
+type KnowledgeQuestionPermissionMethod = 'problemRead' | 'problemEdit' | 'problemCreate' | 'problemDelete'
 
 function knowledgeQuestionPermission(method: KnowledgeQuestionPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
@@ -147,7 +147,7 @@ function handleRemoveProblem(index: number) {
       <h4>{{ t('knowledge.paragraph.relatedQuestions.label') }}</h4>
       <!-- 添加关联问题 -->
       <el-button
-        v-if="!props.readonly && !isWorkspaceSharedResource() && knowledgeQuestionPermission('problemEdit')"
+        v-if="!props.readonly && !isWorkspaceSharedResource() && knowledgeQuestionPermission('problemCreate')"
         text
         :disabled="loading || problemAdding"
         @click="handleAddProblem"
@@ -184,7 +184,7 @@ function handleRemoveProblem(index: number) {
                 <span class="min-w-0 flex-1 truncate" :title="problem.content">{{ problem.content }}</span>
                 <!-- 解除问题关联 -->
                 <el-button
-                  v-if="!props.readonly && !isWorkspaceSharedResource() && knowledgeQuestionPermission('problemEdit')"
+                  v-if="!props.readonly && !isWorkspaceSharedResource() && knowledgeQuestionPermission('problemDelete')"
                   text
                   :disabled="loading"
                   @click="handleRemoveProblem(index)"
