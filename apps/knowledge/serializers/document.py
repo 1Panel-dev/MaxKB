@@ -58,11 +58,13 @@ from knowledge.models import (
     FileSourceType,
     Knowledge,
     KnowledgeType,
+    LocalState,
     Paragraph,
     ParagraphAsset,
     Problem,
     ProblemParagraphMapping,
     State,
+    SyncState,
     Tag,
     TaskType,
 )
@@ -71,6 +73,7 @@ from knowledge.serializers.common import (
     MetaSerializer,
     ProblemParagraphManage,
     get_embedding_model_id_by_knowledge_id,
+    update_document_char_length,
     write_image,
     zip_dir,
 )
@@ -84,7 +87,7 @@ from knowledge.serializers.paragraph import (
     ParagraphSerializers,
 )
 from knowledge.services import validate_knowledge_file_size
-from knowledge.services.document_cleanup import delete_document_data
+from knowledge.services.document_cleanup import delete_document_data, delete_synced_paragraph_data
 from knowledge.services.document_strategy import (
     document_source_hash,
     normalize_document_strategy,
@@ -782,17 +785,28 @@ class DocumentSerializers(serializers.Serializer):
                             document.last_sync_time = timezone.now()
                             document.save(update_fields=["last_sync_time"])
                             merge_result = None
-                        else:
-                            merge_result = IncrementalDocumentSync(document, split_strategy).merge(paragraphs)
-                        if merge_result is None:
                             changed_paragraphs = QuerySet(Paragraph).none()
                             bind_paragraph_image_files(QuerySet(ParagraphAsset).filter(document_id=document_id))
+                            # Older Web syncs retained missing source paragraphs after advancing the source hash.
+                            removed_ids = (
+                                QuerySet(Paragraph)
+                                .filter(
+                                    document_id=document_id,
+                                    origin=ContentOrigin.SYNCED,
+                                    sync_state=SyncState.REMOTE_DELETED,
+                                )
+                                .exclude(local_state=LocalState.MODIFIED)
+                                .values_list("id", flat=True)
+                            )
                         else:
+                            merge_result = IncrementalDocumentSync(document, split_strategy).merge(paragraphs)
                             changed_paragraphs = QuerySet(Paragraph).filter(id__in=merge_result.reembed_ids)
+                            removed_ids = merge_result.disabled_ids
                         assets = sync_paragraph_assets(changed_paragraphs, document.visual_strategy_hash)
                         defer_visual_assets(assets, split_strategy, schedule=not with_embedding)
-                        if merge_result is not None and merge_result.disabled_ids:
-                            delete_embedding_by_paragraph_ids(merge_result.disabled_ids)
+                        # Reconcile images first so assets reused by surviving paragraphs keep their identity.
+                        if removed_ids and delete_synced_paragraph_data(document_id, removed_ids):
+                            update_document_char_length(document_id)
                         # 只重建新增或有效内容变化的向量，稳定段落 ID 与问题关联都保持不变。
                         if with_embedding and merge_result is not None and merge_result.reembed_ids:
                             embedding_model_id = get_embedding_model_id_by_knowledge_id(document.knowledge_id)

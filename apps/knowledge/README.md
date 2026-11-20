@@ -145,6 +145,12 @@ retain their records and source metadata with `local_state=deleted` and `is_acti
 incremental synchronization can recognize local deletions and source conflicts. Both paths remove
 the deleted paragraphs' embeddings.
 
+When a Web source removes a paragraph, the next successful sync physically deletes the corresponding
+paragraph, its embeddings and its question links. Images reused by surviving paragraphs keep their
+asset and file IDs. Manually added paragraphs remain in the document, and locally edited source
+paragraphs are kept as conflicts. Sync also cleans up paragraphs marked as remotely deleted by
+older versions when the source content has remained unchanged.
+
 Web heading renames reuse the existing paragraph ID and manually linked questions when the source
 body uniquely identifies an unmatched paragraph. Matching reserves unchanged paragraphs first and
 compares stored source bodies, preserving local edits and visual descriptions for conflict handling.

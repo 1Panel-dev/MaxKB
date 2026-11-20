@@ -96,6 +96,23 @@ class WebImageOwnershipTests(TestCase):
         first.delete()
         self.assertTrue(File.objects.filter(id=self.image.id).exists())
 
+    def test_web_sync_transfers_reused_asset_before_deleting_its_paragraph(self):
+        removed = self.paragraph()
+        asset = sync_paragraph_assets([removed])[0]
+        response = Fork.Response.success(f"# Replacement\n\nUpdated text ![chart](./oss/file/{self.image.id})", [])
+        serializer = DocumentSerializers.Sync(
+            data={"knowledge_id": str(self.knowledge.id), "document_id": str(self.document.id)}
+        )
+        with patch("knowledge.serializers.document.ListenerManagement"):
+            serializer.sync(with_embedding=False, response=response)
+
+        self.assertFalse(self.document.paragraph_set.filter(pk=removed.pk).exists())
+        replacement = self.document.paragraph_set.get()
+        asset.refresh_from_db()
+        self.image.refresh_from_db()
+        self.assertEqual((asset.paragraph_id, asset.file_id), (replacement.id, self.image.id))
+        self.assertEqual(self.image.source_id, str(replacement.id))
+
     def test_deleting_owner_transfers_shared_file_then_last_delete_removes_it(self):
         first = self.paragraph()
         other_document = Document.objects.create(knowledge=self.knowledge, name="Other page", char_length=0)

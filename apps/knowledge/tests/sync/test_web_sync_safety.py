@@ -22,6 +22,7 @@ from knowledge.models import (
     KnowledgeSyncStatus,
     KnowledgeSyncTrigger,
     KnowledgeType,
+    LocalState,
     Paragraph,
     ParagraphAsset,
     Problem,
@@ -29,6 +30,7 @@ from knowledge.models import (
     SourceType,
     State,
     Status,
+    SyncState,
     Tag,
     TaskType,
 )
@@ -218,6 +220,69 @@ class WebSyncSafetyTests(TestCase):
         self.assertEqual(Status.of(self.document.status)[TaskType.SYNC], State.FAILURE)
         self.assertEqual(callbacks, [])
         self.paragraph_delay.assert_not_called()
+
+    def test_document_sync_deletes_missing_source_paragraph_and_its_relations(self):
+        kept = Paragraph.objects.create(
+            knowledge=self.knowledge, document=self.document, content="updated", origin=ContentOrigin.SYNCED
+        )
+        note = Paragraph.objects.create(knowledge=self.knowledge, document=self.document, content="Note")
+        edited = Paragraph.objects.create(
+            knowledge=self.knowledge,
+            document=self.document,
+            title="Edited",
+            content="Local edit",
+            origin=ContentOrigin.SYNCED,
+            local_state=LocalState.MODIFIED,
+        )
+        shared = Problem.objects.create(knowledge=self.knowledge, content="Shared question")
+        for paragraph in (self.paragraph, kept):
+            ProblemParagraphMapping.objects.create(
+                knowledge=self.knowledge, document=self.document, paragraph=paragraph, problem=shared
+            )
+
+        self.sync_document()
+
+        self.document.refresh_from_db()
+        self.assertEqual(Status.of(self.document.status)[TaskType.SYNC], State.SUCCESS)
+        self.assertSetEqual(set(self.document.paragraph_set.all()), {kept, note, edited})
+        self.assertEqual(self.document.char_length, len(kept.content + note.content + edited.content))
+        edited.refresh_from_db()
+        self.assertEqual(edited.sync_state, SyncState.CONFLICT)
+        for instance in (self.embedding, self.mapping, self.problem, self.asset):
+            self.assertFalse(type(instance).objects.filter(pk=instance.pk).exists())
+        self.assertEqual(ProblemParagraphMapping.objects.get(problem=shared).paragraph_id, kept.id)
+        self.assertTrue(File.objects.filter(pk=self.file.pk).exists())
+
+    def test_failed_document_sync_rolls_back_paragraph_deletion(self):
+        with patch("knowledge.serializers.document.update_document_char_length", side_effect=RuntimeError("failed")):
+            self.sync_document()
+
+        self.assert_old_content_preserved()
+        self.assertEqual(Status.of(self.document.status)[TaskType.SYNC], State.FAILURE)
+
+    def test_unchanged_source_cleans_up_previously_remote_deleted_paragraph(self):
+        self.sync_document()
+        kept = self.document.paragraph_set.get(content="updated")
+        kept.is_active = False
+        kept.save(update_fields=["is_active"])
+        stale = Paragraph.objects.create(
+            knowledge=self.knowledge,
+            document=self.document,
+            content="Removed before upgrade",
+            origin=ContentOrigin.SYNCED,
+            sync_state=SyncState.REMOTE_DELETED,
+            is_active=False,
+        )
+        Document.objects.filter(pk=self.document.pk).update(char_length=len(kept.content + stale.content))
+
+        self.sync_document()
+
+        self.document.refresh_from_db()
+        kept.refresh_from_db()
+        self.assertEqual(Status.of(self.document.status)[TaskType.SYNC], State.SUCCESS)
+        self.assertFalse(self.document.paragraph_set.filter(pk=stale.pk).exists())
+        self.assertFalse(kept.is_active)
+        self.assertEqual(self.document.char_length, len(kept.content))
 
     def test_failed_incremental_can_retry_and_queue_embedding_after_commit(self):
         previous_update_time = timezone.now() - timedelta(days=1)
