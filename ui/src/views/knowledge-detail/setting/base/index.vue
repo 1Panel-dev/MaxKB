@@ -228,14 +228,16 @@ defineProps<ResourceDetailPageProps>()
         </template>
         <MkSlider v-model="settingForm.file_size_limit" show-input :min="1" :max="1000" />
       </el-form-item>
-      <div>
-        <div class="mb-2">
-          <span>{{ t('knowledge.baseSettings.authentication.label') }}</span>
-          <span class="text-N600">（{{ t('knowledge.baseSettings.authentication.description') }}）</span>
-        </div>
+      <el-form-item prop="authentication">
+        <template #label>
+          <div>
+            <span>{{ t('knowledge.baseSettings.authentication.label') }}</span>
+            <span class="text-N600">（{{ t('knowledge.baseSettings.authentication.description') }}）</span>
+          </div>
+        </template>
         <!-- 切换对话用户授权 -->
         <el-switch v-model="settingForm.authentication" :disabled="!knowledgeSettingPermission('settingEdit')" />
-      </div>
+      </el-form-item>
     </el-form>
 
     <!-- 保存知识库设置 -->
