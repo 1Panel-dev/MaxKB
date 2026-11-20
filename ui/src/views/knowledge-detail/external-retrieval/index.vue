@@ -85,7 +85,6 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
       <el-button type="primary" @click="loadExternalRetrieval">{{ t('common.actions.reload') }}</el-button>
     </MkEmpty>
     <div v-else-if="setting" class="space-y-4">
-      <!-- TODO 两个开关等调试 -->
       <section>
         <div class="mb-2">
           <span>{{ t('knowledge.externalRetrieval.apiService.label') }}</span>
@@ -96,18 +95,6 @@ watch([knowledgeId, () => resourceApi.externalRetrieval], loadExternalRetrieval,
           :disabled="!knowledgeExternalServicePermission('knowledgeExternalServiceEdit')"
           :model-value="setting.enabled"
           @change="handleSettingChange('enabled', $event)"
-        />
-      </section>
-      <section v-if="setting.enabled">
-        <div class="mb-2">
-          <span>{{ t('knowledge.externalRetrieval.authentication.label') }}</span>
-          <span class="text-N600">({{ t('knowledge.externalRetrieval.authentication.description') }})</span>
-        </div>
-        <!-- 切换对话用户授权 -->
-        <el-switch
-          :disabled="!knowledgeExternalServicePermission('knowledgeExternalServiceEdit')"
-          :model-value="setting.authentication"
-          @change="handleSettingChange('authentication', $event)"
         />
       </section>
       <section>

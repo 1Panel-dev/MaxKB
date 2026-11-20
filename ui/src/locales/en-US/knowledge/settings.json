@@ -5,6 +5,10 @@
       "label": "Knowledge type"
     },
     "otherSettings": "Other settings",
+    "authentication": {
+      "label": "Chat user authorization",
+      "description": "When enabled, only authorized chat users can search this knowledge base."
+    },
     "fileCountLimit": {
       "label": "Maximum files per upload"
     },

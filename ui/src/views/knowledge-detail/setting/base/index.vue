@@ -39,6 +39,7 @@ const originalEmbeddingModelId = ref('')
 /* 类型配置与校验 */
 const settingFormRef = ref<FormInstance>()
 const settingForm = reactive({
+  authentication: false,
   source_url: '',
   selector: '',
   app_id: '',
@@ -69,6 +70,7 @@ watch(
     originalEmbeddingModelId.value = detail.embedding_model_id ?? ''
     const meta = detail.meta ?? {}
     Object.assign(settingForm, {
+      authentication: detail.authentication ?? false,
       source_url: typeof meta.source_url === 'string' ? meta.source_url : '',
       selector: typeof meta.selector === 'string' ? meta.selector : '',
       app_id: typeof meta.app_id === 'string' ? meta.app_id : '',
@@ -97,6 +99,7 @@ function handleSave() {
       if (!baseValid || !settingValid || !detail || !baseForm) return
 
       const payload: Partial<KnowledgeItem> = {
+        authentication: settingForm.authentication,
         name: baseForm.name.trim(),
         desc: baseForm.desc.trim(),
         embedding_model_id: baseForm.embedding_model_id,
@@ -210,25 +213,29 @@ defineProps<ResourceDetailPageProps>()
           />
         </el-form-item>
       </template>
-      <MkCollapse v-else-if="knowledge.type === KNOWLEDGE_TYPE.BASE" indicator-position="after" trigger="indicator" trigger-class="mb-2">
+      <h6 class="mb-4">{{ t('knowledge.baseSettings.otherSettings') }}</h6>
+      <el-form-item :label="t('knowledge.baseSettings.fileCountLimit.label')">
+        <MkSlider v-model="settingForm.file_count_limit" show-input :min="1" :max="1000" />
+      </el-form-item>
+      <el-form-item>
         <template #label>
-          <h6>{{ t('knowledge.baseSettings.otherSettings') }}</h6>
+          <div class="flex-align-center gap-1">
+            <span>{{ t('knowledge.baseSettings.fileSizeLimit.label') }} (MB)</span>
+            <MkTooltip :content="t('knowledge.baseSettings.fileSizeLimit.description')" placement="right">
+              <MkIcon name="icon_info_outlined" class="text-N600!" />
+            </MkTooltip>
+          </div>
         </template>
-        <el-form-item :label="t('knowledge.baseSettings.fileCountLimit.label')">
-          <MkSlider v-model="settingForm.file_count_limit" show-input :min="1" :max="1000" />
-        </el-form-item>
-        <el-form-item>
-          <template #label>
-            <div class="flex-align-center gap-1">
-              <span>{{ t('knowledge.baseSettings.fileSizeLimit.label') }} (MB)</span>
-              <MkTooltip :content="t('knowledge.baseSettings.fileSizeLimit.description')" placement="right">
-                <MkIcon name="icon_info_outlined" class="text-N600!" />
-              </MkTooltip>
-            </div>
-          </template>
-          <MkSlider v-model="settingForm.file_size_limit" show-input :min="1" :max="1000" />
-        </el-form-item>
-      </MkCollapse>
+        <MkSlider v-model="settingForm.file_size_limit" show-input :min="1" :max="1000" />
+      </el-form-item>
+      <div>
+        <div class="mb-2">
+          <span>{{ t('knowledge.baseSettings.authentication.label') }}</span>
+          <span class="text-N600">（{{ t('knowledge.baseSettings.authentication.description') }}）</span>
+        </div>
+        <!-- 切换对话用户授权 -->
+        <el-switch v-model="settingForm.authentication" :disabled="!knowledgeSettingPermission('settingEdit')" />
+      </div>
     </el-form>
 
     <!-- 保存知识库设置 -->

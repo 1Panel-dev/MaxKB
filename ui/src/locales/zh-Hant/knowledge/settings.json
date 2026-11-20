@@ -5,6 +5,10 @@
       "label": "知識庫類型"
     },
     "otherSettings": "其他設定",
+    "authentication": {
+      "label": "對話使用者授權",
+      "description": "開啟後，僅允許已授權的對話使用者檢索目前知識庫"
+    },
     "fileCountLimit": {
       "label": "每次上傳最多檔案數"
     },
