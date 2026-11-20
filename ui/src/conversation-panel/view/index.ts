@@ -5,6 +5,8 @@ import type { InjectionKey, MaybeRefOrGetter, Ref } from 'vue'
 
 export const VIEW_TYPE = {
   CHAT: 'CHAT',
+  /** 第三方页面嵌入的单应用对话；复用 chat 装配，仅头部不同。 */
+  EMBED: 'EMBED',
   DEBUG: 'DEBUG',
   SIMPLE_DEBUG: 'SIMPLE_DEBUG',
   PORTAL: 'PORTAL',

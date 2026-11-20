@@ -16,9 +16,11 @@ defineOptions({ name: 'ConversationList' })
 
 const viewType = useViewType()
 const { auth } = useStore()
-const authProfile = computed(() => (viewType === VIEW_TYPE.CHAT ? auth.authProfile : null))
+// 单应用对话（含嵌入）使用当前应用的认证配置
+const APPLICATION_CHAT_VIEWS: readonly ViewType[] = [VIEW_TYPE.CHAT, VIEW_TYPE.EMBED]
+const authProfile = computed(() => (APPLICATION_CHAT_VIEWS.includes(viewType) ? auth.authProfile : null))
 
-const SHOW_PROFILE: readonly ViewType[] = [VIEW_TYPE.CHAT, VIEW_TYPE.PORTAL]
+const SHOW_PROFILE: readonly ViewType[] = [VIEW_TYPE.CHAT, VIEW_TYPE.EMBED, VIEW_TYPE.PORTAL]
 const msgs = useMessageListStore()
 // 会话菜单分享默认全选，内容分享由内容入口指定记录。
 const shareLink = useShareLinkStoreOptional()

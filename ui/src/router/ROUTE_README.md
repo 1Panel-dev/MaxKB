@@ -116,6 +116,8 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 
 单应用对话路由以 `/:accessToken/` 开头，兼容 v2 对话地址：`chat-home`（`/:accessToken/`）、
 `chat-home-detail`（`/:accessToken/c/:chatId`）和 `chat-login`（`/:accessToken/login`）。
+嵌入脚本以 iframe 打开带 `mode=embed` 参数的单应用地址，`views/chat/index.vue` 据此改用
+`conversation-panel/view/embed/index.vue`；接口与会话地址同步复用 chat 装配，仅头部不同。
 静态段 `/portal` 优先于动态参数匹配；后端生成的 accessToken 为 16 位十六进制字符串，不会等于 `portal`。
 
 根路径 `/` 重定向到 `portal-home`；匹配不到的地址由末尾 catch-all 重定向到 `/404`（路由名 `404`），
