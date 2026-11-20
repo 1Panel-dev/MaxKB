@@ -4,6 +4,7 @@ import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { LOOP_BUILTIN_FIELDS, isLoopBuiltinField } from './constant'
 import LoopStartNodeDetail from './details/index.vue'
 import LoopStartNodeVue from './index.vue'
+import { t } from '@/locales'
 
 interface LoopStartNodeProperties {
   config?: { fields?: Array<{ label: string; value: string }>; globalFields?: unknown[] }
@@ -30,7 +31,7 @@ class LoopStartNodeModel extends WorkflowNodeModel {
     const loopFields = inputFields
       .map((item) => ({ label: item.label ?? '', value: item.field ?? item.variable ?? '' }))
       .filter((field) => Boolean(field.value) && !isLoopBuiltinField(field.value))
-    return [{ value: 'loop', label: '循环变量', type: 'loop', children: loopFields }, ...super.getNodeFieldList()]
+    return [{ value: 'loop', label: t('workflow.loopStart.variables.label'), type: 'loop', children: loopFields }, ...super.getNodeFieldList()]
   }
 }
 

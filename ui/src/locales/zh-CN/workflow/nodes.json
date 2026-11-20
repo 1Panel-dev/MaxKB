@@ -127,7 +127,18 @@
   "condition": {
     "label": "判断器",
     "description": "根据不同条件执行不同的节点",
-    "branchName": "分支名称"
+    "branchName": "分支名称",
+    "match": {
+      "prefix": "符合以下",
+      "all": "所有",
+      "any": "任一",
+      "suffix": "条件"
+    },
+    "actions": {
+      "addCondition": "添加条件",
+      "addBranch": "添加分支"
+    },
+    "result": "条件结果"
   },
   "form": {
     "label": "表单收集",
@@ -194,26 +205,6 @@
   },
   "toolWorkflow": {
     "label": "工作流工具"
-  },
-  "loop": {
-    "label": "循环节点",
-    "description": "通过设置循环次数和逻辑，重复执行一系列任务"
-  },
-  "loopStart": {
-    "label": "循环开始",
-    "index": "下标",
-    "item": "循环元素"
-  },
-  "loopBody": {
-    "label": "循环体"
-  },
-  "loopContinue": {
-    "label": "Continue",
-    "description": "用于终止当前循环，执行下次循环"
-  },
-  "loopBreak": {
-    "label": "Break",
-    "description": "终止当前循环，跳出循环体"
   },
   "documentSplit": {
     "label": "文档分段",

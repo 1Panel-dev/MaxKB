@@ -1,29 +1,32 @@
 <template>
   <div class="w-full">
     <div class="flex-between">
-      <span>循环变量</span>
+      <span>{{ t('workflow.loopStart.variables.label') }}</span>
       <div class="flex-align-center">
+        <!-- 添加循环变量 -->
         <el-button text type="primary" @click="openAddDialog()">
           <MkIcon name="icon_add_outlined" />
         </el-button>
       </div>
     </div>
     <MkTable class="mt-2 border" size="small" v-if="loopInputFieldList.length > 0" :data="loopInputFieldList" row-key="field">
-      <el-table-column prop="field" label="参数">
+      <el-table-column prop="field" :label="t('dynamicForm.fields.parameter.label')">
         <template #default="{ row }">
           <span :title="row.field" class="truncate">{{ row.field }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="label" label="显示名称">
+      <el-table-column prop="label" :label="t('dynamicForm.fields.displayName.label')">
         <template #default="{ row }">
           <span :title="row.label" class="truncate">{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="left" width="80">
+      <el-table-column :label="t('common.labels.operation')" align="left" width="80">
         <template #default="{ row, $index }">
+          <!-- 编辑循环变量 -->
           <el-button type="primary" text @click.stop="openAddDialog(row, $index)">
             <template #icon><MkIcon name="icon_edit_outlined" /></template>
           </el-button>
+          <!-- 删除循环变量 -->
           <el-button type="primary" text @click="deleteField($index)">
             <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
           </el-button>
@@ -36,12 +39,14 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import { cloneDeep, set } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { BaseNodeModel } from '@logicflow/core'
 import { isLoopBuiltinField } from '../constant'
 import LoopFieldDialog from './LoopFieldDialog.vue'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'LoopFieldTable' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ nodeModel: BaseNodeModel }>()
 
 type WorkflowGraphModel = BaseNodeModel['graphModel'] & { refresh_loop_fields?: (fields: Array<{ label: string; value: string }>) => void }
@@ -61,7 +66,7 @@ function deleteField(index: number) {
 
 function submitField(data: LoopInputField, index?: number) {
   if (loopInputFieldList.value.some((item, i) => index !== i && item.field === data.field)) {
-    MsgError(`循环变量已存在：${data.field}`)
+    MsgError(`${t('workflow.parameters.duplicateMessage')}：${data.field}`)
     return
   }
   if (index === undefined) {

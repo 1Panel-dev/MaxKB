@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FormInstance, FormRules } from 'element-plus'
 import { isLoopBuiltinField } from '../constant'
 
 defineOptions({ name: 'LoopFieldDialog' })
+const { t } = useI18n({ useScope: 'global' })
 
 type LoopInputField = { field: string; label: string }
 const emit = defineEmits<{ submit: [data: LoopInputField, index?: number] }>()
@@ -12,14 +14,14 @@ const emit = defineEmits<{ submit: [data: LoopInputField, index?: number] }>()
 // 参数表单与校验。
 const fieldFormRef = ref<FormInstance>()
 const form = ref<LoopInputField>({ field: '', label: '' })
-const rules: FormRules<LoopInputField> = {
+const rules = computed<FormRules<LoopInputField>>(() => ({
   field: [
-    { whitespace: true, required: true, message: '请输入参数', trigger: 'blur' },
-    { pattern: /^[a-zA-Z0-9_]+$/, message: '参数只能包含英文字母、数字、下划线', trigger: 'blur' },
+    { whitespace: true, required: true, message: t('dynamicForm.fields.parameter.requiredMessage'), trigger: 'blur' },
+    { pattern: /^[a-zA-Z0-9_]+$/, message: t('workflow.parameters.invalidMessage'), trigger: 'blur' },
     {
       validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
         if (isLoopBuiltinField(value)) {
-          callback(new Error('此参数为循环引擎内置，不可使用'))
+          callback(new Error(t('workflow.loopStart.variables.reservedMessage')))
         } else {
           callback()
         }
@@ -27,8 +29,8 @@ const rules: FormRules<LoopInputField> = {
       trigger: 'blur',
     },
   ],
-  label: [{ whitespace: true, required: true, message: '请输入显示名称', trigger: 'blur' }],
-}
+  label: [{ whitespace: true, required: true, message: t('dynamicForm.fields.displayName.requiredMessage'), trigger: 'blur' }],
+}))
 
 // 打开时初始化，关闭动画结束后清理编辑状态。
 const dialogVisible = ref(false)
@@ -62,18 +64,28 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog :title="isEdit ? '编辑参数' : '添加参数'" v-model="dialogVisible" @closed="resetData">
-    <el-form label-position="top" ref="fieldFormRef" :rules="rules" :model="form" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="参数" prop="field">
-        <el-input v-model="form.field" :maxlength="64" placeholder="请输入参数" show-word-limit />
+  <MkDialog :title="isEdit ? t('common.parameters.edit') : t('common.parameters.add')" v-model="dialogVisible" @closed="resetData">
+    <el-form
+      label-position="top"
+      ref="fieldFormRef"
+      :rules="rules"
+      :model="form"
+      :validate-on-rule-change="false"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('dynamicForm.fields.parameter.label')" prop="field">
+        <el-input v-model="form.field" :maxlength="64" :placeholder="t('dynamicForm.fields.parameter.placeholder')" show-word-limit />
       </el-form-item>
-      <el-form-item label="显示名称" prop="label">
-        <el-input v-model="form.label" :maxlength="64" show-word-limit placeholder="请输入显示名称" />
+      <el-form-item :label="t('dynamicForm.fields.displayName.label')" prop="label">
+        <el-input v-model="form.label" :maxlength="64" show-word-limit :placeholder="t('dynamicForm.fields.displayName.placeholder')" />
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button plain @click="close">取消</el-button>
-      <el-button type="primary" @click="submit">{{ isEdit ? '保存' : '添加' }}</el-button>
+      <!-- 取消编辑循环变量 -->
+      <el-button plain @click="close">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存循环变量 -->
+      <el-button type="primary" @click="submit">{{ isEdit ? t('common.actions.save') : t('common.actions.add') }}</el-button>
     </template>
   </MkDialog>
 </template>

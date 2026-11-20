@@ -1,0 +1,42 @@
+{
+  "loop": {
+    "label": "循環節點",
+    "description": "設定循環次數與邏輯，重複執行一系列任務",
+    "type": {
+      "label": "循環類型",
+      "requiredMessage": "請選擇循環類型",
+      "array": "陣列循環",
+      "number": "次數循環",
+      "infinite": "無限循環"
+    },
+    "array": "循環陣列",
+    "number": "循環次數",
+    "settings": "循環設定",
+    "details": "循環詳情",
+    "validation": {
+      "breakRequired": "循環節點需要包含 Break 節點"
+    }
+  },
+  "loopStart": {
+    "label": "循環開始",
+    "index": "索引",
+    "item": "循環元素",
+    "variables": {
+      "label": "循環變量",
+      "reservedMessage": "此參數為循環引擎內建，不可使用"
+    }
+  },
+  "loopBody": {
+    "label": "循環體"
+  },
+  "loopContinue": {
+    "label": "Continue",
+    "description": "結束目前這一輪循環，執行下一輪",
+    "isContinue": "是否繼續"
+  },
+  "loopBreak": {
+    "label": "Break",
+    "description": "終止目前循環並離開循環體",
+    "isBreak": "是否離開"
+  }
+}

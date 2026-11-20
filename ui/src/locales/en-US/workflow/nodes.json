@@ -125,7 +125,18 @@
   "condition": {
     "label": "Condition",
     "description": "Run different nodes based on conditions",
-    "branchName": "Branch name"
+    "branchName": "Branch name",
+    "match": {
+      "prefix": "Match",
+      "all": "All",
+      "any": "Any",
+      "suffix": "conditions"
+    },
+    "actions": {
+      "addCondition": "Add condition",
+      "addBranch": "Add branch"
+    },
+    "result": "Condition result"
   },
   "form": {
     "label": "Form collection",
@@ -192,26 +203,6 @@
   },
   "toolWorkflow": {
     "label": "Workflow tool"
-  },
-  "loop": {
-    "label": "Loop",
-    "description": "Repeat a series of tasks using the configured iteration count and logic"
-  },
-  "loopStart": {
-    "label": "Loop start",
-    "index": "Index",
-    "item": "Loop item"
-  },
-  "loopBody": {
-    "label": "Loop body"
-  },
-  "loopContinue": {
-    "label": "Continue",
-    "description": "End the current iteration and continue with the next one"
-  },
-  "loopBreak": {
-    "label": "Break",
-    "description": "Stop the loop and exit its body"
   },
   "documentSplit": {
     "label": "Document segmentation",
