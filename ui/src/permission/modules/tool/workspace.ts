@@ -99,6 +99,10 @@ const workspace = {
   /**
    * 工作空间「工具」文件夹查看权限
    */
+  folderReadWorkspace: () => can(P.TOOL_FOLDER_READ),
+  /**
+   * 工作空间「工具」文件夹查看权限
+   */
   folderRead: (id: string) => canRes(P.TOOL_FOLDER_READ, id),
   /**
    * 工作空间「工具」文件夹编辑权限

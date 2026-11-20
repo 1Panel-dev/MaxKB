@@ -227,7 +227,7 @@ onMounted(() => {
 
 <template>
   <MkViewLayout :title="t('tool.title')" class="workspace-tool-view" collapsible resizable>
-    <template #aside="{ title, Header }">
+    <template v-if="perm.tool.workspace.folderReadWorkspace()" #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
         <MkTooltip v-if="perm.tool.workspace.folderCreateWorkspace()" :content="t('folder.actions.create')" placement="top">

@@ -157,6 +157,10 @@ const workspace = {
 /**
  * 工作空间「知识库」「文件夹」只读权限
  */
+  folderReadWorkspace: () => can(P.KNOWLEDGE_FOLDER_READ),
+/**
+ * 工作空间「知识库」「文件夹」只读权限
+ */
   folderRead: (id: string) => canRes(P.KNOWLEDGE_FOLDER_READ, id),
 /**
  * 工作空间「知识库」「文件夹」创建权限
