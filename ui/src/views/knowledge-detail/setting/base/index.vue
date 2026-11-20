@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, useTemplateRef, watch } from 'vue'
-import { cloneDeep } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { KnowledgeItem } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
@@ -70,7 +69,7 @@ watch(
     originalEmbeddingModelId.value = detail.embedding_model_id ?? ''
     const meta = detail.meta ?? {}
     Object.assign(settingForm, {
-      authentication: detail.authentication ?? false,
+      authentication: meta.authentication ?? false,
       source_url: typeof meta.source_url === 'string' ? meta.source_url : '',
       selector: typeof meta.selector === 'string' ? meta.selector : '',
       app_id: typeof meta.app_id === 'string' ? meta.app_id : '',
@@ -99,7 +98,6 @@ function handleSave() {
       if (!baseValid || !settingValid || !detail || !baseForm) return
 
       const payload: Partial<KnowledgeItem> = {
-        authentication: settingForm.authentication,
         name: baseForm.name.trim(),
         desc: baseForm.desc.trim(),
         embedding_model_id: baseForm.embedding_model_id,
@@ -107,14 +105,16 @@ function handleSave() {
         file_size_limit: settingForm.file_size_limit,
       }
       if (detail.type === KNOWLEDGE_TYPE.WEB) {
-        payload.meta = { ...cloneDeep(detail.meta), source_url: settingForm.source_url.trim(), selector: settingForm.selector.trim() }
+        payload.meta = { source_url: settingForm.source_url.trim(), selector: settingForm.selector.trim() }
       } else if (detail.type === KNOWLEDGE_TYPE.LARK) {
         payload.meta = {
-          ...cloneDeep(detail.meta),
           app_id: settingForm.app_id.trim(),
           app_secret: settingForm.app_secret,
           folder_token: settingForm.folder_token.trim(),
         }
+      }
+      if (settingForm.authentication !== (detail.meta?.authentication ?? false)) {
+        payload.meta = { ...payload.meta, authentication: settingForm.authentication }
       }
 
       const embeddingModelChanged = originalEmbeddingModelId.value !== payload.embedding_model_id

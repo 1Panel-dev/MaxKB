@@ -66,7 +66,7 @@ def authorize_external(knowledge_id, identity):
         raise RetrievalError("service_unavailable", "Retrieval service is unavailable.", 404)
     if not identity.user_id or not identity.api_key_id:
         raise RetrievalError("authentication_required", "A chat user API key is required.", 401)
-    if knowledge.external_service.get("authentication", False):
+    if (knowledge.meta or {}).get("authentication", False):
         if str(knowledge.id) not in authorized_ids(identity.user_id, [str(knowledge.id)]):
             raise RetrievalError("access_denied", "Knowledge access denied.", 403)
     return knowledge
@@ -122,20 +122,12 @@ def filter_workflow_knowledge(knowledge_ids, parameters):
         identity = RetrievalIdentity()
     if identity.admin_user_id:
         return filter_admin_knowledge(knowledge, identity.admin_user_id)
-    allowed, restricted, legacy = set(), [], []
+    allowed, restricted = set(), []
     for item in knowledge:
-        setting = item.external_service
-        if "authentication" not in setting:
-            legacy.append(str(item.id))
         # Anonymous sessions have already passed application access checks and have no chat-user grants.
-        elif setting["authentication"] and not identity.is_anonymous:
+        if (item.meta or {}).get("authentication", False) and not identity.is_anonymous:
             restricted.append(str(item.id))
         else:
             allowed.add(str(item.id))
     allowed.update(authorized_ids(identity.user_id, restricted) if restricted else [])
-    # Preserve the pre-feature behavior for migrated, unconfigured knowledge bases.
-    handler = DatabaseModelManage.get_model("get_knowledge_list_of_authorized")
-    if legacy and handler and parameters.get("chat_user_type") == "CHAT_USER":
-        legacy = handler(parameters.get("chat_user_id"), legacy)
-    allowed.update(map(str, legacy))
     return [str(i) for i in knowledge_ids if str(i) in allowed]

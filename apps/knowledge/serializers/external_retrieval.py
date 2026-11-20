@@ -3,6 +3,7 @@ import math
 import shlex
 
 from django.db import transaction
+from django.http import QueryDict
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -18,13 +19,7 @@ class StrictSerializer(serializers.Serializer):
 
 
 class ExternalServiceSettings(StrictSerializer):
-    enabled = serializers.BooleanField(required=False)
-    authentication = serializers.BooleanField(required=False)
-
-    def validate(self, attrs):
-        if not attrs:
-            raise serializers.ValidationError(_("At least one setting is required."))
-        return attrs
+    enabled = serializers.BooleanField()
 
 
 class RetrievalRequest(StrictSerializer):
@@ -49,7 +44,6 @@ def service_settings(knowledge, request=None):
     absolute = request.build_absolute_uri if request else lambda path: path
     mcp_url = absolute(f"{prefix}/mcp")
     api_url = absolute(f"{prefix}/retrieve")
-    authentication = knowledge.external_service.get("authentication", False)
     connection = {
         "url": mcp_url,
         "transport": "streamable_http",
@@ -64,7 +58,6 @@ def service_settings(knowledge, request=None):
     example.append(f"-d {shlex.quote(json.dumps(payload, ensure_ascii=False))}")
     return {
         "enabled": knowledge.external_service.get("enabled", False),
-        "authentication": authentication,
         "api_url": api_url,
         "api_example": " \\\n  ".join(example),
         "mcp_url": mcp_url,
@@ -94,7 +87,7 @@ class ExternalServiceSerializer(serializers.Serializer):
 
     @transaction.atomic
     def update_settings(self, data):
-        settings = ExternalServiceSettings(data=data)
+        settings = ExternalServiceSettings(data=data.dict() if isinstance(data, QueryDict) else data)
         settings.is_valid(raise_exception=True)
         knowledge = self.get_knowledge(lock=True)
         knowledge.external_service = {**knowledge.external_service, **settings.validated_data}

@@ -98,7 +98,7 @@ from knowledge.serializers.common import (
 )
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.serializers.document_strategy import DocumentStrategySerializer, WebSourceURLField
-from knowledge.serializers.knowledge_model import KnowledgeModelSerializer
+from knowledge.serializers.knowledge_model import KnowledgeModelSerializer, KnowledgeSettingsMeta
 from knowledge.serializers.knowledge_workflow import (
     KBWFInstance,
     KnowledgeWorkflowModelSerializer,
@@ -138,6 +138,10 @@ class KnowledgeWebCreateRequest(serializers.Serializer):
         return attrs
 
 
+class KnowledgeWebSettingsMeta(MetaSerializer.WebMeta, KnowledgeSettingsMeta):
+    pass
+
+
 class KnowledgeEditRequest(serializers.Serializer):
     name = serializers.CharField(required=False, max_length=64, min_length=1, label=_("knowledge name"))
     desc = serializers.CharField(required=False, max_length=256, min_length=1, label=_("knowledge description"))
@@ -150,14 +154,6 @@ class KnowledgeEditRequest(serializers.Serializer):
     file_size_limit = serializers.IntegerField(required=False, label=_("file size limit"))
     file_count_limit = serializers.IntegerField(required=False, label=_("file count limit"))
     doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
-
-    @staticmethod
-    def get_knowledge_meta_valid_map():
-        knowledge_meta_valid_map = {
-            KnowledgeType.BASE: MetaSerializer.BaseMeta,
-            KnowledgeType.WEB: MetaSerializer.WebMeta,
-        }
-        return knowledge_meta_valid_map
 
     def is_valid(self, *, knowledge: Knowledge = None):
         super().is_valid(raise_exception=True)
@@ -173,12 +169,14 @@ class KnowledgeEditRequest(serializers.Serializer):
                 )
             # Non-Web detail responses contain null; do not treat it as a strategy update.
             self.validated_data.pop("doc_strategy", None)
-        if "meta" in self.validated_data and self.validated_data.get("meta") is not None:
-            knowledge_meta_valid_map = self.get_knowledge_meta_valid_map()
-            valid_class = knowledge_meta_valid_map.get(knowledge.type)
-            meta_serializer = valid_class(data=self.validated_data.get("meta"))
+        meta = self.validated_data.get("meta")
+        if meta is not None:
+            meta_class = KnowledgeSettingsMeta
+            if knowledge.type == KnowledgeType.WEB and meta.keys() != {"authentication"}:
+                meta_class = KnowledgeWebSettingsMeta
+            meta_serializer = meta_class(data=meta)
             meta_serializer.is_valid(raise_exception=True)
-            self._validated_data["meta"] = meta_serializer.validated_data
+            self.validated_data["meta"] = meta_serializer.validated_data
 
 
 class HitTestImageSerializer(serializers.Serializer):
@@ -220,13 +218,15 @@ class HitTestSerializer(serializers.Serializer):
 
 def preserve_knowledge_metadata(workspace_id, knowledge_id, instance):
     """Preserve configuration omitted from a permission-filtered settings form."""
-    if not isinstance(instance.get("meta"), dict):
+    if not isinstance(instance.get("meta"), dict) or instance["meta"].keys() == {"authentication"}:
         return instance
     stored = (
         Knowledge.objects.filter(id=knowledge_id, workspace_id=workspace_id).values_list("meta", flat=True).first()
         or {}
     )
-    return {**instance, "meta": {**stored, **instance["meta"]}}
+    meta = stored.copy()
+    meta.pop("authentication", None)
+    return {**instance, "meta": {**meta, **instance["meta"]}}
 
 
 class KnowledgeSerializer(serializers.Serializer):
@@ -393,14 +393,23 @@ class KnowledgeSerializer(serializers.Serializer):
                 return False
             raise AppApiException(500, _("%s must be a boolean") % field_name)
 
-        def is_valid(self, *, raise_exception=False):
+        def _knowledge_queryset(self):
             super().is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
             query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
-            if not query_set.exists():
+            return query_set
+
+        def is_valid(self, *, raise_exception=False):
+            if not self._knowledge_queryset().exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
+
+        def get_knowledge_for_update(self):
+            knowledge = self._knowledge_queryset().select_for_update().first()
+            if knowledge is None:
+                raise AppApiException(500, _("Knowledge id does not exist"))
+            return knowledge
 
         def move(self, folder_id: str):
             self.is_valid(raise_exception=True)
@@ -573,8 +582,7 @@ class KnowledgeSerializer(serializers.Serializer):
 
         @transaction.atomic
         def edit(self, instance: Dict, select_one=True):
-            self.is_valid()
-            knowledge = QuerySet(Knowledge).get(id=self.data.get("knowledge_id"))
+            knowledge = self.get_knowledge_for_update()
             validate_edit_folder(instance, knowledge)
             request_serializer = KnowledgeEditRequest(data=instance)
             request_serializer.is_valid(knowledge=knowledge)
@@ -800,7 +808,7 @@ class KnowledgeSerializer(serializers.Serializer):
                     "desc": knowledge.desc,
                     "type": knowledge.type,
                     "meta": knowledge_meta,
-                    "external_service": knowledge.external_service,
+                    "external_service": {"enabled": knowledge.external_service.get("enabled", False)},
                     "file_size_limit": knowledge.file_size_limit,
                     "file_count_limit": knowledge.file_count_limit,
                     "tags": [{"key": t["key"], "value": t["value"]} for t in tag_list],
@@ -1026,18 +1034,14 @@ class KnowledgeSerializer(serializers.Serializer):
                 desc=knowledge_data.get("desc", ""),
                 type=knowledge_data.get("type", KnowledgeType.BASE),
                 scope=self.data.get("scope", KnowledgeScope.WORKSPACE),
-                meta=knowledge_data.get("meta", {}),
+                meta={"authentication": False, **knowledge_data.get("meta", {})},
+                external_service={"enabled": knowledge_data.get("external_service", {}).get("enabled", False)},
                 file_size_limit=knowledge_data.get("file_size_limit", 100),
                 file_count_limit=knowledge_data.get("file_count_limit", 50),
                 embedding_model=None,
                 user_id=user_id,
                 workspace_id=workspace_id,
                 folder_id=folder_id,
-                **(
-                    {"external_service": knowledge_data["external_service"]}
-                    if "external_service" in knowledge_data
-                    else {}
-                ),
             )
             knowledge.save()
 
@@ -1271,7 +1275,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 scope=self.data.get("scope", KnowledgeScope.WORKSPACE),
                 folder_id=folder_id,
                 embedding_model_id=instance.get("embedding_model_id"),
-                meta=instance.get("meta", {}),
+                meta={**instance.get("meta", {}), "authentication": False},
             )
 
             document_model_list = []
@@ -1351,6 +1355,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 embedding_model_id=instance.get("embedding_model_id"),
                 meta={
                     "source_url": instance.get("source_url"),
+                    "authentication": False,
                     "selector": selector,
                     "embedding_model_id": instance.get("embedding_model_id"),
                     "doc_strategy": doc_strategy,
@@ -1574,7 +1579,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 raise AppApiException(500, _("Knowledge is already a workflow"))
 
             knowledge.type = KnowledgeType.WORKFLOW
-            knowledge.save()
+            knowledge.save(update_fields=["type", "update_time"])
 
             workflow_id = uuid.uuid7()
             knowledge_workflow = KnowledgeWorkflow(

@@ -27,7 +27,6 @@ from knowledge.models import (
     ProblemParagraphMapping,
     Tag,
 )
-from knowledge.serializers.external_retrieval import ExternalServiceSettings
 from knowledge.services.knowledge_sync_schedule import normalize_knowledge_sync_setting
 
 
@@ -121,7 +120,7 @@ def portable_knowledge_meta(knowledge):
     meta = copy.deepcopy(knowledge.meta or {})
     # Preserve Lark settings without exporting the connection credentials previously omitted.
     if knowledge.type == KnowledgeType.LARK:
-        return {key: meta[key] for key in ("doc_strategy", "sync_setting") if key in meta}
+        return {key: meta[key] for key in ("authentication", "doc_strategy", "sync_setting") if key in meta}
     return meta
 
 
@@ -306,11 +305,12 @@ def validate_archive(data, archive):
     """Validate all cross-resource references before creating any destination records."""
     if not isinstance(data, dict):
         raise ValidationError(_("Invalid knowledge archive metadata."))
+    meta = data.get("meta", {})
+    if not isinstance(meta, dict) or ("authentication" in meta and type(meta["authentication"]) is not bool):
+        raise ValidationError(_("Invalid knowledge metadata."))
     setting = data.get("external_service", {})
-    if not isinstance(setting, dict) or any(type(value) is not bool for value in setting.values()):
+    if not isinstance(setting, dict) or ("enabled" in setting and type(setting["enabled"]) is not bool):
         raise ValidationError(_("Invalid external service settings."))
-    if setting:
-        ExternalServiceSettings(data=setting).is_valid(raise_exception=True)
     version = data.get("archive_version")
     if version is None:
         return None
@@ -369,9 +369,6 @@ def validate_archive(data, archive):
             raise ValidationError(_("An archive file is missing."))
     if not _file_ids({key: value for key, value in resources.items() if key != "files"}).issubset(indexes["files"]):
         raise ValidationError(_("Unknown file reference in knowledge content."))
-    meta = data.get("meta", {})
-    if not isinstance(meta, dict):
-        raise ValidationError(_("Invalid knowledge metadata."))
     if not _file_ids(meta).issubset(indexes["files"]):
         raise ValidationError(_("Unknown file reference in knowledge settings."))
     for kind, (model, fields) in RESOURCE_MODELS.items():

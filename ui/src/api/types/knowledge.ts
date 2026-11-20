@@ -31,7 +31,6 @@ export type KnowledgeHitUnitType = (typeof KNOWLEDGE_HIT_UNIT_TYPE)[keyof typeof
 
 export interface KnowledgeItem {
   application_mapping_count?: number
-  authentication?: boolean
   char_length?: number | null
   create_time?: string
   desc?: string | null
@@ -43,7 +42,7 @@ export interface KnowledgeItem {
   folder_id?: string
   id: string
   image_count?: number | null
-  meta?: Record<string, unknown>
+  meta?: Record<string, unknown> & { authentication?: boolean }
   name: string
   nick_name?: string | null
   scope?: string

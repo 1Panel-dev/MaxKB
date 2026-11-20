@@ -1,4 +1,3 @@
-import importlib
 import json
 import shlex
 from contextlib import ExitStack
@@ -6,7 +5,6 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 from uuid import UUID
 
-from django.db import migrations
 from django.test import RequestFactory, SimpleTestCase
 from django.urls import resolve
 from rest_framework.exceptions import ValidationError
@@ -32,31 +30,33 @@ KEY = "50000000-0000-0000-0000-000000000001"
 
 
 def knowledge(**settings):
+    meta = {"authentication": settings.pop("authentication")} if "authentication" in settings else {}
     return SimpleNamespace(
-        id=KID, name="manual", desc="", workspace_id="default", type=KnowledgeType.BASE, external_service=settings
+        id=KID,
+        name="manual",
+        desc="",
+        workspace_id="default",
+        type=KnowledgeType.BASE,
+        external_service=settings,
+        meta=meta,
     )
 
 
 class RetrievalSettingsTests(SimpleTestCase):
-    def test_new_default_and_existing_migration_default_differ(self):
-        self.assertEqual(Knowledge().external_service, {"enabled": False, "authentication": False})
-        migration = importlib.import_module("knowledge.migrations.0012_v3_upgrade").Migration
-        operations = [
-            operation
-            for operation in migration.operations
-            if isinstance(operation, (migrations.AddField, migrations.AlterField))
-            and operation.model_name == "knowledge"
-            and operation.name == "external_service"
-        ]
-        self.assertEqual([type(operation) for operation in operations], [migrations.AddField, migrations.AlterField])
-        self.assertEqual(operations[0].field.get_default(), {})
-        self.assertEqual(operations[1].field.get_default(), Knowledge().external_service)
+    def test_external_service_defaults_to_disabled(self):
+        self.assertEqual(Knowledge().external_service, {"enabled": False})
         self.assertFalse(service_settings(knowledge())["enabled"])
-        self.assertFalse(service_settings(Knowledge())["authentication"])
+        self.assertNotIn("authentication", service_settings(Knowledge()))
 
-    def test_only_two_settings_can_be_changed(self):
+    def test_only_external_service_enabled_can_be_changed(self):
         self.assertTrue(ExternalServiceSettings(data={"enabled": True}).is_valid())
-        for data in ({}, [], {"knowledge_id": KID}, {"authentication": None}):
+        for data in (
+            {},
+            [],
+            {"knowledge_id": KID},
+            {"authentication": True},
+            {"enabled": True, "authentication": False},
+        ):
             self.assertFalse(ExternalServiceSettings(data=data).is_valid())
 
     def test_invalid_fields_produce_serializable_validation_errors(self):
@@ -72,8 +72,8 @@ class RetrievalSettingsTests(SimpleTestCase):
                     serializer.is_valid(raise_exception=True)
                 self.assertIsInstance(json.loads(json.dumps(serializer.errors)), dict)
 
-    def test_enabling_old_service_preserves_legacy_auth_until_explicitly_changed(self):
-        item = knowledge()
+    def test_enabling_external_service_preserves_knowledge_authorization(self):
+        item = knowledge(authentication=True)
         item.save = Mock()
         serializer = ExternalServiceSerializer(data={"workspace_id": "default", "knowledge_id": KID})
         with patch.object(serializer, "get_knowledge", return_value=item) as get_knowledge:
@@ -81,15 +81,10 @@ class RetrievalSettingsTests(SimpleTestCase):
             update = ExternalServiceSerializer.update_settings.__wrapped__
             settings = update(serializer, {"enabled": True})
             self.assertEqual(item.external_service, {"enabled": True})
+            self.assertEqual(item.meta, {"authentication": True})
             self.assertTrue(settings["enabled"])
-            self.assertFalse(settings["authentication"])
+            self.assertNotIn("authentication", settings)
             get_knowledge.assert_called_once_with(lock=True)
-            settings = update(serializer, {"authentication": True})
-            self.assertEqual(item.external_service, {"enabled": True, "authentication": True})
-            self.assertTrue(settings["enabled"])
-            self.assertTrue(settings["authentication"])
-            self.assertIn("Authorization: Bearer <CHAT_USER_API_KEY>", settings["api_example"])
-            settings = update(serializer, {"authentication": False})
             self.assertIn("Authorization: Bearer <CHAT_USER_API_KEY>", settings["api_example"])
             self.assertEqual(
                 settings["mcp_config"][f"knowledge_{KID}"]["headers"]["Authorization"], "Bearer <CHAT_USER_API_KEY>"
@@ -255,18 +250,22 @@ class RetrievalAccessTests(SimpleTestCase):
         queryset.return_value.filter.return_value.exists.return_value = False
         self.assertEqual(access.authorized_ids(UID, [KID]), set())
 
-    @patch.object(access.DatabaseModelManage, "get_model")
     @patch.object(access, "authorized_ids", return_value={KID})
     @patch.object(access, "QuerySet")
-    def test_old_rules_new_auth_and_anonymous_setting(self, queryset, authorized, handler):
-        queryset.return_value.filter.return_value = [knowledge()]
+    def test_workflow_checks_grants_only_when_enabled_in_metadata(self, queryset, authorized):
+        item = knowledge(enabled=True)
+        item.external_service["authentication"] = True
+        queryset.return_value.filter.return_value = [item]
         self.assertEqual(access.filter_workflow_knowledge([KID], {}), [KID])
-        handler.return_value.return_value = []
-        self.assertEqual(
-            access.filter_workflow_knowledge([KID], {"chat_user_id": UID, "chat_user_type": "CHAT_USER"}), []
-        )
-        queryset.return_value.filter.return_value = [knowledge(enabled=False, authentication=True)]
         identity = access.identity_from_server(UID, "CHAT_USER")
+        self.assertEqual(
+            access.filter_workflow_knowledge(
+                [KID], {"chat_user_id": UID, "chat_user_type": "CHAT_USER", "retrieval_identity": identity}
+            ),
+            [KID],
+        )
+        authorized.assert_not_called()
+        queryset.return_value.filter.return_value = [knowledge(enabled=False, authentication=True)]
         self.assertEqual(access.filter_workflow_knowledge([KID], {"retrieval_identity": identity}), [KID])
         authorized.return_value = set()
         self.assertEqual(
@@ -468,7 +467,7 @@ class RetrievalAuthenticationTests(SimpleTestCase):
 
     def test_missing_or_malformed_key_is_rejected_in_all_authorization_modes(self):
         for settings in ({}, {"authentication": False}, {"authentication": True}):
-            self.item.external_service = {"enabled": True, **settings}
+            self.item.meta = settings
             for header in (None, "", "Basic invalid", "Bearer short"):
                 with self.subTest(settings=settings, header=header):
                     for response in self.responses(header):
@@ -484,7 +483,7 @@ class RetrievalAuthenticationTests(SimpleTestCase):
     def test_unknown_disabled_keys_and_disabled_users_are_always_rejected(self):
         key = self.key_query.first.return_value
         for authentication in (False, True):
-            self.item.external_service["authentication"] = authentication
+            self.item.meta["authentication"] = authentication
             for invalid_key in (
                 None,
                 SimpleNamespace(**{**vars(key), "is_active": False}),
@@ -501,7 +500,7 @@ class RetrievalAuthenticationTests(SimpleTestCase):
 
     def test_valid_key_requires_knowledge_permission_only_when_authorization_is_enabled(self):
         for settings in ({}, {"authentication": False}, {"authentication": True}):
-            self.item.external_service = {"enabled": True, **settings}
+            self.item.meta = settings
             for granted in (False, True):
                 with self.subTest(settings=settings, granted=granted):
                     self.authorized.return_value = {KID} if granted else set()
@@ -710,12 +709,12 @@ class GlobalKnowledgeMCPTests(SimpleTestCase):
 
     def test_list_knowledge_includes_public_and_authorized(self):
         items = [
-            SimpleNamespace(id="k-public", name="a", desc=None, external_service={"enabled": True}),
+            SimpleNamespace(id="k-public", name="a", desc=None, external_service={"enabled": True}, meta={}),
             SimpleNamespace(
-                id="k-granted", name="b", desc="d", external_service={"enabled": True, "authentication": True}
+                id="k-granted", name="b", desc="d", external_service={"enabled": True}, meta={"authentication": True}
             ),
             SimpleNamespace(
-                id="k-denied", name="c", desc="", external_service={"enabled": True, "authentication": True}
+                id="k-denied", name="c", desc="", external_service={"enabled": True}, meta={"authentication": True}
             ),
         ]
         with (

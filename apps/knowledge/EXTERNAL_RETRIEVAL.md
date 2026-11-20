@@ -4,12 +4,11 @@
 MCP 沿用智能体的 Django HTTP 入口与 ToolHandler 结构，
 支持 Streamable HTTP 的 JSON 响应；不新增服务进程、队列或生产依赖，不改动 ChatUserApiKey。
 
-## 配置与兼容
+## 配置
 
-`Knowledge.external_service` 保存两个开关：`enabled`（外部 API/MCP）和 `authentication`（对话用户授权）。
-新知识库的外部服务和对话用户授权均默认关闭：`enabled=false, authentication=false`。迁移 `0015_knowledge_external_service`
-给旧库写入空配置：外部服务关闭，内部检索继续原有规则；管理员显式修改对话用户授权后采用新开关规则。
-只切换外部服务不会改变旧库内部鉴权。迁移需按项目部署流程执行，开发时不自动应用。
+知识库「设置 → 其他设置」从知识库详情读取 `meta.authentication`。
+通过知识库编辑接口（飞书使用专用编辑接口）提交 `{"meta":{"authentication":true}}` 或 `{"meta":{"authentication":false}}` 即可保存。
+对话用户授权和外部服务均默认关闭。缺少 `meta.authentication` 时，检索按关闭处理。编辑请求省略该字段会保留当前设置。
 
 管理接口使用现有管理员 Token 和各范围的知识库读/编辑权限：
 
@@ -20,8 +19,8 @@ MCP 沿用智能体的 Django HTTP 入口与 ToolHandler 结构，
 | System 资源管理 | `/admin/api/system/resource/knowledge/{knowledge_id}/external_service`                        | GET/PUT |
 | System 共享资源 | `/admin/api/system/shared/knowledge/{knowledge_id}/external_service`                          | GET/PUT |
 
-PUT 只提交本次修改的开关，例如 `{"enabled":true}`，其他配置保留。
-查询与保存均返回 `enabled`、`authentication`、`api_url`、`api_example`、`mcp_url`、`mcp_config`。
+外部服务 PUT 只接受 `enabled`，例如 `{"enabled":true}`。提交 `authentication` 会返回参数错误。
+查询与保存均返回 `enabled`、`api_url`、`api_example`、`mcp_url`、`mcp_config`。
 地址与 curl 示例使用当前部署前缀；无论对话用户授权是否开启，API 示例和 MCP 配置均包含 Authorization，
 使用 `<CHAT_USER_API_KEY>` 占位符。页面按资源范围选择接口，Workspace 共享只读；加载失败可重试，保存失败保留原值。
 
@@ -84,6 +83,6 @@ GET/DELETE 返回 405。不提供旧 SSE 或 OAuth 自动发现。带 Origin 的
 
 ## 验证
 
-`python apps/manage.py test knowledge.tests.retrieval.test_external_retrieval` 包含两开关规则、旧库兼容、
+`python apps/manage.py test knowledge.tests.retrieval.test_external_retrieval` 包含两个开关的组合和缺省值、
 原有 Key、所有授权模式下的必填 Key 校验、授权撤销、跨库过滤、管理员调试、JSON-RPC 和真实 MCP Python SDK 的内存 HTTP 往返测试。
 真实 PostgreSQL/pgvector、模型供应商和外部客户端仍需在配置好的测试环境完成部署验收。

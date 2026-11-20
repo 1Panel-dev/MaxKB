@@ -322,6 +322,13 @@ class WorkflowSnapshotIsolationTests(SimpleTestCase):
 
 class WorkflowActionSourceTests(SimpleTestCase):
     def setUp(self):
+        self.enterContext(
+            patch.object(
+                KnowledgeWorkflowActionSerializer,
+                "save_sync_input",
+                staticmethod(KnowledgeWorkflowActionSerializer.save_sync_input.__wrapped__),
+            )
+        )
         heartbeat_patch = patch(
             "knowledge.serializers.knowledge_workflow.start_sync_heartbeat", return_value=lambda: None
         )
@@ -363,6 +370,7 @@ class WorkflowActionSourceTests(SimpleTestCase):
         )
         knowledge_query, workflow_query, version_query = MagicMock(), MagicMock(), MagicMock()
         knowledge_query.filter.return_value.first.return_value = knowledge
+        knowledge_query.select_for_update.return_value.get.return_value = knowledge
         workflow_query.filter.return_value.first.return_value = SimpleNamespace(is_publish=True)
         version_query.filter.return_value.order_by.return_value.__getitem__.return_value.first.return_value = version
         query_set.side_effect = lambda model: {
@@ -427,6 +435,7 @@ class WorkflowActionSourceTests(SimpleTestCase):
             default_model_setting={},
         )
         query_set.return_value.filter.return_value.first.side_effect = [workflow, knowledge]
+        query_set.return_value.select_for_update.return_value.get.return_value = knowledge
         serializer = KnowledgeWorkflowActionSerializer(
             data={"knowledge_id": str(knowledge.id), "workspace_id": "workspace"}
         )

@@ -132,12 +132,12 @@ class ChatUserKnowledgeMCPToolHandler:
 
     def get_knowledge(self):
         knowledge = list(QuerySet(Knowledge).filter(external_service__enabled=True).order_by("name"))
-        restricted = [str(item.id) for item in knowledge if item.external_service.get("authentication", False)]
+        restricted = [str(item.id) for item in knowledge if (item.meta or {}).get("authentication", False)]
         authorized = authorized_ids(self.identity.user_id, restricted) if restricted else set()
         return [
             item
             for item in knowledge
-            if not item.external_service.get("authentication", False) or str(item.id) in authorized
+            if not (item.meta or {}).get("authentication", False) or str(item.id) in authorized
         ]
 
     def list_knowledge(self):

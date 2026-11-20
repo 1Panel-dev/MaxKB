@@ -249,7 +249,9 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             raise AppApiException(500, _("Knowledge id does not exist"))
 
     @staticmethod
+    @transaction.atomic
     def save_sync_input(knowledge, work_flow, instance):
+        knowledge = QuerySet(Knowledge).select_for_update().get(id=knowledge.id)
         if ((knowledge.meta or {}).get("sync_setting") or {}).get("enabled"):
             try:
                 validate_workflow_sync_source(work_flow, instance)
@@ -649,7 +651,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 folder_id=folder_id,
                 workspace_id=self.data.get("workspace_id"),
                 embedding_model_id=instance.get("embedding_model_id"),
-                meta={},
+                meta={"authentication": False},
             )
             knowledge.save()
             # 自动资源给授权当前用户

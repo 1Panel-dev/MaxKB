@@ -5,6 +5,10 @@ from rest_framework import serializers
 from knowledge.models import Knowledge
 
 
+class KnowledgeSettingsMeta(serializers.Serializer):
+    authentication = serializers.BooleanField(required=False)
+
+
 class KnowledgeModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Knowledge

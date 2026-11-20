@@ -1,14 +1,17 @@
 from copy import deepcopy
 from unittest.mock import MagicMock, patch
 
-from django.test import SimpleTestCase
+from django.http import QueryDict
+from django.test import SimpleTestCase, TestCase
 from knowledge.models import (
+    Knowledge,
     KnowledgeType,
 )
 from knowledge.serializers.knowledge import (
     KnowledgeSerializer,
 )
 from knowledge.serializers.knowledge_sync import KnowledgeSyncSettingOperationSerializer
+from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer
 from knowledge.services.document_strategy import (
     normalize_document_strategy,
 )
@@ -18,6 +21,63 @@ from knowledge.services.knowledge_sync_schedule import (
 from knowledge.task.sync import (
     scheduled_sync_web_knowledge,
 )
+from rest_framework.exceptions import ValidationError
+
+
+class KnowledgeAuthenticationSettingsTests(TestCase):
+    def setUp(self):
+        self.knowledge = Knowledge.objects.create(
+            name="Manual", meta={"other": "preserved"}, external_service={"enabled": True}
+        )
+        self.operation = KnowledgeSerializer.Operate(
+            data={
+                "workspace_id": self.knowledge.workspace_id,
+                "knowledge_id": str(self.knowledge.id),
+                "user_id": "00000000-0000-0000-0000-000000000012",
+            }
+        )
+        self.enterContext(patch("knowledge.serializers.knowledge.is_workspace_manage", return_value=True))
+        self.enterContext(patch("knowledge.serializers.knowledge.update_resource_mapping_by_knowledge"))
+
+    def test_settings_read_and_write_existing_retrieval_configuration(self):
+        self.assertNotIn("authentication", self.operation.one()["meta"])
+        self.operation.edit(QueryDict("name=Renamed"))
+        self.knowledge.refresh_from_db()
+        self.assertNotIn("authentication", self.knowledge.meta)
+        self.assertEqual(self.knowledge.external_service, {"enabled": True})
+        for value in (True, False):
+            with self.subTest(authentication=value):
+                self.assertIs(self.operation.edit({"meta": {"authentication": value}})["meta"]["authentication"], value)
+                self.knowledge.refresh_from_db()
+                self.assertEqual(self.knowledge.meta, {"other": "preserved", "authentication": value})
+                self.assertEqual(self.knowledge.external_service, {"enabled": True})
+                self.assertIs(self.operation.one()["meta"]["authentication"], value)
+
+    def test_editing_only_authorization_preserves_web_and_workflow_settings(self):
+        for kind in (KnowledgeType.WEB, KnowledgeType.WORKFLOW):
+            with self.subTest(kind=kind):
+                Knowledge.objects.filter(pk=self.knowledge.pk).update(
+                    type=kind, meta={"source_url": "https://example.com", "sync_setting": {"enabled": True}}
+                )
+                meta = self.operation.edit({"meta": {"authentication": True}})["meta"]
+                self.assertEqual(
+                    meta,
+                    {"source_url": "https://example.com", "sync_setting": {"enabled": True}, "authentication": True},
+                )
+
+    def test_invalid_setting_rejects_the_whole_edit(self):
+        with self.assertRaises(ValidationError):
+            self.operation.edit({"name": "Renamed", "meta": {"authentication": "invalid"}})
+        self.knowledge.refresh_from_db()
+        self.assertEqual(self.knowledge.name, "Manual")
+        self.assertEqual(self.knowledge.external_service, {"enabled": True})
+
+    def test_upload_with_stale_knowledge_preserves_latest_authorization(self):
+        self.operation.edit({"meta": {"authentication": True}})
+        KnowledgeWorkflowActionSerializer.save_sync_input(self.knowledge, {}, {})
+        self.knowledge.refresh_from_db()
+        self.assertIs(self.knowledge.meta["authentication"], True)
+        self.assertIn("workflow_sync_input", self.knowledge.meta)
 
 
 class WebKnowledgeCreationTests(SimpleTestCase):
@@ -96,8 +156,9 @@ class WebKnowledgeSettingsTests(SimpleTestCase):
                 },
             },
         )
-        query_set = self.enterContext(patch("knowledge.serializers.knowledge.QuerySet"))
-        query_set.return_value.get.return_value = self.knowledge
+        self.enterContext(
+            patch.object(KnowledgeSerializer.Operate, "get_knowledge_for_update", return_value=self.knowledge)
+        )
         self.enterContext(patch("knowledge.serializers.knowledge.update_resource_mapping_by_knowledge"))
         crawler = self.enterContext(patch("knowledge.serializers.common.Fork"))
         crawler.return_value.fork.return_value.status = 200
@@ -132,7 +193,9 @@ class WebKnowledgeSettingsTests(SimpleTestCase):
                     self.assertEqual(self.knowledge.meta, expected_meta)
                     with patch("knowledge.serializers.knowledge_sync.QuerySet") as sync_query:
                         sync_query.return_value.filter.return_value.first.return_value = self.knowledge
-                        setting = KnowledgeSyncSettingOperationSerializer(data=self.operation.data).get_setting()
+                        setting = KnowledgeSyncSettingOperationSerializer(
+                            data=self.operation.initial_data
+                        ).get_setting()
                     self.assertEqual(setting, original_meta["sync_setting"])
 
     def test_basic_settings_and_explicit_document_strategy_can_be_updated_together(self):
@@ -168,9 +231,9 @@ class KnowledgeModelUpdateTests(SimpleTestCase):
     @patch("knowledge.task.sync.QuerySet")
     @patch("knowledge.serializers.knowledge.sync_replace_web_knowledge.delay")
     @patch("knowledge.serializers.knowledge.update_resource_mapping_by_knowledge")
-    @patch("knowledge.serializers.knowledge.QuerySet")
+    @patch.object(KnowledgeSerializer.Operate, "get_knowledge_for_update")
     def test_saved_strategy_takes_effect_on_next_manual_or_scheduled_sync(
-        self, query_set, _update_mapping, delay, task_query_set
+        self, get_knowledge, _update_mapping, delay, task_query_set
     ):
         knowledge = MagicMock(
             id="00000000-0000-0000-0000-000000000011",
@@ -183,7 +246,7 @@ class KnowledgeModelUpdateTests(SimpleTestCase):
                 "sync_setting": {"enabled": True, "sync_type": "incremental"},
             },
         )
-        query_set.return_value.get.return_value = knowledge
+        get_knowledge.return_value = knowledge
         task_query_set.return_value.filter.return_value.first.return_value = knowledge
         operation = KnowledgeSerializer.Operate(
             data={"workspace_id": "default", "knowledge_id": knowledge.id, "user_id": knowledge.user_id}
@@ -218,8 +281,10 @@ class KnowledgeModelUpdateTests(SimpleTestCase):
                 self.assertEqual(delay.call_args.args[5], sync_type)
 
     @patch("knowledge.serializers.knowledge.update_resource_mapping_by_knowledge")
-    @patch("knowledge.serializers.knowledge.QuerySet")
-    def test_model_update_preserves_meta_when_strategy_is_omitted_or_inapplicable_null(self, query_set, update_mapping):
+    @patch.object(KnowledgeSerializer.Operate, "get_knowledge_for_update")
+    def test_model_update_preserves_meta_when_strategy_is_omitted_or_inapplicable_null(
+        self, get_knowledge, update_mapping
+    ):
         knowledge_id = "00000000-0000-0000-0000-000000000011"
         model_id = "00000000-0000-0000-0000-000000000012"
         for knowledge_type in KnowledgeType:
@@ -232,7 +297,7 @@ class KnowledgeModelUpdateTests(SimpleTestCase):
                     if knowledge_type == KnowledgeType.WEB:
                         original_meta["doc_strategy"] = normalize_document_strategy({"split": {"max_length": 1024}})
                     knowledge = MagicMock(id=knowledge_id, type=knowledge_type, meta=original_meta.copy())
-                    query_set.return_value.get.return_value = knowledge
+                    get_knowledge.return_value = knowledge
                     operation = KnowledgeSerializer.Operate(
                         data={
                             "user_id": "00000000-0000-0000-0000-000000000013",
@@ -250,13 +315,13 @@ class KnowledgeModelUpdateTests(SimpleTestCase):
                     update_mapping.assert_called_with(knowledge_id)
 
     @patch("knowledge.serializers.knowledge.update_resource_mapping_by_knowledge")
-    @patch("knowledge.serializers.knowledge.QuerySet")
-    def test_web_knowledge_explicit_null_strategy_still_resets_to_defaults(self, query_set, _update_mapping):
+    @patch.object(KnowledgeSerializer.Operate, "get_knowledge_for_update")
+    def test_web_knowledge_explicit_null_strategy_still_resets_to_defaults(self, get_knowledge, _update_mapping):
         knowledge = MagicMock(
             type=KnowledgeType.WEB,
             meta={"selector": "body", "doc_strategy": {"split": {"max_length": 1024}}},
         )
-        query_set.return_value.get.return_value = knowledge
+        get_knowledge.return_value = knowledge
         operation = KnowledgeSerializer.Operate(
             data={
                 "user_id": "00000000-0000-0000-0000-000000000013",

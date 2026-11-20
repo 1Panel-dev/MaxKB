@@ -54,8 +54,9 @@ class KnowledgeArchiveTests(SimpleTestCase):
             user_id=uid(2),
             workspace_id="source",
             folder_id="source",
-            external_service={"enabled": True, "authentication": True},
+            external_service={"enabled": True},
             meta={
+                "authentication": True,
                 "source_url": "https://example.com",
                 "doc_strategy": {"split": {"child_length": 128}},
                 "sync_setting": {
@@ -343,7 +344,8 @@ class KnowledgeArchiveTests(SimpleTestCase):
         with ZipFile(io.BytesIO(self.export())) as archive:
             meta = json.loads(archive.read("knowledge.json"))["meta"]
         self.assertEqual(meta["sync_setting"], self.knowledge.meta["sync_setting"])
-        self.assertEqual(set(meta), {"sync_setting", "doc_strategy"})
+        self.assertIs(meta["authentication"], True)
+        self.assertEqual(set(meta), {"authentication", "sync_setting", "doc_strategy"})
 
     def test_unlinked_problems_and_paragraph_anchors_survive(self):
         anchor = Paragraph(id=uid(11), document_id=self.document.id, knowledge_id=self.knowledge.id, content="anchor")
@@ -451,11 +453,13 @@ class KnowledgeArchiveTests(SimpleTestCase):
         with ZipFile(io.BytesIO(payload)) as archive:
             self.assertNotIn("missing_files.json", archive.namelist())
 
-    def test_legacy_auth_marker_and_disabled_schedule_are_preserved(self):
+    def test_missing_switches_default_to_off_and_disabled_schedule_is_preserved(self):
         self.knowledge.external_service = {}
+        del self.knowledge.meta["authentication"]
         self.knowledge.meta["sync_setting"]["enabled"] = False
         self.import_archive(self.export())
-        self.assertEqual(self.saved_knowledge[0].external_service, {})
+        self.assertIs(self.saved_knowledge[0].meta["authentication"], False)
+        self.assertEqual(self.saved_knowledge[0].external_service, {"enabled": False})
         self.assertFalse(self.saved_knowledge[0].meta["sync_setting"]["enabled"])
         self.on_commit.assert_not_called()
 
@@ -468,7 +472,8 @@ class KnowledgeArchiveTests(SimpleTestCase):
                 lambda value: value["resources"]["assets"][0].update(file_id=str(uid(99))),
                 lambda value: value["resources"]["paragraphs"][0].update(document_id=str(uid(99))),
                 lambda value: value["resources"]["files"][0].update(zip_path="missing.png"),
-                lambda value: value.update(external_service={"authentication": "false"}),
+                lambda value: value.update(external_service={"enabled": "false"}),
+                lambda value: value["meta"].update(authentication="false"),
                 lambda value: value["meta"].update(sync_setting={"schedule_type": "unknown"}),
                 lambda value: value["meta"].update(sync_setting={"enabled": "false"}),
             ):
@@ -495,7 +500,8 @@ class KnowledgeArchiveTests(SimpleTestCase):
             self.import_archive(payload.getvalue())
         self.assertEqual(self.created[Document][0].resource_type, "document")
         self.assertEqual(self.created[Paragraph][0].content, "old content")
-        self.assertEqual(self.saved_knowledge[0].external_service, {"enabled": False, "authentication": False})
+        self.assertEqual(self.saved_knowledge[0].external_service, {"enabled": False})
+        self.assertIs(self.saved_knowledge[0].meta["authentication"], False)
         self.on_commit.assert_not_called()
 
     def test_file_and_workflow_input_references_are_rebound(self):

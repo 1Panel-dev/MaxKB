@@ -166,7 +166,7 @@ class KnowledgeFolder(MPTTModel, AppModelMixin):
 
 
 def default_external_service():
-    return {"enabled": False, "authentication": False}
+    return {"enabled": False}
 
 
 class Knowledge(AppModelMixin):
