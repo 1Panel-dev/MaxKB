@@ -11,6 +11,7 @@ from application.models.application import Application, ApplicationFolder
 from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.application_folder import ApplicationFolderTreeSerializer
 from common.auth.constants.group_constants import Group
+from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
 from common.constants.resource_permission_constants import ResourcePermissionConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -124,16 +125,23 @@ def get_max_depth(current_node):
 
 
 def has_target_permission(workspace_id, source, user_id, target):
+    target_permission = QuerySet(WorkspaceUserResourcePermission).filter(
+        workspace_id=workspace_id,
+        user_id=user_id,
+        auth_target_type=source,
+        target=target,
+    )
+    if target_permission.filter(permission_list__contains=["MANAGE"]).exists():
+        return True
+
     return (
-        QuerySet(WorkspaceUserResourcePermission)
-        .filter(
-            workspace_id=workspace_id,
-            user_id=user_id,
-            auth_target_type=source,
-            target=target,
-            permission_list__contains=["MANAGE"],
+        has_exact_permission_by_role(
+            user_id,
+            workspace_id,
+            str(PermissionConstants[f"{source}_FOLDER_EDIT"].value),
+            RoleConstants.USER.value.__str__(),
         )
-        .exists()
+        and target_permission.filter(permission_list__contains=["ROLE"]).exists()
     )
 
 
