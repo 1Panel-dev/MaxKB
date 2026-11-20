@@ -137,7 +137,7 @@ defineExpose({ refresh: handleLoadParagraphs })
             <!-- 取消当前问题与分段的关联，不删除分段 -->
             <div class="group-hover-visible sticky top-3 z-20 h-0" @click.stop>
               <MkTooltip :content="t('common.actions.unrelate')" placement="top">
-                <el-button circle class="absolute top-0 right-0 shadow-md" :disabled="loading" @click.stop="handleUnlinkParagraph(paragraph)">
+                <el-button circle class="absolute top-0 right-0 shadow-md" :disabled="loading" @click.stop="handleUnlinkParagraph(paragraph)" v-if="knowledgeProblemPermission('problemRelate')">
                   <MkIcon name="icon_unlink_outlined" />
                 </el-button>
               </MkTooltip>
