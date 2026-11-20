@@ -284,14 +284,32 @@ def _auth_chat(file, token):
     if knowledge_id is None:
         _deny()
         return
-    ## 如果是匿名的就要看可访问的应用是否
+    knowledge_id = str(knowledge_id)
+    authentication = _knowledge_requires_authentication(knowledge_id)
+    if authentication is None:
+        _deny()
+        return
+    # 匿名用户没有对话用户授权：只能访问未开启授权、且关联到免登录应用的知识库文件
     if token.login_type.upper() == str(Operate.ANNOTATION_AUTH):
+        if authentication:
+            _deny()
         _check_knowledge_mapped_to_application(knowledge_id)
+        return
+    # 与检索一致：未开启对话用户授权时所有对话用户均可访问
+    if not authentication:
         return
 
     get_authorized = DatabaseModelManage.get_model("get_knowledge_list_of_authorized")
-    if knowledge_id not in get_authorized(user_id, [knowledge_id]):
+    if get_authorized is None or knowledge_id not in set(map(str, get_authorized(user_id, [knowledge_id]))):
         _deny()
+
+
+def _knowledge_requires_authentication(knowledge_id):
+    """返回知识库 meta.authentication；知识库不存在时返回 None"""
+    row = QuerySet(Knowledge).filter(id=knowledge_id).values("meta").first()
+    if row is None:
+        return None
+    return bool((row.get("meta") or {}).get("authentication", False))
 
 
 def _check_anonymous_login(chat_id):
