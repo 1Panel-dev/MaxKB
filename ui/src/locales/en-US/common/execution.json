@@ -3,7 +3,9 @@
     "title": "Execution history",
     "view": "View execution history",
     "resourceType": "Resource type",
-    "executionTime": "Execution time"
+    "executionTime": "Execution time",
+    "initiator": "Initiator",
+    "triggerSource": "Trigger source"
   },
   "details": {
     "title": "Execution details",
@@ -22,5 +24,9 @@
     "title": "Execution result",
     "success": "Execution succeeded",
     "failure": "Execution failed"
+  },
+  "cancel": {
+    "label": "Cancel execution",
+    "title": "Cancel the current execution task?"
   }
 }

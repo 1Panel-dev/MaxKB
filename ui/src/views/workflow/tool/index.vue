@@ -106,7 +106,7 @@ function saveToolWorkflow(graphData = getGraphData(), showMessage = false) {
       defaultModelSetting.value = cloneDeep(toolWorkflow.default_model_setting ?? {})
       saveTime.value = toolWorkflow.update_time || new Date()
       setSavedWorkflow(workflowSnapshot)
-      if (showMessage) MsgSuccess('保存成功')
+      if (showMessage) MsgSuccess(t('common.messages.saveSuccess'))
       return toolWorkflow
     })
 }
@@ -164,7 +164,7 @@ const templateStoreButtonRef = useTemplateRef<InstanceType<typeof ButtonTemplate
 function handleUseTemplate(template: WorkflowStoreTemplate) {
   if (loading.value || historyVisible.value) return
 
-  return MsgConfirm('提示', `使用 ${template.name} 将覆盖当前工作流？`, {
+  return MsgConfirm(t('common.dialogs.notice'), t('workflow.layout.overwriteMessage', { name: template.name }), {
     confirmButtonText: t('common.actions.comfirm'),
     confirmButtonType: 'primary',
   })
@@ -173,7 +173,7 @@ function handleUseTemplate(template: WorkflowStoreTemplate) {
       return requestApi.putToolWorkflow(toolId, { work_flow_template: cloneDeep(template) }).then(() => {
         return loadToolWorkflow().then(() => {
           templateStoreButtonRef.value?.close()
-          MsgSuccess('应用成功')
+          MsgSuccess(t('workflow.layout.applySuccess'))
         })
       })
     })
@@ -260,7 +260,7 @@ function handlePublish(payload: WorkflowVersionPayload) {
     .then(() => requestApi.putToolWorkflowPublish(toolId, payload.name, payload.publish_desc))
     .then(() => {
       publishDialogRef.value?.close()
-      MsgSuccess('发布成功')
+      MsgSuccess(t('common.messages.publishSuccess'))
     })
     .finally(() => {
       loading.value = false
@@ -275,7 +275,7 @@ async function handleExportWorkflow() {
     if (hasUnsavedChanges()) await saveToolWorkflow()
     await requestToolApi.exportTool(toolId, toolDetail.value.name)
   } catch {
-    MsgError('导出工作流失败')
+    MsgError(t('workflow.layout.exportFailedMessage'))
   } finally {
     loading.value = false
   }
@@ -312,9 +312,9 @@ function handleBack() {
 
   // 保存失败时保留当前页面，避免丢失尚未写入服务端的画布数据。
   confirmingExit.value = true
-  MsgConfirm('提示', '当前工作流尚未保存，是否保存后退出？', {
-    cancelButtonText: '直接退出',
-    confirmButtonText: '保存并退出',
+  MsgConfirm(t('common.dialogs.notice'), t('workflow.layout.unsavedExitMessage'), {
+    cancelButtonText: t('workflow.layout.exitDirectly'),
+    confirmButtonText: t('workflow.layout.saveAndExit'),
     confirmButtonType: 'primary',
     distinguishCancelAndClose: true,
   })
@@ -359,7 +359,7 @@ onBeforeUnmount(() => stopAutoSave())
     <template #actions>
       <!-- AI 生成工作流 -->
       <ButtonAiGenerate
-        label="AI 生成"
+        :label="t('workflow.layout.aiGenerate')"
         :disabled="loading || historyVisible"
         :get-logic-flow="() => workflowRef?.getLogicFlow()"
         :default-model-settings="defaultModelSetting"
@@ -367,7 +367,7 @@ onBeforeUnmount(() => stopAutoSave())
       />
       <!-- 模板中心 -->
       <ButtonTemplateStore
-        label="模板中心"
+        :label="t('resource.templateStore.title')"
         v-if="toolWorkflowPermission('read')"
         ref="templateStoreButtonRef"
         v-model:loading="loading"
@@ -391,7 +391,7 @@ onBeforeUnmount(() => stopAutoSave())
         v-if="toolWorkflowPermission('read')"
         ref="debugButtonRef"
         v-model:loading="loading"
-        label="调试"
+        :label="t('common.actions.debug')"
         :api="requestApi"
         :tool-id="toolId"
         :disabled="historyVisible"
@@ -401,28 +401,30 @@ onBeforeUnmount(() => stopAutoSave())
         :get-graph-data="getGraphData"
       />
       <!-- 保存 -->
-      <MkTooltip content="保存" placement="bottom">
+      <MkTooltip :content="t('common.actions.save')" placement="bottom">
         <el-button v-if="toolWorkflowPermission('edit')" plain :disabled="loading" @click="handleSave" class="w-8! min-w-8!">
           <MkIcon name="icon_save_outlined" />
         </el-button>
       </MkTooltip>
       <!-- 发布 -->
-      <el-button v-if="toolWorkflowPermission('publish')" type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
+      <el-button v-if="toolWorkflowPermission('publish')" type="primary" :disabled="loading" @click="handleOpenPublish">
+        {{ t('common.actions.publish') }}
+      </el-button>
       <!-- 更多操作 -->
       <MkDropdown hide-when-empty trigger="click" placement="bottom-end" class="ml-2" persistent>
         <el-button text class="h-7! w-7! px-0!">
           <MkIcon name="icon_more_outlined" class="rotate-90" :size="20" />
         </el-button>
         <template #dropdown>
-          <MkDropdownMenu class="w-37">
+          <MkDropdownMenu>
             <!-- 导出工作流 -->
             <MkDropdownItem v-if="toolWorkflowPermission('export')" @click="handleExportWorkflow">
               <template #icon><MkIcon name="icon_export_outlined" /></template>
-              <span>导出工作流</span>
+              <span>{{ t('workflow.layout.exportWorkflow') }}</span>
             </MkDropdownItem>
             <!-- 发布历史 -->
             <ButtonPublishHistory
-              label="发布历史"
+              :label="t('workflow.publishHistory.title')"
               :api="requestApi"
               :visible="historyVisible"
               @update:visible="handleHistoryVisibleChange"
@@ -437,7 +439,7 @@ onBeforeUnmount(() => stopAutoSave())
             <!-- 自动保存 -->
             <MkDropdownItem v-if="toolWorkflowPermission('edit')" @click.stop>
               <template #icon><MkIcon name="icon_save_outlined" /></template>
-              <span>自动保存</span>
+              <span>{{ t('workflow.layout.autoSave') }}</span>
               <el-switch v-model="autoSaveEnabled" class="ml-auto" size="small" @click.stop @change="handleAutoSaveChange" />
             </MkDropdownItem>
           </MkDropdownMenu>

@@ -5,7 +5,40 @@
     "delete": {
       "title": "是否删除节点：{name}？",
       "batchTitle": "是否删除选中的{count}个节点？"
-    }
+    },
+    "name": {
+      "label": "节点名称",
+      "placeholder": "请输入节点名称",
+      "duplicateMessage": "节点名称已存在！"
+    },
+    "source": "来源",
+    "disabledMessage": "该节点已禁用",
+    "applicationUnavailableMessage": "该智能体不可用",
+    "toolUnavailableMessage": "该工具不可用",
+    "exception": {
+      "label": "异常捕获",
+      "messageLabel": "异常信息"
+    },
+    "executionCondition": {
+      "title": "执行条件",
+      "prefix": "前置",
+      "description": "连线节点执行完，执行当前节点"
+    },
+    "setting": "节点设置",
+    "validation": {
+      "nextNodeMissing": "不存在的下一个节点",
+      "outsideFlow": "未在流程中的节点:{names}",
+      "unavailable": "{name} 节点不可用",
+      "branchConnectionRequired": "{name} 节点的{branch}分支需要连接",
+      "cannotEnd": "{name} 节点不能当做结束节点"
+    },
+    "copyDisabledMessage": "{name}不能被复制",
+    "deleteDisabledMessage": "{name}节点不允许删除",
+    "apiParameters": {
+      "title": "接口传参"
+    },
+    "baseRequiredMessage": "基本信息节点必填",
+    "baseUniqueMessage": "基本信息节点只能有一个"
   },
   "start": {
     "label": "开始",
@@ -15,7 +48,9 @@
     "chatUserId": "对话用户 ID",
     "chatUserType": "对话用户类型",
     "chatUserGroup": "对话用户组",
-    "chatUser": "对话用户"
+    "chatUser": "对话用户",
+    "requiredMessage": "开始节点必填",
+    "uniqueMessage": "开始节点只能有一个"
   },
   "aiChat": {
     "label": "AI 对话",

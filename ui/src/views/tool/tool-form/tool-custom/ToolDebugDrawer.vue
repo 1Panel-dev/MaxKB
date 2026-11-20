@@ -121,7 +121,7 @@ defineExpose({ open })
         <el-button class="mr-1" text @click="visible = false">
           <MkIcon name="icon_arrow-left_outlined" :size="20" />
         </el-button>
-        <h4>{{ t('tool.debug.title') }}</h4>
+        <h4>{{ t('common.actions.debug') }}</h4>
       </div>
     </template>
 

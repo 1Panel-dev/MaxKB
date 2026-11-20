@@ -22,6 +22,11 @@
     "requiredMessage": "请输入名称",
     "copySuffix": "副本"
   },
+  "title": {
+    "label": "标题",
+    "placeholder": "请输入标题",
+    "requiredMessage": "请输入标题"
+  },
   "description": {
     "label": "描述",
     "placeholder": "请输入描述"
@@ -132,7 +137,8 @@
     "saveAndEnable": "保存并启用",
     "comfirm": "确定",
     "submit": "提交",
-    "testConnection": "测试连接"
+    "testConnection": "测试连接",
+    "debug": "调试"
   },
   "dialogs": {
     "notice": "提示",
@@ -191,7 +197,9 @@
     "selectRequired": "请选择",
     "selectFieldRequired": "请选择 {label}",
     "jsonFormat": "请输入正确的 JSON 格式",
-    "lengthRange": "长度应为 {min}-{max} 个字符"
+    "lengthRange": "长度应为 {min}-{max} 个字符",
+    "jsonArrayRequired": "请输入 JSON 数组",
+    "jsonObjectRequired": "请输入 JSON 对象"
   },
   "empty": {
     "default": "暂无数据",

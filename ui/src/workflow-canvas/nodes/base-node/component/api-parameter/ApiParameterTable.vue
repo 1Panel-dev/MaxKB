@@ -41,7 +41,7 @@ function deleteField(index: number) {
 <template>
   <div class="w-full">
     <div class="flex-between">
-      <span>{{ t('workflow.apiParameters.title') }}</span>
+      <span>{{ t('workflow.node.apiParameters.title') }}</span>
       <!-- 添加接口参数 -->
       <el-button text type="primary" @click="openDialog()"><MkIcon name="icon_add_outlined" /></el-button>
     </div>

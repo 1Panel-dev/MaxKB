@@ -30,7 +30,8 @@
   "workflow": {
     "label": "Workflow knowledge",
     "createTitle": "Create workflow knowledge",
-    "description": "Use a custom workflow to build knowledge."
+    "description": "Use a custom workflow to build knowledge.",
+    "documentImportUnavailableMessage": "This Knowledge workflow has not been published. Publish it before importing documents."
   },
   "fields": {
     "name": {

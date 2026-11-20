@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FormField } from '@/components/mk-dynamics-form'
 import { DYNAMIC_FORM_TYPES, MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ submit: [data: FormField, index?: number] }>()
 const constructorRef = useTemplateRef<InstanceType<typeof MkDynamicsFormConstructor>>('constructorRef')
@@ -78,13 +81,17 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" :title="editingIndex === undefined ? '添加参数' : '编辑参数'" @closed="resetData">
+  <MkDialog
+    v-model="dialogVisible"
+    :title="editingIndex === undefined ? t('common.parameters.add') : t('common.parameters.edit')"
+    @closed="resetData"
+  >
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" :field-type-options="fieldTypeOptions" />
     <template #footer>
       <!-- 取消编辑 -->
-      <el-button plain @click="close">取消</el-button>
+      <el-button plain @click="close">{{ t('common.actions.cancel') }}</el-button>
       <!-- 提交参数 -->
-      <el-button type="primary" @click="submitField">{{ editingIndex === undefined ? '添加' : '保存' }}</el-button>
+      <el-button type="primary" @click="submitField">{{ editingIndex === undefined ? t('common.actions.add') : t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type WorkflowApi from '@/api/admin/workspace/application/workflow'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import PublishHistoryDrawer from '@/views/workflow/components/publish-history/PublishHistoryDrawer.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ButtonApplicationPublishHistory' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ label: string; api: typeof WorkflowApi; applicationId: string; selectedId?: string; disabled?: boolean }>()
 const visible = defineModel<boolean>('visible', { default: false })
@@ -49,7 +52,7 @@ function handleSubmit(payload: WorkflowVersionPayload, versionId?: string) {
       .putWorkflowVersion(props.applicationId, versionId, payload)
       .then(() => {
         publishHistoryDrawerRef.value?.closeEdit()
-        MsgSuccess('修改成功')
+        MsgSuccess(t('common.messages.updateSuccess'))
         return loadWorkflowVersions()
       })
       .finally(() => {

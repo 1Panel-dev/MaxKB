@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import type { ToolInputField } from '@/workflow-canvas/nodes/tool-base-node/types'
 import type LogicFlow from '@logicflow/core'
@@ -11,6 +12,7 @@ import { WorkflowNodeType } from '@/workflow-canvas/types'
 import ResultDrawer from './ResultDrawer.vue'
 
 defineOptions({ name: 'ToolWorkflowDebugDrawer' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ toolId: string; api?: typeof WorkflowApi }>()
 const visible = ref(false)
 const inputFields = ref<ToolInputField[]>([])
@@ -42,7 +44,7 @@ function open(graph: LogicFlow.GraphData) {
 function fieldRules(field: ToolInputField): FormItemRule[] {
   return [
     // 必填规则覆盖 change、blur 和提交校验，避免 FormItem 自动补充无文案的 required 规则。
-    { required: field.is_required, message: '请输入' },
+    { required: field.is_required, message: t('common.validation.inputRequired') },
     {
       validator: (_rule, value, callback) => {
         if (field.type === 'array' || field.type === 'dict') {
@@ -52,12 +54,16 @@ function fieldRules(field: ToolInputField): FormItemRule[] {
               return
             }
             const valid = field.type === 'array' ? Array.isArray(value) : value !== null && typeof value === 'object' && !Array.isArray(value)
-            callback(valid ? undefined : new Error(field.type === 'array' ? '请输入 JSON 数组' : '请输入 JSON 对象'))
+            callback(
+              valid
+                ? undefined
+                : new Error(field.type === 'array' ? t('common.validation.jsonArrayRequired') : t('common.validation.jsonObjectRequired')),
+            )
           })
           return
         }
         if (value === undefined || value === '') {
-          callback(field.is_required ? new Error('请输入') : undefined)
+          callback(field.is_required ? new Error(t('common.validation.inputRequired')) : undefined)
           return
         }
         callback()
@@ -93,9 +99,16 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="调试" @closed="reset">
-    <h4 v-if="inputFields.length" class="mk-title-decoration mb-4">输入参数</h4>
-    <el-form ref="formRef" :model="inputValues" label-position="top" require-asterisk-position="right" @submit.prevent>
+  <MkDrawer v-model="visible" :title="t('common.actions.debug')" @closed="reset">
+    <h4 v-if="inputFields.length" class="mk-title-decoration mb-4">{{ t('execution.details.inputParams') }}</h4>
+    <el-form
+      ref="formRef"
+      :model="inputValues"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <template v-for="field in inputFields" :key="field.field">
         <el-form-item class="mk-hide-asterisk" :prop="field.field" :rules="fieldRules(field)" :required="field.is_required">
           <template #label>
@@ -113,15 +126,15 @@ defineExpose({ open, close })
             :precision="field.type === 'int' ? 0 : undefined"
           />
           <el-switch v-else-if="field.type === 'boolean'" v-model="inputValues[field.field]" />
-          <el-input v-else v-model="inputValues[field.field]" placeholder="请输入参数" />
+          <el-input v-else v-model="inputValues[field.field]" :placeholder="t('dynamicForm.fields.parameter.placeholder')" />
         </el-form-item>
       </template>
     </el-form>
     <template #footer>
       <!-- 关闭调试 -->
-      <el-button plain @click="close">取消</el-button>
+      <el-button plain @click="close">{{ t('common.actions.cancel') }}</el-button>
       <!-- 运行工具工作流 -->
-      <el-button type="primary" :loading="running" @click="handleRun">运行</el-button>
+      <el-button type="primary" :loading="running" @click="handleRun">{{ t('tool.debug.run') }}</el-button>
     </template>
   </MkDrawer>
   <ResultDrawer :api="api" ref="resultDrawerRef" :tool-id="props.toolId" v-model:running="running" />

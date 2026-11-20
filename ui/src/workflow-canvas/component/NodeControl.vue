@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type Dagre from '@/workflow-canvas/plugins/dagre'
 import type LogicFlow from '@logicflow/core'
 import type { BaseNodeModel } from '@logicflow/core'
@@ -8,6 +9,8 @@ import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowNodeControl' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ logicFlow: LogicFlow }>()
 type ControlExtensions = { selectionSelect: SelectionSelect; dagre: Dagre }
@@ -93,7 +96,7 @@ async function layout() {
     await nextTick()
     await (logicFlow.extension as ControlExtensions).dagre.layout()
   } catch {
-    MsgError('自动布局失败，请重试')
+    MsgError(t('workflow.layout.layoutFailedMessage'))
   } finally {
     layoutLoading.value = false
   }
@@ -115,20 +118,20 @@ async function layout() {
 
       <el-divider direction="vertical" class="mx-1!" />
 
-      <MkTooltip content="缩小" placement="top">
+      <MkTooltip :content="t('workflow.layout.zoomOut')" placement="top">
         <!-- 缩小画布 -->
         <el-button text @click="zoom(-1)">
           <MkIcon name="icon_zoom-out_outlined" :size="18" />
         </el-button>
       </MkTooltip>
 
-      <MkTooltip content="放大" placement="top">
+      <MkTooltip :content="t('workflow.layout.zoomIn')" placement="top">
         <!-- 放大画布 -->
         <el-button text @click="zoom(1)">
           <MkIcon name="icon_zoom-in_outlined" :size="18" />
         </el-button>
       </MkTooltip>
-      <MkTooltip content="适应" placement="top">
+      <MkTooltip :content="t('workflow.layout.fitView')" placement="top">
         <!-- 显示全部节点 -->
         <el-button text @click="fitView">
           <MkIcon name="icon_repositioning_outlined" :size="18" />
@@ -137,19 +140,19 @@ async function layout() {
 
       <el-divider direction="vertical" class="mx-1!" />
 
-      <MkTooltip content="收起全部节点" placement="top">
+      <MkTooltip :content="t('workflow.layout.collapseAll')" placement="top">
         <!-- 收起全部节点 -->
         <el-button text @click="setNodesExpanded(false)">
           <MkIcon name="icon_collapse_outlined" :size="18" />
         </el-button>
       </MkTooltip>
-      <MkTooltip content="展开全部节点" placement="top">
+      <MkTooltip :content="t('workflow.layout.expandAll')" placement="top">
         <!-- 展开全部节点 -->
         <el-button text @click="setNodesExpanded(true)">
           <MkIcon name="icon_expand_outlined" :size="18" />
         </el-button>
       </MkTooltip>
-      <MkTooltip content="一键美化" placement="top">
+      <MkTooltip :content="t('workflow.layout.autoLayout')" placement="top">
         <!-- 自动整理节点位置 -->
         <el-button text @click="layout">
           <MkIcon name="icon_effects_outlined" :size="18" />

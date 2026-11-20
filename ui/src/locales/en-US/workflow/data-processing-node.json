@@ -4,7 +4,6 @@
     "description": "Update the values of global variables",
     "value": {
       "label": "Value",
-      "placeholder": "Enter content",
       "custom": "Custom"
     }
   },

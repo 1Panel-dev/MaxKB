@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ToolFieldConfig, ToolOutputField } from '../../types'
 import OutputFieldFormDialog from './OutputFieldFormDialog.vue'
 import TitleSettingDialog from './TitleSettingDialog.vue'
 import { MsgError } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const fields = defineModel<ToolOutputField[]>({ required: true })
 const config = defineModel<ToolFieldConfig>('config', { required: true })
@@ -14,7 +17,7 @@ const titleDialogRef = useTemplateRef<InstanceType<typeof TitleSettingDialog>>('
 // 表格只维护列表和重名检查，节点入口统一同步变量。
 function saveField(data: ToolOutputField, index?: number) {
   if (fields.value.some((field, fieldIndex) => field.field === data.field && fieldIndex !== index)) {
-    MsgError(`参数已存在：${data.field}`)
+    MsgError(`${t('workflow.parameters.duplicateMessage')}：${data.field}`)
     return
   }
   const nextFields = cloneDeep(fields.value)
@@ -46,17 +49,17 @@ function saveTitle(data: ToolFieldConfig) {
       </div>
     </div>
     <MkTable v-if="fields.length" v-model:data="fields" size="small" row-key="field" class="mt-2 border" :max-height="undefined">
-      <el-table-column prop="field" label="参数" min-width="100">
+      <el-table-column prop="field" :label="t('dynamicForm.fields.parameter.label')" min-width="100">
         <template #default="{ row }">
           <span class="block truncate" :title="row.field">{{ row.field }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="label" label="显示名称" min-width="100">
+      <el-table-column prop="label" :label="t('dynamicForm.fields.displayName.label')" min-width="100">
         <template #default="{ row }">
           <span class="block truncate" :title="row.label">{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="80">
+      <el-table-column :label="t('common.labels.operation')" width="80">
         <template #default="{ row, $index }">
           <!-- 编辑参数 -->
           <el-button text type="primary" @click="fieldDialogRef?.open(row, $index)"><MkIcon name="icon_edit_outlined" /></el-button>

@@ -22,6 +22,11 @@
     "requiredMessage": "Enter a name",
     "copySuffix": "Copy"
   },
+  "title": {
+    "label": "Title",
+    "placeholder": "Enter a title",
+    "requiredMessage": "Enter a title"
+  },
   "description": {
     "label": "Description",
     "placeholder": "Enter a description"
@@ -132,7 +137,8 @@
     "saveAndEnable": "Save and enable",
     "comfirm": "Ok",
     "submit": "Submit",
-    "testConnection": "Test connection"
+    "testConnection": "Test connection",
+    "debug": "Debug"
   },
   "dialogs": {
     "notice": "Notice",
@@ -191,7 +197,9 @@
     "selectRequired": "This field is required",
     "selectFieldRequired": "Select {label}",
     "jsonFormat": "Enter valid JSON",
-    "lengthRange": "Length must be {min}-{max} characters"
+    "lengthRange": "Length must be {min}-{max} characters",
+    "jsonArrayRequired": "Enter a JSON array",
+    "jsonObjectRequired": "Enter a JSON object"
   },
   "empty": {
     "default": "No data",

@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'WorkflowViewLayout' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 withDefaults(
   defineProps<{
@@ -36,12 +39,14 @@ defineSlots<{
           {{ title }}
         </h4>
         <el-divider direction="vertical" />
-        <span v-if="saveTime" class="shrink-0 text-sm text-N600">保存时间：{{ datetimeFormat(saveTime) }} </span>
+        <span v-if="saveTime" class="shrink-0 text-sm text-N600">{{ t('workflow.layout.saveTime') }}：{{ datetimeFormat(saveTime) }}</span>
       </div>
 
       <div class="flex-align-center shrink-0">
         <!-- 恢复选中的历史版本 -->
-        <el-button v-if="historyVisible" type="primary" :disabled="!canRestoreVersion" @click="emit('restoreVersion')"> 恢复此版本 </el-button>
+        <el-button v-if="historyVisible" type="primary" :disabled="!canRestoreVersion" @click="emit('restoreVersion')">
+          {{ t('workflow.publishHistory.restore') }}
+        </el-button>
         <!-- 保留操作入口实例，避免切换头部时卸载其发布历史面板。 -->
         <div v-show="!historyVisible" class="flex-align-center">
           <slot name="actions" />

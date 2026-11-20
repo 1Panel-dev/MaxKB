@@ -1,4 +1,7 @@
 {
+  "toolStart": {
+    "outputLabel": "參數輸出"
+  },
   "mcp": {
     "label": "MCP 呼叫",
     "description": "透過 SSE／Streamable HTTP 執行 MCP 服務中的工具",

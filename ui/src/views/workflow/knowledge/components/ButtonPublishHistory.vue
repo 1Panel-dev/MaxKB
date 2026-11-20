@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeWorkflowApi, WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import PublishHistoryDrawer from '@/views/workflow/components/publish-history/PublishHistoryDrawer.vue'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ButtonKnowledgePublishHistory' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ label: string; api: KnowledgeWorkflowApi; knowledgeId: string; selectedId?: string; disabled?: boolean }>()
 const visible = defineModel<boolean>('visible', { default: false })
@@ -45,7 +48,7 @@ function handleSubmit(payload: WorkflowVersionPayload, versionId: string) {
     .putWorkflowVersion(props.knowledgeId, versionId, payload)
     .then(() => {
       publishHistoryDrawerRef.value?.closeEdit()
-      MsgSuccess('修改成功')
+      MsgSuccess(t('common.messages.updateSuccess'))
       return loadWorkflowVersions()
     })
     .finally(() => {

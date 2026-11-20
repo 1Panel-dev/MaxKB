@@ -245,7 +245,7 @@ defineExpose({ open })
       <!-- 取消编辑 -->
       <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose">{{ t('common.actions.cancel') }}</el-button>
       <!-- 调试工具 -->
-      <el-button v-if="canEdit" plain :disabled="loading || formLoading" @click="handleOpenDebug">{{ t('tool.debug.title') }}</el-button>
+      <el-button v-if="canEdit" plain :disabled="loading || formLoading" @click="handleOpenDebug">{{ t('common.actions.debug') }}</el-button>
       <!-- 保存或创建工具 -->
       <el-button v-if="canEdit" type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
         {{ editId ? t('common.actions.save') : t('common.actions.create') }}

@@ -1,15 +1,5 @@
 {
   "title": "工作流",
-  "menu": {
-    "basicComponents": "基础组件",
-    "aiCapabilities": "AI 能力",
-    "businessLogic": "业务逻辑",
-    "dataProcessing": "数据处理",
-    "other": "其他"
-  },
-  "nodeSettings": {
-    "title": "节点设置"
-  },
   "userInput": {
     "title": "用户输入",
     "currentForm": "当前表单",
@@ -25,9 +15,6 @@
   "parameters": {
     "duplicateMessage": "参数已存在",
     "invalidMessage": "仅支持字母、数字和下划线"
-  },
-  "apiParameters": {
-    "title": "接口传参"
   },
   "variable": {
     "label": "变量",
@@ -84,41 +71,6 @@
   "showInSources": "结果显示在知识来源中",
   "audioFile": {
     "label": "音频文件"
-  },
-  "defaultModel": {
-    "label": "默认模型",
-    "custom": "自定义",
-    "unconfigured": "未配置默认模型",
-    "requiredMessage": "请配置默认模型",
-    "selectRequiredMessage": "请在默认模型设置中选择{label}",
-    "sttRequiredMessage": "请在默认模型设置中选择语音识别模型",
-    "ttsRequiredMessage": "请在默认模型设置中选择语音合成模型"
-  },
-  "systemPrompt": {
-    "label": "系统提示词",
-    "placeholder": "系统提示词，可以引用系统中变量，如{reference}",
-    "description": "设定模型扮演的角色或遵循的指令"
-  },
-  "userPrompt": {
-    "label": "用户提示词",
-    "placeholder": "用户提示词，可以引用系统中变量，如{reference}",
-    "description": "用户向模型提出的问题或输入的指令",
-    "requiredMessage": "请输入用户提示词"
-  },
-  "positivePrompt": {
-    "label": "提示词(正向)",
-    "requiredMessage": "请输入正向提示词"
-  },
-  "negativePrompt": {
-    "label": "提示词(负向)",
-    "detailLabel": "负向提示词",
-    "videoPlaceholder": "请描述不想生成的视频内容，比如：颜色、血腥内容",
-    "description": "反向提示词，用来描述不希望在画面中看到的内容，可以对画面进行限制"
-  },
-  "promptGeneration": {
-    "title": "生成提示词",
-    "placeholder": "请输入提示词主题",
-    "empty": "提示词显示在这里"
   },
   "history": {
     "label": "历史聊天记录"

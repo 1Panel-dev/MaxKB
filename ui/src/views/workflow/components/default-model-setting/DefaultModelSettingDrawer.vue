@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, provide, ref, watch } from 'vue'
 import { cloneDeep, isEqual } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type SystemModelApi from '@/api/admin/system/resource-management/model'
 import type SharedModelApi from '@/api/admin/system/shared-resources/model'
 import type ModelApi from '@/api/admin/workspace/model'
@@ -14,10 +15,12 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DefaultModelSettingDrawer' })
 
+const { t } = useI18n({ useScope: 'global' })
+
 const defaultModelTypes = ['LLM', 'TTS', 'STT', 'IMAGE', 'TTI', 'TTV', 'ITV', 'RERANKER'] as const
 const defaultModelTypeLabels = computed<Record<string, string>>(() => ({
   ...MODEL_TYPE_LABELS,
-  LLM: 'AI 模型',
+  LLM: t('model.ai.label'),
 }))
 
 const props = defineProps<{
@@ -150,8 +153,8 @@ const applying = ref(false)
 function handleApplyToAll() {
   if (props.disabled || applying.value) return
   applying.value = true
-  return MsgConfirm('应用到所有节点', '将把所有节点的模型来源统一改为「默认模型」，会覆盖它们当前的「自定义 / 引用变量」，请谨慎操作。', {
-    confirmButtonText: '应用',
+  return MsgConfirm(t('workflow.defaultModel.applyToAll'), t('workflow.defaultModel.applyDescription'), {
+    confirmButtonText: t('workflow.defaultModel.apply'),
     confirmButtonType: 'primary',
   })
     .then(() => {
@@ -161,7 +164,7 @@ function handleApplyToAll() {
       const graphData = cloneDeep(currentGraph)
       const changedCount = applyDefaultSources(graphData)
       if (changedCount > 0) emit('applyToAll', graphData)
-      MsgSuccess('应用成功!')
+      MsgSuccess(t('workflow.defaultModel.applySuccess'))
     })
     .catch(() => {})
     .finally(() => {
@@ -190,9 +193,9 @@ function handleBeforeClose(
     done()
     return
   }
-  return MsgConfirm('提示', '默认模型设置尚未保存，是否保存修改？', {
-    confirmButtonText: '保存',
-    cancelButtonText: '直接关闭',
+  return MsgConfirm(t('common.dialogs.notice'), t('workflow.defaultModel.unsavedMessage'), {
+    confirmButtonText: t('common.actions.save'),
+    cancelButtonText: t('workflow.defaultModel.closeDirectly'),
     confirmButtonType: 'primary',
     distinguishCancelAndClose: true,
   })
@@ -217,7 +220,7 @@ defineExpose({ open })
 <template>
   <MkDrawer
     v-model="visible"
-    title="默认模型设置"
+    :title="t('workflow.defaultModel.settingsTitle')"
     size="420"
     class="top-header! h-layout-content! max-w-full rounded-tl-xl!"
     :modal="false"
@@ -228,8 +231,8 @@ defineExpose({ open })
   >
     <template #header>
       <div>
-        <h4 class="mb-1">默认模型设置</h4>
-        <p class="text-sm text-N600">节点选择「默认模型」时，将使用以下配置</p>
+        <h4 class="mb-1">{{ t('workflow.defaultModel.settingsTitle') }}</h4>
+        <p class="text-sm text-N600">{{ t('workflow.defaultModel.description') }}</p>
       </div>
     </template>
 
@@ -251,10 +254,10 @@ defineExpose({ open })
 
     <template #footer>
       <div class="flex-between gap-3">
-        <el-button plain :disabled="disabled" :loading="applying" @click="handleApplyToAll">应用到所有节点</el-button>
+        <el-button plain :disabled="disabled" :loading="applying" @click="handleApplyToAll">{{ t('workflow.defaultModel.applyToAll') }}</el-button>
         <div class="flex-align-center">
-          <el-button plain :disabled="applying" @click="visible = false">取消</el-button>
-          <el-button type="primary" :disabled="disabled || !hasChanges || applying" @click="handleSave">保存</el-button>
+          <el-button plain :disabled="applying" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+          <el-button type="primary" :disabled="disabled || !hasChanges || applying" @click="handleSave">{{ t('common.actions.save') }}</el-button>
         </div>
       </div>
     </template>

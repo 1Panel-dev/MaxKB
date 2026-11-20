@@ -9,6 +9,7 @@ import { nodeDict } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 import NodeAnchor from './node-container/NodeAnchor.vue'
 import { connect, disconnect } from './teleport'
+import { t } from '@/locales'
 
 type NodeViewProps = ConstructorParameters<typeof HtmlNode>[0]
 type NodeFieldGroup = Record<string, WorkflowNodeField[]>
@@ -167,8 +168,8 @@ export class WorkflowNodeModel extends HtmlNodeModel<WorkflowNodeProperties> {
     const fieldGroups: WorkflowNodeField[] = []
 
     if (String(this.type) === WorkflowNodeType.Start) {
-      fieldGroups.push({ value: 'global', label: '全局变量', type: 'global', children: config.globalFields ?? [] })
-      fieldGroups.push({ value: 'chat', label: '会话变量', type: 'chat', children: config.chatFields ?? [] })
+      fieldGroups.push({ value: 'global', label: t('workflow.globalVariables.title'), type: 'global', children: config.globalFields ?? [] })
+      fieldGroups.push({ value: 'chat', label: t('workflow.conversationVariables.title'), type: 'chat', children: config.chatFields ?? [] })
     }
 
     fieldGroups.push({ value: this.id, label: String(this.properties.stepName ?? this.type), type: String(this.type), children: fields })

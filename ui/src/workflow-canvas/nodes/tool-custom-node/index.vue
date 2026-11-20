@@ -90,7 +90,7 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.node.setting') }}</h6>
 
     <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" hide-required-asterisk @submit.prevent>
       <div class="mk-gray-card">

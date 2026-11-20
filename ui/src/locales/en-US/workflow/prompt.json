@@ -1,0 +1,28 @@
+{
+  "systemPrompt": {
+    "label": "System prompt",
+    "placeholder": "System prompt. You can reference system variables, such as {reference}",
+    "description": "Define the role the model plays or the instructions it follows"
+  },
+  "userPrompt": {
+    "label": "User prompt",
+    "placeholder": "User prompt. You can reference system variables, such as {reference}",
+    "description": "The question or instructions the user sends to the model",
+    "requiredMessage": "Enter a user prompt"
+  },
+  "positivePrompt": {
+    "label": "Prompt (positive)",
+    "requiredMessage": "Enter a positive prompt"
+  },
+  "negativePrompt": {
+    "label": "Prompt (negative)",
+    "detailLabel": "Negative prompt",
+    "videoPlaceholder": "Describe what to exclude from the video, such as colors or graphic content",
+    "description": "Describe elements to exclude from the generated image or video"
+  },
+  "promptGeneration": {
+    "title": "Generate prompt",
+    "placeholder": "Enter a prompt topic",
+    "empty": "The generated prompt appears here"
+  }
+}

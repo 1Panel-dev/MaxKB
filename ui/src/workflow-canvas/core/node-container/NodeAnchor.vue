@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowNodeModel } from '../workflow-node'
 import type { Model } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowNodeAnchor' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   anchorData: Model.AnchorConfig
@@ -21,7 +24,11 @@ function openNodeMenu() {
 
 <template>
   <MkTooltip :disabled="!canOpenNodeMenu || tooltipSuppressed" :enterable="false" placement="top">
-    <template #content>点击添加节点<br />拖拽连接节点</template>
+    <template #content>
+      {{ t('workflow.layout.addNodeHint') }}
+      <br />
+      {{ t('workflow.layout.connectNodesHint') }}
+    </template>
     <div
       class="workflow-node-anchor"
       :class="{

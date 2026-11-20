@@ -89,12 +89,12 @@ function saveApplication(graphData = getGraphData(), showMessage = false) {
       defaultModelSetting.value = cloneDeep(application.default_model_setting ?? {})
       saveTime.value = application.update_time || new Date()
       setSavedWorkflow(workflowSnapshot)
-      if (showMessage) MsgSuccess('保存成功')
+      if (showMessage) MsgSuccess(t('common.messages.saveSuccess'))
       return application
     })
     .catch((error) => {
       defaultModelSetting.value = cloneDeep(applicationDetail.value?.default_model_setting ?? {})
-      MsgError('保存失败')
+      MsgError(t('workflow.layout.saveFailed'))
       throw error
     })
 }
@@ -148,7 +148,7 @@ function handleAutoSaveChange() {
 const debugButtonRef = useTemplateRef<InstanceType<typeof ButtonDebug>>('debugButtonRef')
 
 function validateWorkflow() {
-  if (!workflowRef.value) return Promise.reject(new Error('工作流画布尚未加载'))
+  if (!workflowRef.value) return Promise.reject(new Error(t('workflow.layout.canvasNotLoaded')))
   return workflowRef.value.validate()
 }
 
@@ -192,7 +192,7 @@ const templateStoreButtonRef = useTemplateRef<InstanceType<typeof ButtonTemplate
 function handleUseTemplate(template: ApplicationStoreTemplate) {
   if (loading.value) return
 
-  return MsgConfirm('提示', `使用 ${template.name} 将覆盖当前工作流？`, {
+  return MsgConfirm(t('common.dialogs.notice'), t('workflow.layout.overwriteMessage', { name: template.name }), {
     confirmButtonText: t('common.actions.comfirm'),
     confirmButtonType: 'primary',
   })
@@ -202,7 +202,7 @@ function handleUseTemplate(template: ApplicationStoreTemplate) {
         // 重新加载服务端模板，更新画布和已保存基准。
         return loadApplicationDetail().then(() => {
           templateStoreButtonRef.value?.close()
-          MsgSuccess('应用成功')
+          MsgSuccess(t('workflow.layout.applySuccess'))
         })
       })
     })
@@ -253,7 +253,7 @@ function handlePublish(payload: WorkflowVersionPayload) {
       applicationDetail.value = application
       saveTime.value = application.update_time || saveTime.value
       publishDialogRef.value?.close()
-      MsgSuccess('发布成功')
+      MsgSuccess(t('common.messages.publishSuccess'))
     })
     .finally(() => {
       loading.value = false
@@ -273,9 +273,9 @@ function handleBack() {
 
   // 保存失败时保留当前页面，避免丢失尚未写入服务端的画布数据。
   confirmingExit.value = true
-  MsgConfirm('提示', '当前工作流尚未保存，是否保存后退出？', {
-    cancelButtonText: '直接退出',
-    confirmButtonText: '保存并退出',
+  MsgConfirm(t('common.dialogs.notice'), t('workflow.layout.unsavedExitMessage'), {
+    cancelButtonText: t('workflow.layout.exitDirectly'),
+    confirmButtonText: t('workflow.layout.saveAndExit'),
     confirmButtonType: 'primary',
     distinguishCancelAndClose: true,
   })
@@ -339,7 +339,7 @@ onBeforeUnmount(() => stopAutoSave())
     <template #actions>
       <!-- AI 生成工作流 -->
       <ButtonAiGenerate
-        label="AI 生成"
+        :label="t('workflow.layout.aiGenerate')"
         :disabled="loading || historyVisible"
         :get-logic-flow="() => workflowRef?.getLogicFlow()"
         :default-model-settings="defaultModelSetting"
@@ -347,11 +347,17 @@ onBeforeUnmount(() => stopAutoSave())
       />
 
       <!-- 模板中心 -->
-      <ButtonTemplateStore label="模板中心" ref="templateStoreButtonRef" v-model:loading="loading" @open="closeDebug" @use="handleUseTemplate" />
+      <ButtonTemplateStore
+        :label="t('resource.templateStore.title')"
+        ref="templateStoreButtonRef"
+        v-model:loading="loading"
+        @open="closeDebug"
+        @use="handleUseTemplate"
+      />
 
       <!-- 默认模型设置 -->
       <ButtonDefaultModelSetting
-        label="默认模型设置"
+        :label="t('workflow.defaultModel.settingsTitle')"
         :model-value="defaultModelSetting"
         :model-api="requestModelApi"
         :get-graph-data="getGraphData"
@@ -365,7 +371,7 @@ onBeforeUnmount(() => stopAutoSave())
       <ButtonDebug
         ref="debugButtonRef"
         v-model:loading="loading"
-        label="调试"
+        :label="t('common.actions.debug')"
         :disabled="historyVisible"
         :has-unsaved-changes="hasUnsavedChanges"
         :validate-workflow="validateWorkflow"
@@ -374,29 +380,31 @@ onBeforeUnmount(() => stopAutoSave())
       />
 
       <!-- 保存 -->
-      <MkTooltip content="保存" placement="bottom" v-if="applicationWorkflowPermission('edit')">
+      <MkTooltip :content="t('common.actions.save')" placement="bottom" v-if="applicationWorkflowPermission('edit')">
         <el-button plain :disabled="loading" @click="handleSave()" class="w-8! min-w-8!">
           <MkIcon name="icon_save_outlined" />
         </el-button>
       </MkTooltip>
 
       <!-- 发布 -->
-      <el-button v-if="applicationWorkflowPermission('publish')" type="primary" :disabled="loading" @click="handleOpenPublish">发布</el-button>
+      <el-button v-if="applicationWorkflowPermission('publish')" type="primary" :disabled="loading" @click="handleOpenPublish">
+        {{ t('common.actions.publish') }}
+      </el-button>
       <!-- 更多操作 -->
       <MkDropdown trigger="click" placement="bottom-end" class="ml-2" persistent>
         <el-button text class="h-7! w-7! px-0!">
           <MkIcon name="icon_more_outlined" class="rotate-90" :size="20" />
         </el-button>
         <template #dropdown>
-          <MkDropdownMenu class="w-37">
+          <MkDropdownMenu>
             <!-- 去对话 -->
             <MkDropdownItem>
               <template #icon><MkIcon name="icon_new-chat_outlined" /></template>
-              <span>去对话</span>
+              <span>{{ t('application.actions.chat') }}</span>
             </MkDropdownItem>
             <!-- 发布历史 -->
             <ButtonPublishHistory
-              label="发布历史"
+              :label="t('workflow.publishHistory.title')"
               :api="requestWorkflowApi"
               :visible="historyVisible"
               @update:visible="handleHistoryVisibleChange"
@@ -409,7 +417,7 @@ onBeforeUnmount(() => stopAutoSave())
             <!-- 自动保存 -->
             <MkDropdownItem @click.stop>
               <template #icon><MkIcon name="icon_save_outlined" /></template>
-              <span>自动保存</span>
+              <span>{{ t('workflow.layout.autoSave') }}</span>
               <el-switch v-model="autoSaveEnabled" class="ml-auto" size="small" @click.stop @change="handleAutoSaveChange" />
             </MkDropdownItem>
           </MkDropdownMenu>

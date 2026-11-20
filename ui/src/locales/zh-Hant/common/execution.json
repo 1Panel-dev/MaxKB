@@ -3,7 +3,9 @@
     "title": "執行記錄",
     "view": "查看執行記錄",
     "resourceType": "資源類型",
-    "executionTime": "執行時間"
+    "executionTime": "執行時間",
+    "initiator": "發起人",
+    "triggerSource": "觸發來源"
   },
   "details": {
     "title": "執行詳情",
@@ -22,5 +24,9 @@
     "title": "執行結果",
     "success": "執行成功",
     "failure": "執行失敗"
+  },
+  "cancel": {
+    "label": "取消執行",
+    "title": "是否取消目前執行任務？"
   }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemModelApi from '@/api/admin/system/resource-management/model'
 import type SharedModelApi from '@/api/admin/system/shared-resources/model'
 import type ModelApi from '@/api/admin/workspace/model'
@@ -9,6 +10,8 @@ import DefaultModelSettingDrawer from './DefaultModelSettingDrawer.vue'
 
 defineOptions({ name: 'ButtonDefaultModelSetting' })
 
+const { t } = useI18n({ useScope: 'global' })
+
 const props = withDefaults(
   defineProps<{
     label?: string
@@ -17,7 +20,7 @@ const props = withDefaults(
     getGraphData: () => LogicFlow.GraphData | undefined
     disabled?: boolean
   }>(),
-  { label: '默认模型设置', modelValue: () => ({}), disabled: false },
+  { modelValue: () => ({}), disabled: false },
 )
 const emit = defineEmits<{
   open: []
@@ -41,7 +44,7 @@ function handleDrawerClosed() {
 </script>
 
 <template>
-  <MkTooltip :content="label" placement="bottom">
+  <MkTooltip :content="label ?? t('workflow.defaultModel.settingsTitle')" placement="bottom">
     <el-button plain :disabled="disabled" @click="handleOpen" class="w-8! min-w-8!">
       <MkIcon name="icon_admin_outlined" />
     </el-button>

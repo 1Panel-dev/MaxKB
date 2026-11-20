@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
@@ -8,6 +9,8 @@ import { downloadByURL } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'StartNodeDetail' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   data: ExecutionNodeDetail
@@ -36,10 +39,10 @@ const attachments = computed<Record<'document' | 'image' | 'audio' | 'video' | '
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">输入参数</h6>
+      <h6 class="mb-2">{{ t('execution.details.inputParams') }}</h6>
       <div class="space-y-2">
         <p>
-          <span class="text-N600">问题：</span>
+          <span class="text-N600">{{ t('common.labels.question') }}：</span>
           {{ data.question || '-' }}
         </p>
 
@@ -49,7 +52,7 @@ const attachments = computed<Record<'document' | 'image' | 'audio' | 'video' | '
         </p>
 
         <div v-if="attachments.document.length > 0">
-          <p class="mb-1 text-N600">文档：</p>
+          <p class="mb-1 text-N600">{{ t('upload.types.document') }}：</p>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <template v-for="(f, i) in attachments.document" :key="i">
               <!-- 下载文档附件 -->
@@ -64,7 +67,7 @@ const attachments = computed<Record<'document' | 'image' | 'audio' | 'video' | '
         </div>
 
         <div v-if="attachments.image.length > 0">
-          <p class="mb-1 text-N600">图片：</p>
+          <p class="mb-1 text-N600">{{ t('upload.types.image') }}：</p>
           <div class="flex flex-wrap gap-2">
             <template v-for="(file, index) in attachments.image" :key="index">
               <!-- 查看图片 -->
@@ -81,7 +84,7 @@ const attachments = computed<Record<'document' | 'image' | 'audio' | 'video' | '
         </div>
 
         <div v-if="attachments.audio.length > 0">
-          <p class="mb-1 text-N600">音频：</p>
+          <p class="mb-1 text-N600">{{ t('upload.types.audio') }}：</p>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <template v-for="(file, index) in attachments.audio" :key="index">
               <!-- 播放音频 -->
@@ -98,7 +101,7 @@ const attachments = computed<Record<'document' | 'image' | 'audio' | 'video' | '
         </div>
 
         <div v-if="attachments.video.length > 0">
-          <p class="mb-1 text-N600">视频：</p>
+          <p class="mb-1 text-N600">{{ t('upload.types.video') }}：</p>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <template v-for="(file, index) in attachments.video" :key="index">
               <!-- 播放视频 -->
@@ -115,7 +118,7 @@ const attachments = computed<Record<'document' | 'image' | 'audio' | 'video' | '
         </div>
 
         <div v-if="attachments.other.length > 0">
-          <p class="mb-1 text-N600">其他：</p>
+          <p class="mb-1 text-N600">{{ t('common.labels.other') }}：</p>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <template v-for="(f, i) in attachments.other" :key="i">
               <!-- 下载其他附件 -->

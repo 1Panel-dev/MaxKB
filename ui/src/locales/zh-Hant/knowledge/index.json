@@ -30,7 +30,8 @@
   "workflow": {
     "label": "工作流程知識庫",
     "createTitle": "建立工作流程知識庫",
-    "description": "透過自訂工作流程建立知識庫"
+    "description": "透過自訂工作流程建立知識庫",
+    "documentImportUnavailableMessage": "目前知識庫的工作流程尚未發佈，無法匯入文件，請先發佈工作流程。"
   },
   "fields": {
     "name": {

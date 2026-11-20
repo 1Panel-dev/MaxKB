@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeFieldConfig } from './types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -10,12 +11,17 @@ import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'WorkflowKnowledgeBaseNode' })
 
+const { t } = useI18n({ useScope: 'global' })
+
 const getModel = inject<() => WorkflowNodeModel>('getModel')!
 const model = getModel()
 
 /* 文档设置：保留 properties 顶层字段与标题协议。 */
 if (!Array.isArray(model.properties.user_input_field_list)) model.properties.user_input_field_list = []
-model.properties.user_input_config = { title: '文档设置', ...(model.properties.user_input_config as KnowledgeFieldConfig | undefined) }
+model.properties.user_input_config = {
+  title: t('knowledge.document.settings.title'),
+  ...(model.properties.user_input_config as KnowledgeFieldConfig | undefined),
+}
 const nodeConfig = model.properties.config ?? (model.properties.config = {})
 const inputFields = computed({
   get: () => model.properties.user_input_field_list as FormField[],
@@ -39,7 +45,7 @@ function refreshFields() {
       label: typeof field.label === 'string' ? field.label : (field.label?.label ?? field.field),
       value: field.field,
     })),
-    { label: '知识库', value: 'knowledge' },
+    { label: t('knowledge.title'), value: 'knowledge' },
   ]
   model.graphModel.eventCenter.emit('refreshFieldList', undefined)
   model.clearNextNodeField(true)
@@ -58,11 +64,11 @@ onMounted(() => refreshFields())
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.node.setting') }}</h6>
     <div class="mk-gray-card">
       <UserInputFieldTable v-model="inputFields" v-model:config="inputConfig" />
     </div>
-    <h6 class="mk-title-decoration mt-4 mb-2">输出参数</h6>
+    <h6 class="mk-title-decoration mt-4 mb-2">{{ t('execution.details.outputParams') }}</h6>
     <div class="mk-gray-card space-y-4">
       <div v-for="field in globalFields" :key="field.value" class="group flex-between">
         <span class="break-all">{{ field.label }} {{ formatFieldReference(field.value) }}</span>

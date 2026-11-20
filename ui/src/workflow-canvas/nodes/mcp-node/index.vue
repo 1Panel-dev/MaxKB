@@ -305,7 +305,7 @@ onMounted(() => {
 </script>
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.node.setting') }}</h6>
     <div class="mk-gray-card">
       <el-form
         ref="mcpNodeFormRef"

@@ -153,12 +153,7 @@ onMounted(() => {
                 :prop="'variable_list.' + index + '.value'"
                 :rules="{ message: t('common.validation.inputRequired'), trigger: 'blur', required: true }"
               >
-                <el-input
-                  v-model="item.value"
-                  :placeholder="t('workflow.variableAssign.value.placeholder')"
-                  clearable
-                  @wheel="handleNodeWheel"
-                ></el-input>
+                <el-input v-model="item.value" :placeholder="t('common.placeholders.input')" clearable @wheel="handleNodeWheel"></el-input>
               </el-form-item>
               <!-- num -->
               <el-form-item

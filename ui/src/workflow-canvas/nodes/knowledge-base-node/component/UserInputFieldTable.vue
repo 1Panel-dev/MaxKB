@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeFieldConfig } from '../types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import { DYNAMIC_FORM_TYPES } from '@/components/mk-dynamics-form'
 import TitleSettingDialog from './TitleSettingDialog.vue'
 import UserFieldFormDialog from './UserFieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const fields = defineModel<FormField[]>({ required: true })
 const config = defineModel<KnowledgeFieldConfig>('config', { required: true })
@@ -45,7 +48,7 @@ function formatDefaultValue(field: FormField) {
 
 function saveField(data: FormField, index?: number) {
   if (fields.value.some((field, fieldIndex) => field.field === data.field && fieldIndex !== index)) {
-    MsgError(`参数已存在：${data.field}`)
+    MsgError(`${t('workflow.parameters.duplicateMessage')}：${data.field}`)
     return
   }
   const nextFields = cloneDeep(fields.value)
@@ -77,30 +80,30 @@ function saveTitle(data: KnowledgeFieldConfig) {
       </div>
     </div>
     <MkTable v-if="fields.length" v-model:data="fields" sortable size="small" row-key="field" class="mt-2 border" :max-height="undefined">
-      <el-table-column prop="field" label="参数" min-width="100">
+      <el-table-column prop="field" :label="t('dynamicForm.fields.parameter.label')" min-width="100">
         <template #default="{ row }">
           <span class="block truncate" :title="row.field">{{ row.field }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="显示名称" min-width="100">
+      <el-table-column :label="t('dynamicForm.fields.displayName.label')" min-width="100">
         <template #default="{ row }">
           <span class="block truncate" :title="formatLabel(row)">{{ formatLabel(row) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="input_type" label="组件类型" width="95">
+      <el-table-column prop="input_type" :label="t('dynamicForm.fields.inputType.label')" width="95">
         <template #default="{ row }">
           <el-tag type="info" size="small">{{ getTypeLabel(row.input_type) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="默认值" min-width="80">
+      <el-table-column :label="t('dynamicForm.fields.defaultValue.label')" min-width="80">
         <template #default="{ row }">
           <span class="block truncate" :title="formatDefaultValue(row)">{{ formatDefaultValue(row) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="必填" width="55">
+      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="90">
         <template #default="{ row }"><el-switch :model-value="Boolean(row.required)" disabled size="small" /></template>
       </el-table-column>
-      <el-table-column label="操作" width="80">
+      <el-table-column :label="t('common.labels.operation')" width="80">
         <template #default="{ row, $index }">
           <!-- 编辑参数 -->
           <el-button text type="primary" @click="handleOpenField(row, $index)"><MkIcon name="icon_edit_outlined" /></el-button>

@@ -103,7 +103,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     }
     const base_nodes = elements.nodes.filter((node) => node.type === WorkflowNodeType.Start || node.type === WorkflowNodeType.Base)
     if (base_nodes.length > 0) {
-      MsgError(base_nodes[0]?.properties?.stepName + '不能被复制')
+      MsgError(t('workflow.node.copyDisabledMessage', { name: base_nodes[0]?.properties?.stepName }))
       return
     }
     selected = cloneDeep(elements)
@@ -243,34 +243,34 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     try {
       data = JSON.parse(text)
     } catch {
-      throw new Error('数据不是合法的 JSON')
+      throw new Error(t('workflow.layout.paste.invalidJson'))
     }
 
     if (!data || typeof data !== 'object' || Array.isArray(data)) {
-      throw new Error('数据必须是对象')
+      throw new Error(t('workflow.layout.paste.objectRequired'))
     }
 
     if (!('nodes' in data)) {
-      throw new Error('数据缺少 nodes 字段')
+      throw new Error(t('workflow.layout.paste.nodesRequired'))
     }
 
     if (!('edges' in data)) {
-      throw new Error('数据缺少 edges 字段')
+      throw new Error(t('workflow.layout.paste.edgesRequired'))
     }
 
     if (!Array.isArray(data.nodes)) {
-      throw new Error('nodes 必须是数组')
+      throw new Error(t('workflow.layout.paste.nodesArrayRequired'))
     }
 
     for (let i = 0; i < data.nodes.length; i++) {
       const node = data.nodes[i]
 
       if (!node || typeof node !== 'object' || Array.isArray(node)) {
-        throw new Error(`nodes[${i}] 必须是对象`)
+        throw new Error(t('workflow.layout.paste.nodeObjectRequired', { index: i }))
       }
 
       if (!('id' in node) || node.id === undefined || node.id === null || node.id === '') {
-        throw new Error(`nodes[${i}] 缺少 id`)
+        throw new Error(t('workflow.layout.paste.nodeIdRequired', { index: i }))
       }
     }
 
@@ -299,7 +299,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     ]
     const nodes = elements.nodes.filter((node) => protectedNodeTypes.includes(node.type))
     if (nodes.length > 0) {
-      MsgError(`${nodes[0]?.properties?.stepName}节点不允许删除`)
+      MsgError(t('workflow.node.deleteDisabledMessage', { name: nodes[0]?.properties?.stepName }))
       return
     }
     MsgConfirm(

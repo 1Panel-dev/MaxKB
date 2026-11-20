@@ -3,7 +3,9 @@
     "title": "执行记录",
     "view": "查看执行记录",
     "resourceType": "资源类型",
-    "executionTime": "执行时间"
+    "executionTime": "执行时间",
+    "initiator": "发起人",
+    "triggerSource": "触发来源"
   },
   "details": {
     "title": "执行详情",
@@ -22,5 +24,9 @@
     "title": "执行结果",
     "success": "执行成功",
     "failure": "执行失败"
+  },
+  "cancel": {
+    "label": "取消执行",
+    "title": "是否取消当前执行任务？"
   }
 }

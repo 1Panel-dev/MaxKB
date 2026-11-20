@@ -4,7 +4,6 @@
     "description": "更新全局变量的值",
     "value": {
       "label": "赋值",
-      "placeholder": "请输入内容",
       "custom": "自定义"
     }
   },

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import DescriptionDialog from './DescriptionDialog.vue'
 import EditPublishVersionDialog from './EditPublishVersionDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'PublishHistoryDrawer' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const visible = defineModel<boolean>({ default: false })
 
@@ -57,7 +60,7 @@ defineExpose({ closeEdit })
 <template>
   <MkDrawer
     v-model="visible"
-    title="发布历史"
+    :title="t('workflow.publishHistory.title')"
     size="320"
     class="top-header! h-layout-content! max-w-full rounded-tl-xl!"
     content-class="px-2 py-4"
@@ -73,7 +76,7 @@ defineExpose({ closeEdit })
               <h6 class="text-N900! truncate" :title="version.name || datetimeFormat(version.create_time)">
                 {{ version.name || datetimeFormat(version.create_time) }}
               </h6>
-              <el-tag v-if="index === 0" size="small" class="shrink-0">最近发布</el-tag>
+              <el-tag v-if="index === 0" size="small" class="shrink-0">{{ t('workflow.publishHistory.latest') }}</el-tag>
             </div>
             <div class="mt-1 flex-align-center gap-1">
               <el-avatar :size="18" class="bg-primary-gradient!">
@@ -81,9 +84,9 @@ defineExpose({ closeEdit })
               </el-avatar>
               <span
                 class="truncate text-N600! text-sm font-normal!"
-                :title="`${version.publish_user_name || '-'} 发布于 ${datetimeFormat(version.create_time)}`"
+                :title="`${version.publish_user_name || '-'} ${t('workflow.publishHistory.publishedOn')} ${datetimeFormat(version.create_time)}`"
               >
-                {{ version.publish_user_name || '-' }} 发布于 {{ datetimeFormat(version.create_time) }}
+                {{ version.publish_user_name || '-' }} {{ t('workflow.publishHistory.publishedOn') }} {{ datetimeFormat(version.create_time) }}
               </span>
             </div>
           </div>
@@ -91,17 +94,17 @@ defineExpose({ closeEdit })
             <!-- 编辑版本 -->
             <MkDropdownItem @click="handleEdit(version)">
               <template #icon><MkIcon name="icon_edit_outlined" /></template>
-              <span>编辑</span>
+              <span>{{ t('common.actions.edit') }}</span>
             </MkDropdownItem>
             <!-- 恢复此版本 -->
             <MkDropdownItem @click="handleRestore(version)">
               <template #icon><MkIcon name="icon_reset_outlined" /></template>
-              <span>恢复此版本</span>
+              <span>{{ t('workflow.publishHistory.restore') }}</span>
             </MkDropdownItem>
             <!-- 查看更新说明 -->
             <MkDropdownItem @click="handleShowDescription(version)">
               <template #icon><MkIcon name="icon_info_outlined" /></template>
-              <span>更新说明</span>
+              <span>{{ t('workflow.publishHistory.descriptionLabel') }}</span>
             </MkDropdownItem>
           </template>
         </MkListItem>

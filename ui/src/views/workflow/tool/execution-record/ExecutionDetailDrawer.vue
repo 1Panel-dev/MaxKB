@@ -58,16 +58,16 @@ watch(
         <el-button class="mr-1" text @click="visible = false">
           <MkIcon name="icon_arrow-left_outlined" :size="20" />
         </el-button>
-        <h4>执行详情</h4>
+        <h4>{{ t('execution.details.title') }}</h4>
       </div>
     </template>
     <div v-loading="loading">
       <!-- 执行记录 -->
-      <h4 class="mk-title-decoration mb-4">执行记录</h4>
+      <h4 class="mk-title-decoration mb-4">{{ t('execution.records.title') }}</h4>
       <el-card shadow="never">
         <div class="grid grid-cols-4 gap-4">
           <div class="min-w-0">
-            <p class="mb-1 text-N600">触发来源</p>
+            <p class="mb-1 text-N600">{{ t('execution.records.triggerSource') }}</p>
             <div class="flex-align-center gap-2">
               <KnowledgeIcon v-if="record.source_type === TOOL_RECORD_SOURCE.KNOWLEDGE" :type="KNOWLEDGE_TYPE.WORKFLOW" :size="20" />
               <ToolIcon v-else-if="record.source_type === TOOL_RECORD_SOURCE.TOOL" :icon="record.source_icon ?? undefined" :size="20" />
@@ -78,7 +78,7 @@ watch(
           </div>
 
           <div v-if="isSystemSharedResource()">
-            <p class="mb-1 text-N600">工作空间</p>
+            <p class="mb-1 text-N600">{{ t('workspace.title') }}</p>
             {{ record?.workspace_name || '-' }}
           </div>
           <div>
@@ -92,27 +92,27 @@ watch(
             <span v-else>{{ detail?.state ?? record.state }}</span>
           </div>
           <div>
-            <p class="mb-1 text-N600">耗时</p>
+            <p class="mb-1 text-N600">{{ t('common.labels.duration') }}</p>
             {{ runTime == null ? '-' : `${runTime.toFixed(2)} s` }}
           </div>
           <div>
-            <p class="mb-1 text-N600">执行时间</p>
+            <p class="mb-1 text-N600">{{ t('execution.records.executionTime') }}</p>
             {{ datetimeFormat(record.create_time) }}
           </div>
         </div>
       </el-card>
       <!-- 执行详情 -->
-      <h4 class="mk-title-decoration my-4">执行详情</h4>
+      <h4 class="mk-title-decoration my-4">{{ t('execution.details.title') }}</h4>
 
       <div v-if="detail" class="space-y-2">
         <ExecutionDetailContent v-if="nodeDetails.length" :detail="nodeDetails" :workflow-mode="WorkflowMode.Tool" />
         <template v-else>
           <div class="mk-gray-card-sm">
-            <h6 class="mb-2">输入</h6>
+            <h6 class="mb-2">{{ t('execution.details.input') }}</h6>
             <div class="whitespace-pre-wrap break-all">{{ detail.meta?.input ?? '-' }}</div>
           </div>
           <div class="mk-gray-card-sm">
-            <h6 class="mb-2">输出</h6>
+            <h6 class="mb-2">{{ t('execution.details.output') }}</h6>
             <div class="whitespace-pre-wrap break-all">{{ detail.meta?.output ?? '-' }}</div>
           </div>
         </template>
@@ -120,9 +120,9 @@ watch(
     </div>
     <template #footer>
       <!-- 浏览上一个执行记录 -->
-      <el-button plain :disabled="previousDisabled || loading" @click="emit('previous')">上一个</el-button>
+      <el-button plain :disabled="previousDisabled || loading" @click="emit('previous')">{{ t('common.actions.previousItem') }}</el-button>
       <!-- 浏览下一个执行记录 -->
-      <el-button plain :disabled="nextDisabled || loading" @click="emit('next')">下一个</el-button>
+      <el-button plain :disabled="nextDisabled || loading" @click="emit('next')">{{ t('common.actions.nextItem') }}</el-button>
     </template>
   </MkDrawer>
 </template>
