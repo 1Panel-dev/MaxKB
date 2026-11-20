@@ -61,7 +61,7 @@ class WebSnapshotFailureTests(SimpleTestCase):
     @patch("knowledge.task.sync.get_save_handler")
     @patch("knowledge.task.sync.ForkManage")
     def test_partial_complete_run_does_not_publish_prepared_documents(self, crawler, handler, cleanup):
-        def collect(_knowledge, _user, _selector, _strategy, stats, _source_meta, *, prepared_documents):
+        def collect(_knowledge, _user, _selector, _strategy, stats, _source_meta, *, prepared_documents, page_messages):
             prepared_documents.append({"name": "prepared"})
             stats["failed_count"] = 1
             return MagicMock()

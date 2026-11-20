@@ -163,7 +163,7 @@ class WebKnowledgeSyncTaskTests(SimpleTestCase):
 
         delete_document_data.side_effect = cleanup
 
-        def prepare(*_args, prepared_documents):
+        def prepare(*_args, prepared_documents, page_messages):
             prepared_documents.append({"name": "new"})
             return MagicMock()
 

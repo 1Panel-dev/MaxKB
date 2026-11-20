@@ -6,7 +6,7 @@ from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.result import Page
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -151,11 +151,10 @@ class KnowledgeSyncLogQuerySerializer(KnowledgeSyncSettingOperationSerializer):
     def page(self, current_page, page_size):
         self.is_valid(raise_exception=True)
         knowledge = self.validated_data["knowledge"]
-        query_set = (
-            QuerySet(KnowledgeSyncLog)
-            .filter(knowledge_id=knowledge.id, trigger_type=KnowledgeSyncTrigger.SCHEDULED)
-            .order_by("-create_time")
-        )
+        visible_logs = Q(trigger_type=KnowledgeSyncTrigger.SCHEDULED)
+        if knowledge.type == KnowledgeType.WEB:
+            visible_logs |= Q(trigger_type=KnowledgeSyncTrigger.MANUAL, sync_type=KnowledgeSyncType.COMPLETE)
+        query_set = QuerySet(KnowledgeSyncLog).filter(visible_logs, knowledge_id=knowledge.id).order_by("-create_time")
         page = page_search(
             current_page,
             page_size,

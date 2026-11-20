@@ -157,6 +157,7 @@ def sync_replace_web_knowledge(
         if sync_type == "complete":
             document_ids = [document.id for document in documents]
             prepared_documents = []
+            page_messages = []
             ForkManage(url, get_selector_list(selector)).fork(
                 2,
                 set(),
@@ -168,12 +169,17 @@ def sync_replace_web_knowledge(
                     stats,
                     {"web_sync_source_url": normalize_web_url(url)},
                     prepared_documents=prepared_documents,
+                    page_messages=page_messages,
                 ),
+            )
+            stats["message"] = "\n".join(page_messages)
+            stats["total_count"] = max(
+                stats["total_count"], len(prepared_documents) + stats["skipped_count"] + stats["failed_count"]
             )
             if not stats["failed_count"]:
                 if not prepared_documents:
                     raise ValueError("Web synchronization returned an empty document snapshot")
-                # No documents or embedding jobs are published until the complete crawl succeeds.
+                # Publish the surviving pages and their embedding jobs together.
                 with transaction.atomic():
                     QuerySet(Knowledge).select_for_update().get(id=knowledge_id)
                     if sync_log is not None:
@@ -190,9 +196,11 @@ def sync_replace_web_knowledge(
                         # mistake an already-published snapshot for abandoned temporary output.
                         QuerySet(KnowledgeSyncLog).filter(id=sync_log.id).update(
                             status=KnowledgeSyncStatus.SUCCESS,
-                            total_count=max(stats["total_count"], len(prepared_documents)),
+                            total_count=stats["total_count"],
                             synced_count=len(prepared_documents),
+                            skipped_count=stats["skipped_count"],
                             deleted_count=len(deleted_ids),
+                            message=stats["message"],
                             duration_ms=max(0, round((perf_counter() - started_at) * 1000)),
                         )
                 stats["synced_count"] = len(prepared_documents)
@@ -224,7 +232,7 @@ def sync_replace_web_knowledge(
         )
     except Exception as e:
         stats["failed_count"] += 1
-        stats["message"] = str(e)
+        stats["message"] = "\n".join(filter(None, (stats["message"], str(e))))
         if sync_log is None:
             _finish_unstarted_scheduled_sync(sync_log_id, KnowledgeSyncStatus.FAILURE, str(e))
         maxkb_logger.error(

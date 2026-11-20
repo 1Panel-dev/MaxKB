@@ -56,6 +56,12 @@ def _increment_stats(stats, field, amount=1):
         stats[field] = stats.get(field, 0) + amount
 
 
+def _page_log_url(url):
+    # Sync logs can be shared. Omit credentials, query parameters and fragments.
+    page = urlsplit(url)
+    return urlunsplit((page.scheme, page.netloc.rsplit("@", 1)[-1], page.path, "", ""))
+
+
 def _web_documents_by_url(knowledge):
     if knowledge is None:
         return {}
@@ -71,7 +77,14 @@ def _web_documents_by_url(knowledge):
 
 
 def get_save_handler(
-    knowledge_id, user_id, selector, doc_strategy=None, stats=None, source_meta=None, prepared_documents=None
+    knowledge_id,
+    user_id,
+    selector,
+    doc_strategy=None,
+    stats=None,
+    source_meta=None,
+    prepared_documents=None,
+    page_messages=None,
 ):
     knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
     strategy = normalize_document_strategy(
@@ -114,9 +127,20 @@ def get_save_handler(
                 _increment_stats(stats, "synced_count")
             except Exception as e:
                 _increment_stats(stats, "failed_count")
+                if page_messages is not None:
+                    page_messages.append(f"Failed to process {_page_log_url(child_link.url)}")
                 maxkb_logger.error(f"{str(e)}:{traceback.format_exc()}")
         else:
-            _increment_stats(stats, "failed_count")
+            missing_child = (
+                prepared_documents is not None
+                and response.status == 404
+                and normalize_web_url(child_link.url) != source_meta["web_sync_source_url"]
+            )
+            _increment_stats(stats, "skipped_count" if missing_child else "failed_count")
+            if page_messages is not None:
+                status = f" (HTTP {response.http_status})" if response.http_status is not None else ""
+                action = "Skipped" if missing_child else "Failed to fetch"
+                page_messages.append(f"{action} {_page_log_url(child_link.url)}{status}")
 
     return handler
 

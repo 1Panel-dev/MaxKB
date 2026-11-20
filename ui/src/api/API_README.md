@@ -820,7 +820,7 @@ Workspace 共享版本只提供设置查询和日志分页。定时同步设置�
 每周日期为 1–7，每月日期为 1–31。服务端校验至少 5 分钟的频率，保存不立即发起同步。
 `getKnowledgeSyncLogPage(knowledgeId, page)` 查询 `/<knowledgeId>/sync_log/<currentPage>/<pageSize>`，
 使用 `ResponsePage<KnowledgeSyncLog>`，返回文档计数、消息、四种执行状态、毫秒及秒数耗时，
-仅包含定时任务。周期类型统一复用 `enums/schedule.ts` 的 `SCHEDULE_TYPE`，
+包含定时任务和普通 Web 知识库的手动完整同步。周期类型统一复用 `enums/schedule.ts` 的 `SCHEDULE_TYPE`，
 触发器、长期记忆及知识库同步共享同一协议值；日志状态使用 `enums/knowledge.ts` 的 `KNOWLEDGE_SYNC_STATUS`，为 `running`、`success`、
 `failure`、`skipped` 字符串；`KnowledgeSyncStatus` 与 `KnowledgeSyncLog` 经 `@/api/types` 导入。
 

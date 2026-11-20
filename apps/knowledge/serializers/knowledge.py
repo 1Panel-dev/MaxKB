@@ -54,6 +54,7 @@ from knowledge.models import (
     KnowledgeFolder,
     KnowledgeScope,
     KnowledgeSyncTrigger,
+    KnowledgeSyncType,
     KnowledgeType,
     KnowledgeWorkflow,
     Paragraph,
@@ -1419,7 +1420,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 selector,
                 doc_strategy,
                 sync_type,
-                record_log=False,
+                record_log=sync_type == KnowledgeSyncType.COMPLETE,
                 trigger_type=KnowledgeSyncTrigger.MANUAL,
             )
 

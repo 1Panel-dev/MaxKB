@@ -82,7 +82,8 @@ class Fork:
         def __init__(self, content: str, child_link_list: List[ChildLink], status, message: str):
             self.content = content
             self.child_link_list = child_link_list
-            self.status = status
+            self.http_status = status
+            self.status = 500 if status is None else status
             self.message = message
 
         @staticmethod
@@ -90,7 +91,7 @@ class Fork:
             return Fork.Response(html_content, child_link_list, 200, "")
 
         @staticmethod
-        def error(message: str, status=500):
+        def error(message: str, status=None):
             return Fork.Response("", [], status, message)
 
     def __init__(self, base_fork_url: str, selector_list: List[str]):

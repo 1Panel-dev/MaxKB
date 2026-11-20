@@ -35,6 +35,7 @@ from knowledge.models import (
     TaskType,
 )
 from knowledge.serializers.document import DocumentSerializers
+from knowledge.serializers.knowledge_sync import KnowledgeSyncLogQuerySerializer
 from knowledge.services.document_cleanup import delete_document_data
 from knowledge.services.document_strategy import normalize_document_strategy
 from knowledge.task.handler import (
@@ -414,6 +415,65 @@ class WebSyncSafetyTests(TestCase):
         self.assert_old_content_preserved()
         self.assertEqual(Document.objects.filter(knowledge=self.knowledge).count(), 1)
         self.assertEqual(result["status"], "failure")
+
+    def test_complete_sync_skips_missing_child_and_logs_the_rebuild(self):
+        missing_url = ROOT_URL + "/removed"
+        removed = Document.objects.create(
+            knowledge=self.knowledge,
+            name="Removed",
+            type=KnowledgeType.WEB,
+            char_length=0,
+            meta={"source_url": missing_url, "web_sync_source_url": ROOT_URL},
+        )
+        independent = self.add_independent_documents()
+
+        def crawl(level, visited, handler):
+            self.successful_crawl(level, visited, handler)
+            handler(ChildLink(missing_url + "?token=private#anchor", None), Fork.Response.error("not found", 404))
+
+        with self.captureOnCommitCallbacks(execute=True):
+            result = self.run_crawl("complete", crawl, record_log=True)
+
+        self.assertEqual(result["status"], KnowledgeSyncStatus.SUCCESS)
+        self.assertFalse(Document.objects.filter(pk__in=[self.document.pk, removed.pk]).exists())
+        rebuilt = Document.objects.get(knowledge=self.knowledge, meta__source_url=ROOT_URL)
+        self.document_delay.assert_called_once()
+        self.assertEqual(str(self.document_delay.call_args.args[0]), str(rebuilt.id))
+        self.assert_independent_documents_preserved(independent)
+        page = KnowledgeSyncLogQuerySerializer(data={"workspace_id": "default", "knowledge_id": str(self.knowledge.id)})
+        (log,) = page.page(1, 10)["records"]
+        self.assertEqual(
+            (log["trigger_type"], log["status"]), (KnowledgeSyncTrigger.MANUAL, KnowledgeSyncStatus.SUCCESS)
+        )
+        self.assertEqual(
+            (log["total_count"], log["synced_count"], log["skipped_count"], log["deleted_count"], log["failed_count"]),
+            (2, 1, 1, 2, 0),
+        )
+        self.assertEqual(log["message"], f"Skipped {missing_url} (HTTP 404)")
+
+    def test_complete_sync_aborts_on_missing_root_or_unavailable_child(self):
+        for url, status in ((ROOT_URL + "/", 404), (ROOT_URL + "/busy", 503), (ROOT_URL + "/timeout", None)):
+            with self.subTest(url=url, status=status):
+
+                def crawl(level, visited, handler):
+                    if status != 404:
+                        self.successful_crawl(level, visited, handler)
+                        handler(ChildLink(ROOT_URL + "/missing", None), Fork.Response.error("not found", 404))
+                    handler(ChildLink(url, None), Fork.Response.error("unavailable", status))
+
+                with self.captureOnCommitCallbacks(execute=True):
+                    result = self.run_crawl("complete", crawl, record_log=True)
+                self.assert_old_content_preserved()
+                self.document_delay.assert_not_called()
+                self.assertEqual(
+                    (result["status"], result["synced_count"], result["deleted_count"], result["failed_count"]),
+                    ("failure", 0, 0, 1),
+                )
+                self.assertEqual(result["skipped_count"], 0 if status == 404 else 1)
+                log = KnowledgeSyncLog.objects.filter(knowledge=self.knowledge).latest("create_time")
+                self.assertEqual(log.status, KnowledgeSyncStatus.FAILURE)
+                reason = f"Failed to fetch {url}" + (f" (HTTP {status})" if status else "")
+                self.assertIn(reason, log.message.splitlines())
 
     def test_complete_success_publishes_current_source_and_log_together(self):
         independent = self.add_independent_documents()
