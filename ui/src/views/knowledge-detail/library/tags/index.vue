@@ -146,11 +146,11 @@ function handleOpenTagDocuments(row: TagTableRow) {
   associatedDocumentRef.value?.open({ id: row.id, key: row.key, value: row.value })
 }
 
-/* 删除只在确认后提交，标签删除与文档取消关联使用不同接口。 */
+/* 删除只确定后提交，标签删除与文档取消关联使用不同接口。 */
 // type：key 删除整个标签及其所有值；one 仅删除当前标签值。
 function handleDeleteTag(row: TagTableRow, type: 'key' | 'one') {
   const tagName = type === 'key' ? row.key : `${row.key}—${row.value}`
-  return MsgConfirm(`${t('knowledge.tags.delete.title')}: ${tagName}?`, t('knowledge.tags.delete.description')).then(
+  return MsgConfirm(t('knowledge.tags.delete.title', { name: tagName }), t('knowledge.tags.delete.description')).then(
     () => {
       operationLoading.value = true
       return (
@@ -168,7 +168,7 @@ function handleDeleteTag(row: TagTableRow, type: 'key' | 'one') {
 
 function handleBatchDelete() {
   const tagIds = selectedTags.value.map(({ id }) => id)
-  return MsgConfirm(`${t('knowledge.tags.delete.batchTitle', tagIds.length)}?`, t('knowledge.tags.delete.description')).then(
+  return MsgConfirm(t('knowledge.tags.delete.batchTitle', { count: tagIds.length }, tagIds.length), t('knowledge.tags.delete.description')).then(
     () => {
       operationLoading.value = true
       return (

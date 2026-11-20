@@ -18,7 +18,7 @@ defineOptions({ name: 'BaseNodeFileUploadSetting' })
 
 const setting = defineModel<FileUploadSettingData>({ required: true })
 
-// 文件上传设置：打开时创建草稿，确认后回写配置。
+// 文件上传设置：打开时创建草稿，确定后回写配置。
 const visible = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
 const formData = ref<FileUploadSettingData>(cloneDeep(defaultFileUploadSetting))
@@ -122,7 +122,7 @@ function resetData() {
       <!-- 取消设置 -->
       <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存文件上传设置 -->
-      <el-button type="primary" @click="submit">{{ t('common.actions.confirm') }}</el-button>
+      <el-button type="primary" @click="submit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

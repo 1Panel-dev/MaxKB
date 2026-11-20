@@ -85,7 +85,7 @@ const clearing = ref(false)
 const handleClearConversations = () => {
   if (clearing.value) return
   clearing.value = true
-  MsgConfirm('确认清空全部历史对话？', '将清空所有智能体的历史对话，清空后无法恢复。', { confirmButtonText: '清空' })
+  MsgConfirm('是否清空全部历史对话？', '将清空所有智能体的历史对话，清空后无法恢复。', { confirmButtonText: '清空' })
     .then(() => {
       historyVisible.value = false
       return portalList
@@ -110,7 +110,7 @@ const clearGroupConversationLoading = ref(false)
 const handleClearGroupConversations = (group: PortalApplicationGroup) => {
   if (clearGroupConversationLoading.value) return
   clearGroupConversationLoading.value = true
-  MsgConfirm('确认清空该智能体的全部历史对话？', '清空后无法恢复。', { confirmButtonText: '清空' })
+  MsgConfirm('是否清空该智能体的全部历史对话？', '清空后无法恢复。', { confirmButtonText: '清空' })
     .then(() =>
       portalList.clearGroupConversations(group.id, () => {
         if (group.id === currentApplicationId.value) {

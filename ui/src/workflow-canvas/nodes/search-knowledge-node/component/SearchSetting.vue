@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { KnowledgeSearchSetting } from '../types'
 import type { FormInstance } from 'element-plus'
 import { KNOWLEDGE_SEARCH_MODE } from '@/api/enums'
@@ -8,6 +9,7 @@ import { defaultSearchSetting } from '../constant'
 import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 
 defineOptions({ name: 'SearchKnowledgeSetting' })
+const { t } = useI18n({ useScope: 'global' })
 
 const setting = defineModel<KnowledgeSearchSetting>({ required: true })
 const visible = ref(false)
@@ -38,10 +40,12 @@ function resetData() {
 </script>
 
 <template>
+  <!-- 配置知识库检索参数 -->
   <el-button text type="primary" @click="open"><MkIcon name="icon_setting" /></el-button>
-  <MkDialog v-model="visible" title="参数设置" @closed="resetData">
-    <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="检索模式">
+  <MkDialog v-model="visible" :title="t('common.parameters.settingsTitle')" @closed="resetData">
+    <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form-item :label="t('knowledge.retrieval.mode')">
+        <!-- 选择检索模式 -->
         <el-radio-group v-model="formData.search_mode" class="space-y-2" @change="changeSearchMode">
           <template v-for="option in KNOWLEDGE_SEARCH_MODE_OPTIONS" :key="option.value">
             <el-card shadow="hover" class="w-full" :class="{ 'border-primary!': formData.search_mode === option.value }">
@@ -57,8 +61,10 @@ function resetData() {
         <el-form-item>
           <template #label>
             <span class="flex-align-center gap-1">
-              相似度高于
-              <MkTooltip content="相似度越高相关性越强。" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip>
+              {{ t('knowledge.retrieval.similarity.label') }}
+              <MkTooltip :content="t('knowledge.retrieval.similarity.description')" placement="right">
+                <MkIcon name="icon_info_outlined" class="text-N600!" />
+              </MkTooltip>
             </span>
           </template>
           <el-input-number
@@ -72,17 +78,19 @@ function resetData() {
             align="left"
           />
         </el-form-item>
-        <el-form-item label="召回分段数 TOP">
+        <el-form-item :label="t('knowledge.retrieval.topNumber')">
           <el-input-number v-model="formData.top_n" :min="1" :max="10000" :precision="0" :value-on-clear="1" controls-position="right" align="left" />
         </el-form-item>
       </div>
-      <el-form-item label="最多引用字符数">
+      <el-form-item :label="t('knowledge.retrieval.maxReferenceCharacters')">
         <MkSlider v-model="formData.max_paragraph_char_number" show-input :min="500" :max="100000" />
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="submit">保存</el-button>
+      <!-- 取消编辑检索参数 -->
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存检索参数 -->
+      <el-button type="primary" @click="submit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

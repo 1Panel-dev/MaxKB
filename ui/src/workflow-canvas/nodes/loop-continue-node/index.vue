@@ -91,9 +91,9 @@ onBeforeUnmount(() => anchorGuard.reset())
             <el-form-item
               class="small min-w-0 flex-2"
               :prop="`condition_list.${index}.field`"
-              :rules="{ type: 'array', required: true, message: t('workflow.referenceVariable.requiredMessage'), trigger: 'change' }"
+              :rules="{ type: 'array', required: true, message: t('workflow.variable.selectRequiredMessage'), trigger: 'change' }"
             >
-              <NodeCascader v-model="condition.field" :node-model="model" :placeholder="t('workflow.referenceVariable.placeholder')" />
+              <NodeCascader v-model="condition.field" :node-model="model" :placeholder="t('workflow.variable.selectPlaceholder')" />
             </el-form-item>
             <el-form-item
               class="small min-w-0 flex-1"

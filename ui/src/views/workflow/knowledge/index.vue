@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type {
   DefaultModelSettingPayload,
   KnowledgeDetail,
@@ -53,6 +54,7 @@ function knowledgeWorkflowPermission(method: KnowledgeWorkflowPermissionMethod):
 }
 
 defineOptions({ name: 'KnowledgeWorkflowView' })
+const { t } = useI18n({ useScope: 'global' })
 
 const requestApi = isSystemResource()
   ? SystemWorkflowApi
@@ -193,14 +195,14 @@ function handleAutoSaveChange() {
   }
 }
 
-/* 模板中心：确认后由服务端替换工作流，再刷新画布与保存基准。 */
+/* 模板中心：确定后由服务端替换工作流，再刷新画布与保存基准。 */
 const templateStoreButtonRef = useTemplateRef<InstanceType<typeof ButtonTemplateStore>>('templateStoreButtonRef')
 
 function handleUseTemplate(template: WorkflowStoreTemplate) {
   if (loading.value || historyVisible.value) return
 
   return MsgConfirm('提示', `使用 ${template.name} 将覆盖当前工作流？`, {
-    confirmButtonText: '确认',
+    confirmButtonText: t('common.actions.comfirm'),
     confirmButtonType: 'primary',
   })
     .then(() => {
@@ -326,7 +328,7 @@ function handleImportWorkflow(uploadFile: UploadFile) {
   // 确认期间暂停自动保存，避免覆盖流程与旧草稿保存并发。
   loading.value = true
   return MsgConfirm('提示', `使用 ${file.name.replace(/\.kbwf$/i, '')} 将覆盖当前工作流？`, {
-    confirmButtonText: '确认',
+    confirmButtonText: t('common.actions.comfirm'),
     confirmButtonType: 'primary',
   })
     .then(() => {

@@ -68,7 +68,7 @@ function submitQuotaSettings() {
 
     request
       .then(() => {
-        MsgSuccess(t('common.messages.saveSuccess'))
+        MsgSuccess(t('chatUser.quota.saveSuccess'))
         emit('refresh')
         dialogVisible.value = false
       })
@@ -161,7 +161,7 @@ defineExpose({ open })
       <!-- 取消配额设置 -->
       <el-button plain @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存配额设置 -->
-      <el-button :loading="submitting" type="primary" @click="submitQuotaSettings">{{ t('common.actions.confirm') }}</el-button>
+      <el-button :loading="submitting" type="primary" @click="submitQuotaSettings">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

@@ -86,7 +86,7 @@ watch(
   { immediate: true, flush: 'post' },
 )
 
-/* 保存设置；更换向量模型时先确认，保存完成后重新向量化 */
+/* 保存设置；更换向量模型时先确定，保存完成后重新向量化 */
 function handleSave() {
   const knowledgeApi = resourceApi.knowledge
   if (saving.value || !knowledgeSettingPermission('settingEdit') || !('putKnowledge' in knowledgeApi)) return

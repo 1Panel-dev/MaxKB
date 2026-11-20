@@ -62,7 +62,7 @@ defineExpose({ open })
     <template #footer>
       <!-- 取消参数编辑 -->
       <el-button plain @click="settingDialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认参数编辑 -->
+      <!-- 确定参数编辑 -->
       <el-button type="primary" @click="submitSetting">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>

@@ -41,7 +41,7 @@
     "dataType": {
       "label": "Data type",
       "placeholder": "Select a data type",
-      "requiredMessage": "Select a data type"
+      "requiredMessage": "Select a parameter type"
     }
   },
   "taskExecution": {
@@ -68,8 +68,8 @@
     "nextRunTime": "Next run time"
   },
   "delete": {
-    "title": "Delete trigger",
-    "batchTitle": "Delete the {count} selected trigger | Delete the {count} selected triggers",
+    "title": "Delete trigger: {name}?",
+    "batchTitle": "Delete the {count} selected trigger? | Delete the {count} selected triggers?",
     "description": "Deleting this trigger will stop its tasks and delete the related execution records."
   },
   "executionRecords": {

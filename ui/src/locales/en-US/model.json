@@ -87,7 +87,7 @@
     "baseModelsFallback": "Could not fetch the official model list. Built-in common models are shown."
   },
   "delete": {
-    "title": "Delete model",
+    "title": "Delete model: {name}?",
     "description": "This model is related to {count} resource. Deleting it will make it unavailable. Proceed with caution. | This model is related to {count} resources. Deleting it will make it unavailable. Proceed with caution."
   },
   "parameters": {

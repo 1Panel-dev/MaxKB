@@ -124,7 +124,7 @@ defineExpose({ open, close })
       <!-- 取消文档设置 -->
       <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存文档设置 -->
-      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

@@ -217,8 +217,8 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
                       {{
                         t(
                           paragraph.hit_unit_type === KNOWLEDGE_HIT_UNIT_TYPE.IMAGE
-                            ? 'knowledge.hitTest.imageVector'
-                            : 'knowledge.hitTest.textVector',
+                            ? 'knowledge.retrieval.imageVector'
+                            : 'knowledge.retrieval.textVector',
                         )
                       }}
                     </el-tag>

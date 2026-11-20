@@ -97,7 +97,7 @@ function handleOpenRecordDrawer(trigger: Trigger) {
 }
 
 function handleDeleteTrigger(trigger: Trigger) {
-  return MsgConfirm(`${t('trigger.delete.title')}: ${trigger.name}?`, t('trigger.delete.description'))
+  return MsgConfirm(t('trigger.delete.title', { name: trigger.name }), t('trigger.delete.description'))
     .then(() => {
       loading.value = true
       return TriggerApi.deleteTrigger(trigger.id)
@@ -135,7 +135,7 @@ function handleBatchActivate(isActive: boolean) {
   const triggerIds = selectedTriggers.value.map(({ id }) => id)
   return TriggerApi.putBatchActivateTrigger(triggerIds, isActive)
     .then(() => {
-      MsgSuccess(isActive ? t('common.messages.enableSuccess') : t('common.messages.disableSuccess'))
+      MsgSuccess(isActive ? t('common.messages.batchEnableSuccess') : t('common.messages.batchDisableSuccess'))
       tableRef.value?.clearSelection()
       return loadTriggers()
     })
@@ -146,12 +146,12 @@ function handleBatchActivate(isActive: boolean) {
 
 function handleBatchDelete() {
   const triggerIds = selectedTriggers.value.map(({ id }) => id)
-  return MsgConfirm(`${t('trigger.delete.batchTitle', { count: triggerIds.length }, triggerIds.length)}?`)
+  return MsgConfirm(t('trigger.delete.batchTitle', { count: triggerIds.length }, triggerIds.length))
     .then(() => {
       loading.value = true
       return TriggerApi.putBatchDeleteTrigger(triggerIds)
         .then(() => {
-          MsgSuccess(t('common.messages.deleteSuccess'))
+          MsgSuccess(t('common.messages.batchDeleteSuccess'))
           tableRef.value?.clearSelection()
           return loadTriggers()
         })
@@ -212,12 +212,12 @@ onMounted(() => loadTriggers())
           </template>
           <template #default="{ row }">{{ triggerTypeLabels[row.trigger_type as TriggerType] || row.trigger_type }}</template>
         </el-table-column>
-        <el-table-column prop="is_active" :label="t('common.status.label')" width="120">
+        <el-table-column prop="is_active" :label="t('common.status.activeLabel')" width="120">
           <template #header>
             <MkTableFilter
               mode="single"
               v-model="selectedStatus"
-              :label="t('common.status.label')"
+              :label="t('common.status.activeLabel')"
               :options="triggerStatusOptions"
               @change="handleFilterChange"
             />

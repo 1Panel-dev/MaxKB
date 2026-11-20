@@ -102,7 +102,7 @@ function handleChangeStatus(systemUser: SystemUser) {
 
 /* 删除用户*/
 function deleteUser(user: SystemUser) {
-  MsgConfirm(`${t('user.delete.title')}: ${user.username}?`, t('user.delete.description'))
+  MsgConfirm(t('user.delete.title', { name: user.username }), t('user.delete.description'))
     .then(() => {
       systemUsersLoading.value = true
       return UserManageApi.deleteUser(user.id).then(() => {
@@ -123,7 +123,7 @@ function handleBatchSelectionChange(selection: unknown[]) {
 }
 function handleBatchDelete() {
   const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
-  MsgConfirm(`${t('user.delete.batchTitle', { count: batchSelectedUsers.value.length }, batchSelectedUsers.value.length)}?`)
+  MsgConfirm(t('user.delete.batchTitle', { count: selectedUserIds.length }, selectedUserIds.length))
     .then(() => {
       systemUsersLoading.value = true
 

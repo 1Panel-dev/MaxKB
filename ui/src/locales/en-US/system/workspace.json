@@ -9,9 +9,9 @@
     "requiredMessage": "Enter a workspace name"
   },
   "delete": {
-    "title": "Delete workspace",
+    "title": "Delete workspace: {name}?",
     "description": "All members will be removed from this workspace after deletion. Proceed with caution.",
-    "batchRemoveTitle": "Remove the members associated with the selected records",
+    "batchRemoveTitle": "Remove the members associated with the selected records?",
     "batchRemoveDescription": "Affected members: {memberCount}, total records: {recordCount}.",
     "partialRemoveMessage": "Successfully removed {successCount} member; failed: {failedCount} | Successfully removed {successCount} members; failed: {failedCount}"
   }

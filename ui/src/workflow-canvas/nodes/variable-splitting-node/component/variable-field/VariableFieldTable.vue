@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { VariableField } from './types'
 import VariableFieldDialog from './VariableFieldDialog.vue'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowVariableSplittingFieldTable' })
+const { t } = useI18n({ useScope: 'global' })
 
 const variableList = defineModel<VariableField[]>({ required: true })
 const variableFieldDialogRef = useTemplateRef<InstanceType<typeof VariableFieldDialog>>('variableFieldDialogRef')
@@ -20,7 +22,7 @@ function deleteField(index: number) {
 
 function saveField(data: VariableField, index?: number) {
   if (variableList.value.some((field, fieldIndex) => field.field === data.field && fieldIndex !== index)) {
-    MsgError(`变量 "${data.field}" 已存在`)
+    MsgError(`${t('workflow.variable.duplicateMessage')}：${data.field}`)
     return
   }
 
@@ -38,28 +40,31 @@ function saveField(data: VariableField, index?: number) {
 <template>
   <div class="w-full">
     <div class="flex-between mb-2">
-      <span class="mk-required">拆分变量</span>
+      <span class="mk-required">{{ t('workflow.variableSplitting.variables.label') }}</span>
+      <!-- 添加拆分变量 -->
       <el-button text type="primary" @click="openFieldDialog()">
         <MkIcon name="icon_add_outlined" />
       </el-button>
     </div>
 
     <MkTable v-if="variableList.length" size="small" class="border" :data="variableList" row-key="field">
-      <el-table-column prop="field" label="变量">
+      <el-table-column prop="field" :label="t('workflow.variable.label')">
         <template #default="{ row }">
           <span :title="row.field" class="block truncate">{{ row.field }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="label" label="显示名称">
+      <el-table-column prop="label" :label="t('dynamicForm.fields.displayName.label')">
         <template #default="{ row }">
           <span :title="row.label" class="block truncate">{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="80">
+      <el-table-column :label="t('common.labels.operation')" width="80">
         <template #default="{ row, $index }">
+          <!-- 编辑拆分变量 -->
           <el-button text type="primary" @click="openFieldDialog(row, $index)">
             <MkIcon name="icon_edit_outlined" />
           </el-button>
+          <!-- 删除拆分变量 -->
           <el-button text type="primary" @click="deleteField($index)">
             <MkIcon name="icon_delete-trash_outlined" />
           </el-button>

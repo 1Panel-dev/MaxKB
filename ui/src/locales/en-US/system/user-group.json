@@ -12,7 +12,7 @@
   "memberCount": "Member count",
   "set": "Set user groups",
   "delete": {
-    "title": "Delete user group",
+    "title": "Delete user group: {name}?",
     "description": "Deleting this group removes its members from the group and revokes resource permissions inherited through it. Proceed with caution.",
     "chatDescription": "Deleting this group removes its members from the group. Proceed with caution.",
     "removeDescription": "Removing members revokes their resource permissions inherited through this user group. Proceed with caution."

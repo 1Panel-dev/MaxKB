@@ -19,7 +19,8 @@
     },
     "menuTitle": {
       "label": "其他参数收纳菜单标题"
-    }
+    },
+    "invalidParameterMessage": "参数仅支持字母、数字和下划线"
   },
   "parameters": {
     "duplicateMessage": "参数已存在",
@@ -27,6 +28,21 @@
   },
   "apiParameters": {
     "title": "接口传参"
+  },
+  "variable": {
+    "label": "变量",
+    "placeholder": "请输入变量",
+    "selectPlaceholder": "请选择变量",
+    "requiredMessage": "请输入变量",
+    "selectRequiredMessage": "请选择变量",
+    "duplicateMessage": "变量已存在",
+    "invalidMessage": "变量可由字母、数字、下划线组成",
+    "add": "添加变量",
+    "edit": "编辑变量",
+    "input": {
+      "label": "输入变量",
+      "requiredMessage": "请选择输入变量"
+    }
   },
   "globalVariables": {
     "title": "全局变量"
@@ -36,11 +52,36 @@
   },
   "referenceVariable": {
     "label": "引用变量",
-    "placeholder": "请选择变量",
+    "placeholder": "请选择引用变量",
     "requiredMessage": "请选择引用变量",
     "invalidMessage": "引用变量错误",
     "missingMessage": "引用变量不存在"
   },
+  "inputContent": {
+    "label": "输入内容",
+    "placeholder": "请选择输入内容",
+    "requiredMessage": "请选择输入内容"
+  },
+  "document": {
+    "label": "文档",
+    "placeholder": "请选择文档",
+    "requiredMessage": "请选择文档",
+    "paragraphPreviewHint": "每个文档仅展示前 {count} 个分段",
+    "characterPreviewHint": "每个文档仅支持预览 {count} 字"
+  },
+  "searchQuestion": {
+    "label": "检索问题",
+    "placeholder": "请选择检索问题",
+    "requiredMessage": "请选择检索问题"
+  },
+  "searchScope": {
+    "label": "检索范围",
+    "placeholder": "请选择关联知识库",
+    "custom": "自定义",
+    "knowledgeList": "知识库列表",
+    "documentList": "文档列表"
+  },
+  "showInSources": "结果显示在知识来源中",
   "audioFile": {
     "label": "音频文件"
   },
@@ -75,6 +116,7 @@
   },
   "negativePrompt": {
     "label": "提示词(负向)",
+    "detailLabel": "负向提示词",
     "videoPlaceholder": "请描述不想生成的视频内容，比如：颜色、血腥内容",
     "description": "反向提示词，用来描述不希望在画面中看到的内容，可以对画面进行限制"
   },

@@ -19,7 +19,8 @@
     },
     "menuTitle": {
       "label": "其他參數收納選單標題"
-    }
+    },
+    "invalidParameterMessage": "參數僅支援字母、數字和底線"
   },
   "parameters": {
     "duplicateMessage": "參數已存在",
@@ -27,6 +28,21 @@
   },
   "apiParameters": {
     "title": "介面傳參"
+  },
+  "variable": {
+    "label": "變量",
+    "placeholder": "請輸入變量",
+    "selectPlaceholder": "請選擇變量",
+    "requiredMessage": "請輸入變量",
+    "selectRequiredMessage": "請選擇變量",
+    "duplicateMessage": "變量已存在",
+    "invalidMessage": "變量可由字母、數字、底線組成",
+    "add": "新增變量",
+    "edit": "編輯變量",
+    "input": {
+      "label": "輸入變量",
+      "requiredMessage": "請選擇輸入變量"
+    }
   },
   "globalVariables": {
     "title": "全域變量"
@@ -36,11 +52,36 @@
   },
   "referenceVariable": {
     "label": "引用變量",
-    "placeholder": "請選擇變量",
+    "placeholder": "請選擇引用變量",
     "requiredMessage": "請選擇引用變量",
     "invalidMessage": "引用變量錯誤",
     "missingMessage": "引用變量不存在"
   },
+  "inputContent": {
+    "label": "輸入內容",
+    "placeholder": "請選擇輸入內容",
+    "requiredMessage": "請選擇輸入內容"
+  },
+  "document": {
+    "label": "文件",
+    "placeholder": "請選擇文件",
+    "requiredMessage": "請選擇文件",
+    "paragraphPreviewHint": "每個文件僅顯示前 {count} 個分段",
+    "characterPreviewHint": "每個文件僅支援預覽 {count} 字"
+  },
+  "searchQuestion": {
+    "label": "檢索問題",
+    "placeholder": "請選擇檢索問題",
+    "requiredMessage": "請選擇檢索問題"
+  },
+  "searchScope": {
+    "label": "檢索範圍",
+    "placeholder": "請選擇關聯知識庫",
+    "custom": "自訂",
+    "knowledgeList": "知識庫列表",
+    "documentList": "文件列表"
+  },
+  "showInSources": "結果顯示在知識來源中",
   "audioFile": {
     "label": "音訊檔案"
   },
@@ -75,6 +116,7 @@
   },
   "negativePrompt": {
     "label": "提示詞(負向)",
+    "detailLabel": "負向提示詞",
     "videoPlaceholder": "請描述不想生成的影片內容，例如：顏色、血腥內容",
     "description": "反向提示詞，用來描述不希望在畫面中看到的內容，可以對畫面進行限制"
   },

@@ -1,5 +1,7 @@
+import { computed, reactive } from 'vue'
 import type LogicFlow from '@logicflow/core'
 import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
+import { t } from '@/locales'
 
 export const applicationTemplate = {
   blank: { edges: [], nodes: defaultApplicationNodes },
@@ -254,10 +256,10 @@ export const applicationTemplate = {
         properties: {
           config: {
             fields: [
-              {
-                label: 'AI 回答内容',
+              reactive({
+                label: computed(() => `AI ${t('workflow.answer.label')}`),
                 value: 'answer',
-              },
+              }),
               {
                 label: '思考过程',
                 value: 'reasoning_content',

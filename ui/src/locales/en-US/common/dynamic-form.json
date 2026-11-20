@@ -26,7 +26,9 @@
     "parameter": {
       "label": "Parameter",
       "placeholder": "Enter a parameter",
-      "requiredMessage": "Enter a parameter"
+      "selectPlaceholder": "Select a parameter",
+      "requiredMessage": "Enter a parameter",
+      "selectRequiredMessage": "Select a parameter"
     },
     "displayName": {
       "label": "Name",
@@ -173,7 +175,9 @@
   "tree": {
     "addRoot": "Add root option",
     "addChild": "Add child option",
-    "deleteConfirm": "Delete"
+    "delete": {
+      "title": "Delete: {name}?"
+    }
   },
   "visibility": {
     "show": "Show conditions",

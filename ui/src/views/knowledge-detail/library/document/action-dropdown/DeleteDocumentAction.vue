@@ -21,14 +21,29 @@ const props = withDefaults(
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: [] }>()
 
-// 确认后删除单个或选中文档；刷新后的分页总数以服务端为准。
+// 确定后删除单个或选中文档；刷新后的分页总数以服务端为准。
 function handleDelete() {
   const { batch, document, knowledgeId, resourceType } = props
   const ids = [...(props.documentIds ?? [])]
-  // 批量确认展示数量，单个确认展示文档名称；确认期间保留本次删除目标。
+  // 批量展示数量，单个确定展示文档名称；确认期间保留本次删除目标。
   const confirmation = batch
-    ? MsgConfirm(`${t('knowledge.document.delete.batchTitle', ids.length)}?`, t('knowledge.document.delete.batchDescription'))
-    : MsgConfirm(`${t('knowledge.document.delete.title')}: ${document!.name}?`, t('knowledge.document.delete.description', document!.paragraph_count))
+    ? MsgConfirm(
+        t(
+          resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE ? 'knowledge.image.delete.batchTitle' : 'knowledge.document.delete.batchTitle',
+          { count: ids.length },
+          ids.length,
+        ),
+        t(resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE ? 'knowledge.image.delete.batchDescription' : 'knowledge.document.delete.batchDescription'),
+      )
+    : MsgConfirm(
+        t(resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE ? 'knowledge.image.delete.title' : 'knowledge.document.delete.title', {
+          name: document!.name,
+        }),
+        t(
+          resourceType === DOCUMENT_RESOURCE_TYPE.IMAGE ? 'knowledge.image.delete.description' : 'knowledge.document.delete.description',
+          document!.paragraph_count,
+        ),
+      )
   return confirmation
     .then(() => {
       loading.value = true

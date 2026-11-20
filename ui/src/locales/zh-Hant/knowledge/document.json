@@ -48,14 +48,14 @@
       "replaceOriginal": "取代原始文件"
     },
     "delete": {
-      "title": "確定刪除文件",
+      "title": "是否刪除文件：{name}？",
       "description": "此文件的 {count} 個分段都會一併刪除，請謹慎操作。",
-      "batchTitle": "確定刪除選取的 {count} 份文件",
+      "batchTitle": "是否刪除選取的{count}個文件？",
       "batchDescription": "所選文件中的分段會一併刪除，請謹慎操作。"
     },
     "sync": {
-      "title": "確定同步",
-      "batchTitle": "確定同步選取的 {count} 份文件",
+      "title": "是否同步文件：{name}？",
+      "batchTitle": "是否同步選取的{count}個文件？",
       "description": "同步時會略過內容未變更的文件，並以新內容更新有變更文件的既有分段。",
       "workflowDescription": "本次同步只會更新目前的 Web 文件，並使用知識庫工作流程的擷取與分段設定。",
       "missingUrlMessage": "請先設定文件網址，再進行同步。"
@@ -102,6 +102,12 @@
     "preview": {
       "emptyMessage": "圖片預覽沒有分段，請返回重新產生預覽"
     },
-    "unsupportedFormatMessage": "僅支援 {formats} 格式的圖片"
+    "unsupportedFormatMessage": "僅支援 {formats} 格式的圖片",
+    "delete": {
+      "title": "是否刪除圖片：{name}？",
+      "batchTitle": "是否刪除選取的{count}個圖片？",
+      "description": "此圖片的 {count} 個分段都會一併刪除，請謹慎操作。",
+      "batchDescription": "所選圖片中的分段會一併刪除，請謹慎操作。"
+    }
   }
 }

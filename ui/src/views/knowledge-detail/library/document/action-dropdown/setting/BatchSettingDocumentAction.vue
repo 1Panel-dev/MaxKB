@@ -40,7 +40,7 @@ function handleSubmit(data: DocumentSettingPayload) {
     props.api
       .putBatchDocumentSetting?.(targetKnowledgeId.value, targetDocumentIds.value, data)
       .then(() => {
-        MsgSuccess(t('common.messages.saveSuccess'))
+        MsgSuccess(t('common.messages.settingsSuccess'))
         settingDialogRef.value?.close()
         emit('refresh')
       })

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { RerankerSetting } from './types'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { NodeModelData } from '@/workflow-canvas/component/node-model-select/types'
@@ -13,6 +14,8 @@ import { useWorkflowStore } from '@/workflow-canvas/store'
 import SearchSetting from './component/SearchSetting.vue'
 
 defineOptions({ name: 'WorkflowRerankerNode' })
+const { t } = useI18n({ useScope: 'global' })
+
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const resourceScope = inject<string>('resourceScope', 'workspace')
 const model = getModel()
@@ -72,9 +75,9 @@ function updateModel(patch: Partial<NodeModelData>) {
   model.properties.node_data = { ...formData.value, ...patch }
 }
 const settingRows = computed(() => [
-  { label: 'Score 高于', value: formData.value.reranker_setting.similarity.toFixed(3) },
-  { label: '召回分段数 TOP', value: formData.value.reranker_setting.top_n },
-  { label: '最大引用字符数', value: formData.value.reranker_setting.max_paragraph_char_number },
+  { label: t('workflow.reranker.score.label'), value: formData.value.reranker_setting.similarity.toFixed(3) },
+  { label: t('knowledge.retrieval.topNumber'), value: formData.value.reranker_setting.top_n },
+  { label: t('workflow.reranker.maxReferenceCharacters'), value: formData.value.reranker_setting.max_paragraph_char_number },
 ])
 async function validate() {
   return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
@@ -90,18 +93,25 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <!-- 重排内容 -->
         <el-form-item
           class="mk-hide-asterisk mb-0!"
           prop="reranker_reference_list"
-          :rules="{ type: 'array', required: true, message: '请选择重排内容', trigger: 'change' }"
+          :rules="{ type: 'array', required: true, message: t('workflow.reranker.content.requiredMessage'), trigger: 'change' }"
         >
           <template #label>
             <div class="flex-between">
-              <span class="mk-required">重排内容</span>
+              <span class="mk-required">{{ t('workflow.reranker.content.label') }}</span>
               <!-- 添加重排内容 -->
               <el-button text type="primary" @click="addReference">
                 <MkIcon name="icon_add_outlined" />
@@ -114,9 +124,13 @@ onMounted(() => {
               <el-form-item
                 class="mb-2! min-w-0 flex-1 small"
                 :prop="`reranker_reference_list.${index}`"
-                :rules="{ type: 'array', required: true, message: '请选择重排内容', trigger: 'change' }"
+                :rules="{ type: 'array', required: true, message: t('workflow.reranker.content.requiredMessage'), trigger: 'change' }"
               >
-                <NodeCascader v-model="formData.reranker_reference_list[index]!" :node-model="model" placeholder="请选择重排内容" />
+                <NodeCascader
+                  v-model="formData.reranker_reference_list[index]!"
+                  :node-model="model"
+                  :placeholder="t('workflow.reranker.content.placeholder')"
+                />
               </el-form-item>
             </template>
           </MkFormList>
@@ -125,7 +139,7 @@ onMounted(() => {
         <el-form-item>
           <template #label>
             <div class="flex-between">
-              <span>检索参数</span>
+              <span>{{ t('knowledge.retrieval.parameters') }}</span>
               <SearchSetting v-model="formData.reranker_setting" />
             </div>
           </template>
@@ -139,8 +153,17 @@ onMounted(() => {
           </div>
         </el-form-item>
         <!-- 检索问题 -->
-        <el-form-item label="检索问题" prop="question_reference_address" :rules="{ required: true, message: '请选择检索问题', trigger: 'change' }">
-          <NodeCascader ref="questionCascaderRef" v-model="formData.question_reference_address" :node-model="model" placeholder="请选择检索问题" />
+        <el-form-item
+          :label="t('workflow.searchQuestion.label')"
+          prop="question_reference_address"
+          :rules="{ required: true, message: t('workflow.searchQuestion.requiredMessage'), trigger: 'change' }"
+        >
+          <NodeCascader
+            ref="questionCascaderRef"
+            v-model="formData.question_reference_address"
+            :node-model="model"
+            :placeholder="t('workflow.searchQuestion.placeholder')"
+          />
         </el-form-item>
         <!-- 重排模型 -->
         <NodeModelSelect
@@ -148,7 +171,7 @@ onMounted(() => {
           :form-data="formData"
           :fields="{ source: 'reranker_model_id_type', id: 'reranker_model_id', reference: 'reranker_model_id_reference' }"
           model-type="RERANKER"
-          label="重排模型"
+          :label="t('model.types.reranker.label')"
           :options="modelOptions"
           :provider-options="providerOptions"
           :can-edit-params="false"
@@ -157,7 +180,7 @@ onMounted(() => {
           @refresh="refreshModels"
         />
         <div class="flex-between">
-          <span>结果显示在知识来源中</span>
+          <span>{{ t('workflow.showInSources') }}</span>
           <el-switch v-model="formData.show_knowledge" size="small" />
         </div>
       </el-form>

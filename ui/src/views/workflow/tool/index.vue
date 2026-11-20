@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type {
   DefaultModelSettingPayload,
   ToolItem,
@@ -39,6 +40,7 @@ import { getResourceScope, isSystemResource, isSystemSharedResource, isWorkspace
 import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'ToolWorkflowView' })
+const { t } = useI18n({ useScope: 'global' })
 
 // 保存、调试与版本历史保持进入页面时的资源范围。
 const requestModelApi = isSystemResource() ? SystemModelApi : isSystemSharedResource() ? SharedModelApi : WorkspaceModelApi
@@ -156,14 +158,14 @@ function closeDebug() {
   debugButtonRef.value?.close()
 }
 
-/* 模板中心：确认后由服务端替换工作流，再刷新画布与保存基准。 */
+/* 模板中心：确定后由服务端替换工作流，再刷新画布与保存基准。 */
 const templateStoreButtonRef = useTemplateRef<InstanceType<typeof ButtonTemplateStore>>('templateStoreButtonRef')
 
 function handleUseTemplate(template: WorkflowStoreTemplate) {
   if (loading.value || historyVisible.value) return
 
   return MsgConfirm('提示', `使用 ${template.name} 将覆盖当前工作流？`, {
-    confirmButtonText: '确认',
+    confirmButtonText: t('common.actions.comfirm'),
     confirmButtonType: 'primary',
   })
     .then(() => {

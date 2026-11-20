@@ -178,8 +178,8 @@ defineExpose({ open })
         <div>
           <!-- 取消智能体选择 -->
           <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-          <!-- 确认智能体选择 -->
-          <el-button type="primary" @click="submit">{{ t('common.actions.confirm') }}</el-button>
+          <!-- 确定智能体选择 -->
+          <el-button type="primary" @click="submit">{{ t('common.actions.comfirm') }}</el-button>
         </div>
       </div>
     </template>

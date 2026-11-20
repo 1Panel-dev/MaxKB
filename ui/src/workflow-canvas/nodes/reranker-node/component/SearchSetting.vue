@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { RerankerSetting } from '../types'
 import type { FormInstance } from 'element-plus'
 
 defineOptions({ name: 'RerankerSearchSetting' })
+const { t } = useI18n({ useScope: 'global' })
+
 const setting = defineModel<RerankerSetting>({ required: true })
 const visible = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
@@ -29,17 +32,20 @@ function submit() {
 </script>
 
 <template>
+  <!-- 配置重排参数 -->
   <el-button text type="primary" @click="open">
-    <MkIcon name="icon_setting" :size="20" />
+    <MkIcon name="icon_setting" />
   </el-button>
-  <MkDialog v-model="visible" title="参数设置" @closed="resetData">
-    <el-form ref="formRef" :model="formData" label-position="top" @submit.prevent>
+  <MkDialog v-model="visible" :title="t('common.parameters.settingsTitle')" @closed="resetData">
+    <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" @submit.prevent>
       <div class="grid grid-cols-2 gap-4">
         <el-form-item>
           <template #label>
             <span class="flex-align-center gap-1">
-              Score 高于
-              <MkTooltip content="Score 越高相关性越强。" placement="right"><MkIcon name="icon_info_outlined" class="text-N600!" /></MkTooltip>
+              {{ t('workflow.reranker.score.label') }}
+              <MkTooltip :content="t('workflow.reranker.score.description')" placement="right">
+                <MkIcon name="icon_info_outlined" class="text-N600!" />
+              </MkTooltip>
             </span>
           </template>
           <el-input-number
@@ -53,17 +59,19 @@ function submit() {
             align="left"
           />
         </el-form-item>
-        <el-form-item label="召回分段数 TOP">
+        <el-form-item :label="t('knowledge.retrieval.topNumber')">
           <el-input-number v-model="formData.top_n" :min="1" :max="10000" :value-on-clear="1" controls-position="right" align="left" />
         </el-form-item>
       </div>
-      <el-form-item label="最大引用字符数">
+      <el-form-item :label="t('workflow.reranker.maxReferenceCharacters')">
         <MkSlider v-model="formData.max_paragraph_char_number" show-input :min="500" :max="100000" />
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="submit">保存</el-button>
+      <!-- 取消编辑重排参数 -->
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存重排参数 -->
+      <el-button type="primary" @click="submit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

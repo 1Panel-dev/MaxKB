@@ -120,7 +120,7 @@ function replaceContent() {
   visible.value = false
 }
 
-// 需求输入：回车发送，组合键在光标处换行，输入法确认时不提交。
+// 需求输入：回车发送，组合键在光标处换行，输入法确定时不提交。
 function handleKeydown(event: KeyboardEvent) {
   inputShortcut(event, inputValue, () => generateContent())
 }

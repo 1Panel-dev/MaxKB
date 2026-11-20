@@ -89,7 +89,7 @@ function handleParagraphSearch() {
   return refreshParagraphs()
 }
 
-// 勾选仅修改草稿，确认时保存与已有关系的差异。
+// 勾选仅修改草稿，确定时保存与已有关系的差异。
 function handleToggleParagraph(paragraph: ParagraphItem) {
   if (operationLoading.value) return
   if (isSelected(paragraph.id)) {
@@ -273,8 +273,8 @@ defineExpose({ open })
         <div>
           <!-- 取消本次批量关联 -->
           <el-button plain :disabled="operationLoading || documentLoading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-          <!-- 确认批量关联所选分段 -->
-          <el-button type="primary" :loading="operationLoading" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
+          <!-- 确定批量关联所选分段 -->
+          <el-button type="primary" :loading="operationLoading" @click="handleSubmit">{{ t('common.actions.comfirm') }}</el-button>
         </div>
       </div>
     </template>

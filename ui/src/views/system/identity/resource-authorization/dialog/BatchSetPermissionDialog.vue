@@ -50,8 +50,8 @@ defineExpose({ open, close })
     <template #footer>
       <!-- 取消批量配置 -->
       <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认批量配置 -->
-      <el-button type="primary" :disabled="disabled || !permission" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定批量配置 -->
+      <el-button type="primary" :disabled="disabled || !permission" @click="handleSubmit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

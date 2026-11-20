@@ -2,6 +2,7 @@
   "question": {
     "title": "问题",
     "detailTitle": "问题详情",
+    "lastRetrievedAt": "最近一次召回时间",
     "content": {
       "placeholder": "请输入问题",
       "batchPlaceholder": "请输入问题，一行一个，支持输入多个",

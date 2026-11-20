@@ -85,8 +85,8 @@ defineExpose({ open, close })
     <template #footer>
       <!-- 取消请求参数编辑 -->
       <el-button plain @click="close">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认请求参数 -->
-      <el-button type="primary" @click="submit">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定请求参数 -->
+      <el-button type="primary" @click="submit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

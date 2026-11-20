@@ -15,7 +15,7 @@ const props = defineProps<{
 const emit = defineEmits<{ select: [value: TableFilterCustomValue]; open: [] }>()
 defineSlots<{ default(): unknown; content(props: { value: TableFilterCustomValue }): unknown }>()
 
-// 插槽只编辑独立草稿，确认或重置才回写已生效的筛选。
+// 插槽只编辑独立草稿，确定或重置才回写已生效的筛选。
 const visible = ref(false)
 const pendingValue = ref<TableFilterCustomValue>(cloneDeep(props.modelValue))
 
@@ -48,8 +48,8 @@ function handleConfirm() {
     <div class="p-3 text-right">
       <!-- 重置自定义筛选 -->
       <el-button plain class="min-w-12!" size="small" @click="handleReset">{{ t('common.actions.reset') }}</el-button>
-      <!-- 确认自定义筛选 -->
-      <el-button class="min-w-12!" size="small" type="primary" @click="handleConfirm">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定自定义筛选 -->
+      <el-button class="min-w-12!" size="small" type="primary" @click="handleConfirm">{{ t('common.actions.comfirm') }}</el-button>
     </div>
   </el-popover>
 </template>

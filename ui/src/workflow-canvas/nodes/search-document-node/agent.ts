@@ -1,3 +1,4 @@
+import { computed, reactive } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { AgentTool, JsonObjectSchema, NodeAgentContext, NodeAgentModule } from '@/workflow-canvas/ai-generate/type'
 import { getNode, readNodeData, writeNodeProperties } from '@/workflow-canvas/ai-generate/tools/canvas'
@@ -14,17 +15,33 @@ const params: JsonObjectSchema = {
   type: 'object',
   properties: {
     question: { type: 'string', description: '检索问题（search_mode=auto 时必传），通常为用户问题', 'x-bind': 'question_reference' },
-    scope: { type: 'array', description: '由上游决定检索范围时的知识库 / 文档 id 列表（search_scope_type=referencing 时必传）', 'x-bind': 'search_scope_reference' },
+    scope: {
+      type: 'array',
+      description: '由上游决定检索范围时的知识库 / 文档 id 列表（search_scope_type=referencing 时必传）',
+      'x-bind': 'search_scope_reference',
+    },
   },
 }
 
 const config: JsonObjectSchema = {
   type: 'object',
   properties: {
-    search_scope_type: { type: 'string', enum: ['custom', 'referencing'], description: '检索范围：custom 选定知识库（默认），referencing 由入参 scope 决定' },
+    search_scope_type: {
+      type: 'string',
+      enum: ['custom', 'referencing'],
+      description: '检索范围：custom 选定知识库（默认），referencing 由入参 scope 决定',
+    },
     knowledge_ids: { type: 'array', items: { type: 'string' }, description: 'search_scope_type=custom 时的知识库 id 列表' },
-    search_scope_source: { type: 'string', enum: ['knowledge', 'document'], description: 'search_scope_type=referencing 时入参 scope 是知识库 id 还是文档 id' },
-    search_mode: { type: 'string', enum: ['auto', 'custom'], description: 'auto 按检索问题自动匹配文档标签（默认），custom 手动设置标签过滤条件（仅 custom 范围可用）' },
+    search_scope_source: {
+      type: 'string',
+      enum: ['knowledge', 'document'],
+      description: 'search_scope_type=referencing 时入参 scope 是知识库 id 还是文档 id',
+    },
+    search_mode: {
+      type: 'string',
+      enum: ['auto', 'custom'],
+      description: 'auto 按检索问题自动匹配文档标签（默认），custom 手动设置标签过滤条件（仅 custom 范围可用）',
+    },
     condition_type: { type: 'string', enum: ['AND', 'OR'], description: '手动条件之间：AND 全部满足 / OR 任一满足' },
     conditions: {
       type: 'array',
@@ -32,7 +49,11 @@ const config: JsonObjectSchema = {
         type: 'object',
         properties: {
           key: { type: 'string', description: '标签名（get_knowledge_tags 返回的 key）' },
-          compare: { type: 'string', enum: COMPARES, description: compareOptions.map((option) => `${option.value}=${option.label}`).join('，') },
+          compare: reactive({
+            type: 'string',
+            enum: COMPARES,
+            description: computed(() => compareOptions.map((option) => `${option.value}=${option.label}`).join('，')),
+          }),
           value: { type: 'string', description: '标签值' },
         },
         required: ['key', 'compare', 'value'],
@@ -88,8 +109,7 @@ function useAgent(context: NodeAgentContext) {
           if (!node) return new ErrorResult(`节点不存在: ${context.nodeId}`)
           const nodeData = readNodeData<Record<string, unknown>>(node)
           const referencing =
-            args.search_scope_type === 'referencing' ||
-            (args.search_scope_type === undefined && nodeData.search_scope_type === 'referencing')
+            args.search_scope_type === 'referencing' || (args.search_scope_type === undefined && nodeData.search_scope_type === 'referencing')
           const scope = argReference(context, 'scope')
           const searchMode = args.search_mode === 'custom' && !referencing ? 'custom' : 'auto'
           if (searchMode === 'auto' && !argReference(context, 'question')) {
@@ -118,7 +138,9 @@ function useAgent(context: NodeAgentContext) {
               search_mode: searchMode,
               search_condition_type: args.condition_type === 'OR' ? 'OR' : 'AND',
               search_condition_list:
-                searchMode === 'custom' ? conditions.map((condition) => ({ key: condition.key, compare: condition.compare, value: String(condition.value ?? '') })) : [],
+                searchMode === 'custom'
+                  ? conditions.map((condition) => ({ key: condition.key, compare: condition.compare, value: String(condition.value ?? '') }))
+                  : [],
             },
           })
           if (referencing && !scope) {

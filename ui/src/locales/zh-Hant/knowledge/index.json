@@ -92,8 +92,8 @@
     "sourceFilesDescription": "勾選後，原始檔案會一併打包至 ZIP，匯入時可自動還原檔案關聯。若未勾選，則只匯出文字內容。"
   },
   "delete": {
-    "title": "確定刪除知識庫",
-    "batchTitle": "確定批次刪除知識庫"
+    "title": "是否刪除知識庫：{name}？",
+    "batchTitle": "是否刪除選取的{count}個知識庫？"
   },
   "messages": {
     "missingWorkspace": "知識庫缺少所屬工作空間資訊",

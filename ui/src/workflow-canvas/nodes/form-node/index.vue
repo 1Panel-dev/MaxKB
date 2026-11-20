@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, provide, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FormField, VisibilityFieldOption } from '@/components/mk-dynamics-form'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
@@ -9,6 +10,7 @@ import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import FormSettingTable from './component/form-setting/FormSettingTable.vue'
 defineOptions({ name: 'WorkflowFormNode' })
+const { t } = useI18n({ useScope: 'global' })
 const resourceScope = (inject('resourceScope') as string) || 'workspace'
 const store = useWorkflowStore(resourceScope)
 const getModel = inject<() => WorkflowNodeModel>('getModel')!
@@ -57,7 +59,7 @@ const formFields = computed({
     formData.value.form_field_list = cloneDeep(fields)
     model.properties.config ??= {}
     model.properties.config.fields = [
-      { label: '表单全部内容', value: 'form_data' },
+      { label: t('workflow.form.formData'), value: 'form_data' },
       ...formFields.value.map((field) => ({
         label: typeof field.label === 'string' ? field.label : (field.label?.label ?? ''),
         value: field.field,
@@ -84,12 +86,12 @@ function validate() {
       if (!condition.field || condition.field.length < 2 || !condition.field[0] || !condition.field[1]) continue
       if (condition.self) {
         if (!formData.value.form_field_list.some((formField) => formField.field === condition.field[1])) {
-          validationResults.push(Promise.reject('引用变量不存在'))
+          validationResults.push(Promise.reject(t('workflow.referenceVariable.missingMessage')))
         }
       } else {
         const nodeEntry = upstreamNodeFields.find((node) => node.value === condition.field[0])
         if (!nodeEntry || !nodeEntry.children?.some((nodeField) => nodeField.value === condition.field[1])) {
-          validationResults.push(Promise.reject('引用变量不存在'))
+          validationResults.push(Promise.reject(t('workflow.referenceVariable.missingMessage')))
         }
       }
     }
@@ -104,23 +106,30 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formNodeFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formNodeFormRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <el-form-item
           prop="form_content_format"
           class="mk-hide-asterisk"
-          :rules="{ whitespace: true, required: true, message: '请填写表单输出内容', trigger: 'blur' }"
+          :rules="{ whitespace: true, required: true, message: t('workflow.form.content.requiredMessage'), trigger: 'blur' }"
         >
           <template #label>
             <div class="flex-align-center gap-1">
-              <span class="mk-required">表单输出内容</span>
-              <MkTooltip placement="right" content="设置执行该节点输出的内容，{ form } 为表单的占位符">
+              <span class="mk-required">{{ t('workflow.form.content.label') }}</span>
+              <MkTooltip placement="right" :content="t('workflow.form.content.description', { form: '{ form }' })">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </div>
           </template>
-          <MdEditorMagnify v-model="formData.form_content_format" title="表单输出内容" @wheel="handleNodeWheel" />
+          <MdEditorMagnify v-model="formData.form_content_format" :title="t('workflow.form.content.label')" @wheel="handleNodeWheel" />
         </el-form-item>
         <!-- 表单配置 -->
         <el-form-item>
@@ -128,7 +137,7 @@ onMounted(() => {
             v-model="formFields"
             :get-upstream-field-options="getUpstreamFieldOptions"
             :node-id="model.id"
-            :node-name="String(model.properties.stepName || '表单收集')"
+            :node-name="String(model.properties.stepName || t('workflow.form.label'))"
           />
         </el-form-item>
       </el-form>

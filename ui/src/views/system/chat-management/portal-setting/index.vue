@@ -71,7 +71,7 @@ function handleAccessChange(field: AccessField, value: string | number | boolean
     handleOpenAuthSetting(true)
     return
   }
-  // 使用服务端确认的值渲染开关，失败时保留原配置。
+  // 使用服务端确定的值渲染开关，失败时保留原配置。
   return savePortalSetting({ [field]: Boolean(value) })
 }
 

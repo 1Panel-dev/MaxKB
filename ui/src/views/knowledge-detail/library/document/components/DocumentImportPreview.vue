@@ -58,7 +58,7 @@ defineExpose({ validate })
 function handleDeleteParagraph(index: number) {
   const document = selectedDocument.value
   if (!document) return
-  return MsgConfirm(`${t('knowledge.paragraph.delete.confirm')}?`)
+  return MsgConfirm(t('knowledge.paragraph.delete.title', { name: document.content[index]?.title || '-' }))
     .then(() => {
       document.content.splice(index, 1)
     })

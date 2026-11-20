@@ -51,7 +51,11 @@ defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="currentIndex === undefined ? t('common.parameters.add') : t('common.parameters.edit')" @closed="resetData">
+  <MkDialog
+    v-model="visible"
+    :title="currentIndex === undefined ? t('workflow.llm.toolParameters.addTitle') : t('workflow.llm.toolParameters.editTitle')"
+    @closed="resetData"
+  >
     <el-form
       ref="formRef"
       :model="formData"

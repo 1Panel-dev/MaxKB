@@ -60,7 +60,7 @@ function localUpload() {
       <div class="mt-4 text-right">
         <!-- 取消 URL 上传 -->
         <el-button plain @click="visible = false">取消</el-button>
-        <!-- 确认 URL 上传 -->
+        <!-- 确定 URL 上传 -->
         <el-button
           type="primary"
           :loading="urlUploading"

@@ -154,7 +154,7 @@ function handleBeforeClose() {
     return
   }
   MsgConfirm(t('common.dialogs.notice'), `${t('common.dialogs.unsavedChanges')}?`, {
-    confirmButtonText: t('common.actions.confirm'),
+    confirmButtonText: t('common.actions.comfirm'),
     confirmButtonType: 'primary',
   })
     .then(() => {

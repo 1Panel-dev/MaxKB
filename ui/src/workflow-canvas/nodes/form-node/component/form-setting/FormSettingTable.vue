@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { FormField, VisibilityFieldOption } from '@/components/mk-dynamics-form'
 import { DYNAMIC_FORM_TYPES } from '@/components/mk-dynamics-form'
 import FormFieldDialog from './FormFieldDialog.vue'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowFormFieldTable' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ getUpstreamFieldOptions: () => VisibilityFieldOption[]; nodeId: string; nodeName: string }>()
 const formFields = defineModel<FormField[]>({ required: true })
@@ -41,7 +43,7 @@ function deleteField(index: number) {
 
 function saveField(data: FormField, index?: number) {
   if (formFields.value.some((field, fieldIndex) => field.field === data.field && fieldIndex !== index)) {
-    MsgError(`参数 "${data.field}" 已存在`)
+    MsgError(`${t('workflow.parameters.duplicateMessage')}：${data.field}`)
     return
   }
 
@@ -59,19 +61,20 @@ function saveField(data: FormField, index?: number) {
 <template>
   <div class="w-full">
     <div class="flex-between mb-2">
-      <span>表单配置</span>
+      <span>{{ t('workflow.form.configuration') }}</span>
+      <!-- 添加表单参数 -->
       <el-button text type="primary" @click="openFieldDialog()">
         <MkIcon name="icon_add_outlined" />
       </el-button>
     </div>
 
     <MkTable class="border" v-if="formFields.length" v-model:data="formFields" sortable size="small" row-key="field" :max-height="undefined">
-      <el-table-column prop="field" label="参数">
+      <el-table-column prop="field" :label="t('dynamicForm.fields.parameter.label')">
         <template #default="{ row }">
           <span :title="row.field" class="block truncate">{{ row.field }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="显示名称">
+      <el-table-column :label="t('dynamicForm.fields.displayName.label')">
         <template #default="{ row }">
           <span class="block truncate" :title="row.label.label" v-if="row.label && row.label.input_type === 'TooltipLabel'">
             {{ row.label.label }}
@@ -79,24 +82,24 @@ function saveField(data: FormField, index?: number) {
           <span class="block truncate" :title="row.label" v-else>{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="组件类型" width="110">
+      <el-table-column :label="t('dynamicForm.fields.inputType.label')" width="110">
         <template #default="{ row }">
           <el-tag size="small" type="info">{{ getTypeLabel(row.input_type) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="默认值">
+      <el-table-column :label="t('dynamicForm.fields.defaultValue.label')">
         <template #default="{ row }">
           <span :title="getDefaultValue(row)" class="block truncate">{{ getDefaultValue(row) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="必填" width="55">
+      <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="90">
         <template #default="{ row }">
           <div @click.stop>
             <el-switch disabled size="small" :model-value="Boolean(row.required)" />
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="80">
+      <el-table-column :label="t('common.labels.operation')" width="80">
         <template #default="{ row, $index }">
           <!-- 编辑 -->
           <el-button text type="primary" @click="openFieldDialog(row, $index)">

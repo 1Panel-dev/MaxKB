@@ -31,6 +31,8 @@
     },
     "toolParameters": {
       "label": "工具參數",
+      "addTitle": "新增工具參數",
+      "editTitle": "編輯工具參數",
       "empty": "暫無參數",
       "nameRequiredMessage": "請輸入參數名稱",
       "nameLengthMessage": "參數名稱不能超過 {max} 字",

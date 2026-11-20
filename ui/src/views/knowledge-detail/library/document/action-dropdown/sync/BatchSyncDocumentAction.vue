@@ -19,16 +19,20 @@ const knowledgeType = computed(() => route.params.type)
 const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ refresh: [] }>()
 
-// 固定选中文档，确认覆盖后按知识库类型调用批量同步接口。
+// 固定选中文档，确定覆盖后按知识库类型调用批量同步接口。
 function handleSync() {
   const knowledgeId = props.knowledgeId
   const documentIds = [...props.documentIds]
   const isLark = knowledgeType.value === KNOWLEDGE_TYPE_KEY.LARK
-  return MsgConfirm(`${t('knowledge.document.sync.batchTitle', documentIds.length)}?`, t('knowledge.document.sync.description'), {
-    cancelButtonText: t('common.actions.cancel'),
-    confirmButtonText: t('knowledge.sync.label'),
-    confirmButtonType: 'primary',
-  })
+  return MsgConfirm(
+    t('knowledge.document.sync.batchTitle', { count: documentIds.length }, documentIds.length),
+    t('knowledge.document.sync.description'),
+    {
+      cancelButtonText: t('common.actions.cancel'),
+      confirmButtonText: t('knowledge.sync.label'),
+      confirmButtonType: 'primary',
+    },
+  )
     .then(() => {
       if (loading.value) return
       loading.value = true

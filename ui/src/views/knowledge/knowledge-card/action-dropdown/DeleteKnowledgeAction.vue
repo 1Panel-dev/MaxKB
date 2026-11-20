@@ -20,7 +20,7 @@ const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ delete: [knowledgeId: string] }>()
 
 function handleDeleteKnowledge() {
-  return MsgConfirm(`${t('knowledge.delete.title')}: ${props.knowledge.name}?`, t('common.dialogs.deleteWarning'))
+  return MsgConfirm(t('knowledge.delete.title', { name: props.knowledge.name }), t('common.dialogs.deleteWarning'))
     .then(() => {
       loading.value = true
       return props.api

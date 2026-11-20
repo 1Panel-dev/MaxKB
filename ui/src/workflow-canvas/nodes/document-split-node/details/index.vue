@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
@@ -8,6 +9,7 @@ import { DOCUMENT_SPLIT_STRATEGY_LABELS } from '../constant'
 import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'DocumentSplitNodeDetail' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   data: ExecutionNodeDetail
@@ -54,26 +56,26 @@ watch(paragraphList, () => {
 
     <!-- 输入参数 -->
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">输入参数</h6>
+      <h6 class="mb-2">{{ t('workflow.executionResult.inputParams') }}</h6>
       <div class="space-y-2">
         <div>
-          <span class="text-N600">分段策略：</span>
+          <span class="text-N600">{{ t('workflow.documentSplit.strategy.label') }}：</span>
           {{ DOCUMENT_SPLIT_STRATEGY_LABELS[data.split_strategy] ?? (data.split_strategy || '-') }}
         </div>
         <div>
-          <span class="text-N600">子分块长度：</span>
+          <span class="text-N600">{{ t('workflow.documentSplit.childChunkLength.label') }}：</span>
           {{ data.chunk_size ?? '-' }}
         </div>
         <div v-if="data.split_strategy === 'custom'">
-          <span class="text-N600">分段标识：</span>
+          <span class="text-N600">{{ t('knowledge.documentStrategy.delimiter.label') }}：</span>
           {{ data.patterns ?? '-' }}
         </div>
         <div v-if="data.split_strategy === 'custom'">
-          <span class="text-N600">分段长度：</span>
+          <span class="text-N600">{{ t('knowledge.documentStrategy.paragraphLength') }}：</span>
           {{ data.limit ?? '-' }}
         </div>
         <div class="truncate" :title="inputNames">
-          <span class="text-N600">输入内容：</span>
+          <span class="text-N600">{{ t('workflow.inputContent.label') }}：</span>
           {{ inputNames || '-' }}
         </div>
       </div>
@@ -82,8 +84,8 @@ watch(paragraphList, () => {
     <!-- 输出参数 -->
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">
-        输出参数
-        <span class="text-N600 font-normal">（每个文档仅展示前 5 个分段）</span>
+        {{ t('workflow.executionResult.outputParams') }}
+        <span class="text-N600 font-normal">（{{ t('workflow.document.paragraphPreviewHint', { count: 5 }) }}）</span>
       </h6>
       <MkHorizontalScroll v-if="paragraphList.length" class="mb-2">
         <template v-for="(file, index) in paragraphList" :key="index">
@@ -109,7 +111,9 @@ watch(paragraphList, () => {
               <el-scrollbar max-height="400" class="-mr-4" view-class="pr-4">
                 <MdPreview :model-value="paragraph.content" no-img-zoom-in />
               </el-scrollbar>
-              <div class="text-N600 mt-2">{{ (paragraph.content || '').length }} 字符</div>
+              <div class="text-N600 mt-2">
+                {{ (paragraph.content || '').length }} {{ t('knowledge.stats.characters', (paragraph.content || '').length) }}
+              </div>
             </el-card>
           </template>
         </template>

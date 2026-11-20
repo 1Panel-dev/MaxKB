@@ -21,9 +21,13 @@
     "label": "循环开始",
     "index": "下标",
     "item": "循环元素",
+    "currentItem": "循环项",
+    "currentIndex": "循环下标",
+    "copyParameter": "复制参数",
     "variables": {
       "label": "循环变量",
-      "reservedMessage": "此参数为循环引擎内置，不可使用"
+      "reservedMessage": "此参数为循环引擎内置，不可使用",
+      "invalidMessage": "参数只能包含英文字母、数字、下划线"
     }
   },
   "loopBody": {

@@ -254,7 +254,7 @@ onMounted(() => loadProblems())
     <el-table-column prop="hit_num" :label="t('knowledge.stats.retrievalCount')" min-width="140" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ numberFormat(row.hit_num) }}</template>
     </el-table-column>
-    <el-table-column prop="last_hit_time" :label="t('knowledge.stats.lastRetrievedAt')" width="200" sortable>
+    <el-table-column prop="last_hit_time" :label="t('knowledge.question.lastRetrievedAt')" width="200" sortable>
       <template #default="{ row }: { row: ProblemItem }">{{ datetimeFormat(row.last_hit_time) || '-' }}</template>
     </el-table-column>
     <el-table-column prop="create_time" :label="t('common.labels.createTime')" width="180" sortable>

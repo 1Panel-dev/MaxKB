@@ -21,6 +21,7 @@
   "requiredMessage": "Upload a file",
   "reselectFileMessage": "Select the file to upload again",
   "emptyFileMessage": "Cannot upload an empty file.",
+  "emptyContentMessage": "The file cannot be empty",
   "sizeLimitMessage": "File too large",
   "unsupportedFormatMessage": "Unsupported file format",
   "countLimitMessage": "You can upload up to {count} file at a time. | You can upload up to {count} files at a time.",
@@ -31,6 +32,7 @@
     "completed": "Completed",
     "uploading": "Uploading",
     "failed": "Failed",
+    "uploadFailed": "Upload failed",
     "allSucceeded": "All files uploaded"
   },
   "avatar": {

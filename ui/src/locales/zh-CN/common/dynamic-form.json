@@ -26,7 +26,9 @@
     "parameter": {
       "label": "参数",
       "placeholder": "请输入参数",
-      "requiredMessage": "请输入参数"
+      "selectPlaceholder": "请选择参数",
+      "requiredMessage": "请输入参数",
+      "selectRequiredMessage": "请选择参数"
     },
     "displayName": {
       "label": "显示名称",
@@ -173,7 +175,9 @@
   "tree": {
     "addRoot": "添加一级选项",
     "addChild": "添加子选项",
-    "deleteConfirm": "确定删除"
+    "delete": {
+      "title": "是否删除：{name}？"
+    }
   },
   "visibility": {
     "show": "显示条件",

@@ -77,7 +77,7 @@ defineExpose({ open, resetDefault })
 
     <template #footer>
       <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-      <el-button type="primary" :loading="loading" @click="submit">{{ t('common.actions.confirm') }}</el-button>
+      <el-button type="primary" :loading="loading" @click="submit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

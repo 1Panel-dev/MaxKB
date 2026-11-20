@@ -68,8 +68,8 @@ defineExpose({ open, close })
     <template #footer>
       <!-- 取消权限配置 -->
       <el-button plain :disabled="loading" @click="close">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认权限配置 -->
-      <el-button type="primary" :loading="loading" :disabled="!permission" @click="handleSubmit">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定权限配置 -->
+      <el-button type="primary" :loading="loading" :disabled="!permission" @click="handleSubmit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

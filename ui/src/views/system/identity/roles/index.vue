@@ -76,7 +76,7 @@ function handleRoleSaved(role: RoleItem) {
 
 /* 删除角色 */
 function handleDeleteRole(role: RoleItem) {
-  MsgConfirm(`${t('role.delete.title')}: ${role.role_name}?`, t('role.delete.description'))
+  MsgConfirm(t('role.delete.title', { name: role.role_name }), t('role.delete.description'))
     .then(() => {
       loadingRoles.value = true
       return RoleApi.deleteRole(role.id).then(() => {

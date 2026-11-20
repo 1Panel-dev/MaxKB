@@ -80,7 +80,7 @@ async function submitUser() {
           user_group_ids: userForm.user_group_ids,
         })
           .then(() => {
-            MsgSuccess(t('common.messages.saveSuccess'))
+            MsgSuccess(t('common.messages.editSuccess'))
             emit('refresh', false)
             drawerVisible.value = false
           })

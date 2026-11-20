@@ -47,7 +47,7 @@ function handleGroupSelect(group: ListItem) {
 
 /* 删除用户组 */
 function deleteGroup(group: ListItem) {
-  MsgConfirm(`${t('userGroup.delete.title')}: ${group.name}?`, t('userGroup.delete.chatDescription'))
+  MsgConfirm(t('userGroup.delete.title', { name: group.name }), t('userGroup.delete.chatDescription'))
     .then(() => {
       groupsLoading.value = true
       return ChatGroupsApi.deleteChatUserGroup(group.id).then(() => {
@@ -131,8 +131,8 @@ function handleRemoveMembers(member?: ChatUserGroupMember) {
 
   const targetName = member ? member.nick_name || member.username : ''
   const title = member
-    ? `${t('system.member.removeTitle')}: ${targetName}?`
-    : `${t('system.member.batchRemoveTitle', { count: members.length }, members.length)}?`
+    ? t('system.member.removeTitle', { name: targetName })
+    : t('system.member.batchRemoveTitle', { count: members.length }, members.length)
   MsgConfirm(title, t('userGroup.delete.removeDescription'), { confirmButtonText: t('common.actions.remove') })
     .then(() => {
       membersLoading.value = true

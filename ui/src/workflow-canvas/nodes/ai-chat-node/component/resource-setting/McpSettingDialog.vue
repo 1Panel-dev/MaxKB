@@ -142,8 +142,8 @@ defineExpose({ open })
     <template #footer>
       <!-- 取消 MCP 设置 -->
       <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-      <!-- 确认 MCP 设置 -->
-      <el-button type="primary" @click="submit">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定 MCP 设置 -->
+      <el-button type="primary" @click="submit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

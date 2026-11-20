@@ -32,7 +32,6 @@
     "createTitle": "创建工作流知识库",
     "description": "通过自定义工作流方式构建知识库"
   },
-
   "fields": {
     "name": {
       "placeholder": "请输入知识库名称",
@@ -93,8 +92,8 @@
     "sourceFilesDescription": "勾选后将原始文件一并打包至 ZIP，导入时可自动恢复文件关联；不勾选，则仅导出文本内容。"
   },
   "delete": {
-    "title": "确认删除知识库",
-    "batchTitle": "是否批量删除知识库"
+    "title": "是否删除知识库：{name}？",
+    "batchTitle": "是否删除选中的{count}个知识库？"
   },
   "messages": {
     "missingWorkspace": "知识库缺少所属工作空间信息",

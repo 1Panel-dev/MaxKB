@@ -19,7 +19,9 @@
       "description": "相似度越高相關性越強。"
     },
     "topNumber": "召回分段數 TOP",
-    "maxReferenceCharacters": "最多引用字元數"
+    "maxReferenceCharacters": "最多引用字元數",
+    "imageVector": "圖片向量",
+    "textVector": "文字向量"
   },
   "hitTest": {
     "title": "召回測試",
@@ -34,8 +36,6 @@
       "initialEmpty": "召回的知識顯示在這裡",
       "empty": "未召回相關知識，請調整檢索參數內容"
     },
-    "imageVector": "圖片向量",
-    "textVector": "文字向量",
     "test": "測試"
   },
   "externalRetrieval": {

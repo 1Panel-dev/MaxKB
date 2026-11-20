@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationAccessToken } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
@@ -17,6 +18,7 @@ import { isSystemResource } from '@/utils/resource-context.ts'
 import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'ApplicationOverviewView' })
+const { t } = useI18n({ useScope: 'global' })
 defineProps<ResourceDetailPageProps>()
 defineExpose({ hideHeader: true })
 
@@ -49,15 +51,17 @@ const apiKeySaving = ref(false)
 const chatBasePath = CHAT_API_BASE_PATH.replace(/\/api$/, '')
 
 const apiDocUrl = new URL(`${CHAT_API_BASE_PATH}-doc/`, window.location.origin).href
-const apiQuery=computed(()=>{
-const query=application.value?.work_flow?.nodes?.find(n=>n.id==='base-node')?.properties?.api_input_field_list?.map((f:any)=>{
-  return `${f.variable}=${f.default_value}`
-}).join('&')
-if(query){
-  return '?'+query
-}
-return ''
-
+const apiQuery = computed(() => {
+  const query = application.value?.work_flow?.nodes
+    ?.find((n) => n.id === 'base-node')
+    ?.properties?.api_input_field_list?.map((f: any) => {
+      return `${f.variable}=${f.default_value}`
+    })
+    .join('&')
+  if (query) {
+    return '?' + query
+  }
+  return ''
 })
 // TODO：访问链接还有问题
 const accessUrl = computed(() => (accessToken.value ? `${window.location.origin}${chatBasePath}/${accessToken.value}/${apiQuery.value}` : ''))
@@ -87,7 +91,7 @@ function handleChangeWebAccess() {
 function handleResetAccessToken() {
   if (!accessToken.value || loading.value) return
   return MsgConfirm('是否重新生成公开访问链接？', '重新生成后旧链接将失效，嵌入第三方的脚本也需要更新，请谨慎操作！', {
-    confirmButtonText: '确认',
+    confirmButtonText: t('common.actions.comfirm'),
     confirmButtonType: 'primary',
   }).then(
     () => {
@@ -152,7 +156,12 @@ onMounted(() => {
           <div class="flex-between">
             <h6>Web 访问</h6>
             <!-- Web 访问开关 -->
-            <el-switch :model-value="webAccessActive" size="small" :disabled="loading || !applicationOverviewPermission('overviewPublic')" :before-change="handleChangeWebAccess" />
+            <el-switch
+              :model-value="webAccessActive"
+              size="small"
+              :disabled="loading || !applicationOverviewPermission('overviewPublic')"
+              :before-change="handleChangeWebAccess"
+            />
           </div>
           <div class="space-y-2">
             <div>链接</div>

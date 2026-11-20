@@ -14,7 +14,7 @@
     "placeholder": "Select members",
     "requiredMessage": "Select members",
     "add": "Add members",
-    "removeTitle": "Remove member",
-    "batchRemoveTitle": "Remove the {count} selected member | Remove the {count} selected members"
+    "removeTitle": "Remove member: {name}?",
+    "batchRemoveTitle": "Remove the {count} selected member? | Remove the {count} selected members?"
   }
 }

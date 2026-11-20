@@ -26,7 +26,7 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">{{ t('workflow.history.label') }}</h6>
+      <h6 class="mb-2">{{ t('workflow.executionResult.history') }}</h6>
       <div class="space-y-2">
         <template v-if="data.history_message?.length > 0">
           <div v-for="(history, historyIndex) in data.history_message" :key="historyIndex" class="mb-2 last:mb-0">

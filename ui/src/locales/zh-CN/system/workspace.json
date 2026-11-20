@@ -9,9 +9,9 @@
     "requiredMessage": "请输入工作空间名称"
   },
   "delete": {
-    "title": "确认删除工作空间",
+    "title": "是否删除工作空间：{name}？",
     "description": "删除后，该空间下的成员都会被移除，请谨慎操作。",
-    "batchRemoveTitle": "是否移除选中记录对应的成员",
+    "batchRemoveTitle": "是否移除选中记录对应的成员？",
     "batchRemoveDescription": "涉及 {memberCount} 位成员，共 {recordCount} 条记录。",
     "partialRemoveMessage": "移除成功 {successCount} 个成员，失败 {failedCount} 个"
   }

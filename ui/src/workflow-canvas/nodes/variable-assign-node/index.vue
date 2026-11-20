@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowNodeField } from '@/workflow-canvas/types'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
@@ -11,6 +12,7 @@ import { createAnchorGuard, handleNodeWheel, isLastNode } from '@/workflow-canva
 import { randomId } from '@/utils/common'
 
 defineOptions({ name: 'WorkflowVariableAssignNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel()
 
@@ -95,21 +97,35 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <el-form ref="variableAssignNodeFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+    <el-form
+      ref="variableAssignNodeFormRef"
+      :model="formData"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <template v-for="(item, index) in formData.variable_list" :key="item.id">
         <div class="mb-2 flex-align-center gap-1">
           <div class="mk-gray-card flex-1">
             <!-- 变量 -->
             <el-form-item
-              label="变量"
+              :label="t('workflow.variable.label')"
               :prop="'variable_list.' + index + '.fields'"
-              :rules="{ required: true, message: '请选择变量', trigger: 'change' }"
+              :rules="{ required: true, message: t('workflow.variable.selectRequiredMessage'), trigger: 'change' }"
             >
-              <NodeCascader :node-model="model" placeholder="请选择变量" v-model="item.fields" :global="true" @change="variableChange(item)" />
+              <NodeCascader
+                :node-model="model"
+                :placeholder="t('workflow.variable.selectPlaceholder')"
+                v-model="item.fields"
+                :global="true"
+                @change="variableChange(item)"
+              />
             </el-form-item>
             <!-- 赋值 -->
             <div class="flex-between">
-              <span :class="item.source !== 'null' ? 'mk-required' : ''">赋值</span>
+              <span :class="item.source !== 'null' ? 'mk-required' : ''">{{ t('workflow.variableAssign.value.label') }}</span>
+              <!-- 选择赋值来源 -->
               <el-select
                 :teleported="false"
                 v-model="item.source"
@@ -118,13 +134,14 @@ onMounted(() => {
                 @visible-change="anchorGuard.setOverlayVisible(`${item.id}:source`, $event)"
                 @wheel="handleNodeWheel"
               >
-                <el-option label="引用变量" value="referencing" />
-                <el-option label="自定义" value="custom" />
+                <el-option :label="t('workflow.referenceVariable.label')" value="referencing" />
+                <el-option :label="t('workflow.variableAssign.value.custom')" value="custom" />
                 <el-option label="null" value="null" />
               </el-select>
             </div>
 
             <div v-if="item.source === 'custom'">
+              <!-- 选择赋值数据类型 -->
               <el-radio-group v-model="item.type" @change="changeType(index)" class="mb-1">
                 <template v-for="variableType in typeOptions" :key="variableType">
                   <el-radio :value="variableType">{{ variableType }}</el-radio>
@@ -134,15 +151,20 @@ onMounted(() => {
               <el-form-item
                 v-if="item.type === 'string'"
                 :prop="'variable_list.' + index + '.value'"
-                :rules="{ message: '请输入', trigger: 'blur', required: true }"
+                :rules="{ message: t('common.validation.inputRequired'), trigger: 'blur', required: true }"
               >
-                <el-input v-model="item.value" placeholder="请输入内容" clearable @wheel="handleNodeWheel"></el-input>
+                <el-input
+                  v-model="item.value"
+                  :placeholder="t('workflow.variableAssign.value.placeholder')"
+                  clearable
+                  @wheel="handleNodeWheel"
+                ></el-input>
               </el-form-item>
               <!-- num -->
               <el-form-item
                 v-else-if="item.type === 'num'"
                 :prop="'variable_list.' + index + '.value'"
-                :rules="{ message: '请输入', trigger: ['blur', 'change'], required: true }"
+                :rules="{ message: t('common.validation.inputRequired'), trigger: ['blur', 'change'], required: true }"
               >
                 <el-input-number v-model="item.value" controls-position="right" align="left" />
               </el-form-item>
@@ -151,14 +173,14 @@ onMounted(() => {
                 v-else-if="item.type === 'json'"
                 :prop="'variable_list.' + index + '.value'"
                 :rules="[
-                  { message: '请输入', trigger: 'blur', required: true },
+                  { message: t('common.validation.inputRequired'), trigger: 'blur', required: true },
                   {
                     validator: (rule: any, value: any, callback: any) => {
                       try {
                         JSON.parse(value)
                         callback()
                       } catch (e) {
-                        callback(new Error('Invalid JSON format'))
+                        callback(new Error(t('common.validation.jsonFormat')))
                       }
                     },
                     trigger: 'blur',
@@ -172,7 +194,7 @@ onMounted(() => {
               <el-form-item
                 v-else-if="item.type === 'bool'"
                 :prop="'variable_list.' + index + '.value'"
-                :rules="{ message: '请输入', trigger: 'change', required: true }"
+                :rules="{ message: t('common.validation.selectRequired'), trigger: 'change', required: true }"
               >
                 <el-select v-model="item.value" class="w-full" :teleported="false" @wheel="handleNodeWheel">
                   <el-option label="true" :value="true" />
@@ -184,9 +206,9 @@ onMounted(() => {
               class="mt-2"
               v-else-if="item.source === 'referencing'"
               :prop="'variable_list.' + index + '.reference'"
-              :rules="{ required: true, message: '请选择变量', trigger: 'change' }"
+              :rules="{ required: true, message: t('workflow.variable.selectRequiredMessage'), trigger: 'change' }"
             >
-              <NodeCascader v-model="item.reference" :node-model="model" placeholder="请选择变量" />
+              <NodeCascader v-model="item.reference" :node-model="model" :placeholder="t('workflow.variable.selectPlaceholder')" />
             </el-form-item>
           </div>
           <!-- 删除变量 -->
@@ -196,9 +218,10 @@ onMounted(() => {
         </div>
       </template>
 
+      <!-- 添加赋值变量 -->
       <el-button link type="primary" @click="addVariable">
         <MkIcon name="icon_add_outlined" />
-        <span>添加</span>
+        <span>{{ t('common.actions.add') }}</span>
       </el-button>
     </el-form>
   </NodeContainer>

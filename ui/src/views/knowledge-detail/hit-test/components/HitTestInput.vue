@@ -148,7 +148,7 @@ function uploadImage(image: QueryImage) {
       // 保留原文件和缩略图，供重试或移除。
       if (image.status !== 'uploading') return
       image.status = 'fail'
-      image.errMsg = t('upload.status.failed')
+      image.errMsg = t('upload.status.uploadFailed')
     })
     .finally(() => uploadRequests.delete(image.id))
 }

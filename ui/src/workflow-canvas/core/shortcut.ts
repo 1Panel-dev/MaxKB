@@ -4,6 +4,7 @@ import { type GraphModel } from '@logicflow/core'
 import { workflowModelDict } from '@/workflow-canvas/config/node-mapping'
 import { getMenuNodes } from '@/workflow-canvas/node-menu/menu'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
+import { t } from '@/locales'
 import { copyText } from '@/utils/clipboard'
 import { randomId } from '@/utils/common'
 import { MsgConfirm, MsgError } from '@/utils/message'
@@ -301,7 +302,13 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       MsgError(`${nodes[0]?.properties?.stepName}节点不允许删除`)
       return
     }
-    MsgConfirm('提示', '确定删除该节点？', { confirmButtonText: '确定', confirmButtonClass: 'danger' }).then(() => {
+    MsgConfirm(
+      t('common.dialogs.notice'),
+      elements.nodes.length === 1
+        ? t('workflow.node.delete.title', { name: String(elements.nodes[0]?.properties?.stepName || '-') })
+        : t('workflow.node.delete.batchTitle', { count: elements.nodes.length }, elements.nodes.length),
+      { confirmButtonText: t('common.actions.comfirm'), confirmButtonClass: 'danger' },
+    ).then(() => {
       if (!keyboardOptions?.enabled) return true
       if (graph.textEditElement) return true
 
@@ -327,8 +334,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
   // 粘贴
   keyboard.on(['cmd + v', 'ctrl + v'], () => {})
   // undo
-  keyboard.on(['cmd + z', 'ctrl + z'], () => {
-  })
+  keyboard.on(['cmd + z', 'ctrl + z'], () => {})
   // redo
   keyboard.on(['cmd + y', 'ctrl + y'], () => {
     if (!keyboardOptions?.enabled) return true

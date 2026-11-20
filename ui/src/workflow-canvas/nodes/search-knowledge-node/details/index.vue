@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DocumentResourceType, KnowledgeHitTestAsset, KnowledgeType } from '@/api/types'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import { DOCUMENT_RESOURCE_TYPE, KNOWLEDGE_HIT_UNIT_TYPE } from '@/api/enums'
@@ -10,6 +11,7 @@ import { downloadByURL, getFileUrl } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'SearchKnowledgeNodeDetail' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   data: ExecutionNodeDetail
@@ -71,7 +73,7 @@ function openSourceDocument(name: string, fileId?: string, sourceUrl?: string) {
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">检索内容</h6>
+      <h6 class="mb-2">{{ t('workflow.executionResult.retrievalContent') }}</h6>
       <div class="space-y-2">
         <div v-if="data.question">{{ data.question }}</div>
         <div v-if="queryImages.length" class="flex flex-wrap gap-2">
@@ -92,7 +94,7 @@ function openSourceDocument(name: string, fileId?: string, sourceUrl?: string) {
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">检索结果</h6>
+      <h6 class="mb-2">{{ t('workflow.searchKnowledge.result') }}</h6>
       <div class="space-y-2" v-if="sortedParagraphs.length > 0">
         <template v-for="(paragraph, paragraphIndex) in sortedParagraphs" :key="paragraphIndex">
           <MkResourceCard :title="`${paragraph.title || '-'}`" disabled>
@@ -106,7 +108,11 @@ function openSourceDocument(name: string, fileId?: string, sourceUrl?: string) {
             <template #tag>
               <div class="flex-align-center gap-2">
                 <el-tag size="small" type="info">
-                  {{ paragraph.document_resource_type === KNOWLEDGE_HIT_UNIT_TYPE.IMAGE ? '图片向量' : '文本向量' }}
+                  {{
+                    paragraph.document_resource_type === KNOWLEDGE_HIT_UNIT_TYPE.IMAGE
+                      ? t('knowledge.retrieval.imageVector')
+                      : t('knowledge.retrieval.textVector')
+                  }}
                 </el-tag>
                 <h6 class="shrink-0 text-primary">{{ paragraph.similarity?.toFixed(3) }}</h6>
               </div>

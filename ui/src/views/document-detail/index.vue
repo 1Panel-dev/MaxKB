@@ -128,14 +128,17 @@ function handleGenerateQuestionsSuccess() {
   selectedParagraphIds.value = []
 }
 
-// 批量删除：确认前固定目标，取消或失败保留勾选。
+// 批量删除：确定前固定目标，取消或失败保留勾选。
 function handleBatchDeleteParagraphs() {
   if (loading.value || !selectedParagraphIds.value.length) return
   const targetParagraphIds = [...selectedParagraphIds.value]
   const targetKnowledgeId = knowledgeId.value
   const targetDocumentId = documentId.value
   loading.value = true
-  return MsgConfirm(`${t('knowledge.paragraph.delete.batchTitle', targetParagraphIds.length)}?`, t('common.dialogs.deleteWarning'))
+  return MsgConfirm(
+    t('knowledge.paragraph.delete.batchTitle', { count: targetParagraphIds.length }, targetParagraphIds.length),
+    t('common.dialogs.deleteWarning'),
+  )
     .then(() => {
       return resourceApi.paragraph.putBatchDeleteParagraphs?.(targetKnowledgeId, targetDocumentId, targetParagraphIds).then(() => {
         MsgSuccess(t('common.messages.deleteSuccess'))
@@ -204,7 +207,7 @@ function handleDeleteParagraph(paragraph: ParagraphItem) {
   const targetDocumentId = documentId.value
   const targetParagraphId = paragraph.id
   loading.value = true
-  return MsgConfirm(`${t('knowledge.paragraph.delete.title')}: ${paragraph.title || '-'}?`, t('common.dialogs.deleteWarning'))
+  return MsgConfirm(t('knowledge.paragraph.delete.title', { name: paragraph.title || '-' }), t('common.dialogs.deleteWarning'))
     .then(() => {
       return resourceApi.paragraph.deleteParagraph?.(targetKnowledgeId, targetDocumentId, targetParagraphId).then(() => {
         MsgSuccess(t('common.messages.deleteSuccess'))

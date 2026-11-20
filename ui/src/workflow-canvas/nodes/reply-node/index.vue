@@ -81,8 +81,8 @@ onMounted(() => {
         require-asterisk-position="right"
         @submit.prevent
       >
-        <!-- 回复格式 -->
-        <el-form-item :label="t('workflow.reply.format.label')">
+        <!-- 回复类型 -->
+        <el-form-item :label="t('workflow.reply.format.typeLabel')">
           <el-select
             v-model="formData.content_type"
             :teleported="false"
@@ -111,7 +111,7 @@ onMounted(() => {
             required: true,
             whitespace: formData.reply_type !== 'referencing',
             message:
-              formData.reply_type === 'referencing' ? t('workflow.referenceVariable.requiredMessage') : t('workflow.reply.content.requiredMessage'),
+              formData.reply_type === 'referencing' ? t('workflow.variable.selectRequiredMessage') : t('workflow.reply.content.requiredMessage'),
             trigger: 'change',
           }"
         >
@@ -131,7 +131,7 @@ onMounted(() => {
             ref="nodeCascaderRef"
             v-model="formData.fields"
             :node-model="model"
-            :placeholder="t('workflow.referenceVariable.placeholder')"
+            :placeholder="t('workflow.variable.selectPlaceholder')"
           />
 
           <MdEditorMagnify

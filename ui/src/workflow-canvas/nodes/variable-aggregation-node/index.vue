@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
@@ -12,6 +13,7 @@ import { randomId } from '@/utils/common'
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowVariableAggregationNode' })
+const { t } = useI18n({ useScope: 'global' })
 const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel() as WorkflowNodeModel
 
@@ -86,7 +88,7 @@ function handleGroupSubmit(data: { field: string; label: string }, index?: numbe
   for (let i = 0; i < formData.value.group_list.length; i++) {
     const group = formData.value.group_list[i]
     if (group && group.field === data.field && i !== index) {
-      MsgError(`变量 "${data.field}" 已存在`)
+      MsgError(`${t('workflow.variable.duplicateMessage')}：${data.field}`)
       return
     }
   }
@@ -147,15 +149,25 @@ onBeforeUnmount(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="variableAggregationFormRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="variableAggregationFormRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <!-- 聚合策略 -->
-        <el-form-item label="聚合策略" :rules="{ required: true, message: '请选择聚合策略', trigger: 'change' }">
+        <el-form-item
+          :label="t('workflow.variableAggregation.strategy.label')"
+          :rules="{ required: true, message: t('workflow.variableAggregation.strategy.requiredMessage'), trigger: 'change' }"
+        >
           <el-select v-model="formData.strategy" :teleported="false" @change="onStrategyChange" @wheel="handleNodeWheel">
-            <el-option label="返回每组的第一个非空值" value="first_non_null" />
-            <el-option label="返回每组变量的数组（Array）" value="variable_to_array" />
-            <el-option label="返回每组变量的字典（Dict）" value="variable_to_dict" />
+            <el-option :label="t('workflow.variableAggregation.strategy.firstNonNull')" value="first_non_null" />
+            <el-option :label="t('workflow.variableAggregation.strategy.array')" value="variable_to_array" />
+            <el-option :label="t('workflow.variableAggregation.strategy.dict')" value="variable_to_dict" />
           </el-select>
         </el-form-item>
         <template v-for="(group, gIndex) in formData.group_list" :key="group.id">
@@ -180,25 +192,26 @@ onBeforeUnmount(() => {
                   v-if="formData.strategy === 'variable_to_dict'"
                   class="small w-25 shrink-0"
                   :prop="`group_list.${gIndex}.variable_list.${vIndex}.key`"
-                  :rules="{ whitespace: true, required: true, message: '请输入键名', trigger: 'blur' }"
+                  :rules="{ whitespace: true, required: true, message: t('workflow.variableAggregation.key.requiredMessage'), trigger: 'blur' }"
                 >
-                  <el-input v-model="item.key" placeholder="请输入键名" maxlength="256" />
+                  <el-input v-model="item.key" :placeholder="t('workflow.variableAggregation.key.placeholder')" maxlength="256" />
                 </el-form-item>
                 <el-form-item
                   class="small min-w-0 flex-1"
                   :prop="`group_list.${gIndex}.variable_list.${vIndex}.variable`"
-                  :rules="{ type: 'array', required: true, message: '请选择变量', trigger: 'change' }"
+                  :rules="{ type: 'array', required: true, message: t('workflow.variable.selectRequiredMessage'), trigger: 'change' }"
                 >
-                  <NodeCascader v-model="item.variable" :node-model="model" placeholder="请选择变量" />
+                  <NodeCascader v-model="item.variable" :node-model="model" :placeholder="t('workflow.variable.selectPlaceholder')" />
                 </el-form-item>
               </template>
             </MkFormList>
           </div>
         </template>
 
+        <!-- 添加聚合分组 -->
         <el-button @click="openAddOrEditDialog()" type="primary" link>
           <MkIcon name="icon_add_outlined" />
-          <span>添加分组</span>
+          <span>{{ t('workflow.variableAggregation.group.add') }}</span>
         </el-button>
       </el-form>
     </div>

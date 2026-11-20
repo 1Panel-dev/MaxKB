@@ -429,6 +429,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `global/mk-table/MkAction.vue` 统一单个操作的两种外观，通过 `display="menu"`（默认）或
 `display="button"` 显式选择菜单项或带 Tooltip 的图标按钮，不注入或推断展示上下文。
 接收 `label`、SVG Symbol 名称 `icon`、`disabled`、`divided`，发出 `click` 并阻止点击冒泡。
+`size` 控制两种模式的图标尺寸，沿用 `MkIcon` 的数字或字符串类型，默认 16；例如 `:size="18"`。
 `divided` 仅用于菜单模式。页面自行组合外露操作与 `MkTableMoreDropdown`，不自动分配位置。
 `type` 沿用 Element Plus Button 类型，仅用于按钮模式，默认 `primary`；传入空字符串使用默认按钮配色。
 

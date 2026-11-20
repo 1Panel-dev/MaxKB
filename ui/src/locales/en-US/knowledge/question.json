@@ -2,6 +2,7 @@
   "question": {
     "title": "Questions",
     "detailTitle": "Question details",
+    "lastRetrievedAt": "Most recent retrieval time",
     "content": {
       "placeholder": "Enter a question",
       "batchPlaceholder": "Enter questions, one per line",

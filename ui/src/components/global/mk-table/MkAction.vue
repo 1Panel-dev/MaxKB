@@ -3,7 +3,15 @@ import type { ButtonProps } from 'element-plus'
 
 defineOptions({ name: 'MkAction', inheritAttrs: false })
 withDefaults(
-  defineProps<{ display?: 'menu' | 'button'; label: string; icon?: string; disabled?: boolean; divided?: boolean; type?: ButtonProps['type'] }>(),
+  defineProps<{
+    display?: 'menu' | 'button'
+    label: string
+    icon?: string
+    size?: number | string
+    disabled?: boolean
+    divided?: boolean
+    type?: ButtonProps['type']
+  }>(),
   { display: 'menu', type: 'primary' },
 )
 const emit = defineEmits<{ click: [event: MouseEvent] }>()
@@ -18,7 +26,7 @@ const emit = defineEmits<{ click: [event: MouseEvent] }>()
   <MkTooltip v-else :content="label" placement="top">
     <!-- 图标操作 -->
     <el-button v-bind="$attrs" text :type="type" :disabled="disabled" @click.stop="emit('click', $event)">
-      <MkIcon :name="icon" />
+      <MkIcon :name="icon" :size="size" />
     </el-button>
   </MkTooltip>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ToolInputField } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { FormInstance } from 'element-plus'
@@ -12,6 +13,8 @@ import { WorkflowMode } from '@/workflow-canvas/types'
 import FieldSetting from './component/FieldSetting.vue'
 
 defineOptions({ name: 'WorkflowToolCustomNode' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 type ToolNodeInputField =
   | (Omit<ToolInputField, 'source'> & { source: 'reference'; value: string[] })
@@ -87,13 +90,13 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
 
-    <el-form ref="formRef" :model="formData" label-position="top" hide-required-asterisk @submit.prevent>
+    <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" hide-required-asterisk @submit.prevent>
       <div class="mk-gray-card">
         <!-- 输入参数 -->
         <div class="flex-between mb-2">
-          <p>输入参数</p>
+          <p>{{ t('tool.inputParams.title') }}</p>
           <FieldSetting ref="inputFieldDialogRef" @submit="handleInputFieldSubmit" />
         </div>
 
@@ -105,7 +108,10 @@ onMounted(() => {
               :prop="`input_field_list.${index}.value`"
               :rules="{
                 required: field.is_required,
-                message: field.source === 'reference' ? '请选择参数' : '请输入参数',
+                message:
+                  field.source === 'reference'
+                    ? t('dynamicForm.fields.parameter.selectRequiredMessage')
+                    : t('dynamicForm.fields.parameter.requiredMessage'),
                 trigger: field.source === 'reference' ? 'change' : 'blur',
               }"
             >
@@ -120,9 +126,11 @@ onMounted(() => {
                   </div>
 
                   <div class="flex-align-center shrink-0">
+                    <!-- 编辑输入参数 -->
                     <el-button text type="primary" @click.stop="handleOpenInputField(field, index)">
                       <MkIcon name="icon_edit_outlined" />
                     </el-button>
+                    <!-- 删除输入参数 -->
                     <el-button text type="primary" @click="handleDeleteInputField(index)">
                       <MkIcon name="icon_delete-trash_outlined" />
                     </el-button>
@@ -130,20 +138,25 @@ onMounted(() => {
                 </div>
               </template>
 
-              <NodeCascader v-if="field.source === 'reference'" v-model="field.value" :node-model="model" placeholder="请选择参数" />
-              <el-input v-else v-model="field.value" placeholder="请输入参数" />
+              <NodeCascader
+                v-if="field.source === 'reference'"
+                v-model="field.value"
+                :node-model="model"
+                :placeholder="t('dynamicForm.fields.parameter.selectPlaceholder')"
+              />
+              <el-input v-else v-model="field.value" :placeholder="t('dynamicForm.fields.parameter.placeholder')" />
             </el-form-item>
           </div>
         </template>
-        <!-- 输入参数 -->
-        <el-form-item label="工具内容（Python）" class="mt-4">
-          <PythonCodeEditor v-model="formData.code" title="工具内容（Python）" @wheel="handleNodeWheel" />
+        <!-- 编辑工具代码 -->
+        <el-form-item :label="t('tool.pythonCode.title')" class="mt-4">
+          <PythonCodeEditor v-model="formData.code" :title="t('tool.pythonCode.title')" @wheel="handleNodeWheel" />
         </el-form-item>
         <!-- 返回内容 -->
         <div class="flex-between w-full" v-if="showReturnContent">
           <span class="flex-align-center gap-1">
-            返回内容
-            <MkTooltip content="关闭后该节点的内容则不输出给用户。如果你想让用户看到该节点的输出内容，请打开开关。" placement="right">
+            {{ t('workflow.returnContent.label') }}
+            <MkTooltip :content="t('workflow.returnContent.description')" placement="right">
               <MkIcon name="icon_info_outlined" class="text-N600!" />
             </MkTooltip>
           </span>

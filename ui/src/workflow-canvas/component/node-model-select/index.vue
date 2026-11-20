@@ -125,7 +125,7 @@ onBeforeUnmount(() => anchorGuard.reset())
       ref="modelCascaderRef"
       :model-value="reference"
       :node-model="nodeModel"
-      :placeholder="t('workflow.referenceVariable.placeholder')"
+      :placeholder="t('workflow.variable.selectPlaceholder')"
       @update:model-value="emit('update', { [fields.reference]: $event })"
     />
   </el-form-item>

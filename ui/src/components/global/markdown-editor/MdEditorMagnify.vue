@@ -72,8 +72,8 @@ async function submitEditorDialog() {
     />
 
     <template #footer>
-      <!-- 确认编辑内容 -->
-      <el-button type="primary" @click="submitEditorDialog">{{ t('common.actions.confirm') }}</el-button>
+      <!-- 确定编辑内容 -->
+      <el-button type="primary" @click="submitEditorDialog">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>
 </template>

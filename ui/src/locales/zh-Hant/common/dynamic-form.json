@@ -26,7 +26,9 @@
     "parameter": {
       "label": "參數",
       "placeholder": "請輸入參數",
-      "requiredMessage": "請輸入參數"
+      "selectPlaceholder": "請選擇參數",
+      "requiredMessage": "請輸入參數",
+      "selectRequiredMessage": "請選擇參數"
     },
     "displayName": {
       "label": "顯示名稱",
@@ -173,7 +175,9 @@
   "tree": {
     "addRoot": "新增第一層選項",
     "addChild": "新增子選項",
-    "deleteConfirm": "確定刪除"
+    "delete": {
+      "title": "是否刪除：{name}？"
+    }
   },
   "visibility": {
     "show": "顯示條件",

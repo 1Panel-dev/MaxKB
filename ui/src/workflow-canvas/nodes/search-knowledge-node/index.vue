@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { SearchKnowledgeNodeForm } from './types'
 import type { KnowledgeItem } from '@/api/types'
 import type { NodeSearchScopeData } from '@/workflow-canvas/component/node-search-scope/types'
@@ -14,6 +15,7 @@ import { defaultSearchSetting } from './constant.ts'
 import { KNOWLEDGE_SEARCH_MODE_OPTIONS } from '@/constants/knowledge'
 
 defineOptions({ name: 'WorkflowSearchKnowledgeNode' })
+const { t } = useI18n({ useScope: 'global' })
 
 const getModel = inject('getModel') as () => WorkflowNodeModel
 const model = getModel()
@@ -68,17 +70,17 @@ function updateSearchScope(patch: Partial<NodeSearchScopeData>) {
   model.properties.node_data = { ...formData.value, ...patch }
 }
 
-// 检索参数由弹窗编辑，确认后统一写回。
+// 检索参数由弹窗编辑，确定后统一写回。
 const settingRows = computed(() => {
   const searchMode = KNOWLEDGE_SEARCH_MODE_OPTIONS.find(({ value }) => value === formData.value.knowledge_setting.search_mode)
   return [
     {
-      label: '检索模式',
+      label: t('knowledge.retrieval.mode'),
       value: searchMode ? searchMode.label : formData.value.knowledge_setting.search_mode,
     },
-    { label: '相似度高于', value: formData.value.knowledge_setting.similarity.toFixed(3) },
-    { label: '召回分段数 TOP', value: formData.value.knowledge_setting.top_n },
-    { label: '最多引用字符数', value: formData.value.knowledge_setting.max_paragraph_char_number },
+    { label: t('knowledge.retrieval.similarity.label'), value: formData.value.knowledge_setting.similarity.toFixed(3) },
+    { label: t('knowledge.retrieval.topNumber'), value: formData.value.knowledge_setting.top_n },
+    { label: t('knowledge.retrieval.maxReferenceCharacters'), value: formData.value.knowledge_setting.max_paragraph_char_number },
   ]
 })
 
@@ -94,9 +96,16 @@ onMounted(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mk-title-decoration mb-2">节点设置</h6>
+    <h6 class="mk-title-decoration mb-2">{{ t('workflow.nodeSettings.title') }}</h6>
     <div class="mk-gray-card">
-      <el-form ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
         <!-- 检索范围 -->
         <NodeSearchScope
           :node-model="model"
@@ -109,7 +118,7 @@ onMounted(() => {
         <el-form-item>
           <template #label>
             <div class="flex-between">
-              <span>检索参数</span>
+              <span>{{ t('knowledge.retrieval.parameters') }}</span>
               <SearchSetting v-model="formData.knowledge_setting" />
             </div>
           </template>
@@ -125,15 +134,25 @@ onMounted(() => {
           </div>
         </el-form-item>
         <!-- 检索问题 -->
-        <el-form-item label="检索问题" prop="question_reference_address" :rules="{ required: true, message: '请选择检索问题', trigger: 'change' }">
-          <NodeCascader ref="questionReferenceRef" v-model="formData.question_reference_address" :node-model="model" placeholder="请选择检索问题" />
+        <el-form-item
+          :label="t('workflow.searchQuestion.label')"
+          prop="question_reference_address"
+          :rules="{ required: true, message: t('workflow.searchQuestion.requiredMessage'), trigger: 'change' }"
+        >
+          <NodeCascader
+            ref="questionReferenceRef"
+            v-model="formData.question_reference_address"
+            :node-model="model"
+            :placeholder="t('workflow.searchQuestion.placeholder')"
+          />
         </el-form-item>
         <!-- 检索图片 -->
-        <el-form-item label="检索图片" prop="image_list">
-          <NodeCascader v-model="formData.image_list" :node-model="model" placeholder="请选择检索图片" />
+        <el-form-item :label="t('workflow.searchKnowledge.image.label')" prop="image_list">
+          <NodeCascader v-model="formData.image_list" :node-model="model" :placeholder="t('workflow.searchKnowledge.image.placeholder')" />
         </el-form-item>
         <div class="flex-between">
-          <span>结果显示在知识来源中</span>
+          <span>{{ t('workflow.showInSources') }}</span>
+          <!-- 控制检索结果是否显示在知识来源中 -->
           <el-switch v-model="formData.show_knowledge" size="small" />
         </div>
       </el-form>

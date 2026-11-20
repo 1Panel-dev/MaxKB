@@ -179,7 +179,7 @@ function submitEdit() {
 /* -------------------- 删除 -------------------- */
 
 function handleDelete(node: TreeNode) {
-  MsgConfirm(t('common.dialogs.notice'), `${t('dynamicForm.tree.deleteConfirm')}: ${node.label}?`, { type: 'warning' })
+  MsgConfirm(t('common.dialogs.notice'), t('dynamicForm.tree.delete.title', { name: node.label }), { type: 'warning' })
     .then(() => {
       const removed = removeNodeById(formValue.value.treeData, node.id)
       if (removed) {

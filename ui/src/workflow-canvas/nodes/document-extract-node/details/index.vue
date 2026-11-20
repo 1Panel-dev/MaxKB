@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import { KNOWLEDGE_TYPE } from '@/api/enums'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
 import { getFileIconUrl } from '@/utils/icon'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'DocumentExtractNodeDetail' })
 
@@ -25,14 +28,18 @@ const documents = computed<ExtractedDocument[]>(
   () =>
     props.data.document_list ??
     (props.data.content ?? []).map((document: ExtractedDocument | string, index: number) =>
-      typeof document === 'string' ? { name: `文档 ${index + 1}`, content: document } : document,
+      typeof document === 'string' ? { name: `${t('workflow.document.label')} ${index + 1}`, content: document } : document,
     ),
 )
 const selectedDocumentIndex = ref(0)
 const selectedDocument = computed(() => documents.value[selectedDocumentIndex.value] ?? documents.value[0])
-watch(documents, () => {
-  selectedDocumentIndex.value = 0
-})
+// 仅在执行数据变化时重置选择，翻译变化保留当前文档。
+watch(
+  () => props.data.document_list ?? (props.data.content ?? []).slice(),
+  () => {
+    selectedDocumentIndex.value = 0
+  },
+)
 </script>
 
 <template>
@@ -43,8 +50,8 @@ watch(documents, () => {
 
     <div class="mk-gray-card-sm">
       <h6 class="mb-2">
-        <span>输出参数</span>
-        <span class="text-N600 font-normal">（每个文档仅支持预览 500 字）</span>
+        <span>{{ t('workflow.executionResult.outputParams') }}</span>
+        <span class="text-N600 font-normal">（{{ t('workflow.document.characterPreviewHint', { count: 500 }) }}）</span>
       </h6>
 
       <MkHorizontalScroll v-if="documents.length" class="mb-2">
@@ -69,7 +76,10 @@ watch(documents, () => {
           <MdPreview v-if="selectedDocument.content" :model-value="selectedDocument.content.slice(0, 500)" no-img-zoom-in />
           <template v-else>-</template>
         </el-scrollbar>
-        <div class="text-N600 mt-2">{{ Math.min(selectedDocument.content?.length ?? 0, 500) }} 字符</div>
+        <div class="text-N600 mt-2">
+          {{ Math.min(selectedDocument.content?.length ?? 0, 500) }}
+          {{ t('knowledge.stats.characters', Math.min(selectedDocument.content?.length ?? 0, 500)) }}
+        </div>
       </el-card>
       <template v-else>-</template>
     </div>

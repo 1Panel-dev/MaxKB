@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { ExecutionNodeDetail } from '@/workflow-canvas/execution-details/types'
 import BaseHeader from '@/workflow-canvas/execution-details/BaseHeader.vue'
 import DetailContainer from '@/workflow-canvas/execution-details/DetailContainer.vue'
@@ -6,6 +7,8 @@ import { downloadByURL } from '@/utils/common'
 import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'ApplicationNodeDetail' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineProps<{
   data: ExecutionNodeDetail
@@ -19,10 +22,10 @@ defineProps<{
     </template>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">输入参数</h6>
+      <h6 class="mb-2">{{ t('workflow.executionResult.inputParams') }}</h6>
       <div class="space-y-2">
         <p>
-          <span class="text-N600">问题：</span>
+          <span class="text-N600">{{ t('workflow.executionResult.question') }}：</span>
           {{ data.question || '-' }}
         </p>
 
@@ -32,7 +35,7 @@ defineProps<{
         </p>
 
         <div v-if="data.document_list?.length > 0">
-          <p class="mb-1 text-N600">文档：</p>
+          <p class="mb-1 text-N600">{{ t('workflow.document.label') }}：</p>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <template v-for="(f, i) in data.document_list" :key="i">
               <!-- 下载文档附件 -->
@@ -47,11 +50,11 @@ defineProps<{
         </div>
 
         <div v-if="data.image_list?.length > 0">
-          <p class="mb-1 text-N600">图片：</p>
+          <p class="mb-1 text-N600">{{ t('upload.types.image') }}：</p>
           <div class="flex flex-wrap gap-2">
             <template v-for="(imageItem, qIndex) in data?.image_list" :key="qIndex">
               <ImageUploadCard
-                :file="{ name: '图片', status: 'success' }"
+                :file="{ name: t('upload.types.image'), status: 'success' }"
                 :src="imageItem.url || imageItem"
                 :size="58"
                 :show-remove="false"
@@ -62,7 +65,7 @@ defineProps<{
         </div>
 
         <div v-if="data.audio_list?.length > 0">
-          <p class="mb-1 text-N600">音频：</p>
+          <p class="mb-1 text-N600">{{ t('upload.types.audio') }}：</p>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <template v-for="(file, index) in data.audio_list" :key="index">
               <!-- 播放音频 -->
@@ -79,7 +82,7 @@ defineProps<{
         </div>
 
         <div v-if="data.video_list?.length > 0">
-          <p class="mb-1 text-N600">视频：</p>
+          <p class="mb-1 text-N600">{{ t('upload.types.video') }}：</p>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <template v-for="(file, index) in data.video_list" :key="index">
               <!-- 播放视频 -->
@@ -96,7 +99,7 @@ defineProps<{
         </div>
 
         <div v-if="data.other_list?.length > 0">
-          <p class="mb-1 text-N600">其他：</p>
+          <p class="mb-1 text-N600">{{ t('common.labels.other') }}：</p>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <template v-for="(f, i) in data.other_list" :key="i">
               <!-- 下载其他附件 -->
@@ -113,7 +116,7 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">输出参数</h6>
+      <h6 class="mb-2">{{ t('workflow.executionResult.outputParams') }}</h6>
       <div class="space-y-2">
         <MdPreview v-if="data.answer" :model-value="data.answer" noImgZoomIn />
         <template v-else>-</template>

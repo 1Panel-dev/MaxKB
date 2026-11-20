@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { NodeSearchScopeData } from './types'
 import type { KnowledgeItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -9,6 +10,7 @@ import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 
 defineOptions({ name: 'NodeSearchScope' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   nodeModel: WorkflowNodeModel
@@ -22,8 +24,7 @@ const emit = defineEmits<{
 const selectionDialogRef = useTemplateRef<InstanceType<typeof SelectKnowledgeDialog>>('selectionDialogRef')
 const scopeReferenceRef = useTemplateRef<InstanceType<typeof NodeCascader>>('scopeReferenceRef')
 const referenceFormItemRef = useTemplateRef<FormItemInstance>('referenceFormItemRef')
-const scopeExample = `示例：
-[
+const scopeExample = `[
   "019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4",
   "019d8ac3-e2c6-7ff2-8956-c9c98f0e11f3"
 ]`
@@ -51,9 +52,9 @@ function changeScopeSource(search_scope_source: NodeSearchScopeData['search_scop
 // 引用范围加入节点外层表单，自定义范围不注册隐藏引用的规则。
 async function validateReference() {
   if (props.formData.search_scope_type !== 'referencing') return
-  if (!props.formData.search_scope_reference.length) throw new Error('请选择引用变量')
+  if (!props.formData.search_scope_reference.length) throw new Error(t('workflow.referenceVariable.requiredMessage'))
   await nextTick()
-  if (!scopeReferenceRef.value) throw new Error('请选择引用变量')
+  if (!scopeReferenceRef.value) throw new Error(t('workflow.referenceVariable.requiredMessage'))
   await scopeReferenceRef.value.validate().catch((error: unknown) => {
     throw error instanceof Error ? error : new Error(String(error))
   })
@@ -67,12 +68,13 @@ onBeforeUnmount(() => anchorGuard.reset())
   <el-form-item>
     <template #label>
       <div class="flex-between">
-        <span>检索范围</span>
+        <span>{{ t('workflow.searchScope.label') }}</span>
         <div class="flex-align-center gap-2">
           <!-- 添加关联知识库 -->
           <el-button v-if="formData.search_scope_type === 'custom'" link type="primary" @click="selectionDialogRef?.open(selectedKnowledge)">
             <MkIcon name="icon_add_outlined" />
           </el-button>
+          <!-- 选择检索范围来源 -->
           <el-select
             :model-value="formData.search_scope_type"
             :validate-event="false"
@@ -83,14 +85,14 @@ onBeforeUnmount(() => anchorGuard.reset())
             @update:model-value="changeScopeType"
             @visible-change="anchorGuard.setOverlayVisible('scope-type', $event)"
           >
-            <el-option label="引用变量" value="referencing" />
-            <el-option label="自定义" value="custom" />
+            <el-option :label="t('workflow.referenceVariable.label')" value="referencing" />
+            <el-option :label="t('workflow.searchScope.custom')" value="custom" />
           </el-select>
         </div>
       </div>
     </template>
     <div v-if="formData.search_scope_type === 'custom'" class="w-full">
-      <span v-if="!selectedKnowledge.length" class="text-N600">请选择关联知识库</span>
+      <span v-if="!selectedKnowledge.length" class="text-N600">{{ t('workflow.searchScope.placeholder') }}</span>
       <div v-else class="space-y-1">
         <template v-for="knowledge in selectedKnowledge" :key="knowledge.id">
           <el-card class="small" shadow="never">
@@ -113,10 +115,11 @@ onBeforeUnmount(() => anchorGuard.reset())
       prop="search_scope_reference"
       :rules="{ validator: validateReference, trigger: 'change' }"
     >
+      <!-- 选择引用的资源列表类型 -->
       <el-radio-group class="mb-1" :model-value="formData.search_scope_source" :validate-event="false" @update:model-value="changeScopeSource">
         <el-radio value="knowledge">
           <span class="flex-align-center gap-1">
-            <span>知识库列表</span>
+            <span>{{ t('workflow.searchScope.knowledgeList') }}</span>
             <span class="relative inline-flex">
               <MkTooltip
                 :teleported="false"
@@ -125,7 +128,7 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @hide="anchorGuard.setOverlayVisible('knowledge-help', false)"
               >
                 <template #content>
-                  <span class="whitespace-pre font-mono">{{ scopeExample }}</span>
+                  <span class="whitespace-pre font-mono">{{ `${t('common.labels.example')}：\n${scopeExample}` }}</span>
                 </template>
                 <span class="inline-flex">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
@@ -136,7 +139,7 @@ onBeforeUnmount(() => anchorGuard.reset())
         </el-radio>
         <el-radio value="document">
           <span class="flex-align-center gap-1">
-            <span>文档列表</span>
+            <span>{{ t('workflow.searchScope.documentList') }}</span>
             <span class="relative inline-flex">
               <MkTooltip
                 :teleported="false"
@@ -145,7 +148,7 @@ onBeforeUnmount(() => anchorGuard.reset())
                 @hide="anchorGuard.setOverlayVisible('document-help', false)"
               >
                 <template #content>
-                  <span class="whitespace-pre font-mono">{{ scopeExample }}</span>
+                  <span class="whitespace-pre font-mono">{{ `${t('common.labels.example')}：\n${scopeExample}` }}</span>
                 </template>
                 <span class="inline-flex">
                   <MkIcon name="icon_info_outlined" class="text-N600!" />
@@ -161,7 +164,7 @@ onBeforeUnmount(() => anchorGuard.reset())
         :model-value="formData.search_scope_reference"
         @update:model-value="emit('update', { search_scope_reference: $event })"
         :node-model="nodeModel"
-        placeholder="请选择引用变量"
+        :placeholder="t('workflow.referenceVariable.placeholder')"
       />
     </el-form-item>
   </el-form-item>

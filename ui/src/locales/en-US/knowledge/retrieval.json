@@ -19,7 +19,9 @@
       "description": "The higher the similarity, the stronger the relevance."
     },
     "topNumber": "Top segments",
-    "maxReferenceCharacters": "Maximum referenced characters"
+    "maxReferenceCharacters": "Maximum referenced characters",
+    "imageVector": "Image vector",
+    "textVector": "Text vector"
   },
   "hitTest": {
     "title": "Retrieval testing",
@@ -34,8 +36,6 @@
       "initialEmpty": "Retrieved knowledge will appear here",
       "empty": "No relevant knowledge retrieved. Adjust the retrieval parameters."
     },
-    "imageVector": "Image vector",
-    "textVector": "Text vector",
     "test": "Test"
   },
   "externalRetrieval": {

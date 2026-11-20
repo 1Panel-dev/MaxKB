@@ -16,7 +16,7 @@ const loading = defineModel<boolean>('loading', { default: false })
 const emit = defineEmits<{ delete: [toolId: string] }>()
 
 function handleDeleteTool() {
-  return MsgConfirm(`${t('tool.delete.title')}: ${props.tool.name}?`, undefined, {
+  return MsgConfirm(t('tool.delete.title', { name: props.tool.name }), undefined, {
     cancelButtonText: t('common.actions.cancel'),
     confirmButtonText: t('common.actions.delete'),
   })

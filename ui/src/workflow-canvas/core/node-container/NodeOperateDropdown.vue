@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { FormInstance } from 'element-plus'
 import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 import { MsgConfirm, MsgError } from '@/utils/message'
 
 defineOptions({ name: 'NodeOperateDropdown' })
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ model: BaseNodeModel }>()
 const emit = defineEmits<{
@@ -97,8 +99,8 @@ function copyNode() {
 }
 
 function deleteNode() {
-  MsgConfirm('提示', '确定删除当前节点吗？', {
-    confirmButtonText: '确定',
+  MsgConfirm(t('common.dialogs.notice'), t('workflow.node.delete.title', { name: nodeProperties.value.stepName || '-' }), {
+    confirmButtonText: t('common.actions.comfirm'),
     confirmButtonClass: 'danger',
   }).then(() => {
     if (String(props.model.type) === WorkflowNodeType.LoopNode) {

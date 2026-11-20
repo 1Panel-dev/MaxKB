@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ToolInputField } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'WorkflowToolInputFieldDialog' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const emit = defineEmits<{ submit: [field: ToolInputField, index?: number] }>()
 
@@ -14,9 +17,9 @@ const visible = ref(false)
 const editing = ref(false)
 const currentIndex = ref<number>()
 const inputFieldForm = ref<ToolInputField>({ desc: '', is_required: true, name: '', source: 'reference', type: 'string' })
-const formRules: FormRules<ToolInputField> = {
-  name: [{ whitespace: true, required: true, message: '请输入参数名称', trigger: 'blur' }],
-}
+const formRules = computed<FormRules<ToolInputField>>(() => ({
+  name: [{ whitespace: true, required: true, message: t('tool.inputParams.name.requiredMessage'), trigger: 'blur' }],
+}))
 
 // 弹窗仅维护参数草稿，节点接收提交后关闭。
 function open(field?: ToolInputField, index?: number) {
@@ -50,47 +53,58 @@ defineExpose({ open, close })
 </script>
 
 <template>
+  <!-- 添加输入参数 -->
   <el-button text type="primary" @click="open()">
     <MkIcon name="icon_add_outlined" />
   </el-button>
-  <MkDialog v-model="visible" :title="editing ? '编辑参数' : '添加参数'" @closed="resetData">
-    <el-form ref="formRef" :model="inputFieldForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="参数名称" prop="name">
+  <MkDialog v-model="visible" :title="editing ? t('common.parameters.edit') : t('common.parameters.add')" @closed="resetData">
+    <el-form
+      ref="formRef"
+      :model="inputFieldForm"
+      :rules="formRules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('tool.inputParams.name.label')" prop="name">
         <el-input
           v-model="inputFieldForm.name"
           maxlength="64"
-          placeholder="请输入参数名称"
+          :placeholder="t('tool.inputParams.name.placeholder')"
           @blur="inputFieldForm.name = inputFieldForm.name.trim()"
         />
       </el-form-item>
-      <el-form-item label="数据类型">
+      <el-form-item :label="t('tool.inputParams.dataType.label')">
         <el-select v-model="inputFieldForm.type" class="w-full">
           <el-option v-for="fieldType in inputFieldTypes" :key="fieldType" :label="fieldType" :value="fieldType" />
         </el-select>
       </el-form-item>
-      <el-form-item label="参数说明">
+      <el-form-item :label="t('tool.inputParams.description.label')">
         <el-input
           v-model="inputFieldForm.desc"
           maxlength="128"
-          placeholder="请输入参数说明"
+          :placeholder="t('tool.inputParams.description.placeholder')"
           show-word-limit
           @blur="inputFieldForm.desc = inputFieldForm.desc?.trim()"
         />
       </el-form-item>
-      <el-form-item label="来源">
+      <el-form-item :label="t('tool.source.label')">
         <el-select v-model="inputFieldForm.source" class="w-full">
-          <el-option label="引用参数" value="reference" />
-          <el-option label="自定义" value="custom" />
+          <el-option :label="t('tool.source.reference')" value="reference" />
+          <el-option :label="t('tool.source.custom')" value="custom" />
         </el-select>
       </el-form-item>
-      <el-form-item label="是否必填" @click.prevent>
+      <el-form-item :label="t('dynamicForm.fields.required.label')" @click.prevent>
         <el-switch v-model="inputFieldForm.is_required" />
       </el-form-item>
     </el-form>
 
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="handleSubmit">{{ editing ? '保存' : '添加' }}</el-button>
+      <!-- 取消编辑输入参数 -->
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
+      <!-- 保存输入参数 -->
+      <el-button type="primary" @click="handleSubmit">{{ editing ? t('common.actions.save') : t('common.actions.add') }}</el-button>
     </template>
   </MkDialog>
 </template>

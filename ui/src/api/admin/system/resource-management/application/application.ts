@@ -32,7 +32,7 @@ const exportApplication = (applicationId: string, applicationName: string) => {
 }
 
 /** 导出系统资源管理智能体为 Skills 压缩包；文件名优先使用后端返回的技能名称。 */
-// TODO：当前仓库未提供 System 路由，需在部署环境确认 export_skills 路径。
+// TODO：当前仓库未提供 System 路由，需在部署环境确定 export_skills 路径。
 const exportApplicationSkills = (applicationId: string, applicationName: string, baseUrl?: string) => {
   return getExportFile(`${applicationName}.zip`, `${prefix}/${applicationId}/export_skills`, baseUrl ? { base_url: baseUrl } : undefined)
 }

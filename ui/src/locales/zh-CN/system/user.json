@@ -75,8 +75,8 @@
     "conflictMessage": "{type} 冲突"
   },
   "delete": {
-    "title": "确定删除用户",
-    "batchTitle": "是否删除选中的 {count} 个用户",
+    "title": "是否删除用户：{name}？",
+    "batchTitle": "是否删除选中的{count}个用户？",
     "description": "删除用户，该用户创建的资源（智能体、知识库、模型）不会删除，请谨慎操作。"
   }
 }

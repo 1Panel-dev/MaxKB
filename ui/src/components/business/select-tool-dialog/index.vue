@@ -188,8 +188,8 @@ defineExpose({ open })
         <div>
           <!-- 取消工具选择 -->
           <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-          <!-- 确认工具选择 -->
-          <el-button type="primary" @click="submit">{{ t('common.actions.confirm') }}</el-button>
+          <!-- 确定工具选择 -->
+          <el-button type="primary" @click="submit">{{ t('common.actions.comfirm') }}</el-button>
         </div>
       </div>
     </template>

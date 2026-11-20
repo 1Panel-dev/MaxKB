@@ -113,7 +113,7 @@ function handleOpenCreateModel(open: () => void) {
   open()
 }
 
-// 模型参数：切换模型加载默认值，确认弹窗后回写配置。
+// 模型参数：切换模型加载默认值，确定弹窗后回写配置。
 const modelParamsDialogRef = useTemplateRef<InstanceType<typeof ModelParamsDialog>>('modelParamsDialogRef')
 
 function resetModelParams(modelId: string) {

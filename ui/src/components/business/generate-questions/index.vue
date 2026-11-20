@@ -146,7 +146,7 @@ defineExpose({ open, close })
       <el-button plain :disabled="loading || modelLoading" @click="close">{{ t('common.actions.cancel') }}</el-button>
       <!-- 提交生成问题任务 -->
       <el-button type="primary" :loading="loading" :disabled="loading || modelLoading || !modelAvailable" @click="handleSubmit">
-        {{ t('common.actions.confirm') }}
+        {{ t('common.actions.comfirm') }}
       </el-button>
     </template>
   </MkDialog>

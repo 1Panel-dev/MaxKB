@@ -38,8 +38,8 @@
       "unsupportedFormatMessage": "Only XLS and XLSX files are supported."
     },
     "delete": {
-      "title": "Delete tag",
-      "batchTitle": "Delete {count} selected tag | Delete {count} selected tags",
+      "title": "Delete tag: {name}?",
+      "batchTitle": "Delete the {count} selected tag? | Delete the {count} selected tags?",
       "description": "Deleting a tag also removes it from resources that use it. Proceed with caution."
     },
     "messages": {
