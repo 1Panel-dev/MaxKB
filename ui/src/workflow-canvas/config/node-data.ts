@@ -25,85 +25,85 @@ export const startNode = reactive({
   },
 })
 
-export const baseNode = {
+export const baseNode = reactive({
   id: WorkflowNodeType.Base,
   type: WorkflowNodeType.Base,
   x: 360,
   y: 2600,
   text: '',
   properties: {
-    stepName: '基本信息',
+    stepName: computed(() => t('common.labels.basicInfo')),
     input_field_list: [],
     node_data: {
       name: '',
       desc: '',
-      prologue: '您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务',
+      prologue: computed(() => t('application.prologue.defaultValue')),
       tts_type: 'BROWSER',
       stt_model_id_type: 'default',
       long_term_model_id_type: 'default',
     },
     config: {},
     showNode: true,
-    user_input_config: { title: '用户输入' },
+    user_input_config: { title: computed(() => t('workflow.userInput.title')) },
     user_input_field_list: [],
   },
-}
+})
 
-export const knowledgeBaseNode = {
+export const knowledgeBaseNode = reactive({
   id: WorkflowNodeType.KnowledgeBase,
   type: WorkflowNodeType.KnowledgeBase,
   x: 360,
   y: 2600,
   text: '',
   properties: {
-    stepName: '基本信息',
+    stepName: computed(() => t('common.labels.basicInfo')),
     input_field_list: [],
     node_data: {
       name: '',
       desc: '',
-      prologue: '您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务',
+      prologue: computed(() => t('application.prologue.defaultValue')),
       tts_type: 'BROWSER',
     },
     config: {},
     showNode: true,
-    user_input_config: { title: '用户输入' },
+    user_input_config: { title: computed(() => t('workflow.userInput.title')) },
     user_input_field_list: [],
   },
-}
+})
 
-export const toolBaseNode = {
+export const toolBaseNode = reactive({
   id: WorkflowNodeType.ToolBaseNode,
   type: WorkflowNodeType.ToolBaseNode,
   x: 360,
   y: 2600,
   text: '',
   properties: {
-    stepName: '基本信息',
+    stepName: computed(() => t('common.labels.basicInfo')),
     input_field_list: [],
     node_data: {},
     config: {},
     showNode: true,
-    user_input_config: { title: '用户输入' },
+    user_input_config: { title: computed(() => t('workflow.userInput.title')) },
     user_input_field_list: [],
   },
-}
+})
 
-export const toolStartNode = {
+export const toolStartNode = reactive({
   id: WorkflowNodeType.ToolStartNode,
   type: WorkflowNodeType.ToolStartNode,
   x: 846,
   y: 2600,
   text: '',
   properties: {
-    stepName: '开始',
+    stepName: computed(() => t('workflow.start.label')),
     input_field_list: [],
     node_data: {},
     config: {},
     showNode: true,
-    user_input_config: { title: '用户输入' },
+    user_input_config: { title: computed(() => t('workflow.userInput.title')) },
     user_input_field_list: [],
   },
-}
+})
 
 // 以上是默认基础节点
 
@@ -125,302 +125,345 @@ export const aiChatNode = reactive({
 })
 
 /* LLM 节点配置数据 */
-export const llmNode = {
+export const llmNode = reactive({
   type: WorkflowNodeType.Llm,
-  text: '单次调用大模型，可传入工具定义并输出工具调用',
-  label: 'LLM',
+  text: computed(() => t('workflow.llm.description')),
+  label: computed(() => t('workflow.llm.label')),
   properties: {
-    stepName: 'LLM',
+    stepName: computed(() => t('workflow.llm.label')),
     config: {
       fields: [
-        { label: '回答内容', value: 'content' },
-        { label: '思考过程', value: 'reasoning_content' },
-        { label: '思考标识', value: 'reasoning_key' },
-        { label: '拒答内容', value: 'refusal' },
-        { label: '是否拒答', value: 'is_refusal' },
-        { label: 'Token 用量', value: 'usage' },
-        { label: '工具调用', value: 'tool_calls' },
-        { label: '结束原因', value: 'finish_reason' },
+        { label: computed(() => t('workflow.llm.content')), value: 'content' },
+        { label: computed(() => t('workflow.llm.reasoningContent')), value: 'reasoning_content' },
+        { label: computed(() => t('workflow.llm.reasoningKey')), value: 'reasoning_key' },
+        { label: computed(() => t('workflow.llm.refusal')), value: 'refusal' },
+        { label: computed(() => t('workflow.llm.isRefusal')), value: 'is_refusal' },
+        { label: computed(() => t('workflow.llm.usage')), value: 'usage' },
+        { label: computed(() => t('workflow.llm.toolCalls')), value: 'tool_calls' },
+        { label: computed(() => t('workflow.llm.finishReason')), value: 'finish_reason' },
       ],
     },
   },
-}
+})
 
 /* 意图识别节点配置数据 */
-export const intentNode = {
+export const intentNode = reactive({
   type: WorkflowNodeType.IntentNode,
-  text: '将用户问题与用户预设的意图分类进行匹配',
-  label: '意图识别',
+  text: computed(() => t('workflow.intent.description')),
+  label: computed(() => t('workflow.intent.label')),
   properties: {
-    stepName: '意图识别',
+    stepName: computed(() => t('workflow.intent.label')),
     config: {
       fields: [
-        { label: '分类', value: 'category' },
-        { label: '理由', value: 'reason' },
+        { label: computed(() => t('workflow.intent.category')), value: 'category' },
+        { label: computed(() => t('workflow.intent.reason')), value: 'reason' },
       ],
     },
   },
-}
+})
 
 /* 语音转文本节点 */
-export const speechToTextNode = {
+export const speechToTextNode = reactive({
   type: WorkflowNodeType.SpeechToTextNode,
-  text: '将音频通过语音识别模型转换为文本',
-  label: '语音转文本',
-  properties: { stepName: '语音转文本', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
+  text: computed(() => t('workflow.speechToText.description')),
+  label: computed(() => t('workflow.speechToText.label')),
+  properties: {
+    stepName: computed(() => t('workflow.speechToText.label')),
+    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+  },
+})
 
 /* 文本转语音节点 */
-export const textToSpeechNode = {
+export const textToSpeechNode = reactive({
   type: WorkflowNodeType.TextToSpeechNode,
-  text: '将文本通过语音合成模型转换为音频',
-  label: '文本转语音',
-  properties: { stepName: '文本转语音', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
+  text: computed(() => t('workflow.textToSpeech.description')),
+  label: computed(() => t('workflow.textToSpeech.label')),
+  properties: {
+    stepName: computed(() => t('workflow.textToSpeech.label')),
+    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+  },
+})
 
 /* 图片生成节点 */
-export const imageGenerateNode = {
+export const imageGenerateNode = reactive({
   type: WorkflowNodeType.ImageGenerateNode,
-  text: '根据提供的文本内容生成图片',
-  label: '图片生成',
+  text: computed(() => t('workflow.imageGenerate.description')),
+  label: computed(() => t('workflow.imageGenerate.label')),
   properties: {
-    stepName: '图片生成',
+    stepName: computed(() => t('workflow.imageGenerate.label')),
     config: {
       fields: [
-        { label: 'AI 回答内容', value: 'answer' },
-        { label: '图片', value: 'image' },
+        { label: computed(() => t('workflow.imageGenerate.answer')), value: 'answer' },
+        { label: computed(() => t('upload.types.image')), value: 'image' },
       ],
     },
   },
-}
+})
 
 /* 图生视频节点 */
-export const imageToVideoNode = {
+export const imageToVideoNode = reactive({
   type: WorkflowNodeType.ImageToVideoGenerateNode,
-  text: '根据提供的图片生成视频',
-  label: '图生视频',
-  properties: { stepName: '图生视频', config: { fields: [{ label: '视频', value: 'video' }] } },
-}
+  text: computed(() => t('workflow.imageToVideo.description')),
+  label: computed(() => t('workflow.imageToVideo.label')),
+  properties: {
+    stepName: computed(() => t('workflow.imageToVideo.label')),
+    config: { fields: [{ label: computed(() => t('upload.types.video')), value: 'video' }] },
+  },
+})
 
 /* 文生视频节点 */
-export const textToVideoNode = {
+export const textToVideoNode = reactive({
   type: WorkflowNodeType.TextToVideoGenerateNode,
-  text: '根据提供的文本内容生成视频',
-  label: '文生视频',
-  properties: { stepName: '文生视频', config: { fields: [{ label: '视频', value: 'video' }] } },
-}
+  text: computed(() => t('workflow.textToVideo.description')),
+  label: computed(() => t('workflow.textToVideo.label')),
+  properties: {
+    stepName: computed(() => t('workflow.textToVideo.label')),
+    config: { fields: [{ label: computed(() => t('upload.types.video')), value: 'video' }] },
+  },
+})
 
 /* 图片理解节点 */
-export const imageUnderstandNode = {
+export const imageUnderstandNode = reactive({
   type: WorkflowNodeType.ImageUnderstandNode,
-  text: '识别出图片中的对象、场景等信息回答用户问题',
-  label: '图片理解',
-  properties: { stepName: '图片理解', config: { fields: [{ label: 'AI 回答内容', value: 'answer' }] } },
-}
+  text: computed(() => t('workflow.imageUnderstand.description')),
+  label: computed(() => t('workflow.imageUnderstand.label')),
+  properties: {
+    stepName: computed(() => t('workflow.imageUnderstand.label')),
+    config: { fields: [{ label: computed(() => t('workflow.imageUnderstand.answer')), value: 'answer' }] },
+  },
+})
 
 /* 视频理解节点 */
-export const videoUnderstandNode = {
+export const videoUnderstandNode = reactive({
   type: WorkflowNodeType.VideoUnderstandNode,
-  text: '识别出视频中的对象、场景等信息回答用户问题',
-  label: '视频理解',
-  properties: { stepName: '视频理解', config: { fields: [{ label: 'AI 回答内容', value: 'answer' }] } },
-}
+  text: computed(() => t('workflow.videoUnderstand.description')),
+  label: computed(() => t('workflow.videoUnderstand.label')),
+  properties: {
+    stepName: computed(() => t('workflow.videoUnderstand.label')),
+    config: { fields: [{ label: computed(() => t('workflow.videoUnderstand.answer')), value: 'answer' }] },
+  },
+})
 
 /* 问题优化节点 */
-export const questionNode = {
+export const questionNode = reactive({
   type: WorkflowNodeType.Question,
-  text: '根据历史聊天记录优化完善当前问题，更利于匹配知识库分段',
-  label: '问题优化',
-  properties: { stepName: '问题优化', config: { fields: [{ label: '问题优化结果', value: 'answer' }] } },
-}
+  text: computed(() => t('workflow.questionOptimization.description')),
+  label: computed(() => t('workflow.questionOptimization.label')),
+  properties: {
+    stepName: computed(() => t('workflow.questionOptimization.label')),
+    config: { fields: [{ label: computed(() => t('workflow.questionOptimization.result')), value: 'answer' }] },
+  },
+})
 
 /* 指定回复 */
-export const replyNode = {
+export const replyNode = reactive({
   type: WorkflowNodeType.Reply,
-  text: '指定回复内容，引用变量会转换为字符串进行输出',
-  label: '指定回复',
-  properties: { stepName: '指定回复', config: { fields: [{ label: '内容', value: 'answer' }] } },
-}
+  text: computed(() => t('workflow.reply.description')),
+  label: computed(() => t('workflow.reply.label')),
+  properties: {
+    stepName: computed(() => t('workflow.reply.label')),
+    config: { fields: [{ label: computed(() => t('workflow.reply.content')), value: 'answer' }] },
+  },
+})
 
 /* 判断器 */
-export const conditionNode = {
+export const conditionNode = reactive({
   type: WorkflowNodeType.Condition,
-  text: '根据不同条件执行不同的节点',
-  label: '判断器',
-  properties: { stepName: '判断器', config: { fields: [{ label: '分支名称', value: 'branch_name' }] } },
-}
+  text: computed(() => t('workflow.condition.description')),
+  label: computed(() => t('workflow.condition.label')),
+  properties: {
+    stepName: computed(() => t('workflow.condition.label')),
+    config: { fields: [{ label: computed(() => t('workflow.condition.branchName')), value: 'branch_name' }] },
+  },
+})
 
 /* 表单收集 */
-export const formNode = {
+export const formNode = reactive({
   type: WorkflowNodeType.FormNode,
-  text: '在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程',
-  label: '表单收集',
+  text: computed(() => t('workflow.form.description')),
+  label: computed(() => t('workflow.form.label')),
   properties: {
-    stepName: '表单收集',
+    stepName: computed(() => t('workflow.form.label')),
     node_data: {
       is_result: true,
       form_field_list: [],
-      form_content_format: `${'你好，请先填写下面表单内容：'}
-{{form}}
-${'填写后请点击【提交】按钮进行提交。'}`,
+      form_content_format: computed(() => t('workflow.form.defaultContent', { form: '{{form}}' })),
     },
-    config: { fields: [{ label: '表单全部内容', value: 'form_data' }] },
+    config: { fields: [{ label: computed(() => t('workflow.form.formData')), value: 'form_data' }] },
   },
-}
+})
 
 /* 变量赋值 */
-export const variableAssignNode = {
+export const variableAssignNode = reactive({
   type: WorkflowNodeType.VariableAssignNode,
-  text: '更新全局变量的值',
-  label: '变量赋值',
-  properties: { stepName: '变量赋值', config: {} },
-}
+  text: computed(() => t('workflow.variableAssign.description')),
+  label: computed(() => t('workflow.variableAssign.label')),
+  properties: { stepName: computed(() => t('workflow.variableAssign.label')), config: {} },
+})
 
 /* 变量聚合 */
-export const variableAggregationNode = {
+export const variableAggregationNode = reactive({
   type: WorkflowNodeType.VariableAggregationNode,
-  text: '按聚合策略聚合每组的变量',
-  label: '变量聚合',
+  text: computed(() => t('workflow.variableAggregation.description')),
+  label: computed(() => t('workflow.variableAggregation.label')),
   // 分支汇合：各分支互斥执行，需“任一”前置完成即执行，否则会一直等待未执行的分支
-  properties: { stepName: '变量聚合', condition: 'OR', config: { fields: [] } },
-}
+  properties: { stepName: computed(() => t('workflow.variableAggregation.label')), condition: 'OR', config: { fields: [] } },
+})
 
 /* 变量拆分 */
-export const variableSplittingNode = {
+export const variableSplittingNode = reactive({
   type: WorkflowNodeType.VariableSplittingNode,
-  text: '通过配置JSON Path 表达式，对输入的 JSON 格式变量进行解析和拆分',
-  label: '变量拆分',
-  properties: { stepName: '变量拆分', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
+  text: computed(() => t('workflow.variableSplitting.description')),
+  label: computed(() => t('workflow.variableSplitting.label')),
+  properties: {
+    stepName: computed(() => t('workflow.variableSplitting.label')),
+    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+  },
+})
 
 /* 参数提取 */
-export const parameterExtractionNode = {
+export const parameterExtractionNode = reactive({
   type: WorkflowNodeType.ParameterExtractionNode,
-  text: '利用 AI 模型提取结构化参数',
-  label: '参数提取',
-  properties: { stepName: '参数提取', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
+  text: computed(() => t('workflow.parameterExtraction.description')),
+  label: computed(() => t('workflow.parameterExtraction.label')),
+  properties: {
+    stepName: computed(() => t('workflow.parameterExtraction.label')),
+    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+  },
+})
 
 /* 知识库检索 */
-export const searchKnowledgeNode = {
+export const searchKnowledgeNode = reactive({
   type: WorkflowNodeType.SearchKnowledge,
-  text: '关联知识库，查找与问题相关的分段',
-  label: '知识库检索',
+  text: computed(() => t('workflow.searchKnowledge.description')),
+  label: computed(() => t('workflow.searchKnowledge.label')),
   properties: {
-    stepName: '知识库检索',
+    stepName: computed(() => t('workflow.searchKnowledge.label')),
     config: {
       fields: [
-        { label: '检索结果的分段列表', value: 'paragraph_list' },
-        { label: '满足直接回答的分段列表', value: 'is_hit_handling_method_list' },
-        { label: '检索结果', value: 'data' },
-        { label: '满足直接回答的分段内容', value: 'directly_return' },
+        { label: computed(() => t('workflow.searchKnowledge.segmentList')), value: 'paragraph_list' },
+        { label: computed(() => t('workflow.searchKnowledge.directAnswerSegments')), value: 'is_hit_handling_method_list' },
+        { label: computed(() => t('workflow.searchKnowledge.result')), value: 'data' },
+        { label: computed(() => t('workflow.searchKnowledge.directAnswerContent')), value: 'directly_return' },
       ],
     },
   },
-}
+})
 
 /* 文档标签检索 */
-export const searchDocumentNode = {
+export const searchDocumentNode = reactive({
   type: WorkflowNodeType.SearchDocument,
-  text: '从设定的检索范围中，根据文档标签检索出满足条件的文档',
-  label: '文档标签检索',
+  text: computed(() => t('workflow.searchDocument.description')),
+  label: computed(() => t('workflow.searchDocument.label')),
   properties: {
-    stepName: '文档标签检索',
+    stepName: computed(() => t('workflow.searchDocument.label')),
     config: {
       fields: [
-        { label: '知识库列表', value: 'knowledge_list' },
-        { label: '文档列表', value: 'document_list' },
+        { label: computed(() => t('workflow.searchDocument.knowledgeList')), value: 'knowledge_list' },
+        { label: computed(() => t('workflow.searchDocument.documentList')), value: 'document_list' },
       ],
     },
   },
-}
+})
 
 /* 文档内容提取 */
-export const documentExtractNode = {
+export const documentExtractNode = reactive({
   type: WorkflowNodeType.DocumentExtractNode,
-  text: '解析输入文档，输出结构化文档内容',
-  label: '文档内容提取',
+  text: computed(() => t('workflow.documentExtract.description')),
+  label: computed(() => t('workflow.documentExtract.label')),
   properties: {
-    stepName: '文档内容提取',
+    stepName: computed(() => t('workflow.documentExtract.label')),
     config: {
       fields: [
-        { label: '文档内容', value: 'content' },
-        { label: '文档列表', value: 'document_list' },
+        { label: computed(() => t('workflow.documentExtract.content')), value: 'content' },
+        { label: computed(() => t('workflow.documentExtract.documentList')), value: 'document_list' },
       ],
     },
   },
-}
+})
 
 /* 多路召回 */
-export const rerankerNode = {
+export const rerankerNode = reactive({
   type: WorkflowNodeType.RerankerNode,
-  text: '使用重排模型对多个知识库的检索结果进行二次召回',
-  label: '多路召回',
+  text: computed(() => t('workflow.reranker.description')),
+  label: computed(() => t('workflow.reranker.label')),
   properties: {
-    stepName: '多路召回',
+    stepName: computed(() => t('workflow.reranker.label')),
     config: {
       fields: [
-        { label: '重排结果列表', value: 'result_list' },
-        { label: '重排结果', value: 'result' },
-        { label: '满足直接回答的分段列表', value: 'is_hit_handling_method_list' },
+        { label: computed(() => t('workflow.reranker.resultList')), value: 'result_list' },
+        { label: computed(() => t('workflow.reranker.result')), value: 'result' },
+        { label: computed(() => t('workflow.reranker.directAnswerSegments')), value: 'is_hit_handling_method_list' },
       ],
     },
   },
-}
+})
 
 /* MCP 调用 */
-export const mcpNode = {
+export const mcpNode = reactive({
   type: WorkflowNodeType.McpNode,
-  text: '通过 SSE/Streamable HTTP 方式执行MCP服务中的工具',
-  label: 'MCP 调用',
-  properties: { stepName: 'MCP 调用', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
+  text: computed(() => t('workflow.mcp.description')),
+  label: computed(() => t('workflow.mcp.label')),
+  properties: {
+    stepName: computed(() => t('workflow.mcp.label')),
+    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+  },
+})
 
 /* 自定义工具 */
-export const toolCustomNode = {
+export const toolCustomNode = reactive({
   type: WorkflowNodeType.ToolLibCustom,
-  text: '通过执行自定义脚本，实现数据处理',
-  label: '自定义工具',
-  properties: { stepName: '自定义工具', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
+  text: computed(() => t('workflow.customTool.description')),
+  label: computed(() => t('workflow.customTool.label')),
+  properties: {
+    stepName: computed(() => t('workflow.customTool.label')),
+    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+  },
+})
 
 /* 智能体节点 */
-export const applicationNode = {
+export const applicationNode = reactive({
   type: WorkflowNodeType.Application,
-  text: '智能体节点',
-  label: '智能体节点',
-  properties: { stepName: '智能体节点', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
+  text: computed(() => t('workflow.application.label')),
+  label: computed(() => t('workflow.application.label')),
+  properties: {
+    stepName: computed(() => t('workflow.application.label')),
+    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+  },
+})
 
 /**
  * 工具配置数据
  */
-export const toolLibNode = {
+export const toolLibNode = reactive({
   type: WorkflowNodeType.ToolLib,
-  text: '工具节点',
-  label: '工具节点',
-  properties: { stepName: '工具节点', config: { fields: [{ label: '结果', value: 'result' }] } },
-}
+  text: computed(() => t('workflow.tool.label')),
+  label: computed(() => t('workflow.tool.label')),
+  properties: {
+    stepName: computed(() => t('workflow.tool.label')),
+    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+  },
+})
 
 /**
  * 工作流工具配置数据
  */
-export const toolWorkflowLibNode = {
+export const toolWorkflowLibNode = reactive({
   type: WorkflowNodeType.ToolWorkflowLib,
-  text: '工作流工具',
-  label: '工作流工具',
-  properties: { stepName: '工作流工具', config: { fields: [] } },
-}
+  text: computed(() => t('workflow.toolWorkflow.label')),
+  label: computed(() => t('workflow.toolWorkflow.label')),
+  properties: { stepName: computed(() => t('workflow.toolWorkflow.label')), config: { fields: [] } },
+})
 
 /* 循环节点 */
 
-export const loopNode = {
+export const loopNode = reactive({
   type: WorkflowNodeType.LoopNode,
   visible: false,
-  text: '通过设置循环次数和逻辑，重复执行一系列任务',
-  label: '循环节点',
+  text: computed(() => t('workflow.loop.description')),
+  label: computed(() => t('workflow.loop.label')),
   properties: {
-    stepName: '循环节点',
+    stepName: computed(() => t('workflow.loop.label')),
     workflow: {
       edges: [],
       nodes: [
@@ -433,14 +476,14 @@ export const loopNode = {
             config: {
               // 循环引擎内置的输出参数（index/item），只读展示，用户不可增删改
               fields: [
-                { label: '下标', value: 'index' },
-                { label: '循环元素', value: 'item' },
+                { label: computed(() => t('workflow.loopStart.index')), value: 'index' },
+                { label: computed(() => t('workflow.loopStart.item')), value: 'item' },
               ],
               globalFields: [],
             },
             fields: [],
             showNode: true,
-            stepName: '循环开始',
+            stepName: computed(() => t('workflow.loopStart.label')),
             globalFields: [],
           },
         },
@@ -448,95 +491,98 @@ export const loopNode = {
     },
     config: { fields: [] },
   },
-}
+})
 
-export const loopStartNode = {
+export const loopStartNode = reactive({
   id: WorkflowNodeType.LoopStartNode,
   type: WorkflowNodeType.LoopStartNode,
   x: 480,
   y: 200,
   properties: {
-    stepName: '循环开始',
+    stepName: computed(() => t('workflow.loopStart.label')),
     config: {
       // 循环引擎内置的输出参数（index/item），只读展示，用户不可增删改
       fields: [
-        { label: '下标', value: 'index' },
-        { label: '循环元素', value: 'item' },
+        { label: computed(() => t('workflow.loopStart.index')), value: 'index' },
+        { label: computed(() => t('workflow.loopStart.item')), value: 'item' },
       ],
       globalFields: [],
     },
     showNode: true,
   },
-}
+})
 
-export const loopBodyNode = {
+export const loopBodyNode = reactive({
   type: WorkflowNodeType.LoopBodyNode,
-  text: '循环体',
-  label: '循环体',
+  text: computed(() => t('workflow.loopBody.label')),
+  label: computed(() => t('workflow.loopBody.label')),
   height: 1080,
 
-  properties: { width: 1920, stepName: '循环体', config: { fields: [] } },
-}
+  properties: { width: 1920, stepName: computed(() => t('workflow.loopBody.label')), config: { fields: [] } },
+})
 
-export const loopContinueNode = {
+export const loopContinueNode = reactive({
   type: WorkflowNodeType.LoopContinueNode,
-  text: '用于终止当前循环，执行下次循环',
-  label: 'Continue',
-  properties: { width: 600, stepName: 'Continue', config: { fields: [] } },
-}
+  text: computed(() => t('workflow.loopContinue.description')),
+  label: computed(() => t('workflow.loopContinue.label')),
+  properties: { width: 600, stepName: computed(() => t('workflow.loopContinue.label')), config: { fields: [] } },
+})
 
-export const loopBreakNode = {
+export const loopBreakNode = reactive({
   type: WorkflowNodeType.LoopBreakNode,
-  text: '终止当前循环，跳出循环体',
-  label: 'Break',
-  properties: { width: 600, stepName: 'Break', config: { fields: [] } },
-}
+  text: computed(() => t('workflow.loopBreak.description')),
+  label: computed(() => t('workflow.loopBreak.label')),
+  properties: { width: 600, stepName: computed(() => t('workflow.loopBreak.label')), config: { fields: [] } },
+})
 
 /* 文档分段 */
-export const documentSplitNode = {
+export const documentSplitNode = reactive({
   type: WorkflowNodeType.DocumentSplitNode,
-  text: '按分段策略拆分输入文档内容，输出分段文本列表',
-  label: '文档分段',
-  properties: { stepName: '文档分段', config: { fields: [{ label: '分段列表', value: 'paragraph_list' }] } },
-}
+  text: computed(() => t('workflow.documentSplit.description')),
+  label: computed(() => t('workflow.documentSplit.label')),
+  properties: {
+    stepName: computed(() => t('workflow.documentSplit.label')),
+    config: { fields: [{ label: computed(() => t('workflow.documentSplit.segmentList')), value: 'paragraph_list' }] },
+  },
+})
 
-export const dataSourceLocalNode = {
+export const dataSourceLocalNode = reactive({
   type: WorkflowNodeType.DataSourceLocalNode,
   x: 360,
   y: 2761.3875,
-  text: '上传本地文档，输出文档列表（不解析内容，需配合 “文档内容提取” 节点解析）',
-  label: '本地文件',
+  text: computed(() => t('workflow.localFile.description')),
+  label: computed(() => t('workflow.localFile.label')),
   properties: {
     kind: WorkflowKind.DataSource,
     height: 728.375,
-    stepName: '本地文件',
+    stepName: computed(() => t('workflow.localFile.label')),
     input_field_list: [],
-    config: { fields: [{ label: '文件列表', value: 'file_list' }] },
+    config: { fields: [{ label: computed(() => t('workflow.localFile.fileList')), value: 'file_list' }] },
     showNode: true,
     user_input_config: {},
     user_input_field_list: [],
   },
-}
+})
 
-export const dataSourceWebNode = {
+export const dataSourceWebNode = reactive({
   id: WorkflowNodeType.DataSourceWebNode,
   type: WorkflowNodeType.DataSourceWebNode,
   x: 360,
   y: 2761.3875,
-  text: '输入根地址自动抓取 Web 数据（单链接对应单文档），输出含内容的文档列表',
-  label: 'Web 站点',
+  text: computed(() => t('workflow.webSource.description')),
+  label: computed(() => t('workflow.webSource.label')),
   properties: {
     kind: WorkflowKind.DataSource,
     height: 180,
-    stepName: 'Web 站点',
-    config: { fields: [{ label: '文档列表', value: 'document_list' }] },
+    stepName: computed(() => t('workflow.webSource.label')),
+    config: { fields: [{ label: computed(() => t('workflow.webSource.documentList')), value: 'document_list' }] },
   },
-}
+})
 
-export const knowledgeWriteNode = {
+export const knowledgeWriteNode = reactive({
   type: WorkflowNodeType.KnowledgeWriteNode,
-  text: '将输入的分段列表写入当前知识库，并完成向量化处理',
-  label: '知识库写入',
+  text: computed(() => t('workflow.knowledgeWrite.description')),
+  label: computed(() => t('workflow.knowledgeWrite.label')),
   height: 100,
-  properties: { stepName: '知识库写入', config: { fields: [] } },
-}
+  properties: { stepName: computed(() => t('workflow.knowledgeWrite.label')), config: { fields: [] } },
+})

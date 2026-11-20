@@ -1,6 +1,7 @@
 {
   "node": {
-    "title": "节点"
+    "title": "节点",
+    "result": "结果"
   },
   "start": {
     "label": "开始",
@@ -21,11 +22,21 @@
   },
   "llm": {
     "label": "LLM",
-    "description": "单次调用大模型，可传入工具定义并输出工具调用"
+    "description": "单次调用大模型，可传入工具定义并输出工具调用",
+    "content": "回答内容",
+    "reasoningContent": "思考过程",
+    "reasoningKey": "思考标识",
+    "refusal": "拒答内容",
+    "isRefusal": "是否拒答",
+    "usage": "Token 用量",
+    "toolCalls": "工具调用",
+    "finishReason": "结束原因"
   },
   "intent": {
     "label": "意图识别",
-    "description": "将用户问题与用户预设的意图分类进行匹配"
+    "description": "将用户问题与用户预设的意图分类进行匹配",
+    "category": "分类",
+    "reason": "理由"
   },
   "speechToText": {
     "label": "语音转文本",
@@ -37,7 +48,8 @@
   },
   "imageGenerate": {
     "label": "图片生成",
-    "description": "根据提供的文本内容生成图片"
+    "description": "根据提供的文本内容生成图片",
+    "answer": "AI 回答内容"
   },
   "imageToVideo": {
     "label": "图生视频",
@@ -49,27 +61,34 @@
   },
   "imageUnderstand": {
     "label": "图片理解",
-    "description": "识别出图片中的对象、场景等信息回答用户问题"
+    "description": "识别出图片中的对象、场景等信息回答用户问题",
+    "answer": "AI 回答内容"
   },
   "videoUnderstand": {
     "label": "视频理解",
-    "description": "识别出视频中的对象、场景等信息回答用户问题"
+    "description": "识别出视频中的对象、场景等信息回答用户问题",
+    "answer": "AI 回答内容"
   },
   "questionOptimization": {
     "label": "问题优化",
-    "description": "根据历史聊天记录优化完善当前问题，更利于匹配知识库分段"
+    "description": "根据历史聊天记录优化完善当前问题，更利于匹配知识库分段",
+    "result": "问题优化结果"
   },
   "reply": {
     "label": "指定回复",
-    "description": "指定回复内容，引用变量会转换为字符串进行输出"
+    "description": "指定回复内容，引用变量会转换为字符串进行输出",
+    "content": "内容"
   },
   "condition": {
     "label": "判断器",
-    "description": "根据不同条件执行不同的节点"
+    "description": "根据不同条件执行不同的节点",
+    "branchName": "分支名称"
   },
   "form": {
     "label": "表单收集",
-    "description": "在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程"
+    "description": "在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程",
+    "formData": "表单全部内容",
+    "defaultContent": "你好，请先填写下面表单内容：\n{form}\n填写后请点击【提交】按钮进行提交。"
   },
   "variableAssign": {
     "label": "变量赋值",
@@ -89,19 +108,30 @@
   },
   "searchKnowledge": {
     "label": "知识库检索",
-    "description": "关联知识库，查找与问题相关的分段"
+    "description": "关联知识库，查找与问题相关的分段",
+    "segmentList": "检索结果的分段列表",
+    "directAnswerSegments": "满足直接回答的分段列表",
+    "result": "检索结果",
+    "directAnswerContent": "满足直接回答的分段内容"
   },
   "searchDocument": {
     "label": "文档标签检索",
-    "description": "从设定的检索范围中，根据文档标签检索出满足条件的文档"
+    "description": "从设定的检索范围中，根据文档标签检索出满足条件的文档",
+    "knowledgeList": "知识库列表",
+    "documentList": "文档列表"
   },
   "documentExtract": {
     "label": "文档内容提取",
-    "description": "解析输入文档，输出结构化文档内容"
+    "description": "解析输入文档，输出结构化文档内容",
+    "content": "文档内容",
+    "documentList": "文档列表"
   },
   "reranker": {
     "label": "多路召回",
-    "description": "使用重排模型对多个知识库的检索结果进行二次召回"
+    "description": "使用重排模型对多个知识库的检索结果进行二次召回",
+    "resultList": "重排结果列表",
+    "result": "重排结果",
+    "directAnswerSegments": "满足直接回答的分段列表"
   },
   "mcp": {
     "label": "MCP 调用",
@@ -111,9 +141,26 @@
     "label": "自定义工具",
     "description": "通过执行自定义脚本，实现数据处理"
   },
+  "application": {
+    "label": "智能体节点"
+  },
+  "tool": {
+    "label": "工具节点"
+  },
+  "toolWorkflow": {
+    "label": "工作流工具"
+  },
   "loop": {
     "label": "循环节点",
     "description": "通过设置循环次数和逻辑，重复执行一系列任务"
+  },
+  "loopStart": {
+    "label": "循环开始",
+    "index": "下标",
+    "item": "循环元素"
+  },
+  "loopBody": {
+    "label": "循环体"
   },
   "loopContinue": {
     "label": "Continue",
@@ -125,15 +172,18 @@
   },
   "documentSplit": {
     "label": "文档分段",
-    "description": "按分段策略拆分输入文档内容，输出分段文本列表"
+    "description": "按分段策略拆分输入文档内容，输出分段文本列表",
+    "segmentList": "分段列表"
   },
   "localFile": {
     "label": "本地文件",
-    "description": "上传本地文档，输出文档列表（不解析内容，需配合 “文档内容提取” 节点解析）"
+    "description": "上传本地文档，输出文档列表（不解析内容，需配合 “文档内容提取” 节点解析）",
+    "fileList": "文件列表"
   },
   "webSource": {
     "label": "Web 站点",
-    "description": "输入根地址自动抓取 Web 数据（单链接对应单文档），输出含内容的文档列表"
+    "description": "输入根地址自动抓取 Web 数据（单链接对应单文档），输出含内容的文档列表",
+    "documentList": "文档列表"
   },
   "knowledgeWrite": {
     "label": "知识库写入",
