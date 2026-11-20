@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import type { LlmTool, LlmToolsSetting } from './types'
 import type { ModelItem, ModelProviderItem } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import type { FormInstance } from 'element-plus'
+import type { FormInstance, FormItemRule } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/component/NodeCascader.vue'
 import PromptGenerate from '@/workflow-canvas/component/PromptGenerate.vue'
 import NodeModelSelect from '@/workflow-canvas/component/node-model-select/index.vue'
@@ -38,6 +38,13 @@ interface LlmNodeForm {
 }
 
 const formRef = useTemplateRef<FormInstance>('formRef')
+const contextCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('contextCascaderRef')
+
+// 开启上下文时校验必填及引用有效性
+const contextRules: FormItemRule[] = [
+  { type: 'array', required: true, message: t('workflow.llm.context.requiredMessage'), trigger: 'change' },
+  { asyncValidator: () => contextCascaderRef.value?.validate() ?? Promise.resolve(), trigger: 'change' },
+]
 
 const store = useWorkflowStore(resourceScope)
 const modelList = ref<Array<ModelItem>>([])
@@ -90,16 +97,15 @@ function updateNodeData(setting: Partial<LlmNodeForm>) {
   model.properties.node_data = { ...formData.value, ...setting }
 }
 
+// 开启上下文后用户提示词改为非必填，切换时清理对应字段的旧提示
 function handleContextEnabledChange(enabled: boolean) {
-  if (!enabled) void nextTick(() => formRef.value?.clearValidate('context_variable'))
+  void nextTick(() => formRef.value?.clearValidate(enabled ? 'prompt' : 'context_variable'))
 }
 
 async function validate() {
   return formRef.value?.validate().catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
-const userPromptRequired = computed(() => {
-  return formData.value.enable_context ? false : true
-})
+const userPromptRequired = computed(() => !formData.value.enable_context)
 onMounted(() => {
   if (formData.value.is_result === undefined && isLastNode(model)) formData.value.is_result = true
   model.validate = validate
@@ -160,11 +166,16 @@ onMounted(() => {
         <el-form-item
           class="mk-hide-asterisk"
           prop="prompt"
-          :rules="{ whitespace: true, required: userPromptRequired, message: t('workflow.userPrompt.requiredMessage'), trigger: 'blur' }"
+          :rules="{
+            whitespace: userPromptRequired,
+            required: userPromptRequired,
+            message: t('workflow.userPrompt.requiredMessage'),
+            trigger: 'blur',
+          }"
         >
           <template #label>
             <div class="flex-align-center gap-1">
-              <span class="mk-required">{{ t('workflow.userPrompt.label') }}</span>
+              <span :class="{ 'mk-required': userPromptRequired }">{{ t('workflow.userPrompt.label') }}</span>
               <MkTooltip :content="t('workflow.userPrompt.description')" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
@@ -179,15 +190,7 @@ onMounted(() => {
         </el-form-item>
 
         <!-- 上下文 -->
-        <el-form-item
-          class="mk-hide-asterisk"
-          prop="context_variable"
-          :rules="
-            formData.enable_context
-              ? { type: 'array', required: true, message: t('workflow.llm.context.requiredMessage'), trigger: 'change' }
-              : undefined
-          "
-        >
+        <el-form-item class="mk-hide-asterisk" prop="context_variable" :rules="formData.enable_context ? contextRules : undefined">
           <template #label>
             <div class="flex-between">
               <span class="flex-align-center gap-1">
@@ -203,6 +206,7 @@ onMounted(() => {
           </template>
           <NodeCascader
             v-if="formData.enable_context"
+            ref="contextCascaderRef"
             v-model="formData.context_variable"
             :node-model="model"
             class="w-full!"
