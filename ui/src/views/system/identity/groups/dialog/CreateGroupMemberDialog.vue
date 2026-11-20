@@ -112,6 +112,7 @@ defineExpose({ open })
           class="w-full"
           filterable
           remote
+          remote-show-suffix
           reserve-keyword
           multiple
           :remote-method="handleRemoteSearch"

@@ -14,6 +14,7 @@ import type {
 } from './type'
 import { chatCompletion, clipForLog, logDebug, toToolSchemas } from './common'
 import { AgentErrorResult, AgentSuccessResult, ErrorResult, isFailureResult, toToolResult } from './tools/result'
+import { t } from '@/locales'
 
 /** 工具结果回喂模型的截断上限，避免上下文膨胀 */
 const TOOL_RESULT_LIMIT = 8000
@@ -64,14 +65,15 @@ export function createAgent(agent: RunnableAgent): AgentHandle {
   }
 
   async function run(requirement: string): Promise<AgentResult> {
-    if (!modelId) return finish({ status: 'error', data: '缺少模型' })
+    if (!modelId) return finish({ status: 'error', data: t('workflow.aiGeneration.errors.modelRequired') })
     logDebug({ kind: 'run', pos: position, requirement: clipForLog(requirement, 800) })
     messages.push({ role: 'user', content: requirement })
 
     try {
       for (let iteration = 1; ; iteration++) {
         if (controller.signal.aborted) return finish({ status: 'stopped' })
-        if (iteration > maxIterations) return finish({ status: 'error', data: `超过最大轮次 ${maxIterations}` })
+        if (iteration > maxIterations)
+          return finish({ status: 'error', data: t('workflow.aiGeneration.errors.iterationLimit', { max: maxIterations }) })
 
         const response = await runTurn(resourceScope, modelId, modelParams, messages, tools, emit, controller.signal)
         const toolCalls = response.toolCalls ?? []
@@ -153,7 +155,7 @@ function runTurn(
       onComplete: (error) => {
         if (error) reject(error)
         else if (result) resolve(result)
-        else reject(new Error('本轮结束但未收到完整结果'))
+        else reject(new Error(t('workflow.aiGeneration.errors.incompleteTurn')))
       },
     }
     chatCompletion(resourceScope, modelId, { messages, tools: toToolSchemas(tools), model_params_setting: modelParams }, sink, signal)

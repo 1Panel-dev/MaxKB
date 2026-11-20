@@ -32,6 +32,7 @@ Vite 仅扫描 `src/components/global`，当前没有 `globsExclude` 配置；�
 `src/components.d.ts` 由 Vite 开发服务或构建生成，不手动修改。
 
 Element Plus 已在 Admin、Chat 入口注册。使用前先检查原生 API，避免重复实现已有能力。
+启用 `remote` 的 `el-select` 统一设置 `remote-show-suffix`，保留远程搜索选择器的下拉箭头。
 
 手动组件从具体入口导入；动态表单通过 `@/components/mk-dynamics-form` 的公开入口导入。
 

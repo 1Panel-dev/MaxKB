@@ -125,6 +125,7 @@ defineExpose({ open })
               multiple
               :placeholder="t('system.member.placeholder')"
               remote
+              remote-show-suffix
               :reserve-keyword="false"
             >
               <el-option

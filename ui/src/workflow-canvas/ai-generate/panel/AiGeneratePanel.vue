@@ -2,6 +2,7 @@
 import { computed, inject, nextTick, onBeforeUnmount, provide, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { AgentEvent, AgentHandle, AgentMessage } from '../type'
 import type { DefaultModelSettingPayload, ModelItem, ModelProviderItem } from '@/api/types'
 import type LogicFlow from '@logicflow/core'
@@ -22,6 +23,7 @@ import { createActivity } from './activity'
 import { MsgError, MsgSuccess } from '@/utils/message'
 provide(VIEW_KEY, VIEW_TYPE.DEBUG)
 defineOptions({ name: 'WorkflowAiGeneratePanel' })
+const { t } = useI18n({ useScope: 'global' })
 const props = withDefaults(
   defineProps<{
     getLogicFlow: () => LogicFlow | undefined
@@ -50,11 +52,11 @@ const activity = createActivity()
 const busy = computed(() => status.value === 'running')
 const started = computed(() => status.value !== 'idle')
 
-const suggestedRequirements = [
-  '做一个产品客服，先查产品知识库回答，查不到时礼貌兜底。',
-  '做一个可以查询产品收费信息的智能体。',
-  '做一个需要时可以转人工服务的客服智能体。',
-]
+const suggestedRequirements = computed(() => [
+  t('workflow.aiGeneration.examples.productSupport'),
+  t('workflow.aiGeneration.examples.pricing'),
+  t('workflow.aiGeneration.examples.humanSupport'),
+])
 
 function sendSuggestedRequirement(question: string) {
   if (!modelId.value || busy.value) return
@@ -79,7 +81,7 @@ function loadModels() {
         modelParams.value = modelId.value === defaultModelId ? cloneDeep(props.defaultModelSettings?.LLM?.model_params_setting ?? {}) : {}
       }
     })
-    .catch(() => MsgError('获取模型列表失败'))
+    .catch(() => MsgError(t('workflow.aiGeneration.modelListFailedMessage')))
 }
 
 function open() {
@@ -175,7 +177,7 @@ async function run(text: string) {
     if (!canvasChanged) return
     await layoutCanvas(lf)
     lf.fitView()
-    MsgSuccess('工作流已生成，请检查后保存')
+    MsgSuccess(t('workflow.aiGeneration.generatedMessage'))
     emit('done')
   } else if (result.status === 'error') {
     status.value = 'error'
@@ -229,7 +231,7 @@ defineExpose({ open, close })
 <template>
   <MkDrawer
     v-model="visible"
-    title="AI 生成"
+    :title="t('workflow.layout.aiGenerate')"
     size="480"
     class="top-header! h-layout-content! max-w-full rounded-tl-xl!"
     content-class="h-full p-0!"
@@ -241,7 +243,7 @@ defineExpose({ open, close })
       <div class="flex-between flex-1">
         <h4 class="flex-align-center gap-2">
           <MkIcon name="icon_star_colorful" />
-          AI 生成
+          {{ t('workflow.layout.aiGenerate') }}
         </h4>
         <!-- 新建生成会话 -->
         <el-button text :disabled="busy || !started" @click="reset" class="mr-2">
@@ -253,7 +255,7 @@ defineExpose({ open, close })
       <el-scrollbar ref="scrollbarRef" class="min-h-0 flex-1 p-4">
         <div class="space-y-3">
           <div v-if="!started">
-            <p>请描述你的需求，如下</p>
+            <p>{{ t('workflow.aiGeneration.requirementHint') }}</p>
             <div class="flex flex-col items-start">
               <template v-for="question in suggestedRequirements" :key="question">
                 <!-- 发送示例需求生成工作流 -->
@@ -263,9 +265,9 @@ defineExpose({ open, close })
           </div>
           <ContentList v-else :content-list="activity.activityItems.value" />
           <div v-if="busy" class="flex-align-center gap-2 text-N600">
-            <span class="mk-dotting">{{ activity.lastActivity.value || '生成中' }}</span>
+            <span class="mk-dotting">{{ activity.lastActivity.value || t('common.status.generating') }}</span>
           </div>
-          <p v-if="status === 'stopped'" class="text-N500">已停止生成</p>
+          <p v-if="status === 'stopped'" class="text-N500">{{ t('workflow.aiGeneration.stopped') }}</p>
         </div>
       </el-scrollbar>
 
@@ -275,7 +277,7 @@ defineExpose({ open, close })
           type="textarea"
           resize="none"
           :autosize="{ minRows: 1, maxRows: 7 }"
-          placeholder="请描述你的需求"
+          :placeholder="t('workflow.aiGeneration.placeholder')"
           :maxlength="10000"
           @keydown="handleKeydown"
         />
