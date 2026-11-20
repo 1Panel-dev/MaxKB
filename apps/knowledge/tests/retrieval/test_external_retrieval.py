@@ -278,21 +278,27 @@ class RetrievalAccessTests(SimpleTestCase):
         queryset.return_value.filter.return_value = [knowledge(authentication=False)]
         self.assertEqual(access.filter_workflow_knowledge([KID], {}), [KID])
 
-    @patch.object(access, "authorized_ids", return_value=set())
+    @patch.object(access, "authorized_ids", return_value={KID})
     @patch.object(access, "QuerySet")
-    def test_authenticated_anonymous_session_keeps_application_knowledge_access(self, queryset, authorized):
+    def test_anonymous_session_only_reaches_knowledge_without_authentication(self, queryset, authorized):
         identity = access.identity_from_server(UID, "ANONYMOUS_USER")
+        self.assertIsNone(identity.user_id)
         for enabled in (False, True):
             for authentication in (False, True):
                 with self.subTest(enabled=enabled, authentication=authentication):
+                    authorized.reset_mock()
+                    authorized.return_value = set()
                     queryset.return_value.filter.return_value = [
                         knowledge(enabled=enabled, authentication=authentication)
                     ]
                     self.assertEqual(
                         access.filter_workflow_knowledge([KID, "missing-knowledge"], {"retrieval_identity": identity}),
-                        [KID],
+                        [] if authentication else [KID],
                     )
-        authorized.assert_not_called()
+                    if authentication:
+                        authorized.assert_called_once_with(None, [KID])
+                    else:
+                        authorized.assert_not_called()
 
     @patch.object(access, "authorized_ids", return_value=set())
     @patch.object(access, "QuerySet")
@@ -333,12 +339,15 @@ class RetrievalAccessTests(SimpleTestCase):
         self.assertFalse(child["debug"])
         self.assertIsNone(access.identity_from_server(UID, "APPLICATION_API_KEY", True).admin_user_id)
 
+    @patch.object(access, "authorized_ids", return_value=set())
     @patch.object(access, "QuerySet")
-    def test_anonymous_identity_is_inherited_by_nested_tools(self, queryset):
-        queryset.return_value.filter.return_value = [knowledge(authentication=True)]
+    def test_anonymous_restriction_is_inherited_by_nested_tools(self, queryset, authorized):
+        open_item = SimpleNamespace(**{**vars(knowledge(authentication=False)), "id": DID})
+        queryset.return_value.filter.return_value = [knowledge(authentication=True), open_item]
         parent = {"retrieval_identity": access.identity_from_server(UID, "ANONYMOUS_USER")}
-        child = {"retrieval_identity": {}, **access.inherited_retrieval_context(parent)}
-        self.assertEqual(access.filter_workflow_knowledge([KID], child), [KID])
+        child = {"retrieval_identity": {"user_id": UID}, **access.inherited_retrieval_context(parent)}
+        self.assertEqual(access.filter_workflow_knowledge([KID, DID], child), [DID])
+        authorized.assert_called_once_with(None, [KID])
 
     @patch("oss.serializers.file._check_workspace_resource_permission")
     @patch("common.auth.handle.impl.user_token.get_auth")
