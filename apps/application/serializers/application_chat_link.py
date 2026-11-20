@@ -28,6 +28,21 @@ class ShareChatRecordModelSerializer(serializers.ModelSerializer):
         fields = ["id", "problem_text", "answer_text", "answer_text_list", "create_time", "question", "messages"]
 
 
+def get_application_setting(application_id):
+    application_setting_model = DatabaseModelManage.get_model("application_setting")
+    license_is_valid = cache.get(
+        Cache_Version.SYSTEM.get_key(key="license_is_valid"), version=Cache_Version.SYSTEM.get_version()
+    )
+    if application_setting_model is None or not license_is_valid:
+        return None
+    return QuerySet(application_setting_model).filter(application_id=application_id).first()
+
+
+def validate_share_enabled(application_setting):
+    if application_setting is not None and not application_setting.show_share:
+        raise AppApiException(500, _("Application sharing is not enabled"))
+
+
 class ChatRecordShareLinkRequestSerializer(serializers.Serializer):
     chat_record_ids = serializers.ListSerializer(
         child=serializers.UUIDField(), required=False, allow_empty=False, label=_("Chat record IDs")
@@ -105,6 +120,7 @@ class ChatRecordShareLinkSerializer(serializers.Serializer):
             request_serializer = ChatRecordShareLinkRequestSerializer(data=instance)
             request_serializer.is_valid(raise_exception=True)
             self.is_valid(raise_exception=True)
+            validate_share_enabled(get_application_setting(self.data.get("application_id")))
             if not instance.get("is_current_all", False):
                 chat_record_ids: list[str] = instance.get("chat_record_ids")
 
@@ -183,23 +199,16 @@ class ChatShareLinkDetailSerializer(serializers.Serializer):
         abstract = Chat.objects.filter(id=share_link_model.chat_id).values_list("abstract", flat=True).first()
         chat_record_list = ShareChatRecordModelSerializer(chat_record_model_list, many=True).data
 
-        application_setting_model = DatabaseModelManage.get_model("application_setting")
-        license_is_valid = cache.get(
-            Cache_Version.SYSTEM.get_key(key="license_is_valid"), version=Cache_Version.SYSTEM.get_version()
-        )
+        application_setting = get_application_setting(share_link_model.application_id)
         app_info = {}
-        if application_setting_model is not None and license_is_valid:
-            application_setting = (
-                QuerySet(application_setting_model).filter(application_id=share_link_model.application_id).first()
-            )
-            if application_setting is not None:
-                app_info = {
-                    "avatar": application_setting.avatar,
-                    "show_avatar": application_setting.show_avatar,
-                    "user_avatar": application_setting.user_avatar,
-                    "show_user_avatar": application_setting.show_user_avatar,
-                    "custom_theme": application_setting.custom_theme or {"theme_color": "", "header_font_color": ""},
-                    "chat_background": application_setting.chat_background,
-                }
+        if application_setting is not None:
+            app_info = {
+                "avatar": application_setting.avatar,
+                "show_avatar": application_setting.show_avatar,
+                "user_avatar": application_setting.user_avatar,
+                "show_user_avatar": application_setting.show_user_avatar,
+                "custom_theme": application_setting.custom_theme or {"theme_color": "", "header_font_color": ""},
+                "chat_background": application_setting.chat_background,
+            }
 
         return {"abstract": abstract, "chat_record_list": chat_record_list, "app_info": app_info}

@@ -4,6 +4,7 @@ import type { Conversation } from '../../core/types'
 import type { PortalApplicationGroup } from './index'
 import { useMessageListStore } from '../../components/message-list/index'
 import RenameConversation from '../../components/rename/index.vue'
+import { useShowShare } from '../../view/index'
 import AccountMenu from '../account-menu/index.vue'
 import { useConversationListStore } from '../conversation-list/index'
 import HistoryConversationDrawer from './HistoryConversationDrawer.vue'
@@ -25,6 +26,7 @@ const portalLogo = computed(() => authStore.authProfile?.logo)
 
 const msgs = useMessageListStore()
 const canShare = computed(() => msgs.messages.value.length > 0 && !msgs.streamLoading.value && !msgs.loading.value)
+const showShare = useShowShare()
 const portalList = usePortalConversationListStore()
 const { applicationGroups, initialLoading, currentApplicationId, isApplicationListActive, toggleGroup } = portalList
 const { conversations, currentChatId, selectConversation, deleteChat, newConversation, switchShared, toggleLeftSide } = useConversationListStore()
@@ -42,9 +44,9 @@ const RECENT_CONVERSATION_LIMIT = 5
 const isCurrentApplication = (group: PortalApplicationGroup) => group.id === currentApplicationId.value
 
 const groupConversationCount = (group: PortalApplicationGroup) =>
-  Math.max(group.count, isCurrentApplication(group) ? conversations.value.length : group.conversations.length)
+  group.show_history === false ? 0 : Math.max(group.count, isCurrentApplication(group) ? conversations.value.length : group.conversations.length)
 
-// 智能体关闭“显示历史记录”时，门户侧栏不展示其会话。
+// 关闭“显示历史记录”只影响会话展示，智能体本身仍保留在门户侧栏。
 const historyEnabledGroups = computed(() => applicationGroups.value.filter((group) => group.show_history !== false))
 
 // 所有智能体的对话总数超过 20 条时，才显示分组的查看更多入口。
@@ -52,12 +54,17 @@ const totalConversationCount = computed(() => historyEnabledGroups.value.reduce(
 
 // 当前智能体以会话列表 Store 为准；无需查看更多时展示全部已加载会话。
 const groupConversations = (group: PortalApplicationGroup) => {
+  if (group.show_history === false) return []
   const applicationConversations = isCurrentApplication(group) ? conversations.value : group.conversations
   return totalConversationCount.value > 20 ? applicationConversations.slice(0, RECENT_CONVERSATION_LIMIT) : applicationConversations
 }
 
-// 仅展示有历史记录的智能体，随当前会话的新建、删除同步更新。
-const historyApplicationGroups = computed(() => historyEnabledGroups.value.filter((group) => groupConversations(group).length > 0))
+// 关闭历史记录的智能体仍展示分组；开启历史记录的智能体仅在存在会话时展示。
+const historyApplicationGroups = computed(() =>
+  applicationGroups.value.filter((group) => group.show_history === false || groupConversations(group).length > 0),
+)
+
+const clearableApplicationGroups = computed(() => historyEnabledGroups.value.filter((group) => groupConversations(group).length > 0))
 
 const isActiveConversation = (group: PortalApplicationGroup, conversation: Conversation) =>
   isCurrentApplication(group) && currentChatId.value === conversation.id
@@ -154,7 +161,7 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
 
       <MkTooltip content="清空">
         <!-- 清空所有智能体的历史对话 -->
-        <el-button text :loading="clearing" :disabled="!historyApplicationGroups.length" @click="handleClearConversations">
+        <el-button text :loading="clearing" :disabled="!clearableApplicationGroups.length" @click="handleClearConversations">
           <MkIcon name="icon_delete-trash_outlined" />
         </el-button>
       </MkTooltip>
@@ -167,7 +174,7 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
       <div v-else class="space-y-1">
         <template v-for="group in historyApplicationGroups" :key="group.id">
           <MkCollapse
-            :expanded="group.expanded"
+            :expanded="group.show_history !== false && group.expanded"
             trigger="header"
             trigger-class="group rounded-md p-2 hover:bg-N900/10 mb-1"
             indicator-position="after"
@@ -175,6 +182,7 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
           >
             <template #indicator="{ expanded }">
               <MkIcon
+                v-if="group.show_history !== false"
                 name="icon_right_outlined"
                 :size="12"
                 class="transition-transform text-N600! group-hover:text-N900!"
@@ -201,7 +209,7 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
                         <span>新建对话</span>
                       </MkDropdownItem>
                       <!-- 删除智能体历史分组，待接入对应接口 -->
-                      <MkDropdownItem divided @click="handleClearGroupConversations(group)">
+                      <MkDropdownItem v-if="group.show_history !== false" divided @click="handleClearGroupConversations(group)">
                         <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                         <span>清空对话</span>
                       </MkDropdownItem>
@@ -211,7 +219,7 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
               </div>
             </template>
 
-            <div class="space-y-1" v-if="group.expanded">
+            <div class="space-y-1" v-if="group.show_history !== false && group.expanded">
               <MkListItem
                 v-for="conversation in groupConversations(group)"
                 :key="conversation.id"
@@ -240,6 +248,7 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
                       <MkDropdownMenu>
                         <!-- 激活所选对话并全选分享 -->
                         <MkDropdownItem
+                          v-if="isCurrentApplication(group) && showShare"
                           :disabled="msgs.loading.value || (isActiveConversation(group, conversation) && !canShare)"
                           @click="portalList.shareConversation(group.id, conversation.id)"
                         >

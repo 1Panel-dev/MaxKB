@@ -49,7 +49,14 @@ const GROUP_CONVERSATION_LIMIT = 20
  * 侧栏展示时以其为准，保证新建、重命名和删除即时生效；其他智能体使用分组接口返回的最近会话。
  */
 export function createPortalConversationListStore(deps: PortalConversationListDeps) {
-  const { pageApplicationConversations, pageApplications, pageGroupConversations, removeConversation, clearApplicationConversations, currentApplicationId } = deps
+  const {
+    pageApplicationConversations,
+    pageApplications,
+    pageGroupConversations,
+    removeConversation,
+    clearApplicationConversations,
+    currentApplicationId,
+  } = deps
 
   // 历史对话分组
   const applicationGroups = ref<PortalApplicationGroup[]>([])
@@ -58,10 +65,9 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
 
   // 总数不超过 20 条时，补齐分组接口可能只返回的最近 5 条会话。
   const completeGroupConversations = async () => {
-    if (applicationGroups.value.reduce((total, group) => total + group.count, 0) > GROUP_CONVERSATION_LIMIT) return
-    await Promise.all(
-      applicationGroups.value.filter((group) => group.conversations.length < group.count).map((group) => loadGroupConversations(group)),
-    )
+    const visibleGroups = applicationGroups.value.filter((group) => group.show_history !== false)
+    if (visibleGroups.reduce((total, group) => total + group.count, 0) > GROUP_CONVERSATION_LIMIT) return
+    await Promise.all(visibleGroups.filter((group) => group.conversations.length < group.count).map((group) => loadGroupConversations(group)))
   }
 
   const loadApplicationGroups = () =>
@@ -69,7 +75,7 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
       .then((response) => {
         applicationGroups.value = (response.records ?? []).map((application) => ({
           ...application,
-          expanded: application.conversations.length > 0 || application.id === currentApplicationId.value,
+          expanded: application.show_history !== false && (application.conversations.length > 0 || application.id === currentApplicationId.value),
         }))
         isApplicationGroupsLoaded.value = true
         return completeGroupConversations()
@@ -90,7 +96,7 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
 
   const toggleGroup = (applicationId: string) => {
     const group = applicationGroups.value.find((applicationGroup) => applicationGroup.id === applicationId)
-    if (!group) return
+    if (!group || group.show_history === false) return
     group.expanded = !group.expanded
     if (group.expanded && group.id !== currentApplicationId.value) loadGroupConversations(group)
   }
@@ -123,7 +129,7 @@ export function createPortalConversationListStore(deps: PortalConversationListDe
     for (let page = 1; ; page++) {
       const response = await pageApplicationConversations(page, APPLICATION_PAGE_SIZE)
       const records = response.records ?? []
-      records.forEach((application) => applicationIds.add(application.id))
+      records.filter((application) => application.show_history !== false).forEach((application) => applicationIds.add(application.id))
       if (records.length < APPLICATION_PAGE_SIZE) break
     }
 

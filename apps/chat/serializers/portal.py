@@ -142,7 +142,7 @@ class PortalApplicationSerializer(serializers.Serializer):
 
 
 def get_recent_chats_map(user_id, application_ids, limit=5):
-    """批量返回 application_id -> 该应用最近的 limit 条历史会话及其总数；show_history=false 的应用不在此表里"""
+    """批量返回 application_id -> 该应用最近的 limit 条历史会话及其总数"""
     chats = (
         Chat.objects.filter(chat_user_id=user_id, is_deleted=False, application_id__in=application_ids)
         .order_by("application_id", "-update_time", "id")
@@ -199,8 +199,7 @@ class PortalHistoricalConversationSerializer(serializers.Serializer):
             )
             app_ids = [record["id"] for record in result["records"]]
             settings_map = get_application_settings_map(app_ids)
-            show_history_ids = [aid for aid in app_ids if settings_map.get(aid, {}).get("show_history")]
-            chat_map, count_map = get_recent_chats_map(user_id, show_history_ids) if show_history_ids else ({}, {})
+            chat_map, count_map = get_recent_chats_map(user_id, app_ids)
             for record in result["records"]:
                 record.update(settings_map.get(record["id"], {}))
                 record["conversations"] = chat_map.get(record["id"], [])
@@ -221,8 +220,6 @@ class PortalConversationQuerySerializer(PortalApplicationAuthMixin, serializers.
         authorized_ids = {str(item) for item in self.get_authorized_application_ids(user_id)}
         if application_id not in authorized_ids:
             raise serializers.ValidationError(_("Application is not authorized"))
-        if not get_application_settings_map([application_id]).get(application_id, {}).get("show_history"):
-            raise serializers.ValidationError(_("Application historical conversation is not enabled"))
 
     def page(self, current_page, page_size, user_id, with_valid=True):
         if with_valid:
