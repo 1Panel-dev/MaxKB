@@ -133,6 +133,10 @@ without changing paragraph content or recognition results.
 Moving shared images to another knowledge base separates their file ownership records while
 reusing the stored bytes, so access checks and later paragraph deletion remain independent.
 
+Moving paragraphs between documents places them at the start of the target document in source
+order. The target treats them as manual paragraphs during synchronization. Their image assets
+keep their IDs and recognition results and receive keys independent of the source document.
+
 ## Paragraph deletion
 
 Single and batch deletion physically remove manually created paragraphs. Source-derived paragraphs

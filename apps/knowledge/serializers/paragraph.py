@@ -11,6 +11,7 @@ from common.exception.app_exception import AppApiException
 from common.utils.common import post
 from django.db import transaction
 from django.db.models import Count, F, QuerySet
+from django.db.models.functions import Now
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -23,6 +24,7 @@ from knowledge.models import (
     Problem,
     ProblemParagraphMapping,
     SourceType,
+    SyncState,
     State,
     TaskType,
 )
@@ -739,40 +741,31 @@ class ParagraphSerializers(serializers.Serializer):
             document_id = self.data.get("document_id")
             target_document_id = self.data.get("target_document_id")
             paragraph_id_list = self.data.get("paragraph_id_list")
-            paragraph_list = QuerySet(Paragraph).filter(
-                knowledge_id=knowledge_id, document_id=document_id, id__in=paragraph_id_list
+            # Synchronization also locks the document before updating its paragraphs.
+            list(
+                Document.objects.select_for_update()
+                .filter(id__in=[document_id, target_document_id])
+                .order_by("id")
+                .values_list("id", flat=True)
             )
+            source_paragraphs = (
+                Paragraph.objects.select_for_update()
+                .filter(knowledge_id=knowledge_id, document_id=document_id, id__in=paragraph_id_list)
+                .exclude(local_state=LocalState.DELETED)
+                .order_by("position", "id")
+            )
+            paragraphs = list(source_paragraphs)
+            if not paragraphs:
+                return
+            moved_ids = [paragraph.id for paragraph in paragraphs]
             target_knowledge = QuerySet(Knowledge).filter(id=target_knowledge_id).first()
             if target_knowledge is None:
                 raise AppApiException(500, _("Knowledge id does not exist"))
-            migrate_paragraph_files(paragraph_list, target_document_id, target_knowledge)
-            problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(paragraph__in=paragraph_list)
-            # 同数据集迁移
+            migrate_paragraph_files(paragraphs, target_document_id, target_knowledge)
+            problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(paragraph_id__in=moved_ids)
+            embedding_model_id = None
             if target_knowledge_id == knowledge_id:
-                if len(problem_paragraph_mapping_list):
-                    problem_paragraph_mapping_list = [
-                        self.update_problem_paragraph_mapping(target_document_id, problem_paragraph_mapping)
-                        for problem_paragraph_mapping in problem_paragraph_mapping_list
-                    ]
-                    # 修改mapping
-                    QuerySet(ProblemParagraphMapping).bulk_update(problem_paragraph_mapping_list, ["document_id"])
-                update_embedding_document_id(
-                    [paragraph.id for paragraph in paragraph_list], target_document_id, target_knowledge_id, None
-                )
-                # 修改段落信息
-                paragraph_list.update(document_id=target_document_id)
-
-                # 将当前文档中所有段落的位置向下移动，为新段落腾出空间
-                Paragraph.objects.filter(document_id=target_document_id).exclude(id__in=paragraph_id_list).update(
-                    position=F("position") + len(paragraph_id_list)
-                )
-                # 重新查询迁移的段落
-                paragraph_list = Paragraph.objects.filter(id__in=paragraph_id_list, document_id=target_document_id)
-                # 将迁移的段落位置设置为从1开始的序号
-                for i, paragraph in enumerate(paragraph_list):
-                    paragraph.position = i + 1
-                    paragraph.save()
-            # 不同数据集迁移
+                problem_paragraph_mapping_list.update(document_id=target_document_id)
             else:
                 problem_list = QuerySet(Problem).filter(
                     id__in=[
@@ -808,33 +801,29 @@ class ParagraphSerializers(serializers.Serializer):
                     problem_paragraph_mapping_list, ["problem_id", "knowledge_id", "document_id"]
                 )
                 knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
-                embedding_model_id = None
                 if target_knowledge.embedding_model_id != knowledge.embedding_model_id:
                     embedding_model_id = str(target_knowledge.embedding_model_id)
-                pid_list = [paragraph.id for paragraph in paragraph_list]
-                # 修改段落信息
-                paragraph_list.update(knowledge_id=target_knowledge_id, document_id=target_document_id)
 
-                # 将当前文档中所有段落的位置向下移动，为新段落腾出空间
-                Paragraph.objects.filter(document_id=target_document_id).exclude(id__in=pid_list).update(
-                    position=F("position") + len(pid_list)
-                )
-                # 重新查询迁移的段落
-                paragraph_list = Paragraph.objects.filter(id__in=pid_list, document_id=target_document_id)
-                # 将迁移的段落位置设置为从1开始的序号
-                for i, paragraph in enumerate(paragraph_list):
-                    paragraph.position = i + 1
-                    paragraph.save()
-                # 修改向量段落信息
-                update_embedding_document_id(pid_list, target_document_id, target_knowledge_id, embedding_model_id)
-
+            # Source keys and sync snapshots belong to the original document.
+            Paragraph.objects.filter(document_id=target_document_id).update(position=F("position") + len(paragraphs))
+            source_paragraphs.update(
+                knowledge_id=target_knowledge_id,
+                document_id=target_document_id,
+                origin=ContentOrigin.MANUAL,
+                source_key="",
+                source_hash="",
+                source_snapshot={},
+                source_updated_at=None,
+                sync_state=SyncState.ACTIVE,
+                anchor_paragraph=None,
+                update_time=Now(),
+            )
+            for position, paragraph in enumerate(paragraphs, 1):
+                paragraph.position = position
+            Paragraph.objects.bulk_update(paragraphs, ["position"])
+            update_embedding_document_id(moved_ids, target_document_id, target_knowledge_id, embedding_model_id)
             update_document_char_length(document_id)
             update_document_char_length(target_document_id)
-
-        @staticmethod
-        def update_problem_paragraph_mapping(target_document_id: str, problem_paragraph_mapping):
-            problem_paragraph_mapping.document_id = target_document_id
-            return problem_paragraph_mapping
 
         @staticmethod
         def get_target_knowledge_problem(

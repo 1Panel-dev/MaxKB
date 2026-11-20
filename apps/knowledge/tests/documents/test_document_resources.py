@@ -16,6 +16,7 @@ from knowledge.models import (
     KnowledgeType,
     KnowledgeWorkflow,
     Paragraph,
+    ParagraphAsset,
     Problem,
     ProblemParagraphMapping,
 )
@@ -548,10 +549,11 @@ class ParagraphFileMigrationTests(SimpleTestCase):
     @patch("knowledge.serializers.paragraph.update_document_char_length")
     @patch("knowledge.serializers.paragraph.update_embedding_document_id")
     @patch("knowledge.serializers.paragraph.migrate_paragraph_files")
+    @patch("knowledge.serializers.paragraph.Document.objects")
     @patch("knowledge.serializers.paragraph.Paragraph.objects")
     @patch("knowledge.serializers.paragraph.QuerySet")
     def test_paragraph_migration_moves_files_before_owner_update(
-        self, query_set, paragraph_objects, move_files, _update_embedding, _update_char_length
+        self, query_set, paragraph_objects, _document_objects, move_files, _update_embedding, _update_char_length
     ):
         knowledge_id = "00000000-0000-0000-0000-000000000001"
         source_document_id = "00000000-0000-0000-0000-000000000002"
@@ -559,19 +561,17 @@ class ParagraphFileMigrationTests(SimpleTestCase):
         paragraph = Paragraph(id="00000000-0000-0000-0000-000000000004")
         paragraph_list = MagicMock()
         paragraph_list.__iter__.return_value = iter([paragraph])
-        paragraph_query = MagicMock()
-        paragraph_query.filter.return_value = paragraph_list
+        paragraph_query = paragraph_objects.select_for_update.return_value
+        paragraph_query.filter.return_value.exclude.return_value.order_by.return_value = paragraph_list
         knowledge_query = MagicMock()
         target_knowledge = Knowledge(id=knowledge_id)
         knowledge_query.filter.return_value.first.return_value = target_knowledge
         mapping_query = MagicMock()
-        mapping_query.filter.return_value = []
         query_set.side_effect = lambda model: {
-            Paragraph: paragraph_query,
             Knowledge: knowledge_query,
             ProblemParagraphMapping: mapping_query,
         }[model]
-        paragraph_objects.filter.return_value.__iter__.return_value = iter([])
+        move_files.side_effect = lambda *_: paragraph_list.update.assert_not_called()
         serializer = MagicMock(
             data={
                 "knowledge_id": knowledge_id,
@@ -584,8 +584,8 @@ class ParagraphFileMigrationTests(SimpleTestCase):
 
         ParagraphSerializers.Migrate.migrate.__wrapped__(serializer, with_valid=False)
 
-        move_files.assert_called_once_with(paragraph_list, target_document_id, target_knowledge)
-        paragraph_list.update.assert_called_once_with(document_id=target_document_id)
+        move_files.assert_called_once_with([paragraph], target_document_id, target_knowledge)
+        self.assertEqual(paragraph_list.update.call_args.kwargs["document_id"], target_document_id)
 
     @patch.object(Paragraph, "save")
     @patch.object(File, "save", autospec=True)
@@ -606,9 +606,8 @@ class ParagraphFileMigrationTests(SimpleTestCase):
         )
         source_file.get_bytes = MagicMock(return_value=b"image")
         file_objects.filter.return_value = [source_file]
-        asset_objects.filter.return_value.values.return_value = [
-            {"id": asset_id, "paragraph_id": paragraph_id, "file_id": file_id}
-        ]
+        asset = ParagraphAsset(id=asset_id, paragraph_id=paragraph_id, file_id=file_id)
+        asset_objects.filter.return_value.only.return_value = [asset]
         paragraph = Paragraph(
             id=paragraph_id,
             knowledge_id="old-knowledge",
@@ -632,10 +631,9 @@ class ParagraphFileMigrationTests(SimpleTestCase):
         self.assertIn(str(copied.id), paragraph.source_snapshot["content"])
         self.assertIn(str(copied.id), paragraph.chunks[0])
         save_paragraph.assert_called_once()
-        asset_objects.filter.return_value.update.assert_any_call(file_id=str(copied.id))
-        asset_objects.filter.return_value.update.assert_any_call(
-            document_id="new-document", knowledge_id=target_knowledge.id
-        )
+        self.assertEqual(asset.file_id, str(copied.id))
+        self.assertEqual((asset.document_id, asset.knowledge_id), ("new-document", target_knowledge.id))
+        self.assertEqual(asset_objects.bulk_update.call_args.args[0], [asset])
         self.assertEqual(source_file.source_id, "old-document")
 
     @patch.object(Paragraph, "save")
@@ -655,7 +653,7 @@ class ParagraphFileMigrationTests(SimpleTestCase):
         )
         source_file.get_bytes = MagicMock(return_value=b"attachment")
         file_objects.filter.return_value = [source_file]
-        asset_objects.filter.return_value.values.return_value = []
+        asset_objects.filter.return_value.only.return_value = []
         paragraph = Paragraph(
             id=paragraph_id,
             knowledge_id="same-knowledge",
@@ -670,9 +668,7 @@ class ParagraphFileMigrationTests(SimpleTestCase):
         self.assertEqual(copied.source_id, paragraph_id)
         self.assertIn(str(copied.id), paragraph.content)
         save_paragraph.assert_called_once()
-        asset_objects.filter.return_value.update.assert_called_once_with(
-            document_id="new-document", knowledge_id="same-knowledge"
-        )
+        self.assertEqual(asset_objects.bulk_update.call_args.args[0], [])
 
     @patch.object(Paragraph, "save")
     @patch.object(File, "save", autospec=True)
@@ -686,9 +682,8 @@ class ParagraphFileMigrationTests(SimpleTestCase):
         file_objects.filter.return_value = [
             File(id=file_id, source_type=FileSourceType.PARAGRAPH, source_id=paragraph_id, meta={"original_size": 5})
         ]
-        asset_objects.filter.return_value.values.return_value = [
-            {"id": "asset-id", "paragraph_id": paragraph_id, "file_id": file_id}
-        ]
+        asset = ParagraphAsset(paragraph_id=paragraph_id, file_id=file_id)
+        asset_objects.filter.return_value.only.return_value = [asset]
         paragraph = Paragraph(
             id=paragraph_id,
             knowledge_id="old-knowledge",
@@ -702,9 +697,10 @@ class ParagraphFileMigrationTests(SimpleTestCase):
         save_file.assert_not_called()
         save_paragraph.assert_not_called()
         self.assertIn(file_id, paragraph.content)
-        asset_objects.filter.return_value.update.assert_called_once_with(
-            document_id="new-document", knowledge_id=target_knowledge.id
+        self.assertEqual(
+            (asset.document_id, asset.knowledge_id, asset.file_id), ("new-document", target_knowledge.id, file_id)
         )
+        self.assertEqual(asset_objects.bulk_update.call_args.args[0], [asset])
 
     @patch.object(Paragraph, "save")
     @patch.object(File, "save", autospec=True)
@@ -722,7 +718,7 @@ class ParagraphFileMigrationTests(SimpleTestCase):
                 meta={"original_size": 1024 * 1024 + 1},
             )
         ]
-        asset_objects.filter.return_value.values.return_value = []
+        asset_objects.filter.return_value.only.return_value = []
         paragraph = Paragraph(id="00000000-0000-0000-0000-000000000002", knowledge_id="old-knowledge")
 
         with self.assertRaises(AppApiException):
@@ -730,7 +726,7 @@ class ParagraphFileMigrationTests(SimpleTestCase):
 
         save_file.assert_not_called()
         save_paragraph.assert_not_called()
-        asset_objects.filter.return_value.update.assert_not_called()
+        asset_objects.bulk_update.assert_not_called()
 
     @patch.object(File, "save", autospec=True)
     @patch("knowledge.services.paragraph_files.File.objects")
@@ -738,7 +734,7 @@ class ParagraphFileMigrationTests(SimpleTestCase):
     def test_migration_rejects_file_owned_by_another_resource(self, asset_objects, file_objects, save_file):
         file_id = "00000000-0000-0000-0000-000000000001"
         file_objects.filter.return_value = [File(id=file_id, source_type=FileSourceType.CHAT, source_id="chat-id")]
-        asset_objects.filter.return_value.values.return_value = []
+        asset_objects.filter.return_value.only.return_value = []
         paragraph = Paragraph(
             id="00000000-0000-0000-0000-000000000002",
             knowledge_id="old-knowledge",
@@ -750,7 +746,7 @@ class ParagraphFileMigrationTests(SimpleTestCase):
             migrate_paragraph_files([paragraph], "new-document", Knowledge(id="new-knowledge"))
 
         save_file.assert_not_called()
-        asset_objects.filter.return_value.update.assert_not_called()
+        asset_objects.bulk_update.assert_not_called()
 
 
 class DocumentResourceIsolationTests(SimpleTestCase):

@@ -8,7 +8,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
-from knowledge.models import Document, File, FileSourceType, ParagraphAsset
+from knowledge.models import ContentOrigin, Document, File, FileSourceType, ParagraphAsset
 from knowledge.services import validate_knowledge_file_size
 
 
@@ -193,12 +193,14 @@ def migrate_paragraph_files(paragraphs, target_document_id, target_knowledge):
         return
     detach_shared_paragraph_images(paragraphs, target_knowledge.id)
     paragraph_ids = {str(paragraph.id) for paragraph in paragraphs}
-    asset_rows = list(
-        ParagraphAsset.objects.filter(paragraph_id__in=paragraph_ids).values("id", "paragraph_id", "file_id")
+    assets = list(
+        ParagraphAsset.objects.filter(paragraph_id__in=paragraph_ids).only(
+            "paragraph_id", "file_id", "source_asset_key"
+        )
     )
     assets_by_paragraph = defaultdict(list)
-    for asset in asset_rows:
-        assets_by_paragraph[str(asset["paragraph_id"])].append(asset)
+    for asset in assets:
+        assets_by_paragraph[str(asset.paragraph_id)].append(asset)
 
     referenced_ids = set().union(
         *(
@@ -208,7 +210,7 @@ def migrate_paragraph_files(paragraphs, target_document_id, target_knowledge):
             for paragraph in paragraphs
         )
     )
-    referenced_ids.update(str(asset["file_id"]) for asset in asset_rows)
+    referenced_ids.update(str(asset.file_id) for asset in assets)
     files = list(
         File.objects.filter(
             Q(id__in=referenced_ids) | Q(source_type=FileSourceType.PARAGRAPH, source_id__in=paragraph_ids)
@@ -221,7 +223,7 @@ def migrate_paragraph_files(paragraphs, target_document_id, target_knowledge):
         file_ids = _referenced_file_ids(
             [paragraph.content, paragraph.content_schema, paragraph.source_snapshot, paragraph.chunks]
         )
-        file_ids.update(str(asset["file_id"]) for asset in assets_by_paragraph[paragraph_id])
+        file_ids.update(str(asset.file_id) for asset in assets_by_paragraph[paragraph_id])
         for file_id in file_ids:
             file = files_by_id.get(file_id)
             if file is not None and not _belongs_to_migrating_paragraph(
@@ -262,17 +264,32 @@ def migrate_paragraph_files(paragraphs, target_document_id, target_knowledge):
             copied.save(content)
             replacements[file_id] = str(copied.id)
 
+        asset_keys = {}
+        for asset in assets_by_paragraph[paragraph_id]:
+            # Inline keys are scoped to the source document. Standalone images also use
+            # their key prefix to distinguish the original image from inline references.
+            old_key = asset.source_asset_key
+            asset.source_asset_key = f"standalone:{asset.id}" if old_key.startswith("standalone:") else str(asset.id)
+            asset_keys[str(asset.id)] = asset.source_asset_key
+            asset.file_id = replacements.get(str(asset.file_id), asset.file_id)
+            asset.document_id = target_document_id
+            asset.knowledge_id = target_knowledge.id
+            asset.origin = ContentOrigin.MANUAL
+
+        schema_changed = False
+        for block in paragraph.content_schema or []:
+            if isinstance(block, dict) and block.get("type") == "image":
+                key = asset_keys.get(block.get("asset_id"))
+                if key and block.get("source_asset_key") != key:
+                    block["source_asset_key"] = key
+                    schema_changed = True
         if replacements:
             paragraph.content = _replace_file_ids(paragraph.content, replacements)
             paragraph.content_schema = _replace_file_ids(paragraph.content_schema, replacements)
             paragraph.source_snapshot = _replace_file_ids(paragraph.source_snapshot, replacements)
             paragraph.chunks = _replace_file_ids(paragraph.chunks, replacements)
             paragraph.save(update_fields=["content", "content_schema", "source_snapshot", "chunks", "update_time"])
-            for asset in assets_by_paragraph[paragraph_id]:
-                replacement = replacements.get(str(asset["file_id"]))
-                if replacement:
-                    ParagraphAsset.objects.filter(id=asset["id"]).update(file_id=replacement)
+        elif schema_changed:
+            paragraph.save(update_fields=["content_schema", "update_time"])
 
-    ParagraphAsset.objects.filter(paragraph_id__in=paragraph_ids).update(
-        document_id=target_document_id, knowledge_id=target_knowledge.id
-    )
+    ParagraphAsset.objects.bulk_update(assets, ["document", "knowledge", "origin", "source_asset_key", "file"])
