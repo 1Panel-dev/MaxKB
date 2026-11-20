@@ -78,6 +78,7 @@ function handleChange() {
       collapse-tags-tooltip
       reserve-keyword
       :remote="Boolean(activeField.remoteMethod)"
+      remote-show-suffix
       :remote-method="handleRemoteSearch"
       @change="handleChange"
       :persistent="false"

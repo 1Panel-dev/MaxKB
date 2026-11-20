@@ -89,6 +89,7 @@ defineExpose({ open })
           multiple
           :loading="optionsLoading"
           remote
+          remote-show-suffix
           :remote-method="loadUserOptions"
           :reserve-keyword="false"
           :placeholder="t('user.placeholder')"

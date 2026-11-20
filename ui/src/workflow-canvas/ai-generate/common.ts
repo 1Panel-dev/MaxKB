@@ -1,6 +1,7 @@
 import type { AgentBindings, AgentConfig, AgentMessage, AgentTool, Call, RunnableAgent, SseEvent, StreamItem, ToolCall } from './type'
 import type { ChatCompletionPayload } from '@/api/types'
 import { useWorkflowStore } from '@/workflow-canvas/store'
+import { t } from '@/locales'
 
 /**
  * 跨模块共用的基础设施：agent 装配（useAgentConfig）、工具 schema、SSE 流式补全、
@@ -160,11 +161,11 @@ export async function chatCompletion(
             },
           })
         } else if (event.type === 'error') {
-          throw new Error(String(event.message ?? '模型调用失败'))
+          throw new Error(String(event.message ?? t('workflow.aiGeneration.errors.modelCallFailed')))
         }
       }
     }
-    if (!completed) throw new Error('流式响应缺少完整结果')
+    if (!completed) throw new Error(t('workflow.aiGeneration.errors.incompleteStream'))
     call.onComplete?.()
   } catch (error) {
     call.onComplete?.(error instanceof Error ? error : new Error(String(error)))

@@ -168,6 +168,7 @@ function handleRemoveProblem(index: number) {
             default-first-option
             :reserve-keyword="false"
             remote
+            remote-show-suffix
             :remote-method="loadProblemOptions"
             :loading="optionLoading"
             :placeholder="t('common.placeholders.input')"

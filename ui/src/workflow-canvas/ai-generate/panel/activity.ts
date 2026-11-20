@@ -1,7 +1,8 @@
-import { ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { v7 as uuidv7 } from 'uuid'
 import type { AgentEvent } from '../type'
 import { aggregators } from '@/conversation-panel/core/aggregators'
+import { t } from '@/locales'
 
 /**
  * 生成面板的活动：把扁平 AgentEvent 流（每条带 position）转成 conversation-panel 的内容项，
@@ -19,31 +20,31 @@ export interface ContentItem {
   [field: string]: unknown
 }
 
-const TOOL_LABELS: Record<string, string> = {
-  plan: '规划流程',
-  get_canvas_detail: '查看画布',
-  get_node_detail: '查看节点配置',
-  get_last_run: '查看最近一次执行',
-  list_datasource: '查询数据源',
-  get_node_anchors: '查看节点出口',
-  get_tools: '查询工具',
-  add_node: '添加节点',
-  add_edge: '添加连线',
-  delete_node: '删除节点',
-  delete_edge: '删除连线',
-  configure_node: '配置节点',
-  validate: '校验工作流',
-  layout: '整理布局',
-  get_field_options: '查看可引用变量',
-  get_models: '查询模型',
-  get_knowledge_list: '查询知识库',
-  get_skill_resources: '查询技能资源',
-  update: '写入配置',
-  get_branches: '查看分支',
-  add_branch: '新增分支',
-  update_branch: '修改分支',
-  delete_branch: '删除分支',
-}
+const TOOL_LABELS: Record<string, string> = reactive({
+  plan: computed(() => t('workflow.aiGeneration.tools.plan')),
+  get_canvas_detail: computed(() => t('workflow.aiGeneration.tools.getCanvasDetail')),
+  get_node_detail: computed(() => t('workflow.aiGeneration.tools.getNodeDetail')),
+  get_last_run: computed(() => t('workflow.aiGeneration.tools.getLastRun')),
+  list_datasource: computed(() => t('workflow.aiGeneration.tools.listDatasource')),
+  get_node_anchors: computed(() => t('workflow.aiGeneration.tools.getNodeAnchors')),
+  get_tools: computed(() => t('workflow.aiGeneration.tools.getTools')),
+  add_node: computed(() => t('workflow.aiGeneration.tools.addNode')),
+  add_edge: computed(() => t('workflow.aiGeneration.tools.addEdge')),
+  delete_node: computed(() => t('workflow.aiGeneration.tools.deleteNode')),
+  delete_edge: computed(() => t('workflow.aiGeneration.tools.deleteEdge')),
+  configure_node: computed(() => t('workflow.aiGeneration.tools.configureNode')),
+  validate: computed(() => t('workflow.aiGeneration.tools.validate')),
+  layout: computed(() => t('workflow.aiGeneration.tools.layout')),
+  get_field_options: computed(() => t('workflow.aiGeneration.tools.getFieldOptions')),
+  get_models: computed(() => t('workflow.aiGeneration.tools.getModels')),
+  get_knowledge_list: computed(() => t('workflow.aiGeneration.tools.getKnowledgeList')),
+  get_skill_resources: computed(() => t('workflow.aiGeneration.tools.getSkillResources')),
+  update: computed(() => t('workflow.aiGeneration.tools.update')),
+  get_branches: computed(() => t('workflow.aiGeneration.tools.getBranches')),
+  add_branch: computed(() => t('workflow.aiGeneration.tools.addBranch')),
+  update_branch: computed(() => t('workflow.aiGeneration.tools.updateBranch')),
+  delete_branch: computed(() => t('workflow.aiGeneration.tools.deleteBranch')),
+})
 
 export function toolLabel(name: string) {
   return TOOL_LABELS[name] ?? name
@@ -72,7 +73,7 @@ function parseArgs(text: string): Record<string, unknown> | undefined {
   }
 }
 
-/** 工具标题：中文名，配置节点补节点 id，添加节点补名称 / 类型 */
+/** 工具标题：当前语言名称，配置节点补节点 id，添加节点补名称 / 类型 */
 function toolTitle(toolCall: ToolCall): string {
   const label = toolLabel(toolCall.tool)
   const args = parseArgs(toolCall.argumentsText)
@@ -183,7 +184,7 @@ export function createActivity() {
       }
       emit(scopeKey, { type, id: last.id, content: event.delta, ...(type === 'REASONING' ? { status: 'RUNNING' } : {}) })
       // mk-dotting 只接受静态文案（见 STYLE_README.md），不能随逐字增量改变，否则文案本身也会跟着抖动
-      lastActivity.value = event.type === 'reasoning' ? '思考中' : '生成中'
+      lastActivity.value = event.type === 'reasoning' ? t('workflow.aiGeneration.thinking') : t('common.status.generating')
     } else if (event.type === 'tool_start') {
       settle(scopeKey)
       const delegate = DELEGATE_TOOLS.has(event.name)

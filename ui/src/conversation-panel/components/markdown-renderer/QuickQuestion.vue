@@ -9,7 +9,12 @@ defineProps<{
 
 <template>
   <!-- 发送快捷问题 -->
-  <el-button size="large" class="mk-conversation-export-include mt-2 rounded-xl!" plain @click="sendMessage?.(question)">
-    {{ question }}
+  <el-button
+    size="large"
+    class="mk-conversation-export-include mt-2 h-auto! max-w-full whitespace-normal! rounded-xl! py-2!"
+    plain
+    @click="sendMessage?.(question)"
+  >
+    <span class="min-w-0 break-words text-left leading-[22px]">{{ question }}</span>
   </el-button>
 </template>

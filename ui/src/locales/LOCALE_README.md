@@ -308,6 +308,7 @@ MCP、关联资源和模板中心入口复用 `resource`，资源授权入口复
 - `layout.json` 维护 `menu`、`layout`、`defaultModel`、`publishHistory` 四个并列分组；节点添加面板分类使用 `workflow.menu.*`，`layout` 维护工作流页面框架及操作区文案：添加、搜索、缩放、布局、保存时间、自动保存、调试和退出确认，调用为 `workflow.layout.*`。
 - `layout.json` 的 `defaultModel` 维护默认模型来源、选择、设置和批量应用，调用保持 `workflow.defaultModel.*`。
 - `layout.json` 的 `publishHistory` 维护版本历史、发布内容及更新说明，调用保持 `workflow.publishHistory.*`。
+- `ai-generation.json` 的 `aiGeneration` 维护 AI 生成面板、示例需求及工具活动标签，调用为 `workflow.aiGeneration.*`。
 - `prompt.json` 维护 `systemPrompt`、`userPrompt`、`positivePrompt`、`negativePrompt`、`promptGeneration`，各组调用保持原有 key，不增加 `prompt` 层级。
 - 节点专属文案归节点文件，历史聊天记录 `history`、输出思考 `thinking` 及其他跨节点共用字段留在 `index.json`。分文件不增加命名空间层级，同一顶层分组只由一个文件维护。
 
@@ -377,6 +378,8 @@ AI 对话、图片理解及视频理解的智能体与知识库执行详情中�
 工具执行记录与详情的触发来源标签使用 `execution.records.triggerSource`，来源类型名称复用 `application.title`、`knowledge.title`、`tool.title`、`trigger.title`；原来源映射使用响应式配置直接调用 `t`，筛选与表格共用。工作空间标签复用 `workspace.title`，其余执行字段和翻页复用 `execution`、`common`；保留来源协议值、名称、范围显示条件及查询流程。
 知识库工作流执行记录与详情复用 `execution.records`、`execution.details`，发起人标签使用 `execution.records.initiator`；取消执行入口和完整确认句归 `execution.cancel`。耗时、状态、操作和记录翻页复用 `common`，发起人姓名、日期和秒数保持原样，翻译不改变轮询、排序、分页或取消请求流程。
 工具工作流调试的输入／输出参数及执行详情标题复用 `execution.details`，参数占位复用 `dynamicForm.fields.parameter`，调试标题复用 `common.actions.debug`，运行按钮与结果、调试结果标题、回答中及调试请求错误归 `tool.debug`。JSON 数组与对象输入要求复用 `common.validation.jsonArrayRequired` / `jsonObjectRequired`；回复内容标签复用 `workflow.reply.content.label`。用户参数名、协议类型、服务端错误和流式内容保持原值，语言切换不触发校验、运行或重置输入。
+AI 生成引擎缺少模型、轮次上限及流式／单轮响应不完整等本地终止错误归 `workflow.aiGeneration.errors`；在原错误分支直接调用 `t`，轮次上限通过 `{max}` 传入。服务端错误原文优先，模型指令及回喂模型的工具结果保留原值。
+AI 生成面板的说明、示例需求、状态及工具活动名称归 `ai-generation.json` 的 `workflow.aiGeneration`，面板标题复用 `workflow.layout.aiGenerate`，生成中复用 `common.status.generating`。原工具名称映射使用响应式配置直接调用 `t`，未知工具名保留协议值；示例需求响应当前语言，已发送需求、模型回复、工具参数及历史活动按事件发生时的内容保留，不新增翻译辅助函数或语言监听。内部模型指令不在此批翻译。
 工作流资源范围不支持流式补全时，原 Store 请求分支直接调用 `workflow.layout.streamingUnavailableMessage`，通过 `{scope}` 保留范围协议值；不新增翻译辅助函数或改动请求能力判断。
 工作流模板应用与文件导入共用 `workflow.layout.overwriteMessage`，通过 `{name}` 传入模板名或去除扩展名后的文件名；应用成功、工作流导入／导出入口、文件格式提示和导出失败归 `workflow.layout`，导入成功复用 `common.messages.importSuccess`。知识库未发布时的文档导入限制归 `knowledge.workflow.documentImportUnavailableMessage`。模板、文件名称、扩展名校验及覆盖流程保持原样。
 工作流页面头部的保存时间、自动保存、AI 生成和未保存退出确认归 `workflow.layout`，保存／发布／调试按钮及成功提示复用 `common`；模板中心、默认模型与发布历史入口复用各自标题，恢复按钮复用 `workflow.publishHistory.restore`。保存时间只翻译标签，日期和分隔符保持原格式；语言切换不触发保存、发布或恢复版本。

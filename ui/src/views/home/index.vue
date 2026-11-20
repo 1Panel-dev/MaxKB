@@ -52,6 +52,7 @@ onMounted(() => {
           clearable
           filterable
           remote
+          remote-show-suffix
           fit-input-width
           class="w-55!"
           :remote-method="loadApplications"

@@ -1,0 +1,47 @@
+{
+  "aiGeneration": {
+    "modelListFailedMessage": "Failed to load models",
+    "generatedMessage": "Workflow generated. Review it before saving",
+    "requirementHint": "Describe your requirements, for example",
+    "placeholder": "Describe your requirements",
+    "stopped": "Generation stopped",
+    "thinking": "Thinking",
+    "examples": {
+      "productSupport": "Build a product support agent that searches the product Knowledge first and responds politely when no answer is found.",
+      "pricing": "Build an agent that can look up product pricing.",
+      "humanSupport": "Build a customer support agent that can hand off to a human when needed."
+    },
+    "tools": {
+      "plan": "Plan workflow",
+      "getCanvasDetail": "View canvas",
+      "getNodeDetail": "View node configuration",
+      "getLastRun": "View latest execution",
+      "listDatasource": "Query data sources",
+      "getNodeAnchors": "View node outlets",
+      "getTools": "Query tools",
+      "addNode": "Add node",
+      "addEdge": "Add edge",
+      "deleteNode": "Delete node",
+      "deleteEdge": "Delete edge",
+      "configureNode": "Configure node",
+      "validate": "Validate workflow",
+      "layout": "Arrange layout",
+      "getFieldOptions": "View referenceable variables",
+      "getModels": "Query models",
+      "getKnowledgeList": "Query Knowledge",
+      "getSkillResources": "Query skill resources",
+      "update": "Write configuration",
+      "getBranches": "View branches",
+      "addBranch": "Add branch",
+      "updateBranch": "Update branch",
+      "deleteBranch": "Delete branch"
+    },
+    "errors": {
+      "modelRequired": "No model specified",
+      "iterationLimit": "Maximum iteration count exceeded: {max}",
+      "incompleteTurn": "The turn ended without a complete result",
+      "modelCallFailed": "Model call failed",
+      "incompleteStream": "The streaming response is missing a complete result"
+    }
+  }
+}

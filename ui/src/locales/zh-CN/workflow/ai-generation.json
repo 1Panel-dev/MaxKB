@@ -1,0 +1,47 @@
+{
+  "aiGeneration": {
+    "modelListFailedMessage": "获取模型列表失败",
+    "generatedMessage": "工作流已生成，请检查后保存",
+    "requirementHint": "请描述你的需求，如下",
+    "placeholder": "请描述你的需求",
+    "stopped": "已停止生成",
+    "thinking": "思考中",
+    "examples": {
+      "productSupport": "做一个产品客服，先查产品知识库回答，查不到时礼貌兜底。",
+      "pricing": "做一个可以查询产品收费信息的智能体。",
+      "humanSupport": "做一个需要时可以转人工服务的客服智能体。"
+    },
+    "tools": {
+      "plan": "规划流程",
+      "getCanvasDetail": "查看画布",
+      "getNodeDetail": "查看节点配置",
+      "getLastRun": "查看最近一次执行",
+      "listDatasource": "查询数据源",
+      "getNodeAnchors": "查看节点出口",
+      "getTools": "查询工具",
+      "addNode": "添加节点",
+      "addEdge": "添加连线",
+      "deleteNode": "删除节点",
+      "deleteEdge": "删除连线",
+      "configureNode": "配置节点",
+      "validate": "校验工作流",
+      "layout": "整理布局",
+      "getFieldOptions": "查看可引用变量",
+      "getModels": "查询模型",
+      "getKnowledgeList": "查询知识库",
+      "getSkillResources": "查询技能资源",
+      "update": "写入配置",
+      "getBranches": "查看分支",
+      "addBranch": "新增分支",
+      "updateBranch": "修改分支",
+      "deleteBranch": "删除分支"
+    },
+    "errors": {
+      "modelRequired": "缺少模型",
+      "iterationLimit": "超过最大轮次 {max}",
+      "incompleteTurn": "本轮结束但未收到完整结果",
+      "modelCallFailed": "模型调用失败",
+      "incompleteStream": "流式响应缺少完整结果"
+    }
+  }
+}
