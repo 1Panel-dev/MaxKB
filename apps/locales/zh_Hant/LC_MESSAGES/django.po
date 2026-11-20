@@ -15629,3 +15629,6 @@ msgstr "試聽"
 
 msgid "User sync"
 msgstr "用戶同步"
+
+msgid "Set User Group"
+msgstr "設定使用者組"
