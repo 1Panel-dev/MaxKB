@@ -32,6 +32,7 @@ const props = withDefaults(
     toolApi?: typeof ToolApi | typeof SystemToolApi
     toolWorkflowApi?: typeof WorkflowApi
     canEdit?: boolean
+    canCreate?: boolean
   }>(),
   {
     resourceApi: () => ResourceTriggerApi,
@@ -39,6 +40,7 @@ const props = withDefaults(
     toolApi: () => ToolApi,
     toolWorkflowApi: () => WorkflowApi,
     canEdit: true,
+    canCreate: true,
   },
 )
 const emit = defineEmits<{ refresh: []; closed: [] }>()
@@ -461,7 +463,7 @@ defineExpose({ open })
       <!-- 取消触发器编辑 -->
       <el-button plain :disabled="saving" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存触发器配置 -->
-      <el-button v-if="canEdit" type="primary" :loading="saving" :disabled="loading || detailFailed" @click="handleSave">
+      <el-button v-if="editingId ? canEdit : canCreate" type="primary" :loading="saving" :disabled="loading || detailFailed" @click="handleSave">
         {{ editingId ? t('common.actions.save') : t('common.actions.create') }}
       </el-button>
     </template>
