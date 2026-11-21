@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import defaultFloatIconUrl from '/MaxKB.gif?url'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDisplaySetting } from '@/api/types'
 import type { CSSProperties } from 'vue'
 
 defineOptions({ name: 'DisplaySettingPreview' })
 
-const props = withDefaults(
-  defineProps<{
-    applicationName?: string
-    setting: ApplicationDisplaySetting
-    imagePreviews: Partial<Pick<ApplicationDisplaySetting, 'icon' | 'chat_background' | 'avatar' | 'user_avatar' | 'float_icon'>>
-  }>(),
-  { applicationName: '智能体名称' },
-)
+const { t } = useI18n({ useScope: 'global' })
+
+const props = defineProps<{
+  applicationName?: string
+  setting: ApplicationDisplaySetting
+  imagePreviews: Partial<Pick<ApplicationDisplaySetting, 'icon' | 'chat_background' | 'avatar' | 'user_avatar' | 'float_icon'>>
+}>()
 
 // 本次替换的图片优先展示，否则使用草稿中的已有地址。
 const previewImages = computed(() => ({
@@ -38,7 +38,9 @@ const previewHeaderStyle = computed<CSSProperties>(() => ({
         <div class="flex-align-center min-w-0 flex-1 gap-2">
           <MkIcon name="icon_sidebar_outlined" :size="18" class="mr-2 shrink-0" />
           <ApplicationIcon :icon="previewImages.icon" :size="24" class="shrink-0" />
-          <h6 class="truncate" :title="applicationName">{{ applicationName }}</h6>
+          <h6 class="truncate" :title="applicationName ?? t('overview.ranking.applicationName')">
+            {{ applicationName ?? t('overview.ranking.applicationName') }}
+          </h6>
         </div>
         <div class="flex-align-center shrink-0 gap-4">
           <MkIcon name="icon_new-chat_outlined" :size="18" />

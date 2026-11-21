@@ -1,6 +1,5 @@
 {
   "llm": {
-    "label": "LLM",
     "description": "Call an AI model once, optionally providing tool definitions and receiving tool calls",
     "context": {
       "label": "Context",

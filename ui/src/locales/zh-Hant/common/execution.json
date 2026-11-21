@@ -17,7 +17,7 @@
     "currentChat": "本次對話",
     "history": "歷史記錄",
     "answer": "回答",
-    "errorMessage": "錯誤資訊",
+    "errorMessage": "錯誤信息",
     "errorLog": "錯誤日誌"
   },
   "result": {
@@ -27,6 +27,6 @@
   },
   "cancel": {
     "label": "取消執行",
-    "title": "是否取消目前執行任務？"
+    "title": "是否取消當前執行任務？"
   }
 }

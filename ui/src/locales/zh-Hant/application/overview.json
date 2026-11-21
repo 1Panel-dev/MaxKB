@@ -1,0 +1,56 @@
+{
+  "overview": {
+    "webAccess": "Web 訪問",
+    "backendApi": "後端 API 訪問",
+    "link": "鏈接",
+    "apiDoc": "API 文檔",
+    "resetTitle": "是否重新生成公開訪問鏈接？",
+    "resetDescription": "重新生成後舊鏈接將失效，嵌入第三方的腳本也需要更新，請謹慎操作！",
+    "refreshSuccess": "刷新成功",
+    "embed": {
+      "title": "嵌入第三方",
+      "fullscreen": "全屏模式",
+      "floating": "浮窗模式",
+      "mobile": "移動端模式",
+      "copyHint": "複製以下代碼進行嵌入"
+    },
+    "accessRestriction": {
+      "title": "訪問限制",
+      "questionLimit": "每個客戶端提問限制",
+      "perDay": "次/天",
+      "authentication": "身份認證",
+      "authenticationHint": "開啟身份認證後，智能體和關聯的知識庫均需要對話用戶授權配置，否則用戶無權限登錄和知識庫檢索",
+      "whitelist": "嵌入白名單",
+      "whitelistPlaceholder": "請輸入允許嵌入第三方的源地址，一行一個，如：",
+      "integerRangeMessage": "請輸入 {min}～{max} 的整數"
+    },
+    "display": {
+      "title": "顯示設置",
+      "language": "語言",
+      "themeColor": "自定義主題色",
+      "headerFontColor": "頭部標題字體顏色",
+      "background": "聊天背景",
+      "aiAvatar": "AI 回復頭像",
+      "userAvatar": "提問用戶頭像",
+      "floatingIcon": "浮窗入口圖標",
+      "show": "顯示",
+      "imageHint": "建議尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超過 {size} MB",
+      "backgroundHint": "支持 JPG、PNG、GIF，大小不超過 {size} MB",
+      "imageSizeMessage": "圖片大小不能超過 {size} MB",
+      "iconPosition": "圖標默認位置",
+      "draggable": "可拖拽位置",
+      "left": "左",
+      "right": "右",
+      "top": "上",
+      "bottom": "下",
+      "showSource": "顯示知識來源",
+      "showExecution": "顯示執行詳情",
+      "showHistory": "顯示歷史記錄",
+      "allowShare": "允許分享對話記錄",
+      "disclaimer": "免責聲明",
+      "disclaimerPlaceholder": "請輸入免責聲明",
+      "defaultDisclaimer": "「以上內容均由 AI 生成，僅供參考和借鑒」",
+      "restoreDefault": "恢復默認"
+    }
+  }
+}

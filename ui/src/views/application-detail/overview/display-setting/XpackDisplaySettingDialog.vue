@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDisplaySetting } from '@/api/types'
 import type { UploadFile } from 'element-plus'
 import { useApplicationDetailContext } from '../../context'
 import DisplaySettingPreview from './components/DisplaySettingPreview.vue'
 import { APPLICATION_DISPLAY_SETTING_DEFAULT } from '@/constants/application'
+import { LOCALE_OPTIONS } from '@/locales/config'
 import { MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'XpackDisplaySettingDialog' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const { application, applicationId, resourceApi } = useApplicationDetailContext()
 const visible = ref(false)
@@ -20,33 +24,29 @@ const imageFields: {
   key: ImageField
   label: string
   visibility?: 'show_avatar' | 'show_user_avatar'
-}[] = [
-  { key: 'icon', label: '智能体 LOGO' },
-  { key: 'chat_background', label: '聊天背景' },
-  { key: 'avatar', label: 'AI 回复头像', visibility: 'show_avatar' },
-  { key: 'user_avatar', label: '提问用户头像', visibility: 'show_user_avatar' },
-  { key: 'float_icon', label: '浮窗入口图标' },
-]
+}[] = reactive([
+  { key: 'icon', label: computed(() => `${t('application.title')} LOGO`) },
+  { key: 'chat_background', label: computed(() => t('application.overview.display.background')) },
+  { key: 'avatar', label: computed(() => t('application.overview.display.aiAvatar')), visibility: 'show_avatar' },
+  { key: 'user_avatar', label: computed(() => t('application.overview.display.userAvatar')), visibility: 'show_user_avatar' },
+  { key: 'float_icon', label: computed(() => t('application.overview.display.floatingIcon')) },
+])
 
 const imageFiles = ref<Partial<Record<ImageField, File>>>({})
 const imagePreviews = ref<Partial<Record<ImageField, string>>>({})
-const displayOptions = [
-  { key: 'show_source', label: '显示知识来源' },
-  { key: 'show_exec', label: '显示执行详情' },
-  { key: 'show_history', label: '显示历史记录' },
-  { key: 'show_share', label: '允许分享对话记录' },
-  { key: 'disclaimer', label: '免责声明' },
-] as const
-const languageOptions = [
-  { value: 'zh-CN', label: '简体中文' },
-  { value: 'zh-Hant', label: '繁體中文' },
-  { value: 'en-US', label: 'English' },
-]
+const displayOptions = reactive([
+  { key: 'show_source', label: computed(() => t('application.overview.display.showSource')) },
+  { key: 'show_exec', label: computed(() => t('application.overview.display.showExecution')) },
+  { key: 'show_history', label: computed(() => t('application.overview.display.showHistory')) },
+  { key: 'show_share', label: computed(() => t('application.overview.display.allowShare')) },
+  { key: 'disclaimer', label: computed(() => t('application.overview.display.disclaimer')) },
+] as const)
 
 function loadSetting() {
   if (loading.value) return
   loading.value = true
-  return resourceApi.application.getDisplaySetting(applicationId.value)
+  return resourceApi.application
+    .getDisplaySetting(applicationId.value)
     .then((config) => {
       // 旧版接口可能省略展示字段，嵌套配置分别补齐默认值。
       const setting: ApplicationDisplaySetting = cloneDeep(APPLICATION_DISPLAY_SETTING_DEFAULT)
@@ -81,11 +81,11 @@ function handleImageChange(file: UploadFile, field: ImageField) {
   const image = file.raw
   if (!image || loading.value) return
   if (!['image/jpeg', 'image/png', 'image/gif'].includes(image.type)) {
-    MsgError('仅支持 JPG、PNG、GIF 格式的图片')
+    MsgError(t('upload.avatar.formatMessage'))
     return
   }
   if (image.size > 10 * 1024 * 1024) {
-    MsgError('图片大小不能超过 10 MB')
+    MsgError(t('application.overview.display.imageSizeMessage', { size: 10 }))
     return
   }
   const previousPreview = imagePreviews.value[field]
@@ -124,7 +124,7 @@ function handleSave() {
   return resourceApi.application
     .putDisplaySetting(applicationId.value, payload)
     .then(() => {
-      MsgSuccess('设置成功')
+      MsgSuccess(t('common.messages.settingsSuccess'))
       visible.value = false
     })
     .finally(() => {
@@ -139,7 +139,7 @@ onBeforeUnmount(releaseImagePreviews)
 <template>
   <MkDialog
     v-model="visible"
-    title="显示设置"
+    :title="t('application.overview.display.title')"
     class="mk-aside-content-dialog"
     body-class="border-t-0!"
     content-class="overflow-hidden"
@@ -155,14 +155,16 @@ onBeforeUnmount(releaseImagePreviews)
           <el-scrollbar class="min-h-0 flex-1 -mr-6" view-class="pr-6">
             <el-form :model="displayForm" label-position="top" require-asterisk-position="right" @submit.prevent>
               <div class="grid grid-cols-2 gap-4">
-                <el-form-item label="自定义主题色">
+                <el-form-item :label="t('application.overview.display.themeColor')">
                   <el-color-picker v-model="displayForm.custom_theme.theme_color" />
                 </el-form-item>
-                <el-form-item label="头部标题字体颜色"><el-color-picker v-model="displayForm.custom_theme.header_font_color" /></el-form-item>
+                <el-form-item :label="t('application.overview.display.headerFontColor')">
+                  <el-color-picker v-model="displayForm.custom_theme.header_font_color" />
+                </el-form-item>
               </div>
-              <el-form-item label="语言">
-                <el-select v-model="displayForm.language" clearable placeholder="请选择">
-                  <el-option v-for="language in languageOptions" :key="language.value" :label="language.label" :value="language.value" />
+              <el-form-item :label="t('application.overview.display.language')">
+                <el-select v-model="displayForm.language" clearable :placeholder="t('common.placeholders.select')">
+                  <el-option v-for="language in LOCALE_OPTIONS" :key="language.value" :label="language.label" :value="language.value" />
                 </el-select>
               </el-form-item>
               <div class="space-y-2">
@@ -172,7 +174,9 @@ onBeforeUnmount(releaseImagePreviews)
                       <span>{{ field.label }}</span>
                       <div class="flex-align-center gap-3">
                         <!-- 切换头像显示 -->
-                        <el-checkbox v-if="field.visibility" v-model="displayForm[field.visibility]">显示</el-checkbox>
+                        <el-checkbox v-if="field.visibility" v-model="displayForm[field.visibility]">
+                          {{ t('application.overview.display.show') }}
+                        </el-checkbox>
                         <!-- 替换当前展示图片 -->
                         <el-upload
                           action="#"
@@ -188,21 +192,25 @@ onBeforeUnmount(releaseImagePreviews)
                       </div>
                     </div>
                     <p class="text-sm text-N500">
-                      {{ field.key === 'chat_background' ? '' : '建议尺寸 24*24，' }}支持 JPG、PNG、GIF，大小不超过 10 MB
+                      {{
+                        field.key === 'chat_background'
+                          ? t('application.overview.display.backgroundHint', { size: 10 })
+                          : t('application.overview.display.imageHint', { dimensions: '24*24', size: 10 })
+                      }}
                     </p>
                     <div v-if="field.key === 'float_icon'">
                       <el-divider class="my-3!" />
                       <div class="flex-between mb-2">
-                        <span>图标默认位置</span>
-                        <el-checkbox v-model="displayForm.draggable">可拖拽位置</el-checkbox>
+                        <span>{{ t('application.overview.display.iconPosition') }}</span>
+                        <el-checkbox v-model="displayForm.draggable">{{ t('application.overview.display.draggable') }}</el-checkbox>
                       </div>
                       <div class="grid grid-cols-2 gap-4">
                         <div class="flex-align-center gap-2">
                           <div class="mk-input-group min-w-0 flex-1">
                             <!-- 选择横向定位方向 -->
                             <el-select v-model="displayForm.float_location.x.type" class="mk-input-group__prepend w-15! shrink-0">
-                              <el-option label="左" value="left" />
-                              <el-option label="右" value="right" />
+                              <el-option :label="t('application.overview.display.left')" value="left" />
+                              <el-option :label="t('application.overview.display.right')" value="right" />
                             </el-select>
                             <!-- 设置横向偏移量 -->
                             <el-input-number
@@ -223,8 +231,8 @@ onBeforeUnmount(releaseImagePreviews)
                           <div class="mk-input-group min-w-0 flex-1">
                             <!-- 选择纵向定位方向 -->
                             <el-select v-model="displayForm.float_location.y.type" class="mk-input-group__prepend w-15! shrink-0">
-                              <el-option label="上" value="top" />
-                              <el-option label="下" value="bottom" />
+                              <el-option :label="t('application.overview.display.top')" value="top" />
+                              <el-option :label="t('application.overview.display.bottom')" value="bottom" />
                             </el-select>
                             <!-- 设置纵向偏移量 -->
                             <el-input-number
@@ -249,7 +257,12 @@ onBeforeUnmount(releaseImagePreviews)
               <div class="mt-3 flex-column gap-2">
                 <el-checkbox v-for="option in displayOptions" :key="option.key" v-model="displayForm[option.key]">{{ option.label }}</el-checkbox>
                 <div v-if="displayForm.disclaimer" class="ml-6">
-                  <el-input v-model="displayForm.disclaimer_value" :maxlength="128" placeholder="请输入免责声明" show-word-limit />
+                  <el-input
+                    v-model="displayForm.disclaimer_value"
+                    :maxlength="128"
+                    :placeholder="t('application.overview.display.disclaimerPlaceholder')"
+                    show-word-limit
+                  />
                 </div>
               </div>
             </el-form>
@@ -258,13 +271,13 @@ onBeforeUnmount(releaseImagePreviews)
             <div class="flex-between shrink-0 pt-6">
               <!-- 恢复默认展示配置 -->
               <el-button plain :disabled="loading" @click="handleRestoreDefault">
-                <span>恢复默认</span>
+                <span>{{ t('application.overview.display.restoreDefault') }}</span>
               </el-button>
               <div class="flex-align-center">
                 <!-- 取消展示设置 -->
-                <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+                <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
                 <!-- 保存展示设置 -->
-                <el-button type="primary" :loading="loading" @click="handleSave">保存</el-button>
+                <el-button type="primary" :loading="loading" @click="handleSave">{{ t('common.actions.save') }}</el-button>
               </div>
             </div>
           </footer>

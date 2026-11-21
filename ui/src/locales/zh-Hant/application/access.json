@@ -1,15 +1,15 @@
 {
   "access": {
-    "title": "發布管道",
+    "title": "發佈渠道",
     "connection": {
-      "label": "連線方式",
-      "longConnection": "使用長連線",
-      "callback": "使用 URL 回呼",
-      "callbackHint": "透過設定回呼網址接收訊息並傳回結果"
+      "label": "連接方式",
+      "longConnection": "使用長連接",
+      "callback": "使用 URL 回調",
+      "callbackHint": "通過配置回調地址接收消息並返回結果"
     },
     "callback": {
-      "label": "回呼網址",
-      "pasteHint": "複製連結並填入"
+      "label": "回調地址",
+      "pasteHint": "複製鏈接填入到"
     },
     "consoles": {
       "wecom": "企業微信後台",
@@ -18,43 +18,43 @@
       "lark": "飛書開放平台"
     },
     "wecomBot": {
-      "label": "企業微信智慧機器人",
-      "description": "打造企業微信智慧機器人",
-      "longConnectionHint": "無需網域名稱或 IP 即可接收訊息並傳回結果",
-      "callbackTip": "-智慧專區-智慧機器人-建立機器人-API 模式建立的 \"URL\" 中"
+      "label": "企業微信智能機器人",
+      "description": "打造企業微信智能機器人",
+      "longConnectionHint": "無需域名或 IP 即可接收消息並返回結果",
+      "callbackTip": "-智能專區-智能機器人-創建機器人-API模式創建的 \"URL\" 中"
     },
     "wecom": {
-      "label": "企業微信應用程式",
-      "description": "打造企業微信智慧體",
+      "label": "企業微信應用",
+      "description": "打造企業微信智能體",
       "corporationId": "企業 ID",
-      "callbackTip": "-應用程式管理-自建-建立的應用程式-接收訊息-設定 API 接收的 \"URL\" 中"
+      "callbackTip": "-應用管理-自建-創建的應用-接收消息-設置 API 接收的 \"URL\" 中"
     },
     "dingtalk": {
-      "label": "釘釘應用程式",
-      "description": "打造釘釘智慧體",
-      "longConnectionHint": "使用釘釘 Stream 長連線，無需網域名稱或 IP 即可接收訊息並傳回結果",
-      "callbackTip": "-機器人頁面，設定 \"訊息接收模式\" 為 HTTP 模式，並將上方 URL 填入 \"訊息接收網址\" 中"
+      "label": "釘釘應用",
+      "description": "打造釘釘智能體",
+      "longConnectionHint": "使用釘釘 Stream 長連接，無需域名或 IP 即可接收消息並返回結果",
+      "callbackTip": "-機器人頁面，設置 \"消息接收模式\" 為 HTTP模式 ，並把上面 URL 填寫到\"消息接收地址\"中"
     },
     "wechat": {
       "label": "公眾號",
-      "description": "打造公眾號智慧體",
+      "description": "打造公眾號智能體",
       "developerId": "開發者 ID (APP ID)",
       "developerSecret": "開發者密鑰 (APP SECRET)",
-      "token": "權杖 (TOKEN)",
-      "encodingAesKey": "訊息加解密密鑰",
-      "certified": "驗證成功",
-      "callbackTip": "-設定與開發-基本設定-伺服器設定的 \"伺服器網址 URL\" 中"
+      "token": "令牌 (TOKEN)",
+      "encodingAesKey": "消息加解密密鑰",
+      "certified": "認證成功",
+      "callbackTip": "-設置與開發-基本配置-服務器配置的 \"服務器地址URL\" 中"
     },
     "lark": {
-      "label": "飛書應用程式",
-      "description": "打造飛書智慧體",
-      "longConnectionHint": "使用飛書 WebSocket 長連線，無需設定訂閱網址即可接收訊息並傳回結果",
-      "callbackHint": "透過設定事件訂閱回呼網址接收訊息並傳回結果",
-      "callbackTip": "-事件與回呼-事件設定-設定訂閱方式的 \"請求網址\" 中"
+      "label": "飛書應用",
+      "description": "打造飛書智能體",
+      "longConnectionHint": "使用飛書 WebSocket 長連接，無需配置訂閱地址即可接收消息並返回結果",
+      "callbackHint": "通過配置事件訂閱回調地址接收消息並返回結果",
+      "callbackTip": "-事件與回調-事件配置-配置訂閱方式的 \"請求地址\" 中"
     },
     "slack": {
       "label": "Slack",
-      "description": "打造 Slack 智慧體"
+      "description": "打造 Slack 智能體"
     }
   }
 }

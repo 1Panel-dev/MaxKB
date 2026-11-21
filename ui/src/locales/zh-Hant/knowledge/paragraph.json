@@ -5,16 +5,16 @@
       "label": "內容",
       "placeholder": "請輸入內容",
       "requiredMessage": "請輸入內容",
-      "lengthMessage": "內容最多 {max} 個字元"
+      "lengthMessage": "內容最多 {max} 字符"
     },
     "relatedQuestions": {
       "label": "關聯問題",
       "requiredMessage": "請輸入關聯問題",
-      "lengthMessage": "問題最多 {max} 個字元"
+      "lengthMessage": "問題最多 {max} 字符"
     },
     "actions": {
-      "add": "新增分段",
-      "insertAbove": "在上方插入分段",
+      "add": "添加分段",
+      "insertAbove": "上方插入分段",
       "movePosition": "移動位置"
     },
     "position": {
@@ -25,7 +25,7 @@
     },
     "delete": {
       "title": "是否刪除分段：{name}？",
-      "batchTitle": "是否刪除選取的{count}個分段？"
+      "batchTitle": "是否刪除選中的{count}個分段？"
     },
     "empty": "暫無分段"
   }

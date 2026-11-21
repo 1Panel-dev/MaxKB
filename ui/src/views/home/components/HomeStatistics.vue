@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type SystemHomepageApi from '@/api/admin/system/homepage'
 import type OverviewApi from '@/api/admin/workspace/application/overview'
 import type HomepageApi from '@/api/admin/workspace/homepage'
@@ -8,6 +9,8 @@ import type { MkDateRangeValue } from '@/components/global/mk-date-range/types'
 import MkLineChart from '@/components/mk-echart/LineCharts.vue'
 import { formatTokenNumber, numberFormat } from '@/utils/number'
 import { beforeDay } from '@/utils/time'
+const { t } = useI18n({ useScope: 'global' })
+
 const props = defineProps<{
   workspaceId: string
   applicationId: string
@@ -24,20 +27,24 @@ const metrics = computed(() =>
   [
     {
       id: 'activeUsers',
-      title: '活跃用户',
+      title: t('overview.monitoring.activeUsers'),
       keys: [
-        { key: 'customer_num', label: '活跃用户' },
-        { key: 'customer_added_count', label: '新增用户' },
+        { key: 'customer_num', label: t('overview.monitoring.activeUsers') },
+        { key: 'customer_added_count', label: t('overview.monitoring.newUsers') },
       ],
     },
-    { id: 'conversations', title: '对话次数', keys: [{ key: 'chat_record_count', label: '对话次数' }] },
-    { id: 'tokens', title: 'Tokens 总数', keys: [{ key: 'tokens_num', label: 'Tokens' }] },
+    {
+      id: 'conversations',
+      title: t('overview.monitoring.conversations'),
+      keys: [{ key: 'chat_record_count', label: t('overview.monitoring.conversations') }],
+    },
+    { id: 'tokens', title: t('overview.monitoring.totalTokens'), keys: [{ key: 'tokens_num', label: 'Tokens' }] },
     {
       id: 'feedback',
-      title: '用户满意度',
+      title: t('overview.monitoring.satisfaction'),
       keys: [
-        { key: 'star_num', label: '赞同' },
-        { key: 'trample_num', label: '反对' },
+        { key: 'star_num', label: t('overview.monitoring.approval') },
+        { key: 'trample_num', label: t('overview.monitoring.disapproval') },
       ],
     },
   ].map((metric) => ({
@@ -73,7 +80,7 @@ watch(() => [props.workspaceId, props.applicationId], loadMonitoring, { immediat
 <template>
   <section>
     <div class="mb-4 flex-align-center flex-wrap justify-between gap-3">
-      <h4>监控</h4>
+      <h4>{{ t('overview.monitoring.title') }}</h4>
       <div class="flex flex-wrap gap-3">
         <MkDateRange @change="handleRangeChange" />
 
@@ -103,7 +110,9 @@ watch(() => [props.workspaceId, props.applicationId], loadMonitoring, { immediat
                   <h2>
                     {{ metric.id === 'tokens' ? formatTokenNumber(metric.series[0]?.total) : numberFormat(metric.series[0]?.total) }}
                   </h2>
-                  <h6 v-if="metric.id === 'activeUsers'" class="-ml-1 text-danger" title="新增用户">+{{ numberFormat(metric.series[1]?.total) }}</h6>
+                  <h6 v-if="metric.id === 'activeUsers'" class="-ml-1 text-danger" :title="t('overview.monitoring.newUsers')">
+                    +{{ numberFormat(metric.series[1]?.total) }}
+                  </h6>
                 </template>
               </div>
             </el-skeleton>

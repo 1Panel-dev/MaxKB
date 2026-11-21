@@ -1,70 +1,70 @@
 {
-  "title": "智慧體",
+  "title": "智能體",
   "categories": {
-    "all": "全部智慧體",
-    "shared": "共用智慧體"
+    "all": "全部智能體",
+    "shared": "共享智能體"
   },
   "simple": {
-    "label": "簡易智慧體",
+    "label": "簡易智能體",
     "shortLabel": "簡易",
-    "createTitle": "建立簡易智慧體",
-    "description": "透過表單設定方式，快速建立具備基本功能的智慧體"
+    "createTitle": "創建簡易智能體",
+    "description": "通過表單設置方式，快速搭建基礎功能的智能體"
   },
   "advanced": {
-    "label": "進階智慧體",
-    "shortLabel": "進階",
-    "createTitle": "建立進階智慧體",
-    "description": "使用低程式碼拖放方式，靈活編排邏輯複雜、功能豐富的智慧體"
+    "label": "高級智能體",
+    "shortLabel": "高級",
+    "createTitle": "創建高級智能體",
+    "description": "使用低代碼拖拉拽方式，靈活編排複雜邏輯、功能豐富的智能體"
   },
   "fields": {
     "name": {
-      "placeholder": "請輸入智慧體名稱",
-      "requiredMessage": "請輸入智慧體名稱"
+      "placeholder": "請輸入智能體名稱",
+      "requiredMessage": "請輸入智能體名稱"
     },
     "description": {
-      "placeholder": "描述該智慧體的應用場景及用途，如：XXX 小助手回答使用者提出的 XXX 產品使用問題"
+      "placeholder": "描述該智能體的應用場景及用途，如：XXX 小助手回答用戶提出的 XXX 產品使用問題"
     }
   },
   "template": {
-    "label": "範本",
-    "blank": "空白建立",
+    "label": "模板",
+    "blank": "空白創建",
     "assistant": {
       "label": "知識庫問答助手",
-      "description": "將從知識庫中檢索到的知識作為已知資訊，回答使用者提出的問題。"
+      "description": "將從知識庫中檢索到的知識作為已知信息，回答用戶提出的問題。"
     }
   },
   "duplicate": {
-    "title": "複製智慧體"
+    "title": "複製智能體"
   },
   "status": {
-    "unpublished": "未發布",
-    "published": "已發布",
+    "unpublished": "未發佈",
+    "published": "已發佈",
     "onPortal": "已上架"
   },
-  "publishTime": "發布時間",
+  "publishTime": "發佈時間",
   "actions": {
-    "chat": "前往對話"
+    "chat": "去對話"
   },
   "portal": {
-    "add": "上架至入口網站",
-    "remove": "從入口網站下架",
+    "add": "上架到門戶",
+    "remove": "從門戶下架",
     "addSuccess": "上架成功",
     "removeSuccess": "下架成功"
   },
   "export": {
-    "skills": "匯出為 Skills",
-    "agent": "匯出智慧體",
+    "skills": "導出為 Skills",
+    "agent": "導出智能體",
     "baseUrl": {
-      "label": "填寫存取網址",
-      "description": "請填寫 Agent 存取 MaxKB 使用的網址，例如 http://192.168.1.10:8080",
-      "invalidMessage": "請填寫以 http:// 或 https:// 開頭的網址"
+      "label": "填寫訪問地址",
+      "description": "請填寫 Agent 訪問 MaxKB 使用的地址，例如 http://192.168.1.10:8080",
+      "invalidMessage": "請填寫以 http:// 或 https:// 開頭的地址"
     }
   },
   "delete": {
-    "title": "是否刪除智慧體：{name}？",
-    "batchTitle": "是否刪除選取的{count}個智慧體？"
+    "title": "是否刪除智能體：{name}？",
+    "batchTitle": "是否刪除選中的{count}個智能體？"
   },
   "messages": {
-    "missingWorkspace": "智慧體缺少所屬工作空間資訊"
+    "missingWorkspace": "智能體缺少所屬工作空間信息"
   }
 }

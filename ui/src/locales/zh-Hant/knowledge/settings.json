@@ -1,63 +1,63 @@
 {
   "baseSettings": {
-    "title": "基本設定",
+    "title": "基礎設置",
     "type": {
       "label": "知識庫類型"
     },
-    "otherSettings": "其他設定",
+    "otherSettings": "其他設置",
     "authentication": {
-      "label": "對話使用者授權",
-      "description": "開啟後，僅允許已授權的對話使用者檢索目前知識庫"
+      "label": "對話用戶授權",
+      "description": "開啓後，僅允許授權的對話用戶檢索當前知識庫"
     },
     "fileCountLimit": {
-      "label": "每次上傳最多檔案數"
+      "label": "每次上傳最多文件數"
     },
     "fileSizeLimit": {
-      "label": "上傳的每個文件最大",
-      "description": "建議依伺服器配置調整，否則可能導致服務當機"
+      "label": "上傳的每個文檔最大",
+      "description": "建議根據服務器配置調整，否則可能會造成服務宕機"
     },
     "embeddingModel": {
-      "changeConfirm": "修改知識庫向量模型後，需要對知識庫重新向量化，是否繼續儲存"
+      "changeConfirm": "修改知識庫向量模型後，需要對知識庫向量化，是否繼續保存"
     }
   },
   "documentStrategy": {
-    "title": "文件處理策略",
-    "syncHint": "同步知識庫時，新的 URL 會依此策略處理；策略變更會在下次同步時生效",
+    "title": "文檔處理策略",
+    "syncHint": "同步知識庫時若有新的 URL 按該策略執行，策略變更後下次同步知識庫時生效",
     "splitRules": "分段規則",
     "smart": {
-      "label": "智慧分段（建議）",
-      "description": "若不確定如何設定分段規則，建議使用智慧分段"
+      "label": "智能分段（推薦）",
+      "description": "不瞭解如何設置分段規則時推薦使用智能分段"
     },
     "advanced": {
-      "label": "進階分段",
-      "description": "可依文件格式自行設定分段符號、分段長度及清理規則"
+      "label": "高級分段",
+      "description": "用戶可根據文檔規範自行設置分段標識符、分段長度以及清洗規則"
     },
     "delimiter": {
-      "label": "分段符號",
-      "placeholder": "請選擇分段符號",
-      "description": "依照所選符號的順序遞迴分割內容。超過設定長度的分段會截短至該長度。"
+      "label": "分段標識",
+      "placeholder": "請選擇分段標識",
+      "description": "按照所選符號先後順序做遞歸分割，分割結果超出分段長度將截取至分段長度。"
     },
     "splitPatterns": {
       "space": "空格",
       "semicolon": "分號",
       "comma": "逗號",
       "period": "句號",
-      "lineBreak": "換行",
-      "blankLine": "空白行"
+      "lineBreak": "回車",
+      "blankLine": "空行"
     },
     "paragraphLength": "分段長度",
     "childChunkLength": {
-      "label": "子區塊長度",
-      "description": "子區塊僅用於向量檢索，命中後會顯示其所屬的完整分段"
+      "label": "子塊長度",
+      "description": "子塊長度僅用於向量檢索，命中後將回溯顯示其所在分段"
     },
     "autoClean": {
-      "label": "自動清理",
-      "description": "（移除多餘的符號、空格、空白行與定位字元）"
+      "label": "自動清洗",
+      "description": "（去掉重復多餘符號空格、空行、制表符）"
     },
     "imageProcessing": "圖片處理",
     "visualEnhancement": {
       "label": "視覺增強",
-      "description": "將文件中的圖片交由所選模型或工具處理，並將傳回的內容寫入圖片說明。"
+      "description": "識別文檔中圖片，將圖片按照策略發給模型或工具處理，並將返回內容寫入圖片的描述中"
     },
     "enhancementMethod": {
       "label": "增強策略",
@@ -75,8 +75,8 @@
     },
     "indexEnhancement": "索引增強",
     "titleAsQuestion": {
-      "label": "將分段標題設為問題索引",
-      "description": "啟用後，系統會自動將分段標題新增為關聯問題。"
+      "label": "分段標題設置為問題索引",
+      "description": "開啓後會將分段標題自動添加為關聯問題"
     }
   }
 }

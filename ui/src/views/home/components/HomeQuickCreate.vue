@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { ModelProviderItem } from '@/api/types'
 import ModelProviderApi from '@/api/admin/model-provider'
 import ModelApi from '@/api/admin/workspace/model'
@@ -9,6 +10,8 @@ import ButtonCreateKnowledge from '@/views/knowledge/components/ButtonCreateKnow
 import ButtonAddModel from '@/views/model/create-model/ButtonAddModel.vue'
 import ButtonCreateTool from '@/views/tool/components/ButtonCreateTool.vue'
 import perm from '@/permission'
+const { t } = useI18n({ useScope: 'global' })
+
 const props = defineProps<{ workspaceId: string }>()
 const router = useRouter()
 
@@ -39,7 +42,7 @@ function handleCreateModel() {
 
 /* 模型供应商与复用创建入口 */
 const providers = ref<ModelProviderItem[]>([])
-const defaultProvider: ModelProviderItem = { name: '全部模型', provider: 'all', icon: '' }
+const defaultProvider = computed<ModelProviderItem>(() => ({ name: t('model.categories.all'), provider: 'all', icon: '' }))
 onMounted(() =>
   ModelProviderApi.getProviderList().then((result) => {
     providers.value = result
@@ -48,7 +51,7 @@ onMounted(() =>
 </script>
 <template>
   <section v-if="showQuickCreate">
-    <h4 class="mb-4 mt-4">快捷创建</h4>
+    <h4 class="mb-4 mt-4">{{ t('overview.quickCreate.title') }}</h4>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <!-- 创建智能体 -->
       <ButtonCreateApplication
@@ -60,12 +63,12 @@ onMounted(() =>
         @refresh="handleCreateApplication"
       >
         <template #trigger>
-          <el-card shadow="hover">
+          <el-card shadow="hover" class="h-full">
             <div class="flex-between gap-3">
               <MkIcon name="icon_creat-robot_colorful" :size="24" />
               <div class="min-w-0 flex-1">
-                <h6>创建智能体</h6>
-                <p class="text-sm text-N600">手动搭建、AI 生成或导入创建</p>
+                <h6>{{ t('overview.quickCreate.applicationTitle') }}</h6>
+                <p class="text-sm text-N600">{{ t('overview.quickCreate.applicationDescription') }}</p>
               </div>
               <MkIcon name="icon_down_outlined" class="text-N600! transition-transform duration-200 in-aria-expanded:rotate-180" />
             </div>
@@ -82,12 +85,12 @@ onMounted(() =>
         @refresh="handleCreateKnowledge"
       >
         <template #trigger>
-          <el-card shadow="hover">
+          <el-card shadow="hover" class="h-full">
             <div class="flex-between gap-3">
               <MkIcon name="icon_creat-book_colorful" :size="24" />
               <div class="min-w-0 flex-1">
-                <h6>创建知识库</h6>
-                <p class="text-sm text-N600">从本地文档、web网站等多来源创建</p>
+                <h6>{{ t('overview.quickCreate.knowledgeTitle') }}</h6>
+                <p class="text-sm text-N600">{{ t('overview.quickCreate.knowledgeDescription') }}</p>
               </div>
               <MkIcon name="icon_down_outlined" class="text-N600! transition-transform duration-200 in-aria-expanded:rotate-180" />
             </div>
@@ -104,12 +107,12 @@ onMounted(() =>
         @refresh="handleCreateTool"
       >
         <template #trigger>
-          <el-card shadow="hover">
+          <el-card shadow="hover" class="h-full">
             <div class="flex-between gap-3">
               <MkIcon name="icon_creat-busy_colorful" :size="24" />
               <div class="min-w-0 flex-1">
-                <h6>创建工具</h6>
-                <p class="text-sm text-N600">创建或接入脚本、工作流、MCP 等工具</p>
+                <h6>{{ t('tool.createTitle') }}</h6>
+                <p class="text-sm text-N600">{{ t('overview.quickCreate.toolDescription') }}</p>
               </div>
               <MkIcon name="icon_down_outlined" class="text-N600! transition-transform duration-200 in-aria-expanded:rotate-180" />
             </div>
@@ -126,12 +129,12 @@ onMounted(() =>
       >
         <template #default="{ open }">
           <!-- 打开模型创建入口 -->
-          <el-card shadow="hover" class="cursor-pointer" @click="open">
+          <el-card shadow="hover" class="h-full cursor-pointer" @click="open">
             <div class="flex-between gap-3">
               <MkIcon name="icon_creat-model_colorful" :size="24" />
               <div class="min-w-0 flex-1">
-                <h6>添加模型</h6>
-                <p class="text-sm text-N600">配置大语言、向量等模型</p>
+                <h6>{{ t('model.actions.add') }}</h6>
+                <p class="text-sm text-N600">{{ t('overview.quickCreate.modelDescription') }}</p>
               </div>
             </div>
           </el-card>

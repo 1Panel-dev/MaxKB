@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { escape } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
 import floatingImage from '@/assets/application/embed-floating.png'
 import fullscreenImage from '@/assets/application/embed-fullscreen.png'
@@ -9,14 +10,19 @@ import { copyText } from '@/utils/clipboard'
 
 defineOptions({ name: 'EmbedThirdPartyDialog' })
 
+const { t } = useI18n({ useScope: 'global' })
+
 const props = defineProps<{ shareUrl: string; accessToken: string }>()
 const visible = ref(false)
 const selectedMode = ref<'fullscreen' | 'floating' | 'mobile'>('fullscreen')
-const embedModes = [
-  { value: 'fullscreen', label: '全屏模式', image: fullscreenImage },
-  { value: 'floating', label: '浮窗模式', image: floatingImage },
-  { value: 'mobile', label: '移动端模式', image: mobileImage },
-] as const
+const embedModes = computed(
+  () =>
+    [
+      { value: 'fullscreen', label: t('application.overview.embed.fullscreen'), image: fullscreenImage },
+      { value: 'floating', label: t('application.overview.embed.floating'), image: floatingImage },
+      { value: 'mobile', label: t('application.overview.embed.mobile'), image: mobileImage },
+    ] as const,
+)
 
 const embedCode = computed(() => {
   if (!props.shareUrl || !props.accessToken) return ''
@@ -55,7 +61,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="嵌入第三方" :width="840" @closed="selectedMode = 'fullscreen'">
+  <MkDialog v-model="visible" :title="t('application.overview.embed.title')" :width="840" @closed="selectedMode = 'fullscreen'">
     <div class="space-y-4">
       <div class="grid grid-cols-3 gap-4">
         <template v-for="mode in embedModes" :key="mode.value">
@@ -76,10 +82,10 @@ defineExpose({ open })
       </div>
       <div class="mk-gray-card-lg">
         <div class="flex-between mb-2">
-          <h6>复制以下代码进行嵌入</h6>
+          <h6>{{ t('application.overview.embed.copyHint') }}</h6>
           <!-- 复制当前模式的嵌入代码 -->
-          <MkTooltip content="复制">
-            <el-button text :disabled="!embedCode" @click="copyText(embedCode)">
+          <MkTooltip :content="t('common.actions.duplicate')">
+            <el-button text :disabled="!embedCode" @click="copyText(embedCode, t('common.messages.copied'))">
               <MkIcon name="icon_copy_outlined" />
             </el-button>
           </MkTooltip>

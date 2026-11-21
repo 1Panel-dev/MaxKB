@@ -128,9 +128,9 @@ export const aiChatNode = reactive({
 export const llmNode = reactive({
   type: WorkflowNodeType.Llm,
   text: computed(() => t('workflow.llm.description')),
-  label: computed(() => t('workflow.llm.label')),
+  label: 'LLM',
   properties: {
-    stepName: computed(() => t('workflow.llm.label')),
+    stepName: 'LLM',
     config: {
       fields: [
         { label: computed(() => t('workflow.answer.label')), value: 'content' },

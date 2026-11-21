@@ -1,6 +1,6 @@
 {
   "title": "觸發器",
-  "createTitle": "建立觸發器",
+  "createTitle": "創建觸發器",
   "editTitle": "編輯觸發器",
   "fields": {
     "name": {
@@ -25,31 +25,31 @@
       "label": "事件 URL"
     },
     "token": {
-      "requiredMessage": "請產生 Bearer Token"
+      "requiredMessage": "請生成 Bearer Token"
     }
   },
   "requestParameters": {
     "title": "請求參數",
-    "addTitle": "新增請求參數",
+    "addTitle": "添加請求參數",
     "editTitle": "編輯請求參數",
     "name": {
-      "label": "參數名稱",
-      "placeholder": "請輸入參數名稱",
-      "requiredMessage": "請輸入參數名稱",
-      "duplicateMessage": "參數名不能重複"
+      "label": "參數名",
+      "placeholder": "請輸入參數名",
+      "requiredMessage": "請輸入參數名",
+      "duplicateMessage": "參數名不能重復"
     },
     "dataType": {
-      "label": "資料類型",
-      "placeholder": "請選擇資料類型",
+      "label": "數據類型",
+      "placeholder": "請選擇數據類型",
       "requiredMessage": "請選擇參數類型"
     }
   },
   "taskExecution": {
     "label": "任務執行",
     "task": "觸發任務",
-    "triggerInput": "觸發器輸入參數",
+    "triggerInput": "觸發器入參",
     "requiredMessage": "請至少選擇一個執行任務",
-    "invalidReferenceMessage": "請選擇有效的事件請求參數，或切換為自訂",
+    "invalidReferenceMessage": "請選擇有效的事件請求參數，或切換為自定義",
     "triggerFailed": "觸發失敗"
   },
   "labels": {
@@ -58,7 +58,7 @@
   },
   "delete": {
     "title": "是否刪除觸發器：{name}？",
-    "batchTitle": "是否刪除選取的{count}個觸發器？",
+    "batchTitle": "是否刪除選中的{count}個觸發器？",
     "description": "刪除後將停止觸發任務，並刪除相關執行記錄。"
   }
 }

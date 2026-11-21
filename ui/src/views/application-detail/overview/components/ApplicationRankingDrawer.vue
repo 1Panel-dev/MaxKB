@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationRankingKind, HomeDateRange, HomeRankingRecord } from '@/api/types'
 import type { MkDateRangeValue } from '@/components/global/mk-date-range/types'
 import { useApplicationDetailContext } from '../../context'
@@ -10,6 +11,8 @@ import perm from '@/permission'
 defineOptions({ name: 'ApplicationRankingDrawer' })
 const props = defineProps<{ applicationId: string; initialKind: ApplicationRankingKind; initialRange: HomeDateRange }>()
 const emit = defineEmits<{ closed: [] }>()
+const { t } = useI18n({ useScope: 'global' })
+
 const { resourceApi } = useApplicationDetailContext()
 
 /* 概览排行榜导出需要独立的概览导出权限。 */
@@ -100,10 +103,17 @@ onMounted(loadRanking)
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="排行榜详情" class="mk-drawer-with-tabs" contentClass="pt-0" size="1000" @closed="emit('closed')">
+  <MkDrawer
+    v-model="visible"
+    :title="t('overview.ranking.detailTitle')"
+    class="mk-drawer-with-tabs"
+    contentClass="pt-0"
+    size="1000"
+    @closed="emit('closed')"
+  >
     <el-tabs v-model="activeKind" @tab-change="handleTabChange">
-      <el-tab-pane name="userTokens" label="Tokens 消耗 · Top 用户" />
-      <el-tab-pane name="questions" label="对话次数 · Top 用户" />
+      <el-tab-pane name="userTokens" :label="t('overview.ranking.userTokens')" />
+      <el-tab-pane name="questions" :label="t('overview.ranking.userConversations')" />
     </el-tabs>
     <div class="mt-6 mb-4 flex-between">
       <div class="flex gap-3">
@@ -113,7 +123,7 @@ onMounted(loadRanking)
       <!-- 导出当前筛选下的完整用户排行 -->
       <el-button v-if="canExport" plain :loading="exporting" :disabled="loading" @click="handleExport">
         <MkIcon name="icon_export_outlined" />
-        <span>导出</span>
+        <span>{{ t('common.actions.export') }}</span>
       </el-button>
     </div>
     <MkTable
@@ -124,7 +134,7 @@ onMounted(loadRanking)
       @current-change="loadRanking"
       @size-change="loadRanking"
     >
-      <el-table-column label="排名" width="60">
+      <el-table-column :label="t('overview.ranking.rank')" width="60">
         <template #default="{ $index }">
           <span
             class="mk-rank"
@@ -138,26 +148,32 @@ onMounted(loadRanking)
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="用户" min-width="140" show-overflow-tooltip>
+      <el-table-column :label="t('overview.ranking.user')" min-width="140" show-overflow-tooltip>
         <template #default="{ row }">{{ row.asker?.username || '-' }}</template>
       </el-table-column>
-      <el-table-column :label="activeKind === 'userTokens' ? 'Tokens 消耗' : '对话次数'" min-width="125">
+      <el-table-column
+        :label="activeKind === 'userTokens' ? t('overview.ranking.tokenUsage') : t('overview.monitoring.conversations')"
+        min-width="125"
+      >
         <template #default="{ row }">
           {{ formatRankingValue(row) }}
         </template>
       </el-table-column>
-      <el-table-column :label="activeKind === 'userTokens' ? '对话次数' : 'Tokens 消耗'" min-width="125">
+      <el-table-column
+        :label="activeKind === 'userTokens' ? t('overview.monitoring.conversations') : t('overview.ranking.tokenUsage')"
+        min-width="125"
+      >
         <template #default="{ row }">
           {{ formatRankingValue(row, activeKind === 'userTokens' ? 'questions' : 'userTokens') }}
         </template>
       </el-table-column>
-      <el-table-column label="占比" min-width="150">
+      <el-table-column :label="t('overview.ranking.percentage')" min-width="150">
         <template #default="{ row }">
           <el-progress v-if="aggregateTotal != null && getRankingValue(row) != null" :percentage="getRankingRatio(row)" />
           <span v-else>—</span>
         </template>
       </el-table-column>
-      <el-table-column label="均 Tokens/次" min-width="125">
+      <el-table-column :label="t('overview.ranking.tokensPerChat')" min-width="125">
         <template #default="{ row }">{{ formatTokenNumber(getRankingAverage(row)) }}</template>
       </el-table-column>
     </MkTable>

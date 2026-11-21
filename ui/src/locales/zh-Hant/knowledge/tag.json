@@ -3,7 +3,7 @@
     "title": "標籤管理",
     "label": "標籤",
     "untagged": "無標籤",
-    "settings": "標籤設定",
+    "settings": "標籤設置",
     "key": {
       "label": "標籤",
       "placeholder": "請輸入標籤",
@@ -17,30 +17,30 @@
       "selectPlaceholder": "請選擇標籤值",
       "requiredMessage": "請輸入標籤值",
       "selectRequiredMessage": "請選擇標籤值",
-      "unavailableMessage": "此標籤值已無法使用，請重新選擇。"
+      "unavailableMessage": "標籤值已不可用，請重新選擇"
     },
     "actions": {
-      "add": "新增標籤",
-      "create": "建立標籤",
-      "createValue": "建立標籤值",
-      "addValue": "新增標籤值",
+      "add": "添加標籤",
+      "create": "創建標籤",
+      "createValue": "創建標籤值",
+      "addValue": "添加標籤值",
       "edit": "編輯標籤",
       "editValue": "編輯標籤值"
     },
     "documents": {
-      "title": "關聯文件",
-      "related": "已關聯文件",
-      "unrelated": "未關聯文件"
+      "title": "關聯文檔",
+      "related": "已關聯文檔",
+      "unrelated": "未關聯文檔"
     },
     "import": {
-      "title": "匯入標籤",
-      "downloadTemplate": "下載範本",
-      "unsupportedFormatMessage": "僅支援上傳 XLS、XLSX 格式的檔案"
+      "title": "導入標籤",
+      "downloadTemplate": "下載模板",
+      "unsupportedFormatMessage": "僅支持上傳 XLS、XLSX 格式的文件"
     },
     "delete": {
       "title": "是否刪除標籤：{name}？",
-      "batchTitle": "是否刪除選取的{count}個標籤？",
-      "description": "刪除標籤時，也會從使用該標籤的資源中移除它，請謹慎操作。"
+      "batchTitle": "是否刪除選中的{count}個標籤？",
+      "description": "刪除後，使用該標籤的資源將會刪除該標籤，請謹慎操作！"
     },
     "messages": {
       "duplicateTag": "標籤已存在"

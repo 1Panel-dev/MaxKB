@@ -1,7 +1,7 @@
 {
   "title": "角色管理",
-  "createTitle": "建立角色",
-  "renameTitle": "重新命名角色",
+  "createTitle": "創建角色",
+  "renameTitle": "重命名角色",
   "internalLabel": "系",
   "name": {
     "label": "角色名稱",
@@ -15,13 +15,13 @@
   "types": {
     "admin": "系統管理員",
     "workspaceAdmin": "工作空間管理員",
-    "user": "一般使用者"
+    "user": "普通用戶"
   },
   "permission": {
-    "title": "權限設定",
+    "title": "權限配置",
     "label": "權限",
     "category": "分類",
-    "module": "模組名稱",
+    "module": "模塊名稱",
     "target": "操作對象"
   },
   "delete": {

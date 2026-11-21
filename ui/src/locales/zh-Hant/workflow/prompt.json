@@ -1,14 +1,14 @@
 {
   "systemPrompt": {
     "label": "系統提示詞",
-    "placeholder": "系統提示詞，可以引用系統中的變量，例如{reference}",
+    "placeholder": "系統提示詞，可以引用系統中變量，如{reference}",
     "description": "設定模型扮演的角色或遵循的指令"
   },
   "userPrompt": {
-    "label": "使用者提示詞",
-    "placeholder": "使用者提示詞，可以引用系統中的變量，例如{reference}",
-    "description": "使用者向模型提出的問題或輸入的指令",
-    "requiredMessage": "請輸入使用者提示詞"
+    "label": "用戶提示詞",
+    "placeholder": "用戶提示詞，可以引用系統中變量，如{reference}",
+    "description": "用戶向模型提出的問題或輸入的指令",
+    "requiredMessage": "請輸入用戶提示詞"
   },
   "positivePrompt": {
     "label": "提示詞(正向)",
@@ -17,11 +17,11 @@
   "negativePrompt": {
     "label": "提示詞(負向)",
     "detailLabel": "負向提示詞",
-    "videoPlaceholder": "請描述不想生成的影片內容，例如：顏色、血腥內容",
+    "videoPlaceholder": "請描述不想生成的視頻內容，比如：顏色、血腥內容",
     "description": "反向提示詞，用來描述不希望在畫面中看到的內容，可以對畫面進行限制"
   },
   "promptGeneration": {
-    "title": "產生提示詞",
+    "title": "生成提示詞",
     "placeholder": "請輸入提示詞主題",
     "empty": "提示詞顯示在這裡"
   }

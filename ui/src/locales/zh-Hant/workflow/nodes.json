@@ -4,7 +4,7 @@
     "result": "結果",
     "delete": {
       "title": "是否刪除節點：{name}？",
-      "batchTitle": "是否刪除選取的{count}個節點？"
+      "batchTitle": "是否刪除選中的{count}個節點？"
     },
     "name": {
       "label": "節點名稱",
@@ -12,54 +12,54 @@
       "duplicateMessage": "節點名稱已存在！"
     },
     "source": "來源",
-    "disabledMessage": "該節點已停用",
+    "disabledMessage": "該節點已禁用",
     "applicationUnavailableMessage": "該智能體不可用",
     "toolUnavailableMessage": "該工具不可用",
     "exception": {
       "label": "異常捕獲",
-      "messageLabel": "異常資訊"
+      "messageLabel": "異常信息"
     },
     "executionCondition": {
       "title": "執行條件",
       "prefix": "前置",
-      "description": "連線節點執行完，執行目前節點"
+      "description": "連線節點執行完，執行當前節點"
     },
-    "setting": "節點設定",
+    "setting": "節點設置",
     "validation": {
       "nextNodeMissing": "不存在的下一個節點",
       "outsideFlow": "未在流程中的節點:{names}",
       "unavailable": "{name} 節點不可用",
       "branchConnectionRequired": "{name} 節點的{branch}分支需要連接",
-      "cannotEnd": "{name} 節點不能作為結束節點"
+      "cannotEnd": "{name} 節點不能當做結束節點"
     },
     "copyDisabledMessage": "{name}不能被複製",
     "deleteDisabledMessage": "{name}節點不允許刪除",
     "apiParameters": {
-      "title": "介面傳參"
+      "title": "接口傳參"
     },
-    "baseRequiredMessage": "基本資訊節點必填",
-    "baseUniqueMessage": "基本資訊節點只能有一個"
+    "baseRequiredMessage": "基本信息節點必填",
+    "baseUniqueMessage": "基本信息節點只能有一個"
   },
   "start": {
     "label": "開始",
-    "question": "使用者問題",
-    "currentTime": "目前時間",
+    "question": "用戶問題",
+    "currentTime": "當前時間",
     "chatId": "對話 ID",
-    "chatUserId": "對話使用者 ID",
-    "chatUserType": "對話使用者類型",
-    "chatUserGroup": "對話使用者群組",
-    "chatUser": "對話使用者",
+    "chatUserId": "對話用戶 ID",
+    "chatUserType": "對話用戶類型",
+    "chatUserGroup": "對話用戶組",
+    "chatUser": "對話用戶",
     "requiredMessage": "開始節點必填",
     "uniqueMessage": "開始節點只能有一個"
   },
   "aiChat": {
     "label": "AI 對話",
-    "description": "與 AI 大語言模型進行對話",
+    "description": "與 AI 大模型進行對話",
     "vision": "視覺"
   },
   "intent": {
     "label": "意圖識別",
-    "description": "將使用者問題與預設的意圖分類進行比對",
+    "description": "將用戶問題與用戶預設的意圖分類進行匹配",
     "input": "輸入",
     "categories": {
       "label": "意圖分類",
@@ -69,44 +69,44 @@
     "reason": "理由"
   },
   "speechToText": {
-    "label": "語音轉文字",
-    "description": "透過語音識別模型將音訊轉換為文字",
+    "label": "語音轉文本",
+    "description": "將音頻通過語音識別模型轉換為文本",
     "model": {
       "label": "語音識別模型"
     },
-    "audioFile": "語音檔案"
+    "audioFile": "語音文件"
   },
   "textToSpeech": {
-    "label": "文字轉語音",
-    "description": "透過語音合成模型將文字轉換為音訊",
+    "label": "文本轉語音",
+    "description": "將文本通過語音合成模型轉換為音頻",
     "model": {
       "label": "語音合成模型"
     },
     "content": {
-      "label": "文字內容"
+      "label": "文本內容"
     }
   },
   "imageGenerate": {
     "label": "圖片生成",
-    "description": "根據提供的文字內容生成圖片",
+    "description": "根據提供的文本內容生成圖片",
     "model": {
       "label": "圖片生成模型"
     },
     "positivePrompt": {
-      "description": "正向提示詞，用來描述生成圖片中期望包含的元素與視覺特徵"
+      "description": "正向提示詞，用來描述生成圖像中期望包含的元素和視覺特點"
     },
     "negativePrompt": {
-      "placeholder": "請描述不想生成的圖片內容，例如：顏色、血腥內容"
+      "placeholder": "請描述不想生成的圖片內容，比如：顏色、血腥內容"
     }
   },
   "imageToVideo": {
-    "label": "圖生影片",
-    "description": "根據提供的圖片生成影片",
+    "label": "圖生視頻",
+    "description": "根據提供的圖片生成視頻",
     "model": {
-      "label": "圖生影片模型"
+      "label": "圖生視頻模型"
     },
     "positivePrompt": {
-      "description": "正向提示詞，用來描述基於首幀圖片生成影片時的運動與畫面變化"
+      "description": "正向提示詞，用來描述基於首幀圖片生成視頻時的運動和畫面變化"
     },
     "firstFrame": {
       "label": "首幀圖片",
@@ -121,48 +121,48 @@
     }
   },
   "textToVideo": {
-    "label": "文生影片",
-    "description": "根據提供的文字內容生成影片",
+    "label": "文生視頻",
+    "description": "根據提供的文本內容生成視頻",
     "model": {
-      "label": "文生影片模型"
+      "label": "文生視頻模型"
     },
     "positivePrompt": {
-      "description": "正向提示詞，用來描述生成影片中期望包含的元素與視覺特徵"
+      "description": "正向提示詞，用來描述生成視頻中期望包含的元素和視覺特點"
     }
   },
   "imageUnderstand": {
     "label": "圖片理解",
-    "description": "識別圖片中的物件、場景等資訊，回答使用者問題"
+    "description": "識別出圖片中的對象、場景等信息回答用戶問題"
   },
   "videoUnderstand": {
-    "label": "影片理解",
-    "description": "識別影片中的物件、場景等資訊，回答使用者問題"
+    "label": "視頻理解",
+    "description": "識別出視頻中的對象、場景等信息回答用戶問題"
   },
   "questionOptimization": {
-    "label": "問題最佳化",
-    "description": "根據歷史對話記錄完善目前問題，更利於比對知識庫分段",
+    "label": "問題優化",
+    "description": "根據歷史聊天記錄優化完善當前問題，更利於匹配知識庫分段",
     "systemPrompt": {
-      "defaultValue": "# 角色\n你是一位問題最佳化大師，擅長根據上下文精準揣測使用者意圖，並對使用者提出的問題進行最佳化。\n\n## 技能\n### 技能 1: 最佳化問題\n2. 接收使用者輸入的問題。\n3. 依據上下文仔細分析問題含義。\n4. 輸出最佳化後的問題。\n\n## 限制:\n - 僅回傳最佳化後的問題，不進行額外解釋或說明。\n - 確保最佳化後的問題準確反映原始問題意圖，不得改變原意。"
+      "defaultValue": "# 角色\n你是一位問題優化大師，擅長根據上下文精准揣測用戶意圖，並對用戶提出的問題進行優化。\n\n## 技能\n### 技能 1: 優化問題\n2. 接收用戶輸入的問題。\n3. 依據上下文仔細分析問題含義。\n4. 輸出優化後的問題。\n\n## 限制:\n - 僅返回優化後的問題，不進行額外解釋或說明。\n - 確保優化後的問題準確反映原始問題意圖，不得改變原意。"
     },
-    "result": "問題最佳化結果"
+    "result": "問題優化結果"
   },
   "reply": {
-    "label": "指定回覆",
-    "description": "指定回覆內容，引用變量會轉換為字串輸出",
+    "label": "指定回復",
+    "description": "指定回復內容，引用變量會轉換為字符串進行輸出",
     "format": {
-      "label": "回覆格式",
-      "typeLabel": "回覆類型",
-      "text": "文字",
+      "label": "回復格式",
+      "typeLabel": "回復類型",
+      "text": "文本",
       "tool": "工具",
-      "toolDescription": "回覆內容為 JSON 物件或陣列，元素欄位為 id、name、arguments、content",
+      "toolDescription": "回復內容為 JSON 對象或數組，元素字段為 id、name、arguments、content",
       "toolExampleContent": "晴"
     },
     "content": {
-      "label": "回覆內容",
-      "placeholder": "回覆內容，可以引用系統中變量，如 {reference}",
+      "label": "回復內容",
+      "placeholder": "回復內容，可以引用系統中變量，如 {reference}",
       "htmlPlaceholder": "HTML 內容，可以引用系統中變量，如 {reference}",
-      "requiredMessage": "請輸入回覆內容",
-      "custom": "自訂"
+      "requiredMessage": "請輸入回復內容",
+      "custom": "自定義"
     }
   },
   "condition": {
@@ -176,23 +176,23 @@
       "suffix": "條件"
     },
     "actions": {
-      "addCondition": "新增條件",
-      "addBranch": "新增分支"
+      "addCondition": "添加條件",
+      "addBranch": "添加分支"
     },
     "result": "條件結果"
   },
   "form": {
     "label": "表單收集",
-    "description": "在對話過程中收集使用者資訊，根據收集到的表單資料執行後續流程",
+    "description": "在問答過程中用於收集用戶信息，可以根據收集到表單數據執行後續流程",
     "content": {
       "label": "表單輸出內容",
-      "description": "設定執行此節點輸出的內容，{form} 為表單的佔位符",
+      "description": "設置執行該節點輸出的內容，{form} 為表單的佔位符",
       "requiredMessage": "請填寫表單輸出內容"
     },
     "configuration": "表單配置",
     "formData": "表單全部內容",
     "notSubmitted": "未提交",
-    "defaultContent": "你好，請先填寫下方表單內容：\n{form}\n填寫後請點擊【提交】按鈕進行提交。"
+    "defaultContent": "你好，請先填寫下面表單內容：\n{form}\n填寫後請點擊【提交】按鈕進行提交。"
   },
   "application": {
     "label": "智能體節點"

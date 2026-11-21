@@ -3,23 +3,23 @@
     "title": "查看關聯資源"
   },
   "selected": "已選資源",
-  "shared": "共用",
+  "shared": "共享",
   "dataSource": {
-    "label": "資料來源",
-    "selectTitle": "選擇資料來源",
-    "typeLabel": "資料來源類型",
-    "documentsUnavailableMessage": "此知識庫不支援查詢資料來源的檔案"
+    "label": "數據源",
+    "selectTitle": "選擇數據源",
+    "typeLabel": "數據源類型",
+    "documentsUnavailableMessage": "當前知識庫不支持數據源文件查詢"
   },
   "mcpConfig": {
-    "title": "MCP 服務設定"
+    "title": "MCP 服務配置"
   },
   "templateStore": {
-    "title": "範本中心",
-    "searchResults": "找到 {count} 個相關範本",
-    "apply": "套用",
-    "missingDownloadUrl": "範本缺少下載網址，無法使用"
+    "title": "模板中心",
+    "searchResults": "找到 {count} 個相關模板",
+    "apply": "應用",
+    "missingDownloadUrl": "模板缺少下載地址，無法使用"
   },
   "messages": {
-    "unsupportedScope": "目前的資源範圍不支援此操作"
+    "unsupportedScope": "當前資源範圍不支持此操作"
   }
 }

@@ -40,8 +40,8 @@
   },
   "types": {
     "llm": {
-      "label": "AI model",
-      "description": "AI model: a reasoning model for AI conversations in agents."
+      "label": "LLM model",
+      "description": "LLM model: a reasoning model for AI conversations in agents."
     },
     "embedding": {
       "label": "Embedding model",

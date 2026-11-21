@@ -1,25 +1,25 @@
 {
   "variableAssign": {
     "label": "變量賦值",
-    "description": "更新全域變量的值",
+    "description": "更新全局變量的值",
     "value": {
       "label": "賦值",
-      "custom": "自訂"
+      "custom": "自定義"
     }
   },
   "variableAggregation": {
     "label": "變量聚合",
-    "description": "按聚合策略聚合每組變量",
+    "description": "按聚合策略聚合每組的變量",
     "strategy": {
       "label": "聚合策略",
       "requiredMessage": "請選擇聚合策略",
       "firstNonNull": "返回每組的第一個非空值",
-      "firstNonNullDescription": "傳回每組變量的第一個非空值",
-      "array": "返回每組變量的陣列（Array）",
+      "firstNonNullDescription": "返回每組變量的第一個非空值",
+      "array": "返回每組變量的數組（Array）",
       "dict": "返回每組變量的字典（Dict）"
     },
     "group": {
-      "add": "新增分組",
+      "add": "添加分組",
       "edit": "編輯分組"
     },
     "key": {
@@ -29,16 +29,16 @@
   },
   "variableSplitting": {
     "label": "變量拆分",
-    "description": "透過 JSON Path 運算式解析與拆分 JSON 格式的輸入變量",
+    "description": "通過配置JSON Path 表達式，對輸入的 JSON 格式變量進行解析和拆分",
     "variables": {
       "label": "拆分變量",
-      "requiredMessage": "請新增拆分變量"
+      "requiredMessage": "請添加拆分變量"
     },
     "expression": {
-      "label": "運算式",
-      "placeholder": "請輸入運算式",
-      "description": "請使用 JSON Path 運算式拆分變量，例如：{example}",
-      "requiredMessage": "請輸入運算式",
+      "label": "表達式",
+      "placeholder": "請輸入表達式",
+      "description": "請使用 JSON Path 表達式拆分變量，例如：{example}",
+      "requiredMessage": "請輸入表達式",
       "viewDetails": "點擊查看詳情"
     }
   },
@@ -47,8 +47,8 @@
     "description": "利用 AI 模型提取結構化參數",
     "parameters": {
       "label": "提取參數",
-      "requiredMessage": "請新增提取參數",
-      "invalidMessage": "參數可由字母、數字、底線組成"
+      "requiredMessage": "請添加提取參數",
+      "invalidMessage": "參數可由字母、數字、下划線組成"
     },
     "type": {
       "label": "參數類型",

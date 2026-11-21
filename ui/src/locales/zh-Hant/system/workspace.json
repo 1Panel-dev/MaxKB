@@ -1,8 +1,9 @@
 {
   "title": "工作空間",
-  "default": "預設工作空間",
-  "createTitle": "建立工作空間",
-  "renameTitle": "重新命名工作空間",
+  "all": "全部工作空間",
+  "default": "默認工作空間",
+  "createTitle": "創建工作空間",
+  "renameTitle": "重命名工作空間",
   "name": {
     "label": "工作空間名稱",
     "placeholder": "請輸入工作空間名稱",
@@ -11,8 +12,8 @@
   "delete": {
     "title": "是否刪除工作空間：{name}？",
     "description": "刪除後，該空間下的成員都會被移除，請謹慎操作。",
-    "batchRemoveTitle": "是否移除所選記錄對應的成員？",
-    "batchRemoveDescription": "涉及 {memberCount} 位成員，共 {recordCount} 筆記錄。",
-    "partialRemoveMessage": "成功移除 {successCount} 位成員，失敗 {failedCount} 位"
+    "batchRemoveTitle": "是否移除選中記錄對應的成員？",
+    "batchRemoveDescription": "涉及 {memberCount} 位成員，共 {recordCount} 條記錄。",
+    "partialRemoveMessage": "移除成功 {successCount} 個成員，失敗 {failedCount} 個"
   }
 }

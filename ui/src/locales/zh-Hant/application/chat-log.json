@@ -4,20 +4,20 @@
     "labels": {
       "abstract": "摘要",
       "chatCount": "對話次數",
-      "annotations": "改進標註",
-      "user": "使用者",
-      "ipAddress": "IP 位址",
+      "annotations": "改進標注",
+      "user": "用戶",
+      "ipAddress": "IP 地址",
       "lastChatTime": "最近對話時間"
     },
     "feedback": {
-      "label": "使用者回饋",
+      "label": "用戶反饋",
       "positive": "贊同",
       "negative": "反對"
     },
     "source": {
       "label": "來源",
       "online": "線上使用",
-      "apiCall": "API 呼叫",
+      "apiCall": "API 調用",
       "wechatPublicAccount": "微信公眾號",
       "enterpriseWechatRobot": "企業微信機器人",
       "trigger": "觸發器"
@@ -30,7 +30,7 @@
       "attachmentsSuffix": "天之前的對話上傳的附件"
     },
     "addKnowledge": {
-      "title": "新增至知識庫"
+      "title": "添加到知識庫"
     }
   }
 }

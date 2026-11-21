@@ -1,18 +1,17 @@
 {
   "llm": {
-    "label": "LLM",
-    "description": "單次呼叫大語言模型，可傳入工具定義並輸出工具呼叫",
+    "description": "單次調用大模型，可傳入工具定義並輸出工具調用",
     "context": {
       "label": "上下文",
-      "description": "開啟後，本次呼叫會帶上所選變量作為上下文；關閉則僅根據本次輸入回覆",
+      "description": "開啓後，本次調用會帶上所選變量作為上下文；關閉則僅根據本條輸入回復",
       "placeholder": "請選擇上下文變量",
       "requiredMessage": "請選擇上下文變量"
     },
     "tools": {
-      "label": "工具宣告",
-      "description": "按 OpenAI 標準 Function Calling 格式宣告工具能力，僅用於模型決策，不在此處執行；呼叫請求（工具名稱 + 參數）經參數 tool_calls 回傳",
+      "label": "工具聲明",
+      "description": "按 OpenAI 標準 Function Calling 格式聲明工具能力，僅用於模型決策，不在此處執行；調用請求（工具名 + 參數）經參數 tool_calls 返回",
       "placeholder": "請選擇工具變量",
-      "addTitle": "新增工具",
+      "addTitle": "添加工具",
       "editTitle": "編輯工具"
     },
     "toolName": {
@@ -29,37 +28,37 @@
     },
     "toolParameters": {
       "label": "工具參數",
-      "addTitle": "新增工具參數",
+      "addTitle": "添加工具參數",
       "editTitle": "編輯工具參數",
       "empty": "暫無參數",
       "nameRequiredMessage": "請輸入參數名稱",
       "nameLengthMessage": "參數名稱不能超過 {max} 字",
-      "typeMessage": "不支援參數 {name} 的資料類型",
-      "descriptionMessage": "參數 {name} 的描述應為不超過 {max} 字的文字"
+      "typeMessage": "參數 {name} 的數據類型不支持",
+      "descriptionMessage": "參數 {name} 的描述應為不超過 {max} 字的文本"
     },
     "dataType": {
-      "label": "資料類型",
-      "placeholder": "請選擇資料類型",
-      "requiredMessage": "請選擇資料類型"
+      "label": "數據類型",
+      "placeholder": "請選擇數據類型",
+      "requiredMessage": "請選擇數據類型"
     },
     "jsonParse": {
       "label": "JSON 解析",
-      "placeholder": "請輸入 JSON 格式文字進行解析",
+      "placeholder": "請輸入 JSON 格式文本進行解析",
       "invalidMessage": "JSON 解析失敗，請檢查格式",
       "action": "解析"
     },
     "toolImport": {
-      "title": "匯入工具",
-      "placeholder": "貼上 OpenAI tools 格式 JSON，例如：",
+      "title": "導入工具",
+      "placeholder": "粘貼 OpenAI tools 格式 JSON，例如：",
       "invalidMessage": "未找到有效的工具定義",
-      "weatherDescription": "取得天氣",
+      "weatherDescription": "獲取天氣",
       "cityDescription": "城市"
     },
     "reasoningKey": "思考標識",
     "refusal": "拒答內容",
     "isRefusal": "是否拒答",
     "usage": "Token 用量",
-    "toolCalls": "工具呼叫",
+    "toolCalls": "工具調用",
     "finishReason": "結束原因"
   }
 }

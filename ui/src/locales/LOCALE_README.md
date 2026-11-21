@@ -3,6 +3,11 @@
 `src/locales` 负责界面语言、语言包和入口初始化。当前支持 `zh-CN`、`en-US` 与 `zh-Hant`，
 默认及缺失文案回退为简体中文。语言包暂随入口加载，新增语言时再评估按需加载。
 
+## 繁体中文规范
+
+`zh-Hant` 以 `zh-CN` 的当前中文原文为唯一文案依据，只做繁简转换，不从英文反译，也不替换为地区用词或改写原意。例如“智能体／用户／访问／共享／配置／文件”对应“智能體／用戶／訪問／共享／配置／文件”，不改成“智慧體／使用者／存取／共用／設定／檔案”。
+三语 key 和排列保持一致；繁体保留简体原文的英文、技术缩写、占位变量、标点、空格及换行结构。修改简体文案时同步更新对应繁体；业务协议值、代码片段与用户输入仍保持原样，不通过新增翻译函数或运行时转换处理。
+
 ## 分类
 
 按“业务域 → 对象或场景 → 文案用途”组织；文件按业务域划分，不对应组件目录。
@@ -14,6 +19,7 @@
 | upload        | 文件选择、上传提示、校验、状态、后缀与头像上传   |
 | auth          | 登录、退出、找回密码、身份认证                   |
 | authorization | 资源权限、工作空间授权及对话用户授权             |
+| overview      | 首页快捷创建、资源概况、监控统计及排行           |
 | application   | 智能体创建、配置、发布、版本                     |
 | knowledge     | 知识库、文档、分段、问题、标签、检索             |
 | model         | 模型、供应商、模型参数与连接测试                 |
@@ -367,7 +373,7 @@ Web 数据源的无配置提示归 `workflow.webSource.noConfiguration`，详情
 智能体节点配置中的“用户问题”复用 `workflow.start.question`，执行详情中的“问题”使用 `common.labels.question`，分别保留原有名称。文档字段复用 `workflow.document`，图片、音频、视频类型及缺省名称复用 `upload.types`，执行详情中的“其他”使用 `common.labels.other`。按字段名称选择的占位及必填提示分别使用 `common.placeholders.selectField`、`common.validation.selectFieldRequired`，动态参数占位复用 `dynamicForm.fields.parameter.selectPlaceholder`。原有字段名称由既有规则读取后直接传入 `{label}`，不翻译用户字段、变量路径或执行内容；语言切换不重新加载智能体配置、重置引用或主动校验。
 图片与视频生成的正向提示词标签、必填提示及负向提示词标签、说明归 `prompt.json` 中的 `workflow.positivePrompt`、`workflow.negativePrompt`。图片生成的模型标签、正向提示词说明和负向提示词占位分别归 `workflow.imageGenerate.model`、`positivePrompt`、`negativePrompt`；执行详情中的“负向提示词”使用 `workflow.negativePrompt.detailLabel`，配置中的“提示词(负向)”仍使用 `label`；回答内容复用共用标签，本次对话标题复用 `execution.details.currentChat`。已有提示词、变量引用及生成结果保持原值，语言切换不重置内容或主动校验。
 视频生成的负向提示词占位共用 `workflow.negativePrompt.videoPlaceholder`。图生视频和文生视频的模型标签、正向提示词说明分别归 `workflow.imageToVideo`、`workflow.textToVideo`。首／尾帧字段归 `workflow.imageToVideo`，配置使用 `firstFrame.label`、`lastFrame.label`，详情标题和图片缺省名称中的“首帧／末帧”使用各字段的 `shortLabel`，首帧必填与尾帧可选规则保持原样。实际文件名、媒体地址、引用路径和文件引用示例不进入语言包。
-LLM 节点的上下文标签、说明、占位及必填提示归 `workflow.llm.context`；AI 模型标签复用 `model.ai.label`，系统／用户提示词及返回内容复用工作流共用文案。保留上下文开关与用户提示词必填条件，切换语言不重置节点配置或自动触发表单校验。
+LLM 节点名称固定使用 `LLM`，不建立名称翻译 key；其上下文标签、说明、占位及必填提示归 `workflow.llm.context`；AI 模型标签复用 `model.ai.label`，系统／用户提示词及返回内容复用工作流共用文案。保留上下文开关与用户提示词必填条件，切换语言不重置节点配置或自动触发表单校验。
 LLM 工具声明归 `workflow.llm`：声明及来源使用 `tools`，工具名称、描述、参数和数据类型分别使用 `toolName`、`toolDescription`、`toolParameters`、`dataType`，JSON 解析和导入使用 `jsonParse`、`toolImport`。参数基础字段与必填标签复用 `dynamicForm.fields`，“添加工具参数／编辑工具参数”使用 `workflow.llm.toolParameters.addTitle` / `editTitle`，通用操作复用 `common`，参数重名提示复用 `workflow.parameters.duplicateMessage`。OpenAI 类型值、函数名和 JSON 结构保留原样，导入示例的说明文字直接调用 `t`，不把整段 JSON 放入语言包。
 LLM 执行详情的系统／用户提示词及回答内容标题复用工作流共用字段，上下文、结束原因、拒答内容和工具调用标题复用 `workflow.llm`，不另设详情分组。节点名称、提示词及模型输出正文、消息角色、结束原因协议值和工具调用 JSON 按执行数据原样展示；`tokens`、`s` 和占位符 `-` 保持原样。
 MCP 节点的服务配置名称、配置／引用必填提示、获取工具结果提示、工具参数标题和变量设置弹窗标题归 `tool-node.json` 中的 `workflow.mcp`，配置与执行详情共用工具参数标题。原有 `MCP Server Config` 名称保留；引用 MCP、自定义来源及 MCP 工具必填提示复用 `tool.mcp` / `tool.source`，引用变量与选择占位复用工作流共用文案，输入提示、空状态和按钮复用 `common`。工具名称、参数名及说明由 MCP 接口提供，JSON 示例、配置中的变量引用与执行结果保持原值；在原有函数或模板中直接调用 `t`，语言切换不重新请求工具、改写节点数据或主动校验。
@@ -488,6 +494,21 @@ SAML2 的请求签名和断言签名开关归 `auth.saml2`；固定英文参数�
 授权对象、资源和工作空间名称保留接口原文；语言切换不重取授权数据、不切换分类或授权对象，保留未提交的权限编辑状态。
 
 System 共享知识库、模型、工具的工作空间授权弹窗归 `authorization.workspace`：标题、说明、选择区域标题及白名单／黑名单选项分别使用 `title`、`description`、`select`、`whiteList`、`blackList`。类型标签、全选、清空、取消、保存及操作成功提示复用 `common`；“已选”复用 `common.labels.selected`，直接与冒号及数量组合，不建立数量格式 key。工作空间名称展示接口原文，语言切换保留搜索、名单类型及勾选状态，提交沿用 `WHITE_LIST` / `BLACK_LIST` 协议值与工作空间 ID。
+
+## 首页
+
+`overview.json` 维护工作空间与系统首页的专属文案，按 `resources`、`quickCreate`、`monitoring`、`ranking` 分类。资源名称、发布状态、其他选项、已有创建操作及全部智能体选项复用对应业务域和 `common`，首页资源卡片的“大语言”“向量”保留原有简称并翻译，英文分别为 `LLM`、`Embedding`，不替换为完整模型类型名。
+`HomeStatistics` 与智能体概览共用 `overview.monitoring`，统计卡片、图例及提示使用同一组译文，`Tokens` 保留原文。文案在模板或现有 computed 中直接调用 `t()`，不增加翻译辅助函数；系统首页“全部工作空间”选项复用 `workspace.all`，与快捷创建的默认模型供应商一起响应当前语言，接口返回的资源／空间名称保持原文。切换语言不重新请求统计、不清空筛选，也不改变统计口径或导航权限。
+
+首页排行标题、排行类型、表头及数量说明归 `overview.ranking`，对话次数和活跃用户标签复用 `overview.monitoring`；详情与导出操作复用 `common`。卡片与详情抽屉共用排行类型名称，`TOP5` 固定显示，资源名称和用户名保留接口原文；均 Tokens/轮与人均对话轮次保持各自原有名称和统计口径。导出沿用现有接口，不新增成功提示、语言监听或翻译辅助函数。
+
+智能体概览的 Web／后端 API 访问、链接重置确认及嵌入第三方、访问限制、显示设置入口归 `application/overview.json` 的 `application.overview`，与根目录的通用概览语言包区分。基本信息、复制、重新生成、已复制及启停状态复用 `common`，去对话复用 `application.actions.chat`；链接、访问凭证与接口流程保持原样。用户排行与首页共用 `overview.ranking`，用户对话排行标题使用 `userConversations`，表头“均 Tokens/次”使用 `tokensPerChat`，与首页“均 Tokens/轮”分别保留。排行选项在现有展示配置中直接调用 `t()`，切换语言不重取数据或重置筛选。
+
+嵌入第三方弹窗复用入口的 `application.overview.embed.title`，全屏／浮窗／移动端模式与复制说明归同组；复制操作及“已复制”复用 `common`。模式选项在现有展示配置中直接调用 `t()`，生成的 iframe／script、URL 参数、HTML 转义及模式切换逻辑保持原样。
+
+访问限制抽屉的客户端提问限制、身份认证说明、嵌入白名单及原有整数范围校验归 `application.overview.accessRestriction`；登录方式、默认登录方式、验证码和锁定账号文案复用 `auth.loginSettings`，分钟单位与保存结果复用 `common`。规则在现有 computed 中直接调用 `t()`，使用 `validate-on-rule-change=false`，不新增语言监听；数值范围、认证选项查询、授权条件、白名单按行解析及保存字段保持原样。白名单示例 URL 保留在使用处，不进入语言包。
+
+显示设置的社区版、商业版及预览共用 `application.overview.display`，语言选项直接使用 `LOCALE_OPTIONS`；设置结果复用 `common.messages.settingsSuccess`。图片格式提示复用 `upload.avatar.formatMessage`，图片大小提示保留原“图片”用词；尺寸与大小通过插值传入，图片字段和开关选项使用响应式展示配置直接调用 `t()`。默认免责声明在 `APPLICATION_DISPLAY_SETTING_DEFAULT` 中按当前语言提供，初始化或恢复默认时深拷贝为普通草稿；接口回填的免责声明和用户编辑内容不随界面语言重写。预览缺省智能体名称复用 `overview.ranking.applicationName`，不改变图片生命周期、草稿保存协议或功能开关。
 
 ## 知识库详情
 

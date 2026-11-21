@@ -1,31 +1,31 @@
 {
-  "title": "門戶存取設定",
+  "title": "門戶訪問設置",
   "name": {
-    "default": "智慧體門戶",
+    "default": "智能體門戶",
     "placeholder": "請輸入門戶名稱",
     "requiredMessage": "請輸入門戶名稱"
   },
   "access": {
-    "title": "存取設定",
+    "title": "訪問設置",
     "web": {
-      "label": "Web 存取",
-      "description": "控制是否可透過連結存取門戶頁面"
+      "label": "Web 訪問",
+      "description": "控制門戶頁面鏈接是否可訪問"
     },
     "agentApi": {
-      "label": "智慧體對話 API",
-      "description": "控制是否允許透過對話使用者的 API Key 呼叫 API 與智慧體對話"
+      "label": "智能體對話 API",
+      "description": "控制是否允許通過對話用戶的 API Key 調用 API 進行智能體對話"
     },
     "agentMcp": {
-      "label": "智慧體 MCP 服務",
-      "description": "控制是否允許透過對話使用者的 API Key 呼叫智慧體的 MCP 服務"
+      "label": "智能體 MCP 服務",
+      "description": "控制是否允許通過對話用戶的 API Key 調用智能體的 MCP 服務"
     },
     "knowledgeMcp": {
       "label": "知識庫 MCP 服務",
-      "description": "控制是否允許透過對話使用者的 API Key 呼叫知識庫檢索的 MCP 服務"
+      "description": "控制是否允許通過對話用戶的 API Key 調用知識庫檢索的 MCP 服務"
     }
   },
   "cors": {
-    "title": "跨域設定",
-    "placeholder": "請輸入允許的跨域網址，開啟後若未輸入跨域網址則不限制。\n每行輸入一個跨域網址，例如：\nhttp://127.0.0.1:5678\nhttps://dataease.io"
+    "title": "跨域設置",
+    "placeholder": "請輸入允許的跨域地址，開啓後不輸入跨域地址則不限制。\n跨域地址一行一個，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io"
   }
 }

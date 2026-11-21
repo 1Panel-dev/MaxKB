@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type HomepageApi from '@/api/admin/workspace/homepage'
 import type { HomeApplicationAggregation, HomeKnowledgeAggregation, HomeModelAggregation, HomeToolAggregation } from '@/api/types'
 import { toThousands } from '@/utils/number'
@@ -15,6 +16,8 @@ interface HomeResourceCard {
   details: [string, number | undefined][]
 }
 
+const { t } = useI18n({ useScope: 'global' })
+
 /* 资源概况与列表导航 */
 const props = defineProps<{ workspaceId: string; api: typeof HomepageApi }>()
 const router = useRouter()
@@ -27,53 +30,53 @@ const tool = ref<HomeToolAggregation>()
 const model = ref<HomeModelAggregation>()
 const resourceGroups = computed<HomeResourceCard[]>(() => [
   {
-    label: '智能体',
+    label: t('application.title'),
     disabled: isSystemScope.value || !perm.application.workspace.isShare(),
     route: 'workspace-application-list',
     icon: 'icon_robot_filled',
     color: '#3370FF',
     total: application.value?.total,
     details: [
-      ['已发布', application.value?.publish_count],
-      ['未发布', application.value?.un_publish_count],
+      [t('application.status.published'), application.value?.publish_count],
+      [t('application.status.unpublished'), application.value?.un_publish_count],
     ],
   },
   {
-    label: '知识库',
+    label: t('knowledge.title'),
     disabled: isSystemScope.value || !perm.knowledge.workspace.isShare(),
     route: 'workspace-knowledge-list',
     icon: 'icon_book_filled',
     color: '#7F3BF5',
     total: knowledge.value?.total,
     details: [
-      ['文档', knowledge.value?.document_count],
-      ['失败', knowledge.value?.failure_count],
+      [t('knowledge.document.title'), knowledge.value?.document_count],
+      [t('common.status.failure'), knowledge.value?.failure_count],
     ],
   },
   {
-    label: '工具',
+    label: t('tool.title'),
     disabled: isSystemScope.value || !perm.tool.workspace.isShare(),
     route: 'workspace-tools',
     icon: 'icon_busy_filled',
     color: '#2CA91F',
     total: tool.value?.total,
     details: [
-      ['工具', tool.value?.custom_count],
-      ['工作流', tool.value?.workflow_count],
-      ['其他', tool.value ? Math.max(0, tool.value.total - tool.value.custom_count - tool.value.workflow_count) : undefined],
+      [t('tool.title'), tool.value?.custom_count],
+      [t('workflow.title'), tool.value?.workflow_count],
+      [t('common.labels.other'), tool.value ? Math.max(0, tool.value.total - tool.value.custom_count - tool.value.workflow_count) : undefined],
     ],
   },
   {
-    label: '模型',
+    label: t('model.title'),
     disabled: isSystemScope.value || !perm.model.workspace.isShare(),
     route: 'workspace-model',
     icon: 'icon_dataset_filled',
     color: '#FF8800',
     total: model.value?.total,
     details: [
-      ['大语言', model.value?.llm_count],
-      ['向量', model.value?.embedding_count],
-      ['其他', model.value ? Math.max(0, model.value.total - model.value.llm_count - model.value.embedding_count) : undefined],
+      [t('overview.resources.llm'), model.value?.llm_count],
+      [t('overview.resources.embedding'), model.value?.embedding_count],
+      [t('common.labels.other'), model.value ? Math.max(0, model.value.total - model.value.llm_count - model.value.embedding_count) : undefined],
     ],
   },
 ])

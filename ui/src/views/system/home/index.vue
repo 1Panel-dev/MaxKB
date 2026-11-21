@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDetail, WorkspaceItem } from '@/api/types'
 import SystemHomepageApi from '@/api/admin/system/homepage'
 import SystemApplicationApi from '@/api/admin/system/resource-management/application/application'
@@ -11,6 +12,8 @@ import HomeRankings from '@/views/home/components/ranking/HomeRankings.vue'
 import { useStore } from '@/stores'
 import perm from '@/permission'
 
+const { t } = useI18n({ useScope: 'global' })
+
 defineOptions({ name: 'SystemHomeView' })
 
 const { auth } = useStore()
@@ -18,10 +21,11 @@ const { auth } = useStore()
 /* 工作空间筛选 */
 const ALL_WORKSPACES = '' // 全部空间标识（空串），传给后端视为 None（所有工作空间）
 const selectedWorkspaceId = ref(ALL_WORKSPACES)
-const workspaceOptions = ref<WorkspaceItem[]>([])
+const workspaces = ref<WorkspaceItem[]>([])
+const workspaceOptions = computed(() => [{ name: t('workspace.all'), id: ALL_WORKSPACES } as WorkspaceItem, ...workspaces.value])
 function loadWorkspaceOptions() {
-  return WorkspaceApi.getSystemWorkspaceList().then((workspaces) => {
-    workspaceOptions.value = [{ name: '全部空间', id: ALL_WORKSPACES } as WorkspaceItem, ...workspaces]
+  return WorkspaceApi.getSystemWorkspaceList().then((result) => {
+    workspaces.value = result
     if (!workspaceOptions.value.some(({ id }) => id === selectedWorkspaceId.value)) {
       handleWorkspaceChange(workspaceOptions.value[0]?.id ?? ALL_WORKSPACES)
     }
@@ -70,7 +74,7 @@ onMounted(() => {
       <WorkspaceDropdown :model-value="selectedWorkspaceId" :options="workspaceOptions" @update:model-value="handleWorkspaceChange" />
     </template>
     <!-- 资源 -->
-    <h4 class="mb-4 mt-4">资源</h4>
+    <h4 class="mb-4 mt-4">{{ t('overview.resources.title') }}</h4>
     <HomeResourceOverview :key="selectedWorkspaceId" :api="SystemHomepageApi" :workspace-id="selectedWorkspaceId" />
     <!-- 监控 -->
     <HomeStatistics
@@ -95,10 +99,10 @@ onMounted(() => {
           :disabled="loading"
           @change="handleApplicationChange"
         >
-          <el-option label="全部智能体" value="all">
+          <el-option :label="t('application.categories.all')" value="all">
             <div class="flex-align-center gap-2">
               <MkIcon name="icon_card_outlined" :size="20" class="shrink-0 text-N600" />
-              <span>全部智能体</span>
+              <span>{{ t('application.categories.all') }}</span>
             </div>
           </el-option>
           <template v-for="application in applicationsList" :key="application.id">

@@ -1,20 +1,20 @@
 {
   "title": "工作流",
   "userInput": {
-    "title": "使用者輸入",
-    "currentForm": "目前表單",
+    "title": "用戶輸入",
+    "currentForm": "當前表單",
     "exposedFields": {
-      "label": "外置參數設定",
-      "description": "僅支援模型、知識庫、開關、日期、樹狀選擇器、單選框、多選框元件類型"
+      "label": "外置參數設置",
+      "description": "僅支持模型、知識庫、開關、日期、樹形選項器、單選框、多選框組件類型"
     },
     "menuTitle": {
-      "label": "其他參數收納選單標題"
+      "label": "其他參數收納菜單標題"
     },
-    "invalidParameterMessage": "參數僅支援字母、數字和底線"
+    "invalidParameterMessage": "參數僅支持字母、數字和下划線"
   },
   "parameters": {
     "duplicateMessage": "參數已存在",
-    "invalidMessage": "僅支援字母、數字和底線"
+    "invalidMessage": "僅支持字母、數字和下划線"
   },
   "variable": {
     "label": "變量",
@@ -23,8 +23,8 @@
     "requiredMessage": "請輸入變量",
     "selectRequiredMessage": "請選擇變量",
     "duplicateMessage": "變量已存在",
-    "invalidMessage": "變量可由字母、數字、底線組成",
-    "add": "新增變量",
+    "invalidMessage": "變量可由字母、數字、下划線組成",
+    "add": "添加變量",
     "edit": "編輯變量",
     "input": {
       "label": "輸入變量",
@@ -32,10 +32,10 @@
     }
   },
   "globalVariables": {
-    "title": "全域變量"
+    "title": "全局變量"
   },
   "conversationVariables": {
-    "title": "對話變量"
+    "title": "會話變量"
   },
   "referenceVariable": {
     "label": "引用變量",
@@ -50,11 +50,11 @@
     "requiredMessage": "請選擇輸入內容"
   },
   "document": {
-    "label": "文件",
-    "placeholder": "請選擇文件",
-    "requiredMessage": "請選擇文件",
-    "paragraphPreviewHint": "每個文件僅顯示前 {count} 個分段",
-    "characterPreviewHint": "每個文件僅支援預覽 {count} 字"
+    "label": "文檔",
+    "placeholder": "請選擇文檔",
+    "requiredMessage": "請選擇文檔",
+    "paragraphPreviewHint": "每個文檔僅展示前 {count} 個分段",
+    "characterPreviewHint": "每個文檔僅支持預覽 {count} 字"
   },
   "searchQuestion": {
     "label": "檢索問題",
@@ -64,20 +64,20 @@
   "searchScope": {
     "label": "檢索範圍",
     "placeholder": "請選擇關聯知識庫",
-    "custom": "自訂",
+    "custom": "自定義",
     "knowledgeList": "知識庫列表",
-    "documentList": "文件列表"
+    "documentList": "文檔列表"
   },
   "showInSources": "結果顯示在知識來源中",
   "audioFile": {
-    "label": "音訊檔案"
+    "label": "音頻文件"
   },
   "history": {
     "label": "歷史聊天記錄"
   },
   "thinking": {
     "label": "輸出思考",
-    "description": "請根據模型傳回的思考標籤設定，標籤中間的內容將會認定為思考過程",
+    "description": "請根據模型返回的思考標籤設置，標籤中間的內容將會認定為思考過程",
     "process": "思考過程",
     "start": "開始",
     "end": "結束"
@@ -86,7 +86,7 @@
     "label": "回答內容"
   },
   "returnContent": {
-    "label": "回傳內容",
-    "description": "關閉後，此節點的內容不會輸出給使用者。如需讓使用者看到此節點的輸出內容，請開啟開關。"
+    "label": "返回內容",
+    "description": "關閉後該節點的內容則不輸出給用戶。如果你想讓用戶看到該節點的輸出內容，請打開開關。"
   }
 }

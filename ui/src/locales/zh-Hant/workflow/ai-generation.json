@@ -1,36 +1,36 @@
 {
   "aiGeneration": {
-    "modelListFailedMessage": "取得模型清單失敗",
-    "generatedMessage": "工作流程已生成，請檢查後儲存",
+    "modelListFailedMessage": "獲取模型列表失敗",
+    "generatedMessage": "工作流已生成，請檢查後保存",
     "requirementHint": "請描述你的需求，如下",
     "placeholder": "請描述你的需求",
     "stopped": "已停止生成",
     "thinking": "思考中",
     "examples": {
-      "productSupport": "建立一個產品客服，先查詢產品知識庫回答，查不到時禮貌回覆。",
-      "pricing": "建立一個可以查詢產品收費資訊的智能體。",
-      "humanSupport": "建立一個需要時可以轉人工服務的客服智能體。"
+      "productSupport": "做一個產品客服，先查產品知識庫回答，查不到時禮貌兜底。",
+      "pricing": "做一個可以查詢產品收費信息的智能體。",
+      "humanSupport": "做一個需要時可以轉人工服務的客服智能體。"
     },
     "tools": {
       "plan": "規劃流程",
       "getCanvasDetail": "查看畫布",
-      "getNodeDetail": "查看節點設定",
+      "getNodeDetail": "查看節點配置",
       "getLastRun": "查看最近一次執行",
-      "listDatasource": "查詢資料來源",
+      "listDatasource": "查詢數據源",
       "getNodeAnchors": "查看節點出口",
       "getTools": "查詢工具",
-      "addNode": "新增節點",
-      "addEdge": "新增連線",
+      "addNode": "添加節點",
+      "addEdge": "添加連線",
       "deleteNode": "刪除節點",
       "deleteEdge": "刪除連線",
-      "configureNode": "設定節點",
-      "validate": "校驗工作流程",
+      "configureNode": "配置節點",
+      "validate": "校驗工作流",
       "layout": "整理佈局",
       "getFieldOptions": "查看可引用變量",
       "getModels": "查詢模型",
       "getKnowledgeList": "查詢知識庫",
       "getSkillResources": "查詢技能資源",
-      "update": "寫入設定",
+      "update": "寫入配置",
       "getBranches": "查看分支",
       "addBranch": "新增分支",
       "updateBranch": "修改分支",
@@ -40,8 +40,8 @@
       "modelRequired": "缺少模型",
       "iterationLimit": "超過最大輪次 {max}",
       "incompleteTurn": "本輪結束但未收到完整結果",
-      "modelCallFailed": "模型呼叫失敗",
-      "incompleteStream": "串流回應缺少完整結果"
+      "modelCallFailed": "模型調用失敗",
+      "incompleteStream": "流式響應缺少完整結果"
     }
   }
 }

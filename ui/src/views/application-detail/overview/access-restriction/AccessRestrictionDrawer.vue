@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationAccessTokenPayload, ApplicationAuthenticationConfig, LoginMethod, OptionItem } from '@/api/types'
 import type { ApplicationAccessToken } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -12,6 +13,8 @@ import { useStore } from '@/stores/admin'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'AccessRestrictionDrawer' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ initialConfig?: ApplicationAccessToken }>()
 const emit = defineEmits<{ closed: []; updated: [config: ApplicationAccessToken] }>()
@@ -33,13 +36,42 @@ const form = reactive({
 const defaultLoginMethodOptions = computed(() =>
   loginMethodOptions.value.filter((option) => form.authentication_value.login_value?.includes(option.value)),
 )
-const rules: FormRules<typeof form> = {
-  'authentication_value.login_value': [{ required: true, type: 'array', min: 1, message: '请选择至少一种登录方式', trigger: 'change' }],
-  'authentication_value.default_value': [{ required: true, message: '请选择默认登录方式', trigger: 'change' }],
-  'authentication_value.max_attempts': [{ required: true, type: 'integer', min: -1, max: 10, message: '请输入 -1～10 的整数', trigger: 'change' }],
-  'authentication_value.failed_attempts': [{ required: true, type: 'integer', min: 1, max: 100, message: '请输入 1～100 的整数', trigger: 'change' }],
-  'authentication_value.lock_time': [{ required: true, type: 'integer', min: 1, max: 1440, message: '请输入 1～1440 的整数', trigger: 'change' }],
-}
+const rules = computed<FormRules<typeof form>>(() => ({
+  'authentication_value.login_value': [
+    { required: true, type: 'array', min: 1, message: t('auth.loginSettings.method.minSelectionMessage'), trigger: 'change' },
+  ],
+  'authentication_value.default_value': [{ required: true, message: t('auth.loginSettings.defaultMethod.requiredMessage'), trigger: 'change' }],
+  'authentication_value.max_attempts': [
+    {
+      required: true,
+      type: 'integer',
+      min: -1,
+      max: 10,
+      message: t('application.overview.accessRestriction.integerRangeMessage', { min: -1, max: 10 }),
+      trigger: 'change',
+    },
+  ],
+  'authentication_value.failed_attempts': [
+    {
+      required: true,
+      type: 'integer',
+      min: 1,
+      max: 100,
+      message: t('application.overview.accessRestriction.integerRangeMessage', { min: 1, max: 100 }),
+      trigger: 'change',
+    },
+  ],
+  'authentication_value.lock_time': [
+    {
+      required: true,
+      type: 'integer',
+      min: 1,
+      max: 1440,
+      message: t('application.overview.accessRestriction.integerRangeMessage', { min: 1, max: 1440 }),
+      trigger: 'change',
+    },
+  ],
+}))
 
 function handleLoginMethodsChange() {
   const loginMethods = form.authentication_value.login_value ?? []
@@ -108,7 +140,7 @@ function handleSave() {
       .putAccessToken(applicationId.value, payload)
       .then((config: ApplicationAccessToken) => {
         emit('updated', config)
-        MsgSuccess('保存成功')
+        MsgSuccess(t('common.messages.saveSuccess'))
         visible.value = false
       })
       .finally(() => {
@@ -121,10 +153,18 @@ onMounted(loadAccessRestriction)
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="访问限制" @closed="emit('closed')">
+  <MkDrawer size="730" v-model="visible" :title="t('application.overview.accessRestriction.title')" @closed="emit('closed')">
     <div v-loading="loading">
-      <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item label="每个客户端提问限制">
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        :validate-on-rule-change="false"
+        label-position="top"
+        require-asterisk-position="right"
+        @submit.prevent
+      >
+        <el-form-item :label="t('application.overview.accessRestriction.questionLimit')">
           <el-input-number
             v-model="form.access_num"
             class="w-32!"
@@ -136,13 +176,13 @@ onMounted(loadAccessRestriction)
             controls-position="right"
             align="left"
           />
-          <span class="ml-2">次/天</span>
+          <span class="ml-2">{{ t('application.overview.accessRestriction.perDay') }}</span>
         </el-form-item>
         <el-form-item>
           <template #label>
             <span class="flex-align-center gap-1">
-              身份认证
-              <MkTooltip placement="right" content="开启身份认证后，智能体和关联的知识库均需要对话用户授权配置，否则用户无权限登录和知识库检索">
+              {{ t('application.overview.accessRestriction.authentication') }}
+              <MkTooltip placement="right" :content="t('application.overview.accessRestriction.authenticationHint')">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />
               </MkTooltip>
             </span>
@@ -151,7 +191,7 @@ onMounted(loadAccessRestriction)
           <el-switch v-model="form.authentication" />
         </el-form-item>
         <template v-if="(auth.isPE || auth.isEE) && form.authentication">
-          <el-form-item label="登录方式" prop="authentication_value.login_value">
+          <el-form-item :label="t('auth.loginSettings.method.label')" prop="authentication_value.login_value">
             <!-- 选择允许的登录方式 -->
             <el-checkbox-group v-model="form.authentication_value.login_value" class="flex-wrap gap-x-6" @change="handleLoginMethodsChange">
               <template v-for="option in loginMethodOptions" :key="option.value">
@@ -161,17 +201,21 @@ onMounted(loadAccessRestriction)
               </template>
             </el-checkbox-group>
           </el-form-item>
-          <el-form-item label="默认登录方式" prop="authentication_value.default_value">
-            <el-select v-model="form.authentication_value.default_value" placeholder="请选择默认登录方式">
+          <el-form-item :label="t('auth.loginSettings.defaultMethod.label')" prop="authentication_value.default_value">
+            <el-select v-model="form.authentication_value.default_value" :placeholder="t('auth.loginSettings.defaultMethod.placeholder')">
               <template v-for="option in defaultLoginMethodOptions" :key="option.value">
                 <el-option :value="option.value" :label="LOGIN_METHOD_LABELS[option.value as LoginMethod] ?? option.label" />
               </template>
             </el-select>
           </el-form-item>
-          <el-form-item v-if="form.authentication_value.login_value?.includes(LOGIN_METHOD.LOCAL)" label="账号登录验证码设置" required>
+          <el-form-item
+            v-if="form.authentication_value.login_value?.includes(LOGIN_METHOD.LOCAL)"
+            :label="t('auth.loginSettings.captcha.label')"
+            required
+          >
             <div class="mk-gray-card-lg w-full space-y-4">
               <div class="flex-align-center gap-2">
-                <span class="shrink-0">登录失败</span>
+                <span class="shrink-0">{{ t('auth.loginSettings.failurePrefix') }}</span>
                 <el-form-item prop="authentication_value.max_attempts" class="mb-0!">
                   <el-input-number
                     v-model="form.authentication_value.max_attempts"
@@ -182,10 +226,10 @@ onMounted(loadAccessRestriction)
                     :value-on-clear="1"
                   />
                 </el-form-item>
-                <span class="shrink-0">次显示验证码</span>
+                <span class="shrink-0">{{ t('auth.loginSettings.captcha.failureSuffix', form.authentication_value.max_attempts ?? 1) }}</span>
               </div>
               <div class="flex-align-center gap-2">
-                <span class="shrink-0">登录失败</span>
+                <span class="shrink-0">{{ t('auth.loginSettings.failurePrefix') }}</span>
                 <el-form-item prop="authentication_value.failed_attempts" class="mb-0!">
                   <el-input-number
                     v-model="form.authentication_value.failed_attempts"
@@ -196,7 +240,8 @@ onMounted(loadAccessRestriction)
                     :value-on-clear="5"
                   />
                 </el-form-item>
-                <span class="shrink-0">次，锁定账号</span>
+                <span class="shrink-0">{{ t('auth.loginSettings.lockout.failureSuffix', form.authentication_value.failed_attempts ?? 5) }}</span>
+                <span class="shrink-0">{{ t('auth.loginSettings.lockout.durationPrefix') }}</span>
                 <el-form-item prop="authentication_value.lock_time" class="mb-0!">
                   <el-input-number
                     v-model="form.authentication_value.lock_time"
@@ -207,12 +252,12 @@ onMounted(loadAccessRestriction)
                     :value-on-clear="10"
                   />
                 </el-form-item>
-                <span class="shrink-0">分钟</span>
+                <span class="shrink-0">{{ t('common.schedule.units.minutes') }}</span>
               </div>
             </div>
           </el-form-item>
         </template>
-        <el-form-item label="嵌入白名单">
+        <el-form-item :label="t('application.overview.accessRestriction.whitelist')">
           <div class="w-full space-y-2">
             <!-- 设置嵌入白名单 -->
             <el-switch v-model="form.white_active" />
@@ -221,7 +266,7 @@ onMounted(loadAccessRestriction)
               v-model="form.white_list"
               type="textarea"
               :rows="8"
-              :placeholder="'请输入允许嵌入第三方的源地址，一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io'"
+              :placeholder="`${t('application.overview.accessRestriction.whitelistPlaceholder')}\nhttp://127.0.0.1:5678\nhttps://dataease.io`"
             />
           </div>
         </el-form-item>
@@ -229,9 +274,9 @@ onMounted(loadAccessRestriction)
     </div>
     <template #footer>
       <!-- 取消访问限制设置 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存访问限制设置 -->
-      <el-button type="primary" :loading="loading" @click="handleSave">保存</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSave">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDrawer>
 </template>

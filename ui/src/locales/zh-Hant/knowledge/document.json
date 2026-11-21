@@ -1,93 +1,93 @@
 {
   "document": {
-    "title": "文件",
+    "title": "文檔",
     "name": {
-      "label": "文件名稱",
-      "placeholder": "請輸入文件名稱",
-      "invalidCharactersMessage": "檔案名稱不能包含以下特殊字元"
+      "label": "文檔名稱",
+      "placeholder": "請輸入文檔名稱",
+      "invalidCharactersMessage": "文件名稱不能包含以下特殊字符"
     },
     "sourceUrl": {
-      "label": "文件網址",
-      "placeholder": "請輸入文件網址，每行一個。網址有誤的文件將無法匯入。",
-      "requiredMessage": "請輸入文件網址"
+      "label": "文檔地址",
+      "placeholder": "請輸入文檔地址，一行一個，地址不正確文檔會導入失敗。",
+      "requiredMessage": "請輸入文檔地址"
     },
     "targetDocument": {
-      "label": "目標文件",
-      "placeholder": "請選擇目標文件",
-      "requiredMessage": "請選擇目標文件"
+      "label": "目標文檔",
+      "placeholder": "請選擇目標文檔",
+      "requiredMessage": "請選擇目標文檔"
     },
     "labels": {
-      "characters": "字元數",
+      "characters": "字符數",
       "paragraphs": "分段"
     },
     "hitHandling": {
       "label": "召回處理",
-      "description": "使用者提問時，召回的分段將依照設定進行處理。",
-      "optimization": "模型最佳化",
+      "description": "用戶提問時，召回的分段按照設置進行處理。",
+      "optimization": "模型優化",
       "directlyReturn": "直接回答",
       "similarityAbove": "相似度高於",
       "returnParagraphContent": "直接返回分段內容"
     },
     "settings": {
-      "title": "文件設定",
+      "title": "文檔設置",
       "allowPreview": "允許在知識來源中預覽",
       "allowDownload": "允許在知識來源中下載"
     },
     "status": {
-      "label": "檔案狀態",
+      "label": "文件狀態",
       "embedding": "索引中",
-      "generate": "產生中",
+      "generate": "生成中",
       "sync": "同步中",
-      "tokenize": "建立分詞索引中",
+      "tokenize": "分詞索引中",
       "progress": "完成"
     },
     "actions": {
-      "quickCreate": "快速建立空白文件",
-      "generatePreview": "產生預覽",
-      "downloadOriginal": "下載原始文件",
-      "replaceOriginal": "取代原始文件"
+      "quickCreate": "快速創建空白文檔",
+      "generatePreview": "生成預覽",
+      "downloadOriginal": "下載原文檔",
+      "replaceOriginal": "替換原文檔"
     },
     "delete": {
-      "title": "是否刪除文件：{name}？",
-      "description": "此文件的 {count} 個分段都會一併刪除，請謹慎操作。",
-      "batchTitle": "是否刪除選取的{count}個文件？",
-      "batchDescription": "所選文件中的分段會一併刪除，請謹慎操作。"
+      "title": "是否刪除文檔：{name}？",
+      "description": "此文檔下的 {count} 個分段都會被刪除，請謹慎操作。",
+      "batchTitle": "是否刪除選中的{count}個文檔？",
+      "batchDescription": "所選文檔中的分段會跟隨刪除，請謹慎操作。"
     },
     "sync": {
-      "title": "是否同步文件：{name}？",
-      "batchTitle": "是否同步選取的{count}個文件？",
-      "description": "同步時會略過內容未變更的文件，並以新內容更新有變更文件的既有分段。",
-      "workflowDescription": "本次同步只會更新目前的 Web 文件，並使用知識庫工作流程的擷取與分段設定。",
-      "missingUrlMessage": "請先設定文件網址，再進行同步。"
+      "title": "是否同步文檔：{name}？",
+      "batchTitle": "是否同步選中的{count}個文檔？",
+      "description": "文檔內容無更新時跳過，有更新時會使用新內容更新舊分段內容。",
+      "workflowDescription": "將按知識庫工作流的提取、分段配置同步當前 Web 文檔，其他文檔保持不變。",
+      "missingUrlMessage": "無法同步，請先去設置文檔 URL 地址"
     },
     "upload": {
-      "title": "上傳文件",
-      "textLabel": "文字檔案",
-      "textTitle": "上傳文字檔案",
+      "title": "上傳文檔",
+      "textLabel": "文本文件",
+      "textTitle": "上傳文本文件",
       "tableLabel": "表格",
       "tableTitle": "上傳表格",
       "qaLabel": "QA 問答對",
       "qaTitle": "上傳 QA 問答對",
-      "delimiterHint": "上傳檔案前，建議統一檔案的分段標記",
-      "templateHint": "點選下載對應範本並填寫資訊",
-      "downloadTemplate": "下載 {format} 範本",
-      "columnHeaderHint": "第一列必須使用有意義的欄位名稱作為標題。其餘每筆資料會各自成為一個分段",
-      "sheetHint": "每張工作表都會匯入為一份文件，文件名稱與工作表名稱相同"
+      "delimiterHint": "文件上傳前，建議規範文件的分段標識",
+      "templateHint": "點擊下載對應模板並完善信息",
+      "downloadTemplate": "下載 {format} 模板",
+      "columnHeaderHint": "第一行必須是列標題，且列標題必須是有意義的術語，表中每條記錄將作為一個分段",
+      "sheetHint": "上傳的表格文件中每個 sheet 會作為一個文檔，sheet 名稱為文檔名稱"
     },
     "import": {
-      "title": "匯入文件",
-      "start": "開始匯入",
-      "continue": "繼續匯入",
-      "goToDocuments": "前往文件",
-      "allDocuments": "全部文件",
-      "selectionRequiredMessage": "請選擇文件",
-      "larkFormatsHint": "支援文件和試算表，包含 {formats} 格式",
-      "delimiterHint": "匯入文件前，建議統一文件的分段標記。"
+      "title": "導入文檔",
+      "start": "開始導入",
+      "continue": "繼續導入",
+      "goToDocuments": "前往文檔",
+      "allDocuments": "全部文檔",
+      "selectionRequiredMessage": "請選擇文檔",
+      "larkFormatsHint": "支持文檔和表格類型，包含 {formats} 格式",
+      "delimiterHint": "導入文檔前，建議規範文檔的分段標識。"
     },
     "preview": {
       "title": "預覽",
-      "emptyDocuments": "暫無可預覽的文件",
-      "finishEditingMessage": "請先儲存或取消分段編輯"
+      "emptyDocuments": "暫無預覽文檔",
+      "finishEditingMessage": "請先保存或取消分段編輯"
     }
   },
   "image": {
@@ -100,14 +100,14 @@
       "title": "上傳圖片"
     },
     "preview": {
-      "emptyMessage": "圖片預覽沒有分段，請返回重新產生預覽"
+      "emptyMessage": "圖片預覽沒有分段，請返回重新生成預覽"
     },
-    "unsupportedFormatMessage": "僅支援 {formats} 格式的圖片",
+    "unsupportedFormatMessage": "僅支持 {formats} 格式的圖片",
     "delete": {
       "title": "是否刪除圖片：{name}？",
-      "batchTitle": "是否刪除選取的{count}個圖片？",
-      "description": "此圖片的 {count} 個分段都會一併刪除，請謹慎操作。",
-      "batchDescription": "所選圖片中的分段會一併刪除，請謹慎操作。"
+      "batchTitle": "是否刪除選中的{count}個圖片？",
+      "description": "此圖片下的 {count} 個分段都會被刪除，請謹慎操作。",
+      "batchDescription": "所選圖片中的分段會跟隨刪除，請謹慎操作。"
     }
   }
 }

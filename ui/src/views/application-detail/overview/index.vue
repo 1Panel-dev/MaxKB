@@ -80,7 +80,7 @@ function handleChangeWebAccess() {
       webAccessActive.value = config.is_active
       accessToken.value = config.access_token
       accessTokenConfig.value = config
-      MsgSuccess(config.is_active ? '已启用' : '已禁用')
+      MsgSuccess(config.is_active ? t('common.status.enabled') : t('common.status.disabled'))
       return true
     })
     .finally(() => {
@@ -90,7 +90,7 @@ function handleChangeWebAccess() {
 
 function handleResetAccessToken() {
   if (!accessToken.value || loading.value) return
-  return MsgConfirm('是否重新生成公开访问链接？', '重新生成后旧链接将失效，嵌入第三方的脚本也需要更新，请谨慎操作！', {
+  return MsgConfirm(t('application.overview.resetTitle'), t('application.overview.resetDescription'), {
     confirmButtonText: t('common.actions.comfirm'),
     confirmButtonType: 'primary',
   }).then(
@@ -103,7 +103,7 @@ function handleResetAccessToken() {
           accessToken.value = config.access_token
           webAccessActive.value = config.is_active
           accessTokenConfig.value = config
-          MsgSuccess('刷新成功')
+          MsgSuccess(t('application.overview.refreshSuccess'))
         })
         .finally(() => {
           loading.value = false
@@ -124,7 +124,7 @@ function handleChangeApiKeyAccess() {
     .putEnableApiKey(applicationId.value, { enable_api_key: !apiKeyEnabled.value })
     .then((config) => {
       apiKeyEnabled.value = config.enable_api_key
-      MsgSuccess(config.enable_api_key ? '已启用' : '已禁用')
+      MsgSuccess(config.enable_api_key ? t('common.status.enabled') : t('common.status.disabled'))
       return true
     })
     .finally(() => {
@@ -145,7 +145,7 @@ onMounted(() => {
 <template>
   <!-- 基本信息 -->
   <section class="mb-4">
-    <h4 class="my-4">基本信息</h4>
+    <h4 class="my-4">{{ t('common.labels.basicInfo') }}</h4>
     <el-card shadow="never">
       <div class="flex-align-center mb-4 gap-2">
         <ApplicationIcon :icon="application?.icon" />
@@ -154,7 +154,7 @@ onMounted(() => {
       <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div class="mk-gray-card-lg space-y-4">
           <div class="flex-between">
-            <h6>Web 访问</h6>
+            <h6>{{ t('application.overview.webAccess') }}</h6>
             <!-- Web 访问开关 -->
             <el-switch
               :model-value="webAccessActive"
@@ -164,18 +164,18 @@ onMounted(() => {
             />
           </div>
           <div class="space-y-2">
-            <div>链接</div>
+            <div>{{ t('application.overview.link') }}</div>
             <el-input :model-value="accessUrl" readonly>
               <template #suffix>
                 <div class="-mr-1">
                   <!-- 复制访问链接 -->
-                  <MkTooltip content="复制" placement="top">
-                    <el-button text :disabled="!accessUrl" @click="copyText(accessUrl)">
+                  <MkTooltip :content="t('common.actions.duplicate')" placement="top">
+                    <el-button text :disabled="!accessUrl" @click="copyText(accessUrl, t('common.messages.copied'))">
                       <MkIcon name="icon_copy_outlined" />
                     </el-button>
                   </MkTooltip>
                   <!-- 重置访问链接 -->
-                  <MkTooltip v-if="applicationOverviewPermission('overviewPublic')" content="重新生成" placement="top">
+                  <MkTooltip v-if="applicationOverviewPermission('overviewPublic')" :content="t('common.actions.regenerate')" placement="top">
                     <el-button text :loading="loading" @click="handleResetAccessToken">
                       <MkIcon name="icon_refresh_outlined" />
                     </el-button>
@@ -188,7 +188,7 @@ onMounted(() => {
             <!-- 打开智能体对话 -->
             <el-button :disabled="!accessUrl" plain @click="toUrl(accessUrl)">
               <MkIcon name="icon_new-chat_outlined" />
-              <span>去对话</span>
+              <span>{{ t('application.actions.chat') }}</span>
             </el-button>
             <!-- 嵌入第三方 -->
             <ButtonEmbedThirdParty v-if="applicationOverviewPermission('overviewEmbed')" :share-url="accessUrl" :access-token="accessToken" />
@@ -204,7 +204,7 @@ onMounted(() => {
         </div>
         <div class="mk-gray-card-lg space-y-4">
           <div class="flex-between">
-            <h6>后端 API 访问</h6>
+            <h6>{{ t('application.overview.backendApi') }}</h6>
             <!-- 后端 API 访问开关 -->
             <el-switch
               :model-value="apiKeyEnabled"
@@ -214,12 +214,12 @@ onMounted(() => {
             />
           </div>
           <div class="space-y-2">
-            <div>API 文档</div>
+            <div>{{ t('application.overview.apiDoc') }}</div>
             <el-input :model-value="apiDocUrl" readonly>
               <template #suffix>
                 <!-- 复制 API 文档地址 -->
-                <MkTooltip content="复制" placement="top">
-                  <el-button text @click="copyText(apiDocUrl)" class="-mr-1">
+                <MkTooltip :content="t('common.actions.duplicate')" placement="top">
+                  <el-button text @click="copyText(apiDocUrl, t('common.messages.copied'))" class="-mr-1">
                     <MkIcon name="icon_copy_outlined" />
                   </el-button>
                 </MkTooltip>

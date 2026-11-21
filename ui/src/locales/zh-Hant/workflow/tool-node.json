@@ -3,29 +3,29 @@
     "outputLabel": "參數輸出"
   },
   "mcp": {
-    "label": "MCP 呼叫",
-    "description": "透過 SSE／Streamable HTTP 執行 MCP 服務中的工具",
+    "label": "MCP 調用",
+    "description": "通過 SSE/Streamable HTTP 方式執行MCP服務中的工具",
     "serverConfig": {
       "label": "MCP Server Config",
-      "requiredMessage": "請先設定 MCP Server"
+      "requiredMessage": "請先配置 MCP Server"
     },
     "reference": {
       "requiredMessage": "請先選擇引用的 MCP 工具"
     },
     "tools": {
-      "loadSuccess": "取得工具成功",
-      "loadFailed": "取得工具失敗，請檢查 MCP Server 設定"
+      "loadSuccess": "獲取工具成功",
+      "loadFailed": "獲取工具失敗，請檢查 MCP Server 配置"
     },
     "parameters": {
       "label": "工具參數"
     },
     "variables": {
-      "title": "設定變量"
+      "title": "設置變量"
     }
   },
   "customTool": {
-    "label": "自訂工具",
-    "description": "透過執行自訂腳本處理資料"
+    "label": "自定義工具",
+    "description": "通過執行自定義腳本，實現數據處理"
   },
   "tool": {
     "label": "工具節點"

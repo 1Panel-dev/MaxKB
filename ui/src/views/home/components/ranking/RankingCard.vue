@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { HomeRankingKind, HomeRankingRecord } from '@/api/types'
 import { formatTokenNumber, numberFormat } from '@/utils/number'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   title: string
@@ -28,7 +31,7 @@ function getRecordPercentage(record: HomeRankingRecord) {
       <h4>{{ title }}</h4>
       <!-- 查看排行榜详情 -->
       <el-button text :disabled="loading" class="-mr-1" @click="$emit('detail')">
-        <span>详情</span>
+        <span>{{ t('common.labels.details') }}</span>
         <MkIcon name="icon_right_outlined" />
       </el-button>
     </div>

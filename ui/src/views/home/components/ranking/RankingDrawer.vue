@@ -2,11 +2,14 @@
 import { onMounted, ref } from 'vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type HomepageApi from '@/api/admin/workspace/homepage'
 import type { HomeDateRange, HomeRankingKind, HomeRankingRecord } from '@/api/types'
 import type { MkDateRangeValue } from '@/components/global/mk-date-range/types'
 import { formatTokenNumber, numberFormat } from '@/utils/number'
 import perm from '@/permission'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const route = useRoute()
 const isSystemHome = computed(() => route.meta.scope === 'system')
@@ -88,11 +91,11 @@ function handleExport() {
 onMounted(() => loadRanking())
 </script>
 <template>
-  <MkDrawer v-model="visible" title="排行榜详情" class="mk-drawer-with-tabs" contentClass="pt-0" size="1000">
+  <MkDrawer v-model="visible" :title="t('overview.ranking.detailTitle')" class="mk-drawer-with-tabs" contentClass="pt-0" size="1000">
     <el-tabs v-model="activeKind" @tab-change="handleTabChange">
-      <el-tab-pane name="tokens" label="Tokens 消耗 · Top 智能体" />
-      <el-tab-pane name="questions" label="对话次数 · Top 智能体" />
-      <el-tab-pane name="userTokens" label="Tokens 消耗 · Top 用户" />
+      <el-tab-pane name="tokens" :label="t('overview.ranking.agentTokens')" />
+      <el-tab-pane name="questions" :label="t('overview.ranking.agentConversations')" />
+      <el-tab-pane name="userTokens" :label="t('overview.ranking.userTokens')" />
     </el-tabs>
     <div class="mt-6 mb-4 flex-between">
       <div class="flex gap-3">
@@ -102,12 +105,12 @@ onMounted(() => loadRanking())
       <!-- 导出当前筛选下的完整排行榜 -->
       <el-button v-if="canExport" plain :loading="exporting" :disabled="loading" @click="handleExport">
         <MkIcon name="icon_export_outlined" />
-        <span>导出</span>
+        <span>{{ t('common.actions.export') }}</span>
       </el-button>
     </div>
 
     <MkTable v-loading="loading" v-model:pagination-config="pagination" :data="records" @current-change="loadRanking" @size-change="handleSearch">
-      <el-table-column label="排名" width="60">
+      <el-table-column :label="t('overview.ranking.rank')" width="60">
         <template #default="{ $index }">
           <span
             class="mk-rank shrink-0"
@@ -121,31 +124,36 @@ onMounted(() => loadRanking())
           </span>
         </template>
       </el-table-column>
-      <el-table-column v-if="activeKind === 'userTokens'" label="用户" min-width="140" show-overflow-tooltip>
+      <el-table-column v-if="activeKind === 'userTokens'" :label="t('overview.ranking.user')" min-width="140" show-overflow-tooltip>
         <template #default="{ row }">{{ row.asker?.username || '-' }}</template>
       </el-table-column>
-      <el-table-column v-if="activeKind === 'tokens' || activeKind === 'questions'" label="智能体名称" min-width="150" show-overflow-tooltip>
+      <el-table-column
+        v-if="activeKind === 'tokens' || activeKind === 'questions'"
+        :label="t('overview.ranking.applicationName')"
+        min-width="150"
+        show-overflow-tooltip
+      >
         <template #default="{ row }">{{ row.name || '-' }}</template>
       </el-table-column>
 
-      <el-table-column v-if="activeKind === 'tokens' || activeKind === 'userTokens'" label="Tokens 消耗" min-width="125">
+      <el-table-column v-if="activeKind === 'tokens' || activeKind === 'userTokens'" :label="t('overview.ranking.tokenUsage')" min-width="125">
         <template #default="{ row }">{{ formatTokenNumber(row.total_tokens ?? 0) }}</template>
       </el-table-column>
-      <el-table-column label="对话次数" min-width="100">
+      <el-table-column :label="t('overview.monitoring.conversations')" min-width="100">
         <template #default="{ row }">{{ numberFormat(row.chat_record_count) }}</template>
       </el-table-column>
-      <el-table-column label="占比" min-width="150">
+      <el-table-column :label="t('overview.ranking.percentage')" min-width="150">
         <template #default="{ row }">
           <el-progress :percentage="getRankingRatio(getRankingValue(activeKind, row), aggregateTotal)" />
         </template>
       </el-table-column>
-      <el-table-column v-if="activeKind === 'tokens' || activeKind === 'questions'" label="活跃用户" min-width="100">
+      <el-table-column v-if="activeKind === 'tokens' || activeKind === 'questions'" :label="t('overview.monitoring.activeUsers')" min-width="100">
         <template #default="{ row }">{{ numberFormat(row.chat_user_count) }}</template>
       </el-table-column>
-      <el-table-column v-if="activeKind === 'questions'" label="人均对话轮次" min-width="135">
+      <el-table-column v-if="activeKind === 'questions'" :label="t('overview.ranking.roundsPerUser')" min-width="135">
         <template #default="{ row }">{{ numberFormat(getRankingAverage('questions', row)) }}</template>
       </el-table-column>
-      <el-table-column v-if="activeKind === 'tokens' || activeKind === 'userTokens'" label="均 Tokens/轮" min-width="105">
+      <el-table-column v-if="activeKind === 'tokens' || activeKind === 'userTokens'" :label="t('overview.ranking.tokensPerRound')" min-width="135">
         <template #default="{ row }">{{ formatTokenNumber(getRankingAverage(activeKind, row)) }}</template>
       </el-table-column>
     </MkTable>
