@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DisplaySettingDialog from './DisplaySettingDialog.vue'
 import XpackDisplaySettingDialog from './XpackDisplaySettingDialog.vue'
 import { useStore } from '@/stores/admin'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ButtonDisplaySetting' })
 
@@ -19,7 +22,7 @@ function handleOpenDisplaySetting() {
   <!-- 设置对话显示 -->
   <el-button plain @click="handleOpenDisplaySetting">
     <MkIcon name="icon_setting" />
-    <span>显示设置</span>
+    <span>{{ t('application.overview.display.title') }}</span>
   </el-button>
   <component :is="displaySettingDialog" ref="dialogRef" />
 </template>

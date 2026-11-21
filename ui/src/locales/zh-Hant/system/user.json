@@ -1,13 +1,13 @@
 {
-  "title": "使用者管理",
-  "createTitle": "建立使用者",
-  "editTitle": "編輯使用者",
-  "placeholder": "請選擇使用者名稱或姓名",
+  "title": "用戶管理",
+  "createTitle": "創建用戶",
+  "editTitle": "編輯用戶",
+  "placeholder": "請選擇用戶名或姓名",
   "username": {
-    "label": "使用者名稱",
-    "placeholder": "請輸入使用者名稱",
-    "requiredMessage": "請輸入使用者名稱",
-    "existsMessage": "使用者名稱已存在"
+    "label": "用戶名",
+    "placeholder": "請輸入用戶名",
+    "requiredMessage": "請輸入用戶名",
+    "existsMessage": "用戶名已存在"
   },
   "name": {
     "label": "姓名",
@@ -16,23 +16,23 @@
     "existsMessage": "姓名已存在"
   },
   "email": {
-    "label": "電子郵件",
-    "placeholder": "請輸入電子郵件地址",
-    "requiredMessage": "請輸入電子郵件地址",
-    "invalidMessage": "請輸入有效的電子郵件地址",
-    "existsMessage": "電子郵件已存在"
+    "label": "郵箱",
+    "placeholder": "請輸入郵箱",
+    "requiredMessage": "請輸入郵箱",
+    "invalidMessage": "請輸入正確的郵箱",
+    "existsMessage": "郵箱已存在"
   },
   "phone": {
-    "label": "手機號碼",
-    "placeholder": "請輸入手機號碼",
-    "invalidMessage": "請輸入有效的手機號碼"
+    "label": "手機號",
+    "placeholder": "請輸入手機號",
+    "invalidMessage": "請輸入正確的手機號"
   },
   "password": {
     "label": "新密碼",
     "placeholder": "請輸入新密碼",
     "requiredMessage": "請輸入新密碼",
-    "defaultLabel": "預設密碼",
-    "changeTitle": "修改使用者密碼",
+    "defaultLabel": "默認密碼",
+    "changeTitle": "修改用戶密碼",
     "changeSuccess": "密碼修改成功"
   },
   "confirmPassword": {
@@ -45,38 +45,38 @@
     "label": "角色",
     "placeholder": "請選擇角色",
     "requiredMessage": "請選擇角色",
-    "settingsTitle": "角色設定",
-    "add": "新增角色",
-    "set": "設定角色"
+    "settingsTitle": "角色設置",
+    "add": "添加角色",
+    "set": "設置角色"
   },
   "workspace": {
     "placeholder": "請選擇工作空間",
     "requiredMessage": "請選擇工作空間"
   },
   "assignment": {
-    "label": "設定方式",
+    "label": "設置方式",
     "append": "追加",
     "replace": "替換"
   },
   "source": {
-    "label": "使用者來源",
-    "placeholder": "請選擇使用者來源",
-    "requiredMessage": "請選擇使用者來源",
-    "local": "系統使用者",
-    "localFile": "本機檔案"
+    "label": "用戶來源",
+    "placeholder": "請選擇用戶來源",
+    "requiredMessage": "請選擇用戶來源",
+    "local": "系統用戶",
+    "localFile": "本地文件"
   },
   "import": {
-    "title": "匯入使用者",
-    "onlyNewHint": "僅匯入新增使用者",
-    "downloadTemplate": "下載範本",
-    "formatMessage": "僅支援上傳 xlsx 格式的檔案",
-    "successMessage": "成功匯入 {count} 位使用者",
-    "skippedMessage": "略過 {count} 位使用者",
+    "title": "導入用戶",
+    "onlyNewHint": "僅導入新增用戶",
+    "downloadTemplate": "下載模板",
+    "formatMessage": "僅支持上傳 xlsx 格式的文件",
+    "successMessage": "成功導入 {count} 個用戶",
+    "skippedMessage": "跳過 {count} 個用戶",
     "conflictMessage": "{type} 衝突"
   },
   "delete": {
-    "title": "是否刪除使用者：{name}？",
-    "batchTitle": "是否刪除選取的{count}個使用者？",
-    "description": "刪除使用者不會刪除該使用者建立的資源（智慧體、知識庫、模型），請謹慎操作。"
+    "title": "是否刪除用戶：{name}？",
+    "batchTitle": "是否刪除選中的{count}個用戶？",
+    "description": "刪除用戶，該用戶創建的資源（智能體、知識庫、模型）不會刪除，請謹慎操作。"
   }
 }

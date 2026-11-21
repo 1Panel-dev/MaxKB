@@ -1,20 +1,20 @@
 {
-  "title": "對話使用者",
-  "requiredMessage": "請選擇對話使用者",
+  "title": "對話用戶",
+  "requiredMessage": "請選擇對話用戶",
   "source": {
-    "local": "本機建立"
+    "local": "本地創建"
   },
   "import": {
-    "description": "從已設定的使用者來源同步對話使用者，已存在的使用者名稱或姓名不會重複匯入。"
+    "description": "從已配置的用戶來源同步對話用戶，已存在的用戶名或姓名不會重復導入。"
   },
   "quota": {
-    "title": "配額設定",
-    "saveSuccess": "配額設定成功",
+    "title": "配額設置",
+    "saveSuccess": "配額設置成功",
     "usage": "Tokens使用量/總量",
     "expiresAt": "Tokens到期時間",
     "unlimited": "不限",
     "method": {
-      "label": "設定方式",
+      "label": "設置方式",
       "unlimited": "不限額",
       "periodic": "按週期限制"
     },

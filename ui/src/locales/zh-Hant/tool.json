@@ -1,16 +1,16 @@
 {
   "title": "工具",
-  "createTitle": "建立工具",
+  "createTitle": "創建工具",
   "editTitle": "編輯工具",
   "duplicateTitle": "複製工具",
   "categories": {
     "all": "全部工具",
-    "shared": "共用工具"
+    "shared": "共享工具"
   },
   "source": {
     "label": "來源",
     "reference": "引用參數",
-    "custom": "自訂"
+    "custom": "自定義"
   },
   "fields": {
     "name": {
@@ -23,7 +23,7 @@
   },
   "skill": {
     "label": "Skills",
-    "createTitle": "建立 Skill",
+    "createTitle": "創建 Skill",
     "editTitle": "編輯 Skill",
     "duplicateTitle": "複製 Skill",
     "name": {
@@ -31,40 +31,40 @@
       "requiredMessage": "請輸入 Skill 名稱"
     },
     "file": {
-      "label": "Skill 檔案",
-      "description": "支援 ZIP 檔案，大小須小於 {size} MB",
-      "requiredMessage": "請上傳 Skill ZIP 檔案",
-      "sizeLimitMessage": "檔案大小須小於 {size} MB"
+      "label": "Skill 文件",
+      "description": "支持 ZIP 文件，大小須小於 {size} MB",
+      "requiredMessage": "請上傳 Skill ZIP 文件",
+      "sizeLimitMessage": "文件大小須小於 {size} MB"
     }
   },
   "workflow": {
-    "label": "工作流程",
-    "createTitle": "建立工作流程",
-    "editTitle": "編輯工作流程",
-    "duplicateTitle": "複製工作流程",
+    "label": "工作流",
+    "createTitle": "創建工作流",
+    "editTitle": "編輯工作流",
+    "duplicateTitle": "複製工作流",
     "name": {
-      "placeholder": "請輸入工作流程名稱",
-      "requiredMessage": "請輸入工作流程名稱"
+      "placeholder": "請輸入工作流名稱",
+      "requiredMessage": "請輸入工作流名稱"
     }
   },
   "mcp": {
     "label": "MCP",
-    "createTitle": "建立 MCP",
+    "createTitle": "創建 MCP",
     "editTitle": "編輯 MCP",
     "duplicateTitle": "複製 MCP",
     "serviceTitle": "MCP 服務",
-    "settingsTitle": "MCP 設定",
+    "settingsTitle": "MCP 設置",
     "reference": "引用 MCP",
-    "customService": "自訂 MCP 服務",
+    "customService": "自定義 MCP 服務",
     "name": {
       "placeholder": "請輸入 MCP 名稱",
       "requiredMessage": "請輸入 MCP 名稱"
     },
     "config": {
-      "description": "僅支援 SSE 和 Streamable HTTP 連線方式",
-      "requiredMessage": "請輸入 MCP 服務設定",
-      "invalidMessage": "請輸入有效的 JSON 物件作為 MCP 服務設定",
-      "invalidJsonMessage": "MCP 服務設定必須是有效的 JSON"
+      "description": "僅支持 SSE、Streamable HTTP 調用方式",
+      "requiredMessage": "請輸入 MCP 服務配置",
+      "invalidMessage": "請輸入有效的 JSON 對象作為 MCP 服務配置",
+      "invalidJsonMessage": "MCP 服務配置必須是合法的 JSON"
     },
     "tools": {
       "label": "MCP 工具",
@@ -73,34 +73,34 @@
     }
   },
   "dataSource": {
-    "createTitle": "建立資料來源",
-    "editTitle": "編輯資料來源",
-    "duplicateTitle": "複製資料來源",
+    "createTitle": "創建數據源",
+    "editTitle": "編輯數據源",
+    "duplicateTitle": "複製數據源",
     "name": {
-      "placeholder": "請輸入資料來源名稱",
-      "requiredMessage": "請輸入資料來源名稱"
+      "placeholder": "請輸入數據源名稱",
+      "requiredMessage": "請輸入數據源名稱"
     },
     "code": {
-      "requiredMessage": "請輸入資料來源內容"
+      "requiredMessage": "請輸入數據源內容"
     }
   },
   "store": {
     "title": "工具商店",
     "categories": {
-      "webSearch": "網路搜尋",
-      "databaseSearch": "資料庫查詢",
+      "webSearch": "聯網搜索",
+      "databaseSearch": "數據庫查詢",
       "other": "其他"
     },
     "searchResults": "找到 {count} 個相關工具",
-    "apply": "套用",
-    "addTitle": "新增工具"
+    "apply": "應用",
+    "addTitle": "添加工具"
   },
   "help": {
     "shownWhenUsed": "使用工具時顯示",
     "hiddenWhenUsed": "使用工具時不顯示"
   },
   "initParams": {
-    "title": "啟動參數"
+    "title": "啓動參數"
   },
   "inputParams": {
     "title": "輸入參數",
@@ -110,7 +110,7 @@
       "requiredMessage": "請輸入參數名稱"
     },
     "dataType": {
-      "label": "資料類型"
+      "label": "數據類型"
     },
     "description": {
       "label": "參數說明",
@@ -124,41 +124,41 @@
   "pythonCode": {
     "title": "工具內容（Python）",
     "generate": {
-      "title": "產生 Python 程式碼",
+      "title": "生成 Python 代碼",
       "placeholder": "請描述這個工具的功能",
-      "empty": "Python 程式碼會顯示在這裡"
+      "empty": "Python 代碼顯示在這裡"
     }
   },
   "debug": {
-    "run": "執行",
-    "resultTitle": "執行結果",
-    "runSuccess": "執行成功",
-    "runFailed": "執行失敗",
+    "run": "運行",
+    "resultTitle": "運行結果",
+    "runSuccess": "運行成功",
+    "runFailed": "運行失敗",
     "output": "輸出",
-    "failureMessage": "工具執行失敗",
-    "debugResultTitle": "除錯結果",
+    "failureMessage": "工具運行失敗",
+    "debugResultTitle": "調試結果",
     "answering": "回答中",
-    "requestFailedMessage": "除錯請求失敗（{status}）",
-    "noResponseMessage": "未收到除錯回應",
-    "failedMessage": "除錯失敗"
+    "requestFailedMessage": "調試請求失敗（{status}）",
+    "noResponseMessage": "未收到調試響應",
+    "failedMessage": "調試失敗"
   },
   "delete": {
     "title": "是否刪除工具：{name}？",
-    "description": "此工具已被 {count} 個資源引用，刪除後這些資源將無法正常執行，請謹慎操作。",
-    "batchTitle": "是否刪除選取的{count}個工具？"
+    "description": "該工具已被 {count} 個資源引用，刪除後相關資源將無法正常運行，請謹慎操作。",
+    "batchTitle": "是否刪除選中的{count}個工具？"
   },
   "disable": {
-    "title": "確定停用工具",
-    "description": "停用後，使用此工具的資源將無法正常執行。"
+    "title": "是否禁用工具",
+    "description": "禁用後，引用了該工具的資源執行會報錯，請謹慎操作。"
   },
   "messages": {
-    "publishBeforeEnabling": "無法啟用，請先發佈工作流程",
-    "createUnsupported": "資源管理不支援建立工具"
+    "publishBeforeEnabling": "無法啓用，請先發佈工作流",
+    "createUnsupported": "資源管理不支持創建工具"
   },
   "updateVersion": {
     "action": "更新版本",
     "title": "是否更新工具：{name}？",
-    "description": "更新工具可能會影響正在使用此工具的資源，請謹慎操作。",
+    "description": "更新工具可能會影響正在使用的資源，請謹慎操作。",
     "success": "更新成功"
   }
 }

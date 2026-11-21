@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDetail } from '@/api/types'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import HomepageApi from '@/api/admin/workspace/homepage'
@@ -9,6 +10,8 @@ import HomeResourceOverview from './components/HomeResourceOverview.vue'
 import HomeStatistics from './components/HomeStatistics.vue'
 import HomeRankings from './components/ranking/HomeRankings.vue'
 import perm from '@/permission'
+const { t } = useI18n({ useScope: 'global' })
+
 const route = useRoute()
 const workspaceId = computed(() => String(route.params.workspaceId))
 
@@ -41,7 +44,7 @@ onMounted(() => {
     <!-- 快捷创建 -->
     <HomeQuickCreate :workspace-id="workspaceId" />
     <!-- 资源 -->
-    <h4 class="mb-4 mt-4">资源</h4>
+    <h4 class="mb-4 mt-4">{{ t('overview.resources.title') }}</h4>
     <HomeResourceOverview :api="HomepageApi" :workspace-id="workspaceId" />
     <!-- 监控 -->
     <HomeStatistics class="mt-4" :workspace-id="workspaceId" :application-id="applicationId" :api="HomepageApi">
@@ -60,10 +63,10 @@ onMounted(() => {
           :disabled="loading"
           @change="handleApplicationChange"
         >
-          <el-option label="全部智能体" value="all">
+          <el-option :label="t('application.categories.all')" value="all">
             <div class="flex-align-center gap-2">
               <MkIcon name="icon_card_outlined" :size="20" class="shrink-0 text-N600" />
-              <span>全部智能体</span>
+              <span>{{ t('application.categories.all') }}</span>
             </div>
           </el-option>
           <template v-for="application in applicationsList" :key="application.id">

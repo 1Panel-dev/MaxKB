@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationAccessToken } from '@/api/types'
 import AccessRestrictionDrawer from './AccessRestrictionDrawer.vue'
 
 defineProps<{ accessTokenConfig?: ApplicationAccessToken }>()
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ButtonAccessRestriction' })
 
@@ -20,7 +23,7 @@ function handleOpenAccessRestriction() {
   <!-- 设置访问限制 -->
   <el-button plain @click="handleOpenAccessRestriction">
     <MkIcon name="icon-lock" />
-    <span>访问限制</span>
+    <span>{{ t('application.overview.accessRestriction.title') }}</span>
   </el-button>
   <AccessRestrictionDrawer
     v-if="drawerVisible"

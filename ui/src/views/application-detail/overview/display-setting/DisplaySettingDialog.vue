@@ -1,20 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationDisplaySetting } from '@/api/types'
 import { useApplicationDetailContext } from '../../context'
+import { LOCALE_OPTIONS } from '@/locales/config'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DisplaySettingDialog' })
 
+const { t } = useI18n({ useScope: 'global' })
+
 const { applicationId, resourceApi } = useApplicationDetailContext()
 // 社区版仅编辑语言、知识来源与执行详情。
 type DisplaySettingForm = Pick<ApplicationDisplaySetting, 'language' | 'show_source' | 'show_exec'>
-
-const languageOptions = [
-  { value: 'zh-CN', label: '简体中文' },
-  { value: 'zh-Hant', label: '繁體中文' },
-  { value: 'en-US', label: 'English' },
-]
 
 // 打开时查询本次配置，关闭动画结束后统一清理草稿。
 const visible = ref(false)
@@ -61,7 +59,7 @@ function handleSave() {
   return resourceApi.application
     .putAccessToken(applicationId.value, displayForm.value)
     .then(() => {
-      MsgSuccess('设置成功')
+      MsgSuccess(t('common.messages.settingsSuccess'))
       visible.value = false
     })
     .finally(() => {
@@ -73,25 +71,25 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="显示设置" @closed="handleClosed">
+  <MkDialog v-model="visible" :title="t('application.overview.display.title')" @closed="handleClosed">
     <div v-loading="loading">
       <el-form :model="displayForm" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item label="语言">
-          <el-select v-model="displayForm.language" clearable placeholder="请选择">
-            <el-option v-for="language in languageOptions" :key="language.value" :label="language.label" :value="language.value" />
+        <el-form-item :label="t('application.overview.display.language')">
+          <el-select v-model="displayForm.language" clearable :placeholder="t('common.placeholders.select')">
+            <el-option v-for="language in LOCALE_OPTIONS" :key="language.value" :label="language.label" :value="language.value" />
           </el-select>
         </el-form-item>
         <div class="flex-column gap-3">
-          <el-checkbox v-model="displayForm.show_source">显示知识来源</el-checkbox>
-          <el-checkbox v-model="displayForm.show_exec">显示执行详情</el-checkbox>
+          <el-checkbox v-model="displayForm.show_source">{{ t('application.overview.display.showSource') }}</el-checkbox>
+          <el-checkbox v-model="displayForm.show_exec">{{ t('application.overview.display.showExecution') }}</el-checkbox>
         </div>
       </el-form>
     </div>
     <template #footer>
       <!-- 取消展示设置 -->
-      <el-button plain :disabled="loading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存社区版展示设置 -->
-      <el-button type="primary" :loading="loading" @click="handleSave">保存</el-button>
+      <el-button type="primary" :loading="loading" @click="handleSave">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

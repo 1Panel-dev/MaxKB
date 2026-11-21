@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type HomepageApi from '@/api/admin/workspace/homepage'
 import type { HomeRankingKind, HomeRankingRecord } from '@/api/types'
 import type { MkDateRangeValue } from '@/components/global/mk-date-range/types'
@@ -7,6 +8,8 @@ import RankingCard from './RankingCard.vue'
 import RankingDrawer from './RankingDrawer.vue'
 import { formatTokenNumber, numberFormat } from '@/utils/number'
 import { beforeDay } from '@/utils/time'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ workspaceId: string; api: typeof HomepageApi }>()
 
@@ -90,12 +93,12 @@ onMounted(loadRankings)
 <template>
   <section>
     <div class="flex-between mb-4">
-      <h4>排行榜 TOP5</h4>
+      <h4>{{ t('overview.ranking.title') }} TOP5</h4>
       <MkDateRange @change="handleRangeChange" />
     </div>
     <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
       <RankingCard
-        title="Tokens 消耗 · Top 智能体"
+        :title="t('overview.ranking.agentTokens')"
         :records="rankings.tokens"
         :loading="loading"
         kind="tokens"
@@ -103,13 +106,13 @@ onMounted(loadRankings)
         @detail="handleOpenRanking('tokens')"
       >
         <template #description="{ record }">
-          <span>对话 {{ numberFormat(record.chat_record_count) }} 次</span>
+          <span>{{ t('overview.ranking.conversationCount', { count: numberFormat(record.chat_record_count) }) }}</span>
           <el-divider direction="vertical" />
-          <span>均 {{ formatTokenNumber(getRankingAverage('tokens', record)) }} Tokens</span>
+          <span>{{ t('overview.ranking.averageTokens', { count: formatTokenNumber(getRankingAverage('tokens', record)) }) }}</span>
         </template>
       </RankingCard>
       <RankingCard
-        title="对话次数 · Top 智能体"
+        :title="t('overview.ranking.agentConversations')"
         :records="rankings.questions"
         :loading="loading"
         kind="questions"
@@ -117,20 +120,22 @@ onMounted(loadRankings)
         @detail="handleOpenRanking('questions')"
       >
         <template #description="{ record }">
-          <span>活跃用户 {{ numberFormat(record.chat_user_count) }}</span>
+          <span>{{ t('overview.monitoring.activeUsers') }} {{ numberFormat(record.chat_user_count) }}</span>
           <el-divider direction="vertical" />
-          <span>均 {{ numberFormat(getRankingAverage('questions', record)) }} 轮/人</span>
+          <span>{{ t('overview.ranking.averageRounds', { count: numberFormat(getRankingAverage('questions', record)) }) }}</span>
         </template>
       </RankingCard>
       <RankingCard
-        title="Tokens 消耗 · Top 用户"
+        :title="t('overview.ranking.userTokens')"
         :records="rankings.userTokens"
         :loading="loading"
         kind="userTokens"
         :total="tokenTotal"
         @detail="handleOpenRanking('userTokens')"
       >
-        <template #description="{ record }">对话 {{ numberFormat(record.chat_record_count) }} 次</template>
+        <template #description="{ record }">
+          {{ t('overview.ranking.conversationCount', { count: numberFormat(record.chat_record_count) }) }}
+        </template>
       </RankingCard>
     </div>
     <RankingDrawer

@@ -1,17 +1,17 @@
 {
   "loop": {
     "label": "循環節點",
-    "description": "設定循環次數與邏輯，重複執行一系列任務",
+    "description": "通過設置循環次數和邏輯，重復執行一系列任務",
     "type": {
       "label": "循環類型",
       "requiredMessage": "請選擇循環類型",
-      "array": "陣列循環",
+      "array": "數組循環",
       "number": "次數循環",
       "infinite": "無限循環"
     },
-    "array": "循環陣列",
+    "array": "循環數組",
     "number": "循環次數",
-    "settings": "循環設定",
+    "settings": "循環設置",
     "details": "循環詳情",
     "validation": {
       "breakRequired": "循環節點需要包含 Break 節點"
@@ -19,15 +19,15 @@
   },
   "loopStart": {
     "label": "循環開始",
-    "index": "索引",
+    "index": "下標",
     "item": "循環元素",
     "currentItem": "循環項",
     "currentIndex": "循環下標",
     "copyParameter": "複製參數",
     "variables": {
       "label": "循環變量",
-      "reservedMessage": "此參數為循環引擎內建，不可使用",
-      "invalidMessage": "參數只能包含英文字母、數字、底線"
+      "reservedMessage": "此參數為循環引擎內置，不可使用",
+      "invalidMessage": "參數只能包含英文字母、數字、下划線"
     }
   },
   "loopBody": {
@@ -35,12 +35,12 @@
   },
   "loopContinue": {
     "label": "Continue",
-    "description": "結束目前這一輪循環，執行下一輪",
+    "description": "用於終止當前循環，執行下次循環",
     "isContinue": "是否繼續"
   },
   "loopBreak": {
     "label": "Break",
-    "description": "終止目前循環並離開循環體",
-    "isBreak": "是否離開"
+    "description": "終止當前循環，跳出循環體",
+    "isBreak": "是否退出"
   }
 }

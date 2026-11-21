@@ -1,0 +1,45 @@
+{
+  "resources": {
+    "title": "资源",
+    "llm": "大语言",
+    "embedding": "向量"
+  },
+  "quickCreate": {
+    "title": "快捷创建",
+    "applicationTitle": "创建智能体",
+    "applicationDescription": "手动搭建、AI 生成或导入创建",
+    "knowledgeTitle": "创建知识库",
+    "knowledgeDescription": "从本地文档、web网站等多来源创建",
+    "toolDescription": "创建或接入脚本、工作流、MCP 等工具",
+    "modelDescription": "配置大语言、向量等模型"
+  },
+  "monitoring": {
+    "title": "监控",
+    "activeUsers": "活跃用户",
+    "newUsers": "新增用户",
+    "conversations": "对话次数",
+    "totalTokens": "Tokens 总数",
+    "satisfaction": "用户满意度",
+    "approval": "赞同",
+    "disapproval": "反对"
+  },
+  "ranking": {
+    "title": "排行榜",
+    "detailTitle": "排行榜详情",
+    "agentTokens": "Tokens 消耗 · Top 智能体",
+    "agentConversations": "对话次数 · Top 智能体",
+    "userTokens": "Tokens 消耗 · Top 用户",
+    "conversationCount": "对话 {count} 次",
+    "averageTokens": "均 {count} Tokens",
+    "averageRounds": "均 {count} 轮/人",
+    "rank": "排名",
+    "user": "用户",
+    "applicationName": "智能体名称",
+    "tokenUsage": "Tokens 消耗",
+    "percentage": "占比",
+    "roundsPerUser": "人均对话轮次",
+    "tokensPerRound": "均 Tokens/轮",
+    "userConversations": "对话次数 · Top 用户",
+    "tokensPerChat": "均 Tokens/次"
+  }
+}

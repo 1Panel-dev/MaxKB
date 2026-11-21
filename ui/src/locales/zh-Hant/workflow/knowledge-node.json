@@ -1,7 +1,7 @@
 {
   "searchKnowledge": {
     "label": "知識庫檢索",
-    "description": "關聯知識庫，尋找與問題相關的分段",
+    "description": "關聯知識庫，查找與問題相關的分段",
     "image": {
       "label": "檢索圖片",
       "placeholder": "請選擇檢索圖片"
@@ -12,26 +12,26 @@
     "directAnswerContent": "滿足直接回答的分段內容"
   },
   "searchDocument": {
-    "label": "文件標籤檢索",
-    "description": "在設定的檢索範圍內，根據文件標籤檢索符合條件的文件",
+    "label": "文檔標籤檢索",
+    "description": "從設定的檢索範圍中，根據文檔標籤檢索出滿足條件的文檔",
     "searchMode": {
-      "label": "檢索設定",
+      "label": "檢索設置",
       "auto": "自動",
-      "autoDescription": "根據檢索問題自動比對文件標籤",
+      "autoDescription": "根據檢索問題自動匹配文檔標籤",
       "manual": "手動",
-      "manualDescription": "手動設定標籤篩選條件"
+      "manualDescription": "手動設置標籤過濾條件"
     },
     "value": {
       "placeholder": "值或變量"
     },
     "knowledgeList": "知識庫列表",
-    "documentList": "文件列表"
+    "documentList": "文檔列表"
   },
   "documentExtract": {
-    "label": "文件內容提取",
-    "description": "解析輸入文件，輸出結構化文件內容",
-    "content": "文件內容",
-    "documentList": "文件列表"
+    "label": "文檔內容提取",
+    "description": "解析輸入文檔，輸出結構化文檔內容",
+    "content": "文檔內容",
+    "documentList": "文檔列表"
   },
   "reranker": {
     "label": "多路召回",
@@ -48,11 +48,11 @@
     "resultList": "重排結果列表",
     "result": "重排結果",
     "directAnswerSegments": "滿足直接回答的分段列表",
-    "maxReferenceCharacters": "最大引用字元數"
+    "maxReferenceCharacters": "最大引用字符數"
   },
   "documentSplit": {
-    "label": "文件分段",
-    "description": "按分段策略拆分輸入文件內容，輸出分段文字列表",
+    "label": "文檔分段",
+    "description": "按分段策略拆分輸入文檔內容，輸出分段文本列表",
     "strategy": {
       "label": "分段策略",
       "placeholder": "請選擇分段策略",
@@ -61,40 +61,40 @@
     "childChunkLength": {
       "label": "子分塊長度",
       "description": "核心目標是平衡檢索精度與召回效率",
-      "tooShortHint": "避免過短拆分：單塊＜50 字易導致語意碎片化，檢索時可能因缺少上下文無法符合查詢意圖",
-      "tooLongHint": "避免過長拆分：單塊＞500 字會增加冗餘資訊，降低檢索精準度，且占用更多儲存和運算資源"
+      "tooShortHint": "避免過短拆分：單塊＜50 字易導致語義碎片化，檢索時可能因缺少上下文無法匹配查詢意圖",
+      "tooLongHint": "避免過長拆分：單塊＞500 字會增加冗余信息，降低檢索精准度，且佔用更多存儲和計算資源"
     },
-    "titleAsQuestion": "將分段標題設為分段的關聯問題",
-    "documentNameAsQuestion": "將文件名稱設為分段的關聯問題",
+    "titleAsQuestion": "分段標題設置為分段的關聯問題",
+    "documentNameAsQuestion": "文檔名稱設置為分段的關聯問題",
     "segmentList": "分段列表"
   },
   "localFile": {
-    "label": "本機檔案",
-    "description": "上傳本機文件並輸出文件列表（不解析內容，需搭配「文件內容提取」節點解析）",
+    "label": "本地文件",
+    "description": "上傳本地文檔，輸出文檔列表（不解析內容，需配合 “文檔內容提取” 節點解析）",
     "format": {
-      "label": "檔案格式",
-      "placeholder": "請選擇檔案格式",
-      "requiredMessage": "請選擇檔案格式"
+      "label": "文件格式",
+      "placeholder": "請選擇文件格式",
+      "requiredMessage": "請選擇文件格式"
     },
     "fileCount": {
-      "label": "最多上傳檔案數",
-      "rangeMessage": "請輸入 {min}–{max} 的檔案數量"
+      "label": "最多上傳文件數",
+      "rangeMessage": "請輸入 {min}–{max} 的文件數量"
     },
     "fileSize": {
-      "label": "單一檔案大小上限",
-      "rangeMessage": "請輸入 {min}–{max} MB 的檔案大小"
+      "label": "單個文件大小上限",
+      "rangeMessage": "請輸入 {min}–{max} MB 的文件大小"
     },
-    "fileList": "檔案列表"
+    "fileList": "文件列表"
   },
   "webSource": {
     "label": "Web 站點",
-    "description": "輸入根網址自動擷取 Web 資料（每個連結對應一份文件），輸出包含內容的文件列表",
-    "noConfiguration": "暫無設定項目",
-    "documentList": "文件列表"
+    "description": "輸入根地址自動抓取 Web 數據（單鏈接對應單文檔），輸出含內容的文檔列表",
+    "noConfiguration": "暫無配置項",
+    "documentList": "文檔列表"
   },
   "knowledgeWrite": {
     "label": "知識庫寫入",
-    "description": "將輸入的分段列表寫入目前知識庫，並完成向量化處理",
+    "description": "將輸入的分段列表寫入當前知識庫，並完成向量化處理",
     "content": "寫入內容"
   }
 }

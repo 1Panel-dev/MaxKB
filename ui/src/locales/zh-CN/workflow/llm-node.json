@@ -1,6 +1,5 @@
 {
   "llm": {
-    "label": "LLM",
     "description": "单次调用大模型，可传入工具定义并输出工具调用",
     "context": {
       "label": "上下文",

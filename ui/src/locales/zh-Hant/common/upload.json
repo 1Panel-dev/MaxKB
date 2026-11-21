@@ -1,33 +1,33 @@
 {
-  "dropHint": "將檔案拖曳到此處。",
-  "selectFile": "選擇檔案上傳",
-  "selectFiles": "選擇檔案",
-  "selectFolder": "選擇資料夾",
-  "replaceFile": "更換檔案",
+  "dropHint": "將文件拖至此區域。",
+  "selectFile": "選擇文件上傳",
+  "selectFiles": "選擇文件",
+  "selectFolder": "選擇文件夾",
+  "replaceFile": "更換文件",
   "retryUpload": "重新上傳",
-  "limits": "每次最多上傳 {count} 個檔案，每個檔案不超過 {size} MB",
-  "formats": "支援格式",
+  "limits": "每次最多上傳 {count} 個文件，每個文件不超過 {size} MB",
+  "formats": "支持格式",
   "types": {
-    "document": "文件",
+    "document": "文檔",
     "image": "圖片",
-    "audio": "音訊",
-    "video": "影片",
-    "other": "其他檔案"
+    "audio": "音頻",
+    "video": "視頻",
+    "other": "其他文件"
   },
   "extension": {
-    "add": "新增副檔名",
-    "duplicateMessage": "副檔名已存在"
+    "add": "添加後綴名",
+    "duplicateMessage": "文件後綴已存在"
   },
-  "requiredMessage": "請上傳檔案",
-  "reselectFileMessage": "請重新選擇上傳檔案",
-  "emptyFileMessage": "無法上傳空檔案",
-  "emptyContentMessage": "檔案不能為空",
-  "sizeLimitMessage": "檔案大小超過上限",
-  "unsupportedFormatMessage": "不支援此檔案格式",
-  "countLimitMessage": "每次最多上傳 {count} 個檔案",
-  "networkErrorMessage": "網路連線失敗",
-  "uploadInProgressMessage": "檔案正在上傳，請稍候",
-  "noSuccessfulFilesMessage": "沒有成功上傳的檔案，請重新上傳",
+  "requiredMessage": "請上傳文件",
+  "reselectFileMessage": "請重新選擇上傳文件",
+  "emptyFileMessage": "不能上傳空文件",
+  "emptyContentMessage": "文件不能為空",
+  "sizeLimitMessage": "大小超限",
+  "unsupportedFormatMessage": "文件格式不支持",
+  "countLimitMessage": "每次最多上傳 {count} 個文件",
+  "networkErrorMessage": "網絡失敗",
+  "uploadInProgressMessage": "文件正在上傳，請稍候",
+  "noSuccessfulFilesMessage": "沒有上傳成功的文件，請重新上傳",
   "status": {
     "completed": "已完成",
     "uploading": "上傳中",
@@ -36,11 +36,11 @@
     "allSucceeded": "全部成功"
   },
   "avatar": {
-    "title": "頭像設定",
-    "default": "預設頭像",
-    "customUpload": "自訂上傳",
-    "uploadHint": "支援 JPG、PNG、GIF，檔案大小不超過 {size} MB",
-    "formatMessage": "僅支援 JPG、PNG、GIF 格式的圖片",
-    "sizeLimitMessage": "檔案大小不能超過 {size} MB"
+    "title": "頭像設置",
+    "default": "默認頭像",
+    "customUpload": "自定義上傳",
+    "uploadHint": "支持 JPG、PNG、GIF，文件大小不超過 {size} MB",
+    "formatMessage": "僅支持 JPG、PNG、GIF 格式的圖片",
+    "sizeLimitMessage": "文件大小不能超過 {size} MB"
   }
 }

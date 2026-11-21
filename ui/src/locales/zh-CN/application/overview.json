@@ -1,0 +1,56 @@
+{
+  "overview": {
+    "webAccess": "Web 访问",
+    "backendApi": "后端 API 访问",
+    "link": "链接",
+    "apiDoc": "API 文档",
+    "resetTitle": "是否重新生成公开访问链接？",
+    "resetDescription": "重新生成后旧链接将失效，嵌入第三方的脚本也需要更新，请谨慎操作！",
+    "refreshSuccess": "刷新成功",
+    "embed": {
+      "title": "嵌入第三方",
+      "fullscreen": "全屏模式",
+      "floating": "浮窗模式",
+      "mobile": "移动端模式",
+      "copyHint": "复制以下代码进行嵌入"
+    },
+    "accessRestriction": {
+      "title": "访问限制",
+      "questionLimit": "每个客户端提问限制",
+      "perDay": "次/天",
+      "authentication": "身份认证",
+      "authenticationHint": "开启身份认证后，智能体和关联的知识库均需要对话用户授权配置，否则用户无权限登录和知识库检索",
+      "whitelist": "嵌入白名单",
+      "whitelistPlaceholder": "请输入允许嵌入第三方的源地址，一行一个，如：",
+      "integerRangeMessage": "请输入 {min}～{max} 的整数"
+    },
+    "display": {
+      "title": "显示设置",
+      "language": "语言",
+      "themeColor": "自定义主题色",
+      "headerFontColor": "头部标题字体颜色",
+      "background": "聊天背景",
+      "aiAvatar": "AI 回复头像",
+      "userAvatar": "提问用户头像",
+      "floatingIcon": "浮窗入口图标",
+      "show": "显示",
+      "imageHint": "建议尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超过 {size} MB",
+      "backgroundHint": "支持 JPG、PNG、GIF，大小不超过 {size} MB",
+      "imageSizeMessage": "图片大小不能超过 {size} MB",
+      "iconPosition": "图标默认位置",
+      "draggable": "可拖拽位置",
+      "left": "左",
+      "right": "右",
+      "top": "上",
+      "bottom": "下",
+      "showSource": "显示知识来源",
+      "showExecution": "显示执行详情",
+      "showHistory": "显示历史记录",
+      "allowShare": "允许分享对话记录",
+      "disclaimer": "免责声明",
+      "disclaimerPlaceholder": "请输入免责声明",
+      "defaultDisclaimer": "「以上内容均由 AI 生成，仅供参考和借鉴」",
+      "restoreDefault": "恢复默认"
+    }
+  }
+}

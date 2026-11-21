@@ -1,41 +1,41 @@
 {
-  "byGroup": "按使用者群組",
-  "byUser": "按使用者",
+  "byGroup": "按用戶組",
+  "byUser": "按用戶",
   "autoAuthorization": "自動授權",
   "authorized": "已授權",
   "authorize": "授權",
   "resource": {
     "title": "資源授權",
-    "permissionTitle": "資源權限設定",
+    "permissionTitle": "資源權限配置",
     "scope": {
       "label": "生效資源",
-      "current": "僅目前資源",
-      "includeChildren": "包含所有子資料夾"
+      "current": "僅當前資源",
+      "includeChildren": "包含所有子文件夾"
     }
   },
   "permission": {
     "label": "權限",
     "operationLabel": "操作權限",
-    "configure": "設定權限",
+    "configure": "配置權限",
     "notAuthorized": {
       "label": "不授權"
     },
     "view": {
-      "label": "檢視",
-      "description": "僅能檢視和使用該資源"
+      "label": "查看",
+      "description": "僅能查看和使用該資源"
     },
     "manage": {
       "label": "管理",
       "description": "可對該資源進行刪改操作"
     },
     "role": {
-      "label": "按使用者角色",
-      "description": "根據使用者角色中的權限授予使用者對該資源的操作權限"
+      "label": "按用戶角色",
+      "description": "根據用戶角色中的權限授權用戶對該資源的操作權限"
     }
   },
   "workspace": {
     "title": "授權工作空間",
-    "description": "被授權的工作空間，可使用目前資源",
+    "description": "被授權的工作空間，可使用當前資源",
     "select": "選擇工作空間",
     "whiteList": "白名單",
     "blackList": "黑名單"

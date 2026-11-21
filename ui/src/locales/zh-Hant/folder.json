@@ -1,19 +1,19 @@
 {
   "actions": {
-    "create": "建立資料夾",
-    "createChild": "建立子資料夾",
-    "edit": "編輯資料夾",
+    "create": "創建文件夾",
+    "createChild": "創建子文件夾",
+    "edit": "編輯文件夾",
     "moveTo": "移動到"
   },
   "sort": {
-    "createdAtAsc": "依建立時間遞增",
-    "createdAtDesc": "依建立時間遞減",
-    "nameAsc": "依名稱遞增",
-    "nameDesc": "依名稱遞減",
-    "custom": "拖曳排序"
+    "createdAtAsc": "按創建時間升序",
+    "createdAtDesc": "按創建時間降序",
+    "nameAsc": "按名稱升序",
+    "nameDesc": "按名稱降序",
+    "custom": "按拖拽排序"
   },
   "delete": {
-    "title": "是否刪除資料夾：{name}？",
-    "description": "資料夾內的資源也會被刪除，請謹慎操作。"
+    "title": "是否刪除文件夾：{name}？",
+    "description": "文件夾下的資源會被刪除，請謹慎操作。"
   }
 }

@@ -2,36 +2,36 @@
   "title": "知識庫",
   "menu": {
     "library": "資料庫",
-    "retrieval": "檢索最佳化",
-    "integration": "授權與整合"
+    "retrieval": "檢索優化",
+    "integration": "授權與集成"
   },
   "categories": {
     "all": "全部知識庫",
-    "shared": "共用知識庫"
+    "shared": "共享知識庫"
   },
   "help": {
     "embeddingModelHint": "所選知識庫必須使用相同的 Embedding 模型"
   },
   "base": {
     "label": "通用知識庫",
-    "createTitle": "建立通用知識庫",
-    "description": "上傳檔案或手動輸入內容來建立知識庫"
+    "createTitle": "創建通用知識庫",
+    "description": "通過上傳文件或手動錄入構建知識庫"
   },
   "web": {
     "label": "Web 知識庫",
-    "createTitle": "建立 Web 知識庫",
-    "description": "透過網站連結建立知識庫"
+    "createTitle": "創建 Web 知識庫",
+    "description": "通過網站鏈接構建知識庫"
   },
   "lark": {
     "label": "飛書知識庫",
-    "createTitle": "建立飛書知識庫",
-    "description": "透過飛書文件建立知識庫"
+    "createTitle": "創建飛書知識庫",
+    "description": "通過飛書文檔構建知識庫"
   },
   "workflow": {
-    "label": "工作流程知識庫",
-    "createTitle": "建立工作流程知識庫",
-    "description": "透過自訂工作流程建立知識庫",
-    "documentImportUnavailableMessage": "目前知識庫的工作流程尚未發佈，無法匯入文件，請先發佈工作流程。"
+    "label": "工作流知識庫",
+    "createTitle": "創建工作流知識庫",
+    "description": "通過自定義工作流方式構建知識庫",
+    "documentImportUnavailableMessage": "當前知識庫的工作流未發佈，無法導入文檔，請先發佈工作流。"
   },
   "fields": {
     "name": {
@@ -52,19 +52,19 @@
       "requiredMessage": "請選擇目標知識庫"
     },
     "webRootUrl": {
-      "label": "網站根網址",
-      "placeholder": "請輸入網站根網址",
-      "requiredMessage": "請輸入網站根網址"
+      "label": "Web 根地址",
+      "placeholder": "請輸入 Web 根地址",
+      "requiredMessage": "請輸入 Web 根地址"
     },
     "selector": {
       "label": "選擇器",
-      "placeholder": "預設為 body，可輸入 .classname、#idname 或 tagname"
+      "placeholder": "默認為 body，可輸入 .classname/#idname/tagname"
     }
   },
   "stats": {
-    "documents": "文件",
+    "documents": "文檔",
     "paragraphs": "分段",
-    "characters": "字元",
+    "characters": "字符",
     "images": "圖片",
     "retrievalCount": "召回次數",
     "lastRetrievedAt": "最後一次召回時間"
@@ -79,35 +79,35 @@
   },
   "paragraphScope": {
     "label": "選擇分段",
-    "unsuccessful": "僅處理尚未成功的分段",
+    "unsuccessful": "僅執行未成功部分",
     "all": "全部分段"
   },
   "generateQuestions": {
-    "title": "產生問題",
-    "cancel": "取消產生問題",
+    "title": "生成問題",
+    "cancel": "取消生成問題",
     "prompt": {
       "label": "提示詞",
-      "description": "執行時，系統會將提示詞中的 {data} 替換為分段內容，再傳送給 AI 模型。\n請要求模型將每個產生的問題放在 {questionTags} 標籤中，系統會自動將問題關聯至分段。\n您可以調整提示詞或選擇其他模型，以改善產生的結果。",
+      "description": "提示詞中的 {data} 是分段內容佔位符，執行時會替換為分段內容併發送給 AI 模型；\nAI 模型根據分段內容生成相關問題，請將生成的問題放至{questionTags}標籤中，系統會自動關聯標籤中的問題；\n生成效果依賴於所選模型和提示詞，用戶可自行調整至最佳效果。",
       "requiredMessage": "請輸入提示詞",
-      "defaultValue": "內容：{data}\n\n請摘要上述內容，並根據摘要產生 5 個問題。\n輸出要求：\n- 請只輸出問題。\n- 請將每個問題放在 {questionTags} 標籤中。"
+      "defaultValue": "內容：{data}\n\n請總結上面的內容，並根據內容總結生成 5 個問題。\n回答要求：\n- 請只輸出問題；\n- 請將每個問題放置{questionTags}標籤中。"
     }
   },
   "import": {
-    "embeddingNotice": "已成功匯入並建立知識庫。文件尚未向量化，請先在知識庫設定中選擇向量模型，再將文件向量化。"
+    "embeddingNotice": "導入創建知識庫成功，文檔數據未向量化，請先設置知識庫的向量模型，並對文檔進行向量化操作"
   },
   "export": {
-    "title": "匯出知識庫",
-    "documentsExcel": "匯出文件為 Excel",
-    "documentsZip": "匯出文件為 ZIP",
-    "includeSourceFiles": "同時匯出來源檔案",
-    "sourceFilesDescription": "勾選後，原始檔案會一併打包至 ZIP，匯入時可自動還原檔案關聯。若未勾選，則只匯出文字內容。"
+    "title": "導出知識庫",
+    "documentsExcel": "導出文檔 Excel",
+    "documentsZip": "導出文檔 ZIP",
+    "includeSourceFiles": "同時導出源文件",
+    "sourceFilesDescription": "勾選後將原始文件一並打包至 ZIP，導入時可自動恢復文件關聯；不勾選，則僅導出文本內容。"
   },
   "delete": {
     "title": "是否刪除知識庫：{name}？",
-    "batchTitle": "是否刪除選取的{count}個知識庫？"
+    "batchTitle": "是否刪除選中的{count}個知識庫？"
   },
   "messages": {
-    "missingWorkspace": "知識庫缺少所屬工作空間資訊",
+    "missingWorkspace": "知識庫缺少所屬工作空間信息",
     "migrateSuccess": "遷移成功"
   }
 }

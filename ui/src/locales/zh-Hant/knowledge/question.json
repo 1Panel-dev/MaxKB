@@ -5,8 +5,8 @@
     "lastRetrievedAt": "最近一次召回時間",
     "content": {
       "placeholder": "請輸入問題",
-      "batchPlaceholder": "請輸入問題，一行一個，支援輸入多個",
-      "lengthMessage": "每個問題最多輸入 {max} 個字元"
+      "batchPlaceholder": "請輸入問題，一行一個，支持輸入多個",
+      "lengthMessage": "每個問題最多輸入 {max} 個字符"
     },
     "paragraphs": {
       "title": "關聯分段",
@@ -14,8 +14,8 @@
       "empty": "暫無關聯分段"
     },
     "actions": {
-      "create": "建立問題",
-      "quickCreate": "快速建立問題"
+      "create": "創建問題",
+      "quickCreate": "快速創建問題"
     }
   }
 }

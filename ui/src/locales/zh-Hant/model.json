@@ -2,7 +2,7 @@
   "title": "模型",
   "categories": {
     "all": "全部模型",
-    "shared": "共用模型",
+    "shared": "共享模型",
     "public": "公有模型",
     "private": "私有模型"
   },
@@ -17,14 +17,14 @@
   "provider": {
     "label": "供應商",
     "placeholder": "選擇供應商",
-    "local": "本機模型"
+    "local": "本地模型"
   },
   "fields": {
     "name": {
       "label": "模型名稱",
-      "placeholder": "請為基礎模型設定名稱",
+      "placeholder": "請給基礎模型設置一個名稱",
       "requiredMessage": "請輸入模型名稱",
-      "description": "MaxKB 中自訂的模型名稱"
+      "description": "MaxKB 中自定義的模型名稱"
     },
     "type": {
       "label": "模型類型",
@@ -33,63 +33,63 @@
     },
     "baseModel": {
       "label": "基礎模型",
-      "placeholder": "請先點擊「取得模型」載入清單，或直接輸入模型名稱後按 Enter",
-      "requiredMessage": "請選擇基礎模型，或輸入自訂基礎模型後按 Enter",
-      "description": "清單中未列出的模型，直接輸入模型名稱後按 Enter 即可新增"
+      "placeholder": "請先點擊「獲取模型」加載列表，或直接輸入模型名稱後回車",
+      "requiredMessage": "請選擇基礎模型，自定義輸入基礎模型後回車即可",
+      "description": "列表中未列出的模型，直接輸入模型名稱，回車即可添加"
     }
   },
   "types": {
     "llm": {
-      "label": "大型語言模型",
-      "description": "大型語言模型：在智慧體中與 AI 對話的推理模型。"
+      "label": "大語言模型",
+      "description": "大語言模型：在智能體中與AI對話的推理模型。"
     },
     "embedding": {
       "label": "向量模型",
-      "description": "向量模型：在知識庫中將文件內容轉為向量的模型。"
+      "description": "向量模型：在知識庫中對文檔內容進行向量化的模型。"
     },
     "reranker": {
       "label": "重排模型",
-      "description": "重排模型：在進階智慧體使用多路檢索時，重新排序候選分段的模型。"
+      "description": "重排模型：在高級智能體中使用多路召回時，對候選分段進行重新排序的模型。"
     },
     "stt": {
-      "label": "語音辨識",
-      "description": "語音識別：在智慧體中啟用語音識別後，將語音轉為文字的模型。"
+      "label": "語音識別",
+      "description": "語音識別：在智能體中開啓語音識別後用於語音轉文字的模型。"
     },
     "tts": {
       "label": "語音合成",
-      "description": "語音合成：在智慧體中啟用語音播放後，將文字轉為語音的模型。"
+      "description": "語音合成：在智能體中開啓語音播放後用於文字轉語音的模型。"
     },
     "image": {
       "label": "視覺模型",
-      "description": "視覺模型：在進階智慧體中用於圖片理解的視覺模型。"
+      "description": "視覺模型：在高級智能體中用於圖片理解的視覺模型。"
     },
     "tti": {
       "label": "圖片生成",
-      "description": "圖片生成：在進階智慧體中用於產生圖片的視覺模型。"
+      "description": "圖片生成：在高級智能體中用於圖片生成的視覺模型。"
     },
     "itv": {
-      "label": "圖生影片",
-      "description": "圖生影片：在進階智慧體中由圖片產生影片的模型。"
+      "label": "圖生視頻",
+      "description": "圖生視頻：在高級智能體中用於圖生視頻的模型。"
     },
     "ttv": {
-      "label": "文生影片",
-      "description": "文生影片：在進階智慧體中由文字產生影片的模型。"
+      "label": "文生視頻",
+      "description": "文生視頻：在高級智能體中用於文生視頻的模型。"
     }
   },
   "actions": {
-    "add": "新增模型",
-    "parameters": "模型參數設定",
+    "add": "添加模型",
+    "parameters": "模型參數設置",
     "cancelDownload": "取消下載",
-    "fetchModels": "取得模型"
+    "fetchModels": "獲取模型"
   },
   "states": {
-    "unavailable": "無法使用",
+    "unavailable": "不可用",
     "downloading": "下載中"
   },
   "messages": {
     "missingOllama": "{name} 模型在 Ollama 不存在",
     "downloadFailed": "基礎模型: {name} 下載失敗",
-    "baseModelsFallback": "未取得官方模型清單，已顯示內建常用模型"
+    "baseModelsFallback": "未獲取到官方模型列表，已展示內置常用模型"
   },
   "delete": {
     "title": "是否刪除模型：{name}？",
@@ -97,11 +97,11 @@
   },
   "parameters": {
     "title": "模型參數",
-    "duplicateField": "參數「{name}」已存在",
-    "duplicateLabel": "顯示名稱「{name}」已存在"
+    "duplicateField": "參數“{name}”已存在",
+    "duplicateLabel": "顯示名稱“{name}”已存在"
   },
   "create": {
     "selectProvider": "選擇供應商",
-    "advancedSettings": "進階設定"
+    "advancedSettings": "高級設置"
   }
 }

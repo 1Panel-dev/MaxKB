@@ -1,20 +1,20 @@
 {
   "menu": {
-    "identity": "身分與權限",
+    "identity": "身份與權限",
     "resourceManagement": "資源管理",
     "sharedResources": "共享資源",
     "chatManagement": "對話端管理",
-    "chatUserGroup": "對話使用者群組",
-    "chatUserAuthentication": "對話使用者認證",
-    "settings": "系統設定",
-    "userAuthentication": "系統使用者認證"
+    "chatUserGroup": "對話用戶組",
+    "chatUserAuthentication": "對話用戶認證",
+    "settings": "系統設置",
+    "userAuthentication": "系統用戶認證"
   },
   "member": {
     "label": "成員",
     "placeholder": "請選擇成員",
     "requiredMessage": "請選擇成員",
-    "add": "新增成員",
+    "add": "添加成員",
     "removeTitle": "是否移除成員：{name}？",
-    "batchRemoveTitle": "是否移除選取的{count}個成員？"
+    "batchRemoveTitle": "是否移除選中的{count}個成員？"
   }
 }

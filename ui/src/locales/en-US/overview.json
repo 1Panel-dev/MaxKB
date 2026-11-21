@@ -1,0 +1,45 @@
+{
+  "resources": {
+    "title": "Resources",
+    "llm": "LLM",
+    "embedding": "Embedding"
+  },
+  "quickCreate": {
+    "title": "Quick create",
+    "applicationTitle": "Create agent",
+    "applicationDescription": "Build manually, generate with AI, or import",
+    "knowledgeTitle": "Create knowledge",
+    "knowledgeDescription": "Create from local documents, websites, and other sources",
+    "toolDescription": "Create or connect scripts, workflows, MCP, and other tools",
+    "modelDescription": "Configure LLMs, embedding models, and more"
+  },
+  "monitoring": {
+    "title": "Monitoring",
+    "activeUsers": "Active users",
+    "newUsers": "New users",
+    "conversations": "Chats",
+    "totalTokens": "Total tokens",
+    "satisfaction": "User satisfaction",
+    "approval": "Agree",
+    "disapproval": "Disagree"
+  },
+  "ranking": {
+    "title": "Rankings",
+    "detailTitle": "Ranking details",
+    "agentTokens": "Token usage · Top agents",
+    "agentConversations": "Chats · Top agents",
+    "userTokens": "Token usage · Top users",
+    "conversationCount": "Chats: {count}",
+    "averageTokens": "Avg. {count} Tokens",
+    "averageRounds": "Avg. {count} rounds/user",
+    "rank": "Rank",
+    "user": "User",
+    "applicationName": "Agent name",
+    "tokenUsage": "Token usage",
+    "percentage": "Share",
+    "roundsPerUser": "Rounds per user",
+    "tokensPerRound": "Avg. Tokens/round",
+    "userConversations": "Chats · Top users",
+    "tokensPerChat": "Avg. Tokens/chat"
+  }
+}

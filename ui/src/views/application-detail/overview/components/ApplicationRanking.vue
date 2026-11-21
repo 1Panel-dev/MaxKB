@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ApplicationRankingKind, HomeRankingRecord } from '@/api/types'
 import type { MkDateRangeValue } from '@/components/global/mk-date-range/types'
 import RankingCard from '@/views/home/components/ranking/RankingCard.vue'
@@ -7,6 +8,8 @@ import { useApplicationDetailContext } from '../../context'
 import ApplicationRankingDrawer from './ApplicationRankingDrawer.vue'
 import { formatTokenNumber, numberFormat } from '@/utils/number'
 import { beforeDay } from '@/utils/time'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const { resourceApi } = useApplicationDetailContext()
 
@@ -20,10 +23,13 @@ const tokenUsage = ref<HomeRankingRecord[]>()
 const topQuestions = ref<HomeRankingRecord[]>()
 const tokenTotal = ref<number>()
 const chatTotal = ref<number>()
-const rankingOptions = [
-  { kind: 'userTokens', title: 'Tokens 消耗 · Top 用户' },
-  { kind: 'questions', title: '对话次数 · Top 用户' },
-] as const
+const rankingOptions = computed(
+  () =>
+    [
+      { kind: 'userTokens', title: t('overview.ranking.userTokens') },
+      { kind: 'questions', title: t('overview.ranking.userConversations') },
+    ] as const,
+)
 const detailKind = ref<ApplicationRankingKind>()
 function handleOpenRankingDetail(kind: ApplicationRankingKind) {
   detailKind.value = kind
@@ -86,7 +92,7 @@ onMounted(loadRankings)
 <template>
   <section>
     <div class="flex-between mb-4">
-      <h4>排行榜 TOP5</h4>
+      <h4>{{ t('overview.ranking.title') }} TOP5</h4>
       <MkDateRange @change="handleRangeChange" />
     </div>
     <div v-loading="loading" class="grid grid-cols-1 gap-4 xl:grid-cols-2">
@@ -102,7 +108,9 @@ onMounted(loadRankings)
         @detail="handleOpenRankingDetail(option.kind)"
       >
         <template #description="{ record }">
-          <span v-if="option.kind === 'userTokens'">对话 {{ numberFormat(record.chat_record_count) }} 次</span>
+          <span v-if="option.kind === 'userTokens'">
+            {{ t('overview.ranking.conversationCount', { count: numberFormat(record.chat_record_count) }) }}
+          </span>
           <span v-else>{{ formatTokenNumber(record.total_tokens ?? 0) }}</span>
         </template>
       </RankingCard>
