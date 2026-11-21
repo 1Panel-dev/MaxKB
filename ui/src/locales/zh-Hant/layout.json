@@ -16,8 +16,7 @@
       "expiresAt": "過期時間",
       "edition": "版本",
       "version": "版本號",
-      "serialNo": "序列號",
-      "remark": "備註"
+      "serialNo": "序列號"
     },
     "expiration": {
       "expired": "已過期",

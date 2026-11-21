@@ -122,7 +122,15 @@ onMounted(loadRankings)
         <template #description="{ record }">
           <span>{{ t('overview.monitoring.activeUsers') }} {{ numberFormat(record.chat_user_count) }}</span>
           <el-divider direction="vertical" />
-          <span>{{ t('overview.ranking.averageRounds', { count: numberFormat(getRankingAverage('questions', record)) }) }}</span>
+          <span>
+            {{
+              t(
+                'overview.ranking.averageRounds',
+                { count: numberFormat(getRankingAverage('questions', record)) },
+                getRankingAverage('questions', record),
+              )
+            }}
+          </span>
         </template>
       </RankingCard>
       <RankingCard

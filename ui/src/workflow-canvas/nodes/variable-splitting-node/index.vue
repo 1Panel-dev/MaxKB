@@ -45,7 +45,7 @@ const variableList = computed({
     formData.value.variable_list = fields
     model.properties.config ??= {}
     model.properties.config.fields = [
-      { label: t('workflow.node.result'), value: 'result' },
+      { label: t('common.labels.result'), value: 'result' },
       ...fields.map((field) => ({ label: field.label, value: field.field })),
     ]
     model.clearNextNodeField(false)

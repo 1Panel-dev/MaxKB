@@ -1,7 +1,6 @@
 {
   "node": {
     "title": "Node",
-    "result": "Result",
     "delete": {
       "title": "Delete node: {name}?",
       "batchTitle": "Delete the {count} selected node? | Delete the {count} selected nodes?"
@@ -11,7 +10,6 @@
       "placeholder": "Enter a node name",
       "duplicateMessage": "Node name already exists!"
     },
-    "source": "Source",
     "disabledMessage": "This node is disabled",
     "applicationUnavailableMessage": "This agent is unavailable",
     "toolUnavailableMessage": "This tool is unavailable",
@@ -60,10 +58,8 @@
   "intent": {
     "label": "Intent classification",
     "description": "Match user questions to predefined intent categories",
-    "input": "Input",
     "categories": {
-      "label": "Intent categories",
-      "other": "Other"
+      "label": "Intent categories"
     },
     "category": "Category",
     "reason": "Reason"
@@ -161,8 +157,7 @@
       "label": "Reply content",
       "placeholder": "Reply content can reference system variables, such as {reference}",
       "htmlPlaceholder": "HTML content can reference system variables, such as {reference}",
-      "requiredMessage": "Enter reply content",
-      "custom": "Custom"
+      "requiredMessage": "Enter reply content"
     }
   },
   "condition": {

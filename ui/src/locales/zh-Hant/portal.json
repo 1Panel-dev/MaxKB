@@ -1,6 +1,7 @@
 {
   "label": "門戶",
   "title": "門戶訪問設置",
+  "loginTitle": "門戶登錄",
   "name": {
     "default": "智能體門戶",
     "placeholder": "請輸入門戶名稱",

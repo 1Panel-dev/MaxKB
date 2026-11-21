@@ -59,7 +59,7 @@ function saveTitle(data: ToolFieldConfig) {
           <span class="block truncate" :title="row.label">{{ row.label }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="type" :label="t('tool.inputParams.dataType.label')" width="90">
+      <el-table-column prop="type" :label="t('common.labels.dataType')" width="90">
         <template #default="{ row }">
           <el-tag type="info" size="small">{{ row.type }}</el-tag>
         </template>

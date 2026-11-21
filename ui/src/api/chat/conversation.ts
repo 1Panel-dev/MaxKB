@@ -2,6 +2,7 @@ import type { ResponsePage } from './core/types'
 import type { ChatFeedback, ChatLogRecord, ChatShareDetail, PortalConversationSummary } from '@/api/types'
 import { del, get, post, postStream, put } from './core/request'
 import { CHAT_API_BASE_PATH as chatApiBase } from '@/api/constants'
+import { t } from '@/locales'
 
 /** v3 对话接口均按智能体划分资源路径。 */
 const getApplicationPath = (applicationId: string) => `/v3/application/${applicationId}`
@@ -65,7 +66,7 @@ const postTextToSpeech = async (applicationId: string, text: string) => {
   const response = await postStream(chatApiBase, `${getApplicationPath(applicationId)}/text_to_speech`, { text })
   if (!response.ok || response.headers.get('Content-Type')?.includes('application/json')) {
     const body: { message?: string } | null = await response.json().catch(() => null)
-    throw new Error(body?.message || '语音合成失败')
+    throw new Error(body?.message || t('chat.voice.synthesisFailedMessage'))
   }
   return response.blob()
 }

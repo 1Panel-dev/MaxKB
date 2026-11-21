@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type RelatedResourcesApi from '@/api/admin/workspace/related-resources'
 import type { ToolItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
@@ -7,6 +8,7 @@ import RelatedResourcesDrawer from '@/components/business/related-resources-draw
 import { MsgError } from '@/utils/message'
 
 defineOptions({ name: 'RelatedResourcesToolAction' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: typeof RelatedResourcesApi
   tool: ToolItem
@@ -19,7 +21,7 @@ const relatedResourcesDrawerRef = useTemplateRef<InstanceType<typeof RelatedReso
 function handleOpenRelatedResources() {
   const workspaceId = props.tool.workspace_id
   if (!workspaceId) {
-    MsgError('工具缺少所属工作空间信息')
+    MsgError(t('tool.messages.missingWorkspace'))
     return
   }
   const tool = { ...props.tool, workspace_id: workspaceId }

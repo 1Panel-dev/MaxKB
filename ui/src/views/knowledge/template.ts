@@ -1,6 +1,8 @@
+import { computed, reactive } from 'vue'
 import type LogicFlow from '@logicflow/core'
+import { t } from '@/locales'
 
-export const knowledgeTemplate = {
+export const knowledgeTemplate = reactive({
   default: {
     edges: [
       {
@@ -167,16 +169,15 @@ export const knowledgeTemplate = {
           config: { fields: [], globalFields: [] },
           height: 394.383,
           showNode: true,
-          stepName: '\u57fa\u672c\u4fe1\u606f',
+          stepName: computed(() => t('common.labels.basicInfo')),
           node_data: {
             desc: '',
             name: '',
-            prologue:
-              '\u60a8\u597d\uff0c\u6211\u662f XXX \u5c0f\u52a9\u624b\uff0c\u60a8\u53ef\u4ee5\u5411\u6211\u63d0\u51fa XXX \u4f7f\u7528\u95ee\u9898\u3002\n- XXX \u4e3b\u8981\u529f\u80fd\u6709\u4ec0\u4e48\uff1f\n- XXX \u5982\u4f55\u6536\u8d39\uff1f\n- \u9700\u8981\u8f6c\u4eba\u5de5\u670d\u52a1',
+            prologue: computed(() => t('application.prologue.defaultValue')),
             tts_type: 'BROWSER',
           },
           input_field_list: [],
-          user_input_config: { title: '\u6587\u6863\u5904\u7406\u8bbe\u7f6e' },
+          user_input_config: { title: computed(() => t('knowledge.workflow.template.processingSettings')) },
           user_input_field_list: [],
         },
       },
@@ -187,10 +188,10 @@ export const knowledgeTemplate = {
         type: 'data-source-local-node',
         properties: {
           kind: 'data-source',
-          config: { fields: [{ label: '\u6587\u4ef6\u5217\u8868', value: 'file_list' }] },
+          config: { fields: [{ label: computed(() => t('workflow.localFile.fileList')), value: 'file_list' }] },
           height: 566,
           showNode: true,
-          stepName: '\u6587\u672c\u6587\u4ef6',
+          stepName: computed(() => t('knowledge.document.upload.textLabel')),
           node_data: { file_type_list: ['TXT', 'DOCX', 'PDF', 'HTML', 'XLS', 'XLSX', 'CSV'], file_size_limit: 100, file_count_limit: 50 },
           input_field_list: [],
           user_input_config: {},
@@ -205,13 +206,13 @@ export const knowledgeTemplate = {
         properties: {
           config: {
             fields: [
-              { label: '\u6587\u6863\u5185\u5bb9', value: 'content' },
-              { label: '\u6587\u6863\u5217\u8868', value: 'document_list' },
+              { label: computed(() => t('workflow.documentExtract.content')), value: 'content' },
+              { label: computed(() => t('workflow.document.list')), value: 'document_list' },
             ],
           },
           height: 394,
           showNode: true,
-          stepName: '\u6587\u6863\u5185\u5bb9\u63d0\u53d6',
+          stepName: computed(() => t('workflow.documentExtract.label')),
           condition: 'OR',
           node_data: { document_list: ['768aed24-8139-4689-870f-2065ef05473c', 'file_list'] },
         },
@@ -223,10 +224,10 @@ export const knowledgeTemplate = {
         type: 'document-split-node',
         properties: {
           width: 500,
-          config: { fields: [{ label: '\u5206\u6bb5\u5217\u8868', value: 'paragraph_list' }] },
+          config: { fields: [{ label: computed(() => t('workflow.documentSplit.segmentList')), value: 'paragraph_list' }] },
           height: 652,
           showNode: true,
-          stepName: 'Web\u667a\u80fd\u5206\u6bb5',
+          stepName: computed(() => t('knowledge.workflow.template.webSplit')),
           condition: 'AND',
           node_data: {
             limit: 4096,
@@ -261,7 +262,7 @@ export const knowledgeTemplate = {
           config: { fields: [] },
           height: 278,
           showNode: true,
-          stepName: '\u77e5\u8bc6\u5e93\u5199\u5165',
+          stepName: computed(() => t('workflow.knowledgeWrite.label')),
           condition: 'AND',
           node_data: { document_list: ['ade860cd-db62-4538-9943-c8f42c1b927e', 'Segmented_List'] },
         },
@@ -273,10 +274,10 @@ export const knowledgeTemplate = {
         type: 'document-split-node',
         properties: {
           width: 500,
-          config: { fields: [{ label: '\u5206\u6bb5\u5217\u8868', value: 'paragraph_list' }] },
+          config: { fields: [{ label: computed(() => t('workflow.documentSplit.segmentList')), value: 'paragraph_list' }] },
           height: 652,
           showNode: true,
-          stepName: '\u667a\u80fd\u5206\u6bb5',
+          stepName: computed(() => t('knowledge.workflow.template.smartSplit')),
           condition: 'AND',
           node_data: {
             limit: 4096,
@@ -309,10 +310,10 @@ export const knowledgeTemplate = {
         type: 'data-source-local-node',
         properties: {
           kind: 'data-source',
-          config: { fields: [{ label: '\u6587\u4ef6\u5217\u8868', value: 'file_list' }] },
+          config: { fields: [{ label: computed(() => t('workflow.localFile.fileList')), value: 'file_list' }] },
           height: 536,
           showNode: true,
-          stepName: 'QA\u95ee\u7b54\u5bf9',
+          stepName: computed(() => t('knowledge.workflow.template.qaSource')),
           node_data: { file_type_list: ['XLS', 'XLSX', 'CSV', 'ZIP'], file_size_limit: 100, file_count_limit: 50 },
           input_field_list: [],
           user_input_config: {},
@@ -327,13 +328,13 @@ export const knowledgeTemplate = {
         properties: {
           config: {
             fields: [
-              { label: '\u6587\u6863\u5185\u5bb9', value: 'content' },
-              { label: '\u6587\u6863\u5217\u8868', value: 'document_list' },
+              { label: computed(() => t('workflow.documentExtract.content')), value: 'content' },
+              { label: computed(() => t('workflow.document.list')), value: 'document_list' },
             ],
           },
           height: 394,
           showNode: true,
-          stepName: '\u6587\u6863\u5185\u5bb9\u63d0\u53d61',
+          stepName: computed(() => `${t('workflow.documentExtract.label')}1`),
           condition: 'AND',
           node_data: { document_list: ['affa7bad-1898-4bdb-967b-9e12a72492c6', 'file_list'] },
         },
@@ -345,10 +346,10 @@ export const knowledgeTemplate = {
         type: 'document-split-node',
         properties: {
           width: 500,
-          config: { fields: [{ label: '\u5206\u6bb5\u5217\u8868', value: 'paragraph_list' }] },
+          config: { fields: [{ label: computed(() => t('workflow.documentSplit.segmentList')), value: 'paragraph_list' }] },
           height: 580,
           showNode: true,
-          stepName: 'QA\u95ee\u7b54\u5bf9\u5206\u6bb5',
+          stepName: computed(() => t('knowledge.workflow.template.qaSplit')),
           condition: 'AND',
           node_data: {
             limit: 4096,
@@ -380,10 +381,10 @@ export const knowledgeTemplate = {
         id: 'ade860cd-db62-4538-9943-c8f42c1b927e',
         type: 'variable-aggregation-node',
         properties: {
-          config: { fields: [{ label: '\u6587\u6863\u5206\u6bb5\u5217\u8868', value: 'Segmented_List' }] },
+          config: { fields: [{ label: computed(() => t('knowledge.workflow.template.documentSegments')), value: 'Segmented_List' }] },
           height: 570.7660000000001,
           showNode: true,
-          stepName: '\u805a\u5408\u6587\u6863\u5206\u6bb5\u5217\u8868',
+          stepName: computed(() => t('knowledge.workflow.template.aggregateSegments')),
           condition: 'OR',
           node_data: {
             strategy: 'first_non_null',
@@ -392,7 +393,7 @@ export const knowledgeTemplate = {
               {
                 id: 'kU2zR8yRzNIt3RXKHmJtL',
                 field: 'Segmented_List',
-                label: '\u6587\u6863\u5206\u6bb5\u5217\u8868',
+                label: computed(() => t('knowledge.workflow.template.documentSegments')),
                 variable_list: [
                   { v_id: 'N59Lo_VyRKuYASHaKN6g0', variable: ['9018d6b6-be6e-420b-9a0d-7226fd789398', 'paragraph_list'] },
                   { v_id: 'IRQkWPB7THGXlkSBCWmkY', variable: ['a1d0fa5d-4779-4364-8b54-7eff69bd1ec4', 'paragraph_list'] },
@@ -410,12 +411,12 @@ export const knowledgeTemplate = {
         type: 'data-source-web-node',
         properties: {
           kind: 'data-source',
-          config: { fields: [{ label: '\u6587\u6863\u5217\u8868', value: 'document_list' }] },
+          config: { fields: [{ label: computed(() => t('workflow.document.list')), value: 'document_list' }] },
           height: 292,
           showNode: true,
-          stepName: 'Web\u7ad9\u70b9',
+          stepName: computed(() => t('knowledge.workflow.template.webSource')),
         },
       },
     ],
   },
-} satisfies Record<string, LogicFlow.GraphConfigData>
+}) satisfies Record<string, LogicFlow.GraphConfigData>

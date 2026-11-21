@@ -6,7 +6,6 @@
     },
     "otherSettings": "其他设置",
     "authentication": {
-      "label": "对话用户授权",
       "description": "开启后，仅允许授权的对话用户检索当前知识库"
     },
     "fileCountLimit": {

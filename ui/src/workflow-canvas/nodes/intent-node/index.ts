@@ -34,7 +34,7 @@ type UpdatePathEdge = { updatePathByAnchor: () => void }
 function defaultBranch(): IntentNodeBranch[] {
   return [
     { id: randomId(), content: '', isOther: false },
-    { id: randomId(), content: t('workflow.intent.categories.other'), isOther: true },
+    { id: randomId(), content: t('common.labels.other'), isOther: true },
   ]
 }
 

@@ -6,7 +6,6 @@
     },
     "otherSettings": "其他設置",
     "authentication": {
-      "label": "對話用戶授權",
       "description": "開啓後，僅允許授權的對話用戶檢索當前知識庫"
     },
     "fileCountLimit": {

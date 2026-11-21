@@ -50,7 +50,7 @@ const fileCountLimit = computed(() => Number(props.formField.attrs?.file_count_l
       <template #icon><MkIcon name="icon_info_filled" /></template>
       <ol class="list-inside list-decimal space-y-1">
         <li>{{ t('dynamicForm.upload.segmentation') }}</li>
-        <li>{{ t('dynamicForm.upload.limits', { count: fileCountLimit, size: fileSizeLimit }) }}</li>
+        <li>{{ t('upload.limits', { count: fileCountLimit, size: fileSizeLimit }, fileCountLimit) }}</li>
       </ol>
     </el-alert>
     <MkDragUpload

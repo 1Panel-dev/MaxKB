@@ -53,7 +53,7 @@ const searchFields = computed(() => [
 const toolTypeOptions = computed(() => TOOL_TYPE_OPTIONS.filter(({ value }) => value))
 const sourceOptions = computed(() => [
   { label: t('tool.store.title'), value: 'TOOL_STORE' },
-  { label: t('tool.source.custom'), value: 'CUSTOM' },
+  { label: t('common.options.custom'), value: 'CUSTOM' },
 ])
 const statusOptions = computed(() => [
   { label: t('common.status.enabled'), value: 'enabled' },
@@ -184,17 +184,17 @@ onMounted(() => {
           </template>
           <template #default="{ row }">{{ toolTypeLabels.get(row.tool_type) ?? row.tool_type }}</template>
         </el-table-column>
-        <el-table-column :label="t('tool.source.label')" width="120">
+        <el-table-column :label="t('common.labels.source')" width="120">
           <template #header>
             <MkTableFilter
               mode="single"
               v-model="selectedSource"
-              :label="t('tool.source.label')"
+              :label="t('common.labels.source')"
               :options="sourceOptions"
               @change="handleFilterChange"
             />
           </template>
-          <template #default="{ row }">{{ row.template_id ? t('tool.store.title') : t('tool.source.custom') }}</template>
+          <template #default="{ row }">{{ row.template_id ? t('tool.store.title') : t('common.options.custom') }}</template>
         </el-table-column>
         <el-table-column :label="t('common.status.label')" width="100">
           <template #header>

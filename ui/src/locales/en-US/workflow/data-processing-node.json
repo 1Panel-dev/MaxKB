@@ -3,8 +3,7 @@
     "label": "Variable assignment",
     "description": "Update the values of global variables",
     "value": {
-      "label": "Value",
-      "custom": "Custom"
+      "label": "Value"
     }
   },
   "variableAggregation": {

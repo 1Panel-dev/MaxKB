@@ -38,7 +38,7 @@ export const knowledgeMenuNodes = reactive([
     label: computed(() => t('workflow.menu.dataProcessing')),
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: computed(() => t('workflow.menu.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
+  { label: computed(() => t('common.labels.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ])
 export const menuNodes = reactive([
   {
@@ -69,7 +69,7 @@ export const menuNodes = reactive([
     label: computed(() => t('workflow.menu.dataProcessing')),
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: computed(() => t('workflow.menu.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
+  { label: computed(() => t('common.labels.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ])
 export const applicationLoopMenuNodes = reactive([
   {
@@ -100,7 +100,7 @@ export const applicationLoopMenuNodes = reactive([
     label: computed(() => t('workflow.menu.dataProcessing')),
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: computed(() => t('workflow.menu.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
+  { label: computed(() => t('common.labels.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ])
 export const knowledgeLoopMenuNodes = reactive([
   { label: computed(() => t('resource.dataSource.label')), list: [NodeData.dataSourceLocalNode, NodeData.dataSourceWebNode] },
@@ -129,7 +129,7 @@ export const knowledgeLoopMenuNodes = reactive([
     label: computed(() => t('workflow.menu.dataProcessing')),
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: computed(() => t('workflow.menu.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
+  { label: computed(() => t('common.labels.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ])
 export const toolLoopMenuNodes = reactive([
   { label: computed(() => t('resource.dataSource.label')), list: [NodeData.dataSourceLocalNode, NodeData.dataSourceWebNode] },
@@ -161,7 +161,7 @@ export const toolLoopMenuNodes = reactive([
     label: computed(() => t('workflow.menu.dataProcessing')),
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: computed(() => t('workflow.menu.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
+  { label: computed(() => t('common.labels.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ])
 const toolMenuNodes = reactive([
   {
@@ -198,7 +198,7 @@ const toolMenuNodes = reactive([
     label: computed(() => t('workflow.menu.dataProcessing')),
     list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
   },
-  { label: computed(() => t('workflow.menu.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
+  { label: computed(() => t('common.labels.other')), list: [NodeData.mcpNode, NodeData.toolCustomNode] },
 ])
 const menuNodesByMode: Record<WorkflowMode, WorkflowMenuGroup[]> = {
   [WorkflowMode.Application]: menuNodes,

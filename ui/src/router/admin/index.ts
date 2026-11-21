@@ -1,17 +1,12 @@
+import { createRouter, createWebHistory } from 'vue-router'
 import NProgress from 'nprogress'
-import {
-  createRouter,
-  createWebHistory,
-  type RouteLocationNormalizedLoaded,
-  type RouteLocationNormalized,
-  type RouteLocationResolvedGeneric,
-} from 'vue-router'
-import { useStore } from '@/stores'
+import type { RouteLocationNormalized, RouteLocationNormalizedLoaded, RouteLocationResolvedGeneric } from 'vue-router'
 import { loginRoutes } from './login'
 import { systemRoutes } from './system'
-import { workspaceRoutes } from './workspace'
-import { workflowRoutes } from './workflow'
 import { getChildRouteList } from './utils'
+import { workflowRoutes } from './workflow'
+import { workspaceRoutes } from './workspace'
+import { useStore } from '@/stores'
 import { withRouteWorkspace } from '@/utils/resource-context'
 const ADMIN_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/admin/'
 
@@ -28,7 +23,12 @@ const router = createRouter({
     workspaceRoutes,
     systemRoutes,
     // 承接权限守卫在没有可访问后续页面时的兜底跳转
-    { path: '/no-permission', name: 'no-permission', component: () => import('@/views/error/NoPermission.vue'), meta: { title: '无访问权限' } },
+    {
+      path: '/no-permission',
+      name: 'no-permission',
+      component: () => import('@/views/error/NoPermission.vue'),
+      meta: { title: '无访问权限' },
+    },
     { path: '/no-service', name: 'no-service', component: () => import('@/views/error/NoService.vue'), meta: { title: '服务不可用' } },
     { path: '/404', name: '404', component: () => import('@/views/error/404.vue'), meta: { title: '页面不存在' } },
     { path: '/:pathMatch(.*)*', redirect: { name: '404' } },

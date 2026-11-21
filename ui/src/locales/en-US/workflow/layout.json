@@ -40,12 +40,10 @@
     "basicComponents": "Basic components",
     "aiCapabilities": "AI capabilities",
     "businessLogic": "Business logic",
-    "dataProcessing": "Data processing",
-    "other": "Other"
+    "dataProcessing": "Data processing"
   },
   "defaultModel": {
     "label": "Default model",
-    "custom": "Custom",
     "unconfigured": "No default model configured",
     "requiredMessage": "Configure a default model",
     "selectRequiredMessage": "Select {label} in the default model settings",

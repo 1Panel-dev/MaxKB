@@ -71,30 +71,37 @@
 - 字段的标签、占位、说明和校验提示同级维护，如 `label`、`placeholder`、`description`、`requiredMessage`、`invalidMessage`、`lengthMessage`，不加 `validation` 层。
 - `placeholder` 与 `requiredMessage` 用途独立，文案相同也保留不同 key。
 - 普通字段可直接归业务域，如 `user.username.label`；已有 `fields` 或场景分组时沿用清晰的业务结构，不机械套用统一层级。
-- `common.name`、`common.title`、`common.description` 集中维护通用字段的标签、占位及已有校验；纯标签归 `common.labels`，状态归 `common.status`。
+- `common.name`、`common.title`、`common.description`、`common.content` 集中维护通用字段的标签、占位及已有校验；纯标签归 `common.labels`，状态归 `common.status`。
 - 简单入口文案可以平级。只有完整对象或场景才增加分组，不为组件名、文件名或单条文案额外包一层。
 - 三语键按含义分组，顺序一致。字段内按 `label` → `placeholder` → `description` → 校验提示排列；状态组先放标签，再放各状态。
-- `common/index.json` 顶层顺序为 `labels` → `name` → `title` → `description` → `status` → `options` → `dateRange` → `schedule` → `parameters` → `configuration` → `actions` → `dialogs` → `messages` → `placeholders` → `validation` → `empty`。其他业务沿用现有业务分组顺序。
+- `common/index.json` 顶层顺序为 `labels` → `name` → `title` → `description` → `content` → `status` → `options` → `dateRange` → `relativeTime` → `schedule` → `parameters` → `configuration` → `actions` → `dialogs` → `messages` → `error` → `placeholders` → `validation` → `empty`。其他业务沿用现有业务分组顺序。
 
 ## 文案与复用边界
 
 只翻译已有文案，不为复用 key 改写中文或扩大含义。多处使用不等于通用，相同中文也可能属于不同业务。
 用户输入、接口返回的实体名称、代码、协议值、已保存提示词和节点数据保留原文。
 
-| 文案                                                     | 归属或使用规则                                                                                           |
-| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| 添加、编辑、删除、保存、取消、导出、调试等通用操作       | `common.actions`                                                                                         |
-| 创建者、操作、创建／更新时间、问题、语言、备注、API 文档 | `common.labels`                                                                                          |
-| 名称、标题、描述                                         | `common.name`、`common.title`、`common.description`                                                      |
-| 带对象的配置标题、未配置                                 | `common.configuration`，标题通过 `{name}` 传参                                                           |
-| 通用成功／失败、排队、执行、启停状态                     | `common.status`；启用状态标签使用 `activeLabel`                                                          |
-| 通用操作结果                                             | `common.messages`，保留编辑／设置／保存／发送等不同含义                                                  |
-| 引用／自定义、是／否                                     | `common.options`；引用变量、引用参数等完整名称保留业务文案                                               |
-| 日期范围、星期、周期、间隔单位和 Cron                    | `common.dateRange`、`common.schedule`                                                                    |
-| 输入／输出、输入参数／输出参数、错误信息／错误日志       | 分别使用 `execution.details` 中对应 key，不互相替换                                                      |
-| 用户问题／问题／检索问题                                 | 分别维护，执行详情原来是“问题”时不能改成“用户问题”                                                       |
-| 回答内容／AI 回答内容                                    | `workflow.answer.label`／`workflow.answer.aiLabel`，英文分别为 `Response content`／`AI response content` |
-| 默认值和用户内容                                         | 默认值在初始化或恢复默认时按当前语言读取；已有值和编辑草稿不随语言重写                                   |
+| 文案                                                                              | 归属或使用规则                                                                                           |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| 添加、编辑、删除、保存、取消、导出、调试等通用操作                                | `common.actions`                                                                                         |
+| 创建者、操作、创建／更新时间、问题、语言、备注、来源、数据类型、IP 地址、API 文档 | `common.labels`                                                                                          |
+| 名称、标题、描述、内容                                                            | `common.name`、`common.title`、`common.description`、`common.content`                                    |
+| 带对象的配置标题、未配置                                                          | `common.configuration`，标题通过 `{name}` 传参                                                           |
+| 通用成功／失败、排队、执行、启停状态                                              | `common.status`；启用状态标签使用 `activeLabel`                                                          |
+| 通用操作成功、完成等结果                                                          | `common.messages`，保留编辑／设置／保存／发送等不同含义                                                  |
+| 通用操作失败、请求、网络、权限、服务及音视频播放错误                              | `common.error`，复用原文案，不改写接口返回或具体错误信息                                                 |
+| 引用／引用参数／引用变量／自定义、是／否                                          | `common.options`；带具体业务对象的完整名称按实际展示含义维护                                             |
+| 日期范围、星期、周期、间隔单位和 Cron                                             | `common.dateRange`、`common.schedule`                                                                    |
+| 输入／输出、输入参数／输出参数、错误信息／错误日志                                | 分别使用 `execution.details` 中对应 key，不互相替换                                                      |
+| 用户问题／问题／检索问题                                                          | 分别维护，执行详情原来是“问题”时不能改成“用户问题”                                                       |
+| 回答内容／AI 回答内容                                                             | `workflow.answer.label`／`workflow.answer.aiLabel`，英文分别为 `Response content`／`AI response content` |
+| 默认值和用户内容                                                                  | 默认值在初始化或恢复默认时按当前语言读取；已有值和编辑草稿不随语言重写                                   |
+
+独立选项“自定义”统一使用 `common.options.custom`，“其他”统一使用 `common.labels.other`；完整名称、说明及不同含义的业务文案仍归对应业务，不为统一翻译修改选项值。
+“引用”“引用参数”“引用变量”分别使用 `common.options.reference`、`referenceParameter`、`referenceVariable`，同级维护；引用变量的占位、校验及错误说明仍归 `workflow.referenceVariable`。
+MCP 设置的来源选项在已有上下文中直接显示“引用”，复用 `common.options.reference`，来源配置值保持原样。
+通用“结果”标签使用 `common.labels.result`；执行结果、条件结果、问题优化结果等完整名称保留业务文案。
+输入、输出、输入参数和输出参数的通用标签，包括工具表单与调试标题，复用 `execution.details`；角色表头的“权限”复用 `authorization.permission.label`，知识库设置的“对话用户授权”复用 `authorization.chatUserTitle`。
 
 复制到剪贴板和复制资源生成副本统一使用 `copy` 命名及 `Copy` 词族：通用按钮使用 `common.actions.copy`，复制成功使用 `common.messages.copySuccess`，已复制使用 `common.messages.copied`；业务标题使用 `application.copy.title`、`tool.copyTitle` 等对应业务 key。英文分别为 `Copy`、`Copied successfully`、`Copied`、`Copy agent`、`Copy tool`。表示重复名称、字段或文件的校验仍使用 `duplicate`，不属于复制操作。
 
@@ -112,7 +119,7 @@
 
 - 通用输入／选择占位使用 `Please enter`、`Please select`，不加省略号；有具体对象时使用 `Enter a model name`、`Select a model` 等完整短语，不统一加 Please。
 - 通用必填提示使用 `This field is required`；具体字段优先写明对象，placeholder 与校验仍保留独立 key。
-- “知识库”使用 `knowledge`，不加 base／bases；“分段”使用 `segment`／`segments`，代码 key 和文件名仍可沿用 `paragraph`；“子块”使用 `child chunk`。
+- “知识库”使用 `knowledge`，不加 base／bases；“分段”使用 `segment`／`segments`，代码 key 和文件名仍可沿用 `paragraph`；“子块”使用 `sub-chunk`。
 - 自定义分词使用 `term`，标题为 `Custom term`，创建入口为 `Create term`。
 - “关联”使用 `relate` 词族：`Relate`、`Unrelate`、`Related`、`Unrelated`；结果为 `Related successfully`／`Unrelated successfully`。网页链接仍使用 `link`。
 - 创建时间／更新时间使用 `Create time`／`Update time`。概览中的“对话次数”使用 `Chats`。
@@ -209,7 +216,7 @@ App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、z
 用户档案和本地偏好，不刷新页面。Admin 后续加载账号时继续采用已保存的账号语言。
 
 `src/main.ts`、`src/chat.ts` 的 import、样式、初始化和插件注册顺序始终保持，新增国际化内容也不得重排。
-错误页当前不接入翻译。共享组件的修改授权遵循 [组件规则](../components/COMPONENT_README.md#公共组件修改边界)，每批只处理用户指定范围，完成后说明检查结果和下一步，等待用户检查。
+错误页文案使用 `common.error.noPermission`／`noService`，404 数字保持原样。共享组件的修改授权遵循 [组件规则](../components/COMPONENT_README.md#公共组件修改边界)，每批只处理用户指定范围，完成后说明检查结果和下一步，等待用户检查。
 
 ## 公共能力与资源组件
 
@@ -243,10 +250,14 @@ App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、z
 ### 上传与动态表单
 
 上传文案归 `upload`：文件类型使用 `types`，头像设置与图片说明使用 `avatar`，状态使用 `status`，后缀编辑使用 `extension`。
+智能体显示设置与外观设置的通用图片大小限制复用 `upload.imageSizeMessage`，大小上限由调用方传入。
+动态表单上传数量说明复用 `upload.limits`，按实际数量选择英文单复数。
 “文件不能为空”与“不能上传空文件”、“上传失败”与“失败”保留各自完整含义；业务模板和文件内容要求留在业务域。
 
 `dynamicForm` 维护控件类型、字段配置、选项、显隐条件、帮助、比较符、上传及树形配置。字段与模型参数表头共用 `fields`，比较值按输入／选择控件使用对应占位和校验。
 参数标识与显示名称使用 `fields.parameter`／`fields.displayName`，数据中的 `field`、`label` 属性保持原样；显示名称统一使用“显示名称”，不缩成“显示名”。
+默认值及生成规则中的通用长度范围校验复用 `common.validation.lengthRange`，不在动态表单中重复定义长度提示。
+动态表单的“基本信息”复用 `common.labels.basicInfo`；智能体显示设置与外观设置的“恢复默认”复用 `common.actions.restoreDefault`。
 控件名称统一读取 `DYNAMIC_FORM_TYPES`，比较符统一读取 `dynamicForm.operators` 的响应式名称；协议值、顺序、用户选项标签、字段说明与序列化结果不翻译。
 通用操作、结果及参数添加／编辑标题复用 `common`；树形选项删除确认使用 `dynamicForm.tree.delete.title`。
 
@@ -280,7 +291,7 @@ App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、z
 `message` 平铺维护输入提示、回复及思考状态、工具调用数量、文件差异提示、消息异常、消息表单状态、对话记录空状态和 URL 缺少参数提示，不额外嵌套 `toolCall`、`form` 或 `userForm`。
 `actions` 平铺维护“更多设置”、放大／还原、关闭调试、设置及侧栏展开／收起等界面操作，使用 `chat.actions`，关闭调试使用 `closeDebug`；通用操作仍复用 `common.actions`，清空成功复用 `common.messages.clearSuccess`。
 `voice` 平铺维护录音、转文字及朗读的状态、操作和异常提示，不另设 `reading` 分组。
-查看标注与修正内容统一归 `chat.improve`；查看标注标题使用 `markTitle`，两个弹窗共用的内容字段归 `improve.content`，不另设顶层 `mark` 或 `content` 分组。
+查看标注与修正内容统一归 `chat.improve`；查看标注标题使用 `markTitle`，内容字段与分段表单共用 `common.content`，不在业务中重复定义。
 
 ## 模型与工具
 
@@ -289,21 +300,22 @@ App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、z
 `model.json` 的分类使用 `categories`，供应商使用 `provider`，类型名称和说明使用 `types.<类型>.label`／`description`。`MODEL_TYPE_LABELS` 提供共用响应式名称，类型协议值不变。
 “AI 模型”的标签、占位及必填提示统一使用 `model.ai`，模型、长期记忆和语音等不同场景的完整名称分别保留。普通“模型”与选择模型占位继续使用 `model.title`、`model.select.placeholder`。
 模型参数字段与控件类型复用 `dynamicForm`；名称及代码等专属提示、创建与删除确认归 `model`，通用操作复用 `common`。
+动态表单内置供应商的中文名称归 `model.provider`，在现有选项生成函数中直接读取当前语言；纯英文品牌、供应商标识、图标和顺序保留原样，接口返回的名称不在前端改写。
 
 ### 工具
 
 `tool.json` 维护列表、分类、创建／编辑／复制、参数、调试和删除等业务；普通工具名称直接用 `tool.title`，不另设 `custom` 类型分组。
 Skill、工作流、MCP、数据源分别归 `skill`、`workflow`、`mcp`、`dataSource`，名称和表单文案集中在同组，不单独拆目录。
 
-| 内容                              | 归属                                                           |
-| --------------------------------- | -------------------------------------------------------------- |
-| 名称、代码等字段提示              | `tool.fields`                                                  |
-| 来源标签、自定义、引用参数        | `tool.source`，保留引用与引用参数的区别                        |
-| 商店分类、搜索计数和应用入口      | `tool.store`；接口分类、README 和资源内容保留原文              |
-| 启动／输入／输出参数、Python 代码 | `tool.initParams`、`inputParams`、`outputParams`、`pythonCode` |
-| 使用时显示／代码区隐藏说明        | `tool.help`                                                    |
-| 调试运行、状态和错误提示          | `tool.debug`；调试操作复用 `common.actions.debug`              |
-| 版本更新与删除／禁用影响          | `tool.updateVersion`、`delete`、`disable`                      |
+| 内容                         | 归属                                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------ |
+| 名称、代码等字段提示         | `tool.fields`                                                                              |
+| 来源标签、自定义、引用参数   | `tool.source`，保留引用与引用参数的区别                                                    |
+| 商店分类、搜索计数和应用入口 | `tool.store`；接口分类、README 和资源内容保留原文                                          |
+| 参数配置与 Python 代码       | `tool.initParams`、`inputParams`、`pythonCode`；输入／输出参数标题复用 `execution.details` |
+| 使用时显示／代码区隐藏说明   | `tool.help`                                                                                |
+| 调试运行、状态和错误提示     | `tool.debug`；调试操作复用 `common.actions.debug`                                          |
+| 版本更新与删除／禁用影响     | `tool.updateVersion`、`delete`、`disable`                                                  |
 
 MCP 的 JSON 配置校验区分“语法有效”与“必须为对象”，不为复用文案改变原校验条件。Python 模板、用户代码和参数说明保持原文。
 工作流工具节点可复用工具参数文案；输入／输出、输入参数／输出参数按原名称选择 `execution.details` 对应 key。复制名称按“原名称 + 空格 + `common.name.copySuffix`”组合，并保留原长度限制。
@@ -376,13 +388,15 @@ MCP 的 JSON 配置校验区分“语法有效”与“必须为对象”，不�
 - 不修改 `node-data.ts` 的数据属性名或结构，不增加翻译 key 属性，也不创建独立展示映射。菜单、搜索和 AI 节点目录直接读取定义中的 `label`／`text`。
 - 节点默认名称、字段及缺省内容通过响应式配置读取当前语言；创建／复制节点时转为普通数据。已创建节点名称、保存的配置、模板内容、用户变量和提示词不随界面语言重写。
 - 开始节点名称及内置字段归 `workflow.start`，历史复用 `workflow.history`。默认引用由既有 `START_NODE_REFERENCES` 提供，保留双层花括号及字段名；用户已保存的引用不重建。
-- `workflow.userInput` 维护用户输入配置；节点设置标题使用 `workflow.node.setting`，接口传参及基本信息必填／唯一性提示归 `workflow.node`。工具基本信息参数复用 `dynamicForm`、`common.title`、`tool.inputParams`／`outputParams`。
+- `workflow.userInput` 维护用户输入配置；节点设置标题使用 `workflow.node.setting`，接口传参及基本信息必填／唯一性提示归 `workflow.node`。工具基本信息参数复用 `dynamicForm`、`common.title`、`tool.inputParams` 和 `execution.details`。
 - `LLM` 节点名称固定显示，不建立名称翻译 key。上下文和工具声明归 `workflow.llm`；通用模型标签复用 `model.ai`，提示词复用 `workflow` 对应共用分组。
 - 历史 `history`、思考 `thinking` 和技能 `application.skills` 不放进提示词分组；“回答内容”与“AI 回答内容”直接使用各自完整 key。
 - 检索问题、范围和文档共用字段归 `workflow.searchQuestion`、`searchScope`、`document`；检索参数及策略复用 `knowledge.retrieval`、`knowledge.documentStrategy`。
 - “最大引用字符数”与“最多引用字符数”、“参数输出”与“输出参数”、“回复内容”与“回答内容”、“负向提示词”与“提示词(负向)”保留各自原名称，不为复用 key 统一改写。
 - 节点条件比较符复用 `dynamicForm.operators`；参数格式、有效引用及比较值按原含义校验，输入与选择提示分别维护。示例 JSON、媒体地址、文件名、后缀和变量路径保留原样。
 - 执行详情共用 `execution.details`，节点专属字段归对应节点；字段协议值、模型输出、实际名称、错误内容及消息角色不翻译。
+- 工作流的“文档列表”标签共用 `workflow.document.list`，用于检索范围及节点输出字段；数据中的 `document_list` 标识保持原样。
+- “知识库列表”标签归 `knowledge.list`，工作流检索范围及节点输出字段直接复用；数据中的 `knowledge_list` 标识保持原样。
 - 调试操作使用 `common.actions.debug`，工具调试文案归 `tool.debug`；生成、发布、版本历史和默认模型各自归对应分组，不随语言切换运行、保存、重置或请求历史。
 
 ### Agent 长期排除范围

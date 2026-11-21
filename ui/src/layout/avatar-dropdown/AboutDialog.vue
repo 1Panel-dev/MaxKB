@@ -47,7 +47,7 @@ const licenseFields = computed(() => [
   { key: 'edition', label: t('layout.about.fields.edition'), value: editionText.value },
   { key: 'version', label: t('layout.about.fields.version'), value: auth.baseProfile?.version || '-' },
   { key: 'serialNo', label: t('layout.about.fields.serialNo'), value: licenseInfo.value?.serialNo || '-' },
-  { key: 'remark', label: t('layout.about.fields.remark'), value: licenseInfo.value?.remark || '-' },
+  { key: 'remark', label: t('common.labels.remark'), value: licenseInfo.value?.remark || '-' },
 ])
 
 function loadLicense() {

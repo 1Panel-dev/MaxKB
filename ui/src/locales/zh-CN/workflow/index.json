@@ -38,7 +38,6 @@
     "title": "会话变量"
   },
   "referenceVariable": {
-    "label": "引用变量",
     "placeholder": "请选择引用变量",
     "requiredMessage": "请选择引用变量",
     "invalidMessage": "引用变量错误",
@@ -51,6 +50,7 @@
   },
   "document": {
     "label": "文档",
+    "list": "文档列表",
     "placeholder": "请选择文档",
     "requiredMessage": "请选择文档",
     "paragraphPreviewHint": "每个文档仅展示前 {count} 个分段",
@@ -63,10 +63,7 @@
   },
   "searchScope": {
     "label": "检索范围",
-    "placeholder": "请选择关联知识库",
-    "custom": "自定义",
-    "knowledgeList": "知识库列表",
-    "documentList": "文档列表"
+    "placeholder": "请选择关联知识库"
   },
   "showInSources": "结果显示在知识来源中",
   "audioFile": {

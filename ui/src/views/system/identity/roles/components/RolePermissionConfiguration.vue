@@ -167,7 +167,7 @@ watch([() => props.currentRole.id, locale], ([roleId], [previousRoleId]) => load
       <el-table-column v-if="showCategory" prop="category" :label="t('role.permission.category')" width="120" />
       <el-table-column prop="module" :label="t('role.permission.module')" width="150" />
       <el-table-column prop="name" :label="t('role.permission.target')" width="150" />
-      <el-table-column :label="t('role.permission.label')">
+      <el-table-column :label="t('authorization.permission.label')">
         <template #default="{ row }">
           <div class="flex-wrap">
             <template v-for="permission in row.permissions" :key="permission.id">

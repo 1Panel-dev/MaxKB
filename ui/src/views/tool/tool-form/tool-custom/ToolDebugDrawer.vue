@@ -132,7 +132,7 @@ defineExpose({ open })
     </section>
 
     <section v-if="debugForm.debug_field_list.length" class="mb-6">
-      <h4 class="mk-title-decoration mb-4">{{ t('tool.inputParams.title') }}</h4>
+      <h4 class="mk-title-decoration mb-4">{{ t('execution.details.inputParams') }}</h4>
 
       <el-form
         ref="formRef"
@@ -171,7 +171,7 @@ defineExpose({ open })
         class="mb-4!"
         show-icon
       />
-      <p class="mb-2">{{ t('tool.debug.output') }}</p>
+      <p class="mb-2">{{ t('execution.details.output') }}</p>
 
       <el-card class="small whitespace-pre-wrap" shadow="never" :class="{ 'border-danger': !debugSucceeded }">
         {{ formattedResult }}

@@ -23,15 +23,12 @@
     },
     "value": {
       "placeholder": "Value or variable"
-    },
-    "knowledgeList": "Knowledge list",
-    "documentList": "Document list"
+    }
   },
   "documentExtract": {
     "label": "Document content extraction",
     "description": "Parse input documents and output structured content",
-    "content": "Document content",
-    "documentList": "Document list"
+    "content": "Document content"
   },
   "reranker": {
     "label": "Multi-source retrieval",
@@ -89,8 +86,7 @@
   "webSource": {
     "label": "Web site",
     "description": "Crawl web data from a root URL and output documents with content, with one document per URL",
-    "noConfiguration": "No configuration options",
-    "documentList": "Document list"
+    "noConfiguration": "No configuration options"
   },
   "knowledgeWrite": {
     "label": "Write to knowledge",

@@ -85,8 +85,8 @@ onBeforeUnmount(() => anchorGuard.reset())
             @update:model-value="changeScopeType"
             @visible-change="anchorGuard.setOverlayVisible('scope-type', $event)"
           >
-            <el-option :label="t('workflow.referenceVariable.label')" value="referencing" />
-            <el-option :label="t('workflow.searchScope.custom')" value="custom" />
+            <el-option :label="t('common.options.referenceVariable')" value="referencing" />
+            <el-option :label="t('common.options.custom')" value="custom" />
           </el-select>
         </div>
       </div>
@@ -119,7 +119,7 @@ onBeforeUnmount(() => anchorGuard.reset())
       <el-radio-group class="mb-1" :model-value="formData.search_scope_source" :validate-event="false" @update:model-value="changeScopeSource">
         <el-radio value="knowledge">
           <span class="flex-align-center gap-1">
-            <span>{{ t('workflow.searchScope.knowledgeList') }}</span>
+            <span>{{ t('knowledge.list') }}</span>
             <span class="relative inline-flex">
               <MkTooltip
                 :teleported="false"
@@ -139,7 +139,7 @@ onBeforeUnmount(() => anchorGuard.reset())
         </el-radio>
         <el-radio value="document">
           <span class="flex-align-center gap-1">
-            <span>{{ t('workflow.searchScope.documentList') }}</span>
+            <span>{{ t('workflow.document.list') }}</span>
             <span class="relative inline-flex">
               <MkTooltip
                 :teleported="false"

@@ -1,6 +1,7 @@
 {
   "label": "门户",
   "title": "门户访问设置",
+  "loginTitle": "门户登录",
   "name": {
     "default": "智能体门户",
     "placeholder": "请输入门户名称",

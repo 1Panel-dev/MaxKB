@@ -50,7 +50,7 @@ function formatFieldType(type: TriggerBodyField['type']) {
           <span class="block truncate" :title="row.field">{{ row.field }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="t('trigger.requestParameters.dataType.label')" width="100">
+      <el-table-column :label="t('common.labels.dataType')" width="100">
         <template #default="{ row }">
           <el-tag size="small" type="info">{{ formatFieldType(row.type) }}</el-tag>
         </template>

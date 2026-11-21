@@ -9,7 +9,6 @@
     "red": "Rouge red"
   },
   "loginSettings": "Platform login settings",
-  "restoreDefault": "Restore defaults",
   "website": "Website",
   "websiteLogoHint": "Logo shown in the browser tab. Recommended size: {dimensions}. Supports JPG, PNG, GIF, up to {size}MB",
   "loginLogoHint": "Logo on the left of the login page. Recommended size: {dimensions}. Supports JPG, PNG, GIF, up to {size} MB",
@@ -33,6 +32,5 @@
   "platformPreviewHint": "The preview shows the default MaxKB platform interface and supports customization",
   "abandonChanges": "Discard updates",
   "saveAndApply": "Save and apply",
-  "imageFormatMessage": "Only JPG, PNG, or GIF images are supported",
-  "imageSizeMessage": "Image size cannot exceed {size} MB"
+  "imageFormatMessage": "Only JPG, PNG, or GIF images are supported"
 }

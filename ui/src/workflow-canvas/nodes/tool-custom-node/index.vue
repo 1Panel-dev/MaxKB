@@ -96,7 +96,7 @@ onMounted(() => {
       <div class="mk-gray-card">
         <!-- 输入参数 -->
         <div class="flex-between mb-2">
-          <p>{{ t('tool.inputParams.title') }}</p>
+          <p>{{ t('execution.details.inputParams') }}</p>
           <FieldSetting ref="inputFieldDialogRef" @submit="handleInputFieldSubmit" />
         </div>
 

@@ -1,16 +1,10 @@
 {
   "paragraph": {
     "detailTitle": "分段詳情",
-    "content": {
-      "label": "內容",
-      "placeholder": "請輸入內容",
-      "requiredMessage": "請輸入內容",
-      "lengthMessage": "內容最多 {max} 字符"
-    },
     "relatedQuestions": {
       "label": "關聯問題",
       "requiredMessage": "請輸入關聯問題",
-      "lengthMessage": "問題最多 {max} 字符"
+      "lengthMessage": "問題不超過 {max} 字符"
     },
     "actions": {
       "add": "添加分段",

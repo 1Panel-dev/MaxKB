@@ -3,7 +3,6 @@
   "menu": "操作菜单",
   "operationDetails": "操作详情",
   "operator": "操作用户",
-  "ipAddress": "IP 地址",
   "operationTime": "操作时间",
   "apiDetails": "API 详情",
   "cleanStrategy": {

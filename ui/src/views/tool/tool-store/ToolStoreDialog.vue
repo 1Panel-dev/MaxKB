@@ -36,7 +36,7 @@ const categoryTitles = computed<Record<string, string>>(() => ({
   ...Object.fromEntries(storeTags.value.map(({ key, name }) => [key, name])),
   web_search: t('tool.store.categories.webSearch'),
   database_search: t('tool.store.categories.databaseSearch'),
-  other: t('tool.store.categories.other'),
+  other: t('common.labels.other'),
 }))
 
 function getCategoryTitle(categoryId: string) {

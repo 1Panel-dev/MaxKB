@@ -346,7 +346,7 @@ onMounted(() => {
       >
         <el-radio-group v-model="formData.stt_model_id_type" class="mb-2">
           <el-radio value="default">{{ t('workflow.defaultModel.label') }}</el-radio>
-          <el-radio value="custom">{{ t('workflow.defaultModel.custom') }}</el-radio>
+          <el-radio value="custom">{{ t('common.options.custom') }}</el-radio>
         </el-radio-group>
         <SelectModel
           v-if="formData.stt_model_id_type === 'default'"
@@ -400,7 +400,7 @@ onMounted(() => {
         <el-radio-group v-model="formData.tts_type" class="mb-2">
           <el-radio value="BROWSER">{{ t('application.speechPlayback.browser') }}</el-radio>
           <el-radio value="DEFAULT">{{ t('workflow.defaultModel.label') }}</el-radio>
-          <el-radio value="CUSTOM">{{ t('workflow.defaultModel.custom') }}</el-radio>
+          <el-radio value="CUSTOM">{{ t('common.options.custom') }}</el-radio>
         </el-radio-group>
         <SelectModel
           v-if="formData.tts_type === 'DEFAULT'"

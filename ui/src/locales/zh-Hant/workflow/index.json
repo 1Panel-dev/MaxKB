@@ -38,7 +38,6 @@
     "title": "會話變量"
   },
   "referenceVariable": {
-    "label": "引用變量",
     "placeholder": "請選擇引用變量",
     "requiredMessage": "請選擇引用變量",
     "invalidMessage": "引用變量錯誤",
@@ -51,6 +50,7 @@
   },
   "document": {
     "label": "文檔",
+    "list": "文檔列表",
     "placeholder": "請選擇文檔",
     "requiredMessage": "請選擇文檔",
     "paragraphPreviewHint": "每個文檔僅展示前 {count} 個分段",
@@ -63,10 +63,7 @@
   },
   "searchScope": {
     "label": "檢索範圍",
-    "placeholder": "請選擇關聯知識庫",
-    "custom": "自定義",
-    "knowledgeList": "知識庫列表",
-    "documentList": "文檔列表"
+    "placeholder": "請選擇關聯知識庫"
   },
   "showInSources": "結果顯示在知識來源中",
   "audioFile": {

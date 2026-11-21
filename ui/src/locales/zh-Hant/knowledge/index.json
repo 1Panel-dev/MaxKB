@@ -1,5 +1,6 @@
 {
   "title": "知識庫",
+  "list": "知識庫列表",
   "menu": {
     "library": "資料庫",
     "retrieval": "檢索優化",
@@ -31,7 +32,26 @@
     "label": "工作流知識庫",
     "createTitle": "創建工作流知識庫",
     "description": "通過自定義工作流方式構建知識庫",
-    "documentImportUnavailableMessage": "當前知識庫的工作流未發佈，無法導入文檔，請先發佈工作流。"
+    "documentImportUnavailableMessage": "當前知識庫的工作流未發佈，無法導入文檔，請先發佈工作流。",
+    "transform": {
+      "title": "轉換為工作流知識庫",
+      "description": "您現在可以將現有知識庫轉換為工作流知識庫 ——這是一種更開放、更靈活的知識庫，通過拖拽節點的方式自主編排從不同數據源到知識庫寫入的全流程，滿足企業個性化知識管理需求。可以使用我們工具中的數據源和工具。",
+      "futureDocumentsHint": "新的處理方式將應用到後續導入的所有文檔。",
+      "irreversibleMessage": "注意：轉換後不可撤回。",
+      "confirmMessage": "轉換後無法回退，請謹慎操作。",
+      "action": "轉換",
+      "successMessage": "轉換成功"
+    },
+    "template": {
+      "processingSettings": "文檔處理設置",
+      "webSplit": "Web智能分段",
+      "smartSplit": "智能分段",
+      "qaSource": "QA問答對",
+      "qaSplit": "QA問答對分段",
+      "documentSegments": "文檔分段列表",
+      "aggregateSegments": "聚合文檔分段列表",
+      "webSource": "Web站點"
+    }
   },
   "fields": {
     "name": {

@@ -7,7 +7,7 @@
     "stopped": "Generation stopped",
     "thinking": "Thinking",
     "examples": {
-      "productSupport": "Build a product support agent that searches the product Knowledge first and responds politely when no answer is found.",
+      "productSupport": "Build a product support agent that searches the product knowledge first and responds politely when no answer is found.",
       "pricing": "Build an agent that can look up product pricing.",
       "humanSupport": "Build a customer support agent that can hand off to a human when needed."
     },
@@ -28,7 +28,7 @@
       "layout": "Arrange layout",
       "getFieldOptions": "View referenceable variables",
       "getModels": "Query models",
-      "getKnowledgeList": "Query Knowledge",
+      "getKnowledgeList": "Query knowledge",
       "getSkillResources": "Query skill resources",
       "update": "Write configuration",
       "getBranches": "View branches",

@@ -6,15 +6,15 @@
     "label": "MCP call",
     "description": "Run tools on MCP servers over SSE or Streamable HTTP",
     "serverConfig": {
-      "label": "MCP Server Config",
-      "requiredMessage": "Configure the MCP Server first"
+      "label": "MCP server config",
+      "requiredMessage": "Configure the MCP server first"
     },
     "reference": {
       "requiredMessage": "Select the referenced MCP tool first"
     },
     "tools": {
       "loadSuccess": "Tools retrieved successfully",
-      "loadFailed": "Failed to retrieve tools. Check the MCP Server configuration."
+      "loadFailed": "Failed to retrieve tools. Check the MCP server configuration."
     },
     "parameters": {
       "label": "Tool parameters"

@@ -30,7 +30,10 @@
     "blank": "Start from scratch",
     "assistant": {
       "label": "Knowledge Q&A assistant",
-      "description": "Answer user questions using information retrieved from knowledge."
+      "description": "Answer user questions using information retrieved from knowledge.",
+      "emptyReply": "Sorry, no relevant content was found in the knowledge. Please provide more details.",
+      "workflowDescription": "Retrieve relevant knowledge content based on the user question as reference material for the AI model",
+      "userPrompt": "Known information:\n{knowledgeReference}\nQuestion:\n{questionReference}"
     }
   },
   "copy": {

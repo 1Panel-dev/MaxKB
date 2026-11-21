@@ -23,7 +23,7 @@ defineSlots<{ default(): unknown }>()
         autoplay
         playsinline
         class="w-full max-h-[75vh] object-contain"
-        @error="MsgWarning(t('common.messages.videoPlaybackFailed'))"
+        @error="MsgWarning(t('common.error.videoPlaybackFailed'))"
       />
     </template>
   </MkMediaPreview>

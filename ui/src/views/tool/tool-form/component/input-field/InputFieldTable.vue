@@ -35,7 +35,7 @@ function handleDeleteInputField(index: number) {
   <section>
     <div class="mb-4 flex-between">
       <div class="flex-align-center gap-2">
-        <h4 class="mk-title-decoration">{{ t('tool.inputParams.title') }}</h4>
+        <h4 class="mk-title-decoration">{{ t('execution.details.inputParams') }}</h4>
         <span class="text-N600">{{ t('tool.help.shownWhenUsed') }}</span>
       </div>
       <!-- 添加输入参数 -->
@@ -45,14 +45,14 @@ function handleDeleteInputField(index: number) {
     </div>
     <MkTable :data="inputFields" size="small">
       <el-table-column :label="t('dynamicForm.fields.parameter.label')" prop="name" min-width="140" />
-      <el-table-column :label="t('tool.inputParams.dataType.label')" prop="type" min-width="100">
+      <el-table-column :label="t('common.labels.dataType')" prop="type" min-width="100">
         <template #default="{ row }">
           <el-tag size="small" type="info">{{ row.type }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('tool.source.label')" min-width="100">
+      <el-table-column :label="t('common.labels.source')" min-width="100">
         <template #default="{ row }">
-          {{ row.source === 'custom' ? t('tool.source.custom') : t('tool.source.reference') }}
+          {{ row.source === 'custom' ? t('common.options.custom') : t('common.options.referenceParameter') }}
         </template>
       </el-table-column>
       <el-table-column :label="t('dynamicForm.fields.required.columnLabel')" width="90">

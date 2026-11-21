@@ -10,10 +10,10 @@ const { t } = useI18n({ useScope: 'global' })
 const emit = defineEmits<{ submit: [data: ToolFieldConfig] }>()
 const formRef = useTemplateRef<FormInstance>('formRef')
 const dialogVisible = ref(false)
-const form = ref<ToolFieldConfig>({ title: t('tool.outputParams.title') })
+const form = ref<ToolFieldConfig>({ title: t('execution.details.outputParams') })
 
 function resetData() {
-  form.value = { title: t('tool.outputParams.title') }
+  form.value = { title: t('execution.details.outputParams') }
   formRef.value?.clearValidate()
 }
 

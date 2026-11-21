@@ -109,7 +109,7 @@ onMounted(() => {
     <div class="mk-gray-card">
       <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" hide-required-asterisk @submit.prevent>
         <!-- 输入参数 -->
-        <h6 class="mb-2">{{ t('tool.inputParams.title') }}</h6>
+        <h6 class="mb-2">{{ t('execution.details.inputParams') }}</h6>
         <template v-if="formData.input_field_list.length">
           <div class="mk-white-card">
             <el-form-item

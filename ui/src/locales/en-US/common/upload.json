@@ -42,5 +42,6 @@
     "uploadHint": "Supports JPG, PNG and GIF files up to {size} MB.",
     "formatMessage": "Only JPG, PNG and GIF images are supported.",
     "sizeLimitMessage": "File size must not exceed {size} MB."
-  }
+  },
+  "imageSizeMessage": "Image size cannot exceed {size} MB"
 }

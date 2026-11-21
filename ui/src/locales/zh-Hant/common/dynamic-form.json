@@ -18,7 +18,6 @@
     "treeSelect": "樹形選擇器"
   },
   "tabs": {
-    "basic": "基本信息",
     "visibility": "顯隱設置",
     "label": "頁簽"
   },
@@ -53,7 +52,6 @@
       "placeholder": "請輸入默認值",
       "requiredMessage": "請輸入默認值",
       "selectRequiredMessage": "請選擇默認值",
-      "lengthMessage": "長度在 {min} 到 {max} 個字符",
       "datePlaceholder": "選擇日期"
     },
     "optionLabel": {
@@ -150,8 +148,6 @@
     }
   },
   "options": {
-    "custom": "自定義",
-    "reference": "引用變量",
     "showDefault": "顯示默認值",
     "unselected": "未選中項",
     "multiple": "允許多選",
@@ -191,7 +187,6 @@
   "upload": {
     "segmentation": "文件上傳前，建議規範文件的分段標識",
     "duplicateName": "文件名已存在",
-    "limits": "每次最多上傳 {count} 個文件，每個文件不超過 {size} MB",
     "sizeLimit": "文件大小不能超過 {size}MB",
     "countLimit": "最多只能上傳 {count} 個文件"
   },

@@ -29,7 +29,7 @@ declare module 'vue-router' {
     resource?: ResourceAuthorizationType
     /** 详情返回导航的可访问性判断，由业务路由配置。 */
     canAccess?: (params: RouteParamsGeneric) => boolean
-    /** 页面和菜单标题；已迁移路由使用业务翻译 key，其他路由保留原文案。 */
+    /** 用于显示的页面和菜单标题使用业务翻译 key，内部元信息及临时 Demo 保留原文案。 */
     title?: string
   }
 }

@@ -27,9 +27,9 @@ const isClientLoggingIn = ref(false)
 console.log(auth)
 const loginTitle = computed(() => {
   if (auth.isPortal) {
-    return (auth.authProfile?.meta as PortalAuthProfileMeta | undefined)?.portal_name || '门户登录'
+    return (auth.authProfile?.meta as PortalAuthProfileMeta | undefined)?.portal_name || t('portal.loginTitle')
   }
-  return (auth.authProfile?.meta as ApplicationAuthProfileMeta | undefined)?.application_name || '登录'
+  return (auth.authProfile?.meta as ApplicationAuthProfileMeta | undefined)?.application_name || t('auth.login.label')
 })
 
 // 认证前置配置只有可用登录方式，默认登录方式优先取后端配置，再依次回退本地、LDAP、第一个可用方式
@@ -84,7 +84,6 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
 
     // OAuth2 通过 state 透传 accessToken
     if (!config.authEndpoint || !config.clientId) return ''
-    const redirectUrl = `${config.redirectUrl}${queryString ? `?${queryString}` : ''}`
     const state = accessToken ? `${uuidv7()}_${accessToken}` : uuidv7()
     let url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${config.redirectUrl}&state=${state}`
     if (config.scope) url += `&scope=${config.scope}`
@@ -171,7 +170,7 @@ const goBack = () => {
       <!-- 返回上一页 -->
       <el-button text v-if="!enableAuth" @click="goBack" class="-ml-1 mb-4 shrink-0 self-start text-N900!">
         <MkIcon :icon="ArrowLeft" />
-        <span>返回</span>
+        <span>{{ t('common.actions.back') }}</span>
       </el-button>
       <div v-if="!isClientLoggingIn" class="min-h-0 flex-1">
         <LoginModePanel :login-config="loginConfig" :login-service="loginService" />

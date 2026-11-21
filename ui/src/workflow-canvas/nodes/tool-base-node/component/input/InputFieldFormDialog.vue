@@ -91,7 +91,7 @@ defineExpose({ open, close })
           @blur="form.desc = form.desc?.trim()"
         />
       </el-form-item>
-      <el-form-item :label="t('tool.inputParams.dataType.label')">
+      <el-form-item :label="t('common.labels.dataType')">
         <el-select v-model="form.type">
           <el-option v-for="fieldType in typeOptions" :key="fieldType" :label="fieldType" :value="fieldType" />
         </el-select>

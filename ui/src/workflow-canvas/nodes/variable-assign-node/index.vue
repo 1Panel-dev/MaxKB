@@ -134,8 +134,8 @@ onMounted(() => {
                 @visible-change="anchorGuard.setOverlayVisible(`${item.id}:source`, $event)"
                 @wheel="handleNodeWheel"
               >
-                <el-option :label="t('workflow.referenceVariable.label')" value="referencing" />
-                <el-option :label="t('workflow.variableAssign.value.custom')" value="custom" />
+                <el-option :label="t('common.options.referenceVariable')" value="referencing" />
+                <el-option :label="t('common.options.custom')" value="custom" />
                 <el-option label="null" value="null" />
               </el-select>
             </div>

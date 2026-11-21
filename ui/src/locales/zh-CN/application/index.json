@@ -30,7 +30,10 @@
     "blank": "空白创建",
     "assistant": {
       "label": "知识库问答助手",
-      "description": "将从知识库中检索到的知识作为已知信息，回答用户提出的问题。"
+      "description": "将从知识库中检索到的知识作为已知信息，回答用户提出的问题。",
+      "emptyReply": "抱歉，没有在知识库查询到相关内容，请提供更详细的信息。",
+      "workflowDescription": "基于用户问题，检索知识库相关内容作为AI模型的参考内容",
+      "userPrompt": "已知信息：\n{knowledgeReference}\n问题：\n{questionReference}"
     }
   },
   "copy": {

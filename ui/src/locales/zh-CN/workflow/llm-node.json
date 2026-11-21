@@ -37,7 +37,6 @@
       "descriptionMessage": "参数 {name} 的描述应为不超过 {max} 字的文本"
     },
     "dataType": {
-      "label": "数据类型",
       "placeholder": "请选择数据类型",
       "requiredMessage": "请选择数据类型"
     },

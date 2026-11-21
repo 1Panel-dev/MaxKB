@@ -1,4 +1,5 @@
 /** 加载登录提供商的外部 SDK，并避免重复插入相同脚本。 */
+import { t } from '@/locales'
 
 /** 加载指定外部脚本。 */
 export function loadLoginScript(source: string, id: string) {
@@ -16,7 +17,7 @@ export function loadLoginScript(source: string, id: string) {
       script.dataset.loaded = 'true'
       resolve()
     }
-    script.onerror = () => reject(new Error(`登录 SDK 加载失败：${source}`))
+    script.onerror = () => reject(new Error(t('auth.login.sdkLoadFailed', { source })))
     document.head.appendChild(script)
   })
 }

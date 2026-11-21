@@ -26,7 +26,11 @@ const getData = () => {
       'show-input-controls': true,
       'show-input': formValue.value.showInput,
     },
-    props_info: { rules: [{ message: `请输入 ${formValue.value.label}`, trigger: 'blur', required: formValue.value.required }] },
+    props_info: {
+      rules: [
+        { message: t('common.validation.inputFieldRequired', { label: formValue.value.label }), trigger: 'blur', required: formValue.value.required },
+      ],
+    },
     show_default_value: true,
     default_value: formValue.value.default_value,
   }

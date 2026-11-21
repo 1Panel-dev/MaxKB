@@ -85,7 +85,7 @@ function handleImageChange(file: UploadFile, field: ImageField) {
     return
   }
   if (image.size > 10 * 1024 * 1024) {
-    MsgError(t('application.overview.display.imageSizeMessage', { size: 10 }))
+    MsgError(t('upload.imageSizeMessage', { size: 10 }))
     return
   }
   const previousPreview = imagePreviews.value[field]
@@ -271,7 +271,7 @@ onBeforeUnmount(releaseImagePreviews)
             <div class="flex-between shrink-0 pt-6">
               <!-- 恢复默认展示配置 -->
               <el-button plain :disabled="loading" @click="handleRestoreDefault">
-                <span>{{ t('application.overview.display.restoreDefault') }}</span>
+                <span>{{ t('common.actions.restoreDefault') }}</span>
               </el-button>
               <div class="flex-align-center">
                 <!-- 取消展示设置 -->

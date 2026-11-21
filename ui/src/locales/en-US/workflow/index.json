@@ -38,7 +38,6 @@
     "title": "Conversation variables"
   },
   "referenceVariable": {
-    "label": "Variable reference",
     "placeholder": "Select a variable reference",
     "requiredMessage": "Select a variable reference",
     "invalidMessage": "Invalid variable reference",
@@ -51,6 +50,7 @@
   },
   "document": {
     "label": "Document",
+    "list": "Document list",
     "placeholder": "Select a document",
     "requiredMessage": "Select a document",
     "paragraphPreviewHint": "Only the first {count} segments of each document are shown",
@@ -63,10 +63,7 @@
   },
   "searchScope": {
     "label": "Retrieval scope",
-    "placeholder": "Select knowledge to relate",
-    "custom": "Custom",
-    "knowledgeList": "Knowledge list",
-    "documentList": "Document list"
+    "placeholder": "Select knowledge to relate"
   },
   "showInSources": "Show results in knowledge sources",
   "audioFile": {

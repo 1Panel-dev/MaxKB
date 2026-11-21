@@ -15,8 +15,8 @@ const formRef = ref<FormInstance>()
 const contentMaxLength = 100000
 const paragraphRules = computed<FormRules<ParagraphUpdatePayload>>(() => ({
   content: [
-    { required: true, whitespace: true, message: t('knowledge.paragraph.content.requiredMessage'), trigger: 'blur' },
-    { max: contentMaxLength, message: t('knowledge.paragraph.content.lengthMessage', { max: contentMaxLength }), trigger: 'blur' },
+    { required: true, whitespace: true, message: t('common.content.requiredMessage'), trigger: 'blur' },
+    { max: contentMaxLength, message: t('common.content.lengthMessage', { max: contentMaxLength }), trigger: 'blur' },
   ],
 }))
 
@@ -86,10 +86,10 @@ defineExpose({ validate })
     <el-form-item :label="t('common.title.label')" prop="title">
       <el-input v-model="paragraphForm.title" maxlength="256" :placeholder="t('common.title.placeholder')" />
     </el-form-item>
-    <el-form-item :label="t('knowledge.paragraph.content.label')" prop="content">
+    <el-form-item :label="t('common.content.label')" prop="content">
       <MdEditor
         v-model="paragraphForm.content"
-        :placeholder="t('knowledge.paragraph.content.placeholder')"
+        :placeholder="t('common.content.placeholder')"
         :max-length="contentMaxLength"
         :preview="false"
         :toolbars="toolbars"

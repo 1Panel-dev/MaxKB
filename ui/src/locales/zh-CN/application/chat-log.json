@@ -6,7 +6,6 @@
       "chatCount": "对话次数",
       "annotations": "改进标注",
       "user": "用户",
-      "ipAddress": "IP 地址",
       "lastChatTime": "最近对话时间"
     },
     "feedback": {
@@ -15,7 +14,6 @@
       "negative": "反对"
     },
     "source": {
-      "label": "来源",
       "online": "线上使用",
       "apiCall": "API 调用",
       "wechatPublicAccount": "微信公众号",

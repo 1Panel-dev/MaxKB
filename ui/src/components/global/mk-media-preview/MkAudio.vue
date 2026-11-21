@@ -16,7 +16,7 @@ defineSlots<{ default(): unknown }>()
   <MkMediaPreview v-bind="props">
     <slot />
     <template #player>
-      <audio :src="src" controls tabindex="0" autoplay class="w-full max-w-160" @error="MsgWarning(t('common.messages.audioPlaybackFailed'))" />
+      <audio :src="src" controls tabindex="0" autoplay class="w-full max-w-160" @error="MsgWarning(t('common.error.audioPlaybackFailed'))" />
     </template>
   </MkMediaPreview>
 </template>
