@@ -1,6 +1,6 @@
 # Router 目录说明
 
-本文档是项目路由规则的唯一依据。新增、删除、移动或修改路由前，应先阅读本文档。
+本文维护路由、导航和认证规则；修改路由前先阅读对应章节。
 
 项目包含 Admin 和 Chat 两个独立入口，两者分别创建自己的 Router 实例，不共享路由表。
 
@@ -179,12 +179,14 @@ Workspace 根据目标路由中的 workspaceId、knowledgeId 判断权限，权�
 
 ## 导航生成
 
+工作空间首页、系统首页及两种资源范围的智能体概览路由共用 `overview.title`；外观设置路由使用 `appearance.title`，外观页面通过已有 `MkViewLayout.title` 传入对应译文。操作日志路由与页面共用 `operateLog.title`。
+
 模型相关路由的 `meta.title` 使用 `model.title`。工作空间、系统资源管理和系统共享资源的工具列表路由共用 `tool.title`。
 工作空间智能体列表、系统资源管理智能体列表和资源授权中的智能体分类共用 `application.title`；两种范围的对话日志路由共用 `application.chatLog.title`，发布渠道路由共用 `application.access.title`。
 两种范围的简易设置与高级工作流设置菜单共用 `common.labels.settings`；简易设置页面通过详情布局接收已翻译的标题。
 工作空间、系统资源管理和系统共享资源的知识库列表路由，以及工作空间知识库菜单共用 `knowledge.title`。
 知识库四种资源范围的工作流入口菜单共用 `workflow.title`。
-智能体和知识库各资源范围的对话用户菜单共用 `chatUser.title`。
+智能体和知识库各资源范围的“对话用户授权”菜单共用 `authorization.chatUserTitle`，与系统中的对话用户管理标题区分；路由路径、名称和权限规则保持原样。
 工作空间触发器菜单与列表共用 `trigger.title`。
 系统用户管理菜单与列表共用 `user.title`。
 系统对话用户管理菜单与列表共用 `chatUser.title`。
@@ -266,7 +268,7 @@ Drawer、Dialog 通常不根据 path、路由名称或 Scope 自行维护 API �
 ## 新增与维护
 
 - 路由 name 全局唯一；导航页配置 title、order；详情／创建／编辑父页使用 hidden。
-  详情二级菜单需要展示的子页保留 title、icon、order，不再隐藏。
+  详情二级菜单中的可见子页保留 title、icon、order，不设置 hidden。
 - 层级直接用 children，不增加菜单分组字段。新增 Workspace 模块由 workspace/index.ts 汇总；
   System 复用路由按模块汇总。Admin 和 Chat 不相互引用。
 - View 路径、功能登记见 [VIEW_README.md](../views/VIEW_README.md)，不在本文登记业务交互。

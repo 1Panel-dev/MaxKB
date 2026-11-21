@@ -257,7 +257,7 @@ export const applicationTemplate = {
           config: {
             fields: [
               reactive({
-                label: computed(() => `AI ${t('workflow.answer.label')}`),
+                label: computed(() => t('workflow.answer.aiLabel')),
                 value: 'answer',
               }),
               {

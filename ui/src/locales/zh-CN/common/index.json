@@ -14,7 +14,10 @@
     "type": "类型",
     "settings": "设置",
     "example": "示例",
-    "question": "问题"
+    "question": "问题",
+    "language": "语言",
+    "apiDoc": "API 文档",
+    "remark": "备注"
   },
   "name": {
     "label": "名称",

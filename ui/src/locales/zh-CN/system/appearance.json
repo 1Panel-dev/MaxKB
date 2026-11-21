@@ -1,0 +1,38 @@
+{
+  "title": "外观设置",
+  "customColor": "自定义颜色",
+  "colors": {
+    "default": "默认",
+    "orange": "活力橙",
+    "green": "松石绿",
+    "purple": "神秘紫",
+    "red": "胭脂红"
+  },
+  "loginSettings": "平台登录设置",
+  "restoreDefault": "恢复默认",
+  "website": "网站",
+  "websiteLogoHint": "顶部网站显示 Logo，建议尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超过 {size}MB",
+  "loginLogoHint": "登录页面左侧 Logo，建议尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超过 {size} MB",
+  "loginBackground": "登录背景图",
+  "loginBackgroundHint": "左侧背景图，矢量图建议尺寸 {vector}，位图建议尺寸 {bitmap}；支持 JPG、PNG、GIF，大小不超过 {size} MB",
+  "name": {
+    "label": "网站名称",
+    "placeholder": "请输入网站名称",
+    "requiredMessage": "请输入网站名称"
+  },
+  "slogan": {
+    "label": "欢迎语",
+    "placeholder": "请输入网站欢迎语",
+    "requiredMessage": "请输入网站欢迎语"
+  },
+  "loginPreviewHint": "预览页默认为 MaxKB 登录界面，支持自定义设置",
+  "platformSettings": "平台设置",
+  "userManualPlaceholder": "请输入用户手册地址",
+  "forumPlaceholder": "请输入论坛求助地址",
+  "projectPlaceholder": "请输入项目地址",
+  "platformPreviewHint": "预览页默认为 MaxKB 平台界面，支持自定义设置",
+  "abandonChanges": "放弃更新",
+  "saveAndApply": "保存并应用",
+  "imageFormatMessage": "仅支持 JPG、PNG 或 GIF 格式的图片",
+  "imageSizeMessage": "图片大小不能超过 {size} MB"
+}

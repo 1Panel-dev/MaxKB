@@ -83,7 +83,7 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
       >
         <MkIcon name="icon_side-fold_outlined" :size="18" :class="props.collapsed && 'rotate-180'" />
         <span class="whitespace-nowrap transition-opacity duration-100" :class="props.collapsed ? 'opacity-0' : 'delay-200 opacity-100'">
-          收起导航
+          {{ t('layout.collapseNavigation') }}
         </span>
       </button>
     </div>

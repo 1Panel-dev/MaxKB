@@ -1,0 +1,14 @@
+{
+  "title": "操作日誌",
+  "menu": "操作菜單",
+  "operationDetails": "操作詳情",
+  "operator": "操作用戶",
+  "ipAddress": "IP 地址",
+  "operationTime": "操作時間",
+  "apiDetails": "API 詳情",
+  "cleanStrategy": {
+    "title": "清除策略",
+    "recordsPrefix": "刪除",
+    "recordsSuffix": "天之前的對話記錄"
+  }
+}

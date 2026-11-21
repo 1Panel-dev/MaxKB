@@ -37,13 +37,13 @@ function handleExportDocument(method: (typeof exportOptions)[number]['method']) 
   <MkDropdownItem @click.prevent.stop class="p-0!">
     <MkDropdown @command="parentDropdown?.handleClose()" class="w-full" trigger="hover" placement="left-start">
       <!-- 展开文档导出菜单 -->
-      <div class="flex-between w-full gap-2 p-2">
+      <div class="flex-between w-full gap-2 py-[5px] px-2">
         <div class="flex-align-center gap-2">
           <MkIcon name="icon_export_outlined" class="text-N600!" />
           <span>{{ label }}</span>
         </div>
 
-        <MkIcon name="icon_right_outlined" class="text-N600!" />
+        <MkIcon name="icon_right_outlined" class="text-N500!" />
       </div>
       <template #dropdown>
         <MkDropdownMenu>

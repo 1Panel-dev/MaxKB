@@ -1,0 +1,36 @@
+{
+  "portal": "门户",
+  "upgrade": "升级",
+  "returnWorkspace": "返回工作空间",
+  "project": "项目地址",
+  "userManual": "用户手册",
+  "forum": "论坛求助",
+  "about": {
+    "title": "关于",
+    "editions": {
+      "professional": "专业版",
+      "enterprise": "企业版",
+      "community": "社区版"
+    },
+    "fields": {
+      "corporation": "授权给",
+      "expiresAt": "过期时间",
+      "edition": "版本",
+      "version": "版本号",
+      "serialNo": "序列号",
+      "remark": "备注"
+    },
+    "expiration": {
+      "expired": "已过期",
+      "soon": "即将到期",
+      "minutes": "{count}分钟后到期",
+      "hours": "{count}小时后到期",
+      "days": "{count}天后到期"
+    },
+    "updateLicense": "更新 License",
+    "copyright": "版权所有",
+    "company": "杭州飞致云信息科技有限公司"
+  },
+  "slogan": "强大易用的企业级智能体平台",
+  "collapseNavigation": "收起导航"
+}

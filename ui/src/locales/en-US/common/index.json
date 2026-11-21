@@ -14,7 +14,10 @@
     "type": "Type",
     "settings": "Settings",
     "example": "Example",
-    "question": "Question"
+    "question": "Question",
+    "language": "Language",
+    "apiDoc": "API Docs",
+    "remark": "Remarks"
   },
   "name": {
     "label": "Name",

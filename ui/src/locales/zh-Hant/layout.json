@@ -1,0 +1,36 @@
+{
+  "portal": "門戶",
+  "upgrade": "升級",
+  "returnWorkspace": "返回工作空間",
+  "project": "項目地址",
+  "userManual": "用戶手冊",
+  "forum": "論壇求助",
+  "about": {
+    "title": "關於",
+    "editions": {
+      "professional": "專業版",
+      "enterprise": "企業版",
+      "community": "社區版"
+    },
+    "fields": {
+      "corporation": "授權給",
+      "expiresAt": "過期時間",
+      "edition": "版本",
+      "version": "版本號",
+      "serialNo": "序列號",
+      "remark": "備註"
+    },
+    "expiration": {
+      "expired": "已過期",
+      "soon": "即將到期",
+      "minutes": "{count}分鐘後到期",
+      "hours": "{count}小時後到期",
+      "days": "{count}天後到期"
+    },
+    "updateLicense": "更新 License",
+    "copyright": "版權所有",
+    "company": "杭州飛致雲信息科技有限公司"
+  },
+  "slogan": "強大易用的企業級智能體平台",
+  "collapseNavigation": "收起導航"
+}

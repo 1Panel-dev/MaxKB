@@ -34,7 +34,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
             name: 'workspace-application-overview',
             component: () => import('@/views/application-detail/overview/index.vue'),
             meta: {
-              title: '概览',
+              title: 'overview.title',
               icon: 'icon_screen_outlined',
               activeIcon: 'icon_screen_filled',
               order: 10,
@@ -94,7 +94,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
             name: 'workspace-application-chat-user',
             component: () => import('@/views/application-detail/chat-user/index.vue'),
             meta: {
-              title: 'chatUser.title',
+              title: 'authorization.chatUserTitle',
               icon: 'icon_contacts_outlined',
               activeIcon: 'icon_contacts_filled',
               order: 40,

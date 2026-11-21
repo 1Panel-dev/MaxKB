@@ -15,7 +15,7 @@ export const systemRoutes: RouteRecordRaw = {
       name: 'system-home',
       component: () => import('@/views/system/home/index.vue'),
       meta: {
-        title: '概览',
+        title: 'overview.title',
         activeIcon: 'icon_screen_filled',
         icon: 'icon_screen_outlined',
         order: 0,
@@ -296,7 +296,7 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'theme',
           name: 'system-theme',
           component: () => import('@/views/system/settings/theme/index.vue'),
-          meta: { title: '外观设置', order: 20, permission: perm.system.appearance.read, next: 'system-email' },
+          meta: { title: 'appearance.title', order: 20, permission: perm.system.appearance.read, next: 'system-email' },
         },
         {
           path: 'email',
@@ -311,7 +311,7 @@ export const systemRoutes: RouteRecordRaw = {
       name: 'system-logs',
       component: () => import('@/views/system/operate-logs/index.vue'),
       meta: {
-        title: '操作日志',
+        title: 'operateLog.title',
         icon: 'icon_logs_outlined',
         activeIcon: 'icon_logs_filled',
         order: 60,

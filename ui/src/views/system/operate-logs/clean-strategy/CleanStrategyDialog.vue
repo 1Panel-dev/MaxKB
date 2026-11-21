@@ -28,7 +28,7 @@ function handleSubmit() {
   submitting.value = true
   return OperateLogApi.postOperateLogCleanTime(days.value)
     .then(() => {
-      MsgSuccess('保存成功')
+      MsgSuccess(t('common.messages.saveSuccess'))
       visible.value = false
     })
     .finally(() => {
@@ -46,15 +46,15 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="清除策略" @closed="resetData">
+  <MkDialog v-model="visible" :title="t('operateLog.cleanStrategy.title')" @closed="resetData">
     <div v-loading="loading" class="flex-align-center gap-2">
-      <span>删除</span>
+      <span>{{ t('operateLog.cleanStrategy.recordsPrefix') }}</span>
       <el-input-number v-model="days" class="w-40!" controls-position="right" align="left" :min="1" :max="100000" :value-on-clear="1" step-strictly />
-      <span>天之前的对话记录</span>
+      <span>{{ t('operateLog.cleanStrategy.recordsSuffix', days) }}</span>
     </div>
 
     <template #footer>
-      <el-button plain @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <el-button type="primary" :loading="submitting" :disabled="loading" @click="handleSubmit">{{ t('common.actions.comfirm') }}</el-button>
     </template>
   </MkDialog>

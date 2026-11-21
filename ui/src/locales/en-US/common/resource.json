@@ -1,6 +1,9 @@
 {
   "relations": {
-    "title": "View related resources"
+    "title": "View related resources",
+    "label": "Related resources",
+    "dependency": "Dependencies",
+    "dependent": "Dependents"
   },
   "selected": "Selected resource",
   "shared": "Shared",

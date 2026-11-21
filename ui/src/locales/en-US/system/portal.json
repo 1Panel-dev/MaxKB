@@ -25,7 +25,7 @@
     }
   },
   "cors": {
-    "title": "Cross-origin settings",
+    "title": "CORS settings",
     "placeholder": "Enter the allowed origins. When enabled, leaving this empty allows all origins.\nEnter one origin per line, for example:\nhttp://127.0.0.1:5678\nhttps://dataease.io"
   }
 }

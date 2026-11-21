@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { LayoutMode } from './types'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
@@ -11,6 +12,8 @@ import { Compare, Role, RoleConstants, hasPermission } from '@/permission/core'
 import { useStore } from '@/stores'
 import { getWorkspaceId } from '@/utils/resource-context'
 import perm from '@/permission/index.ts'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const router = useRouter()
 const props = withDefaults(defineProps<{ mode?: LayoutMode; preview?: boolean }>(), { mode: 'workspace', preview: false })
@@ -79,7 +82,7 @@ function toUrl(url?: string) {
         <el-divider direction="vertical" />
         <!-- 企业版: 工作空间下拉框 -->
         <HeaderWorkspaceDropdown v-if="isWorkspace(mode)" />
-        <span v-if="isSystem(mode)">系统管理</span>
+        <span v-if="isSystem(mode)">{{ t('system.title') }}</span>
       </div>
     </div>
 
@@ -88,25 +91,25 @@ function toUrl(url?: string) {
         <!-- 访问智能体门户 -->
         <el-button v-if="perm.system.other.portal()" text @click="toUrl(portalAccessUrl)">
           <MkIcon name="icon_chat_outlined" />
-          <span>门户</span>
+          <span>{{ t('layout.portal') }}</span>
         </el-button>
       </span>
 
       <!-- 社区版访问升级价格页 -->
       <el-button v-if="!preview && auth.isCE" class="bg-primary-gradient" round @click="toUrl('https://maxkb.cn/price')">
         <MkIcon name="icon_launch_outlined" />
-        <span>升级</span>
+        <span>{{ t('layout.upgrade') }}</span>
       </el-button>
       <el-divider direction="vertical" />
       <!-- 保存当前工作空间并进入系统管理 -->
       <el-button v-if="isWorkspace(mode) && (isWorkspaceManager || canManageSystem)" class="-mx-1" text @click="switchMode">
         <MkIcon name="icon_admin_outlined" />
-        <span>系统管理</span>
+        <span>{{ t('system.title') }}</span>
       </el-button>
       <!-- 返回进入系统管理前的工作空间 -->
       <el-button v-if="isSystem(mode) && canReturnWorkspace" class="-mx-1" text @click="switchMode">
         <MkIcon name="icon_left_outlined" />
-        <span>返回工作空间</span>
+        <span>{{ t('layout.returnWorkspace') }}</span>
       </el-button>
       <AvatarDropdown><!-- 头像  --></AvatarDropdown>
     </div>

@@ -20,12 +20,12 @@ const positionOptions = reactive([
   <!-- 展开分段位置菜单 -->
   <MkDropdownItem class="p-0!" @click.prevent.stop>
     <MkDropdown class="w-full" trigger="hover" placement="left-start" @visible-change="emit('visible-change', $event)">
-      <div class="flex-between w-full gap-2 p-2">
+      <div class="flex-between w-full gap-2 py-[5px] px-2">
         <div class="flex-align-center gap-2">
           <MkIcon name="icon_drag_outlined" class="text-N600!" />
           <span>{{ label }}</span>
         </div>
-        <MkIcon name="icon_right_outlined" class="text-N600!" />
+        <MkIcon name="icon_right_outlined" class="text-N500!" />
       </div>
       <template #dropdown>
         <MkDropdownMenu>

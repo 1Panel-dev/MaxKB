@@ -128,8 +128,7 @@ Tailwind 在 `tailwind.css` 中显式重写了项目字号及对应行高：
 
 ## 标题层级
 
-全局标题样式统一定义在 `app.scss`。业务页面按照内容层级直接使用 `h1` 至 `h6`，不再重复添加
-字号、行高和字重 class：
+标题样式在 `app.scss` 定义。按内容层级使用 `h1` 至 `h6`，不重复设置字号、行高和字重：
 
 | 标签 | 设计层级 | 字号/行高 | 字重 |
 | ---- | -------- | --------- | ---- |
@@ -211,7 +210,7 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 | 中（默认） | `mk-gray-card`    | 12px                | 6px  |
 | 小         | `mk-gray-card-sm` | 上下 8px、左右 12px | 12px |
 
-符合以上规格的卡片直接使用对应类名，不再叠加 `p-4!`、`py-2!` 或 `rounded-xl!`。
+符合规格的卡片使用对应类名，不叠加重复的内边距或圆角类。
 自定义工具的输出参数结果展示保留 6px 圆角，使用 `mk-gray-card-sm rounded-md!`。
 
 白色内容卡片使用 `mk-white-card` 或 `mk-white-card-sm`，内边距和圆角与同尺寸灰色卡片一致。
@@ -401,7 +400,7 @@ Tailwind v4 的 `border` 只设置边框宽度和样式，不提供 `--tw-border
 树形 Table 的名称列统一通过 `el-table-column` 的 `class-name="expand-name-column"`
 启用同行布局。样式维护在 `element-plus.scss` 的 table 分组，令单元格使用纵向居中的 Flex，
 并禁止展开图标、缩进和占位元素收缩，使长名称截断时保持目录层级。
-资源授权 `PermissionTable` 和飞书导入表格共用该类，页面不再重复声明对应的 `:deep()` 样式。
+资源授权 `PermissionTable` 和飞书导入表格共用该类，页面不重复覆盖。
 
 Tree 的 `.el-tree-node__content` 统一保留 4px 底部间距，使同级节点及展开后的父子节点行
 保持一致间距；规则维护在 `element-plus.scss` 的 tree 分组。

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, reactive, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict, OperateLog, OptionItem } from '@/api/types'
 import type { MkDateRangeValue } from '@/components/global/mk-date-range/types'
 import OperateLogApi from '@/api/admin/system/operate-log'
@@ -11,17 +12,19 @@ import { toOrderBy } from '@/utils/common'
 import { beforeDay, datetimeFormat } from '@/utils/time'
 import perm from '@/permission/index.ts'
 
+const { locale, t } = useI18n({ useScope: 'global' })
+
 const { auth } = useStore()
 /* 日志筛选与列表 */
 const loading = ref(false)
 const operateLogs = ref<OperateLog[]>([])
 const orderBy = ref<string>()
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
-const searchFields: OptionItem<string>[] = [
-  { label: '操作详情', value: 'operate' },
-  { label: '操作用户', value: 'user' },
-  { label: 'IP 地址', value: 'ip_address' },
-]
+const searchFields: OptionItem<string>[] = reactive([
+  { label: computed(() => t('operateLog.operationDetails')), value: 'operate' },
+  { label: computed(() => t('operateLog.operator')), value: 'user' },
+  { label: computed(() => t('operateLog.ipAddress')), value: 'ip_address' },
+])
 const operateLogSearchQuery = ref<Dict<unknown>>()
 
 function handleSearchChange(query?: Dict<unknown>) {
@@ -77,10 +80,10 @@ function handleWorkspaceChange() {
 
 // 状态筛选
 const selectedStatus = ref<number>()
-const statusOptions: OptionItem<number>[] = [
-  { label: '成功', value: 200 },
-  { label: '失败', value: 500 },
-]
+const statusOptions: OptionItem<number>[] = reactive([
+  { label: computed(() => t('common.status.success')), value: 200 },
+  { label: computed(() => t('common.status.failure')), value: 500 },
+])
 
 function handleStatusChange() {
   paginationConfig.value.currentPage = 1
@@ -133,6 +136,12 @@ function handleExport() {
   })
 }
 
+// 切换语言后重新获取服务端翻译的日志和菜单，保留当前查询条件。
+watch(locale, () => {
+  loadOperateLogs()
+  loadOperateMenuOptions()
+})
+
 onMounted(() => {
   loadOperateLogs()
   loadOperateMenuOptions()
@@ -141,7 +150,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout :loading="loading">
+  <MkViewLayout :title="t('operateLog.title')" :loading="loading">
     <template #default="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -151,7 +160,7 @@ onMounted(() => {
           <!-- 清除策略 导出-->
           <el-button v-if="perm.system.operationLog.export()" plain @click="handleExport">
             <MkIcon name="icon_export_outlined" />
-            <span>导出</span>
+            <span>{{ t('common.actions.export') }}</span>
           </el-button>
           <!-- 清除策略 -->
           <ButtonCleanStrategy v-if="perm.system.operationLog.clearPolicy()" />
@@ -167,21 +176,21 @@ onMounted(() => {
         :max-table-height="200"
         resizable
       >
-        <el-table-column prop="menu" min-width="140" show-overflow-tooltip>
+        <el-table-column prop="menu" min-width="160" show-overflow-tooltip>
           <template #header>
             <MkTableFilter
               mode="multiple"
               v-model="selectedOperateMenus"
-              label="操作菜单"
+              :label="t('operateLog.menu')"
               :options="operateMenuOptions"
               @change="handleOperateMenuChange"
             />
           </template>
         </el-table-column>
-        <el-table-column label="操作详情" min-width="220" show-overflow-tooltip>
+        <el-table-column :label="t('operateLog.operationDetails')" min-width="220" show-overflow-tooltip>
           <template #default="{ row }">{{ row.operate }}{{ row.operation_object?.name ? `【${row.operation_object.name}】` : '' }}</template>
         </el-table-column>
-        <el-table-column label="操作用户" min-width="130" show-overflow-tooltip>
+        <el-table-column :label="t('operateLog.operator')" min-width="130" show-overflow-tooltip>
           <template #default="{ row }">{{ row.user?.username || '-' }}</template>
         </el-table-column>
         <el-table-column v-if="auth.isEE" min-width="160">
@@ -189,7 +198,7 @@ onMounted(() => {
             <MkTableFilter
               mode="multiple"
               v-model="selectedWorkspaceIds"
-              label="工作空间"
+              :label="t('workspace.title')"
               filterable
               :options="workspaceOptions"
               @change="handleWorkspaceChange"
@@ -199,24 +208,30 @@ onMounted(() => {
         </el-table-column>
         <el-table-column min-width="110">
           <template #header>
-            <MkTableFilter mode="single" v-model="selectedStatus" label="状态" :options="statusOptions" @change="handleStatusChange" />
+            <MkTableFilter
+              mode="single"
+              v-model="selectedStatus"
+              :label="t('common.status.label')"
+              :options="statusOptions"
+              @change="handleStatusChange"
+            />
           </template>
           <template #default="{ row }">
             <span class="inline-flex items-center gap-2">
               <span :class="row.status === 200 ? 'mk-dot-success' : 'mk-dot-danger'" />
-              <span>{{ row.status === 200 ? '成功' : '失败' }}</span>
+              <span>{{ row.status === 200 ? t('common.status.success') : t('common.status.failure') }}</span>
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="IP 地址" width="140" show-overflow-tooltip>
+        <el-table-column :label="t('operateLog.ipAddress')" width="140" show-overflow-tooltip>
           <template #default="{ row }">{{ row.ip_address || '-' }}</template>
         </el-table-column>
-        <el-table-column prop="create_time" label="操作时间" width="180" sortable>
+        <el-table-column prop="create_time" :label="t('operateLog.operationTime')" width="180" sortable>
           <template #default="{ row }">{{ datetimeFormat(row.create_time) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="70" fixed="right">
+        <el-table-column :label="t('common.labels.operation')" width="80" fixed="right">
           <template #default="{ row }">
-            <MkTooltip effect="dark" content="API 详情" placement="top">
+            <MkTooltip effect="dark" :content="t('operateLog.apiDetails')" placement="top">
               <el-button type="primary" text @click.stop="handleOpenDetail(row)">
                 <MkIcon name="icon_describe_outlined" />
               </el-button>

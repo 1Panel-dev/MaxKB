@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { Locale } from '@/locales/config'
 import { LOGIN_METHOD } from '@/api/enums'
 import CurrentUserApi from '@/api/admin/auth/current-user'
@@ -13,6 +14,8 @@ import { useStore } from '@/stores'
 import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'AvatarDropdown' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const isChangingLanguage = ref(false)
 const router = useRouter()
@@ -93,7 +96,7 @@ function toUrl(url?: string) {
           <!-- 修改密码 -->
           <MkDropdownItem @click="handleOpenChangePassword" v-if="perm.system.other.changePassword()">
             <template #icon><MkIcon name="icon-key_outlined" /></template>
-            <span>修改密码</span>
+            <span>{{ t('auth.changePassword.title') }}</span>
           </MkDropdownItem>
           <!-- 管理系统 API Key -->
           <MkDropdownItem v-if="perm.system.other.systemApiKey()" @click="handleOpenApiKey">
@@ -103,10 +106,10 @@ function toUrl(url?: string) {
           <!-- 切换账号界面语言 -->
           <MkDropdownItem @click.stop class="p-0!" v-if="perm.system.other.SWITCH_LANGUAGE()">
             <MkDropdown class="w-full" trigger="hover" placement="left-start">
-              <div class="flex-between w-full gap-2 p-2">
+              <div class="flex-between w-full gap-2 py-[5px] px-2">
                 <div class="flex-align-center gap-2">
                   <MkIcon name="icon_translate_outlined" class="text-N600!" />
-                  <span>语言</span>
+                  <span>{{ t('common.labels.language') }}</span>
                 </div>
 
                 <MkIcon name="icon_right_outlined" class="text-N500!" />
@@ -129,24 +132,24 @@ function toUrl(url?: string) {
           </MkDropdownItem>
           <MkDropdownItem divided @click="toUrl(theme.themeInfo?.projectUrl)" v-if="theme.themeInfo?.showProject">
             <template #icon><MkIcon name="icon_github_filled" /></template>
-            <span>项目地址</span>
+            <span>{{ t('layout.project') }}</span>
           </MkDropdownItem>
           <MkDropdownItem @click="toUrl(theme.themeInfo?.userManualUrl)" v-if="theme.themeInfo?.showUserManual">
             <template #icon><MkIcon name="icon_add-dictionary_outlined" /></template>
-            <span>用户手册</span>
+            <span>{{ t('layout.userManual') }}</span>
           </MkDropdownItem>
           <MkDropdownItem @click="toUrl(theme.themeInfo?.forumUrl)" v-if="theme.themeInfo?.showForum">
             <template #icon><MkIcon name="icon-maybe_outlined" /></template>
-            <span>论坛求助</span>
+            <span>{{ t('layout.forum') }}</span>
           </MkDropdownItem>
           <!-- 查看版本与授权信息 -->
           <MkDropdownItem v-if="perm.system.other.about()" @click="handleOpenAbout">
             <template #icon><MkIcon name="icon_info_outlined" /></template>
-            <span>关于</span>
+            <span>{{ t('layout.about.title') }}</span>
           </MkDropdownItem>
           <MkDropdownItem divided @click="handleLogout">
             <template #icon><MkIcon name="icon_logout_outlined" /></template>
-            <span>退出登录</span>
+            <span>{{ t('auth.logout.label') }}</span>
           </MkDropdownItem>
         </MkDropdownMenu>
       </div>

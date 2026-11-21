@@ -117,7 +117,7 @@
 `layout/ResourceDetailLayout.vue` 提供侧栏和固定标题栏。子页声明 `ResourceDetailPageProps`，
 普通页使用默认标题；`defineExpose({ customHeader: true })` 配合 Teleport 到 `headerTarget`
 自定义标题、搜索及操作；`hideHeader: true` 隐藏整个标题栏且优先于自定义标题。
-不再嵌套页面布局、创建 Header 注入或增加路由字段。
+不嵌套页面布局，不另建 Header 注入或路由字段。
 
 `knowledge-detail/context.ts` 仅通过 `provideKnowledgeDetailContext` 和
 `useKnowledgeDetailContext` 公开详情、更新能力、ID、来源导航及完整 API。
@@ -225,7 +225,7 @@ System 资源管理或 System 共享 Knowledge API 的 `postKnowledgeHitTest`；
 `library/image/index.vue` 使用独立列表入口，复用 `document/` 的状态、展示组件及 Action，
 查询与操作沿用 Document API；图片列表的查询参数差异见 [API 文档](../api/API_README.md#文档与分段)。
 文本、表格、QA 与图片上传抽屉的数量提示和控件限制均使用知识库 `file_count_limit`，未配置时默认 50，
-不再额外限制为 50；图片预览与导入接口也按知识库配置校验数量。
+不额外设置 50 张上限；预览和导入均按知识库配置校验数量。
 点击图片行通过 `resourceApi.paragraph.getParagraphPage` 查询首个分段，使用 `ParagraphDialog` 展示详情；弹窗按需挂载，关闭动画结束后卸载。
 图片上传独立放在 `image/upload-image/`，`ButtonUploadImage` 管理入口与按需挂载，
 `UploadImageDrawer` 分为上传图片、图片处理两步，复用 `MkDragUpload` 的多文件图片模式暂存文件；
@@ -502,7 +502,7 @@ System 资源管理的修正内容与添加知识库选项仅包含当前智能�
   切换排序清空选择并回到第一页，搜索、筛选和分页保留排序；取消排序恢复后端默认顺序。
   排序参数见 API 文档。
 - 系统操作日志的操作时间使用服务端表头排序，切换后回到第一页，保留搜索及筛选条件。
-  分页和导出沿用当前排序条件，取消排序不传排序值。
+  分页和导出沿用当前排序条件，取消排序不传排序值。切换界面语言时重新加载日志列表和操作菜单选项，保留当前筛选、排序与页码，工作空间选项不重复查询。
 
 ### 登录
 

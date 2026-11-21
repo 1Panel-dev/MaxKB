@@ -3,7 +3,6 @@
     "webAccess": "Web access",
     "backendApi": "Backend API access",
     "link": "Link",
-    "apiDoc": "API documentation",
     "resetTitle": "Regenerate the public access link?",
     "resetDescription": "The old link will become invalid, and scripts embedded in third-party sites will also need updating. Proceed with caution!",
     "refreshSuccess": "Refreshed successfully",
@@ -26,7 +25,6 @@
     },
     "display": {
       "title": "Display settings",
-      "language": "Language",
       "themeColor": "Custom theme color",
       "headerFontColor": "Header title font color",
       "background": "Chat background",
