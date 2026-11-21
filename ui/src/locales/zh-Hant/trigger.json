@@ -36,7 +36,7 @@
       "label": "參數名",
       "placeholder": "請輸入參數名",
       "requiredMessage": "請輸入參數名",
-      "duplicateMessage": "參數名不能重復"
+      "duplicateMessage": "參數名已存在"
     },
     "dataType": {
       "label": "數據類型",

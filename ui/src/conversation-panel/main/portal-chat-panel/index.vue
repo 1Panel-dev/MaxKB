@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, provide, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { EXPORT_MESSAGE_ELEMENT_KEY } from '../../components/header/header-actions/export/context.ts'
 import PortalHeader from '../../components/header/portal/index.vue'
 import { useMessageInputStore } from '../../components/message-input/index'
@@ -8,6 +9,8 @@ import MessageList from '../../components/message-list/index.vue'
 import { useShareLinkStoreOptional } from '../../components/message-list/share/index'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { usePortalConversationListStore } from '../../left-sidebar/portal-conversation-list/index'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'PortalChatPanel' })
 
@@ -31,10 +34,14 @@ const disclaimerText = computed(() =>
   <main ref="mainRef" class="mk-conversation-main" @drop.prevent="handleDrop" @dragover.prevent>
     <!-- 收起侧栏时标题栏的新建对话与侧栏一致：没有当前智能体时选择智能体 -->
     <PortalHeader :new-conversation="portalList.newConversation" @share="shareLink?.enterShare()" />
-    <MessageList :key="list.currentChatId.value" v-if="portalList.currentApplicationId.value" :app-name="list.appInfo.value?.name || 'AI 助手'" />
+    <MessageList
+      :key="list.currentChatId.value"
+      v-if="portalList.currentApplicationId.value"
+      :app-name="list.appInfo.value?.name || t('chat.defaultAssistantName')"
+    />
     <!-- 未确定智能体时不显示欢迎语：分组加载完成且没有可用智能体时显示空状态 -->
     <div v-else class="flex-center min-h-0 flex-1">
-      <MkEmpty v-if="portalList.isApplicationGroupsLoaded.value" description="暂无可用智能体" />
+      <MkEmpty v-if="portalList.isApplicationGroupsLoaded.value" :description="t('portal.noAvailableApplications')" />
     </div>
     <footer v-if="!list.isShared.value" class="mk-conversation-content flex-col-center shrink-0 gap-2 p-4">
       <MessageInput />

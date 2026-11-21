@@ -36,7 +36,7 @@
       "label": "Parameter name",
       "placeholder": "Enter a parameter name",
       "requiredMessage": "Enter a parameter name",
-      "duplicateMessage": "Parameter names must be unique"
+      "duplicateMessage": "Parameter name already exists"
     },
     "dataType": {
       "label": "Data type",

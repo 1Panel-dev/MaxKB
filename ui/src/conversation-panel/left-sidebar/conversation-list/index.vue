@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Conversation } from '../../core/types'
 import type { ViewType } from '../../view/index'
 import { useMessageListStore } from '../../components/message-list/index'
@@ -14,6 +15,7 @@ import { relativeTimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'ConversationList' })
 
+const { t } = useI18n({ useScope: 'global' })
 const viewType = useViewType()
 const { auth } = useStore()
 // 单应用对话（含嵌入）使用当前应用的认证配置
@@ -45,7 +47,7 @@ const historyEnabled = computed(() => appInfo.value?.show_history !== false)
 const clearing = ref(false)
 
 function handleDeleteConversation(conversation: Conversation) {
-  MsgConfirm('是否删除该对话？', '删除后无法恢复。')
+  MsgConfirm(t('chat.delete.title', { name: conversation.abstract || t('chat.defaultConversationTitle') }), t('chat.delete.description'))
     .then(() => deleteChat(conversation.id))
     .catch(() => {})
 }
@@ -53,7 +55,7 @@ function handleDeleteConversation(conversation: Conversation) {
 // 先加载全部分页，再切到新对话并逐条删除；失败时保留未删除记录。
 function handleClearConversations() {
   if (clearing.value) return
-  MsgConfirm('是否清空全部历史对话？', '清空后无法恢复。', { confirmButtonText: '清空' })
+  MsgConfirm(t('chat.history.clearTitle'), t('chat.history.clearDescription'), { confirmButtonText: t('common.actions.clear') })
     .then(async () => {
       clearing.value = true
       while (hasMore.value) await loadMore()
@@ -73,10 +75,10 @@ function handleClearConversations() {
     <div class="mb-4 flex-between shrink-0 gap-2" :style="{ color: authProfile?.custom_theme?.header_font_color || undefined }">
       <div class="min-w-0 flex-align-center gap-2">
         <ApplicationIcon :icon="appInfo?.icon" :size="24" class="shrink-0" />
-        <h4 class="truncate" :title="appInfo?.name || 'AI 助手'">{{ appInfo?.name || 'AI 助手' }}</h4>
+        <h4 class="truncate" :title="appInfo?.name || t('chat.defaultAssistantName')">{{ appInfo?.name || t('chat.defaultAssistantName') }}</h4>
       </div>
       <!-- 收起左侧 -->
-      <MkTooltip content="收起侧边栏">
+      <MkTooltip :content="t('chat.actions.collapseSidebar')">
         <el-button text @click="toggleLeftSide()" class="-mr-1">
           <MkIcon name="icon_sidebar_outlined" :size="18" :color="authProfile?.custom_theme?.header_font_color || 'var(--mk-N900)'" />
         </el-button>
@@ -84,17 +86,17 @@ function handleClearConversations() {
     </div>
 
     <!-- 新建对话 -->
-    <MkTooltip content="新建对话">
+    <MkTooltip :content="t('chat.newChat')">
       <MkListItem @click="newConversation()">
         <MkIcon name="icon_new-chat_outlined" :size="18" class="mr-2" />
-        <span>新建对话</span>
+        <span>{{ t('chat.newChat') }}</span>
       </MkListItem>
     </MkTooltip>
     <template v-if="historyEnabled">
       <div class="flex-between pl-2 mt-4">
-        <h6 class="text-N600">历史对话</h6>
+        <h6 class="text-N600">{{ t('chat.history.label') }}</h6>
 
-        <MkTooltip content="清空">
+        <MkTooltip :content="t('common.actions.clear')">
           <!-- 批量清空历史对话 -->
           <el-button text :loading="clearing" :disabled="!conversations.length" @click="handleClearConversations">
             <MkIcon name="icon_delete-trash_outlined" />
@@ -105,13 +107,13 @@ function handleClearConversations() {
       <!-- 历史列表独立滚动，应用信息和新建入口保持固定。 -->
       <el-scrollbar class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
         <el-skeleton v-if="initialLoading" animated />
-        <div v-else-if="conversations.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
+        <div v-else-if="conversations.length === 0" class="text-N600 text-center mt-4">{{ t('chat.history.empty') }}</div>
         <div v-else class="space-y-1">
           <template v-for="conversation in conversations" :key="conversation.id">
             <MkListItem :active="currentChatId === conversation.id" @click="selectConversation(conversation.id)">
               <template #default="{ active }">
-                <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || '新对话'">
-                  {{ conversation.abstract || '新对话' }}
+                <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || t('chat.defaultConversationTitle')">
+                  {{ conversation.abstract || t('chat.defaultConversationTitle') }}
                 </span>
 
                 <!-- 选中、悬停或聚焦列表行时隐藏时间，显示内置更多操作。 -->
@@ -135,7 +137,7 @@ function handleClearConversations() {
                         @click="handleShareConversation(conversation)"
                       >
                         <template #icon><MkIcon name="icon_share_outlined" /></template>
-                        <span>分享</span>
+                        <span>{{ t('chat.share.label') }}</span>
                       </MkDropdownItem>
                       <!-- 重命名 -->
                       <RenameConversation :conversation="conversation" />
@@ -143,7 +145,7 @@ function handleClearConversations() {
                       <!-- 删除历史对话 -->
                       <MkDropdownItem @click="handleDeleteConversation(conversation)">
                         <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                        <span>删除</span>
+                        <span>{{ t('common.actions.delete') }}</span>
                       </MkDropdownItem>
                     </MkDropdownMenu>
                   </template>

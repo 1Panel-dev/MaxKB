@@ -9,6 +9,7 @@
   },
   "details": {
     "title": "执行详情",
+    "empty": "暂无执行详情",
     "input": "输入",
     "output": "输出",
     "inputParams": "输入参数",

@@ -170,7 +170,7 @@ onMounted(() => {
               <template #suffix>
                 <div class="-mr-1">
                   <!-- 复制访问链接 -->
-                  <MkTooltip :content="t('common.actions.duplicate')" placement="top">
+                  <MkTooltip :content="t('common.actions.copy')" placement="top">
                     <el-button text :disabled="!accessUrl" @click="copyText(accessUrl, t('common.messages.copied'))">
                       <MkIcon name="icon_copy_outlined" />
                     </el-button>
@@ -219,7 +219,7 @@ onMounted(() => {
             <el-input :model-value="apiDocUrl" readonly>
               <template #suffix>
                 <!-- 复制 API 文档地址 -->
-                <MkTooltip :content="t('common.actions.duplicate')" placement="top">
+                <MkTooltip :content="t('common.actions.copy')" placement="top">
                   <el-button text @click="copyText(apiDocUrl, t('common.messages.copied'))" class="-mr-1">
                     <MkIcon name="icon_copy_outlined" />
                   </el-button>

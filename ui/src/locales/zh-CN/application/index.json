@@ -33,7 +33,7 @@
       "description": "将从知识库中检索到的知识作为已知信息，回答用户提出的问题。"
     }
   },
-  "duplicate": {
+  "copy": {
     "title": "复制智能体"
   },
   "status": {

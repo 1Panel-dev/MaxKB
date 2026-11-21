@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import { useRightSidebarStore } from '../index'
 import DocumentPreview from './document-preview/index.vue'
@@ -6,6 +7,7 @@ import { getFileIconUrl } from '@/utils/icon'
 
 defineOptions({ name: 'KnowledgeSource' })
 
+const { t } = useI18n({ useScope: 'global' })
 const { knowledgeSource, closeRightSide } = useRightSidebarStore()
 const { previewDocument, sourceParagraphs, count, openDocument } = knowledgeSource
 </script>
@@ -16,7 +18,7 @@ const { previewDocument, sourceParagraphs, count, openDocument } = knowledgeSour
     <!-- 分段列表预览文档时仅隐藏不卸载，返回后保留滚动位置 -->
     <div class="flex-column h-full" :class="{ invisible: previewDocument }">
       <div class="flex-between shrink-0 px-6 py-4 border-b">
-        <h4>知识来源 ({{ count }})</h4>
+        <h4>{{ t('chat.knowledgeSource.label') }} ({{ count }})</h4>
         <!-- 关闭知识来源 -->
         <el-button text @click="closeRightSide()">
           <MkIcon name="icon_close_outlined" size="18" />
@@ -76,7 +78,7 @@ const { previewDocument, sourceParagraphs, count, openDocument } = knowledgeSour
             </MkResourceCard>
           </template>
         </div>
-        <el-empty v-else description="暂无知识来源" :image-size="80" />
+        <el-empty v-else :description="t('chat.knowledgeSource.empty')" :image-size="80" />
       </el-scrollbar>
     </div>
     <!-- 预览 PDF 来源文档，覆盖在分段列表之上 -->

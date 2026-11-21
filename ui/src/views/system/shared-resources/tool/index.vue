@@ -159,7 +159,7 @@ function handleOpenWorkflow(tool: ToolItem, event: MouseEvent) {
                   <CopyToolAction
                     v-if="perm.tool.share.copy()"
                     v-model:loading="toolOperationLoading"
-                    :label="t('common.actions.duplicate')"
+                    :label="t('common.actions.copy')"
                     :api="SystemSharedToolApi"
                     :tool="tool"
                     @refresh="refreshTools"

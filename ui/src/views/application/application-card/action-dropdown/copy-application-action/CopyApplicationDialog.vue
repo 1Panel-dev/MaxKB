@@ -67,7 +67,7 @@ function submit() {
       })
       .then((application) => {
         visible.value = false
-        MsgSuccess(t('common.messages.duplicateSuccess'))
+        MsgSuccess(t('common.messages.copySuccess'))
         emit('refresh')
         return user.loadCurrentUser().then(() =>
           router
@@ -92,7 +92,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" :title="t('application.duplicate.title')" @closed="emit('closed')">
+  <MkDialog v-model="visible" :title="t('application.copy.title')" @closed="emit('closed')">
     <el-form
       ref="applicationFormRef"
       :model="applicationForm"
@@ -121,7 +121,7 @@ defineExpose({ open })
       <!-- 取消复制 -->
       <el-button plain :disabled="submitting" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 创建智能体副本 -->
-      <el-button type="primary" :loading="submitting" @click="submit">{{ t('common.actions.duplicate') }}</el-button>
+      <el-button type="primary" :loading="submitting" @click="submit">{{ t('common.actions.copy') }}</el-button>
     </template>
   </MkDialog>
 </template>

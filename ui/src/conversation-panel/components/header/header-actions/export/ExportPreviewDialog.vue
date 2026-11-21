@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { downloadBlob } from './use-conversation-export'
 import { MsgError } from '@/utils/message'
 
+const { t } = useI18n({ useScope: 'global' })
 const visible = ref(false)
 const loading = ref(false)
 const previewUrl = ref('')
 let capturedCanvas: HTMLCanvasElement | null = null
-let fileName = '对话记录'
+let fileName = t('chat.export.fileName')
 
 function clear() {
   previewUrl.value = ''
@@ -54,7 +56,7 @@ async function save(format: 'pdf' | 'png') {
       pdf.save(`${fileName}.pdf`)
     }
   } catch {
-    MsgError('导出失败，请稍后重试')
+    MsgError(t('chat.export.failedMessage'))
   } finally {
     loading.value = false
   }
@@ -63,13 +65,13 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="导出预览" width="900px" @closed="clear">
-    <img v-if="previewUrl" :src="previewUrl" alt="对话导出预览" class="w-full" />
+  <MkDialog v-model="visible" :title="t('chat.export.previewTitle')" width="900px" @closed="clear">
+    <img v-if="previewUrl" :src="previewUrl" class="w-full" />
     <template #footer>
       <!-- 导出 PDF -->
-      <el-button :loading="loading" @click="save('pdf')">导出 PDF</el-button>
+      <el-button :loading="loading" @click="save('pdf')">{{ t('common.actions.export') }} PDF</el-button>
       <!-- 导出图片 -->
-      <el-button type="primary" :loading="loading" @click="save('png')">导出图片</el-button>
+      <el-button type="primary" :loading="loading" @click="save('png')">{{ t('chat.export.image') }}</el-button>
     </template>
   </MkDialog>
 </template>

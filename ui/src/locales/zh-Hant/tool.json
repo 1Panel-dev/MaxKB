@@ -2,7 +2,7 @@
   "title": "工具",
   "createTitle": "創建工具",
   "editTitle": "編輯工具",
-  "duplicateTitle": "複製工具",
+  "copyTitle": "複製工具",
   "categories": {
     "all": "全部工具",
     "shared": "共享工具"
@@ -25,7 +25,7 @@
     "label": "Skills",
     "createTitle": "創建 Skill",
     "editTitle": "編輯 Skill",
-    "duplicateTitle": "複製 Skill",
+    "copyTitle": "複製 Skill",
     "name": {
       "placeholder": "請輸入 Skill 名稱",
       "requiredMessage": "請輸入 Skill 名稱"
@@ -41,7 +41,7 @@
     "label": "工作流",
     "createTitle": "創建工作流",
     "editTitle": "編輯工作流",
-    "duplicateTitle": "複製工作流",
+    "copyTitle": "複製工作流",
     "name": {
       "placeholder": "請輸入工作流名稱",
       "requiredMessage": "請輸入工作流名稱"
@@ -51,7 +51,7 @@
     "label": "MCP",
     "createTitle": "創建 MCP",
     "editTitle": "編輯 MCP",
-    "duplicateTitle": "複製 MCP",
+    "copyTitle": "複製 MCP",
     "serviceTitle": "MCP 服務",
     "settingsTitle": "MCP 設置",
     "reference": "引用 MCP",
@@ -75,7 +75,7 @@
   "dataSource": {
     "createTitle": "創建數據源",
     "editTitle": "編輯數據源",
-    "duplicateTitle": "複製數據源",
+    "copyTitle": "複製數據源",
     "name": {
       "placeholder": "請輸入數據源名稱",
       "requiredMessage": "請輸入數據源名稱"

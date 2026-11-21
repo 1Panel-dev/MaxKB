@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatContent, Dict } from '@/api/types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ConversationDefaultToolContent' })
 
@@ -9,15 +12,15 @@ const props = defineProps<{ content: ChatContent }>()
 // 默认工具独立管理展开状态，初始收起。
 const isExpanded = ref(false)
 const loading = computed(() => props.content.status === 'RUNNING')
-const toolTitle = computed(() => props.content.name || 'Tool')
+const toolTitle = computed(() => props.content.name || t('tool.title'))
 
 // 状态文案与配色
 const statusText = computed(() => {
   const map: Dict<string> = {
-    RUNNING: '执行中',
-    SUCCESS: '成功',
-    FAIL: '失败',
-    FAILURE: '失败',
+    RUNNING: t('common.status.running'),
+    SUCCESS: t('common.status.success'),
+    FAIL: t('common.status.failure'),
+    FAILURE: t('common.status.failure'),
   }
   const status = props.content.status ?? ''
   return map[status] ?? status
@@ -76,12 +79,12 @@ const formattedResult = computed(() => tryFormatJson(props.content.content))
     <div class="space-y-2">
       <!-- 请求参数 -->
       <div v-if="content.arguments" class="mk-gray-card-lg py-3!">
-        <h6 class="mb-2">输入参数</h6>
+        <h6 class="mb-2">{{ t('execution.details.inputParams') }}</h6>
         <div class="whitespace-pre-wrap break-words">{{ formattedArguments }}</div>
       </div>
       <!-- 返回结果 -->
       <div v-if="content.content" class="mk-gray-card-lg py-3!">
-        <h6 class="mb-2">输出参数</h6>
+        <h6 class="mb-2">{{ t('execution.details.outputParams') }}</h6>
         <div class="whitespace-pre-wrap break-words">{{ formattedResult }}</div>
       </div>
     </div>

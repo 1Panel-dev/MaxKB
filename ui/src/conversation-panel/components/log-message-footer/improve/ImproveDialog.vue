@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import type { DocumentItem, KnowledgeItem } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -12,6 +13,7 @@ import { MsgSuccess } from '@/utils/message'
 import { isSystemResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'ImproveDialog' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: Pick<typeof ChatLogApi, 'putChatRecordLog'>
   applicationId: string
@@ -40,18 +42,18 @@ const improveForm = reactive({
   content: props.answer,
   title: '',
 })
-const rules: FormRules<typeof improveForm> = {
+const rules = computed<FormRules<typeof improveForm>>(() => ({
   problem_text: [
-    { required: true, whitespace: true, message: '请输入关联问题', trigger: 'blur' },
-    { max: 64, message: '关联问题不能超过64个字符', trigger: 'blur' },
+    { required: true, whitespace: true, message: t('chat.improve.relatedQuestion.requiredMessage'), trigger: 'blur' },
+    { max: 64, message: t('chat.improve.relatedQuestion.lengthMessage', { max: 64 }), trigger: 'blur' },
   ],
   content: [
-    { required: true, whitespace: true, message: '请输入内容', trigger: 'blur' },
-    { max: 100000, message: '内容不能超过100000个字符', trigger: 'blur' },
+    { required: true, whitespace: true, message: t('chat.improve.content.requiredMessage'), trigger: 'blur' },
+    { max: 100000, message: t('chat.improve.content.lengthMessage', { max: 100000 }), trigger: 'blur' },
   ],
-  knowledge_id: [{ required: true, message: '请选择知识库', trigger: 'change' }],
-  document_id: [{ required: true, message: '请选择文档', trigger: 'change' }],
-}
+  knowledge_id: [{ required: true, message: t('knowledge.fields.targetKnowledge.requiredMessage'), trigger: 'change' }],
+  document_id: [{ required: true, message: t('knowledge.document.targetDocument.requiredMessage'), trigger: 'change' }],
+}))
 
 function open() {
   if (visible.value || loading.value || optionLoading.value) return
@@ -104,7 +106,7 @@ async function handleSubmit() {
     })
     .then(() => {
       emit('saved')
-      MsgSuccess('保存成功')
+      MsgSuccess(t('common.messages.saveSuccess'))
       visible.value = false
     })
     .catch(() => {
@@ -119,31 +121,39 @@ onMounted(open)
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="修正内容" @closed="emit('closed')">
+  <MkDialog v-model="visible" :title="t('chat.improve.title')" @closed="emit('closed')">
     <el-form
       ref="formRef"
       v-loading="loading || optionLoading"
       :model="improveForm"
       :rules="rules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="关联问题" prop="problem_text">
-        <el-input v-model="improveForm.problem_text" maxlength="64" show-word-limit placeholder="请输入关联问题" />
+      <el-form-item :label="t('chat.improve.relatedQuestion.label')" prop="problem_text">
+        <el-input v-model="improveForm.problem_text" maxlength="64" show-word-limit :placeholder="t('chat.improve.relatedQuestion.placeholder')" />
       </el-form-item>
-      <el-form-item label="内容" prop="content">
-        <el-input v-model="improveForm.content" type="textarea" :rows="10" maxlength="100000" show-word-limit placeholder="请输入内容" />
+      <el-form-item :label="t('chat.improve.content.label')" prop="content">
+        <el-input
+          v-model="improveForm.content"
+          type="textarea"
+          :rows="10"
+          maxlength="100000"
+          show-word-limit
+          :placeholder="t('chat.improve.content.placeholder')"
+        />
       </el-form-item>
-      <el-form-item label="标题" prop="title">
-        <el-input v-model="improveForm.title" maxlength="256" placeholder="请给当前内容设置一个标题，以便管理查看" />
+      <el-form-item :label="t('common.title.label')" prop="title">
+        <el-input v-model="improveForm.title" maxlength="256" :placeholder="t('chat.improve.titlePlaceholder')" />
       </el-form-item>
-      <el-form-item label="选择知识库" prop="knowledge_id">
+      <el-form-item :label="t('knowledge.fields.targetKnowledge.label')" prop="knowledge_id">
         <el-select
           v-model="improveForm.knowledge_id"
           fit-input-width
           filterable
-          placeholder="请选择知识库"
+          :placeholder="t('knowledge.fields.targetKnowledge.placeholder')"
           :loading="knowledgeLoading"
           @change="handleKnowledgeChange"
         >
@@ -163,12 +173,12 @@ onMounted(open)
           </template>
         </el-select>
       </el-form-item>
-      <el-form-item label="保存到文档" prop="document_id">
+      <el-form-item :label="t('knowledge.document.targetDocument.label')" prop="document_id">
         <el-select
           v-model="improveForm.document_id"
           fit-input-width
           filterable
-          placeholder="请选择文档"
+          :placeholder="t('knowledge.document.targetDocument.placeholder')"
           :loading="documentLoading"
           :disabled="!improveForm.knowledge_id"
         >
@@ -191,9 +201,9 @@ onMounted(open)
     </el-form>
     <template #footer>
       <!-- 取消修正内容 -->
-      <el-button plain :disabled="loading || optionLoading" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="loading || optionLoading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存修正内容 -->
-      <el-button type="primary" :loading="loading" :disabled="optionLoading" @click="handleSubmit">保存</el-button>
+      <el-button type="primary" :loading="loading" :disabled="optionLoading" @click="handleSubmit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

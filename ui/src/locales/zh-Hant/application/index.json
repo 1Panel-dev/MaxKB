@@ -33,7 +33,7 @@
       "description": "將從知識庫中檢索到的知識作為已知信息，回答用戶提出的問題。"
     }
   },
-  "duplicate": {
+  "copy": {
     "title": "複製智能體"
   },
   "status": {

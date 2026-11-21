@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useBottomFollow } from '@/conversation-panel/core/bottom-follow'
 
 defineOptions({ name: 'ConversationReasoningContent' })
 
 defineProps<{ content: { content?: string | null; status?: string } }>()
+const { t } = useI18n({ useScope: 'global' })
 // 默认收起，思考中也只显示状态文案，手动展开后查看内容
 const isExpanded = ref(false)
 
@@ -26,7 +28,7 @@ useBottomFollow(useTemplateRef<HTMLElement>('reasoningScrollRef'))
     <template #label>
       <MkIcon name="icon_two-ellipses_outlined" />
       <span class="-mx-1" :class="{ 'mk-dotting': content.status === 'RUNNING' }">
-        {{ content.status === 'RUNNING' ? '思考中' : '思考完成' }}
+        {{ content.status === 'RUNNING' ? t('chat.message.thinking') : t('chat.message.thinkingCompleted') }}
       </span>
     </template>
     <div ref="reasoningScrollRef" class="max-h-[400px] overflow-y-auto text-N500! whitespace-pre-wrap break-words">

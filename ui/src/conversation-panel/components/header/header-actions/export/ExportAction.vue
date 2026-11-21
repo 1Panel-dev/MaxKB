@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { inject, onBeforeUnmount, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Options } from '@popperjs/core'
 import MkDropdown from '@/components/global/mk-dropdown/index.vue'
 import ExportPreviewDialog from './ExportPreviewDialog.vue'
@@ -9,6 +10,7 @@ import { MsgError } from '@/utils/message'
 
 withDefaults(defineProps<{ display?: 'button' | 'menu' }>(), { display: 'button' })
 defineOptions({ inheritAttrs: false })
+const { t } = useI18n({ useScope: 'global' })
 const { disabled, loading, fileName, exportText } = useConversationExport()
 const getMessageElement = inject(EXPORT_MESSAGE_ELEMENT_KEY, () => null)
 const dropdownRef = ref<InstanceType<typeof MkDropdown>>()
@@ -40,7 +42,7 @@ async function previewPdf() {
     if (!disposed) previewRef.value?.open(canvas, name)
   } catch (error) {
     console.error('[conversation-export] 导出预览失败', error)
-    if (!disposed) MsgError('导出预览失败，请等待内容加载完成后重试')
+    if (!disposed) MsgError(t('chat.export.previewFailedMessage'))
   } finally {
     loading.value = false
   }
@@ -67,13 +69,13 @@ async function previewPdf() {
           :class="{ 'is-open': submenuOpen }"
         >
           <template #icon><MkIcon name="icon_export_outlined" /></template>
-          <span class="flex-1">导出</span>
+          <span class="flex-1">{{ t('common.actions.export') }}</span>
           <MkIcon name="icon_right_outlined" class="text-N500!" />
         </MkDropdownItem>
       </span>
       <!-- 桌面端导出图标入口 -->
       <span v-else class="inline-flex">
-        <MkTooltip content="导出">
+        <MkTooltip :content="t('common.actions.export')">
           <el-button text :disabled="disabled" :loading="loading">
             <MkIcon name="icon_export_outlined" :size="18" :class="disabled ? 'text-N400!' : 'text-N900!'" />
           </el-button>
@@ -82,11 +84,11 @@ async function previewPdf() {
       <template #dropdown>
         <MkDropdownMenu>
           <!-- 导出 Markdown -->
-          <MkDropdownItem :disabled="disabled" @click="selectFormat('markdown')">导出 Markdown</MkDropdownItem>
+          <MkDropdownItem :disabled="disabled" @click="selectFormat('markdown')">{{ t('common.actions.export') }} Markdown</MkDropdownItem>
           <!-- 导出 HTML -->
-          <MkDropdownItem :disabled="disabled" @click="selectFormat('html')">导出 HTML</MkDropdownItem>
+          <MkDropdownItem :disabled="disabled" @click="selectFormat('html')">{{ t('common.actions.export') }} HTML</MkDropdownItem>
           <!-- 预览并导出 PDF -->
-          <MkDropdownItem :disabled="disabled" @click="selectFormat('pdf')">导出 PDF</MkDropdownItem>
+          <MkDropdownItem :disabled="disabled" @click="selectFormat('pdf')">{{ t('common.actions.export') }} PDF</MkDropdownItem>
         </MkDropdownMenu>
       </template>
     </MkDropdown>

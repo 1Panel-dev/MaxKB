@@ -3,6 +3,7 @@ import type { PreviewDocument } from './document-preview/index'
 import type { ChatParagraphSource, ChatParagraphSourceMeta, DocumentResourceType, KnowledgeType } from '@/api/types'
 import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import { isPdfDocument } from './document-preview/index'
+import { t } from '@/locales'
 import { downloadByURL, getFileUrl } from '@/utils/common'
 import { MsgInfo } from '@/utils/message'
 
@@ -78,7 +79,10 @@ function toSourceParagraph(paragraph: ChatParagraphSource, index: number): Knowl
     title: paragraph.title || '-',
     content: paragraph.content || '',
     similarity: paragraph.similarity?.toFixed(3) ?? '',
-    vectorLabel: paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE || paragraph.hit_asset ? '图片向量' : '文本向量',
+    vectorLabel:
+      paragraph.document_resource_type === DOCUMENT_RESOURCE_TYPE.IMAGE || paragraph.hit_asset
+        ? t('knowledge.retrieval.imageVector')
+        : t('knowledge.retrieval.textVector'),
     imageUrl: getImageUrl(paragraph),
     documentName,
     documentResourceType: paragraph.document_resource_type,
@@ -121,7 +125,7 @@ export function createKnowledgeSourceStore() {
     if (documentAction === SOURCE_DOCUMENT_ACTION.PREVIEW) previewDocument.value = { name: documentName, url: documentUrl }
     else if (documentAction === SOURCE_DOCUMENT_ACTION.DOWNLOAD) downloadByURL(documentUrl, documentName)
     else if (documentAction === SOURCE_DOCUMENT_ACTION.LINK) window.open(documentUrl, '_blank', 'noopener,noreferrer')
-    else MsgInfo(paragraph.allowDownload ? '原文档不存在' : '没有下载权限')
+    else MsgInfo(paragraph.allowDownload ? t('chat.knowledgeSource.documentMissingMessage') : t('chat.knowledgeSource.noDownloadPermissionMessage'))
   }
 
   return { paragraphs, previewDocument, sourceParagraphs, count, setParagraphs, openDocument, closePreview }

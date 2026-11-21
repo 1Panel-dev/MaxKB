@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { Dict } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
@@ -9,6 +10,7 @@ import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ConversationUserForm' })
 
+const { t } = useI18n({ useScope: 'global' })
 // 行内字段按类型固定宽度，按容器宽度计算能展示的数量，其余收进弹出层
 const INLINE_FIELD_WIDTH = 140
 // 模型选择包含供应商图标和参数按钮，需要更宽
@@ -110,7 +112,7 @@ function validateApiQuery() {
   if (apiInputEditable) return Promise.resolve()
   const missingFields = userForm.getMissingApiFields()
   if (missingFields.length) {
-    MsgWarning(`请在URL中填写参数 ${missingFields.join('、')}的值`)
+    MsgWarning(t('chat.message.missingApiParameters', { fields: missingFields.join('、') }))
     return Promise.reject(false)
   }
   return Promise.resolve()
@@ -226,9 +228,9 @@ onBeforeUnmount(() => {
           </el-scrollbar>
           <div class="mt-4">
             <!-- 确定参数 -->
-            <el-button type="primary" @click="confirmHandle">确定</el-button>
+            <el-button type="primary" @click="confirmHandle">{{ t('common.actions.comfirm') }}</el-button>
             <!-- 取消修改 -->
-            <el-button plain @click="cancelHandle">取消</el-button>
+            <el-button plain @click="cancelHandle">{{ t('common.actions.cancel') }}</el-button>
           </div>
         </div>
       </el-popover>

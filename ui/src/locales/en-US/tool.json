@@ -2,7 +2,7 @@
   "title": "Tools",
   "createTitle": "Create tool",
   "editTitle": "Edit tool",
-  "duplicateTitle": "Duplicate tool",
+  "copyTitle": "Copy tool",
   "categories": {
     "all": "All tools",
     "shared": "Shared tools"
@@ -25,7 +25,7 @@
     "label": "Skills",
     "createTitle": "Create skill",
     "editTitle": "Edit skill",
-    "duplicateTitle": "Duplicate skill",
+    "copyTitle": "Copy skill",
     "name": {
       "placeholder": "Enter a skill name",
       "requiredMessage": "Enter a skill name"
@@ -41,7 +41,7 @@
     "label": "Workflow",
     "createTitle": "Create workflow",
     "editTitle": "Edit workflow",
-    "duplicateTitle": "Duplicate workflow",
+    "copyTitle": "Copy workflow",
     "name": {
       "placeholder": "Enter a workflow name",
       "requiredMessage": "Enter a workflow name"
@@ -51,7 +51,7 @@
     "label": "MCP",
     "createTitle": "Create MCP tool",
     "editTitle": "Edit MCP tool",
-    "duplicateTitle": "Duplicate MCP tool",
+    "copyTitle": "Copy MCP tool",
     "serviceTitle": "MCP server",
     "settingsTitle": "MCP settings",
     "reference": "Reference MCP",
@@ -75,7 +75,7 @@
   "dataSource": {
     "createTitle": "Create data source",
     "editTitle": "Edit data source",
-    "duplicateTitle": "Duplicate data source",
+    "copyTitle": "Copy data source",
     "name": {
       "placeholder": "Enter a data source name",
       "requiredMessage": "Enter a data source name"

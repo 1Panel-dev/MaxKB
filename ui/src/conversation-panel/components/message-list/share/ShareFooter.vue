@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useShareLinkStoreOptional } from './index'
 
 defineOptions({ name: 'ShareFooter' })
 
+const { t } = useI18n({ useScope: 'global' })
 const shareLink = useShareLinkStoreOptional()
 // 消息列表卸载（切换会话等）时退出分享态
 onBeforeUnmount(() => shareLink?.exitShare())
@@ -19,14 +21,14 @@ onBeforeUnmount(() => shareLink?.exitShare())
         :disabled="!shareLink.totalCount.value || shareLink.sharing.value"
         @change="shareLink.selectAll"
       >
-        已选 {{ shareLink.selectedCount.value }}/{{ shareLink.totalCount.value }}
+        {{ t('common.labels.selected') }} {{ shareLink.selectedCount.value }}/{{ shareLink.totalCount.value }}
       </el-checkbox>
       <div>
         <!-- 退出分享选择 -->
-        <el-button plain :disabled="shareLink.sharing.value" @click="shareLink.exitShare()">取消</el-button>
+        <el-button plain :disabled="shareLink.sharing.value" @click="shareLink.exitShare()">{{ t('common.actions.cancel') }}</el-button>
         <!-- 创建并复制分享链接 -->
         <el-button type="primary" :disabled="!shareLink.selectedCount.value" :loading="shareLink.sharing.value" @click="shareLink.copyShareLink()">
-          复制链接
+          {{ t('chat.share.copy') }}
         </el-button>
       </div>
     </div>

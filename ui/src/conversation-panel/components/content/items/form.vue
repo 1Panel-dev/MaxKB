@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Dict } from '@/api/types'
 import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import type { ViewType } from '@/conversation-panel/view/index'
@@ -7,6 +8,7 @@ import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import { useSendMessageOptional } from '@/conversation-panel/components/message-list/index'
 import { VIEW_TYPE, useViewType } from '@/conversation-panel/view/index'
 defineOptions({ name: 'ConversationFormContent' })
+const { t } = useI18n({ useScope: 'global' })
 const viewType = useViewType()
 // 发送能力由消息列表或外部宿主 provide;拿不到 → 只读降级
 const sendMessage = useSendMessageOptional()
@@ -66,7 +68,7 @@ const READONLY_VIEWS: readonly ViewType[] = [VIEW_TYPE.LOG, VIEW_TYPE.SHARE]
     <MkDynamicsForm ref="dynamicsFormRef" :view="is_submit || READONLY_VIEWS.includes(viewType)" :render-data="form_field_list" v-model="form_data" />
     <MdPreview class="!h-auto" editorId="conversation-text" :modelValue="trailingText || ''"></MdPreview>
     <el-button :type="is_submit ? 'info' : 'primary'" :disabled="is_submit || READONLY_VIEWS.includes(viewType) || !sendMessage" @click="submit">
-      {{ is_submit ? '已提交' : '提交' }}
+      {{ is_submit ? t('chat.message.formSubmitted') : t('common.actions.submit') }}
     </el-button>
   </div>
 </template>

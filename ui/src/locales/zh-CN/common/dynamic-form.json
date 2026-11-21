@@ -190,7 +190,7 @@
   },
   "upload": {
     "segmentation": "文件上传前，建议规范文件的分段标识",
-    "duplicateName": "文件名重复",
+    "duplicateName": "文件名已存在",
     "limits": "每次最多上传 {count} 个文件，每个文件不超过 {size} MB",
     "sizeLimit": "文件大小不能超过 {size}MB",
     "countLimit": "最多只能上传 {count} 个文件"

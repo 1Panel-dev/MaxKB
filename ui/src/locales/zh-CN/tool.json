@@ -2,7 +2,7 @@
   "title": "工具",
   "createTitle": "创建工具",
   "editTitle": "编辑工具",
-  "duplicateTitle": "复制工具",
+  "copyTitle": "复制工具",
   "categories": {
     "all": "全部工具",
     "shared": "共享工具"
@@ -25,7 +25,7 @@
     "label": "Skills",
     "createTitle": "创建 Skill",
     "editTitle": "编辑 Skill",
-    "duplicateTitle": "复制 Skill",
+    "copyTitle": "复制 Skill",
     "name": {
       "placeholder": "请输入 Skill 名称",
       "requiredMessage": "请输入 Skill 名称"
@@ -41,7 +41,7 @@
     "label": "工作流",
     "createTitle": "创建工作流",
     "editTitle": "编辑工作流",
-    "duplicateTitle": "复制工作流",
+    "copyTitle": "复制工作流",
     "name": {
       "placeholder": "请输入工作流名称",
       "requiredMessage": "请输入工作流名称"
@@ -51,7 +51,7 @@
     "label": "MCP",
     "createTitle": "创建 MCP",
     "editTitle": "编辑 MCP",
-    "duplicateTitle": "复制 MCP",
+    "copyTitle": "复制 MCP",
     "serviceTitle": "MCP 服务",
     "settingsTitle": "MCP 设置",
     "reference": "引用 MCP",
@@ -75,7 +75,7 @@
   "dataSource": {
     "createTitle": "创建数据源",
     "editTitle": "编辑数据源",
-    "duplicateTitle": "复制数据源",
+    "copyTitle": "复制数据源",
     "name": {
       "placeholder": "请输入数据源名称",
       "requiredMessage": "请输入数据源名称"

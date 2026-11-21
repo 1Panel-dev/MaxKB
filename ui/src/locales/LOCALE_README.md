@@ -34,7 +34,6 @@
 | `system/workspace.json`   | `workspace`  | 工作空间名称、全部／默认空间、创建、重命名及成员移除 |
 | `system/role.json`        | `role`       | 角色、继承关系及权限配置                             |
 | `system/chat-user.json`   | `chatUser`   | 对话用户管理、来源、导入说明与 Token 配额            |
-| `system/portal.json`      | `portal`     | 门户名称、访问方式与跨域设置                         |
 | `system/email.json`       | `email`      | SMTP 账户、发件人和 SSL／TLS                         |
 | `system/appearance.json`  | `appearance` | 平台外观、主题色、登录品牌配置与预览说明             |
 | `system/operate-log.json` | `operateLog` | 操作日志、API 详情及清除策略                         |
@@ -52,6 +51,7 @@
 | `trigger.json`  | `trigger`     | 定时／事件触发器、请求参数、执行任务及触发失败   |
 | `folder.json`   | `folder`      | 文件夹创建、移动、排序和删除                     |
 | `workflow/`     | `workflow`    | 画布、节点、变量、提示词、调试与执行展示         |
+| `portal.json`   | `portal`      | 门户入口、名称、访问设置、智能体选择与历史清空   |
 | `chat.json`     | `chat`        | 对话共用文案；按已确认的功能范围维护             |
 
 ### 加载规则
@@ -95,6 +95,8 @@
 | 用户问题／问题／检索问题                                 | 分别维护，执行详情原来是“问题”时不能改成“用户问题”                                                       |
 | 回答内容／AI 回答内容                                    | `workflow.answer.label`／`workflow.answer.aiLabel`，英文分别为 `Response content`／`AI response content` |
 | 默认值和用户内容                                         | 默认值在初始化或恢复默认时按当前语言读取；已有值和编辑草稿不随语言重写                                   |
+
+复制到剪贴板和复制资源生成副本统一使用 `copy` 命名及 `Copy` 词族：通用按钮使用 `common.actions.copy`，复制成功使用 `common.messages.copySuccess`，已复制使用 `common.messages.copied`；业务标题使用 `application.copy.title`、`tool.copyTitle` 等对应业务 key。英文分别为 `Copy`、`Copied successfully`、`Copied`、`Copy agent`、`Copy tool`。表示重复名称、字段或文件的校验仍使用 `duplicate`，不属于复制操作。
 
 ### 语言与术语
 
@@ -229,6 +231,8 @@ App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、z
 `apiKey` 维护编辑标题、安全提示、知道了、删除确认、`expiration` 和 `cors`；备注、启用状态、日期、操作及结果复用 `common`。`API Key`、`Base URL` 固定显示，API 文档标签使用 `common.labels.apiDoc`，复制提示使用 `common.messages.copied`。
 翻译不改变密钥遮罩、复制内容、跨域按行解析、有效期计算和删除后的分页回退；保留向上取整及七天到期提示边界，不添加计时器或重置草稿。
 
+对话用户的唯一密钥说明、“我的 API Key”及 MCP 服务类型名称归 `apiKey.chatUser`；MCP 配置标题复用 `resource.mcpConfig.title`，重新生成和复制结果复用 `common`。密钥、服务地址、配置 JSON、协议值及 `<CHAT_USER_API_KEY>` 占位保持原样。
+
 `execution.records`、`details`、`result`、`cancel` 供工作流、知识库、工具和触发器共用。触发失败属于 `trigger.taskExecution.triggerFailed`，不放到通用执行状态；未知状态、接口错误和执行内容保留原文。
 
 ### 文件夹
@@ -250,7 +254,7 @@ App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、z
 
 ### 应用布局
 
-`layout.json` 的门户、升级、返回工作空间、项目地址、用户手册、论坛求助和收起导航使用平级 key。关于弹窗归 `layout.about`，不按头部／头像组件另包一层。
+`layout.json` 的升级、返回工作空间、项目地址、用户手册、论坛求助和收起导航使用平级 key。门户入口复用 `portal.label`。关于弹窗归 `layout.about`，不按头部／头像组件另包一层。
 系统管理标题复用 `system.title`，默认工作空间复用 `workspace.default`；修改密码、退出登录使用 `auth.changePassword.title`／`auth.logout.label`，语言标签使用 `common.labels.language`，语言选项统一读取 `LOCALE_OPTIONS`。
 
 关于弹窗的版本名称、授权字段和到期提示分别归 `layout.about.editions`、`fields`、`expiration`。授权主体、日期、版本号、序列号和备注保留接口原文；版权公司名称使用 `layout.about.company`，简体为“杭州飞致云信息科技有限公司”，繁体按简体转换，英文为 `FIT2CLOUD`。年份、版权符号、括号及既有到期计算保持原样。
@@ -265,6 +269,18 @@ App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、z
 `application/overview.json` 维护 `application.overview`：Web／后端 API 访问、链接重置确认及 `embed`、`accessRestriction`、`display`。基本信息、复制、启停和重新生成复用 `common`，去对话复用 `application.actions.chat`。
 嵌入模式只翻译名称和说明，iframe／script、URL 参数与 HTML 转义保持原样；访问限制复用 `auth.loginSettings`，保留自己的数值范围和白名单解析。
 显示设置的社区版、商业版与预览共用文案，语言选项使用 `LOCALE_OPTIONS`。默认免责声明按初始化或恢复默认时的语言读取；已保存内容和编辑草稿不重写。
+
+### 门户
+
+门户专属文案集中在根目录 `portal.json`，统一使用 `portal` 命名空间，包含入口名称、名称与访问配置、智能体选择及门户清空说明。智能体管理中的上下架操作和结果提示归 `application.portal`，“已上架”状态归 `application.status.onPortal`。普通对话与门户共用的新建对话、历史记录、分享、删除及清空基础提示继续复用 `chat`；智能体名称、通用操作及搜索占位分别复用 `application`、`common`，不复制到门户语言包。
+
+### 对话
+
+`chat.json` 保持单文件。顶层按基础名称与角色 → `actions` → `history`／`delete` → `message` → `upload`／`urlUpload` → `voice` → `feedback`／`knowledgeSource` → `share`／`export` → `improve` 排列；组内按字段、操作、状态及提示的使用关系排列，三语顺序一致。`share` 集中维护分享入口、标题、复制链接和分享页提示；`knowledgeSource` 集中维护知识来源及其 PDF 文档预览文案，不另设 `documentPreview` 分组。
+`message` 平铺维护输入提示、回复及思考状态、工具调用数量、文件差异提示、消息异常、消息表单状态、对话记录空状态和 URL 缺少参数提示，不额外嵌套 `toolCall`、`form` 或 `userForm`。
+`actions` 平铺维护“更多设置”、放大／还原、关闭调试、设置及侧栏展开／收起等界面操作，使用 `chat.actions`，关闭调试使用 `closeDebug`；通用操作仍复用 `common.actions`，清空成功复用 `common.messages.clearSuccess`。
+`voice` 平铺维护录音、转文字及朗读的状态、操作和异常提示，不另设 `reading` 分组。
+查看标注与修正内容统一归 `chat.improve`；查看标注标题使用 `markTitle`，两个弹窗共用的内容字段归 `improve.content`，不另设顶层 `mark` 或 `content` 分组。
 
 ## 模型与工具
 
@@ -386,22 +402,22 @@ MCP 的 JSON 配置校验区分“语法有效”与“必须为对象”，不�
 
 系统业务的文件与命名空间见前文。业务标题继续使用各域的 `title`，系统分组使用 `system.menu`，不为系统资源管理复制模型、知识库、工具或智能体的语言包。
 
-| 内容                       | 归属与约束                                                                                             |
-| -------------------------- | ------------------------------------------------------------------------------------------------------ |
-| 系统共用成员入口与移除标题 | `system.member`，保留“成员”与账号“用户”的区别                                                          |
-| 用户密码与确认密码         | `user.password`、`user.confirmPassword`；长度范围复用 `common.validation.lengthRange`                  |
-| 用户／用户组分配方式       | `user.assignment`，追加／替换仍提交原布尔协议值                                                        |
-| 用户及对话用户导入         | 共用 `user.import`，对话用户专属来源说明归 `chatUser.import`；冲突名称保持原文                         |
-| 对话用户配额               | `chatUser.quota`；数值与 `/` 不翻译，周期复用 `common.schedule`，保留原换算规则                        |
-| 系统用户组与对话用户组     | 共用 `userGroup`；明确显示“对话用户组”时使用 `system.menu.chatUserGroup`                               |
-| 角色类型与继承             | `role.types`、`role.inheritedRole`，实际角色名称保留接口原值                                           |
-| 认证协议和平台名称         | `auth.methods`；本地创建来源仍使用对应用户业务的 `source.local`                                        |
-| 系统／对话用户认证页面标题 | `system.menu.userAuthentication`／`system.menu.chatUserAuthentication`                                 |
-| 认证字段与配置             | `auth.fields`、`auth.loginSettings`、各协议分组；LDAP 名称统一为 `LDAP`                                |
-| 邮箱设置                   | `email`；固定 SMTP 英文字段名不翻译，密码复用 `auth.fields.password`                                   |
-| 门户设置                   | `portal.name`、`access`、`cors`；默认名称在初始化时读取，已保存名称不翻译，新建对话复用 `chat.newChat` |
-| 外观设置                   | `appearance`，预览菜单复用 `layout`、`auth`、`role`；默认 slogan 归 `layout.slogan`                    |
-| 操作日志                   | `operateLog`；状态、工作空间和操作复用公共文案，接口翻译数据按语言重新加载                             |
+| 内容                       | 归属与约束                                                                                                       |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| 系统共用成员入口与移除标题 | `system.member`，保留“成员”与账号“用户”的区别                                                                    |
+| 用户密码与确认密码         | `user.password`、`user.confirmPassword`；长度范围复用 `common.validation.lengthRange`                            |
+| 用户／用户组分配方式       | `user.assignment`，追加／替换仍提交原布尔协议值                                                                  |
+| 用户及对话用户导入         | 共用 `user.import`，对话用户专属来源说明归 `chatUser.import`；冲突名称保持原文                                   |
+| 对话用户配额               | `chatUser.quota`；数值与 `/` 不翻译，周期复用 `common.schedule`，保留原换算规则                                  |
+| 系统用户组与对话用户组     | 共用 `userGroup`；明确显示“对话用户组”时使用 `system.menu.chatUserGroup`                                         |
+| 角色类型与继承             | `role.types`、`role.inheritedRole`，实际角色名称保留接口原值                                                     |
+| 认证协议和平台名称         | `auth.methods`；本地创建来源仍使用对应用户业务的 `source.local`                                                  |
+| 系统／对话用户认证页面标题 | `system.menu.userAuthentication`／`system.menu.chatUserAuthentication`                                           |
+| 认证字段与配置             | `auth.fields`、`auth.loginSettings`、各协议分组；LDAP 名称统一为 `LDAP`                                          |
+| 邮箱设置                   | `email`；固定 SMTP 英文字段名不翻译，密码复用 `auth.fields.password`                                             |
+| 门户设置                   | `portal.json` 的 `name`、`access`、`cors`；默认名称在初始化时读取，已保存名称不翻译，新建对话复用 `chat.newChat` |
+| 外观设置                   | `appearance`，预览菜单复用 `layout`、`auth`、`role`；默认 slogan 归 `layout.slogan`                              |
+| 操作日志                   | `operateLog`；状态、工作空间和操作复用公共文案，接口翻译数据按语言重新加载                                       |
 
 成员移除的影响和统计归各自业务的 `delete`，工作空间的成员人数与关系记录数分别保留；不把用户组、角色、空间关系的“移除”改成“删除”。
 用户名、角色、用户组、工作空间及授权对象名称保留接口原文；未知登录来源按原值显示。语言切换不重新请求这些选项或清空未保存授权。

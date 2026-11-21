@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import MkAudio from '@/components/global/mk-media-preview/MkAudio.vue'
 import MkVideo from '@/components/global/mk-media-preview/MkVideo.vue'
 import FileUploadCard from '@/components/mk-drag-upload/FileUploadCard.vue'
@@ -17,6 +18,7 @@ import { formatFileSize } from '@/utils/number'
 
 defineOptions({ name: 'ConversationQuestionContent' })
 
+const { t } = useI18n({ useScope: 'global' })
 // 智能体允许分享时显示分享入口；进入分享时预先勾选所属轮次。
 const showShare = useShowShare()
 const shareLink = useShareLinkStoreOptional()
@@ -84,7 +86,7 @@ const attachmentGroups = computed(() =>
 const imageSources = computed(() => attachments.value.filter((file) => file.field === 'image_list' && file.src).map((file) => file.src))
 
 function getAttachmentDescription(file: QuestionAttachment) {
-  const extension = getFileExtension(file.name) || '文件'
+  const extension = getFileExtension(file.name) || t('common.labels.file')
   return file.size == null ? extension : `${extension} – ${formatFileSize(file.size)}`
 }
 </script>
@@ -148,17 +150,19 @@ function getAttachmentDescription(file: QuestionAttachment) {
       class="h-8 -mt-3 flex items-center justify-end gap-1 invisible group-hover/question:visible group-focus-within/question:visible"
     >
       <!-- 编辑提问 -->
-      <MkTooltip v-if="messageInput" content="编辑">
+      <MkTooltip v-if="messageInput" :content="t('common.actions.edit')">
         <el-button text :disabled="!canEdit" @click="startEditing">
           <MkIcon name="icon_edit_outlined" />
         </el-button>
       </MkTooltip>
       <!-- 复制提问 -->
-      <el-button text @click="copyText(content.content)">
-        <MkIcon name="icon_copy_outlined" />
-      </el-button>
+      <MkTooltip :content="t('common.actions.copy')">
+        <el-button text @click="copyText(content.content, t('common.messages.copied'))">
+          <MkIcon name="icon_copy_outlined" />
+        </el-button>
+      </MkTooltip>
       <!-- 进入分享模式 -->
-      <MkTooltip v-if="showShare" content="分享">
+      <MkTooltip v-if="showShare" :content="t('chat.share.label')">
         <el-button text :disabled="!canShare" @click="shareLink?.enterShare([messageRecordId])">
           <MkIcon name="icon_share_outlined" />
         </el-button>

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { InputInstance } from 'element-plus'
 import { useInputEvents } from '../../../../core/input-events'
 
 defineOptions({ name: 'ConversationQuestionEditor' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ content: string; disabled: boolean }>()
 const emit = defineEmits<{ cancel: []; send: [question: string] }>()
 
@@ -35,9 +37,11 @@ const { handleKeydown } = useInputEvents({ text: questionDraft, canUpload: () =>
     />
     <div class="flex justify-end">
       <!-- 取消编辑；提交请求期间禁用，避免编辑框关闭后提问仍被发送 -->
-      <el-button plain class="min-w-20" :disabled="disabled" @click="emit('cancel')">取消</el-button>
+      <el-button plain class="min-w-20" :disabled="disabled" @click="emit('cancel')">{{ t('common.actions.cancel') }}</el-button>
       <!-- 发送编辑后的提问 -->
-      <el-button type="primary" class="min-w-20" :disabled="disabled || !questionDraft.trim()" @click="sendQuestion">发送</el-button>
+      <el-button type="primary" class="min-w-20" :disabled="disabled || !questionDraft.trim()" @click="sendQuestion">
+        {{ t('common.actions.send') }}
+      </el-button>
     </div>
   </div>
 </template>

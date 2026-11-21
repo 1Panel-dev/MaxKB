@@ -72,7 +72,7 @@ function handleFormClosed() {
     <ToolFormDrawer
       v-if="tool.tool_type === TOOL_TYPE.CUSTOM"
       ref="toolFormDrawerRef"
-      :title="t('tool.duplicateTitle')"
+      :title="t('tool.copyTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -81,7 +81,7 @@ function handleFormClosed() {
     <DataSourceFormDrawer
       v-else-if="tool.tool_type === TOOL_TYPE.DATA_SOURCE"
       ref="dataSourceFormDrawerRef"
-      :title="t('tool.dataSource.duplicateTitle')"
+      :title="t('tool.dataSource.copyTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -90,7 +90,7 @@ function handleFormClosed() {
     <McpFormDrawer
       v-else-if="tool.tool_type === TOOL_TYPE.MCP"
       ref="mcpFormDrawerRef"
-      :title="t('tool.mcp.duplicateTitle')"
+      :title="t('tool.mcp.copyTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -99,7 +99,7 @@ function handleFormClosed() {
     <SkillToolFormDrawer
       v-else-if="tool.tool_type === TOOL_TYPE.SKILL"
       ref="skillToolFormDrawerRef"
-      :title="t('tool.skill.duplicateTitle')"
+      :title="t('tool.skill.copyTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
@@ -108,7 +108,7 @@ function handleFormClosed() {
     <WorkflowFormDialog
       v-else-if="tool.tool_type === TOOL_TYPE.WORKFLOW"
       ref="workflowFormDialogRef"
-      :title="t('tool.workflow.duplicateTitle')"
+      :title="t('tool.workflow.copyTitle')"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"

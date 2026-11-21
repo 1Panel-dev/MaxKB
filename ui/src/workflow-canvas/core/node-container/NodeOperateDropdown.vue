@@ -130,7 +130,7 @@ function deleteNode() {
         </MkDropdownItem>
         <MkDropdownItem @click="copyNode">
           <template #icon><MkIcon name="icon_copy_outlined" /></template>
-          {{ t('common.actions.duplicate') }}
+          {{ t('common.actions.copy') }}
         </MkDropdownItem>
         <div v-if="canChangeEnabled" class="flex-between px-3 py-1" @click.stop>
           <span class="flex-align-center gap-2">

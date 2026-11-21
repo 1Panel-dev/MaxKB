@@ -9,6 +9,7 @@
   },
   "details": {
     "title": "執行詳情",
+    "empty": "暫無執行詳情",
     "input": "輸入",
     "output": "輸出",
     "inputParams": "輸入參數",

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useConversationListStore } from '../../../left-sidebar/conversation-list/index'
 import { DEVICE_TYPE, useDeviceType, useShowShare } from '../../../view/index'
 import { useMessageListStore } from '../../message-list/index'
@@ -11,6 +12,7 @@ const props = defineProps<{
   /** 新建对话；不传时在当前应用中新建（门户在没有当前智能体时改为选择智能体） */
   newConversation?: () => void
 }>()
+const { t } = useI18n({ useScope: 'global' })
 const list = useConversationListStore()
 
 const msgs = useMessageListStore()
@@ -28,7 +30,7 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
     <!-- 左侧收起时才在顶部显示:展开左侧 + 新建对话(展开时它们在侧栏内) -->
     <template v-if="!list.leftSideOpen.value">
       <!-- 展开左侧 -->
-      <MkTooltip content="展开侧边栏">
+      <MkTooltip :content="t('chat.actions.expandSidebar')">
         <el-button text @click="list.toggleLeftSide()" class="-ml-1 mr-2">
           <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
         </el-button>
@@ -36,21 +38,28 @@ const handleNewConversation = () => (props.newConversation ? props.newConversati
     </template>
 
     <div class="min-w-0 flex-1">
-      <h4 class="truncate">{{ list.currentConversation.value?.abstract || '新建对话' }}</h4>
+      <h4 class="truncate">{{ list.currentConversation.value?.abstract || t('chat.newChat') }}</h4>
     </div>
     <template v-if="!list.isShared.value">
       <!-- 新建对话 -->
       <MkAction
         v-if="!list.leftSideOpen.value"
         display="button"
-        label="新建对话"
+        :label="t('chat.newChat')"
         icon="icon_new-chat_outlined"
         class="text-N900! mr-1"
         @click="handleNewConversation"
       />
       <HeaderActions :collapse="deviceType === DEVICE_TYPE.MOBILE">
         <!-- 进入分享模式，勾选要分享的对话 -->
-        <MkAction v-if="showShare" label="分享" :size="18" icon="icon_share_outlined" :disabled="!canShare" @click="shareLink?.enterShare()" />
+        <MkAction
+          v-if="showShare"
+          :label="t('chat.share.label')"
+          :size="18"
+          icon="icon_share_outlined"
+          :disabled="!canShare"
+          @click="shareLink?.enterShare()"
+        />
         <!-- 导出对话 -->
         <ExportAction />
         <slot />

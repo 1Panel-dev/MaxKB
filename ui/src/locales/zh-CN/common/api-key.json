@@ -23,5 +23,11 @@
     "opened": "已开启",
     "closed": "未开启",
     "placeholder": "请输入允许的跨域地址，开启后不输入跨域地址则不限制。\n跨域地址一行一个，如："
+  },
+  "chatUser": {
+    "label": "我的 API Key",
+    "description": "每个用户仅一个 API Key，绑定当前对话用户、与其同权。重置后旧 Key 立即失效",
+    "agentChat": "智能体对话",
+    "knowledgeRetrieval": "知识库检索"
   }
 }

@@ -5,6 +5,7 @@ import type { Dict } from '@/api/types'
 import type { DynamicFormValue, FormField } from '@/components/mk-dynamics-form'
 import type { Ref } from 'vue'
 import type { LocationQuery } from 'vue-router'
+import { t } from '@/locales'
 
 /** 开始节点中旧版简写字段（input / select / date）的配置结构。 */
 interface LegacyInputField {
@@ -125,7 +126,10 @@ export function createUserFormStore(deps: UserFormDeps) {
   /** 配置为在输入框旁直接展示的字段，实际展示数量由可用宽度决定。 */
   const exposedFieldNames = computed(() => baseNodeProperties.value.user_input_field_list_setting?.exposed_fields || [])
   const menuTitle = computed(
-    () => baseNodeProperties.value.user_input_field_list_setting?.menu_title || baseNodeProperties.value.user_input_config?.title || '更多设置',
+    () =>
+      baseNodeProperties.value.user_input_field_list_setting?.menu_title ||
+      baseNodeProperties.value.user_input_config?.title ||
+      t('chat.actions.moreSettings'),
   )
   const hasFields = computed(() => userInputFields.value.length > 0 || (apiInputEditable && apiInputFields.value.length > 0))
 

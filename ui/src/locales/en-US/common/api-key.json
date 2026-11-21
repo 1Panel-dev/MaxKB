@@ -23,5 +23,11 @@
     "opened": "Turned on",
     "closed": "Not turned on",
     "placeholder": "Enter the allowed origins. Leaving this empty imposes no origin restrictions.\nEnter one origin per line, for example:"
+  },
+  "chatUser": {
+    "label": "My API Key",
+    "description": "Each user has one API Key, bound to the current chat user with the same permissions. Resetting it immediately invalidates the old key",
+    "agentChat": "Agent chat",
+    "knowledgeRetrieval": "Knowledge retrieval"
   }
 }

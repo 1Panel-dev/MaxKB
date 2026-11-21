@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import type { PDFDocumentLoadingTask, PDFDocumentProxy, RenderTask } from 'pdfjs-dist/legacy/build/pdf.mjs'
+import { t } from '@/locales'
 
 /** 待预览的来源文档；当前预览文档由知识来源 store 维护。 */
 export interface PreviewDocument {
@@ -111,7 +112,7 @@ export function createPdfRenderer() {
   const redraw = () => {
     const current = ++token
     drawPages(current, false).catch(() => {
-      if (current === token) error.value = 'PDF 渲染失败'
+      if (current === token) error.value = t('chat.knowledgeSource.renderFailedMessage')
     })
   }
   const resizeObserver = new ResizeObserver(([entry]) => {
@@ -140,7 +141,7 @@ export function createPdfRenderer() {
       if (current !== token) return
       await drawPages(current, true)
     } catch {
-      if (current === token) error.value = 'PDF 加载失败'
+      if (current === token) error.value = t('chat.knowledgeSource.loadFailedMessage')
     } finally {
       if (current === token) loading.value = false
     }

@@ -3,6 +3,7 @@ import type { ChatMessage } from '../../core/types'
 import type { ChatShareDetail } from '@/api/types'
 import type { InjectionKey, MaybeRefOrGetter } from 'vue'
 import ConversationApi from '@/api/chat/conversation'
+import { t } from '@/locales'
 
 export interface ShareMessageListDeps {
   /** 公开分享链接 ID */
@@ -18,7 +19,7 @@ export function createShareMessageListStore(deps: ShareMessageListDeps) {
   const loading = ref(false)
   const failed = ref(false)
 
-  const title = computed(() => detail.value?.abstract || '分享对话')
+  const title = computed(() => detail.value?.abstract || t('chat.share.title'))
   const appInfo = computed(() => detail.value?.app_info ?? {})
   const messages = computed<ChatMessage[]>(() =>
     (detail.value?.chat_record_list ?? []).flatMap((record): ChatMessage[] => [

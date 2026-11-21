@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatContent } from '@/api/types'
 import { extractPartialJsonField } from './extract-partial-json'
 
 defineOptions({ name: 'ConversationReadFileContent' })
 
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ content: ChatContent; loading: boolean }>()
 const expanded = defineModel<boolean>('expanded', { required: true })
 
@@ -47,7 +49,7 @@ const lineCount = computed(() => parsedLines.value.length)
         <path d="M6 8h4M6 10.5h4M6 5.5h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
       </svg>
       <span class="min-w-0 max-w-[300px] truncate" :title="filePath || 'read_file'">{{ filePath || 'read_file' }}</span>
-      <span class="shrink-0 font-mono text-xs text-N500" v-if="lineCount">{{ lineCount }} lines</span>
+      <span class="shrink-0 font-mono text-xs text-N500" v-if="lineCount">{{ t('chat.message.lineCount', { count: lineCount }, lineCount) }}</span>
     </template>
     <div v-if="parsedLines.length" class="py-1">
       <div class="rf-block">

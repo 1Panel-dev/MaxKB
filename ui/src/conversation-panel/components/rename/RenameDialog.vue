@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { inject, reactive, ref } from 'vue'
+import { computed, inject, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Conversation } from '../../core/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import ConversationApi from '@/api/chat/conversation'
@@ -9,6 +10,7 @@ import { PORTAL_CONVERSATION_LIST_KEY } from '../../left-sidebar/portal-conversa
 defineOptions({ name: 'RenameDialog' })
 
 const props = defineProps<{ conversation: Conversation; applicationId?: string }>()
+const { t } = useI18n({ useScope: 'global' })
 const conversationList = useConversationListStore()
 const portalList = inject(PORTAL_CONVERSATION_LIST_KEY, null)
 const emit = defineEmits<{ renamed: [title: string]; closed: [] }>()
@@ -19,9 +21,9 @@ const renameSubmitting = ref(false)
 const renameConversationId = props.conversation.id
 const renameFormRef = ref<FormInstance>()
 const renameForm = reactive({ abstract: props.conversation.abstract || '' })
-const renameRules: FormRules<typeof renameForm> = {
-  abstract: [{ required: true, whitespace: true, message: '请输入', trigger: 'blur' }],
-}
+const renameRules = computed<FormRules<typeof renameForm>>(() => ({
+  abstract: [{ required: true, whitespace: true, message: t('common.validation.inputRequired'), trigger: 'blur' }],
+}))
 
 function submitRename() {
   if (renameSubmitting.value) return
@@ -57,17 +59,25 @@ function submitRename() {
 </script>
 
 <template>
-  <MkDialog v-model="renameDialogVisible" title="重命名" @closed="emit('closed')">
-    <el-form ref="renameFormRef" :model="renameForm" :rules="renameRules" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item label="会话标题" prop="abstract">
-        <el-input v-model="renameForm.abstract" placeholder="请输入" />
+  <MkDialog v-model="renameDialogVisible" :title="t('common.actions.rename')" @closed="emit('closed')">
+    <el-form
+      ref="renameFormRef"
+      :model="renameForm"
+      :rules="renameRules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
+      <el-form-item :label="t('chat.conversationTitle')" prop="abstract">
+        <el-input v-model="renameForm.abstract" :placeholder="t('common.placeholders.input')" />
       </el-form-item>
     </el-form>
     <template #footer>
       <!-- 取消重命名 -->
-      <el-button plain @click="renameDialogVisible = false">取消</el-button>
+      <el-button plain @click="renameDialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存会话标题 -->
-      <el-button type="primary" :loading="renameSubmitting" @click="submitRename">保存</el-button>
+      <el-button type="primary" :loading="renameSubmitting" @click="submitRename">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatMessage, ChatRecordMeta } from '../../core/types'
 import type { ChatContent, ChatFeedback } from '@/api/types'
 import { useRightSidebarStore } from '../../right-sidebar/index'
-import { useShowShare } from '../../view/index'
+import { DEVICE_TYPE, useDeviceType, useShowShare } from '../../view/index'
 import { MESSAGE_LIST_KEY } from '../message-list/index'
 import { useShareLinkStoreOptional } from '../message-list/share/index'
 import ButtonFeedback from './feedback/ButtonFeedback.vue'
@@ -14,6 +15,8 @@ import { datetimeFormat } from '@/utils/time'
 
 const props = defineProps<{ message: ChatMessage }>()
 const emit = defineEmits<{ resize: [] }>()
+const { t } = useI18n({ useScope: 'global' })
+const deviceType = useDeviceType()
 const footerRef = ref<HTMLElement>()
 
 // 反馈展开动画逐帧改变高度，由消息列表决定是否继续跟随底部。
@@ -30,8 +33,8 @@ const shareLink = useShareLinkStoreOptional()
 // 回答生成中禁用分享。
 const messageList = inject(MESSAGE_LIST_KEY, null)
 const canShare = computed(() => Boolean(messageList?.messages.value.length && !messageList.streamLoading.value))
-const show_exec=computed(()=>messageList?.appInfo.value?.show_exec)
-const tts_model_enable=computed(()=>messageList?.appInfo.value?.tts_model_enable)
+const show_exec = computed(() => messageList?.appInfo.value?.show_exec)
+const tts_model_enable = computed(() => messageList?.appInfo.value?.tts_model_enable)
 const rightSidebar = useRightSidebarStore()
 
 const EMPTY: ChatRecordMeta = {
@@ -70,7 +73,9 @@ function regenerateAnswer() {
 const speechSupported = computed(() => Boolean(messageList?.speechSupported.value))
 const reading = computed(() => Boolean(messageList && messageList.speakingMessage.value === props.message))
 const readingPaused = computed(() => reading.value && Boolean(messageList?.speechPaused.value))
-const readingTip = computed(() => (!reading.value ? '朗读内容' : readingPaused.value ? '继续朗读' : '暂停朗读'))
+const readingTip = computed(() =>
+  !reading.value ? t('chat.voice.readContent') : readingPaused.value ? t('chat.voice.resumeReading') : t('chat.voice.pauseReading'),
+)
 function stopReading() {
   if (reading.value) messageList?.stopSpeech()
 }
@@ -100,7 +105,7 @@ async function saveFeedback(data: ChatFeedback) {
     await messageList.feedback(message.recordId!, data)
     if (message.record) message.record.feedback = data
     draftStatus.value = undefined
-    MsgSuccess(data.vote_status === '-1' ? '已取消反馈' : '感谢你的反馈')
+    MsgSuccess(data.vote_status === '-1' ? t('chat.feedback.cancelledMessage') : t('chat.feedback.thanksMessage'))
   } catch {
     // 请求层统一提示错误，保留当前填写内容供重试。
   } finally {
@@ -128,30 +133,33 @@ function openFeedback(status: '0' | '1') {
       <!-- 知识来源:在右侧展示回答引用的分段 -->
       <el-button v-if="meta.paragraphList.length" text class="-ml-1" @click="rightSidebar.showKnowledgeSource(meta.paragraphList)">
         <MkIcon name="icon_reference_outlined" />
-        <span>知识来源 ({{ meta.paragraphList.length }})</span>
+        <span>
+          <template v-if="deviceType !== DEVICE_TYPE.MOBILE">{{ t('chat.knowledgeSource.label') }}</template>
+          ({{ meta.paragraphList.length }})
+        </span>
       </el-button>
 
       <!-- 执行详情:对话结束时已拉取并缓存,点击直接在右侧展示 -->
       <el-button v-if="show_exec" text @click="openExecutionDetail" class="-ml-1">
         <MkIcon name="icon_logs_outlined" />
-        <span>执行详情</span>
+        <span v-if="deviceType !== DEVICE_TYPE.MOBILE">{{ t('execution.details.title') }}</span>
       </el-button>
       <template v-if="meta.runTime || tokens">
         <el-divider v-if="meta.paragraphList.length || show_exec" direction="vertical" class="ml-2! mr-3!" />
-        <span class="text-N600">Tokens {{ tokens }} · 耗时 {{ meta.runTime.toFixed(2) }}s</span>
+        <span class="text-N600">Tokens {{ tokens }} · {{ t('common.labels.duration') }} {{ meta.runTime.toFixed(2) }}s</span>
       </template>
     </div>
     <!-- 其他操作 -->
     <div class="flex-align-center flex-wrap gap-2">
       <!-- 复制回答正文 -->
-      <MkTooltip content="复制">
-        <el-button text class="-ml-1" :disabled="!answerText" @click="copyText(answerText)">
+      <MkTooltip :content="t('common.actions.copy')">
+        <el-button text class="-ml-1" :disabled="!answerText" @click="copyText(answerText, t('common.messages.copied'))">
           <MkIcon name="icon_copy_outlined" />
         </el-button>
       </MkTooltip>
       <!-- 重新生成当前回答 -->
       <span>
-        <MkTooltip content="重新生成">
+        <MkTooltip :content="t('common.actions.regenerate')">
           <el-button text :disabled="!canRegenerate" @click="regenerateAnswer">
             <MkIcon name="icon_refresh_outlined" />
           </el-button>
@@ -170,7 +178,7 @@ function openFeedback(status: '0' | '1') {
       <ButtonFeedback v-if="canFeedback" :current-status="currentStatus" :submitting="submitting" @select="openFeedback" />
       <!-- 进入分享模式 -->
       <span v-if="showShare">
-        <MkTooltip content="分享">
+        <MkTooltip :content="t('chat.share.label')">
           <el-button text :disabled="!canShare" @click="shareLink?.enterShare([message.recordId])">
             <MkIcon name="icon_share_outlined" />
           </el-button>
