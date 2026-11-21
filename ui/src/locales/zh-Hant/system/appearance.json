@@ -1,0 +1,38 @@
+{
+  "title": "外觀設置",
+  "customColor": "自定義顏色",
+  "colors": {
+    "default": "默認",
+    "orange": "活力橙",
+    "green": "松石綠",
+    "purple": "神秘紫",
+    "red": "胭脂紅"
+  },
+  "loginSettings": "平台登錄設置",
+  "restoreDefault": "恢復默認",
+  "website": "網站",
+  "websiteLogoHint": "頂部網站顯示 Logo，建議尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超過 {size}MB",
+  "loginLogoHint": "登錄頁面左側 Logo，建議尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超過 {size} MB",
+  "loginBackground": "登錄背景圖",
+  "loginBackgroundHint": "左側背景圖，矢量圖建議尺寸 {vector}，位圖建議尺寸 {bitmap}；支持 JPG、PNG、GIF，大小不超過 {size} MB",
+  "name": {
+    "label": "網站名稱",
+    "placeholder": "請輸入網站名稱",
+    "requiredMessage": "請輸入網站名稱"
+  },
+  "slogan": {
+    "label": "歡迎語",
+    "placeholder": "請輸入網站歡迎語",
+    "requiredMessage": "請輸入網站歡迎語"
+  },
+  "loginPreviewHint": "預覽頁默認為 MaxKB 登錄界面，支持自定義設置",
+  "platformSettings": "平台設置",
+  "userManualPlaceholder": "請輸入用戶手冊地址",
+  "forumPlaceholder": "請輸入論壇求助地址",
+  "projectPlaceholder": "請輸入項目地址",
+  "platformPreviewHint": "預覽頁默認為 MaxKB 平台界面，支持自定義設置",
+  "abandonChanges": "放棄更新",
+  "saveAndApply": "保存並應用",
+  "imageFormatMessage": "僅支持 JPG、PNG 或 GIF 格式的圖片",
+  "imageSizeMessage": "圖片大小不能超過 {size} MB"
+}

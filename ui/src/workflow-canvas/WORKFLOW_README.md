@@ -351,7 +351,7 @@ AI 对话节点的提示词、历史记录、视觉理解和输出思考表单�
 共享组件维护提示词模板和请求上下文，不依赖某个节点，也不接收未使用的模型或供应商选项。
 组件将画布注入的 `resourceScope` 传给 `useWorkflowStore`，通过 `store.postPromptGenerate` 发起生成；
 Store 适配器统一选择 Workspace、System 资源管理或 System 共享资源的 Model API。
-循环画布已转发同一上下文，组件不再单独判断资源范围。生成方法不使用 Store 的查询缓存或请求去重。
+循环画布转发同一上下文，组件不自行判断范围；生成请求不缓存或去重。
 打开弹窗时优先选中传入的节点模型并复制参数；未传模型 ID 时，按下拉分组顺序选中第一个可用模型并加载默认参数。
 输入框底部复用 `SelectModel`，可独立调整本次生成使用的模型和参数，
 不回写节点配置。选项通过当前范围 Store 查询 LLM 和 IMAGE 模型，生成请求提交弹窗当前的
@@ -361,7 +361,7 @@ Store 适配器统一选择 Workspace、System 资源管理或 System 共享资�
 点击替换后通过 `replace` 交由节点回写系统提示词。
 Enter 发送、组合键换行、输入法保护、纯空白校验及文本粘贴统一遵循公共组件约定，
 键盘和粘贴事件停止冒泡，避免触发画布快捷键或节点粘贴。
-AI 对话、图片理解和视频理解统一复用 `component/ThinkingSetting.vue`，后续同类入口也应复用。
+AI 对话、图片理解、视频理解及同类入口复用 `component/ThinkingSetting.vue`。
 组件通过 `v-model` 接收 `types.ts` 的 `ReasoningSettingData`，由节点的输出思考开关以 `v-if` 挂载，
 遵循通用设置弹窗规则；开始、结束标签当前不设必填。
 
@@ -586,6 +586,8 @@ AI 生成的 validate 工具复用同一入口（`collectWorkflowValidationError
 add_node 时按 tool_id / application_id 查出真实详情、连同输入输出字段一起写入新节点的 node_data，返回结果里的
 `inputs`／`outputs` 就是这份真实签名，不需要再查一次。tool-lib-node 同时覆盖自定义工具与工作流工具（AI 侧只传
 这一种 type，按工具类型选择实际的内部节点），application-node 的入参只能引用上游数据，不支持常量。
+
+节点 `agent.ts` 与 `ai-generate/impl/**` 的 agent 内容不做国际化，今后也不补翻译；具体排除范围及与生成面板展示文案的边界遵循 [国际化规则](../locales/LOCALE_README.md#工作流)。
 
 节点配置 agent 位于节点目录的 agent.ts，通过 index.ts 默认导出的 agent 字段注册；
 未注册的节点仍进入 AI 可选目录（说明取菜单文案，输出取模板 config.fields），可新增和连线，但不能 AI 配置。NodeAgentModule 使用 JSON Schema 定义 params、config、returns：

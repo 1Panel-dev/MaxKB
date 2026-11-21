@@ -97,12 +97,12 @@ function handleExportApplication() {
   <MkDropdownItem v-if="canExportApplication || canExportSkills" @click.prevent.stop class="p-0!">
     <MkDropdown @command="parentDropdown?.handleClose()" class="w-full" trigger="hover" placement="right-start" :append-to="exportMenuContainer">
       <!-- 展开智能体导出菜单 -->
-      <div ref="exportTriggerRef" class="flex-between w-full gap-2 p-2">
+      <div ref="exportTriggerRef" class="flex-between w-full gap-2 gap-2 py-[5px] px-2">
         <div class="flex-align-center gap-2">
           <MkIcon name="icon_export_outlined" class="text-N600!" />
           <span>{{ label }}</span>
         </div>
-        <MkIcon name="icon_right_outlined" class="text-N600!" />
+        <MkIcon name="icon_right_outlined" class="text-N500!" />
       </div>
       <template #dropdown>
         <MkDropdownMenu>

@@ -3,7 +3,6 @@
     "webAccess": "Web 访问",
     "backendApi": "后端 API 访问",
     "link": "链接",
-    "apiDoc": "API 文档",
     "resetTitle": "是否重新生成公开访问链接？",
     "resetDescription": "重新生成后旧链接将失效，嵌入第三方的脚本也需要更新，请谨慎操作！",
     "refreshSuccess": "刷新成功",
@@ -26,7 +25,6 @@
     },
     "display": {
       "title": "显示设置",
-      "language": "语言",
       "themeColor": "自定义主题色",
       "headerFontColor": "头部标题字体颜色",
       "background": "聊天背景",

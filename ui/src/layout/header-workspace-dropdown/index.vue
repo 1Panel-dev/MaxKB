@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import type { WorkspaceItem } from '@/api/types'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import { useStore } from '@/stores'
 
 defineOptions({ name: 'HeaderWorkspaceDropdown' })
+const { t } = useI18n({ useScope: 'global' })
+
 const router = useRouter()
 const route = useRoute()
 const { user } = useStore()
 
 const workspaceOptions = computed<WorkspaceItem[]>(() => {
   const workspaces = user.userInfo?.workspace_list
-  return workspaces?.length ? workspaces : [{ id: 'default', name: '默认工作空间' }]
+  return workspaces?.length ? workspaces : [{ id: 'default', name: t('workspace.default') }]
 })
 const selectedWorkspace = ref('default')
 

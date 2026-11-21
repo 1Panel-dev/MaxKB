@@ -25,7 +25,7 @@ const imageFields: {
   label: string
   visibility?: 'show_avatar' | 'show_user_avatar'
 }[] = reactive([
-  { key: 'icon', label: computed(() => `${t('application.title')} LOGO`) },
+  { key: 'icon', label: computed(() => `${t('application.title')} Logo`) },
   { key: 'chat_background', label: computed(() => t('application.overview.display.background')) },
   { key: 'avatar', label: computed(() => t('application.overview.display.aiAvatar')), visibility: 'show_avatar' },
   { key: 'user_avatar', label: computed(() => t('application.overview.display.userAvatar')), visibility: 'show_user_avatar' },
@@ -162,7 +162,7 @@ onBeforeUnmount(releaseImagePreviews)
                   <el-color-picker v-model="displayForm.custom_theme.header_font_color" />
                 </el-form-item>
               </div>
-              <el-form-item :label="t('application.overview.display.language')">
+              <el-form-item :label="t('common.labels.language')">
                 <el-select v-model="displayForm.language" clearable :placeholder="t('common.placeholders.select')">
                   <el-option v-for="language in LOCALE_OPTIONS" :key="language.value" :label="language.label" :value="language.value" />
                 </el-select>

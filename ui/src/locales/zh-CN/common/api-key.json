@@ -1,0 +1,27 @@
+{
+  "delete": {
+    "title": "是否删除API Key：{name}？",
+    "description": "删除后，使用该 API Key 的服务将无法访问，请谨慎操作！"
+  },
+  "editTitle": "编辑 API Key",
+  "safetyHint": "请安全保存此密钥，不要泄露。",
+  "gotIt": "知道了",
+  "expiration": {
+    "label": "到期时间",
+    "placeholder": "请选择到期时间",
+    "requiredMessage": "请选择到期时间",
+    "futureMessage": "请选择晚于当前时间的到期时间",
+    "never": "永不过期",
+    "expired": "已过期",
+    "validDays": "{count} 天有效",
+    "minutes": "{count}分钟后过期",
+    "hours": "{count}小时后过期",
+    "days": "{count}天后过期"
+  },
+  "cors": {
+    "label": "跨域设置",
+    "opened": "已开启",
+    "closed": "未开启",
+    "placeholder": "请输入允许的跨域地址，开启后不输入跨域地址则不限制。\n跨域地址一行一个，如："
+  }
+}

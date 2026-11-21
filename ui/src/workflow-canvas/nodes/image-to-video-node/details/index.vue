@@ -91,7 +91,7 @@ defineProps<{
     </div>
 
     <div class="mk-gray-card-sm">
-      <h6 class="mb-2">AI {{ t('workflow.answer.label') }}</h6>
+      <h6 class="mb-2">{{ t('workflow.answer.aiLabel') }}</h6>
       <div class="space-y-2">
         <MdPreview v-if="data.answer" :model-value="data.answer" noImgZoomIn />
         <template v-else>-</template>

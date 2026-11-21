@@ -58,7 +58,7 @@ function handleChangeActive(record: ApiKeyRecord) {
       : (props.api as typeof SystemApiKeyApi).putApiKey(record.id, payload)
   return request
     .then(() => {
-      MsgSuccess(payload.is_active ? '已启用' : '已禁用')
+      MsgSuccess(payload.is_active ? t('common.status.enabled') : t('common.status.disabled'))
       return fetchApiKeys().then(() => true)
     })
     .finally(() => {
@@ -68,7 +68,7 @@ function handleChangeActive(record: ApiKeyRecord) {
 
 function handleDelete(record: ApiKeyRecord) {
   if (loading.value) return
-  return MsgConfirm(t('auth.apiKey.delete.title', { name: `******${record.secret_key.slice(-4)}` }), t('auth.apiKey.delete.description')).then(
+  return MsgConfirm(t('apiKey.delete.title', { name: `******${record.secret_key.slice(-4)}` }), t('apiKey.delete.description')).then(
     () => {
       if (loading.value) return
       loading.value = true
@@ -78,7 +78,7 @@ function handleDelete(record: ApiKeyRecord) {
           : (props.api as typeof SystemApiKeyApi).deleteApiKey(record.id)
       return request
         .then(() => {
-          MsgSuccess('删除成功')
+          MsgSuccess(t('common.messages.deleteSuccess'))
           const total = Math.max(0, pagination.value.total - 1)
           pagination.value.currentPage = Math.min(pagination.value.currentPage, Math.max(1, Math.ceil(total / pagination.value.pageSize)))
           return fetchApiKeys()
@@ -115,25 +115,25 @@ onMounted(loadApiKeys)
               {{ `******${row.secret_key.slice(-4)}` }}
             </span>
             <!-- 复制完整 API Key -->
-            <el-button text @click="copyText(row.secret_key)">
+            <el-button text @click="copyText(row.secret_key, t('common.messages.copied'))">
               <MkIcon name="icon_copy_outlined" />
             </el-button>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="启用状态" width="120">
+      <el-table-column :label="t('common.status.activeLabel')" width="130">
         <template #default="{ row }">
           <MkStatusLabel :active="row.is_active" />
         </template>
       </el-table-column>
-      <el-table-column label="跨域设置" width="110">
+      <el-table-column :label="t('apiKey.cors.label')" width="130">
         <template #default="{ row }">
           <el-tag :type="row.allow_cross_domain ? 'primary' : 'info'" size="small">
-            {{ row.allow_cross_domain ? '已开启' : '未开启' }}
+            {{ row.allow_cross_domain ? t('apiKey.cors.opened') : t('apiKey.cors.closed') }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="到期时间" width="265">
+      <el-table-column :label="t('apiKey.expiration.label')" width="265">
         <template #default="{ row }">
           <span :class="{ 'text-danger': row.expiration.status === 'expired', 'text-warning': row.expiration.status === 'soon' }">
             {{ row.expiration.label }}
@@ -143,13 +143,13 @@ onMounted(loadApiKeys)
           </span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" width="180" show-overflow-tooltip>
+      <el-table-column :label="t('common.labels.remark')" width="180" show-overflow-tooltip>
         <template #default="{ row }">{{ row.remark || '—' }}</template>
       </el-table-column>
-      <el-table-column prop="create_time" label="创建时间" width="180">
+      <el-table-column prop="create_time" :label="t('common.labels.createTime')" width="180">
         <template #default="{ row }">{{ datetimeFormat(row.create_time) || '—' }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="140" fixed="right">
+      <el-table-column :label="t('common.labels.operation')" width="140" fixed="right">
         <template #default="{ row }">
           <div class="flex-align-center gap-3">
             <!-- 启用或禁用 API Key -->
@@ -158,7 +158,7 @@ onMounted(loadApiKeys)
             <!-- 编辑API Key -->
             <ButtonEditApiKey :api="props.api" :application-id="props.applicationId" :record="row" @refresh="loadApiKeys" />
             <!-- 删除 API Key -->
-            <MkTooltip content="删除" placement="top">
+            <MkTooltip :content="t('common.actions.delete')" placement="top">
               <el-button class="ml-0!" type="primary" text @click.stop="handleDelete(row)">
                 <MkIcon name="icon_delete-trash_outlined" />
               </el-button>

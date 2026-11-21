@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type { ApplicationAccessToken } from '@/api/types'
 import type { ResourceDetailPageProps } from '@/layout/ResourceDetailLayout.vue'
+import type { ApiInputField } from '@/workflow-canvas/nodes/base-node/types'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
 import HomeStatistics from '@/views/home/components/HomeStatistics.vue'
 import { useApplicationDetailContext } from '../context'
@@ -54,7 +55,7 @@ const apiDocUrl = new URL(`${CHAT_API_BASE_PATH}-doc/`, window.location.origin).
 const apiQuery = computed(() => {
   const query = application.value?.work_flow?.nodes
     ?.find((n) => n.id === 'base-node')
-    ?.properties?.api_input_field_list?.map((f: any) => {
+    ?.properties?.api_input_field_list?.map((f: ApiInputField) => {
       return `${f.variable}=${f.default_value}`
     })
     .join('&')
@@ -214,7 +215,7 @@ onMounted(() => {
             />
           </div>
           <div class="space-y-2">
-            <div>{{ t('application.overview.apiDoc') }}</div>
+            <div>{{ t('common.labels.apiDoc') }}</div>
             <el-input :model-value="apiDocUrl" readonly>
               <template #suffix>
                 <!-- 复制 API 文档地址 -->

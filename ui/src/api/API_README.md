@@ -65,8 +65,6 @@ Admin 与 Chat 分别维护请求客户端和业务接口。
 `enums/state.ts` 的 `STATE_TYPES` 维护跨业务复用的任务状态，联合类型 `State` 定义在
 `types/state.ts`。触发器及工具／知识库执行记录引用公共状态；文档任务使用 DOCUMENT_TASK_STATE，新增状态时保持已有接口值不变。
 
-API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文档统一维护。
-
 后端字段的固定枚举值放在 `src/api/enums/<domain>.ts`，使用 `as const` 对象声明，并通过
 `src/api/enums/index.ts` 统一导出。业务代码统一从 `@/api/enums` 导入运行时枚举值，不直接
 引用领域文件；不得重复使用裸字符串或另建同值常量。
@@ -96,12 +94,9 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
   `Dict<unknown>`，不为相同结构声明额外别名。
 - `src/api/types` 只存放 API 与 View 或 Component 跨层共用的业务类型，使用方统一通过
   `import type { ... } from '@/api/types'` 导入，不写 `/index.ts`。
-- `src/api/types/index.ts` 只负责导出各业务域类型，不直接声明类型。
+- `src/api/types/index.ts` 只使用 `export type *` 导出领域类型，不声明类型或暴露运行时值。
 - 新增类型前先搜索是否已有等价声明，优先复用或扩展已有类型。
-- `src/api/types/index.ts` 只使用 `export type *` 导出类型，运行时值不得从 `@/api/types` 暴露。
-- 同一业务边界内的重复类型提取到最近共同目录的 `common.ts`；`common.ts` 不得成为无关类型
-  的集合。
-- API 与 View 或 Component 使用同一业务类型时只保留一份声明，不得在两层分别定义。
+- 按上述归属只维护一份类型声明；`common.ts` 不收集无关类型。
 - 智能体详情及保存参数中的 `default_model_setting` 使用 `DefaultModelSettingPayload`；该类型由
   `DefaultModelType` 和单项配置 `ModelConfig` 组合而成（`types/model.ts`），工作流页面及设置抽屉
   从 `@/api/types` 引用。
@@ -493,7 +488,7 @@ Workspace 与 System 资源管理的 `application/overview.ts` 独立维护概�
 
 `admin/workspace/homepage.ts` 维护 `/workspace/<workspaceId>/homepage` 的四类资源汇总、
 每日趋势、三类排行分页、Tokens／对话总量及三类导出。每个接口均以必填的 `workspaceId` 为首个参数，
-由调用方显式传入，API 文件不再自行读取当前路由。
+由调用方显式传入，API 不读取当前路由。
 资源汇总、日期范围、趋势及排行记录类型在 `types/homepage.ts`，统一从 `@/api/types` 导入。
 `getRanking` 与 `exportRanking` 通过 `HomeRankingKind` 选择后端排行路径，名称及起止日期
 筛选保持一致；分页使用 `ParamsPage` 与 `ResponsePage`。导出沿用 `getExportFile`。

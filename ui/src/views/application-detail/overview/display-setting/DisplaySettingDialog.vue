@@ -74,7 +74,7 @@ defineExpose({ open })
   <MkDialog v-model="visible" :title="t('application.overview.display.title')" @closed="handleClosed">
     <div v-loading="loading">
       <el-form :model="displayForm" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item :label="t('application.overview.display.language')">
+        <el-form-item :label="t('common.labels.language')">
           <el-select v-model="displayForm.language" clearable :placeholder="t('common.placeholders.select')">
             <el-option v-for="language in LOCALE_OPTIONS" :key="language.value" :label="language.label" :value="language.value" />
           </el-select>

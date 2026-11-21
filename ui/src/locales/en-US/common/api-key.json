@@ -1,0 +1,27 @@
+{
+  "delete": {
+    "title": "Delete API Key: {name}?",
+    "description": "Services using this API Key will no longer be able to access the API after deletion. Proceed with caution."
+  },
+  "editTitle": "Edit API Key",
+  "safetyHint": "Keep this key safe and do not disclose it.",
+  "gotIt": "Got it",
+  "expiration": {
+    "label": "Expiration time",
+    "placeholder": "Select an expiration time",
+    "requiredMessage": "Select an expiration time",
+    "futureMessage": "Select an expiration time later than the current time",
+    "never": "Never expires",
+    "expired": "Expired",
+    "validDays": "Valid for {count} day | Valid for {count} days",
+    "minutes": "Expires in {count} minute | Expires in {count} minutes",
+    "hours": "Expires in {count} hour | Expires in {count} hours",
+    "days": "Expires in {count} day | Expires in {count} days"
+  },
+  "cors": {
+    "label": "CORS settings",
+    "opened": "Turned on",
+    "closed": "Not turned on",
+    "placeholder": "Enter the allowed origins. Leaving this empty imposes no origin restrictions.\nEnter one origin per line, for example:"
+  }
+}

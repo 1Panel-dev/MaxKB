@@ -149,7 +149,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
                 meta: {
                   permission: ({ params }) => perm.knowledge.workspace.knowledgeChatUserRead(String(params.knowledgeId)),
                   next: 'workspace-knowledge-external-retrieval',
-                  title: 'chatUser.title',
+                  title: 'authorization.chatUserTitle',
                   order: 10,
                 },
               },

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ThemeInfo } from '@/api/admin/auth/types'
 import type { Component } from 'vue'
 import AppLayout from '@/layout/AppLayout.vue'
@@ -13,21 +14,23 @@ interface PreviewMenuItem {
   rightIcon?: Boolean
 }
 
+const { t } = useI18n({ useScope: 'global' })
+
 const props = defineProps<{
   data: Pick<ThemeInfo, 'showForum' | 'showProject' | 'showUserManual'>
 }>()
 
-const accountMenuItems: PreviewMenuItem[] = [
-  { iconName: 'icon-key_outlined', label: '修改密码' },
+const accountMenuItems: PreviewMenuItem[] = reactive([
+  { iconName: 'icon-key_outlined', label: computed(() => t('auth.changePassword.title')) },
   { iconName: 'icon_passkeys_outlined', label: 'API Key' },
-  { iconName: 'icon_translate_outlined', label: '语言', rightIcon: true },
-]
+  { iconName: 'icon_translate_outlined', label: computed(() => t('common.labels.language')), rightIcon: true },
+])
 
 const platformMenuItems = computed<PreviewMenuItem[]>(() => [
-  ...(props.data.showProject ? [{ iconName: 'icon_github_filled', label: '项目地址' }] : []),
-  ...(props.data.showUserManual ? [{ iconName: 'icon_add-dictionary_outlined', label: '用户手册' }] : []),
-  ...(props.data.showForum ? [{ iconName: 'icon-maybe_outlined', label: '论坛求助' }] : []),
-  { iconName: 'icon_info_outlined', label: '关于' },
+  ...(props.data.showProject ? [{ iconName: 'icon_github_filled', label: t('layout.project') }] : []),
+  ...(props.data.showUserManual ? [{ iconName: 'icon_add-dictionary_outlined', label: t('layout.userManual') }] : []),
+  ...(props.data.showForum ? [{ iconName: 'icon-maybe_outlined', label: t('layout.forum') }] : []),
+  { iconName: 'icon_info_outlined', label: t('layout.about.title') },
 ])
 </script>
 
@@ -70,7 +73,7 @@ const platformMenuItems = computed<PreviewMenuItem[]>(() => [
             <div class="border-t py-1">
               <div class="flex-align-center h-8 gap-2 px-3">
                 <MkIcon name="icon_logout_outlined" class="text-N600!" />
-                <span>退出登录</span>
+                <span>{{ t('auth.logout.label') }}</span>
               </div>
             </div>
           </div>

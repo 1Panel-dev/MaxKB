@@ -1,0 +1,38 @@
+{
+  "title": "Appearance settings",
+  "customColor": "Custom color",
+  "colors": {
+    "default": "Default",
+    "orange": "Vibrant orange",
+    "green": "Turquoise green",
+    "purple": "Mystic purple",
+    "red": "Rouge red"
+  },
+  "loginSettings": "Platform login settings",
+  "restoreDefault": "Restore defaults",
+  "website": "Website",
+  "websiteLogoHint": "Logo shown in the browser tab. Recommended size: {dimensions}. Supports JPG, PNG, GIF, up to {size}MB",
+  "loginLogoHint": "Logo on the left of the login page. Recommended size: {dimensions}. Supports JPG, PNG, GIF, up to {size} MB",
+  "loginBackground": "Login background",
+  "loginBackgroundHint": "Background on the left. Recommended vector size: {vector}, bitmap size: {bitmap}. Supports JPG, PNG, GIF, up to {size} MB",
+  "name": {
+    "label": "Website name",
+    "placeholder": "Enter a website name",
+    "requiredMessage": "Enter a website name"
+  },
+  "slogan": {
+    "label": "Welcome message",
+    "placeholder": "Enter a website welcome message",
+    "requiredMessage": "Enter a website welcome message"
+  },
+  "loginPreviewHint": "The preview shows the default MaxKB login page and supports customization",
+  "platformSettings": "Platform settings",
+  "userManualPlaceholder": "Enter the user manual URL",
+  "forumPlaceholder": "Enter the forum support URL",
+  "projectPlaceholder": "Enter the project URL",
+  "platformPreviewHint": "The preview shows the default MaxKB platform interface and supports customization",
+  "abandonChanges": "Discard updates",
+  "saveAndApply": "Save and apply",
+  "imageFormatMessage": "Only JPG, PNG, or GIF images are supported",
+  "imageSizeMessage": "Image size cannot exceed {size} MB"
+}

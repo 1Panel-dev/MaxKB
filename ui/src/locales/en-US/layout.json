@@ -1,0 +1,36 @@
+{
+  "portal": "Portal",
+  "upgrade": "Upgrade",
+  "returnWorkspace": "Back to workspace",
+  "project": "Project URL",
+  "userManual": "User manual",
+  "forum": "Forum support",
+  "about": {
+    "title": "About",
+    "editions": {
+      "professional": "Professional edition",
+      "enterprise": "Enterprise edition",
+      "community": "Community edition"
+    },
+    "fields": {
+      "corporation": "Authorized",
+      "expiresAt": "Expiration time",
+      "edition": "Edition",
+      "version": "Version",
+      "serialNo": "Serial No.",
+      "remark": "Remarks"
+    },
+    "expiration": {
+      "expired": "Expired",
+      "soon": "Expires soon",
+      "minutes": "Expires in {count} minute | Expires in {count} minutes",
+      "hours": "Expires in {count} hour | Expires in {count} hours",
+      "days": "Expires in {count} day | Expires in {count} days"
+    },
+    "updateLicense": "Update License",
+    "copyright": "All rights reserved",
+    "company": "FIT2CLOUD"
+  },
+  "slogan": "A powerful and easy-to-use enterprise agent platform",
+  "collapseNavigation": "Collapse navigation"
+}

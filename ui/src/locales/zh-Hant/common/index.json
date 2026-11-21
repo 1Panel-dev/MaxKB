@@ -14,7 +14,10 @@
     "type": "類型",
     "settings": "設置",
     "example": "示例",
-    "question": "問題"
+    "question": "問題",
+    "language": "語言",
+    "apiDoc": "API 文檔",
+    "remark": "備註"
   },
   "name": {
     "label": "名稱",

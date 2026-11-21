@@ -1,10 +1,9 @@
 # Chat API
 
-`core/request.ts` 提供独立的 Axios 客户端、JSON 响应解包和 `postStream` 流式请求，
-不复用 Admin 请求客户端。JSON 与流式请求通过 `@/stores/chat` 的 `useStore()` 获取当前认证场景
-（门户或单应用）的 token 和语言。
+`core/request.ts` 独立维护 Axios、JSON 解包和 `postStream`，通过 `@/stores/chat` 的
+`useStore()` 读取当前门户／单应用的 token 和语言，不复用 Admin 客户端。
 非认证接口返回 401 时不弹出通用提示，调用 `@/router/chat` 的 `reauthenticate()` 重新认证。
-流式请求返回原始 `Response`，由对话面板解析，不在请求层维护消息或 loading。
+流式请求返回原始 `Response`；面板负责解析、消息和 loading。
 
 ## 对话
 

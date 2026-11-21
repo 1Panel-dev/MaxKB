@@ -83,7 +83,8 @@
     "end": "結束"
   },
   "answer": {
-    "label": "回答內容"
+    "label": "回答內容",
+    "aiLabel": "AI 回答內容"
   },
   "returnContent": {
     "label": "返回內容",

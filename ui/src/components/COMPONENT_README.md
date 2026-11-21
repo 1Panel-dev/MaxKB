@@ -59,7 +59,7 @@ Element Plus 已在 Admin、Chat 入口注册。使用前先检查原生 API，�
   布局和工作流画布；已有循环暂不批量改写。
 - 不编写 `aria-label`；按钮前添加简短中文用途注释，已有注释不重复添加。
 - `<el-button>` 和原生 `<button>` 不设置 `title` 属性，包括 `:title` / `v-bind:title` 动态绑定，避免引入额外的翻译文案。
-  此规则适用于页面、公共组件、对话面板和工作流画布。
+  适用于页面、共享组件、对话面板和画布。
 - `global` 不创建仅用于二次导出的聚合入口。
 - `el-input-number` 设置 `controls-position="right"` 时，同时设置 `align="left"`。
 - Tooltip、Popover、Popconfirm、Dropdown 的触发插槽只保留一个有实际布局盒的根节点；
@@ -383,7 +383,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 级联默认配置为 `{ multiple: true, checkStrictly: true, emitPath: false, showPrefix: false }`，与 v2 文档标签筛选一致：
 父子节点独立选择，隐藏节点前的选择框。静态多选时，组件保留面板的原始勾选，
-对外将选中的父组递归展开为可用叶子节点并去重；页面直接使用回写值，不再自行转换父组。
+对外将父组递归展开为可用叶子并去重；页面直接使用回写值。
 单选、父子联动和懒加载沿用原生返回值；`emitPath: true` 时返回对应叶子的完整路径。
 外部模型变更同步面板；自身提交后的模型回写保留原始父组勾选，关闭再打开也保持。
 通过 `cascaderProps` 覆盖字段映射、单多选、路径输出及懒加载等原生配置。
@@ -395,7 +395,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 `resetValue` 传入完整的默认对象，未传时回退 `{}`；固定表单字段应显式传入，避免重置后缺失字段。
 重置和确定都关闭浮层、回写模型并触发 `change`；点击外部关闭不提交，再次打开按当前模型回填。
 草稿、提交值和默认值之间使用 Lodash 深拷贝隔离，图标按已生效对象是否与 `resetValue` 深度相等决定高亮。
-自定义内容放在内置滚动区，页面不再编写 Popover、开关状态或重置、确定按钮。
+自定义内容使用内置滚动区、浮层状态和重置／确定按钮。
 
 `change(value)` 在写回模型后触发，类型跟随模型；`open` 在每次打开时触发，供页面加载选项。
 组件不请求业务接口、不转换查询参数。文档文件状态用唯一选项值映射为 `status` 和 `task_type`，
@@ -543,8 +543,7 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 编辑期间根节点自动设置内部标记 `data-mk-edit-name-editing`，供 `MkTable` 识别编辑焦点；
 退出编辑时移除，调用方无需传入标记或编辑状态。
 
-表格通过列默认插槽使用，列表以资源 ID 为 key；该列不再启用 `show-overflow-tooltip`，避免编辑时
-叠加表格提示。单元格可用宽度控制组件宽度，业务图标在编辑态隐藏。
+通过表格列的默认插槽使用，行 key 为资源 ID；该列不启用 `show-overflow-tooltip`，避免编辑时叠加提示。单元格可用宽度控制组件宽度，业务图标在编辑态隐藏。
 
 ## 手动导入的共享 UI
 
@@ -797,6 +796,8 @@ Model 配置器的默认模型也使用 `SelectModel`，仅展示已选的可选
 启停成功后刷新，失败保留原状态。查询与列表操作共用 loading，编辑抽屉单独管理保存状态。
 密钥默认隐藏，翻页或刷新恢复隐藏，复制始终使用完整值，隐藏状态不通过 Tooltip 暴露明文。
 
+API Key 专属展示文案与有效期选项归 `apiKey`，通用字段和操作复用 `common`。切换语言更新标签、到期提示及校验文案，不重取密钥或重置编辑草稿；已有到期计算函数直接调用 `t()`，不新增翻译辅助函数。
+
 创建入口与结果 Dialog 封装在内部 `create-api-key/index.vue`（`ButtonCreateApiKey`），接收完整 API、
 可选 `applicationId`、共享 `v-model:loading` 和异步 `refresh` 回调；创建成功展示密钥，并等待列表回到第一页刷新后释放 loading。
 编辑入口与 Drawer 封装在内部 `edit-api-key/index.vue`（`ButtonEditApiKey`），接收完整 API、可选 `applicationId`
@@ -999,6 +1000,8 @@ Workspace 使用 Workspace API，System 资源管理使用 System API；不以�
 用户组、成员及角色名称保留接口原文，语言切换不重置查询与分页。
 
 ### RelatedResourcesDrawer
+
+关联资源专属文案归 `resource.relations`，资源名称与通用字段复用原业务域；语言切换不重新查询、不重置筛选或关系方向，接口返回的资源内容保持原文。
 
 入口 `business/related-resources-drawer/index.vue`。传入完整 `api: typeof RelatedResourcesApi`，
 通过 `open(resourceType, resource)` 传入资源快照，`workspace_id` 可选。查询只传资源类型、资源 ID、分页与筛选；

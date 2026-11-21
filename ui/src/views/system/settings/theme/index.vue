@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ThemeInfo } from '@/api/admin/auth/types'
 import type { FormInstance, FormRules, UploadFile } from 'element-plus'
 import ThemeSettingApi from '@/api/admin/system/settings/theme-setting'
@@ -39,17 +40,27 @@ interface SyncThemeSettingOptions {
   saveSnapshot?: boolean
 }
 
+const { t } = useI18n({ useScope: 'global' })
+
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024
 const IMAGE_TYPES = ['image/gif', 'image/jpeg', 'image/png']
-const THEME_IMAGE_SETTINGS: ThemeImageSetting[] = [
-  { description: '顶部网站显示 Logo，建议尺寸 48*48，支持 JPG、PNG、GIF，大小不超过 10MB', field: 'icon', label: '网站 Logo' },
-  { description: '登录页面左侧 Logo，建议尺寸 126*32，支持 JPG、PNG、GIF，大小不超过 10 MB', field: 'loginLogo', label: '登录 Logo' },
+const THEME_IMAGE_SETTINGS: ThemeImageSetting[] = reactive([
   {
-    description: '左侧背景图，矢量图建议尺寸 1728*1117，位图建议尺寸 3456*2234；支持 JPG、PNG、GIF，大小不超过 10 MB',
-    field: 'loginImage',
-    label: '登录背景图',
+    description: computed(() => t('appearance.websiteLogoHint', { dimensions: '48*48', size: 10 })),
+    field: 'icon',
+    label: computed(() => `${t('appearance.website')} Logo`),
   },
-]
+  {
+    description: computed(() => t('appearance.loginLogoHint', { dimensions: '126*32', size: 10 })),
+    field: 'loginLogo',
+    label: computed(() => `${t('auth.login.label')} Logo`),
+  },
+  {
+    description: computed(() => t('appearance.loginBackgroundHint', { vector: '1728*1117', bitmap: '3456*2234', size: 10 })),
+    field: 'loginImage',
+    label: computed(() => t('appearance.loginBackground')),
+  },
+])
 
 const { theme } = useStore()
 const initialThemeSetting = toThemeSettingForm(theme.themeInfo)
@@ -60,10 +71,10 @@ const savedThemeSetting = ref<ThemeSettingForm>({ ...initialThemeSetting })
 const themeSetting = reactive<ThemeSettingForm>({ ...initialThemeSetting })
 const selectedTheme = ref(THEME_OPTIONS.some((option) => option.value === normalizedInitialThemeColor) ? normalizedInitialThemeColor : 'custom')
 const customThemeColor = ref(initialThemeSetting.theme)
-const formRules: FormRules<ThemeSettingForm> = {
-  slogan: [{ whitespace: true, required: true, message: '请输入网站欢迎语', trigger: 'blur' }],
-  title: [{ whitespace: true, required: true, message: '请输入网站名称', trigger: 'blur' }],
-}
+const formRules = computed<FormRules<ThemeSettingForm>>(() => ({
+  slogan: [{ whitespace: true, required: true, message: t('appearance.slogan.requiredMessage'), trigger: 'blur' }],
+  title: [{ whitespace: true, required: true, message: t('appearance.name.requiredMessage'), trigger: 'blur' }],
+}))
 
 const isCustomTheme = computed(() => selectedTheme.value === 'custom')
 
@@ -121,7 +132,7 @@ function handleSaveTheme() {
       .then(() => theme.loadThemeInfo())
       .then((setting) => {
         syncThemeSetting(toThemeSettingForm(setting), { saveSnapshot: true })
-        MsgSuccess('保存成功')
+        MsgSuccess(t('common.messages.saveSuccess'))
       })
       .finally(() => {
         loading.value = false
@@ -162,11 +173,11 @@ function handleUploadImage(field: ThemeImageField) {
   return (file: UploadFile) => {
     if (!file.raw) return
     if (!IMAGE_TYPES.includes(file.raw.type)) {
-      MsgError('仅支持 JPG、PNG 或 GIF 格式的图片')
+      MsgError(t('appearance.imageFormatMessage'))
       return
     }
     if (file.raw.size > MAX_IMAGE_SIZE) {
-      MsgError('图片大小不能超过 10 MB')
+      MsgError(t('appearance.imageSizeMessage', { size: 10 }))
       return
     }
     themeSetting[field] = file.raw
@@ -177,7 +188,7 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
 </script>
 
 <template>
-  <MkViewLayout class="system-settings-theme" :loading="loading">
+  <MkViewLayout class="system-settings-theme" :title="t('appearance.title')" :loading="loading">
     <template #default="{ Footer }">
       <div class="min-w-215 space-y-4">
         <!-- 平台主题色 -->
@@ -185,18 +196,18 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
           <el-radio-button v-for="themeOption in THEME_OPTIONS" :key="themeOption.value" :label="themeOption.label" :value="themeOption.value">
             {{ themeOption.label }}
           </el-radio-button>
-          <el-radio-button label="自定义" value="custom" />
+          <el-radio-button :label="t('common.options.custom')" value="custom" />
         </el-radio-group>
         <div v-if="isCustomTheme" class="flex-align-center gap-3">
-          <span>自定义颜色</span>
+          <span>{{ t('appearance.customColor') }}</span>
           <el-color-picker v-model="customThemeColor" @change="handleThemeColorChange" />
         </div>
         <el-divider class="mb-4!" />
         <!-- 平台登录设置 -->
         <div class="flex-between">
-          <h6>平台登录设置</h6>
+          <h6>{{ t('appearance.loginSettings') }}</h6>
 
-          <el-button text type="primary" class="-mr-1" @click="handleRestoreLoginDefaults">恢复默认</el-button>
+          <el-button text type="primary" class="-mr-1" @click="handleRestoreLoginDefaults">{{ t('appearance.restoreDefault') }}</el-button>
         </div>
 
         <div class="grid grid-cols-[2fr_1fr] gap-6">
@@ -230,72 +241,73 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
               ref="themeFormRef"
               :model="themeSetting"
               :rules="formRules"
+              :validate-on-rule-change="false"
               label-position="top"
               require-asterisk-position="right"
               @submit.prevent
             >
-              <el-form-item class="mb-2!" label="网站名称" prop="title">
-                <el-input v-model="themeSetting.title" maxlength="128" placeholder="请输入网站名称" show-word-limit />
+              <el-form-item class="mb-2!" :label="t('appearance.name.label')" prop="title">
+                <el-input v-model="themeSetting.title" maxlength="128" :placeholder="t('appearance.name.placeholder')" show-word-limit />
               </el-form-item>
-              <el-form-item label="欢迎语" prop="slogan">
-                <el-input v-model="themeSetting.slogan" maxlength="64" placeholder="请输入网站欢迎语" show-word-limit />
+              <el-form-item :label="t('appearance.slogan.label')" prop="slogan">
+                <el-input v-model="themeSetting.slogan" maxlength="64" :placeholder="t('appearance.slogan.placeholder')" show-word-limit />
               </el-form-item>
             </el-form>
           </div>
-          <span class="text-N500">预览页默认为 MaxKB 登录界面，支持自定义设置</span>
+          <span class="text-N500">{{ t('appearance.loginPreviewHint') }}</span>
         </div>
 
         <el-divider class="mb-4!" />
         <!-- 平台设置 -->
         <div class="flex-between">
-          <h6>平台设置</h6>
-          <el-button text type="primary" class="-mr-1" @click="handleRestorePlatformDefaults">恢复默认</el-button>
+          <h6>{{ t('appearance.platformSettings') }}</h6>
+          <el-button text type="primary" class="-mr-1" @click="handleRestorePlatformDefaults">{{ t('appearance.restoreDefault') }}</el-button>
         </div>
 
         <div class="grid grid-cols-[2fr_1fr] gap-6">
           <PlatformPreview :data="themeSetting" />
 
           <div class="flex-column gap-2">
-            <el-checkbox v-model="themeSetting.showUserManual" label="用户手册" />
+            <el-checkbox v-model="themeSetting.showUserManual" :label="t('layout.userManual')" />
             <div class="ml-6">
               <el-input
                 v-if="themeSetting.showUserManual"
                 v-model="themeSetting.userManualUrl"
                 maxlength="128"
-                placeholder="请输入用户手册地址"
+                :placeholder="t('appearance.userManualPlaceholder')"
                 show-word-limit
               />
             </div>
 
-            <el-checkbox v-model="themeSetting.showForum" label="论坛求助" />
+            <el-checkbox v-model="themeSetting.showForum" :label="t('layout.forum')" />
             <div class="ml-6">
               <el-input
                 v-if="themeSetting.showForum"
                 v-model="themeSetting.forumUrl"
                 maxlength="128"
-                placeholder="请输入论坛求助地址"
+                :placeholder="t('appearance.forumPlaceholder')"
                 show-word-limit
               />
             </div>
 
-            <el-checkbox v-model="themeSetting.showProject" label="项目地址" />
+            <el-checkbox v-model="themeSetting.showProject" :label="t('layout.project')" />
             <div class="ml-6">
               <el-input
                 v-if="themeSetting.showProject"
                 v-model="themeSetting.projectUrl"
                 maxlength="128"
-                placeholder="请输入项目地址"
+                :placeholder="t('appearance.projectPlaceholder')"
                 show-word-limit
               />
             </div>
           </div>
-          <span class="text-N500">预览页默认为 MaxKB 平台界面，支持自定义设置</span>
+          <span class="text-N500">{{ t('appearance.platformPreviewHint') }}</span>
         </div>
       </div>
 
       <component :is="Footer">
-        <el-button plain @click="handleAbandonChanges">放弃更新</el-button>
-        <el-button v-if="perm.system.appearance.edit()" type="primary" @click="handleSaveTheme">保存并应用</el-button>
+        <el-button plain @click="handleAbandonChanges">{{ t('appearance.abandonChanges') }}</el-button>
+        <el-button v-if="perm.system.appearance.edit()" type="primary" @click="handleSaveTheme">{{ t('appearance.saveAndApply') }}</el-button>
       </component>
     </template>
   </MkViewLayout>

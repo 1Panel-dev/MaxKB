@@ -156,7 +156,7 @@ export const systemResourceKnowledgeRoutes: RouteRecordRaw[] = [
             meta: {
               permission: () => perm.knowledge.system.knowledgeChatUserRead(),
               next: 'system-resource-knowledge-external-retrieval',
-              title: 'chatUser.title',
+              title: 'authorization.chatUserTitle',
               order: 10,
             },
           },

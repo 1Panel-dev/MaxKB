@@ -16,8 +16,8 @@ npm install
 npm run dev
 ```
 
-Admin 默认访问地址为 `http://localhost:3000/admin/`。在另一个终端运行 `npm run chat`，
-可通过 `http://localhost:3001/chat/` 访问 Chat 入口。开发服务器启用 `strictPort`，端口被占用时不会自动换端口。
+Admin 地址为 `http://localhost:3000/admin/`；另开终端运行 `npm run chat`，
+访问 `http://localhost:3001/chat/`。两者启用 `strictPort`，端口占用时不自动切换。
 
 ### 后端代理与环境变量
 
@@ -58,8 +58,8 @@ OSS 文件接口。前端业务接口需要可用的后端服务。
 | `npm run preview -- --mode chat` | 预览 Chat 构建产物              |
 | `npm run format`                 | 使用 Prettier 格式化 `src/`     |
 
-`npm run lint` 当前仅配置了 `run-s "lint:*"`，但尚未定义任何 `lint:*` 子脚本，不能作为已执行
-ESLint 检查的依据。需要检查代码时，可运行 `npx eslint <待检查的文件或目录>`。
+`npm run lint` 仅调用 `run-s "lint:*"`，尚无对应子脚本。实际检查使用
+`npx eslint <文件或目录>`。
 导入顺序由项目 ESLint 规则检查，使用 `npx eslint <文件或目录> --fix` 自动整理；
 分组与顺序见 [AGENTS.md](AGENTS.md#import-顺序)。
 

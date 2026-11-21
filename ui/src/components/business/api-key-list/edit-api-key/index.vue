@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { reactive, ref, useTemplateRef } from 'vue'
+import { computed, reactive, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ExpirationType } from '../expiration'
 import type SystemApiKeyApi from '@/api/admin/system/api-key'
 import type SystemResourceApiKeyApi from '@/api/admin/system/resource-management/application/api-key'
@@ -11,6 +12,8 @@ import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ButtonEditApiKey' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{
   api: typeof ApplicationApiKeyApi | typeof SystemResourceApiKeyApi | typeof SystemApiKeyApi
@@ -44,20 +47,20 @@ const form = reactive<ApiKeyForm>({
   is_active: true,
 })
 
-const rules: FormRules<ApiKeyForm> = {
-  expirationType: [{ required: true, message: '请选择到期时间', trigger: 'change' }],
+const rules = computed<FormRules<ApiKeyForm>>(() => ({
+  expirationType: [{ required: true, message: t('apiKey.expiration.requiredMessage'), trigger: 'change' }],
   expire_time: [
     {
       validator: (_rule, value: string | null, callback) => {
         if (form.expirationType !== 'custom') return callback()
         const timestamp = value ? new Date(value).getTime() : NaN
-        if (!Number.isFinite(timestamp) || timestamp <= Date.now()) return callback(new Error('请选择晚于当前时间的到期时间'))
+        if (!Number.isFinite(timestamp) || timestamp <= Date.now()) return callback(new Error(t('apiKey.expiration.futureMessage')))
         callback()
       },
       trigger: 'change',
     },
   ],
-}
+}))
 
 function handleOpenEdit() {
   const record = props.record
@@ -101,7 +104,7 @@ function handleSave() {
         : (props.api as typeof SystemApiKeyApi).putApiKey(apiKeyId.value, payload)
     return request
       .then(() => {
-        MsgSuccess('保存成功')
+        MsgSuccess(t('common.messages.saveSuccess'))
         visible.value = false
         emit('refresh')
       })
@@ -126,24 +129,32 @@ function handleClosed() {
 
 <template>
   <!-- 编辑 API Key -->
-  <MkTooltip content="编辑" placement="top">
+  <MkTooltip :content="t('common.actions.edit')" placement="top">
     <el-button type="primary" text @click.stop="handleOpenEdit">
       <MkIcon name="icon_edit_outlined" />
     </el-button>
   </MkTooltip>
-  <MkDrawer v-model="visible" title="编辑 API Key" @closed="handleClosed">
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
+  <MkDrawer v-model="visible" :title="t('apiKey.editTitle')" @closed="handleClosed">
+    <el-form
+      ref="formRef"
+      :model="form"
+      :rules="rules"
+      :validate-on-rule-change="false"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent
+    >
       <el-form-item label="API KEY">
         <el-input :model-value="form.secret_key" disabled>
           <template #suffix>
             <!-- 复制 API Key -->
-            <el-button text @click="copyText(form.secret_key)" class="-mr-1">
+            <el-button text @click="copyText(form.secret_key, t('common.messages.copied'))" class="-mr-1">
               <MkIcon name="icon_copy_outlined" />
             </el-button>
           </template>
         </el-input>
       </el-form-item>
-      <el-form-item label="到期时间" prop="expirationType">
+      <el-form-item :label="t('apiKey.expiration.label')" prop="expirationType">
         <el-select v-model="form.expirationType" @change="handleExpirationChange">
           <template v-for="option in expirationOptions" :key="option.value">
             <el-option :label="option.label" :value="option.value" />
@@ -151,12 +162,18 @@ function handleClosed() {
         </el-select>
       </el-form-item>
       <el-form-item v-if="form.expirationType === 'custom'" prop="expire_time">
-        <el-date-picker v-model="form.expire_time" class="w-full!" type="datetime" value-format="YYYY-MM-DDTHH:mm:ssZ" placeholder="请选择到期时间" />
+        <el-date-picker
+          v-model="form.expire_time"
+          class="w-full!"
+          type="datetime"
+          value-format="YYYY-MM-DDTHH:mm:ssZ"
+          :placeholder="t('apiKey.expiration.placeholder')"
+        />
       </el-form-item>
-      <el-form-item label="备注" prop="remark">
-        <el-input v-model="form.remark" type="textarea" :rows="3" maxlength="256" show-word-limit placeholder="请输入" />
+      <el-form-item :label="t('common.labels.remark')" prop="remark">
+        <el-input v-model="form.remark" type="textarea" :rows="3" maxlength="256" show-word-limit :placeholder="t('common.placeholders.input')" />
       </el-form-item>
-      <el-form-item label="跨域设置">
+      <el-form-item :label="t('apiKey.cors.label')">
         <el-switch v-model="form.allow_cross_domain" />
       </el-form-item>
       <el-form-item v-if="form.allow_cross_domain">
@@ -164,18 +181,18 @@ function handleClosed() {
           v-model="form.cross_domain_list"
           type="textarea"
           :rows="8"
-          :placeholder="'请输入允许的跨域地址，开启后不输入跨域地址则不限制。\n跨域地址一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io'"
+          :placeholder="`${t('apiKey.cors.placeholder')}\nhttp://127.0.0.1:5678\nhttps://dataease.io`"
         />
       </el-form-item>
-      <el-form-item label="启用状态">
+      <el-form-item :label="t('common.status.activeLabel')">
         <el-switch v-model="form.is_active" />
       </el-form-item>
     </el-form>
     <template #footer>
       <!-- 取消编辑 -->
-      <el-button plain :disabled="saving" @click="visible = false">取消</el-button>
+      <el-button plain :disabled="saving" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存 API Key 配置 -->
-      <el-button type="primary" :loading="saving" @click="handleSave">保存</el-button>
+      <el-button type="primary" :loading="saving" @click="handleSave">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDrawer>
 </template>

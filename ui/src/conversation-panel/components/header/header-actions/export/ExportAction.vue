@@ -68,7 +68,7 @@ async function previewPdf() {
         >
           <template #icon><MkIcon name="icon_export_outlined" /></template>
           <span class="flex-1">导出</span>
-          <MkIcon name="icon_right_outlined" class="text-N500" />
+          <MkIcon name="icon_right_outlined" class="text-N500!" />
         </MkDropdownItem>
       </span>
       <!-- 桌面端导出图标入口 -->
