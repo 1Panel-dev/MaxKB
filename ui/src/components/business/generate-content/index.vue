@@ -78,7 +78,7 @@ function generateContent(regenerate = false) {
     if (error) {
       messages.value = messages.value.filter((message) => message !== answer)
       if (!(error instanceof Error) || error.name !== 'StreamRequestError') {
-        MsgError(error instanceof Error ? error.message : t('common.messages.generateFailed'))
+        MsgError(error instanceof Error ? error.message : t('common.error.generateFailed'))
       }
     }
     conversationStream = undefined

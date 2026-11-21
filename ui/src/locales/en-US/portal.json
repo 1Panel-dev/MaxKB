@@ -1,6 +1,7 @@
 {
   "label": "Portal",
   "title": "Portal access settings",
+  "loginTitle": "Portal login",
   "name": {
     "default": "Agent portal",
     "placeholder": "Enter a portal name",

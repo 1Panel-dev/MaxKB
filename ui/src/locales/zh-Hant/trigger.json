@@ -39,7 +39,6 @@
       "duplicateMessage": "參數名已存在"
     },
     "dataType": {
-      "label": "數據類型",
       "placeholder": "請選擇數據類型",
       "requiredMessage": "請選擇參數類型"
     }

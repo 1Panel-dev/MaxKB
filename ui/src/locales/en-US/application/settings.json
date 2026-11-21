@@ -85,7 +85,6 @@
     "label": "Voice playback",
     "autoPlay": "Autoplay",
     "browser": "Browser playback (free)",
-    "custom": "Custom",
     "model": {
       "placeholder": "Select a text-to-speech model",
       "requiredMessage": "Select a text-to-speech model"

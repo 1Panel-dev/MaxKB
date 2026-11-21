@@ -19,7 +19,6 @@
   },
   "permission": {
     "title": "权限配置",
-    "label": "权限",
     "category": "分类",
     "module": "模块名称",
     "target": "操作对象"

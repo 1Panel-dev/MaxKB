@@ -40,12 +40,10 @@
     "basicComponents": "基礎組件",
     "aiCapabilities": "AI 能力",
     "businessLogic": "業務邏輯",
-    "dataProcessing": "數據處理",
-    "other": "其他"
+    "dataProcessing": "數據處理"
   },
   "defaultModel": {
     "label": "默認模型",
-    "custom": "自定義",
     "unconfigured": "未配置默認模型",
     "requiredMessage": "請配置默認模型",
     "selectRequiredMessage": "請在默認模型設置中選擇{label}",

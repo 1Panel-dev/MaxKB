@@ -177,7 +177,7 @@ function handleUploadImage(field: ThemeImageField) {
       return
     }
     if (file.raw.size > MAX_IMAGE_SIZE) {
-      MsgError(t('appearance.imageSizeMessage', { size: 10 }))
+      MsgError(t('upload.imageSizeMessage', { size: 10 }))
       return
     }
     themeSetting[field] = file.raw
@@ -207,7 +207,7 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
         <div class="flex-between">
           <h6>{{ t('appearance.loginSettings') }}</h6>
 
-          <el-button text type="primary" class="-mr-1" @click="handleRestoreLoginDefaults">{{ t('appearance.restoreDefault') }}</el-button>
+          <el-button text type="primary" class="-mr-1" @click="handleRestoreLoginDefaults">{{ t('common.actions.restoreDefault') }}</el-button>
         </div>
 
         <div class="grid grid-cols-[2fr_1fr] gap-6">
@@ -261,7 +261,7 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
         <!-- 平台设置 -->
         <div class="flex-between">
           <h6>{{ t('appearance.platformSettings') }}</h6>
-          <el-button text type="primary" class="-mr-1" @click="handleRestorePlatformDefaults">{{ t('appearance.restoreDefault') }}</el-button>
+          <el-button text type="primary" class="-mr-1" @click="handleRestorePlatformDefaults">{{ t('common.actions.restoreDefault') }}</el-button>
         </div>
 
         <div class="grid grid-cols-[2fr_1fr] gap-6">

@@ -3,8 +3,7 @@
     "label": "变量赋值",
     "description": "更新全局变量的值",
     "value": {
-      "label": "赋值",
-      "custom": "自定义"
+      "label": "赋值"
     }
   },
   "variableAggregation": {

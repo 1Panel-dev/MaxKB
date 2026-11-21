@@ -23,15 +23,12 @@
     },
     "value": {
       "placeholder": "值或变量"
-    },
-    "knowledgeList": "知识库列表",
-    "documentList": "文档列表"
+    }
   },
   "documentExtract": {
     "label": "文档内容提取",
     "description": "解析输入文档，输出结构化文档内容",
-    "content": "文档内容",
-    "documentList": "文档列表"
+    "content": "文档内容"
   },
   "reranker": {
     "label": "多路召回",
@@ -89,8 +86,7 @@
   "webSource": {
     "label": "Web 站点",
     "description": "输入根地址自动抓取 Web 数据（单链接对应单文档），输出含内容的文档列表",
-    "noConfiguration": "暂无配置项",
-    "documentList": "文档列表"
+    "noConfiguration": "暂无配置项"
   },
   "knowledgeWrite": {
     "label": "知识库写入",

@@ -19,7 +19,7 @@ const datePresetOptions = computed<OptionItem<DatePreset>[]>(() => [
   { label: t('common.dateRange.lastDays', { days: 30 }), value: 30 },
   { label: t('common.dateRange.lastDays', { days: 90 }), value: 90 },
   { label: t('common.dateRange.lastHalfYear'), value: 183 },
-  { label: t('common.dateRange.custom'), value: 'custom' },
+  { label: t('common.options.custom'), value: 'custom' },
 ])
 
 /* 默认范围只在挂载时回填，不触发查询。 */

@@ -39,7 +39,6 @@
       "duplicateMessage": "Parameter name already exists"
     },
     "dataType": {
-      "label": "Data type",
       "placeholder": "Select a data type",
       "requiredMessage": "Select a parameter type"
     }

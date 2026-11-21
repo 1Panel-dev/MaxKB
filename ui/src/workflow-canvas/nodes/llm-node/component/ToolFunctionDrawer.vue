@@ -233,7 +233,7 @@ defineExpose({ open, close })
             <span class="block truncate" :title="row.name">{{ row.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="t('workflow.llm.dataType.label')" width="90">
+        <el-table-column :label="t('common.labels.dataType')" width="90">
           <template #default="{ row }">
             <el-tag type="info" size="small">{{ row.type }}</el-tag>
           </template>

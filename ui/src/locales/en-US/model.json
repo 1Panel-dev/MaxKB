@@ -17,7 +17,14 @@
   "provider": {
     "label": "Provider",
     "placeholder": "Select a provider",
-    "local": "Local models"
+    "local": "Local models",
+    "qianfan": "Qianfan",
+    "zhipu": "Zhipu AI",
+    "iflytek": "iFlytek Spark",
+    "volcengine": "Volcengine",
+    "tencentHunyuan": "Tencent Hunyuan",
+    "tencentCloud": "Tencent Cloud",
+    "aliyunBailian": "Alibaba Cloud Bailian"
   },
   "fields": {
     "name": {

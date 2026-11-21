@@ -75,7 +75,7 @@ defineExpose({ open, close })
           @blur="inputFieldForm.name = inputFieldForm.name.trim()"
         />
       </el-form-item>
-      <el-form-item :label="t('tool.inputParams.dataType.label')">
+      <el-form-item :label="t('common.labels.dataType')">
         <el-select v-model="inputFieldForm.type" class="w-full">
           <el-option v-for="fieldType in inputFieldTypes" :key="fieldType" :label="fieldType" :value="fieldType" />
         </el-select>
@@ -89,10 +89,10 @@ defineExpose({ open, close })
           @blur="inputFieldForm.desc = inputFieldForm.desc?.trim()"
         />
       </el-form-item>
-      <el-form-item :label="t('tool.source.label')">
+      <el-form-item :label="t('common.labels.source')">
         <el-select v-model="inputFieldForm.source" class="w-full">
-          <el-option :label="t('tool.source.reference')" value="reference" />
-          <el-option :label="t('tool.source.custom')" value="custom" />
+          <el-option :label="t('common.options.referenceParameter')" value="reference" />
+          <el-option :label="t('common.options.custom')" value="custom" />
         </el-select>
       </el-form-item>
       <el-form-item :label="t('dynamicForm.fields.required.label')" @click.prevent>

@@ -32,7 +32,7 @@
     "userTokens": "Token usage · Top users",
     "conversationCount": "Chats: {count}",
     "averageTokens": "Avg. {count} Tokens",
-    "averageRounds": "Avg. {count} rounds/user",
+    "averageRounds": "Avg. {count} round/user | Avg. {count} rounds/user",
     "rank": "Rank",
     "user": "User",
     "applicationName": "Agent name",

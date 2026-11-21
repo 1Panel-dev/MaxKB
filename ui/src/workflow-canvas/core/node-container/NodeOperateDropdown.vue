@@ -145,7 +145,7 @@ function deleteNode() {
           {{ t('common.actions.delete') }}
         </MkDropdownItem>
         <div v-if="sourceName" class="border-t mt-1 px-3 py-2" @click.stop>
-          <div class="text-sm text-N500">{{ t('workflow.node.source') }}</div>
+          <div class="text-sm text-N500">{{ t('common.labels.source') }}</div>
           <div class="mt-1 break-all text-N600">{{ sourceName }}</div>
         </div>
       </MkDropdownMenu>

@@ -18,7 +18,11 @@
     "language": "Language",
     "apiDoc": "API Docs",
     "remark": "Remarks",
-    "file": "File"
+    "file": "File",
+    "source": "Source",
+    "dataType": "Data type",
+    "ipAddress": "IP address",
+    "result": "Result"
   },
   "name": {
     "label": "Name",
@@ -34,6 +38,12 @@
   "description": {
     "label": "Description",
     "placeholder": "Enter a description"
+  },
+  "content": {
+    "label": "Content",
+    "placeholder": "Enter content",
+    "requiredMessage": "Enter content",
+    "lengthMessage": "Content must not exceed {max} characters"
   },
   "status": {
     "label": "Status",
@@ -52,14 +62,21 @@
     "yes": "Yes",
     "no": "No",
     "reference": "Reference",
+    "referenceParameter": "Parameter reference",
+    "referenceVariable": "Variable reference",
     "custom": "Custom"
   },
   "dateRange": {
     "lastDays": "Past {days} days",
     "lastHalfYear": "Past 6 months",
-    "custom": "Custom",
     "startDate": "Start date",
     "endDate": "End date"
+  },
+  "relativeTime": {
+    "justNow": "Just now",
+    "minutesAgo": "{count} minute ago | {count} minutes ago",
+    "hoursAgo": "{count} hour ago | {count} hours ago",
+    "daysAgo": "{count} day ago | {count} days ago"
   },
   "schedule": {
     "daily": "Daily",
@@ -115,6 +132,7 @@
     "reload": "Reload",
     "clear": "Clear",
     "reset": "Reset",
+    "restoreDefault": "Restore defaults",
     "save": "Save",
     "publish": "Publish",
     "add": "Add",
@@ -145,7 +163,8 @@
     "debug": "Debug",
     "download": "Download",
     "fullscreen": "Fullscreen",
-    "send": "Send"
+    "send": "Send",
+    "back": "Back"
   },
   "dialogs": {
     "notice": "Notice",
@@ -160,9 +179,7 @@
     "deleteSuccess": "Deleted successfully",
     "clearSuccess": "Cleared successfully",
     "batchDeleteSuccess": "Deleted successfully in bulk",
-    "deleteFailed": "Deletion failed",
     "createSuccess": "Created successfully",
-    "generateFailed": "Generation failed",
     "copySuccess": "Copied successfully",
     "addSuccess": "Added successfully",
     "removeSuccess": "Removed successfully",
@@ -178,7 +195,6 @@
     "disableSuccess": "Disabled successfully",
     "batchDisableSuccess": "Disabled successfully in bulk",
     "exportSuccess": "Exported successfully",
-    "exportFailed": "Export failed",
     "copied": "Copied",
     "connectionSuccess": "Connection successful",
     "testSuccess": "Test successful",
@@ -186,9 +202,21 @@
     "submitSuccess": "Submitted successfully",
     "sendSuccess": "Sent successfully",
     "taskSubmitted": "Task submitted",
-    "operationSuccess": "Operation successful",
+    "operationSuccess": "Operation successful"
+  },
+  "error": {
     "audioPlaybackFailed": "Unable to play audio. Check the audio format or file URL.",
-    "videoPlaybackFailed": "Unable to play video. Check the video format or file URL."
+    "videoPlaybackFailed": "Unable to play video. Check the video format or file URL.",
+    "resourceNotFound": "The requested resource does not exist",
+    "serverError": "Service error. Please try again later",
+    "requestFailed": "Request failed. Please try again later",
+    "noPermission": "You do not have permission to access this page. Please contact an administrator",
+    "noService": "The service is temporarily unavailable",
+    "requestTimeout": "Request timed out. Please try again later",
+    "networkError": "Network error",
+    "deleteFailed": "Deletion failed",
+    "generateFailed": "Generation failed",
+    "exportFailed": "Export failed"
   },
   "placeholders": {
     "input": "Please enter",

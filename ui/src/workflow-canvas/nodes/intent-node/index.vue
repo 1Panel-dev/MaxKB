@@ -44,7 +44,7 @@ const providerOptions = ref<Array<ModelProviderItem>>([])
 function defaultBranch(): IntentNodeBranch[] {
   return [
     { id: randomId(), content: '', isOther: false },
-    { id: randomId(), content: t('workflow.intent.categories.other'), isOther: true },
+    { id: randomId(), content: t('common.labels.other'), isOther: true },
   ]
 }
 
@@ -149,7 +149,7 @@ onMounted(() => {
         <el-form-item
           prop="content_list"
           :rules="{ required: true, message: t('common.validation.selectRequired'), trigger: 'change' }"
-          :label="t('workflow.intent.input')"
+          :label="t('execution.details.input')"
         >
           <NodeCascader ref="contentCascaderRef" v-model="formData.content_list" :node-model="model" :placeholder="t('common.placeholders.select')" />
         </el-form-item>

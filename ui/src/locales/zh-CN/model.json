@@ -17,7 +17,14 @@
   "provider": {
     "label": "供应商",
     "placeholder": "选择供应商",
-    "local": "本地模型"
+    "local": "本地模型",
+    "qianfan": "千帆大模型",
+    "zhipu": "智谱 AI",
+    "iflytek": "讯飞星火",
+    "volcengine": "火山引擎",
+    "tencentHunyuan": "腾讯混元",
+    "tencentCloud": "腾讯云",
+    "aliyunBailian": "阿里云百炼"
   },
   "fields": {
     "name": {

@@ -1,5 +1,6 @@
 {
   "title": "Knowledge",
+  "list": "Knowledge list",
   "menu": {
     "library": "Library",
     "retrieval": "Retrieval optimization",
@@ -31,7 +32,26 @@
     "label": "Workflow knowledge",
     "createTitle": "Create workflow knowledge",
     "description": "Use a custom workflow to build knowledge.",
-    "documentImportUnavailableMessage": "This Knowledge workflow has not been published. Publish it before importing documents."
+    "documentImportUnavailableMessage": "This Knowledge workflow has not been published. Publish it before importing documents.",
+    "transform": {
+      "title": "Convert to workflow knowledge",
+      "description": "You can now convert existing knowledge to workflow knowledge for a more open and flexible approach. Drag and drop nodes to orchestrate the entire process, from different data sources to writing into knowledge, to meet your enterprise’s specific knowledge management needs. You can use the data sources and tools available in Tools.",
+      "futureDocumentsHint": "The new processing method will apply to all documents imported after conversion.",
+      "irreversibleMessage": "Note: Conversion cannot be undone.",
+      "confirmMessage": "Conversion cannot be undone. Proceed with caution.",
+      "action": "Convert",
+      "successMessage": "Converted successfully"
+    },
+    "template": {
+      "processingSettings": "Document processing settings",
+      "webSplit": "Web smart segmentation",
+      "smartSplit": "Smart segmentation",
+      "qaSource": "QA pairs",
+      "qaSplit": "QA pair segmentation",
+      "documentSegments": "Document segment list",
+      "aggregateSegments": "Aggregate document segment lists",
+      "webSource": "Web site"
+    }
   },
   "fields": {
     "name": {

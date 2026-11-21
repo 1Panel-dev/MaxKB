@@ -5,6 +5,7 @@ import type { ApiResponse } from './types'
 import type { Dict } from '@/api/types'
 import type { AxiosProgressEvent, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
+import { t } from '@/locales'
 import { reauthenticate } from '@/router/chat'
 import { useStore } from '@/stores/chat'
 import { MsgError } from '@/utils/message'
@@ -47,9 +48,9 @@ function isHtmlResponse(responseText: string) {
 
 /** 根据 HTTP 状态生成通用错误提示。 */
 function getStatusErrorMessage(status?: number) {
-  if (status === 404) return '请求的资源不存在'
-  if (status && status >= 500) return '服务异常，请稍后重试'
-  return '请求失败，请稍后重试'
+  if (status === 404) return t('common.error.resourceNotFound')
+  if (status && status >= 500) return t('common.error.serverError')
+  return t('common.error.requestFailed')
 }
 
 export const request = axios.create({

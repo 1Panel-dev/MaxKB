@@ -48,8 +48,8 @@ const rules = computed<FormRules<typeof improveForm>>(() => ({
     { max: 64, message: t('chat.improve.relatedQuestion.lengthMessage', { max: 64 }), trigger: 'blur' },
   ],
   content: [
-    { required: true, whitespace: true, message: t('chat.improve.content.requiredMessage'), trigger: 'blur' },
-    { max: 100000, message: t('chat.improve.content.lengthMessage', { max: 100000 }), trigger: 'blur' },
+    { required: true, whitespace: true, message: t('common.content.requiredMessage'), trigger: 'blur' },
+    { max: 100000, message: t('common.content.lengthMessage', { max: 100000 }), trigger: 'blur' },
   ],
   knowledge_id: [{ required: true, message: t('knowledge.fields.targetKnowledge.requiredMessage'), trigger: 'change' }],
   document_id: [{ required: true, message: t('knowledge.document.targetDocument.requiredMessage'), trigger: 'change' }],
@@ -135,14 +135,14 @@ onMounted(open)
       <el-form-item :label="t('chat.improve.relatedQuestion.label')" prop="problem_text">
         <el-input v-model="improveForm.problem_text" maxlength="64" show-word-limit :placeholder="t('chat.improve.relatedQuestion.placeholder')" />
       </el-form-item>
-      <el-form-item :label="t('chat.improve.content.label')" prop="content">
+      <el-form-item :label="t('common.content.label')" prop="content">
         <el-input
           v-model="improveForm.content"
           type="textarea"
           :rows="10"
           maxlength="100000"
           show-word-limit
-          :placeholder="t('chat.improve.content.placeholder')"
+          :placeholder="t('common.content.placeholder')"
         />
       </el-form-item>
       <el-form-item :label="t('common.title.label')" prop="title">

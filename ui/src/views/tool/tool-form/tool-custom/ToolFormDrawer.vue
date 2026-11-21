@@ -234,10 +234,10 @@ defineExpose({ open })
       <ToolCodeGenerate v-model="toolForm.code" :tool-form="toolForm" class="mb-6" show-generate />
       <section>
         <div class="mb-4 flex-align-center gap-2">
-          <h4 class="mk-title-decoration">{{ t('tool.outputParams.title') }}</h4>
+          <h4 class="mk-title-decoration">{{ t('execution.details.outputParams') }}</h4>
           <span class="text-N600">{{ t('tool.help.shownWhenUsed') }}</span>
         </div>
-        <div class="mk-gray-card-sm rounded-md!">{{ t('tool.outputParams.result') }} {result}</div>
+        <div class="mk-gray-card-sm rounded-md!">{{ t('common.labels.result') }} {result}</div>
       </section>
     </el-form>
 

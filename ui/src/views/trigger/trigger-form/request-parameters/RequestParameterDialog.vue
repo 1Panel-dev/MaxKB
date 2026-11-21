@@ -69,7 +69,7 @@ defineExpose({ open, close })
       <el-form-item :label="t('trigger.requestParameters.name.label')" prop="field">
         <el-input v-model="formData.field" :placeholder="t('trigger.requestParameters.name.placeholder')" />
       </el-form-item>
-      <el-form-item :label="t('trigger.requestParameters.dataType.label')" prop="type">
+      <el-form-item :label="t('common.labels.dataType')" prop="type">
         <el-select v-model="formData.type" :placeholder="t('trigger.requestParameters.dataType.placeholder')">
           <el-option v-for="type in bodyFieldTypeOptions" :key="type" :label="type" :value="type" />
         </el-select>

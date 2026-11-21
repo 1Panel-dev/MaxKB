@@ -7,11 +7,6 @@
     "all": "全部工具",
     "shared": "共享工具"
   },
-  "source": {
-    "label": "來源",
-    "reference": "引用參數",
-    "custom": "自定義"
-  },
   "fields": {
     "name": {
       "placeholder": "請輸入工具名稱",
@@ -54,7 +49,6 @@
     "copyTitle": "複製 MCP",
     "serviceTitle": "MCP 服務",
     "settingsTitle": "MCP 設置",
-    "reference": "引用 MCP",
     "customService": "自定義 MCP 服務",
     "name": {
       "placeholder": "請輸入 MCP 名稱",
@@ -88,8 +82,7 @@
     "title": "工具商店",
     "categories": {
       "webSearch": "聯網搜索",
-      "databaseSearch": "數據庫查詢",
-      "other": "其他"
+      "databaseSearch": "數據庫查詢"
     },
     "searchResults": "找到 {count} 個相關工具",
     "apply": "應用",
@@ -103,23 +96,15 @@
     "title": "啓動參數"
   },
   "inputParams": {
-    "title": "輸入參數",
     "name": {
       "label": "參數名稱",
       "placeholder": "請輸入參數名稱",
       "requiredMessage": "請輸入參數名稱"
     },
-    "dataType": {
-      "label": "數據類型"
-    },
     "description": {
       "label": "參數說明",
       "placeholder": "請輸入參數說明"
     }
-  },
-  "outputParams": {
-    "title": "輸出參數",
-    "result": "結果"
   },
   "pythonCode": {
     "title": "工具內容（Python）",
@@ -134,7 +119,6 @@
     "resultTitle": "運行結果",
     "runSuccess": "運行成功",
     "runFailed": "運行失敗",
-    "output": "輸出",
     "failureMessage": "工具運行失敗",
     "debugResultTitle": "調試結果",
     "answering": "回答中",
@@ -153,7 +137,8 @@
   },
   "messages": {
     "publishBeforeEnabling": "無法啓用，請先發佈工作流",
-    "createUnsupported": "資源管理不支持創建工具"
+    "createUnsupported": "資源管理不支持創建工具",
+    "missingWorkspace": "工具缺少所屬工作空間信息"
   },
   "updateVersion": {
     "action": "更新版本",

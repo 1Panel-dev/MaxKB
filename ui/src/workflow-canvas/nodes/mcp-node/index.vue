@@ -340,8 +340,8 @@ onMounted(() => {
                 class="w-23!"
                 @change="changeMcpSource"
               >
-                <el-option :label="t('tool.mcp.reference')" value="referencing" />
-                <el-option :label="t('tool.source.custom')" value="custom" />
+                <el-option :label="`${t('common.options.reference')} MCP`" value="referencing" />
+                <el-option :label="t('common.options.custom')" value="custom" />
               </el-select>
             </div>
           </template>
@@ -408,8 +408,8 @@ onMounted(() => {
               <span v-else :class="item.required ? 'mk-required' : ''">{{ item.label.label }}</span>
 
               <el-select :teleported="false" v-model="item.source" size="small" class="w-21!" @change="setParamValue(item, '')">
-                <el-option :label="t('workflow.referenceVariable.label')" value="referencing" />
-                <el-option :label="t('tool.source.custom')" value="custom" />
+                <el-option :label="t('common.options.referenceVariable')" value="referencing" />
+                <el-option :label="t('common.options.custom')" value="custom" />
               </el-select>
             </div>
           </template>

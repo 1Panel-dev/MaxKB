@@ -6,8 +6,7 @@
     },
     "otherSettings": "Other settings",
     "authentication": {
-      "label": "Chat user authorization",
-      "description": "When enabled, only authorized chat users can search this knowledge base."
+      "description": "When enabled, only authorized chat users can search this knowledge."
     },
     "fileCountLimit": {
       "label": "Maximum files per upload"
@@ -47,7 +46,7 @@
     },
     "paragraphLength": "Segment length",
     "childChunkLength": {
-      "label": "Child chunk length",
+      "label": "Sub-chunk length",
       "description": "Vector search uses these smaller chunks. When a chunk matches, the full segment is shown."
     },
     "autoClean": {

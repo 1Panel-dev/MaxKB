@@ -7,11 +7,6 @@
     "all": "全部工具",
     "shared": "共享工具"
   },
-  "source": {
-    "label": "来源",
-    "reference": "引用参数",
-    "custom": "自定义"
-  },
   "fields": {
     "name": {
       "placeholder": "请输入工具名称",
@@ -54,7 +49,6 @@
     "copyTitle": "复制 MCP",
     "serviceTitle": "MCP 服务",
     "settingsTitle": "MCP 设置",
-    "reference": "引用 MCP",
     "customService": "自定义 MCP 服务",
     "name": {
       "placeholder": "请输入 MCP 名称",
@@ -88,8 +82,7 @@
     "title": "工具商店",
     "categories": {
       "webSearch": "联网搜索",
-      "databaseSearch": "数据库查询",
-      "other": "其他"
+      "databaseSearch": "数据库查询"
     },
     "searchResults": "找到 {count} 个相关工具",
     "apply": "应用",
@@ -103,23 +96,15 @@
     "title": "启动参数"
   },
   "inputParams": {
-    "title": "输入参数",
     "name": {
       "label": "参数名称",
       "placeholder": "请输入参数名称",
       "requiredMessage": "请输入参数名称"
     },
-    "dataType": {
-      "label": "数据类型"
-    },
     "description": {
       "label": "参数说明",
       "placeholder": "请输入参数说明"
     }
-  },
-  "outputParams": {
-    "title": "输出参数",
-    "result": "结果"
   },
   "pythonCode": {
     "title": "工具内容（Python）",
@@ -134,7 +119,6 @@
     "resultTitle": "运行结果",
     "runSuccess": "运行成功",
     "runFailed": "运行失败",
-    "output": "输出",
     "failureMessage": "工具运行失败",
     "debugResultTitle": "调试结果",
     "answering": "回答中",
@@ -153,7 +137,8 @@
   },
   "messages": {
     "publishBeforeEnabling": "无法启用，请先发布工作流",
-    "createUnsupported": "资源管理不支持创建工具"
+    "createUnsupported": "资源管理不支持创建工具",
+    "missingWorkspace": "工具缺少所属工作空间信息"
   },
   "updateVersion": {
     "action": "更新版本",

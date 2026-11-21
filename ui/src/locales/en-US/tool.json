@@ -7,11 +7,6 @@
     "all": "All tools",
     "shared": "Shared tools"
   },
-  "source": {
-    "label": "Source",
-    "reference": "Parameter reference",
-    "custom": "Custom"
-  },
   "fields": {
     "name": {
       "placeholder": "Enter a tool name",
@@ -54,7 +49,6 @@
     "copyTitle": "Copy MCP tool",
     "serviceTitle": "MCP server",
     "settingsTitle": "MCP settings",
-    "reference": "Reference MCP",
     "customService": "Custom MCP server",
     "name": {
       "placeholder": "Enter an MCP tool name",
@@ -88,8 +82,7 @@
     "title": "Tool store",
     "categories": {
       "webSearch": "Web search",
-      "databaseSearch": "Database queries",
-      "other": "Other"
+      "databaseSearch": "Database queries"
     },
     "searchResults": "{count} matching tool | {count} matching tools",
     "apply": "Use tool",
@@ -103,23 +96,15 @@
     "title": "Startup parameters"
   },
   "inputParams": {
-    "title": "Input parameters",
     "name": {
       "label": "Parameter name",
       "placeholder": "Enter a parameter name",
       "requiredMessage": "Enter a parameter name"
     },
-    "dataType": {
-      "label": "Data type"
-    },
     "description": {
       "label": "Parameter description",
       "placeholder": "Enter a parameter description"
     }
-  },
-  "outputParams": {
-    "title": "Output parameters",
-    "result": "Result"
   },
   "pythonCode": {
     "title": "Tool code (Python)",
@@ -134,7 +119,6 @@
     "resultTitle": "Run result",
     "runSuccess": "Run succeeded",
     "runFailed": "Run failed",
-    "output": "Output",
     "failureMessage": "The tool failed to run.",
     "debugResultTitle": "Debug result",
     "answering": "Answering",
@@ -153,7 +137,8 @@
   },
   "messages": {
     "publishBeforeEnabling": "Publish the workflow before enabling this tool.",
-    "createUnsupported": "Tools cannot be created in resource management."
+    "createUnsupported": "Tools cannot be created in resource management.",
+    "missingWorkspace": "The tool is missing workspace information"
   },
   "updateVersion": {
     "action": "Update version",

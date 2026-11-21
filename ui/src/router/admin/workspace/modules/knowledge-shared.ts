@@ -8,7 +8,13 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
     name: 'workspace-shared-knowledge-detail',
     component: () => import('@/views/knowledge-detail/index.vue'),
     redirect: { name: 'workspace-shared-knowledge-document-list' },
-    meta: { title: '共享知识库详情', hidden: true, resourceDetailRoot: true, resourceScope: 'workspace-shared', activeMenu: 'workspace-knowledge' },
+    meta: {
+      title: '共享知识库详情',
+      hidden: true,
+      resourceDetailRoot: true,
+      resourceScope: 'workspace-shared',
+      activeMenu: 'workspace-knowledge',
+    },
     children: [
       {
         path: '',
@@ -153,6 +159,12 @@ export const sharedKnowledgeRoutes: RouteRecordRaw[] = [
     path: 'shared/knowledge/:knowledgeId/:type/document/:documentId',
     name: 'workspace-shared-knowledge-paragraph',
     component: () => import('@/views/document-detail/index.vue'),
-    meta: { resourceScope: 'workspace-shared', activeMenu: 'workspace-knowledge', title: '文档分段', hidden: true, resourceDetailRoot: true },
+    meta: {
+      resourceScope: 'workspace-shared',
+      activeMenu: 'workspace-knowledge',
+      title: '文档分段',
+      hidden: true,
+      resourceDetailRoot: true,
+    },
   },
 ]

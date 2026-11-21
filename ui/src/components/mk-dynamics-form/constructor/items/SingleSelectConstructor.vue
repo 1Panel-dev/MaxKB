@@ -8,9 +8,9 @@ const { t } = useI18n({ useScope: 'global' })
 const getModel = inject<() => DynamicFormValue>('getModel')
 
 const assignmentMethodOptions = computed(() => {
-  const options = [{ label: t('dynamicForm.options.custom'), value: 'custom' }]
+  const options = [{ label: t('common.options.custom'), value: 'custom' }]
   if (getModel) {
-    options.push({ label: t('dynamicForm.options.reference'), value: 'ref_variables' })
+    options.push({ label: t('common.options.referenceVariable'), value: 'ref_variables' })
   }
   return options
 })

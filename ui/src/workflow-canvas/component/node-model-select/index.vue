@@ -91,8 +91,8 @@ onBeforeUnmount(() => anchorGuard.reset())
           @wheel="handleNodeWheel"
         >
           <el-option :label="t('workflow.defaultModel.label')" value="default" />
-          <el-option :label="t('workflow.referenceVariable.label')" value="reference" />
-          <el-option :label="t('workflow.defaultModel.custom')" value="custom" />
+          <el-option :label="t('common.options.referenceVariable')" value="reference" />
+          <el-option :label="t('common.options.custom')" value="custom" />
         </el-select>
       </div>
     </template>

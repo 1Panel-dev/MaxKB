@@ -23,7 +23,7 @@ const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const searchFields: OptionItem<string>[] = reactive([
   { label: computed(() => t('operateLog.operationDetails')), value: 'operate' },
   { label: computed(() => t('operateLog.operator')), value: 'user' },
-  { label: computed(() => t('operateLog.ipAddress')), value: 'ip_address' },
+  { label: computed(() => t('common.labels.ipAddress')), value: 'ip_address' },
 ])
 const operateLogSearchQuery = ref<Dict<unknown>>()
 
@@ -223,7 +223,7 @@ onMounted(() => {
             </span>
           </template>
         </el-table-column>
-        <el-table-column :label="t('operateLog.ipAddress')" width="140" show-overflow-tooltip>
+        <el-table-column :label="t('common.labels.ipAddress')" width="140" show-overflow-tooltip>
           <template #default="{ row }">{{ row.ip_address || '-' }}</template>
         </el-table-column>
         <el-table-column prop="create_time" :label="t('operateLog.operationTime')" width="180" sortable>

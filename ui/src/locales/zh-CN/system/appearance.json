@@ -9,7 +9,6 @@
     "red": "胭脂红"
   },
   "loginSettings": "平台登录设置",
-  "restoreDefault": "恢复默认",
   "website": "网站",
   "websiteLogoHint": "顶部网站显示 Logo，建议尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超过 {size}MB",
   "loginLogoHint": "登录页面左侧 Logo，建议尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超过 {size} MB",
@@ -33,6 +32,5 @@
   "platformPreviewHint": "预览页默认为 MaxKB 平台界面，支持自定义设置",
   "abandonChanges": "放弃更新",
   "saveAndApply": "保存并应用",
-  "imageFormatMessage": "仅支持 JPG、PNG 或 GIF 格式的图片",
-  "imageSizeMessage": "图片大小不能超过 {size} MB"
+  "imageFormatMessage": "仅支持 JPG、PNG 或 GIF 格式的图片"
 }

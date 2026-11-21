@@ -96,8 +96,8 @@ defineExpose({ open })
     <el-form ref="formRef" :model="formData" :validate-on-rule-change="false" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item>
         <el-radio-group :model-value="formData.mcp_source" @update:model-value="changeSource">
-          <el-radio value="referencing">{{ t('tool.mcp.reference') }}</el-radio>
-          <el-radio value="custom">{{ t('tool.source.custom') }}</el-radio>
+          <el-radio value="referencing">{{ t('common.options.reference') }} MCP</el-radio>
+          <el-radio value="custom">{{ t('common.options.custom') }}</el-radio>
         </el-radio-group>
       </el-form-item>
 

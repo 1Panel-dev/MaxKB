@@ -123,12 +123,6 @@
       "requiredMessage": "Enter a related question",
       "lengthMessage": "The related question must not exceed {max} characters"
     },
-    "content": {
-      "label": "Content",
-      "placeholder": "Enter content",
-      "requiredMessage": "Enter content",
-      "lengthMessage": "Content must not exceed {max} characters"
-    },
     "titlePlaceholder": "Set a title for this content to make it easier to manage and view"
   }
 }

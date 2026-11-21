@@ -1,7 +1,6 @@
 {
   "node": {
     "title": "节点",
-    "result": "结果",
     "delete": {
       "title": "是否删除节点：{name}？",
       "batchTitle": "是否删除选中的{count}个节点？"
@@ -11,7 +10,6 @@
       "placeholder": "请输入节点名称",
       "duplicateMessage": "节点名称已存在！"
     },
-    "source": "来源",
     "disabledMessage": "该节点已禁用",
     "applicationUnavailableMessage": "该智能体不可用",
     "toolUnavailableMessage": "该工具不可用",
@@ -60,10 +58,8 @@
   "intent": {
     "label": "意图识别",
     "description": "将用户问题与用户预设的意图分类进行匹配",
-    "input": "输入",
     "categories": {
-      "label": "意图分类",
-      "other": "其他"
+      "label": "意图分类"
     },
     "category": "分类",
     "reason": "理由"
@@ -161,8 +157,7 @@
       "label": "回复内容",
       "placeholder": "回复内容，可以引用系统中变量，如 {reference}",
       "htmlPlaceholder": "HTML 内容，可以引用系统中变量，如 {reference}",
-      "requiredMessage": "请输入回复内容",
-      "custom": "自定义"
+      "requiredMessage": "请输入回复内容"
     }
   },
   "condition": {

@@ -231,7 +231,7 @@ defineProps<ResourceDetailPageProps>()
       <el-form-item prop="authentication">
         <template #label>
           <div>
-            <span>{{ t('knowledge.baseSettings.authentication.label') }}</span>
+            <span>{{ t('authorization.chatUserTitle') }}</span>
             <span class="text-N600">（{{ t('knowledge.baseSettings.authentication.description') }}）</span>
           </div>
         </template>

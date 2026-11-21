@@ -75,7 +75,7 @@ defineExpose({ open, close })
           @blur="formData.name = formData.name.trim()"
         />
       </el-form-item>
-      <el-form-item :label="t('workflow.llm.dataType.label')" prop="type">
+      <el-form-item :label="t('common.labels.dataType')" prop="type">
         <el-select v-model="formData.type" :placeholder="t('workflow.llm.dataType.placeholder')" class="w-full">
           <el-option v-for="parameterType in toolParameterTypes" :key="parameterType" :label="parameterType" :value="parameterType" />
         </el-select>

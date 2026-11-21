@@ -18,7 +18,11 @@
     "language": "語言",
     "apiDoc": "API 文檔",
     "remark": "備註",
-    "file": "文件"
+    "file": "文件",
+    "source": "來源",
+    "dataType": "數據類型",
+    "ipAddress": "IP 地址",
+    "result": "結果"
   },
   "name": {
     "label": "名稱",
@@ -34,6 +38,12 @@
   "description": {
     "label": "描述",
     "placeholder": "請輸入描述"
+  },
+  "content": {
+    "label": "內容",
+    "placeholder": "請輸入內容",
+    "requiredMessage": "請輸入內容",
+    "lengthMessage": "內容不能超過{max}個字符"
   },
   "status": {
     "label": "狀態",
@@ -52,14 +62,21 @@
     "yes": "是",
     "no": "否",
     "reference": "引用",
+    "referenceParameter": "引用參數",
+    "referenceVariable": "引用變量",
     "custom": "自定義"
   },
   "dateRange": {
     "lastDays": "過去 {days} 天",
     "lastHalfYear": "過去半年",
-    "custom": "自定義",
     "startDate": "開始日期",
     "endDate": "結束日期"
+  },
+  "relativeTime": {
+    "justNow": "剛剛",
+    "minutesAgo": "{count}分鐘前",
+    "hoursAgo": "{count}小時前",
+    "daysAgo": "{count}天前"
   },
   "schedule": {
     "daily": "每日",
@@ -115,6 +132,7 @@
     "reload": "重新加載",
     "clear": "清空",
     "reset": "重置",
+    "restoreDefault": "恢復默認",
     "save": "保存",
     "publish": "發佈",
     "add": "添加",
@@ -145,7 +163,8 @@
     "debug": "調試",
     "download": "下載",
     "fullscreen": "全屏",
-    "send": "發送"
+    "send": "發送",
+    "back": "返回"
   },
   "dialogs": {
     "notice": "提示",
@@ -160,9 +179,7 @@
     "deleteSuccess": "刪除成功",
     "clearSuccess": "清空成功",
     "batchDeleteSuccess": "批量刪除成功",
-    "deleteFailed": "刪除失敗",
     "createSuccess": "創建成功",
-    "generateFailed": "生成失敗",
     "copySuccess": "複製成功",
     "addSuccess": "添加成功",
     "removeSuccess": "移除成功",
@@ -178,7 +195,6 @@
     "disableSuccess": "禁用成功",
     "batchDisableSuccess": "批量禁用成功",
     "exportSuccess": "導出成功",
-    "exportFailed": "導出失敗",
     "copied": "已複製",
     "connectionSuccess": "連接成功",
     "testSuccess": "測試成功",
@@ -186,9 +202,21 @@
     "submitSuccess": "提交成功",
     "sendSuccess": "發送成功",
     "taskSubmitted": "任務已提交",
-    "operationSuccess": "操作成功",
+    "operationSuccess": "操作成功"
+  },
+  "error": {
     "audioPlaybackFailed": "無法播放，請檢查音頻格式或文件地址",
-    "videoPlaybackFailed": "無法播放，請檢查視頻格式或文件地址"
+    "videoPlaybackFailed": "無法播放，請檢查視頻格式或文件地址",
+    "resourceNotFound": "請求的資源不存在",
+    "serverError": "服務異常，請稍後重試",
+    "requestFailed": "請求失敗，請稍後重試",
+    "noPermission": "當前用戶暫無權限訪問，請聯繫管理員",
+    "noService": "暫時無法訪問服務",
+    "requestTimeout": "請求超時，請稍後重試",
+    "networkError": "網絡錯誤",
+    "deleteFailed": "刪除失敗",
+    "generateFailed": "生成失敗",
+    "exportFailed": "導出失敗"
   },
   "placeholders": {
     "input": "請輸入",

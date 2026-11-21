@@ -23,15 +23,12 @@
     },
     "value": {
       "placeholder": "值或變量"
-    },
-    "knowledgeList": "知識庫列表",
-    "documentList": "文檔列表"
+    }
   },
   "documentExtract": {
     "label": "文檔內容提取",
     "description": "解析輸入文檔，輸出結構化文檔內容",
-    "content": "文檔內容",
-    "documentList": "文檔列表"
+    "content": "文檔內容"
   },
   "reranker": {
     "label": "多路召回",
@@ -89,8 +86,7 @@
   "webSource": {
     "label": "Web 站點",
     "description": "輸入根地址自動抓取 Web 數據（單鏈接對應單文檔），輸出含內容的文檔列表",
-    "noConfiguration": "暫無配置項",
-    "documentList": "文檔列表"
+    "noConfiguration": "暫無配置項"
   },
   "knowledgeWrite": {
     "label": "知識庫寫入",

@@ -37,11 +37,14 @@ const getData = () => {
     props_info: {
       rules: formValue.value.required
         ? [
-            { required: true, message: `请输入 ${formValue.value.label}` },
+            { required: true, message: t('common.validation.inputFieldRequired', { label: formValue.value.label }) },
             {
               min: formValue.value.minlength,
               max: formValue.value.maxlength,
-              message: `${formValue.value.label}长度在 ${formValue.value.minlength} 到 ${formValue.value.maxlength} 个字符`,
+              message: t('common.validation.lengthRange', {
+                min: formValue.value.minlength,
+                max: formValue.value.maxlength,
+              }),
               trigger: 'blur',
             },
           ]
@@ -49,7 +52,10 @@ const getData = () => {
             {
               min: formValue.value.minlength,
               max: formValue.value.maxlength,
-              message: `${formValue.value.label}长度在 ${formValue.value.minlength} 到 ${formValue.value.maxlength} 个字符`,
+              message: t('common.validation.lengthRange', {
+                min: formValue.value.minlength,
+                max: formValue.value.maxlength,
+              }),
               trigger: 'blur',
             },
           ],
@@ -68,7 +74,7 @@ const rules = computed(() => [
   {
     min: formValue.value.minlength,
     max: formValue.value.maxlength,
-    message: t('dynamicForm.fields.defaultValue.lengthMessage', { min: formValue.value.minlength, max: formValue.value.maxlength }),
+    message: t('common.validation.lengthRange', { min: formValue.value.minlength, max: formValue.value.maxlength }),
     trigger: 'blur',
   },
 ])

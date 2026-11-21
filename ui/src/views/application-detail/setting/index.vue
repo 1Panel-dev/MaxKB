@@ -557,7 +557,7 @@ onMounted(() => {
                 >
                   <el-radio-group v-model="settings.tts_type" class="mb-2">
                     <el-radio value="BROWSER">{{ t('application.speechPlayback.browser') }}</el-radio>
-                    <el-radio value="TTS">{{ t('application.speechPlayback.custom') }}</el-radio>
+                    <el-radio value="TTS">{{ t('common.options.custom') }}</el-radio>
                   </el-radio-group>
                   <SelectModel
                     v-if="settings.tts_type === 'TTS'"

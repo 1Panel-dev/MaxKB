@@ -99,7 +99,7 @@ defineExpose({ getData, validate, render })
 <template>
   <div v-if="enableVisibility" class="flex-column max-h-[inherit] min-h-0">
     <el-tabs v-model="activeTab" class="shrink-0">
-      <el-tab-pane :label="t('dynamicForm.tabs.basic')" name="basic" />
+      <el-tab-pane :label="t('common.labels.basicInfo')" name="basic" />
       <el-tab-pane :label="t('dynamicForm.tabs.visibility')" name="visibility" />
     </el-tabs>
 

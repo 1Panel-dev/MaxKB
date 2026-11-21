@@ -25,8 +25,8 @@ const contentForm = ref({ content: '' })
 const formRef = useTemplateRef<FormInstance>('formRef')
 const rules = computed<FormRules>(() => ({
   content: [
-    { required: true, whitespace: true, message: t('chat.improve.content.requiredMessage'), trigger: 'blur' },
-    { max: 100000, message: t('chat.improve.content.lengthMessage', { max: 100000 }), trigger: 'blur' },
+    { required: true, whitespace: true, message: t('common.content.requiredMessage'), trigger: 'blur' },
+    { max: 100000, message: t('common.content.lengthMessage', { max: 100000 }), trigger: 'blur' },
   ],
 }))
 const markIds = ref<string[]>([])
@@ -127,7 +127,7 @@ function cancelEdit() {
             type="textarea"
             :readonly="!editing"
             maxlength="100000"
-            :placeholder="t('chat.improve.content.placeholder')"
+            :placeholder="t('common.content.placeholder')"
           />
         </el-form-item>
       </el-form>

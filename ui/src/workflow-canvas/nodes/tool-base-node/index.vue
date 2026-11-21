@@ -20,7 +20,10 @@ const model = getModel()
 if (!Array.isArray(model.properties.user_input_field_list)) model.properties.user_input_field_list = []
 if (!Array.isArray(model.properties.user_output_field_list)) model.properties.user_output_field_list = []
 model.properties.user_input_config = { title: t('workflow.userInput.title'), ...(model.properties.user_input_config as ToolFieldConfig | undefined) }
-model.properties.user_output_config = { title: t('tool.outputParams.title'), ...(model.properties.user_output_config as ToolFieldConfig | undefined) }
+model.properties.user_output_config = {
+  title: t('execution.details.outputParams'),
+  ...(model.properties.user_output_config as ToolFieldConfig | undefined),
+}
 
 const inputFields = computed({
   get: () => model.properties.user_input_field_list as ToolInputField[],

@@ -18,7 +18,11 @@
     "language": "语言",
     "apiDoc": "API 文档",
     "remark": "备注",
-    "file": "文件"
+    "file": "文件",
+    "source": "来源",
+    "dataType": "数据类型",
+    "ipAddress": "IP 地址",
+    "result": "结果"
   },
   "name": {
     "label": "名称",
@@ -34,6 +38,12 @@
   "description": {
     "label": "描述",
     "placeholder": "请输入描述"
+  },
+  "content": {
+    "label": "内容",
+    "placeholder": "请输入内容",
+    "requiredMessage": "请输入内容",
+    "lengthMessage": "内容不能超过{max}个字符"
   },
   "status": {
     "label": "状态",
@@ -52,14 +62,21 @@
     "yes": "是",
     "no": "否",
     "reference": "引用",
+    "referenceParameter": "引用参数",
+    "referenceVariable": "引用变量",
     "custom": "自定义"
   },
   "dateRange": {
     "lastDays": "过去 {days} 天",
     "lastHalfYear": "过去半年",
-    "custom": "自定义",
     "startDate": "开始日期",
     "endDate": "结束日期"
+  },
+  "relativeTime": {
+    "justNow": "刚刚",
+    "minutesAgo": "{count}分钟前",
+    "hoursAgo": "{count}小时前",
+    "daysAgo": "{count}天前"
   },
   "schedule": {
     "daily": "每日",
@@ -115,6 +132,7 @@
     "reload": "重新加载",
     "clear": "清空",
     "reset": "重置",
+    "restoreDefault": "恢复默认",
     "save": "保存",
     "publish": "发布",
     "add": "添加",
@@ -145,7 +163,8 @@
     "debug": "调试",
     "download": "下载",
     "fullscreen": "全屏",
-    "send": "发送"
+    "send": "发送",
+    "back": "返回"
   },
   "dialogs": {
     "notice": "提示",
@@ -160,9 +179,7 @@
     "deleteSuccess": "删除成功",
     "clearSuccess": "清空成功",
     "batchDeleteSuccess": "批量删除成功",
-    "deleteFailed": "删除失败",
     "createSuccess": "创建成功",
-    "generateFailed": "生成失败",
     "copySuccess": "复制成功",
     "addSuccess": "添加成功",
     "removeSuccess": "移除成功",
@@ -178,7 +195,6 @@
     "disableSuccess": "禁用成功",
     "batchDisableSuccess": "批量禁用成功",
     "exportSuccess": "导出成功",
-    "exportFailed": "导出失败",
     "copied": "已复制",
     "connectionSuccess": "连接成功",
     "testSuccess": "测试成功",
@@ -186,9 +202,21 @@
     "submitSuccess": "提交成功",
     "sendSuccess": "发送成功",
     "taskSubmitted": "任务已提交",
-    "operationSuccess": "操作成功",
+    "operationSuccess": "操作成功"
+  },
+  "error": {
     "audioPlaybackFailed": "无法播放，请检查音频格式或文件地址",
-    "videoPlaybackFailed": "无法播放，请检查视频格式或文件地址"
+    "videoPlaybackFailed": "无法播放，请检查视频格式或文件地址",
+    "resourceNotFound": "请求的资源不存在",
+    "serverError": "服务异常，请稍后重试",
+    "requestFailed": "请求失败，请稍后重试",
+    "noPermission": "当前用户暂无权限访问，请联系管理员",
+    "noService": "暂时无法访问服务",
+    "requestTimeout": "请求超时，请稍后重试",
+    "networkError": "网络错误",
+    "deleteFailed": "删除失败",
+    "generateFailed": "生成失败",
+    "exportFailed": "导出失败"
   },
   "placeholders": {
     "input": "请输入",

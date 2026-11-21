@@ -16,8 +16,7 @@
       "expiresAt": "Expiration time",
       "edition": "Edition",
       "version": "Version",
-      "serialNo": "Serial No.",
-      "remark": "Remarks"
+      "serialNo": "Serial No."
     },
     "expiration": {
       "expired": "Expired",

@@ -34,7 +34,6 @@
       "show": "显示",
       "imageHint": "建议尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超过 {size} MB",
       "backgroundHint": "支持 JPG、PNG、GIF，大小不超过 {size} MB",
-      "imageSizeMessage": "图片大小不能超过 {size} MB",
       "iconPosition": "图标默认位置",
       "draggable": "可拖拽位置",
       "left": "左",
@@ -47,8 +46,7 @@
       "allowShare": "允许分享对话记录",
       "disclaimer": "免责声明",
       "disclaimerPlaceholder": "请输入免责声明",
-      "defaultDisclaimer": "「以上内容均由 AI 生成，仅供参考和借鉴」",
-      "restoreDefault": "恢复默认"
+      "defaultDisclaimer": "「以上内容均由 AI 生成，仅供参考和借鉴」"
     }
   }
 }

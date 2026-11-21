@@ -123,12 +123,6 @@
       "requiredMessage": "請輸入關聯問題",
       "lengthMessage": "關聯問題不能超過{max}個字符"
     },
-    "content": {
-      "label": "內容",
-      "placeholder": "請輸入內容",
-      "requiredMessage": "請輸入內容",
-      "lengthMessage": "內容不能超過{max}個字符"
-    },
     "titlePlaceholder": "請給當前內容設置一個標題，以便管理查看"
   }
 }

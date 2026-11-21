@@ -1,9 +1,10 @@
 import { computed, reactive } from 'vue'
 import type LogicFlow from '@logicflow/core'
+import { START_NODE_REFERENCES } from '@/workflow-canvas/config/constants'
 import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
 import { t } from '@/locales'
 
-export const applicationTemplate = {
+export const applicationTemplate = reactive({
   blank: { edges: [], nodes: defaultApplicationNodes },
   assistant: {
     nodes: [
@@ -17,11 +18,11 @@ export const applicationTemplate = {
           config: {},
           height: 725,
           showNode: true,
-          stepName: '基本信息',
+          stepName: computed(() => t('common.labels.basicInfo')),
           node_data: {
-            desc: '基于用户问题，检索知识库相关内容作为AI模型的参考内容',
-            name: '知识库问答助手',
-            prologue: '您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务',
+            desc: computed(() => t('application.template.assistant.workflowDescription')),
+            name: computed(() => t('application.template.assistant.label')),
+            prologue: computed(() => t('application.prologue.defaultValue')),
             tts_type: 'BROWSER',
             stt_model_id_type: 'default',
             long_term_model_id_type: 'default',
@@ -29,7 +30,7 @@ export const applicationTemplate = {
           enableException: false,
           input_field_list: [],
           user_input_config: {
-            title: '用户输入',
+            title: computed(() => t('workflow.userInput.title')),
           },
           api_input_field_list: [],
           chat_input_field_list: [],
@@ -45,37 +46,37 @@ export const applicationTemplate = {
           config: {
             fields: [
               {
-                label: '用户问题',
+                label: computed(() => t('workflow.start.question')),
                 value: 'question',
               },
             ],
             globalFields: [
               {
-                label: '当前时间',
+                label: computed(() => t('workflow.start.currentTime')),
                 value: 'time',
               },
               {
-                label: '历史聊天记录',
+                label: computed(() => t('workflow.history.label')),
                 value: 'history_context',
               },
               {
-                label: '对话 ID',
+                label: computed(() => t('workflow.start.chatId')),
                 value: 'chat_id',
               },
               {
-                label: '对话用户 ID',
+                label: computed(() => t('workflow.start.chatUserId')),
                 value: 'chat_user_id',
               },
               {
-                label: '对话用户类型',
+                label: computed(() => t('workflow.start.chatUserType')),
                 value: 'chat_user_type',
               },
               {
-                label: '对话用户组',
+                label: computed(() => t('workflow.start.chatUserGroup')),
                 value: 'chat_user_group',
               },
               {
-                label: '对话用户',
+                label: computed(() => t('workflow.start.chatUser')),
                 value: 'chat_user',
               },
             ],
@@ -83,16 +84,16 @@ export const applicationTemplate = {
           },
           fields: [
             {
-              label: '用户问题',
+              label: computed(() => t('workflow.start.question')),
               value: 'question',
             },
           ],
           height: 556,
           showNode: true,
-          stepName: '开始',
+          stepName: computed(() => t('workflow.start.label')),
           globalFields: [
             {
-              label: '当前时间',
+              label: computed(() => t('workflow.start.currentTime')),
               value: 'time',
             },
           ],
@@ -108,26 +109,26 @@ export const applicationTemplate = {
           config: {
             fields: [
               {
-                label: '检索结果的分段列表',
+                label: computed(() => t('workflow.searchKnowledge.segmentList')),
                 value: 'paragraph_list',
               },
               {
-                label: '满足直接回答的分段列表',
+                label: computed(() => t('workflow.searchKnowledge.directAnswerSegments')),
                 value: 'is_hit_handling_method_list',
               },
               {
-                label: '检索结果',
+                label: computed(() => t('workflow.searchKnowledge.result')),
                 value: 'data',
               },
               {
-                label: '满足直接回答的分段内容',
+                label: computed(() => t('workflow.searchKnowledge.directAnswerContent')),
                 value: 'directly_return',
               },
             ],
           },
           height: 806.383,
           showNode: true,
-          stepName: '知识库检索',
+          stepName: computed(() => t('workflow.searchKnowledge.label')),
           condition: 'AND',
           node_data: {
             knowledge_list: [],
@@ -158,14 +159,14 @@ export const applicationTemplate = {
           config: {
             fields: [
               {
-                label: '分支名称',
+                label: computed(() => t('workflow.condition.branchName')),
                 value: 'branch_name',
               },
             ],
           },
           height: 552.148,
           showNode: true,
-          stepName: '判断器',
+          stepName: computed(() => t('workflow.condition.label')),
           condition: 'AND',
           node_data: {
             branch: [
@@ -230,14 +231,14 @@ export const applicationTemplate = {
           config: {
             fields: [
               {
-                label: '内容',
+                label: computed(() => t('common.content.label')),
                 value: 'answer',
               },
             ],
           },
           height: 394,
           showNode: true,
-          stepName: '指定回复',
+          stepName: computed(() => t('workflow.reply.label')),
           condition: 'AND',
           node_data: {
             fields: ['fd0324fc-f5e4-4fa6-a2d9-cb251b467605', 'directly_return'],
@@ -256,26 +257,31 @@ export const applicationTemplate = {
         properties: {
           config: {
             fields: [
-              reactive({
+              {
                 label: computed(() => t('workflow.answer.aiLabel')),
                 value: 'answer',
-              }),
+              },
               {
-                label: '思考过程',
+                label: computed(() => t('workflow.thinking.process')),
                 value: 'reasoning_content',
               },
               {
-                label: '历史聊天记录',
+                label: computed(() => t('workflow.history.label')),
                 value: 'history_message',
               },
             ],
           },
           height: 1174.38,
           showNode: true,
-          stepName: 'AI 对话',
+          stepName: computed(() => t('workflow.aiChat.label')),
           condition: 'AND',
           node_data: {
-            prompt: '已知信息：\n{{知识库检索.data}}\n问题：\n{{开始.question}}',
+            prompt: computed(() =>
+              t('application.template.assistant.userPrompt', {
+                knowledgeReference: `{{${t('workflow.searchKnowledge.label')}.data}}`,
+                questionReference: START_NODE_REFERENCES.question,
+              }),
+            ),
             system: '',
             model_id: '',
             is_result: true,
@@ -304,18 +310,18 @@ export const applicationTemplate = {
           config: {
             fields: [
               {
-                label: '内容',
+                label: computed(() => t('common.content.label')),
                 value: 'answer',
               },
             ],
           },
           height: 512,
           showNode: true,
-          stepName: '指定回复1',
+          stepName: computed(() => `${t('workflow.reply.label')}1`),
           condition: 'AND',
           node_data: {
             fields: [],
-            content: '抱歉，没有在知识库查询到相关内容，请提供更详细的信息。',
+            content: computed(() => t('application.template.assistant.emptyReply')),
             is_result: true,
             reply_type: 'content',
           },
@@ -501,4 +507,4 @@ export const applicationTemplate = {
       },
     ],
   },
-} satisfies Record<string, LogicFlow.GraphConfigData>
+}) satisfies Record<string, LogicFlow.GraphConfigData>

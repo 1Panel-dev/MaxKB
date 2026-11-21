@@ -52,7 +52,7 @@ function exportSkills(baseUrl: string): Promise<unknown> {
     if (status === 400) return promptSkillsBaseUrl(baseUrl).then(exportSkills)
     if (status && status !== 403) {
       return error.response.data.text().then((response: string) => {
-        MsgError(`${t('common.messages.exportFailed')}: ${JSON.parse(response).message}`)
+        MsgError(`${t('common.error.exportFailed')}: ${JSON.parse(response).message}`)
       })
     }
   })
@@ -83,7 +83,7 @@ function handleExportApplication() {
     .catch((error: ExportError) => {
       if (error.response.status !== 403) {
         return error.response.data.text().then((response: string) => {
-          MsgError(`${t('common.messages.exportFailed')}: ${JSON.parse(response).message}`)
+          MsgError(`${t('common.error.exportFailed')}: ${JSON.parse(response).message}`)
         })
       }
     })

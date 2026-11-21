@@ -5,6 +5,7 @@ import type { ApiResponse } from './types'
 import type { Dict } from '@/api/types'
 import type { AxiosProgressEvent, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { ADMIN_API_BASE_PATH } from '@/api/constants'
+import { t } from '@/locales'
 import router from '@/router/admin'
 import { useStore } from '@/stores'
 import { MsgError } from '@/utils/message'
@@ -124,7 +125,7 @@ request.interceptors.response.use(
     const skipGlobalErrorMessage = (error.config as ExportRequestConfig | undefined)?.skipGlobalErrorMessage
 
     if (error.code === 'ECONNABORTED') {
-      MsgError(error.message)
+      MsgError(t('common.error.requestTimeout'))
       console.error(error)
     }
     if (status === 404 && !requestUrl.includes('/application/authentication')) {
@@ -136,10 +137,12 @@ request.interceptors.response.use(
       router.push({ name: 'login' })
     }
     if (status === 403) {
-      MsgError(responseMessage || 'No permission to access')
+      MsgError(responseMessage || t('common.error.noService'))
     }
     if (error.code !== 'ECONNABORTED' && ![401, 403, 404].includes(status ?? 0) && !skipGlobalErrorMessage) {
-      MsgError(responseMessage || error.message)
+      MsgError(
+        responseMessage || (error.code === 'ERR_NETWORK' && error.message === 'Network Error' ? t('common.error.networkError') : error.message),
+      )
     }
 
     return Promise.reject(error)

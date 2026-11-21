@@ -123,12 +123,6 @@
       "requiredMessage": "请输入关联问题",
       "lengthMessage": "关联问题不能超过{max}个字符"
     },
-    "content": {
-      "label": "内容",
-      "placeholder": "请输入内容",
-      "requiredMessage": "请输入内容",
-      "lengthMessage": "内容不能超过{max}个字符"
-    },
     "titlePlaceholder": "请给当前内容设置一个标题，以便管理查看"
   }
 }

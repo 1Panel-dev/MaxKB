@@ -52,7 +52,7 @@ const formData = computed({
   get: () => model.properties.node_data as ToolWorkflowLibNodeForm,
   set: (value: ToolWorkflowLibNodeForm) => (model.properties.node_data = value),
 })
-const inputTitle = computed(() => formData.value.input_title || t('tool.inputParams.title'))
+const inputTitle = computed(() => formData.value.input_title || t('execution.details.inputParams'))
 const showReturnContent = computed(() =>
   [WorkflowMode.Application, WorkflowMode.ApplicationLoop, WorkflowMode.Tool, WorkflowMode.ToolLoop].includes(workflowMode),
 )
@@ -169,8 +169,8 @@ onBeforeUnmount(() => {
                     @change="changeSource(field, $event, index)"
                     @visible-change="anchorGuard.setOverlayVisible(field.field, $event)"
                   >
-                    <el-option :label="t('tool.source.reference')" value="reference" />
-                    <el-option :label="t('tool.source.custom')" value="custom" />
+                    <el-option :label="t('common.options.referenceParameter')" value="reference" />
+                    <el-option :label="t('common.options.custom')" value="custom" />
                   </el-select>
                 </div>
               </template>

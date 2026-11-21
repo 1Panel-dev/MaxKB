@@ -19,7 +19,6 @@
   },
   "permission": {
     "title": "Permission configuration",
-    "label": "Permissions",
     "category": "Category",
     "module": "Module name",
     "target": "Target"

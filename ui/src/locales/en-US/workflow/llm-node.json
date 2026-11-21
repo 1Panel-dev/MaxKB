@@ -37,7 +37,6 @@
       "descriptionMessage": "The description of parameter {name} must be text with no more than {max} characters"
     },
     "dataType": {
-      "label": "Data type",
       "placeholder": "Select a data type",
       "requiredMessage": "Select a data type"
     },

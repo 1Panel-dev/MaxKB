@@ -1,4 +1,6 @@
 /** 提供跨页面复用的日期时间计算与格式化函数。 */
+import { t } from '@/locales'
+
 type Timestamp = Date | number | string | null | undefined
 
 function getCheckedDate(timestamp: Timestamp) {
@@ -68,9 +70,18 @@ export function relativeTimeFormat(timestamp: Timestamp): string {
   if (!date) return ''
 
   const elapsedMinutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000))
-  if (elapsedMinutes < 10) return '刚刚'
-  if (elapsedMinutes < 60) return `${Math.floor(elapsedMinutes / 10) * 10}分钟前`
-  if (elapsedMinutes < 1440) return `${Math.floor(elapsedMinutes / 60)}小时前`
-  if (elapsedMinutes < 8 * 1440) return `${Math.floor(elapsedMinutes / 1440)}天前`
+  if (elapsedMinutes < 10) return t('common.relativeTime.justNow')
+  if (elapsedMinutes < 60) {
+    const count = Math.floor(elapsedMinutes / 10) * 10
+    return t('common.relativeTime.minutesAgo', { count }, count)
+  }
+  if (elapsedMinutes < 1440) {
+    const count = Math.floor(elapsedMinutes / 60)
+    return t('common.relativeTime.hoursAgo', { count }, count)
+  }
+  if (elapsedMinutes < 8 * 1440) {
+    const count = Math.floor(elapsedMinutes / 1440)
+    return t('common.relativeTime.daysAgo', { count }, count)
+  }
   return formatDateParts(date)
 }

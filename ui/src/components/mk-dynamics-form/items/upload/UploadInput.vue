@@ -66,7 +66,7 @@ const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) 
   }
 
   if (fileList.length > attrs.limit) {
-    MsgWarning(t('dynamicForm.upload.countLimit', { count: attrs.limit }))
+    MsgWarning(t('dynamicForm.upload.countLimit', { count: attrs.limit }, Number(attrs.limit)))
     return
   }
   upload(file.raw, loading).then((ok: DynamicFormValue) => {

@@ -1,5 +1,6 @@
 {
   "title": "知识库",
+  "list": "知识库列表",
   "menu": {
     "library": "资料库",
     "retrieval": "检索优化",
@@ -31,7 +32,26 @@
     "label": "工作流知识库",
     "createTitle": "创建工作流知识库",
     "description": "通过自定义工作流方式构建知识库",
-    "documentImportUnavailableMessage": "当前知识库的工作流未发布，无法导入文档，请先发布工作流。"
+    "documentImportUnavailableMessage": "当前知识库的工作流未发布，无法导入文档，请先发布工作流。",
+    "transform": {
+      "title": "转换为工作流知识库",
+      "description": "您现在可以将现有知识库转换为工作流知识库 ——这是一种更开放、更灵活的知识库，通过拖拽节点的方式自主编排从不同数据源到知识库写入的全流程，满足企业个性化知识管理需求。可以使用我们工具中的数据源和工具。",
+      "futureDocumentsHint": "新的处理方式将应用到后续导入的所有文档。",
+      "irreversibleMessage": "注意：转换后不可撤回。",
+      "confirmMessage": "转换后无法回退，请谨慎操作。",
+      "action": "转换",
+      "successMessage": "转换成功"
+    },
+    "template": {
+      "processingSettings": "文档处理设置",
+      "webSplit": "Web智能分段",
+      "smartSplit": "智能分段",
+      "qaSource": "QA问答对",
+      "qaSplit": "QA问答对分段",
+      "documentSegments": "文档分段列表",
+      "aggregateSegments": "聚合文档分段列表",
+      "webSource": "Web站点"
+    }
   },
   "fields": {
     "name": {

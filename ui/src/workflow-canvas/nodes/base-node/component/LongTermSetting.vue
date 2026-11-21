@@ -184,7 +184,7 @@ function submit() {
       <el-form-item :label="t('model.ai.label')" prop="long_term_model_id" :rules="{ required: true, validator: validateModel, trigger: 'change' }">
         <el-radio-group v-model="formData.long_term_model_id_type" class="mb-2">
           <el-radio value="default">{{ t('workflow.defaultModel.label') }}</el-radio>
-          <el-radio value="custom">{{ t('workflow.defaultModel.custom') }}</el-radio>
+          <el-radio value="custom">{{ t('common.options.custom') }}</el-radio>
         </el-radio-group>
         <SelectModel
           v-if="formData.long_term_model_id_type === 'default'"

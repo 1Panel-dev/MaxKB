@@ -42,5 +42,6 @@
     "uploadHint": "支持 JPG、PNG、GIF，文件大小不超过 {size} MB",
     "formatMessage": "仅支持 JPG、PNG、GIF 格式的图片",
     "sizeLimitMessage": "文件大小不能超过 {size} MB"
-  }
+  },
+  "imageSizeMessage": "图片大小不能超过 {size} MB"
 }

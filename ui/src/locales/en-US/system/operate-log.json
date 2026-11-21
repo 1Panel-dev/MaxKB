@@ -3,7 +3,6 @@
   "menu": "Operation menu",
   "operationDetails": "Operation details",
   "operator": "Operator",
-  "ipAddress": "IP address",
   "operationTime": "Operation time",
   "apiDetails": "API details",
   "cleanStrategy": {

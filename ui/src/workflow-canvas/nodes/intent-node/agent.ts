@@ -56,13 +56,13 @@ function useAgent(context: NodeAgentContext) {
     if (Array.isArray(branches) && branches.length) return branches
     return [
       { id: randomId(), content: '', isOther: false },
-      { id: randomId(), content: t('workflow.intent.categories.other'), isOther: true },
+      { id: randomId(), content: t('common.labels.other'), isOther: true },
     ]
   }
 
   /** 写回分类："其他"固定在末尾，并刷新出口锚点 */
   const writeBranches = (branches: IntentBranch[]) => {
-    const other = branches.find((branch) => branch.isOther) ?? { id: randomId(), content: t('workflow.intent.categories.other'), isOther: true }
+    const other = branches.find((branch) => branch.isOther) ?? { id: randomId(), content: t('common.labels.other'), isOther: true }
     writeNodeProperties(node(), {
       node_data: { ...readNodeData<Record<string, unknown>>(node()), branch: [...branches.filter((branch) => !branch.isOther), other] },
     })

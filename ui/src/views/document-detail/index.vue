@@ -50,7 +50,7 @@ const loading = ref(false)
 const paragraphQuery = ref<ParagraphQuery>({})
 const searchFields = computed(() => [
   { label: t('common.title.label'), value: 'title' },
-  { label: t('knowledge.paragraph.content.label'), value: 'content' },
+  { label: t('common.content.label'), value: 'content' },
 ])
 
 function loadParagraphPage(pagination: ParamsPage) {

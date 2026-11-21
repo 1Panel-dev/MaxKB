@@ -179,6 +179,10 @@ Workspace 根据目标路由中的 workspaceId、knowledgeId 判断权限，权�
 
 ## 导航生成
 
+用于菜单或页面显示的 `meta.title` 保存对应业务翻译 key，由显示位置调用 `t()`，不在路由模块初始化时翻译。
+仅作内部元信息、不实际渲染的标题保留原中文，不为全屏工作流、资源详情父路由、分段页、登录、Chat 或错误页的此类标题单独增加翻译 key。
+错误页实际显示的文案共用 `common.error.noPermission`／`noService`，404 数字不翻译。Chat 仍不根据路由标题改写浏览器标题，临时 Demo 保留原文案。
+
 工作空间首页、系统首页及两种资源范围的智能体概览路由共用 `overview.title`；外观设置路由使用 `appearance.title`，外观页面通过已有 `MkViewLayout.title` 传入对应译文。操作日志路由与页面共用 `operateLog.title`。
 
 模型相关路由的 `meta.title` 使用 `model.title`。工作空间、系统资源管理和系统共享资源的工具列表路由共用 `tool.title`。

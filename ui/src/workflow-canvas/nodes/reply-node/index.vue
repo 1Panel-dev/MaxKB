@@ -120,8 +120,8 @@ onMounted(() => {
               <span class="mk-required">{{ t('workflow.reply.content.label') }}</span>
               <!-- 选择回复内容来源 -->
               <el-select v-model="formData.reply_type" :teleported="false" class="w-21!" size="small">
-                <el-option :label="t('workflow.referenceVariable.label')" value="referencing" />
-                <el-option :label="t('workflow.reply.content.custom')" value="content" />
+                <el-option :label="t('common.options.referenceVariable')" value="referencing" />
+                <el-option :label="t('common.options.custom')" value="content" />
               </el-select>
             </div>
           </template>

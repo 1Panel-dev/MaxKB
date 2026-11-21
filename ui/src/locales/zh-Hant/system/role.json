@@ -19,7 +19,6 @@
   },
   "permission": {
     "title": "權限配置",
-    "label": "權限",
     "category": "分類",
     "module": "模塊名稱",
     "target": "操作對象"

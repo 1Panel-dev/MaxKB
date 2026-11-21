@@ -185,7 +185,7 @@ function handleDelete(node: TreeNode) {
       if (removed) {
         MsgSuccess(t('common.messages.deleteSuccess'))
       } else {
-        MsgError(t('common.messages.deleteFailed'))
+        MsgError(t('common.error.deleteFailed'))
       }
     })
     .catch(() => {})

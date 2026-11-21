@@ -18,7 +18,6 @@
     "treeSelect": "Tree select"
   },
   "tabs": {
-    "basic": "Basic information",
     "visibility": "Visibility settings",
     "label": "Tab"
   },
@@ -53,7 +52,6 @@
       "placeholder": "Enter a default",
       "requiredMessage": "Enter a default",
       "selectRequiredMessage": "Select a default",
-      "lengthMessage": "Length must be between {min} and {max} characters",
       "datePlaceholder": "Select a date"
     },
     "optionLabel": {
@@ -150,8 +148,6 @@
     }
   },
   "options": {
-    "custom": "Custom",
-    "reference": "Variable reference",
     "showDefault": "Show default",
     "unselected": "Unselected",
     "multiple": "Allow multiple selections",
@@ -191,9 +187,8 @@
   "upload": {
     "segmentation": "Standardize segment delimiters before uploading files.",
     "duplicateName": "File name already exists",
-    "limits": "Upload up to {count} files at a time, each no larger than {size} MB",
     "sizeLimit": "File size cannot exceed {size}MB",
-    "countLimit": "You can upload at most {count} files"
+    "countLimit": "You can upload at most {count} file | You can upload at most {count} files"
   },
   "operators": {
     "is_null": "Is empty",

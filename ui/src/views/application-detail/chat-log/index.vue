@@ -38,7 +38,7 @@ const sourceOptions = computed<OptionItem<string>[]>(() => Object.entries(CHAT_L
 const searchFields = computed<OptionItem<string>[]>(() => [
   { label: t('application.chatLog.labels.abstract'), value: 'abstract' },
   { label: t('application.chatLog.labels.user'), value: 'username' },
-  { label: t('application.chatLog.source.label'), value: 'source', options: sourceOptions.value },
+  { label: t('common.labels.source'), value: 'source', options: sourceOptions.value },
 ])
 const chatLogSearchQuery = ref<Dict<unknown>>()
 const chatLogDateQuery = ref({ start_time: beforeDay(7), end_time: beforeDay(0) })
@@ -247,10 +247,10 @@ onMounted(() => loadChatLogs())
     <el-table-column prop="asker.username" :label="t('application.chatLog.labels.user')" min-width="130" show-overflow-tooltip>
       <template #default="{ row }">{{ row.asker?.username || '-' }}</template>
     </el-table-column>
-    <el-table-column :label="t('application.chatLog.labels.ipAddress')" width="140" show-overflow-tooltip>
+    <el-table-column :label="t('common.labels.ipAddress')" width="140" show-overflow-tooltip>
       <template #default="{ row }">{{ row.ip_address || '-' }}</template>
     </el-table-column>
-    <el-table-column :label="t('application.chatLog.source.label')" min-width="140" show-overflow-tooltip>
+    <el-table-column :label="t('common.labels.source')" min-width="140" show-overflow-tooltip>
       <template #default="{ row }">{{ formatSource(row.source?.type) }}</template>
     </el-table-column>
     <el-table-column prop="update_time" :label="t('application.chatLog.labels.lastChatTime')" width="180" sortable>

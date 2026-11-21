@@ -85,7 +85,6 @@
     "label": "语音播放",
     "autoPlay": "自动播放",
     "browser": "浏览器播放（免费）",
-    "custom": "自定义",
     "model": {
       "placeholder": "请选择语音播放模型",
       "requiredMessage": "请选择语音播放模型"

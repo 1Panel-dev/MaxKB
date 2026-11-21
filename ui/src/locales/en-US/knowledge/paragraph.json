@@ -1,16 +1,10 @@
 {
   "paragraph": {
     "detailTitle": "Segment details",
-    "content": {
-      "label": "Content",
-      "placeholder": "Enter segment content",
-      "requiredMessage": "Enter segment content",
-      "lengthMessage": "Content cannot exceed {max} characters."
-    },
     "relatedQuestions": {
       "label": "Related questions",
       "requiredMessage": "Enter a related question",
-      "lengthMessage": "Questions cannot exceed {max} characters."
+      "lengthMessage": "Questions must not exceed {max} characters"
     },
     "actions": {
       "add": "Add segment",

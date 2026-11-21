@@ -169,7 +169,7 @@ export const speechToTextNode = reactive({
   label: computed(() => t('workflow.speechToText.label')),
   properties: {
     stepName: computed(() => t('workflow.speechToText.label')),
-    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+    config: { fields: [{ label: computed(() => t('common.labels.result')), value: 'result' }] },
   },
 })
 
@@ -180,7 +180,7 @@ export const textToSpeechNode = reactive({
   label: computed(() => t('workflow.textToSpeech.label')),
   properties: {
     stepName: computed(() => t('workflow.textToSpeech.label')),
-    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+    config: { fields: [{ label: computed(() => t('common.labels.result')), value: 'result' }] },
   },
 })
 
@@ -317,7 +317,7 @@ export const variableSplittingNode = reactive({
   label: computed(() => t('workflow.variableSplitting.label')),
   properties: {
     stepName: computed(() => t('workflow.variableSplitting.label')),
-    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+    config: { fields: [{ label: computed(() => t('common.labels.result')), value: 'result' }] },
   },
 })
 
@@ -328,7 +328,7 @@ export const parameterExtractionNode = reactive({
   label: computed(() => t('workflow.parameterExtraction.label')),
   properties: {
     stepName: computed(() => t('workflow.parameterExtraction.label')),
-    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+    config: { fields: [{ label: computed(() => t('common.labels.result')), value: 'result' }] },
   },
 })
 
@@ -359,8 +359,8 @@ export const searchDocumentNode = reactive({
     stepName: computed(() => t('workflow.searchDocument.label')),
     config: {
       fields: [
-        { label: computed(() => t('workflow.searchDocument.knowledgeList')), value: 'knowledge_list' },
-        { label: computed(() => t('workflow.searchDocument.documentList')), value: 'document_list' },
+        { label: computed(() => t('knowledge.list')), value: 'knowledge_list' },
+        { label: computed(() => t('workflow.document.list')), value: 'document_list' },
       ],
     },
   },
@@ -376,7 +376,7 @@ export const documentExtractNode = reactive({
     config: {
       fields: [
         { label: computed(() => t('workflow.documentExtract.content')), value: 'content' },
-        { label: computed(() => t('workflow.documentExtract.documentList')), value: 'document_list' },
+        { label: computed(() => t('workflow.document.list')), value: 'document_list' },
       ],
     },
   },
@@ -406,7 +406,7 @@ export const mcpNode = reactive({
   label: computed(() => t('workflow.mcp.label')),
   properties: {
     stepName: computed(() => t('workflow.mcp.label')),
-    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+    config: { fields: [{ label: computed(() => t('common.labels.result')), value: 'result' }] },
   },
 })
 
@@ -417,7 +417,7 @@ export const toolCustomNode = reactive({
   label: computed(() => t('workflow.customTool.label')),
   properties: {
     stepName: computed(() => t('workflow.customTool.label')),
-    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+    config: { fields: [{ label: computed(() => t('common.labels.result')), value: 'result' }] },
   },
 })
 
@@ -428,7 +428,7 @@ export const applicationNode = reactive({
   label: computed(() => t('workflow.application.label')),
   properties: {
     stepName: computed(() => t('workflow.application.label')),
-    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+    config: { fields: [{ label: computed(() => t('common.labels.result')), value: 'result' }] },
   },
 })
 
@@ -441,7 +441,7 @@ export const toolLibNode = reactive({
   label: computed(() => t('workflow.tool.label')),
   properties: {
     stepName: computed(() => t('workflow.tool.label')),
-    config: { fields: [{ label: computed(() => t('workflow.node.result')), value: 'result' }] },
+    config: { fields: [{ label: computed(() => t('common.labels.result')), value: 'result' }] },
   },
 })
 
@@ -575,7 +575,7 @@ export const dataSourceWebNode = reactive({
     kind: WorkflowKind.DataSource,
     height: 180,
     stepName: computed(() => t('workflow.webSource.label')),
-    config: { fields: [{ label: computed(() => t('workflow.webSource.documentList')), value: 'document_list' }] },
+    config: { fields: [{ label: computed(() => t('workflow.document.list')), value: 'document_list' }] },
   },
 })
 

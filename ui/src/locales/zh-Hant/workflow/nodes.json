@@ -1,7 +1,6 @@
 {
   "node": {
     "title": "節點",
-    "result": "結果",
     "delete": {
       "title": "是否刪除節點：{name}？",
       "batchTitle": "是否刪除選中的{count}個節點？"
@@ -11,7 +10,6 @@
       "placeholder": "請輸入節點名稱",
       "duplicateMessage": "節點名稱已存在！"
     },
-    "source": "來源",
     "disabledMessage": "該節點已禁用",
     "applicationUnavailableMessage": "該智能體不可用",
     "toolUnavailableMessage": "該工具不可用",
@@ -60,10 +58,8 @@
   "intent": {
     "label": "意圖識別",
     "description": "將用戶問題與用戶預設的意圖分類進行匹配",
-    "input": "輸入",
     "categories": {
-      "label": "意圖分類",
-      "other": "其他"
+      "label": "意圖分類"
     },
     "category": "分類",
     "reason": "理由"
@@ -161,8 +157,7 @@
       "label": "回復內容",
       "placeholder": "回復內容，可以引用系統中變量，如 {reference}",
       "htmlPlaceholder": "HTML 內容，可以引用系統中變量，如 {reference}",
-      "requiredMessage": "請輸入回復內容",
-      "custom": "自定義"
+      "requiredMessage": "請輸入回復內容"
     }
   },
   "condition": {
