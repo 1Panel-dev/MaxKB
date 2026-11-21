@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import { useLogMessageListStore } from '../../log-message-list'
 import ImproveDialog from './ImproveDialog.vue'
 import MarkDialog from './MarkDialog.vue'
 
 defineOptions({ name: 'ButtonImprove' })
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{
   api: Pick<typeof ChatLogApi, 'putChatRecordLog' | 'getMarkChatRecord' | 'deleteMarkChatRecord'>
   applicationId: string
@@ -36,7 +38,7 @@ function refreshMarks() {
 
 <template>
   <!-- 打开修正内容弹窗 -->
-  <MkTooltip :content="marked ? '查看标注' : '修正内容'">
+  <MkTooltip :content="marked ? t('chat.improve.markTitle') : t('chat.improve.title')">
     <el-button text @click="activeDialog = marked ? 'mark' : 'improve'">
       <MkIcon v-if="marked" name="icon_feedback_outlined" />
       <MkIcon v-else name="icon_edit_outlined" />

@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import MessageList from '../../components/message-list/index.vue'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const list = useConversationListStore()
 </script>
@@ -13,7 +16,7 @@ const list = useConversationListStore()
       class="flex-column min-h-0 flex-1 bg-cover bg-center"
       :style="{ backgroundImage: list.appInfo.value?.chat_background ? `url(${JSON.stringify(list.appInfo.value.chat_background)})` : undefined }"
     >
-      <MessageList :key="list.currentChatId.value" :app-name="list.appInfo.value?.name || 'AI 助手'" />
+      <MessageList :key="list.currentChatId.value" :app-name="list.appInfo.value?.name || t('chat.defaultAssistantName')" />
     </div>
   </main>
 </template>

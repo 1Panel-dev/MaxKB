@@ -9,6 +9,7 @@
   },
   "details": {
     "title": "Execution details",
+    "empty": "No execution details",
     "input": "Input",
     "output": "Output",
     "inputParams": "Input parameters",

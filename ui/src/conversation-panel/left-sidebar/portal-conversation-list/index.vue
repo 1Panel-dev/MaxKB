@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Conversation } from '../../core/types'
 import type { PortalApplicationGroup } from './index'
 import { useMessageListStore } from '../../components/message-list/index'
@@ -15,12 +16,14 @@ import { relativeTimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'PortalConversationList' })
 
+const { t } = useI18n({ useScope: 'global' })
+
 // 门户名称和 Logo 使用认证配置，配置未加载时保留默认展示。
 const { auth: authStore } = useStore()
 const portalName = computed(() => {
   const meta = authStore.authProfile?.meta
   const name = meta && typeof meta === 'object' && 'portal_name' in meta ? meta.portal_name : undefined
-  return typeof name === 'string' && name ? name : '智能体门户'
+  return typeof name === 'string' && name ? name : t('portal.name.default')
 })
 const portalLogo = computed(() => authStore.authProfile?.logo)
 
@@ -85,7 +88,7 @@ const clearing = ref(false)
 const handleClearConversations = () => {
   if (clearing.value) return
   clearing.value = true
-  MsgConfirm('是否清空全部历史对话？', '将清空所有智能体的历史对话，清空后无法恢复。', { confirmButtonText: '清空' })
+  MsgConfirm(t('chat.history.clearTitle'), t('portal.clearAllDescription'), { confirmButtonText: t('common.actions.clear') })
     .then(() => {
       historyVisible.value = false
       return portalList
@@ -97,7 +100,7 @@ const handleClearConversations = () => {
             newConversation()
           }
         })
-        .then(() => MsgSuccess('清空成功'))
+        .then(() => MsgSuccess(t('common.messages.clearSuccess')))
     })
     .catch(() => {})
     .finally(() => {
@@ -110,7 +113,7 @@ const clearGroupConversationLoading = ref(false)
 const handleClearGroupConversations = (group: PortalApplicationGroup) => {
   if (clearGroupConversationLoading.value) return
   clearGroupConversationLoading.value = true
-  MsgConfirm('是否清空该智能体的全部历史对话？', '清空后无法恢复。', { confirmButtonText: '清空' })
+  MsgConfirm(t('portal.clearApplicationTitle'), t('chat.history.clearDescription'), { confirmButtonText: t('common.actions.clear') })
     .then(() =>
       portalList.clearGroupConversations(group.id, () => {
         if (group.id === currentApplicationId.value) {
@@ -120,7 +123,7 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
         }
       }),
     )
-    .then(() => MsgSuccess('清空成功'))
+    .then(() => MsgSuccess(t('common.messages.clearSuccess')))
     .catch(() => {})
     .finally(() => {
       clearGroupConversationLoading.value = false
@@ -137,7 +140,7 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
         <h4 class="truncate">{{ portalName }}</h4>
       </div>
       <!-- 收起左侧 -->
-      <MkTooltip content="收起侧边栏">
+      <MkTooltip :content="t('chat.actions.collapseSidebar')">
         <el-button text @click="toggleLeftSide()">
           <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
         </el-button>
@@ -147,19 +150,19 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
     <!-- 全部智能体 -->
     <MkListItem :active="isApplicationListActive" @click="portalList.openApplicationList()">
       <MkIcon :name="isApplicationListActive ? 'icon_card_filled' : 'icon_card_outlined'" :size="18" class="mr-2" />
-      <span>智能体</span>
+      <span>{{ t('application.title') }}</span>
     </MkListItem>
     <!-- 新建对话 -->
-    <MkTooltip content="新建对话">
+    <MkTooltip :content="t('chat.newChat')">
       <MkListItem @click="portalList.newConversation()">
         <MkIcon name="icon_new-chat_outlined" :size="18" class="mr-2" />
-        <span>新建对话</span>
+        <span>{{ t('chat.newChat') }}</span>
       </MkListItem>
     </MkTooltip>
     <div class="flex-between pl-2 mt-4">
-      <h6 class="text-N600 font-medium">历史对话</h6>
+      <h6 class="text-N600 font-medium">{{ t('chat.history.label') }}</h6>
 
-      <MkTooltip content="清空">
+      <MkTooltip :content="t('common.actions.clear')">
         <!-- 清空所有智能体的历史对话 -->
         <el-button text :loading="clearing" :disabled="!clearableApplicationGroups.length" @click="handleClearConversations">
           <MkIcon name="icon_delete-trash_outlined" />
@@ -170,7 +173,7 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
     <!-- 历史列表独立滚动，门户入口和新建入口保持固定。 -->
     <el-scrollbar class="min-h-0 flex-1 mt-1 -mr-4" view-class="pr-4">
       <el-skeleton v-if="initialLoading" animated />
-      <div v-else-if="historyApplicationGroups.length === 0" class="text-N600 text-center mt-4">暂无历史记录</div>
+      <div v-else-if="historyApplicationGroups.length === 0" class="text-N600 text-center mt-4">{{ t('chat.history.empty') }}</div>
       <div v-else class="space-y-1">
         <template v-for="group in historyApplicationGroups" :key="group.id">
           <MkCollapse
@@ -206,12 +209,12 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
                       <!-- 新建当前分组智能体的对话 -->
                       <MkDropdownItem @click="portalList.openApplication(group.id)">
                         <template #icon><MkIcon name="icon_new-chat_outlined" /></template>
-                        <span>新建对话</span>
+                        <span>{{ t('chat.newChat') }}</span>
                       </MkDropdownItem>
                       <!-- 删除智能体历史分组，待接入对应接口 -->
                       <MkDropdownItem v-if="group.show_history !== false" divided @click="handleClearGroupConversations(group)">
                         <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                        <span>清空对话</span>
+                        <span>{{ t('portal.clearConversations') }}</span>
                       </MkDropdownItem>
                     </MkDropdownMenu>
                   </template>
@@ -228,8 +231,8 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
                 @click="handleSelectConversation(group, conversation)"
               >
                 <template #default="{ active }">
-                  <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || '新对话'">
-                    {{ conversation.abstract || '新对话' }}
+                  <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || t('chat.defaultConversationTitle')">
+                    {{ conversation.abstract || t('chat.defaultConversationTitle') }}
                   </span>
 
                   <!-- 选中、悬停或聚焦列表行时隐藏时间，显示内置更多操作。 -->
@@ -253,13 +256,13 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
                           @click="portalList.shareConversation(group.id, conversation.id)"
                         >
                           <template #icon><MkIcon name="icon_share_outlined" /></template>
-                          <span>分享</span>
+                          <span>{{ t('chat.share.label') }}</span>
                         </MkDropdownItem>
                         <RenameConversation :conversation="conversation" :application-id="group.id" @renamed="conversation.abstract = $event" />
                         <!-- 删除历史对话 -->
                         <MkDropdownItem divided @click="handleDeleteConversation(group, conversation)">
                           <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                          <span>删除</span>
+                          <span>{{ t('common.actions.delete') }}</span>
                         </MkDropdownItem>
                       </MkDropdownMenu>
                     </template>
@@ -273,7 +276,7 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
                 @click="handleOpenHistory(group)"
               >
                 <template #default>
-                  <span>查看更多</span>
+                  <span>{{ t('chat.history.viewMore') }}</span>
                   <span>
                     ({{
                       groupConversationCount(group) - RECENT_CONVERSATION_LIMIT > 99

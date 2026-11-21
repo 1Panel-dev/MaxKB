@@ -1,3 +1,134 @@
 {
-  "newChat": "New chat"
+  "newChat": "New chat",
+  "defaultConversationTitle": "New chat",
+  "defaultAssistantName": "AI assistant",
+  "conversationTitle": "Conversation title",
+  "roles": {
+    "user": "User",
+    "assistant": "Assistant"
+  },
+  "actions": {
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "expandSettings": "Expand settings",
+    "collapseSettings": "Collapse settings",
+    "moreSettings": "More settings",
+    "maximize": "Maximize",
+    "restore": "Restore",
+    "closeDebug": "Close debug"
+  },
+  "history": {
+    "label": "Chat history",
+    "empty": "No history yet",
+    "noMatches": "No matching chats",
+    "viewMore": "View more",
+    "clearTitle": "Clear all chat history?",
+    "clearDescription": "This cannot be undone."
+  },
+  "delete": {
+    "title": "Delete conversation: {name}?",
+    "description": "This cannot be undone."
+  },
+  "message": {
+    "inputPlaceholder": "Type a message...",
+    "missingApiParameters": "Enter values for these parameters in the URL: {fields}",
+    "replying": "Replying...",
+    "thinking": "Thinking",
+    "thinkingCompleted": "Thinking complete",
+    "toolsCalled": "Called {count} tool | Called {count} tools",
+    "failedToolCount": "{count} failed",
+    "fileStatusOnly": "Only the file status changed; no code content changed.",
+    "lineCount": "{count} line | {count} lines",
+    "formSubmitted": "Submitted",
+    "legacyFormSubmitUnsupported": "Legacy forms do not support submission yet",
+    "errorOccurred": "An error occurred",
+    "noConversationRecords": "No chat records"
+  },
+  "upload": {
+    "dropHint": "Drag files into the input box to upload",
+    "limits": "Upload up to {count} file, with a limit of {size}MB per file | Upload up to {count} files, with a limit of {size}MB per file",
+    "formatsHint": "File types: {formats}",
+    "countLimitMessage": "Upload up to {count} file at a time | Upload up to {count} files at a time",
+    "unsupportedTypeMessage": "This file type cannot be uploaded",
+    "sizeLimitMessage": "Each file must not exceed {size}MB"
+  },
+  "urlUpload": {
+    "label": "URL address",
+    "placeholder": "Enter URL addresses, one per line",
+    "invalidAddressMessage": "Enter valid HTTP or HTTPS URL addresses",
+    "invalidResponseMessage": "Invalid URL address",
+    "typeMismatchMessage": "The file type does not match the selected type",
+    "readFailedMessage": "Failed to read the file from the URL",
+    "localUpload": "Local upload"
+  },
+  "voice": {
+    "recordingUnavailableMessage": "Cannot record audio: {reason}",
+    "recordingFailedMessage": "Recording failed: {reason}",
+    "transcribing": "Transcribing...",
+    "emptyTranscriptMessage": "No speech recognized",
+    "readContent": "Read aloud",
+    "pauseReading": "Pause reading",
+    "resumeReading": "Resume reading",
+    "synthesisFailedMessage": "Speech synthesis failed",
+    "playbackFailedMessage": "Audio playback failed"
+  },
+  "feedback": {
+    "positive": "Like",
+    "cancelPositive": "Remove like",
+    "negative": "Dislike",
+    "cancelNegative": "Remove dislike",
+    "positiveTitle": "What did you like?",
+    "negativeTitle": "Tell us why you were dissatisfied",
+    "reasons": {
+      "accurate": "Accurate content",
+      "complete": "Complete content",
+      "inaccurate": "Inaccurate content",
+      "incomplete": "Incomplete content"
+    },
+    "placeholder": "Tell us more about your experience",
+    "cancelledMessage": "Feedback cancelled",
+    "thanksMessage": "Thank you for your feedback"
+  },
+  "knowledgeSource": {
+    "label": "Knowledge sources",
+    "empty": "No knowledge sources",
+    "documentMissingMessage": "The original document does not exist",
+    "noDownloadPermissionMessage": "No permission to download",
+    "loading": "Loading PDF...",
+    "loadFailedMessage": "Failed to load PDF",
+    "renderFailedMessage": "PDF rendering failed"
+  },
+  "share": {
+    "label": "Share",
+    "title": "Shared chat",
+    "copy": "Copy link",
+    "copiedMessage": "Share link copied",
+    "loadFailedMessage": "Failed to load shared content",
+    "empty": "No conversations to share"
+  },
+  "export": {
+    "fileName": "Chat history",
+    "attachment": "Attachment",
+    "image": "Export image",
+    "previewTitle": "Export preview",
+    "previewFailedMessage": "Export preview failed. Wait for the content to load and try again",
+    "failedMessage": "Export failed. Please try again later"
+  },
+  "improve": {
+    "title": "Correct content",
+    "markTitle": "View annotations",
+    "relatedQuestion": {
+      "label": "Related question",
+      "placeholder": "Enter a related question",
+      "requiredMessage": "Enter a related question",
+      "lengthMessage": "The related question must not exceed {max} characters"
+    },
+    "content": {
+      "label": "Content",
+      "placeholder": "Enter content",
+      "requiredMessage": "Enter content",
+      "lengthMessage": "Content must not exceed {max} characters"
+    },
+    "titlePlaceholder": "Set a title for this content to make it easier to manage and view"
+  }
 }

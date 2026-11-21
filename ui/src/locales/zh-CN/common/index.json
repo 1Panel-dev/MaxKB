@@ -17,7 +17,8 @@
     "question": "问题",
     "language": "语言",
     "apiDoc": "API 文档",
-    "remark": "备注"
+    "remark": "备注",
+    "file": "文件"
   },
   "name": {
     "label": "名称",
@@ -127,7 +128,7 @@
     "create": "创建",
     "quickCreate": "快速创建",
     "createFromImport": "导入创建",
-    "duplicate": "复制",
+    "copy": "复制",
     "import": "导入",
     "export": "导出",
     "relate": "关联",
@@ -141,7 +142,10 @@
     "comfirm": "确定",
     "submit": "提交",
     "testConnection": "测试连接",
-    "debug": "调试"
+    "debug": "调试",
+    "download": "下载",
+    "fullscreen": "全屏",
+    "send": "发送"
   },
   "dialogs": {
     "notice": "提示",
@@ -154,11 +158,12 @@
     "settingsSuccess": "设置成功",
     "publishSuccess": "发布成功",
     "deleteSuccess": "删除成功",
+    "clearSuccess": "清空成功",
     "batchDeleteSuccess": "批量删除成功",
     "deleteFailed": "删除失败",
     "createSuccess": "创建成功",
     "generateFailed": "生成失败",
-    "duplicateSuccess": "复制成功",
+    "copySuccess": "复制成功",
     "addSuccess": "添加成功",
     "removeSuccess": "移除成功",
     "fetchSuccess": "获取成功",

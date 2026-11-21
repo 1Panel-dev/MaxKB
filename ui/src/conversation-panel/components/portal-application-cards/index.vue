@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { ChatApplicationProfile } from '@/api/types'
 
 defineOptions({ name: 'PortalApplicationCards' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineProps<{ applications: ChatApplicationProfile[] }>()
 
@@ -16,7 +19,7 @@ const emit = defineEmits<{ select: [applicationId: string] }>()
         <template #icon>
           <ApplicationIcon :icon="application.icon" :size="20" class="shrink-0" />
         </template>
-        <div class="line-clamp-2" :title="application.desc || ''">{{ application.desc || '暂无描述' }}</div>
+        <div class="line-clamp-2" :title="application.desc || ''">{{ application.desc || t('portal.noDescription') }}</div>
       </MkResourceCard>
     </template>
   </div>

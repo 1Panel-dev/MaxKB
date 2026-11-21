@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { QUOTA_TYPE } from '@/api/enums'
 import { useConversationListStore } from '../conversation-list/index'
 import ApiKeyDialog from './ApiKeyDialog.vue'
@@ -10,13 +11,14 @@ import { formatTokenNumber } from '@/utils/number'
 
 defineOptions({ name: 'ConversationAccountMenu' })
 
+const { t } = useI18n({ useScope: 'global' })
 const { account } = useConversationListStore()
 const { auth } = useStore()
 const router = useRouter()
 const route = useRoute()
 
 const menuVisible = ref(false)
-const displayName = computed(() => account.value?.nickName || account.value?.username || '用户')
+const displayName = computed(() => account.value?.nickName || account.value?.username || t('chat.roles.user'))
 
 // 配额尚未接入时保留空值展示，不将缺失数据表示为零用量。
 const tokenPercentage = computed(() => {
@@ -77,7 +79,11 @@ const goLogin = () => {
             <span class="mr-3">Tokens</span>
             <span class="text-primary">{{ formatTokenNumber(account?.token_quota?.used_tokens ?? 0) }}</span>
             <span class="text-N500">
-              /{{ !account?.token_quota || account?.token_quota?.quota_type === QUOTA_TYPE.UNLIMITED ? '不限' : formatTokenNumber(account?.token_quota?.token_limit) }}
+              /{{
+                !account?.token_quota || account?.token_quota?.quota_type === QUOTA_TYPE.UNLIMITED
+                  ? t('chatUser.quota.unlimited')
+                  : formatTokenNumber(account?.token_quota?.token_limit)
+              }}
             </span>
           </div>
 
@@ -94,7 +100,7 @@ const goLogin = () => {
           <!-- 修改密码 -->
           <MkDropdownItem @click="userPwdDialogRef?.open()">
             <template #icon><MkIcon name="icon-key_outlined" /></template>
-            <span>修改密码</span>
+            <span>{{ t('auth.changePassword.title') }}</span>
           </MkDropdownItem>
           <!-- 管理 API Key -->
           <MkDropdownItem @click="apiKeyDialogRef?.open()">
@@ -104,14 +110,14 @@ const goLogin = () => {
           <!-- 退出登录 -->
           <MkDropdownItem divided @click="handleLogout">
             <template #icon><MkIcon name="icon_logout_outlined" /></template>
-            <span>退出登录</span>
+            <span>{{ t('auth.logout.label') }}</span>
           </MkDropdownItem>
         </MkDropdownMenu>
       </div>
     </template>
   </MkDropdown>
   <!-- 匿名登陆 -->
-  <el-button v-else type="primary" class="w-full" @click="goLogin">立即登录</el-button>
+  <el-button v-else type="primary" class="w-full" @click="goLogin">{{ t('auth.login.now') }}</el-button>
   <UserPwdDialog ref="userPwdDialogRef" />
   <ApiKeyDialog ref="apiKeyDialogRef" />
 </template>

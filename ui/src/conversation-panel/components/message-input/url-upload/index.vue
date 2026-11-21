@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useMessageInputStore } from '../index'
 
 defineOptions({ name: 'MessageInputUrlUpload' })
+const { t } = useI18n({ useScope: 'global' })
 const emit = defineEmits<{ localUpload: [] }>()
 const { canUpload, uploadEnabled, urlUploading, urlUploadTypes, addUrls, disabled, streamLoading } = useMessageInputStore()
 const visible = ref(false)
@@ -50,16 +52,16 @@ function localUpload() {
     </template>
     <div class="p-4">
       <div class="flex-between mb-2">
-        <span>URL 地址</span>
+        <span>{{ t('chat.urlUpload.label') }}</span>
         <!-- 选择 URL 文件类型 -->
         <el-select v-model="selectedType" :disabled="urlUploading" :teleported="false" size="small" class="w-15!">
           <el-option v-for="type in urlUploadTypes" :key="type.value" :label="type.label" :value="type.value" />
         </el-select>
       </div>
-      <el-input v-model="addresses" :disabled="urlUploading" type="textarea" :rows="5" placeholder="请输入URL地址，每行一个地址" />
+      <el-input v-model="addresses" :disabled="urlUploading" type="textarea" :rows="5" :placeholder="t('chat.urlUpload.placeholder')" />
       <div class="mt-4 text-right">
         <!-- 取消 URL 上传 -->
-        <el-button plain @click="visible = false">取消</el-button>
+        <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
         <!-- 确定 URL 上传 -->
         <el-button
           type="primary"
@@ -67,14 +69,14 @@ function localUpload() {
           :disabled="urlUploading || !canUpload || !urls.length || !urlUploadTypes.length"
           @click="confirm"
         >
-          确定
+          {{ t('common.actions.comfirm') }}
         </el-button>
       </div>
 
       <el-divider v-if="uploadEnabled" class="my-4!" />
       <!-- 选择本地文件 -->
       <el-button v-if="uploadEnabled" type="primary" plain class="w-full" :disabled="urlUploading || !canUpload" @click="localUpload">
-        本地上传
+        {{ t('chat.urlUpload.localUpload') }}
       </el-button>
     </div>
   </el-popover>

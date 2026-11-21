@@ -2,6 +2,7 @@ import { onBeforeUnmount, ref } from 'vue'
 import Recorder from 'recorder-core'
 import 'recorder-core/src/engine/mp3'
 import 'recorder-core/src/engine/mp3-engine'
+import { t } from '@/locales'
 import { MsgError } from '@/utils/message'
 
 /** 单次录音最长秒数，到时自动结束并转写。 */
@@ -84,7 +85,7 @@ export function useVoiceRecorder(onRecorded: (audio: Blob) => void) {
       },
       (message: string) => {
         if (recorder === instance) recorder = null
-        MsgError(`无法录音：${message}`)
+        MsgError(t('chat.voice.recordingUnavailableMessage', { reason: message }))
       },
     )
   }
@@ -101,7 +102,7 @@ export function useVoiceRecorder(onRecorded: (audio: Blob) => void) {
       },
       (message: string) => {
         release()
-        MsgError(`录音失败：${message}`)
+        MsgError(t('chat.voice.recordingFailedMessage', { reason: message }))
       },
     )
   }

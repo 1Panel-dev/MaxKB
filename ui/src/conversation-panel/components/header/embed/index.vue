@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useConversationListStore } from '../../../left-sidebar/conversation-list/index'
 
+const { t } = useI18n({ useScope: 'global' })
 const { appInfo, leftSideOpen, toggleLeftSide, newConversation } = useConversationListStore()
 </script>
 
@@ -8,7 +10,7 @@ const { appInfo, leftSideOpen, toggleLeftSide, newConversation } = useConversati
   <header class="mk-conversation-embed-header flex-align-center h-header shrink-0 border-b px-3">
     <!-- 左侧收起时才在顶部显示展开按钮 -->
     <template v-if="!leftSideOpen">
-      <MkTooltip content="展开侧边栏">
+      <MkTooltip :content="t('chat.actions.expandSidebar')">
         <!-- 展开左侧 -->
         <el-button text @click="toggleLeftSide()" class="mr-2">
           <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
@@ -20,7 +22,7 @@ const { appInfo, leftSideOpen, toggleLeftSide, newConversation } = useConversati
       {{ appInfo?.name }}
     </h4>
 
-    <MkTooltip content="新建对话">
+    <MkTooltip :content="t('chat.newChat')">
       <!-- 新建对话 -->
       <el-button text @click="newConversation()">
         <MkIcon name="icon_new-chat_outlined" :size="18" />

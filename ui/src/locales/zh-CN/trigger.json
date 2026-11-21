@@ -36,7 +36,7 @@
       "label": "参数名",
       "placeholder": "请输入参数名",
       "requiredMessage": "请输入参数名",
-      "duplicateMessage": "参数名不能重复"
+      "duplicateMessage": "参数名已存在"
     },
     "dataType": {
       "label": "数据类型",

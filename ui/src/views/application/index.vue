@@ -291,7 +291,7 @@ function handleBatchDelete() {
                   <!-- 复制 -->
                   <CopyApplicationAction
                     v-model:loading="applicationOperationLoading"
-                    :label="t('common.actions.duplicate')"
+                    :label="t('common.actions.copy')"
                     :api="ApplicationApi"
                     :application="application"
                     :folder-id="currentFolder.id"

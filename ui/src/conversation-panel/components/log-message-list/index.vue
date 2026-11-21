@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
 import ContentList from '../content-list/index.vue'
 import LogMessageFooter from '../log-message-footer/index.vue'
 import { useLogMessageListStore } from './index'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineProps<{
   api: Pick<typeof ChatLogApi, 'putChatRecordLog' | 'getMarkChatRecord' | 'deleteMarkChatRecord'>
@@ -50,7 +53,7 @@ const showUserAvatar = computed(() => appInfo.value?.show_user_avatar)
     </template>
 
     <template #empty>
-      <el-empty class="flex-1" description="暂无对话记录" :image-size="80" />
+      <el-empty class="flex-1" :description="t('chat.message.noConversationRecords')" :image-size="80" />
     </template>
   </ReverseInfiniteScroll>
 </template>

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { PatchFileInfo } from './patchTypes'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = withDefaults(
   defineProps<{
@@ -43,7 +46,7 @@ const displayLines = computed(() =>
         </tbody>
       </table>
     </div>
-    <div v-if="!displayLines.length" class="fd-empty">仅文件状态变化，无代码内容变更。</div>
+    <div v-if="!displayLines.length" class="fd-empty">{{ t('chat.message.fileStatusOnly') }}</div>
   </div>
 </template>
 

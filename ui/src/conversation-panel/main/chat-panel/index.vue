@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { computed, provide, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ChatHeader from '../../components/header/chat/index.vue'
 import { EXPORT_MESSAGE_ELEMENT_KEY } from '../../components/header/header-actions/export/context.ts'
 import { useMessageInputStore } from '../../components/message-input/index'
 import MessageInput from '../../components/message-input/index.vue'
 import MessageList from '../../components/message-list/index.vue'
 import { useConversationListStore } from '../../left-sidebar/conversation-list/index'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const mainRef = ref<HTMLElement>()
 provide(EXPORT_MESSAGE_ELEMENT_KEY, () => mainRef.value?.querySelector<HTMLElement>('.mk-conversation-content') ?? null)
@@ -31,7 +34,7 @@ const disclaimerText = computed(() => (list.appInfo.value?.disclaimer ? list.app
     </slot>
     <!-- 消息区与输入区共用主面板背景 -->
     <div class="flex-column min-h-0 flex-1">
-      <MessageList :key="list.currentChatId.value" :app-name="list.appInfo.value?.name || 'AI 助手'"></MessageList>
+      <MessageList :key="list.currentChatId.value" :app-name="list.appInfo.value?.name || t('chat.defaultAssistantName')"></MessageList>
 
       <footer v-if="!list.isShared.value" class="mk-conversation-content flex-col-center shrink-0 gap-2 p-4">
         <MessageInput />

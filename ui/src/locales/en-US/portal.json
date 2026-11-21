@@ -1,4 +1,5 @@
 {
+  "label": "Portal",
   "title": "Portal access settings",
   "name": {
     "default": "Agent portal",
@@ -27,5 +28,12 @@
   "cors": {
     "title": "CORS settings",
     "placeholder": "Enter the allowed origins. When enabled, leaving this empty allows all origins.\nEnter one origin per line, for example:\nhttp://127.0.0.1:5678\nhttps://dataease.io"
-  }
+  },
+  "selectApplicationTitle": "Select an agent",
+  "noMatchingApplications": "No matching agents",
+  "noAvailableApplications": "No agents available",
+  "noDescription": "No description yet",
+  "clearConversations": "Clear chats",
+  "clearAllDescription": "Chat history for all agents will be cleared. This cannot be undone.",
+  "clearApplicationTitle": "Clear all chat history for this agent?"
 }

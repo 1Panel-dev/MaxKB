@@ -1,4 +1,5 @@
 {
+  "label": "門戶",
   "title": "門戶訪問設置",
   "name": {
     "default": "智能體門戶",
@@ -27,5 +28,12 @@
   "cors": {
     "title": "跨域設置",
     "placeholder": "請輸入允許的跨域地址，開啓後不輸入跨域地址則不限制。\n跨域地址一行一個，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io"
-  }
+  },
+  "selectApplicationTitle": "選擇智能體",
+  "noMatchingApplications": "沒有匹配的智能體",
+  "noAvailableApplications": "暫無可用智能體",
+  "noDescription": "暫無描述",
+  "clearConversations": "清空對話",
+  "clearAllDescription": "將清空所有智能體的歷史對話，清空後無法恢復。",
+  "clearApplicationTitle": "是否清空該智能體的全部歷史對話？"
 }

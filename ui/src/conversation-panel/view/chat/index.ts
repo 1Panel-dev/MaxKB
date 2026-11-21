@@ -16,6 +16,7 @@ import { createShareLinkStore } from '../../components/message-list/share/index'
 import { createConversationListStore } from '../../left-sidebar/conversation-list/index'
 import { createRightSidebarStore } from '../../right-sidebar/index'
 import { APPLICATION_DISPLAY_SETTING_DEFAULT } from '@/constants/application'
+import { t } from '@/locales'
 import { useStore } from '@/stores/chat'
 import { copyText } from '@/utils/clipboard'
 /** chat 模式在通用组件 store 之外提供分享;debug 模式无分享。 */
@@ -141,7 +142,7 @@ export function createChatConversation(routing: ChatConversationRouting = useApp
     setShared: list.switchShared,
     share: (chatRecordIds) =>
       ConversationApi.postShareConversation(getApplicationId(), list.currentChatId.value, { chat_record_ids: chatRecordIds }).then(({ link }) =>
-        copyText(`${window.location.origin}${CHAT_API_BASE_PATH.replace(/\/api$/, '')}/share/${link}`, '分享链接已复制'),
+        copyText(`${window.location.origin}${CHAT_API_BASE_PATH.replace(/\/api$/, '')}/share/${link}`, t('chat.share.copiedMessage')),
       ),
   })
 

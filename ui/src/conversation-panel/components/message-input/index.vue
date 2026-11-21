@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import ImageUploadCard from '@/components/mk-drag-upload/ImageUploadCard.vue'
 import { useInputEvents } from '../../core/input-events'
 import FileCard from './file-card/index.vue'
@@ -9,6 +10,7 @@ import { useVoiceRecorder } from './voice-recorder/index'
 import VoiceRecorder from './voice-recorder/index.vue'
 import { isAudio, isVideo } from '@/utils/icon'
 
+const { t } = useI18n({ useScope: 'global' })
 const {
   question,
   fileList,
@@ -116,11 +118,11 @@ const { recording, seconds: recordSeconds, waveLevels, start: startRecording, st
       <MkTooltip v-if="uploadEnabled && !urlUploadEnabled" placement="top">
         <template #content>
           <div class="break-all whitespace-pre-wrap">
-            可拖拽到输入框内上传文件
+            {{ t('chat.upload.dropHint') }}
             <br />
-            上传文件：最多{{ maxFiles }}个，每个文件限制{{ maxSizeMB }}MB
+            {{ t('chat.upload.limits', { count: maxFiles, size: maxSizeMB }, maxFiles) }}
             <br />
-            文件类型：{{ allowedExtensions.join('、') }}
+            {{ t('chat.upload.formatsHint', { formats: allowedExtensions.join('、') }) }}
           </div>
         </template>
         <el-button text :disabled="!canUpload" @click="fileInputRef?.click()">

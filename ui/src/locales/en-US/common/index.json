@@ -17,7 +17,8 @@
     "question": "Question",
     "language": "Language",
     "apiDoc": "API Docs",
-    "remark": "Remarks"
+    "remark": "Remarks",
+    "file": "File"
   },
   "name": {
     "label": "Name",
@@ -127,7 +128,7 @@
     "create": "Create",
     "quickCreate": "Quick create",
     "createFromImport": "Create from file",
-    "duplicate": "Duplicate",
+    "copy": "Copy",
     "import": "Import",
     "export": "Export",
     "relate": "Relate",
@@ -141,7 +142,10 @@
     "comfirm": "Ok",
     "submit": "Submit",
     "testConnection": "Test connection",
-    "debug": "Debug"
+    "debug": "Debug",
+    "download": "Download",
+    "fullscreen": "Fullscreen",
+    "send": "Send"
   },
   "dialogs": {
     "notice": "Notice",
@@ -154,11 +158,12 @@
     "settingsSuccess": "Settings applied successfully",
     "publishSuccess": "Published successfully",
     "deleteSuccess": "Deleted successfully",
+    "clearSuccess": "Cleared successfully",
     "batchDeleteSuccess": "Deleted successfully in bulk",
     "deleteFailed": "Deletion failed",
     "createSuccess": "Created successfully",
     "generateFailed": "Generation failed",
-    "duplicateSuccess": "Duplicated successfully",
+    "copySuccess": "Copied successfully",
     "addSuccess": "Added successfully",
     "removeSuccess": "Removed successfully",
     "fetchSuccess": "Fetched successfully",

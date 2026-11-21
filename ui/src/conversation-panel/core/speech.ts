@@ -1,5 +1,6 @@
 import type { StreamChunk } from './types'
 import type { ChatContent } from '@/api/types'
+import { t } from '@/locales'
 import { MsgError } from '@/utils/message'
 
 /** 模型语音合成：返回音频，失败时抛出带后端提示信息的错误。 */
@@ -172,7 +173,7 @@ export class StreamSpeech {
       request.catch(() => {})
       this.audioRequests.set(index, request)
     }
-    return request ?? Promise.reject(new Error('语音合成失败'))
+    return request ?? Promise.reject(new Error(t('chat.voice.synthesisFailedMessage')))
   }
 
   private async run() {
@@ -198,7 +199,7 @@ export class StreamSpeech {
   private fail(error: unknown) {
     if (this.state === 'ended') return
     const silent = error instanceof SpeechInterruptedError || (error instanceof DOMException && error.name === 'NotAllowedError')
-    if (!silent) MsgError(error instanceof Error && error.message ? error.message : '语音播放失败')
+    if (!silent) MsgError(error instanceof Error && error.message ? error.message : t('chat.voice.playbackFailedMessage'))
     this.stop()
   }
 
@@ -226,7 +227,7 @@ export class StreamSpeech {
     try {
       return await new Promise<boolean>((resolve, reject) => {
         audio.onended = () => resolve(true)
-        audio.onerror = () => reject(new Error('语音播放失败'))
+        audio.onerror = () => reject(new Error(t('chat.voice.playbackFailedMessage')))
         this.interruptCurrent = () => resolve(false)
         audio.src = url
         this.audioReady = true

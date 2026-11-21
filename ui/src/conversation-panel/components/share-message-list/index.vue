@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatContent } from '@/api/types'
 import ReverseInfiniteScroll from '../../core/reverse-infinite-scroll/index.vue'
 import ContentList from '../content-list/index.vue'
@@ -9,6 +10,7 @@ import { resetUrl } from '@/utils/icon'
 
 defineOptions({ name: 'ShareMessageList' })
 
+const { t } = useI18n({ useScope: 'global' })
 const { appInfo, messages, loading, failed, load } = useShareMessageListStore()
 const avatar = computed(() => appInfo.value?.avatar)
 const userAvatar = computed(() => appInfo.value?.user_avatar)
@@ -56,8 +58,13 @@ function collectAnswerText(contents: ChatContent[]): string {
         <div class="mk-conversation-message-footer mt-3">
           <div class="flex-align-center flex-wrap gap-2">
             <!-- 复制回答正文 -->
-            <MkTooltip content="复制">
-              <el-button text class="-ml-1" :disabled="!collectAnswerText(msg.content)" @click="copyText(collectAnswerText(msg.content))">
+            <MkTooltip :content="t('common.actions.copy')">
+              <el-button
+                text
+                class="-ml-1"
+                :disabled="!collectAnswerText(msg.content)"
+                @click="copyText(collectAnswerText(msg.content), t('common.messages.copied'))"
+              >
                 <MkIcon name="icon_copy_outlined" />
               </el-button>
             </MkTooltip>
@@ -66,9 +73,9 @@ function collectAnswerText(contents: ChatContent[]): string {
       </div>
     </template>
     <template #empty>
-      <MkEmpty :description="failed ? '分享内容加载失败' : '暂无可分享的对话'" class="mt-20">
+      <MkEmpty :description="failed ? t('chat.share.loadFailedMessage') : t('chat.share.empty')" class="mt-20">
         <!-- 重新加载分享内容 -->
-        <el-button v-if="failed" type="primary" @click="load()">重试</el-button>
+        <el-button v-if="failed" type="primary" @click="load()">{{ t('common.actions.retry') }}</el-button>
       </MkEmpty>
     </template>
   </ReverseInfiniteScroll>

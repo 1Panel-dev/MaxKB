@@ -91,7 +91,7 @@ function toUrl(url?: string) {
         <!-- 访问智能体门户 -->
         <el-button v-if="perm.system.other.portal()" text @click="toUrl(portalAccessUrl)">
           <MkIcon name="icon_chat_outlined" />
-          <span>{{ t('layout.portal') }}</span>
+          <span>{{ t('portal.label') }}</span>
         </el-button>
       </span>
 

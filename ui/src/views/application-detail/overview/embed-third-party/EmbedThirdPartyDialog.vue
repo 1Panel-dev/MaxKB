@@ -84,7 +84,7 @@ defineExpose({ open })
         <div class="flex-between mb-2">
           <h6>{{ t('application.overview.embed.copyHint') }}</h6>
           <!-- 复制当前模式的嵌入代码 -->
-          <MkTooltip :content="t('common.actions.duplicate')">
+          <MkTooltip :content="t('common.actions.copy')">
             <el-button text :disabled="!embedCode" @click="copyText(embedCode, t('common.messages.copied'))">
               <MkIcon name="icon_copy_outlined" />
             </el-button>

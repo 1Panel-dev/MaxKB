@@ -1,3 +1,134 @@
 {
-  "newChat": "新建对话"
+  "newChat": "新建对话",
+  "defaultConversationTitle": "新对话",
+  "defaultAssistantName": "AI 助手",
+  "conversationTitle": "会话标题",
+  "roles": {
+    "user": "用户",
+    "assistant": "助手"
+  },
+  "actions": {
+    "expandSidebar": "展开侧边栏",
+    "collapseSidebar": "收起侧边栏",
+    "expandSettings": "展开设置",
+    "collapseSettings": "收起设置",
+    "moreSettings": "更多设置",
+    "maximize": "放大",
+    "restore": "还原",
+    "closeDebug": "关闭调试"
+  },
+  "history": {
+    "label": "历史对话",
+    "empty": "暂无历史记录",
+    "noMatches": "没有匹配的历史对话",
+    "viewMore": "查看更多",
+    "clearTitle": "是否清空全部历史对话？",
+    "clearDescription": "清空后无法恢复。"
+  },
+  "delete": {
+    "title": "是否删除对话：{name}？",
+    "description": "删除后无法恢复。"
+  },
+  "message": {
+    "inputPlaceholder": "输入消息...",
+    "missingApiParameters": "请在URL中填写参数 {fields}的值",
+    "replying": "正在回复中...",
+    "thinking": "思考中",
+    "thinkingCompleted": "思考完成",
+    "toolsCalled": "调用了 {count} 个工具",
+    "failedToolCount": "{count} 个失败",
+    "fileStatusOnly": "仅文件状态变化，无代码内容变更。",
+    "lineCount": "{count} 行",
+    "formSubmitted": "已提交",
+    "legacyFormSubmitUnsupported": "旧版表单暂不支持提交",
+    "errorOccurred": "发生错误",
+    "noConversationRecords": "暂无对话记录"
+  },
+  "upload": {
+    "dropHint": "可拖拽到输入框内上传文件",
+    "limits": "上传文件：最多{count}个，每个文件限制{size}MB",
+    "formatsHint": "文件类型：{formats}",
+    "countLimitMessage": "单次最多上传 {count} 个文件",
+    "unsupportedTypeMessage": "不支持上传该类型的文件",
+    "sizeLimitMessage": "每个文件不能超过 {size}MB"
+  },
+  "urlUpload": {
+    "label": "URL 地址",
+    "placeholder": "请输入URL地址，每行一个地址",
+    "invalidAddressMessage": "请输入有效的 HTTP 或 HTTPS URL 地址",
+    "invalidResponseMessage": "URL 地址无效",
+    "typeMismatchMessage": "文件类型与所选类型不匹配",
+    "readFailedMessage": "读取 URL 文件失败",
+    "localUpload": "本地上传"
+  },
+  "voice": {
+    "recordingUnavailableMessage": "无法录音：{reason}",
+    "recordingFailedMessage": "录音失败：{reason}",
+    "transcribing": "语音转文字中...",
+    "emptyTranscriptMessage": "未识别到语音内容",
+    "readContent": "朗读内容",
+    "pauseReading": "暂停朗读",
+    "resumeReading": "继续朗读",
+    "synthesisFailedMessage": "语音合成失败",
+    "playbackFailedMessage": "语音播放失败"
+  },
+  "feedback": {
+    "positive": "赞同",
+    "cancelPositive": "取消赞同",
+    "negative": "反对",
+    "cancelNegative": "取消反对",
+    "positiveTitle": "你觉得什么让你满意？",
+    "negativeTitle": "请告诉我们不满意的原因",
+    "reasons": {
+      "accurate": "内容准确",
+      "complete": "内容完善",
+      "inaccurate": "内容不准确",
+      "incomplete": "内容不完善"
+    },
+    "placeholder": "告诉我们更多关于你的相关体验",
+    "cancelledMessage": "已取消反馈",
+    "thanksMessage": "感谢你的反馈"
+  },
+  "knowledgeSource": {
+    "label": "知识来源",
+    "empty": "暂无知识来源",
+    "documentMissingMessage": "原文档不存在",
+    "noDownloadPermissionMessage": "没有下载权限",
+    "loading": "PDF 加载中...",
+    "loadFailedMessage": "PDF 加载失败",
+    "renderFailedMessage": "PDF 渲染失败"
+  },
+  "share": {
+    "label": "分享",
+    "title": "分享对话",
+    "copy": "复制链接",
+    "copiedMessage": "分享链接已复制",
+    "loadFailedMessage": "分享内容加载失败",
+    "empty": "暂无可分享的对话"
+  },
+  "export": {
+    "fileName": "对话记录",
+    "attachment": "附件",
+    "image": "导出图片",
+    "previewTitle": "导出预览",
+    "previewFailedMessage": "导出预览失败，请等待内容加载完成后重试",
+    "failedMessage": "导出失败，请稍后重试"
+  },
+  "improve": {
+    "title": "修正内容",
+    "markTitle": "查看标注",
+    "relatedQuestion": {
+      "label": "关联问题",
+      "placeholder": "请输入关联问题",
+      "requiredMessage": "请输入关联问题",
+      "lengthMessage": "关联问题不能超过{max}个字符"
+    },
+    "content": {
+      "label": "内容",
+      "placeholder": "请输入内容",
+      "requiredMessage": "请输入内容",
+      "lengthMessage": "内容不能超过{max}个字符"
+    },
+    "titlePlaceholder": "请给当前内容设置一个标题，以便管理查看"
+  }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatMessage, ChatRecordMeta } from '../../core/types'
 import type ChatLogApi from '@/api/admin/workspace/application/chat-log'
 import type { ChatContent } from '@/api/types'
@@ -17,6 +18,7 @@ const props = defineProps<{
   message: ChatMessage
 }>()
 
+const { t } = useI18n({ useScope: 'global' })
 const rightSidebar = useRightSidebarStore()
 
 const EMPTY: ChatRecordMeta = {
@@ -56,24 +58,24 @@ const openExecutionDetail = () => {
       <!-- 知识来源:在右侧展示回答引用的分段 -->
       <el-button v-if="meta.paragraphList.length" text class="-ml-1" @click="rightSidebar.showKnowledgeSource(meta.paragraphList)">
         <MkIcon name="icon_reference_outlined" />
-        <span>知识来源 ({{ meta.paragraphList.length }})</span>
+        <span>{{ t('chat.knowledgeSource.label') }} ({{ meta.paragraphList.length }})</span>
       </el-button>
 
       <!-- 执行详情:对话结束时已拉取并缓存,点击直接在右侧展示 -->
       <el-button text @click="openExecutionDetail" class="-ml-1">
         <MkIcon name="icon_logs_outlined" />
-        <span>执行详情</span>
+        <span>{{ t('execution.details.title') }}</span>
       </el-button>
       <template v-if="meta.runTime || tokens">
         <el-divider direction="vertical" class="ml-2! mr-3!" />
-        <span class="text-N600">Tokens {{ tokens }} · 耗时 {{ meta.runTime.toFixed(2) }}s</span>
+        <span class="text-N600">Tokens {{ tokens }} · {{ t('common.labels.duration') }} {{ meta.runTime.toFixed(2) }}s</span>
       </template>
     </div>
     <!-- 其他操作 -->
     <div class="flex-align-center gap-2">
       <!-- 复制回答正文 -->
-      <MkTooltip content="复制">
-        <el-button text class="-ml-1" :disabled="!answerText" @click="copyText(answerText)">
+      <MkTooltip :content="t('common.actions.copy')">
+        <el-button text class="-ml-1" :disabled="!answerText" @click="copyText(answerText, t('common.messages.copied'))">
           <MkIcon name="icon_copy_outlined" />
         </el-button>
       </MkTooltip>

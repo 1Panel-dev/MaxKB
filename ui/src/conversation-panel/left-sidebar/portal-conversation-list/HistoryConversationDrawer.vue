@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { PortalConversationSummary } from '@/api/types'
 import ConversationApi from '@/api/chat/conversation'
 import { useMessageListStore } from '../../components/message-list/index'
 import RenameConversation from '../../components/rename/index.vue'
+import { useShowShare } from '../../view/index'
 import { useConversationListStore } from '../conversation-list/index'
 import { usePortalConversationListStore } from './index'
 import { relativeTimeFormat } from '@/utils/time'
-import { useShowShare } from '../../view/index'
 
 defineOptions({ name: 'HistoryConversationDrawer' })
+
+const { t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ applicationId: string }>()
 const visible = defineModel<boolean>({ required: true })
 const portalList = usePortalConversationListStore()
@@ -65,7 +68,7 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="历史对话" :size="600" :close-on-click-modal="true" :close-on-press-escape="true">
+  <MkDrawer v-model="visible" :title="t('chat.history.label')" :size="600" :close-on-click-modal="true" :close-on-press-escape="true">
     <div class="mb-4 flex-align-center gap-3">
       <!-- 切换历史对话所属智能体 -->
       <el-select v-model="selectedApplicationId" class="w-50! shrink-0" @change="handleApplicationChange">
@@ -83,7 +86,7 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
         </el-option>
       </el-select>
       <!-- 按历史对话摘要搜索 -->
-      <MkSearchInput v-model="keyword" class="min-w-0 flex-1" placeholder="搜索" @change="handleSearch" />
+      <MkSearchInput v-model="keyword" class="min-w-0 flex-1" :placeholder="t('common.placeholders.search')" @change="handleSearch" />
     </div>
     <el-skeleton v-if="initialLoading" animated />
     <!-- 保持滚动组件挂载，由它发起首屏和重置请求。 -->
@@ -98,7 +101,9 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
           class="px-4!"
         >
           <template #default="{ active }">
-            <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || '新对话'">{{ conversation.abstract || '新对话' }}</span>
+            <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || t('chat.defaultConversationTitle')">
+              {{ conversation.abstract || t('chat.defaultConversationTitle') }}
+            </span>
             <span class="-mr-6 shrink-0 text-sm text-N500 group-hover:invisible group-focus-within:invisible" :class="{ invisible: active }">
               {{ relativeTimeFormat(conversation.update_time || conversation.create_time) }}
             </span>
@@ -116,7 +121,7 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
                     @click="handleShareConversation(conversation)"
                   >
                     <template #icon><MkIcon name="icon_share_outlined" /></template>
-                    <span>分享</span>
+                    <span>{{ t('chat.share.label') }}</span>
                   </MkDropdownItem>
                   <!-- 重命名 -->
                   <RenameConversation
@@ -128,7 +133,7 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
                   <!-- 删除历史对话 -->
                   <MkDropdownItem @click="handleDeleteConversation(conversation)">
                     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                    <span>删除</span>
+                    <span>{{ t('common.actions.delete') }}</span>
                   </MkDropdownItem>
                 </MkDropdownMenu>
               </template>
@@ -136,7 +141,9 @@ const handleDeleteConversation = (conversation: PortalConversationSummary) => {
           </template>
         </MkListItem>
       </div>
-      <template #empty><MkEmpty :type="keyword ? 'search' : 'default'" :description="keyword ? '没有匹配的历史对话' : '暂无历史记录'" /></template>
+      <template #empty>
+        <MkEmpty :type="keyword ? 'search' : 'default'" :description="keyword ? t('chat.history.noMatches') : t('chat.history.empty')" />
+      </template>
     </MkInfiniteScroll>
   </MkDrawer>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ChatUserApi from '@/api/chat/chat-user'
 import { CHAT_API_BASE_PATH } from '@/api/constants'
 import { useMessageListStore } from '@/conversation-panel/components/message-list'
@@ -11,6 +12,7 @@ defineOptions({ name: 'ConversationApiKeyDialog' })
 
 type McpServiceType = 'agent' | 'knowledge'
 
+const { t } = useI18n({ useScope: 'global' })
 const dialogVisible = ref(false)
 const apiKey = ref('')
 const loading = ref(false)
@@ -63,16 +65,16 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="dialogVisible" title="API Key" @closed="resetData">
-    <template #subtitle>每个用户仅一个 API Key，绑定当前对话用户、与其同权。重置后旧 Key 立即失效</template>
+    <template #subtitle>{{ t('apiKey.chatUser.description') }}</template>
 
-    <div class="mb-2">我的 API Key</div>
+    <div class="mb-2">{{ t('apiKey.chatUser.label') }}</div>
     <el-input :model-value="`******${apiKey.slice(-4)}`" readonly class="mb-4">
       <template #suffix>
         <!-- 复制 API URL -->
-        <el-button text @click="copyText(apiKey)">
+        <el-button text @click="copyText(apiKey, t('common.messages.copied'))">
           <MkIcon name="icon_copy_outlined" />
         </el-button>
-        <MkTooltip content="重新生成" placement="top">
+        <MkTooltip :content="t('common.actions.regenerate')" placement="top">
           <!-- 重新生成 API Key -->
           <el-button text class="-mr-1" :loading="loading" @click="loadApiKey(true)">
             <MkIcon name="icon_refresh_outlined" />
@@ -81,17 +83,21 @@ defineExpose({ open })
       </template>
     </el-input>
 
-    <div class="mb-2">MCP 服务配置</div>
+    <div class="mb-2">{{ t('resource.mcpConfig.title') }}</div>
     <template v-if="viewType === VIEW_TYPE.PORTAL">
       <!-- 切换 MCP 服务类型 -->
       <el-radio-group v-model="mcpServiceType" class="mb-2">
-        <el-radio-button value="agent">智能体对话</el-radio-button>
-        <el-radio-button value="knowledge">知识库检索</el-radio-button>
+        <el-radio-button value="agent">{{ t('apiKey.chatUser.agentChat') }}</el-radio-button>
+        <el-radio-button value="knowledge">{{ t('apiKey.chatUser.knowledgeRetrieval') }}</el-radio-button>
       </el-radio-group>
       <div class="group relative">
         <el-input :model-value="mcpConfig[mcpServiceType]" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
         <!-- 复制 MCP 配置 -->
-        <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle @click="copyText(mcpConfig[mcpServiceType].replace('<CHAT_USER_API_KEY>',apiKey))">
+        <el-button
+          class="group-hover-visible absolute right-3 top-3 z-10 shadow-md"
+          circle
+          @click="copyText(mcpConfig[mcpServiceType].replace('<CHAT_USER_API_KEY>', apiKey), t('common.messages.copied'))"
+        >
           <MkIcon name="icon_copy_outlined" />
         </el-button>
       </div>
@@ -99,7 +105,11 @@ defineExpose({ open })
     <div v-else class="group relative">
       <el-input :model-value="agentMcpConfig" readonly :autosize="{ minRows: 8, maxRows: 24 }" type="textarea" />
       <!-- 复制 MCP 配置 -->
-      <el-button class="group-hover-visible absolute right-3 top-3 z-10 shadow-md" circle @click="copyText(agentMcpConfig.replace('<CHAT_USER_API_KEY>',apiKey))">
+      <el-button
+        class="group-hover-visible absolute right-3 top-3 z-10 shadow-md"
+        circle
+        @click="copyText(agentMcpConfig.replace('<CHAT_USER_API_KEY>', apiKey), t('common.messages.copied'))"
+      >
         <MkIcon name="icon_copy_outlined" />
       </el-button>
     </div>

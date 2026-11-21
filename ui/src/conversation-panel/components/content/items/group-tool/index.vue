@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatContent, Dict } from '@/api/types'
 import type { Component } from 'vue'
 import CreateFile from '../tool/CreateFile.vue'
@@ -13,6 +14,8 @@ import ReadFile from '../tool/ReadFile.vue'
 import RunSkill from '../tool/RunSkill.vue'
 import Terminal from '../tool/Terminal.vue'
 import ToolItem from './components/ToolItem.vue'
+
+const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'ConversationGroupToolContent' })
 
@@ -84,10 +87,10 @@ const isExpanded = ref(false)
     </template>
     <template #label>
       <span v-if="groupStatus === 'running'" class="mk-conversation-loading" />
-      <span>调用了 {{ toolItems.length }} 个工具</span>
+      <span>{{ t('chat.message.toolsCalled', { count: toolItems.length }, toolItems.length) }}</span>
       <span v-if="failedToolCount">
-        （{{ failedToolCount }} 个
-        <span class="text-danger">失败</span>
+        （
+        <span class="text-danger">{{ t('chat.message.failedToolCount', { count: failedToolCount }, failedToolCount) }}</span>
         ）
       </span>
     </template>

@@ -17,7 +17,8 @@
     "question": "問題",
     "language": "語言",
     "apiDoc": "API 文檔",
-    "remark": "備註"
+    "remark": "備註",
+    "file": "文件"
   },
   "name": {
     "label": "名稱",
@@ -127,7 +128,7 @@
     "create": "創建",
     "quickCreate": "快速創建",
     "createFromImport": "導入創建",
-    "duplicate": "複製",
+    "copy": "複製",
     "import": "導入",
     "export": "導出",
     "relate": "關聯",
@@ -141,7 +142,10 @@
     "comfirm": "確定",
     "submit": "提交",
     "testConnection": "測試連接",
-    "debug": "調試"
+    "debug": "調試",
+    "download": "下載",
+    "fullscreen": "全屏",
+    "send": "發送"
   },
   "dialogs": {
     "notice": "提示",
@@ -154,11 +158,12 @@
     "settingsSuccess": "設置成功",
     "publishSuccess": "發佈成功",
     "deleteSuccess": "刪除成功",
+    "clearSuccess": "清空成功",
     "batchDeleteSuccess": "批量刪除成功",
     "deleteFailed": "刪除失敗",
     "createSuccess": "創建成功",
     "generateFailed": "生成失敗",
-    "duplicateSuccess": "複製成功",
+    "copySuccess": "複製成功",
     "addSuccess": "添加成功",
     "removeSuccess": "移除成功",
     "fetchSuccess": "獲取成功",

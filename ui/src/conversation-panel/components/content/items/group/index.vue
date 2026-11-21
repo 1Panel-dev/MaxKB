@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatContent } from '@/api/types'
 import ContentList from '@/conversation-panel/components/content-list/index.vue'
 import { useBottomFollow } from '@/conversation-panel/core/bottom-follow'
@@ -12,16 +13,19 @@ import { useBottomFollow } from '@/conversation-panel/core/bottom-follow'
 defineOptions({ name: 'ConversationGroupContent' })
 
 const props = defineProps<{ content: ChatContent }>()
+const { t } = useI18n({ useScope: 'global' })
 
 const childContents = computed(() => props.content.children ?? [])
 
-const STATUS_TEXT: Record<string, string> = {
-  RUNNING: '执行中',
-  SUCCESS: '成功',
-  FAIL: '失败',
-  FAILURE: '失败',
-}
-const statusText = computed(() => STATUS_TEXT[props.content.status ?? ''] ?? props.content.status)
+const statusText = computed(() => {
+  const statusLabels: Record<string, string> = {
+    RUNNING: t('common.status.running'),
+    SUCCESS: t('common.status.success'),
+    FAIL: t('common.status.failure'),
+    FAILURE: t('common.status.failure'),
+  }
+  return statusLabels[props.content.status ?? ''] ?? props.content.status
+})
 
 const statusType = computed(() => {
   const status = props.content.status
@@ -37,26 +41,26 @@ const isExpanded = ref(false)
 // 分组内容限高滚动，高度与新建文件的差异区一致；子项流式更新时跟随到底部
 useBottomFollow(useTemplateRef<HTMLElement>('groupScrollRef'))
 
-function tail(text: string) {
-  const trimmed = text.trim()
-  return trimmed.length > 40 ? `…${trimmed.slice(-40)}` : trimmed
-}
+// function tail(text: string) {
+//   const trimmed = text.trim()
+//   return trimmed.length > 40 ? `…${trimmed.slice(-40)}` : trimmed
+// }
 
 // 子项在做什么：工具取名称，正文取末尾，思考固定文案，子分组取标题，失败取错误信息
-function describeChild(child: ChatContent): string {
-  if (child.type === 'TOOL' || child.type === 'GROUP') return child.name ?? ''
-  if (child.type === 'TEXT' || child.type === 'FAILURE') return tail(child.content ?? '')
-  if (child.type === 'REASONING') return '思考中'
-  return ''
-}
+// function describeChild(child: ChatContent): string {
+//   if (child.type === 'TOOL' || child.type === 'GROUP') return child.name ?? ''
+//   if (child.type === 'TEXT' || child.type === 'FAILURE') return tail(child.content ?? '')
+//   if (child.type === 'REASONING') return t('chat.message.thinking')
+//   return ''
+// }
 
 // 最新一条子项按 id 排序取最大，与 ContentList 的排序规则一致
-const currentActivity = computed(() => {
-  const latestChild = childContents.value
-    .filter((child) => describeChild(child))
-    .reduce<ChatContent | undefined>((latest, child) => (!latest || (child.id ?? '').localeCompare(latest.id ?? '') >= 0 ? child : latest), undefined)
-  return latestChild ? describeChild(latestChild) : ''
-})
+// const currentActivity = computed(() => {
+//   const latestChild = childContents.value
+//     .filter((child) => describeChild(child))
+//     .reduce<ChatContent | undefined>((latest, child) => (!latest || (child.id ?? '').localeCompare(latest.id ?? '') >= 0 ? child : latest), undefined)
+//   return latestChild ? describeChild(latestChild) : ''
+// })
 </script>
 
 <template>

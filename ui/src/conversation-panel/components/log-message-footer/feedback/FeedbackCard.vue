@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatFeedback } from '@/api/types'
+
+const { t } = useI18n({ useScope: 'global' })
 
 const props = defineProps<{ feedback: ChatFeedback }>()
 const status = computed(() => props.feedback.vote_status)
@@ -10,14 +13,14 @@ const content = computed(() => props.feedback.vote_other_content ?? '')
 const reasons = computed(() =>
   props.feedback.vote_status === '0'
     ? ([
-        { value: 'accurate', label: '内容准确' },
-        { value: 'complete', label: '内容完善' },
-        { value: 'other', label: '其他' },
+        { value: 'accurate', label: t('chat.feedback.reasons.accurate') },
+        { value: 'complete', label: t('chat.feedback.reasons.complete') },
+        { value: 'other', label: t('common.labels.other') },
       ] as const)
     : ([
-        { value: 'inaccurate', label: '内容不准确' },
-        { value: 'incomplete', label: '内容不完善' },
-        { value: 'other', label: '其他' },
+        { value: 'inaccurate', label: t('chat.feedback.reasons.inaccurate') },
+        { value: 'incomplete', label: t('chat.feedback.reasons.incomplete') },
+        { value: 'other', label: t('common.labels.other') },
       ] as const),
 )
 </script>
@@ -25,7 +28,7 @@ const reasons = computed(() =>
 <template>
   <div class="mk-gray-card-lg border w-full space-y-3 mb-4">
     <div>
-      <h4>{{ status === '0' ? '你觉得什么让你满意？' : '请告诉我们不满意的原因' }}</h4>
+      <h4>{{ status === '0' ? t('chat.feedback.positiveTitle') : t('chat.feedback.negativeTitle') }}</h4>
     </div>
     <div class="flex flex-wrap gap-2">
       <template v-for="option in reasons" :key="option.value">
@@ -35,6 +38,6 @@ const reasons = computed(() =>
         </el-check-tag>
       </template>
     </div>
-    <el-input v-if="reason === 'other'" :model-value="content" type="textarea" :rows="4" disabled placeholder="告诉我们更多关于你的相关体验" />
+    <el-input v-if="reason === 'other'" :model-value="content" type="textarea" :rows="4" disabled :placeholder="t('chat.feedback.placeholder')" />
   </div>
 </template>

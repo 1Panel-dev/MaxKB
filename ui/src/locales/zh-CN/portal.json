@@ -1,4 +1,5 @@
 {
+  "label": "门户",
   "title": "门户访问设置",
   "name": {
     "default": "智能体门户",
@@ -27,5 +28,12 @@
   "cors": {
     "title": "跨域设置",
     "placeholder": "请输入允许的跨域地址，开启后不输入跨域地址则不限制。\n跨域地址一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io"
-  }
+  },
+  "selectApplicationTitle": "选择智能体",
+  "noMatchingApplications": "没有匹配的智能体",
+  "noAvailableApplications": "暂无可用智能体",
+  "noDescription": "暂无描述",
+  "clearConversations": "清空对话",
+  "clearAllDescription": "将清空所有智能体的历史对话，清空后无法恢复。",
+  "clearApplicationTitle": "是否清空该智能体的全部历史对话？"
 }

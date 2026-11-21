@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRightSidebarStore } from '../../index'
 import { createFullscreenToggle, createPdfRenderer } from './index'
 import { downloadByURL } from '@/utils/common'
 
 defineOptions({ name: 'DocumentPreview' })
 
+const { t } = useI18n({ useScope: 'global' })
 const { knowledgeSource, closeRightSide } = useRightSidebarStore()
 const { previewDocument, closePreview } = knowledgeSource
 const { loading, error, render, destroy } = createPdfRenderer()
@@ -50,13 +52,13 @@ onBeforeUnmount(() => {
       </div>
       <div class="flex-align-center gap-2 shrink-0">
         <!-- 下载 -->
-        <MkTooltip content="下载">
+        <MkTooltip :content="t('common.actions.download')">
           <el-button text :disabled="!previewDocument?.url" @click="downloadDocument">
             <MkIcon name="icon_download_outlined" size="18" />
           </el-button>
         </MkTooltip>
         <!-- 全屏预览 -->
-        <MkTooltip content="全屏">
+        <MkTooltip :content="t('common.actions.fullscreen')">
           <el-button text @click="fullscreen.toggle()" class="ml-0!">
             <MkIcon name="icon_window-new_outlined" size="18" />
           </el-button>
@@ -74,7 +76,7 @@ onBeforeUnmount(() => {
       </div>
       <div v-if="loading" class="absolute inset-0 flex-center gap-2 text-N600">
         <LoadingIcon />
-        <span>PDF 加载中...</span>
+        <span>{{ t('chat.knowledgeSource.loading') }}</span>
       </div>
       <el-empty v-else-if="error" class="absolute inset-0" :description="error" :image-size="80" />
     </div>

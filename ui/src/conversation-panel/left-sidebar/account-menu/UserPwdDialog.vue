@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import JSEncrypt from 'jsencrypt'
+import { useI18n } from 'vue-i18n'
 import type { UpdatePasswordForm } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserApi from '@/api/chat/chat-user'
@@ -10,6 +11,7 @@ import { MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'UserPwdDialog' })
 
+const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const { auth } = useStore()
 
@@ -21,24 +23,24 @@ const userPasswordForm = reactive<UpdatePasswordForm>({ password: '', re_passwor
 
 function validateConfirmPassword(_rule: unknown, value: string, callback: (error?: Error) => void) {
   if (!value) {
-    callback(new Error('请输入确认密码'))
+    callback(new Error(t('user.confirmPassword.requiredMessage')))
   } else if (value !== userPasswordForm.password) {
-    callback(new Error('输入的密码不一致'))
+    callback(new Error(t('user.confirmPassword.mismatchMessage')))
   } else {
     callback()
   }
 }
 
-const userPasswordRules = reactive<FormRules<UpdatePasswordForm>>({
+const userPasswordRules = computed<FormRules<UpdatePasswordForm>>(() => ({
   password: [
-    { required: true, whitespace: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '长度应为 6-20 个字符', trigger: 'blur' },
+    { required: true, whitespace: true, message: t('user.password.requiredMessage'), trigger: 'blur' },
+    { min: 6, max: 20, message: t('common.validation.lengthRange', { min: 6, max: 20 }), trigger: 'blur' },
   ],
   re_password: [
-    { required: true, whitespace: true, message: '请输入确认密码', trigger: 'blur' },
+    { required: true, whitespace: true, message: t('user.confirmPassword.requiredMessage'), trigger: 'blur' },
     { validator: validateConfirmPassword, trigger: 'blur' },
   ],
-})
+}))
 
 function open() {
   dialogVisible.value = true
@@ -53,14 +55,14 @@ async function submitPassword() {
     encryptor.setPublicKey(auth.authProfile?.rsa_key ?? '')
     const encryptedData = encryptor.encrypt(JSON.stringify(userPasswordForm))
     if (!encryptedData) {
-      MsgError('密码加密失败，请刷新后重试')
+      MsgError(t('auth.changePassword.chatEncryptionFailedMessage'))
       passwordSubmitting.value = false
       return
     }
 
     return ChatUserApi.postResetPassword({ encryptedData }, auth.accessToken)
       .then(() => {
-        MsgSuccess('密码修改成功')
+        MsgSuccess(t('user.password.changeSuccess'))
 
         dialogVisible.value = false
         auth.clearToken()
@@ -82,31 +84,32 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="修改密码" @closed="resetData">
+  <MkDialog v-model="dialogVisible" :title="t('auth.changePassword.title')" @closed="resetData">
     <el-form
       ref="userPasswordFormRef"
       :model="userPasswordForm"
       :rules="userPasswordRules"
+      :validate-on-rule-change="false"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="新密码" prop="password">
+      <el-form-item :label="t('user.password.label')" prop="password">
         <el-input
           v-model="userPasswordForm.password"
           autocomplete="new-password"
           maxlength="20"
-          placeholder="请输入新密码"
+          :placeholder="t('user.password.placeholder')"
           show-password
           type="password"
         />
       </el-form-item>
-      <el-form-item label="确认密码" prop="re_password">
+      <el-form-item :label="t('user.confirmPassword.label')" prop="re_password">
         <el-input
           v-model="userPasswordForm.re_password"
           autocomplete="new-password"
           maxlength="20"
-          placeholder="请再次输入新密码"
+          :placeholder="t('user.confirmPassword.placeholder')"
           show-password
           type="password"
         />
@@ -115,9 +118,9 @@ defineExpose({ open })
 
     <template #footer>
       <!-- 取消修改密码 -->
-      <el-button plain @click="dialogVisible = false">取消</el-button>
+      <el-button plain @click="dialogVisible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 保存新密码 -->
-      <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">保存</el-button>
+      <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDialog>
 </template>

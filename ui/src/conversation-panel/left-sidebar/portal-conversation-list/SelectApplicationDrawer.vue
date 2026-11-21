@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ChatApplicationProfile } from '@/api/types'
 import PortalApplicationCards from '../../components/portal-application-cards/index.vue'
 import { usePortalConversationListStore } from './index'
 
 defineOptions({ name: 'SelectApplicationDrawer' })
+
+const { t } = useI18n({ useScope: 'global' })
 
 // 没有当前智能体时新建对话：选择智能体后进入其新建对话。搜索条件与结果独立于全部智能体页。
 const { fetchApplications, openApplication } = usePortalConversationListStore()
@@ -51,7 +54,7 @@ defineExpose({ open })
   >
     <template #header>
       <div class="flex w-full flex-col gap-4 md:flex-row">
-        <h4>选择智能体</h4>
+        <h4>{{ t('portal.selectApplicationTitle') }}</h4>
         <div class="w-full md:absolute-center md:w-85">
           <!-- 搜索智能体 -->
           <MkSearchInput v-model="applicationKeyword" @change="loadApplications" />
@@ -63,7 +66,7 @@ defineExpose({ open })
       <MkEmpty
         v-if="!isLoading && applications.length === 0"
         :type="applicationKeyword ? 'search' : 'default'"
-        :description="applicationKeyword ? '没有匹配的智能体' : '暂无可用智能体'"
+        :description="applicationKeyword ? t('portal.noMatchingApplications') : t('portal.noAvailableApplications')"
         class="mt-10"
       />
       <PortalApplicationCards v-else :applications="applications" @select="handleSelect" />

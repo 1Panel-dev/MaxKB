@@ -190,7 +190,7 @@
   },
   "upload": {
     "segmentation": "文件上傳前，建議規範文件的分段標識",
-    "duplicateName": "文件名重復",
+    "duplicateName": "文件名已存在",
     "limits": "每次最多上傳 {count} 個文件，每個文件不超過 {size} MB",
     "sizeLimit": "文件大小不能超過 {size}MB",
     "countLimit": "最多只能上傳 {count} 個文件"

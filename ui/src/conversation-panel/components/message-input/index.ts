@@ -9,6 +9,7 @@ import { defaultFileUploadSetting } from '@/workflow-canvas/nodes/base-node/cons
 import { URL_FILE_MIME_TYPES, createUrlFile } from './url-upload/index'
 import { createUserFormStore } from './user-form/index'
 import { AUDIO_EXTENSIONS, DOCUMENT_EXTENSIONS, IMAGE_EXTENSIONS, VIDEO_EXTENSIONS } from '@/constants/file-type'
+import { t } from '@/locales'
 import { getFileExtension, isAudio, isDocument, isImage, isVideo } from '@/utils/icon'
 import { MsgError, MsgWarning } from '@/utils/message'
 
@@ -132,9 +133,9 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   const speechEnabled = computed(() => !!deps.speechToText && !!appInfo.value?.stt_model_enable)
 
   const placeholder = computed(() => {
-    if (disabled.value) return '暂无可用智能体'
-    if (transcribing.value) return '语音转文字中...'
-    return streamLoading.value ? '正在回复中...' : '输入消息...'
+    if (disabled.value) return t('portal.noAvailableApplications')
+    if (transcribing.value) return t('chat.voice.transcribing')
+    return streamLoading.value ? t('chat.message.replying') : t('chat.message.inputPlaceholder')
   })
   // 附件上传完成前不能发送，否则消息中的附件没有地址
   const attachmentsReady = computed(() => fileList.value.every((attachment) => attachment.status === 'success'))
@@ -156,11 +157,11 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   // URL 上传：服务端读取远程文件，校验后按类型保留地址或转为本地上传。
   const urlUploadTypes = computed(() =>
     [
-      { enabled: uploadSetting.value.document, value: 'document_list' as const, label: '文档' },
-      { enabled: uploadSetting.value.image, value: 'image_list' as const, label: '图片' },
-      { enabled: uploadSetting.value.audio, value: 'audio_list' as const, label: '音频' },
-      { enabled: uploadSetting.value.video, value: 'video_list' as const, label: '视频' },
-      { enabled: uploadSetting.value.other, value: 'other_list' as const, label: '其他' },
+      { enabled: uploadSetting.value.document, value: 'document_list' as const, label: t('upload.types.document') },
+      { enabled: uploadSetting.value.image, value: 'image_list' as const, label: t('upload.types.image') },
+      { enabled: uploadSetting.value.audio, value: 'audio_list' as const, label: t('upload.types.audio') },
+      { enabled: uploadSetting.value.video, value: 'video_list' as const, label: t('upload.types.video') },
+      { enabled: uploadSetting.value.other, value: 'other_list' as const, label: t('common.labels.other') },
     ].filter((type) => type.enabled),
   )
   const addUrls = async (addresses: string[], attachmentType: MessageAttachmentKey): Promise<boolean> => {
@@ -173,7 +174,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
     )
       return false
     if (fileList.value.length + addresses.length > maxFiles.value) {
-      MsgWarning(`单次最多上传 ${maxFiles.value} 个文件`)
+      MsgWarning(t('chat.upload.countLimitMessage', { count: maxFiles.value }, maxFiles.value))
       return false
     }
     const validAddresses = addresses.filter((address) => {
@@ -183,7 +184,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
         return false
       }
     })
-    if (validAddresses.length !== addresses.length) MsgWarning('请输入有效的 HTTP 或 HTTPS URL 地址')
+    if (validAddresses.length !== addresses.length) MsgWarning(t('chat.urlUpload.invalidAddressMessage'))
     if (!validAddresses.length) return false
     const extensions =
       attachmentType === 'image_list'
@@ -216,11 +217,11 @@ export function createMessageInputStore(deps: MessageInputDeps) {
           try {
             const response = await deps.getUrlFile(attachment.url!)
             if (!fileList.value.includes(attachment)) return false
-            if (response.status_code !== 200) throw new Error('URL 地址无效')
+            if (response.status_code !== 200) throw new Error(t('chat.urlUpload.invalidResponseMessage'))
             const mime = (response['Content-Type'] || '').split(';')[0]!.trim().toLowerCase()
-            if (expectedMimes.length && !expectedMimes.includes(mime)) throw new Error('文件类型与所选类型不匹配')
+            if (expectedMimes.length && !expectedMimes.includes(mime)) throw new Error(t('chat.urlUpload.typeMismatchMessage'))
             const size = Number(response['Content-Length']) || 0
-            if (size > maxSizeMB.value * 1024 * 1024) throw new Error(`每个文件不能超过 ${maxSizeMB.value}MB`)
+            if (size > maxSizeMB.value * 1024 * 1024) throw new Error(t('chat.upload.sizeLimitMessage', { size: maxSizeMB.value }))
             if (!attachment.name.includes('.')) {
               const extension =
                 extensions.find((extension) => URL_FILE_MIME_TYPES[extension.toLowerCase()] === mime) ??
@@ -230,8 +231,8 @@ export function createMessageInputStore(deps: MessageInputDeps) {
             attachment.size = size
             if (attachmentType === 'document_list' || attachmentType === 'audio_list' || attachmentType === 'other_list') {
               const file = createUrlFile(response.content, attachment.name, mime)
-              if (file.size > maxSizeMB.value * 1024 * 1024) throw new Error(`每个文件不能超过 ${maxSizeMB.value}MB`)
-              if (!file.size) throw new Error('不能上传空文件')
+              if (file.size > maxSizeMB.value * 1024 * 1024) throw new Error(t('chat.upload.sizeLimitMessage', { size: maxSizeMB.value }))
+              if (!file.size) throw new Error(t('upload.emptyFileMessage'))
               attachment.raw = file
               attachment.size = file.size
               attachment.url = undefined
@@ -246,7 +247,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
             const index = fileList.value.indexOf(attachment)
             if (index >= 0) {
               removeFile(index)
-              MsgWarning(`${attachment.url || attachment.name}：${error instanceof Error ? error.message : '读取 URL 文件失败'}`)
+              MsgWarning(`${attachment.url || attachment.name}：${error instanceof Error ? error.message : t('chat.urlUpload.readFailedMessage')}`)
             }
             return false
           }
@@ -261,10 +262,10 @@ export function createMessageInputStore(deps: MessageInputDeps) {
   // 附件上传与本地预览
   /** 校验单个文件，返回不通过的提示；拖拽、粘贴不受 accept 限制，需校验扩展名。 */
   const getFileError = (file: File) => {
-    if (fileList.value.length >= maxFiles.value) return `单次最多上传 ${maxFiles.value} 个文件`
-    if (!allowedExtensions.value.includes(getFileExtension(file.name))) return '不支持上传该类型的文件'
-    if (file.size <= 0) return '不能上传空文件'
-    if (file.size > maxSizeMB.value * 1024 * 1024) return `每个文件不能超过 ${maxSizeMB.value}MB`
+    if (fileList.value.length >= maxFiles.value) return t('chat.upload.countLimitMessage', { count: maxFiles.value }, maxFiles.value)
+    if (!allowedExtensions.value.includes(getFileExtension(file.name))) return t('chat.upload.unsupportedTypeMessage')
+    if (file.size <= 0) return t('upload.emptyFileMessage')
+    if (file.size > maxSizeMB.value * 1024 * 1024) return t('chat.upload.sizeLimitMessage', { size: maxSizeMB.value })
   }
 
   /** 添加并上传文件，校验不通过时返回提示。 */
@@ -316,7 +317,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
         const index = fileList.value.indexOf(attachment)
         if (index < 0) return
         removeFile(index)
-        MsgError('上传失败')
+        MsgError(t('upload.status.uploadFailed'))
       })
   }
 
@@ -358,7 +359,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       const createTime = new Date().toISOString()
       conversations.value.unshift({
         id: chatId,
-        abstract: questionText ? abstract : '新对话',
+        abstract: questionText ? abstract : t('chat.defaultConversationTitle'),
         create_time: createTime,
         update_time: createTime,
       })
@@ -432,7 +433,7 @@ export function createMessageInputStore(deps: MessageInputDeps) {
       .then((result) => {
         if (resetSignal !== composerResetSignal.value) return
         const text = typeof result === 'string' ? result.trim() : ''
-        if (!text) return MsgError('未识别到语音内容')
+        if (!text) return MsgError(t('chat.voice.emptyTranscriptMessage'))
         question.value = question.value ? `${question.value} ${text}` : text
         transcribing.value = false
         if (appInfo.value?.stt_autosend) void send()

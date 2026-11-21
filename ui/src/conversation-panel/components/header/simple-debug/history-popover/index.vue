@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Conversation } from '../../../../core/types'
 import type { ScrollbarDirection } from 'element-plus'
 import { useConversationListStore } from '../../../../left-sidebar/conversation-list/index'
@@ -9,6 +10,7 @@ import { relativeTimeFormat } from '@/utils/time'
 
 defineOptions({ name: 'HistoryPopover' })
 
+const { t } = useI18n({ useScope: 'global' })
 const conversationList = useConversationListStore()
 const visible = ref(false)
 const clearing = ref(false)
@@ -31,7 +33,7 @@ function handleSelectConversation(conversation: Conversation) {
 }
 
 function handleDeleteConversation(conversation: Conversation) {
-  MsgConfirm('是否删除该对话？', '删除后无法恢复。')
+  MsgConfirm(t('chat.delete.title', { name: conversation.abstract || t('chat.defaultConversationTitle') }), t('chat.delete.description'))
     .then(() => conversationList.deleteChat(conversation.id))
     .catch(() => {})
 }
@@ -42,7 +44,7 @@ function handleDeleteConversation(conversation: Conversation) {
  */
 function handleClearConversations() {
   if (clearing.value) return
-  MsgConfirm('是否清空全部历史对话？', '清空后无法恢复。', { confirmButtonText: '清空' })
+  MsgConfirm(t('chat.history.clearTitle'), t('chat.history.clearDescription'), { confirmButtonText: t('common.actions.clear') })
     .then(async () => {
       clearing.value = true
       while (conversationList.hasMore.value) await conversationList.loadMore()
@@ -60,7 +62,7 @@ function handleClearConversations() {
   <el-popover v-model:visible="visible" trigger="click" placement="bottom-end" :width="280" popper-class="p-2!" @show="handleShow">
     <template #reference>
       <span class="inline-flex">
-        <MkTooltip content="历史对话">
+        <MkTooltip :content="t('chat.history.label')">
           <!-- 打开历史对话 -->
           <el-button text>
             <MkIcon name="icon_history_outlined" :size="18" />
@@ -69,8 +71,8 @@ function handleClearConversations() {
       </span>
     </template>
     <div class="flex-between pl-2">
-      <h6 class="text-N600">历史对话</h6>
-      <MkTooltip content="清空">
+      <h6 class="text-N600">{{ t('chat.history.label') }}</h6>
+      <MkTooltip :content="t('common.actions.clear')">
         <!-- 批量清空历史对话 -->
         <el-button text :loading="clearing" :disabled="!conversationList.conversations.value.length" @click="handleClearConversations">
           <MkIcon name="icon_delete-trash_outlined" />
@@ -78,7 +80,7 @@ function handleClearConversations() {
       </MkTooltip>
     </div>
     <el-scrollbar max-height="360px" class="mt-1" @end-reached="handleEndReached">
-      <div v-if="!conversationList.conversations.value.length" class="py-4 text-center text-N600">暂无历史记录</div>
+      <div v-if="!conversationList.conversations.value.length" class="py-4 text-center text-N600">{{ t('chat.history.empty') }}</div>
       <div v-else class="space-y-1">
         <!-- 切换历史对话 -->
         <MkListItem
@@ -88,8 +90,8 @@ function handleClearConversations() {
           @click="handleSelectConversation(conversation)"
         >
           <template #default="{ active }">
-            <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || '新对话'">
-              {{ conversation.abstract || '新对话' }}
+            <span class="min-w-0 flex-1 truncate" :title="conversation.abstract || t('chat.defaultConversationTitle')">
+              {{ conversation.abstract || t('chat.defaultConversationTitle') }}
             </span>
             <!-- 选中、悬停或聚焦列表行时隐藏时间，显示内置更多操作。 -->
             <span
@@ -109,7 +111,7 @@ function handleClearConversations() {
                   <!-- 删除历史对话 -->
                   <MkDropdownItem @click="handleDeleteConversation(conversation)">
                     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                    <span>删除</span>
+                    <span>{{ t('common.actions.delete') }}</span>
                   </MkDropdownItem>
                 </MkDropdownMenu>
               </template>
