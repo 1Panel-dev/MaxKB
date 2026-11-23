@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import type { QrCodeProvider, QrLoginPlatform, QrLoginPlatformPayload } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import ChatUserAuthScanApi from '@/api/admin/system/chat-management/chat-user-auth-scan.ts'
+import { CHAT_API_BASE_PATH } from '@/api/constants'
 import dingtalkLogo from '@/assets/logo/logo_dingtalk.svg'
 import enterpriseWechatLogo from '@/assets/logo/logo_enterprise-wechat.svg'
 import larkLogo from '@/assets/logo/logo_lark.svg'
@@ -34,7 +35,10 @@ function createQrLoginPlatforms(settings: QrLoginPlatform[]): QrLoginPlatformVie
     return {
       key,
       logo,
-      config: Object.fromEntries(configKeys.map((configKey) => [configKey, setting?.config[configKey] ?? ''])),
+      config: {
+        ...Object.fromEntries(configKeys.map((configKey) => [configKey, setting?.config[configKey] ?? ''])),
+        callback_url: setting?.config.callback_url || `${window.location.origin}${CHAT_API_BASE_PATH}/auth/${key}`,
+      },
       isActive: setting?.is_active ?? false,
       isValid: setting?.is_valid ?? false,
     }
