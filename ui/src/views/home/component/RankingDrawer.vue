@@ -356,8 +356,11 @@ function changeDayHandle(val: number | string) {
   if (val !== 'other') {
     daterange.value.start_time = beforeDay(val)
     daterange.value.end_time = nowDate
-    getDetail()
+  } else if (!daterange.value.start_time || !daterange.value.end_time) {
+    // 自定义且尚未选择有效区间时不请求
+    return
   }
+  getDetail()
 }
 
 function changeDayRangeHandle(val: string) {
@@ -460,11 +463,14 @@ watch(drawerVisible, (bool) => {
   }
 })
 
-const open = (name: string, historyDay: number | string, daterangeVal: string, daterange: any) => {
+const open = (name: string, historyDay: number | string, daterangeVal: any, range: any) => {
   activeName.value = name
   history_day.value = historyDay
   daterangeValue.value = daterangeVal
-  daterange.value = daterange
+  daterange.value = {
+    start_time: range?.start_time || '',
+    end_time: range?.end_time || '',
+  }
   changeDayHandle(history_day.value)
   drawerVisible.value = true
 }
