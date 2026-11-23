@@ -50,7 +50,7 @@ const resourceGroups = computed<HomeResourceCard[]>(() => [
     total: knowledge.value?.total,
     details: [
       [t('knowledge.document.title'), knowledge.value?.document_count],
-      [t('common.status.failure'), knowledge.value?.failure_count],
+      [t('knowledge.image.title'), knowledge.value?.image_count],
     ],
   },
   {

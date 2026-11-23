@@ -7,7 +7,7 @@ export interface HomeApplicationAggregation {
 export interface HomeKnowledgeAggregation {
   total: number
   document_count: number
-  failure_count: number
+  image_count: number
 }
 export interface HomeToolAggregation {
   total: number
