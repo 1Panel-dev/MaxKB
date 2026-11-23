@@ -23,12 +23,16 @@ const defaultModelTypeLabels = computed<Record<string, string>>(() => ({
   LLM: t('model.ai.label'),
 }))
 
-const props = defineProps<{
-  modelValue?: DefaultModelSettingPayload
-  modelApi: typeof ModelApi | typeof SystemModelApi | typeof SharedModelApi
-  getGraphData: () => LogicFlow.GraphData | undefined
-  disabled?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    modelValue?: DefaultModelSettingPayload
+    modelApi: typeof ModelApi | typeof SystemModelApi | typeof SharedModelApi
+    getGraphData: () => LogicFlow.GraphData | undefined
+    disabled?: boolean
+    canEdit?: boolean
+  }>(),
+  { canEdit: true },
+)
 const emit = defineEmits<{
   save: [settings: DefaultModelSettingPayload]
   applyToAll: [graphData: LogicFlow.GraphData]
@@ -99,7 +103,7 @@ function handleModelChange(modelType: DefaultModelType) {
 }
 
 function handleSave() {
-  if (props.disabled || !hasChanges.value) return
+  if (props.disabled || !props.canEdit || !hasChanges.value) return
   emit('save', cloneDeep(modelSettings.value))
 }
 
@@ -193,6 +197,16 @@ function handleBeforeClose(
     done()
     return
   }
+  // 无编辑权限：只保留「直接关闭」，不提供保存，任何关闭方式都直接丢弃改动。
+  if (!props.canEdit) {
+    return MsgConfirm(t('common.dialogs.notice'), t('workflow.defaultModel.unsavedMessage'), {
+      confirmButtonText: t('workflow.defaultModel.closeDirectly'),
+      showCancelButton: false,
+      confirmButtonType: 'primary',
+    })
+      .then(() => done())
+      .catch(() => done())
+  }
   return MsgConfirm(t('common.dialogs.notice'), t('workflow.defaultModel.unsavedMessage'), {
     confirmButtonText: t('common.actions.save'),
     cancelButtonText: t('workflow.defaultModel.closeDirectly'),
@@ -201,6 +215,7 @@ function handleBeforeClose(
   })
     .then(() => {
       handleSave()
+      done()
     })
     .catch((action) => {
       if (action === 'cancel') done()
@@ -254,10 +269,10 @@ defineExpose({ open })
 
     <template #footer>
       <div class="flex-between gap-3">
-        <el-button plain :disabled="disabled" :loading="applying" @click="handleApplyToAll">{{ t('workflow.defaultModel.applyToAll') }}</el-button>
+        <el-button plain v-if="canEdit" :disabled="disabled" :loading="applying" @click="handleApplyToAll">{{ t('workflow.defaultModel.applyToAll') }}</el-button>
         <div class="flex-align-center">
           <el-button plain :disabled="applying" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-          <el-button type="primary" :disabled="disabled || !hasChanges || applying" @click="handleSave">{{ t('common.actions.save') }}</el-button>
+          <el-button v-if="canEdit" type="primary" :disabled="disabled || !hasChanges || applying" @click="handleSave">{{ t('common.actions.save') }}</el-button>
         </div>
       </div>
     </template>

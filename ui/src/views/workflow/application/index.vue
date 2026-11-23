@@ -392,6 +392,7 @@ onBeforeUnmount(() => stopAutoSave())
         @open="closeDebug"
         @save="handleSaveDefaultModelSetting"
         @apply-to-all="handleApplyDefaultModelToAll"
+        :can-edit="applicationWorkflowPermission('edit')"
       />
 
       <!-- 调试 -->
@@ -404,6 +405,7 @@ onBeforeUnmount(() => stopAutoSave())
         :validate-workflow="validateWorkflow"
         :save-workflow="saveApplication"
         :application="applicationDetail"
+        v-if="applicationWorkflowPermission('edit')"
       />
 
       <!-- 保存 -->

@@ -472,6 +472,7 @@ onBeforeUnmount(stopAutoSave)
         @open="closeDebug"
         @save="handleSaveDefaultModelSetting"
         @apply-to-all="handleApplyDefaultModelToAll"
+        :can-edit="knowledgeWorkflowPermission('workflowEdit')"
       />
 
       <!-- 调试知识库工作流 -->
@@ -486,6 +487,7 @@ onBeforeUnmount(stopAutoSave)
         :validate-workflow="validateWorkflow"
         :save-workflow="saveKnowledgeWorkflow"
         :get-graph-data="getGraphData"
+        v-if="knowledgeWorkflowPermission('workflowEdit')"
       />
 
       <!-- 保存 -->

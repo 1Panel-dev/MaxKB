@@ -11,10 +11,19 @@ import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import { loadCachedBaseModelOptions, loadCachedOrBuiltinBaseModelOptions } from '@/views/model/base-model-options'
 import { MODEL_TYPE_LABELS } from '@/constants/model'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'EditModelDrawer' })
 
 const { t } = useI18n({ useScope: 'global' })
+
+const canEdit = computed(() => {
+  if (!currentModelId.value) return false
+  if (isSystemResource()) return perm.model.system.modify()
+  if (isSystemSharedResource()) return perm.model.share.modify()
+  return perm.model.workspace.modify(currentModelId.value)
+})
 
 const props = defineProps<{ api: typeof ModelApi | typeof SystemSharedModelApi | typeof SystemResourceModelApi }>()
 
@@ -311,7 +320,7 @@ defineExpose({ open })
 
     <template #footer>
       <el-button plain :disabled="loading" @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
-      <el-button type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.save') }}</el-button>
+      <el-button v-if="canEdit" type="primary" :loading="loading" @click="handleSubmit">{{ t('common.actions.save') }}</el-button>
     </template>
   </MkDrawer>
 </template>
