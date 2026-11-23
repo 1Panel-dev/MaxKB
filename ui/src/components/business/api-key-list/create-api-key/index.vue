@@ -51,9 +51,11 @@ function handleCreate() {
     <el-input :model-value="createdApiKey" readonly>
       <template #suffix>
         <!-- 复制新建的完整 API Key -->
-        <el-button text @click="copyText(createdApiKey, t('common.messages.copied'))" class="-mr-1">
-          <MkIcon name="icon_copy_outlined" />
-        </el-button>
+        <MkTooltip :content="t('common.actions.copy')" placement="top">
+          <el-button text @click="copyText(createdApiKey, t('common.messages.copied'))" class="-mr-1">
+            <MkIcon name="icon_copy_outlined" />
+          </el-button>
+        </MkTooltip>
       </template>
     </el-input>
     <template #footer>

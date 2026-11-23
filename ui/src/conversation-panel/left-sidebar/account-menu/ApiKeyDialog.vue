@@ -71,9 +71,11 @@ defineExpose({ open })
     <el-input :model-value="`******${apiKey.slice(-4)}`" readonly class="mb-4">
       <template #suffix>
         <!-- 复制 API URL -->
-        <el-button text @click="copyText(apiKey, t('common.messages.copied'))">
-          <MkIcon name="icon_copy_outlined" />
-        </el-button>
+        <MkTooltip :content="t('common.actions.copy')" placement="top">
+          <el-button text @click="copyText(apiKey, t('common.messages.copied'))">
+            <MkIcon name="icon_copy_outlined" />
+          </el-button>
+        </MkTooltip>
         <MkTooltip :content="t('common.actions.regenerate')" placement="top">
           <!-- 重新生成 API Key -->
           <el-button text class="-mr-1" :loading="loading" @click="loadApiKey(true)">
