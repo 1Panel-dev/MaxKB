@@ -43,18 +43,29 @@ watch(
 </script>
 
 <template>
-  <div class="mt-6 flex-center">
+  <div class="relative z-10 mt-6 mb-3 flex-center">
     <img src="@/assets/logo/logo_dingtalk.svg" alt="" width="24px" class="mr-2" />
     <h2>{{ t('auth.qrCode.title', { provider: t('auth.methods.dingtalk') }) }}</h2>
   </div>
   <div class="ding-talk-layout">
     <div id="dingtalk-qr-code" />
   </div>
+  <p class="relative mt-3 text-center text-N600">
+    {{ t('auth.qrCode.scanHint', { provider: t('auth.methods.dingtalk') }) }}
+  </p>
 </template>
 <style lang="scss" scoped>
 .ding-talk-layout {
-  margin: auto;
+  // 当前 SDK 的二维码外框距 iframe 顶部约 40px，缩放后扣除该留白，外框距标题约 12px。
+  // 扣除 iframe 底部约 40px 的留白，让下方提示与二维码外框保持约 12px 间距。
+  height: calc((280px - 40px) * 7 / 6);
+  margin: -48px auto 0;
   width: 280px;
-  height: 280px;
+
+  :deep(iframe) {
+    display: block;
+    transform: scale(calc(7 / 6));
+    transform-origin: top center;
+  }
 }
 </style>
