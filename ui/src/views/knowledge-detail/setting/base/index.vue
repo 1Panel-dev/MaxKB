@@ -213,21 +213,24 @@ defineProps<ResourceDetailPageProps>()
           />
         </el-form-item>
       </template>
+
       <h6 class="mb-4">{{ t('knowledge.baseSettings.otherSettings') }}</h6>
-      <el-form-item :label="t('knowledge.baseSettings.fileCountLimit.label')">
-        <MkSlider v-model="settingForm.file_count_limit" show-input :min="1" :max="1000" />
-      </el-form-item>
-      <el-form-item>
-        <template #label>
-          <div class="flex-align-center gap-1">
-            <span>{{ t('knowledge.baseSettings.fileSizeLimit.label') }} (MB)</span>
-            <MkTooltip :content="t('knowledge.baseSettings.fileSizeLimit.description')" placement="right">
-              <MkIcon name="icon_info_outlined" class="text-N600!" />
-            </MkTooltip>
-          </div>
-        </template>
-        <MkSlider v-model="settingForm.file_size_limit" show-input :min="1" :max="1000" />
-      </el-form-item>
+      <template v-if="knowledge.type === KNOWLEDGE_TYPE.BASE">
+        <el-form-item :label="t('knowledge.baseSettings.fileCountLimit.label')">
+          <MkSlider v-model="settingForm.file_count_limit" show-input :min="1" :max="1000" />
+        </el-form-item>
+        <el-form-item>
+          <template #label>
+            <div class="flex-align-center gap-1">
+              <span>{{ t('knowledge.baseSettings.fileSizeLimit.label') }} (MB)</span>
+              <MkTooltip :content="t('knowledge.baseSettings.fileSizeLimit.description')" placement="right">
+                <MkIcon name="icon_info_outlined" class="text-N600!" />
+              </MkTooltip>
+            </div>
+          </template>
+          <MkSlider v-model="settingForm.file_size_limit" show-input :min="1" :max="1000" />
+        </el-form-item>
+      </template>
       <el-form-item prop="authentication">
         <template #label>
           <div>
