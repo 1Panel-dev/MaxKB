@@ -1,7 +1,7 @@
 {
   "termbase": {
     "title": "自定義分詞",
-    "description": "避免專業術語被拆分，提升全文檢索的精准度與召回率",
+    "description": "避免專業術語被拆分，提升全文檢索的精準度與召回率",
     "content": {
       "label": "詞語",
       "placeholder": "請輸入詞語",

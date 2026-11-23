@@ -47,7 +47,7 @@
     "parameters": {
       "label": "提取參數",
       "requiredMessage": "請添加提取參數",
-      "invalidMessage": "參數可由字母、數字、下划線組成"
+      "invalidMessage": "參數可由字母、數字、下劃線組成"
     },
     "type": {
       "label": "參數類型",

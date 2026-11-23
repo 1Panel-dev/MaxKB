@@ -27,7 +27,7 @@
     "variables": {
       "label": "循環變量",
       "reservedMessage": "此參數為循環引擎內置，不可使用",
-      "invalidMessage": "參數只能包含英文字母、數字、下划線"
+      "invalidMessage": "參數只能包含英文字母、數字、下劃線"
     }
   },
   "loopBody": {

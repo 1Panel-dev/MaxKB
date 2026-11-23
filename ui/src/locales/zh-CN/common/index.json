@@ -225,6 +225,7 @@
     "select": "请选择",
     "selectField": "请选择 {label}",
     "search": "搜索",
+    "searchBy": "按{label}搜索",
     "searchByName": "按名称搜索"
   },
   "validation": {

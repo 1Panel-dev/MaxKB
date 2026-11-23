@@ -72,7 +72,7 @@ function handleChange() {
       clearable
       :loading="remoteLoading"
       :multiple="activeField.multiple"
-      :placeholder="t('common.placeholders.select')"
+      :placeholder="t('common.placeholders.searchBy', { label: activeField?.label ?? '' })"
       filterable
       collapse-tags
       collapse-tags-tooltip
@@ -99,7 +99,7 @@ function handleChange() {
       v-model="searchValue"
       class="mk-input-group__content w-50!"
       clearable
-      :placeholder="t('common.placeholders.input')"
+      :placeholder="t('common.placeholders.searchBy', { label: activeField?.label ?? '' })"
       @change="handleChange"
     />
   </div>

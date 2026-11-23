@@ -1,7 +1,7 @@
 {
   "labels": {
     "duration": "Duration",
-    "creator": "Created by",
+    "creator": "Creator",
     "operation": "Actions",
     "createdOn": "created on",
     "createTime": "Create time",
@@ -225,6 +225,7 @@
     "select": "Please select",
     "selectField": "Select {label}",
     "search": "Search",
+    "searchBy": "Search by {label}",
     "searchByName": "Search by name"
   },
   "validation": {

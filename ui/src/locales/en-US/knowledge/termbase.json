@@ -1,6 +1,6 @@
 {
   "termbase": {
-    "title": "Custom term",
+    "title": "Terminology",
     "description": "Keep specialized terms intact to improve full-text search precision and recall.",
     "content": {
       "label": "Term",
