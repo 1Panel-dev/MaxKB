@@ -9,12 +9,12 @@
     "sourceUrl": {
       "label": "Document URL",
       "placeholder": "Enter one document URL per line. Documents with invalid URLs cannot be imported.",
-      "requiredMessage": "Enter a document URL"
+      "requiredMessage": "Document URL is required"
     },
     "targetDocument": {
       "label": "Target document",
       "placeholder": "Select the target document",
-      "requiredMessage": "Select the target document"
+      "requiredMessage": "Target document is required"
     },
     "labels": {
       "characters": "Characters",
@@ -80,7 +80,7 @@
       "continue": "Import more",
       "goToDocuments": "Go to documents",
       "allDocuments": "All documents",
-      "selectionRequiredMessage": "Select at least one document.",
+      "selectionRequiredMessage": "At least one document is required",
       "larkFormatsHint": "Supported document and spreadsheet formats: {formats}.",
       "delimiterHint": "Use consistent segment delimiters before importing documents."
     },

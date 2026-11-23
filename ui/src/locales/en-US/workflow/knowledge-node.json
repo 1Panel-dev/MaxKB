@@ -36,7 +36,7 @@
     "content": {
       "label": "Content to rerank",
       "placeholder": "Select content to rerank",
-      "requiredMessage": "Select content to rerank"
+      "requiredMessage": "Content to rerank is required"
     },
     "score": {
       "label": "Score higher than",
@@ -53,7 +53,7 @@
     "strategy": {
       "label": "Segmentation strategy",
       "placeholder": "Select a segmentation strategy",
-      "requiredMessage": "Select a segmentation strategy"
+      "requiredMessage": "Segmentation strategy is required"
     },
     "childChunkLength": {
       "label": "Sub-chunk length",
@@ -71,7 +71,7 @@
     "format": {
       "label": "File formats",
       "placeholder": "Select file formats",
-      "requiredMessage": "Select file formats"
+      "requiredMessage": "File format selection is required"
     },
     "fileCount": {
       "label": "Maximum files per upload",

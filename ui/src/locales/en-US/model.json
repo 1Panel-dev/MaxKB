@@ -12,7 +12,7 @@
   "ai": {
     "label": "AI model",
     "placeholder": "Select an AI model",
-    "requiredMessage": "Select an AI model"
+    "requiredMessage": "AI model is required"
   },
   "provider": {
     "label": "Provider",
@@ -30,18 +30,18 @@
     "name": {
       "label": "Model name",
       "placeholder": "Give the base model a name",
-      "requiredMessage": "Enter a model name",
+      "requiredMessage": "Model name is required",
       "description": "Custom model name in MaxKB"
     },
     "type": {
       "label": "Model type",
       "placeholder": "Select a model type",
-      "requiredMessage": "Select a model type"
+      "requiredMessage": "Model type is required"
     },
     "baseModel": {
       "label": "Base model",
       "placeholder": "Click “Fetch models” to load the list, or enter a model name and press Enter",
-      "requiredMessage": "Select a base model, or enter a custom base model and press Enter",
+      "requiredMessage": "Base model is required",
       "description": "For a model not listed, enter its name and press Enter to add it"
     }
   },

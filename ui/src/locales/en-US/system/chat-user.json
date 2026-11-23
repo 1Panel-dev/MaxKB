@@ -1,6 +1,6 @@
 {
   "title": "Chat users",
-  "requiredMessage": "Select a chat user",
+  "requiredMessage": "Chat user is required",
   "source": {
     "local": "Created locally"
   },
@@ -20,11 +20,11 @@
     },
     "period": {
       "label": "Period",
-      "requiredMessage": "Enter a period"
+      "requiredMessage": "Period is required"
     },
     "tokenLimit": {
       "label": "Token limit (K)",
-      "requiredMessage": "Enter a token limit"
+      "requiredMessage": "Token limit is required"
     }
   }
 }

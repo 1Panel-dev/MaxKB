@@ -18,7 +18,7 @@
     "add": "Add extension",
     "duplicateMessage": "File extension already exists"
   },
-  "requiredMessage": "Upload a file",
+  "requiredMessage": "File is required",
   "reselectFileMessage": "Select the file to upload again",
   "emptyFileMessage": "Cannot upload an empty file.",
   "emptyContentMessage": "The file cannot be empty",

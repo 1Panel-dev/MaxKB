@@ -33,9 +33,9 @@ const formData = computed(() => model.properties.node_data as DataSourceLocalFor
 const rules = computed<FormRules<DataSourceLocalForm>>(() => ({
   file_type_list: [{ type: 'array', required: true, message: t('workflow.localFile.format.requiredMessage'), trigger: 'change' }],
   file_count_limit: [
+    { required: true, message: t('common.validation.inputRequired'), trigger: 'change' },
     {
       type: 'integer',
-      required: true,
       min: 1,
       max: 1000,
       message: t('workflow.localFile.fileCount.rangeMessage', { min: 1, max: 1000 }),
@@ -43,9 +43,9 @@ const rules = computed<FormRules<DataSourceLocalForm>>(() => ({
     },
   ],
   file_size_limit: [
+    { required: true, message: t('common.validation.inputRequired'), trigger: 'change' },
     {
       type: 'integer',
-      required: true,
       min: 1,
       max: 1000,
       message: t('workflow.localFile.fileSize.rangeMessage', { min: 1, max: 1000 }),

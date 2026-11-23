@@ -261,7 +261,7 @@ function submit() {
                       v-else
                       prop="long_term_trigger_setting.cron_expression"
                       :rules="[
-                        { required: true, whitespace: true, message: t('common.schedule.cron.invalidMessage'), trigger: ['blur', 'change'] },
+                        { required: true, whitespace: true, message: t('common.schedule.cron.requiredMessage'), trigger: ['blur', 'change'] },
                         { validator: validateCron, trigger: ['blur', 'change'] },
                       ]"
                       class="mb-0!"

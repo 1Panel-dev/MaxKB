@@ -11,7 +11,7 @@
     "description": "Aggregate each group of variables using the configured strategy",
     "strategy": {
       "label": "Aggregation strategy",
-      "requiredMessage": "Select an aggregation strategy",
+      "requiredMessage": "Aggregation strategy is required",
       "firstNonNull": "Return the first non-null value in each group",
       "firstNonNullDescription": "Return the first non-null value from each group of variables",
       "array": "Return each group's variables as an array (Array)",
@@ -23,7 +23,7 @@
     },
     "key": {
       "placeholder": "Enter a key name",
-      "requiredMessage": "Enter a key name"
+      "requiredMessage": "Key name is required"
     }
   },
   "variableSplitting": {
@@ -31,13 +31,13 @@
     "description": "Parse and split JSON variables using JSON Path expressions",
     "variables": {
       "label": "Split variables",
-      "requiredMessage": "Add a split variable"
+      "requiredMessage": "At least one split variable is required"
     },
     "expression": {
       "label": "Expression",
       "placeholder": "Enter an expression",
       "description": "Use a JSON Path expression to split variables, for example: {example}",
-      "requiredMessage": "Enter an expression",
+      "requiredMessage": "Expression is required",
       "viewDetails": "View details"
     }
   },
@@ -46,13 +46,13 @@
     "description": "Extract structured parameters using an AI model",
     "parameters": {
       "label": "Parameters to extract",
-      "requiredMessage": "Add a parameter to extract",
+      "requiredMessage": "At least one extraction parameter is required",
       "invalidMessage": "Parameters may contain letters, numbers, and underscores"
     },
     "type": {
       "label": "Type",
       "placeholder": "Select a parameter type",
-      "requiredMessage": "Select a parameter type"
+      "requiredMessage": "Parameter type is required"
     }
   }
 }

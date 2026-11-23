@@ -6,7 +6,7 @@
     "name": {
       "label": "Trigger name",
       "placeholder": "Enter a trigger name",
-      "requiredMessage": "Enter a trigger name"
+      "requiredMessage": "Trigger name is required"
     }
   },
   "scheduled": {
@@ -15,7 +15,7 @@
     "period": {
       "label": "Trigger schedule",
       "placeholder": "Select a trigger schedule",
-      "requiredMessage": "Select a trigger schedule"
+      "requiredMessage": "Trigger schedule is required"
     }
   },
   "event": {
@@ -25,7 +25,7 @@
       "label": "Event URL"
     },
     "token": {
-      "requiredMessage": "Generate a Bearer Token"
+      "requiredMessage": "Bearer Token is required"
     }
   },
   "requestParameters": {
@@ -35,19 +35,19 @@
     "name": {
       "label": "Parameter name",
       "placeholder": "Enter a parameter name",
-      "requiredMessage": "Enter a parameter name",
+      "requiredMessage": "Parameter name is required",
       "duplicateMessage": "Parameter name already exists"
     },
     "dataType": {
       "placeholder": "Select a data type",
-      "requiredMessage": "Select a parameter type"
+      "requiredMessage": "Parameter type is required"
     }
   },
   "taskExecution": {
     "label": "Task execution",
     "task": "Triggered task",
     "triggerInput": "Trigger input",
-    "requiredMessage": "Select at least one task to run",
+    "requiredMessage": "At least one task is required",
     "invalidReferenceMessage": "Select a valid event request parameter or switch to Custom",
     "triggerFailed": "Trigger failed"
   },

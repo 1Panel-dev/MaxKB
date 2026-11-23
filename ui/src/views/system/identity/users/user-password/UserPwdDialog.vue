@@ -26,9 +26,9 @@ const userPasswordForm = reactive<UpdatePasswordForm>({ password: '', re_passwor
 
 function validateConfirmPassword(_rule: unknown, value: string, callback: (error?: Error) => void) {
   if (!value) {
-    callback(new Error(t('user.confirmPassword.requiredMessage')))
+    callback(new Error(t('auth.changePassword.confirmPassword.requiredMessage')))
   } else if (value !== userPasswordForm.password) {
-    callback(new Error(t('user.confirmPassword.mismatchMessage')))
+    callback(new Error(t('auth.changePassword.confirmPassword.mismatchMessage')))
   } else {
     callback()
   }
@@ -36,7 +36,7 @@ function validateConfirmPassword(_rule: unknown, value: string, callback: (error
 
 const userPasswordRules = computed<FormRules<UpdatePasswordForm>>(() => ({
   password: [
-    { required: true, message: t('user.password.requiredMessage'), trigger: 'blur' },
+    { required: true, message: t('auth.changePassword.newPassword.requiredMessage'), trigger: 'blur' },
     { min: 6, max: 20, message: t('common.validation.lengthRange', { min: 6, max: 20 }), trigger: 'blur' },
   ],
   re_password: [
@@ -99,22 +99,22 @@ defineExpose({ open })
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item :label="t('user.password.label')" prop="password">
+      <el-form-item :label="t('auth.changePassword.newPassword.label')" prop="password">
         <el-input
           v-model="userPasswordForm.password"
           autocomplete="new-password"
           maxlength="20"
-          :placeholder="t('user.password.placeholder')"
+          :placeholder="t('auth.changePassword.newPassword.placeholder')"
           show-password
           type="password"
         />
       </el-form-item>
-      <el-form-item :label="t('user.confirmPassword.label')" prop="re_password">
+      <el-form-item :label="t('auth.changePassword.confirmPassword.label')" prop="re_password">
         <el-input
           v-model="userPasswordForm.re_password"
           autocomplete="new-password"
           maxlength="20"
-          :placeholder="t('user.confirmPassword.placeholder')"
+          :placeholder="t('auth.changePassword.confirmPassword.placeholder')"
           show-password
           type="password"
         />

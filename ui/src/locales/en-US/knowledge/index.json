@@ -56,25 +56,25 @@
   "fields": {
     "name": {
       "placeholder": "Enter a name for this knowledge",
-      "requiredMessage": "Enter a name for this knowledge"
+      "requiredMessage": "Knowledge name is required"
     },
     "description": {
       "placeholder": "Enter a description for this knowledge",
-      "requiredMessage": "Enter a description for this knowledge"
+      "requiredMessage": "Knowledge description is required"
     },
     "embeddingModel": {
       "placeholder": "Select an embedding model",
-      "requiredMessage": "Select an embedding model"
+      "requiredMessage": "Embedding model is required"
     },
     "targetKnowledge": {
       "label": "Target knowledge",
       "placeholder": "Select the target knowledge",
-      "requiredMessage": "Select the target knowledge"
+      "requiredMessage": "Target knowledge is required"
     },
     "webRootUrl": {
       "label": "Website root URL",
       "placeholder": "Enter the website root URL",
-      "requiredMessage": "Enter the website root URL"
+      "requiredMessage": "Website root URL is required"
     },
     "selector": {
       "label": "CSS selector",
@@ -108,7 +108,7 @@
     "prompt": {
       "label": "Prompt",
       "description": "The system replaces {data} in the prompt with the segment text and sends it to the AI model.\nAsk the model to wrap each generated question in {questionTags} so the system can relate it to the segment.\nYou can adjust the prompt or choose another model to improve the results.",
-      "requiredMessage": "Enter a prompt",
+      "requiredMessage": "Prompt is required",
       "defaultValue": "Content: {data}\n\nSummarize the content above and use the summary to generate 5 questions.\nOutput requirements:\n- Output only the questions.\n- Wrap each question in {questionTags}."
     }
   },

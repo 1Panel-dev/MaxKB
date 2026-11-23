@@ -10,10 +10,10 @@
   "fields": {
     "name": {
       "placeholder": "Enter a tool name",
-      "requiredMessage": "Enter a tool name"
+      "requiredMessage": "Tool name is required"
     },
     "code": {
-      "requiredMessage": "Enter the Python code for this tool"
+      "requiredMessage": "Python code is required"
     }
   },
   "skill": {
@@ -23,12 +23,12 @@
     "copyTitle": "Copy skill",
     "name": {
       "placeholder": "Enter a skill name",
-      "requiredMessage": "Enter a skill name"
+      "requiredMessage": "Skill name is required"
     },
     "file": {
       "label": "Skill file",
       "description": "Upload a ZIP file smaller than {size} MB.",
-      "requiredMessage": "Upload a skill ZIP file",
+      "requiredMessage": "Skill ZIP file is required",
       "sizeLimitMessage": "The file must be smaller than {size} MB."
     }
   },
@@ -39,7 +39,7 @@
     "copyTitle": "Copy workflow",
     "name": {
       "placeholder": "Enter a workflow name",
-      "requiredMessage": "Enter a workflow name"
+      "requiredMessage": "Workflow name is required"
     }
   },
   "mcp": {
@@ -52,18 +52,18 @@
     "customService": "Custom MCP server",
     "name": {
       "placeholder": "Enter an MCP tool name",
-      "requiredMessage": "Enter an MCP tool name"
+      "requiredMessage": "MCP tool name is required"
     },
     "config": {
       "description": "Only SSE and Streamable HTTP are supported",
-      "requiredMessage": "Enter the MCP server configuration",
+      "requiredMessage": "MCP server configuration is required",
       "invalidMessage": "Enter the MCP server configuration as a valid JSON object.",
       "invalidJsonMessage": "The MCP server configuration must be valid JSON."
     },
     "tools": {
       "label": "MCP tools",
       "placeholder": "Select MCP tools",
-      "requiredMessage": "Select MCP tools"
+      "requiredMessage": "At least one MCP tool is required"
     }
   },
   "dataSource": {
@@ -72,10 +72,10 @@
     "copyTitle": "Copy data source",
     "name": {
       "placeholder": "Enter a data source name",
-      "requiredMessage": "Enter a data source name"
+      "requiredMessage": "Data source name is required"
     },
     "code": {
-      "requiredMessage": "Enter the Python code for this data source"
+      "requiredMessage": "Python code is required"
     }
   },
   "store": {
@@ -99,7 +99,7 @@
     "name": {
       "label": "Parameter name",
       "placeholder": "Enter a parameter name",
-      "requiredMessage": "Enter a parameter name"
+      "requiredMessage": "Parameter name is required"
     },
     "description": {
       "label": "Parameter description",

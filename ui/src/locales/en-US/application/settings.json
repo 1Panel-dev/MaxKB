@@ -18,7 +18,7 @@
       "askAI": "Continue asking AI",
       "designatedAnswer": "Specified answer",
       "defaultValue": "Hello, I'm the XXX assistant. My knowledge only covers the XXX product. Please rephrase your question.",
-      "requiredMessage": "Enter an answer"
+      "requiredMessage": "Answer is required"
     },
     "problemOptimization": {
       "label": "Question optimization",
@@ -39,11 +39,11 @@
     "description": "When enabled, new conversations are recorded from that point onward and periodically summarized into memory. Use the {memory} variable in the system prompt to access it. Disabling this clears chat users' long-term memory. Re-enabling it starts collecting conversations again from that point.",
     "model": {
       "placeholder": "Select a long-term memory model",
-      "requiredMessage": "Select a long-term memory model"
+      "requiredMessage": "Long-term memory model is required"
     },
     "trigger": {
       "label": "Trigger method",
-      "requiredMessage": "Select a trigger method",
+      "requiredMessage": "Trigger method is required",
       "rounds": "Round-based trigger",
       "roundsDescription": "After N rounds, automatically summarize those N conversation rounds to generate memory.",
       "scheduled": "Scheduled trigger",
@@ -56,7 +56,7 @@
     "period": {
       "label": "Trigger schedule",
       "placeholder": "Select a trigger schedule",
-      "requiredMessage": "Select a trigger schedule"
+      "requiredMessage": "Trigger schedule is required"
     }
   },
   "fileUpload": {
@@ -67,7 +67,7 @@
       "label": "Upload method",
       "local": "Local upload",
       "url": "URL upload",
-      "requiredMessage": "Select at least one upload method"
+      "requiredMessage": "At least one upload method is required"
     },
     "maxFiles": "Maximum files per upload",
     "fileSize": "Maximum size per file",
@@ -78,7 +78,7 @@
     "autoSend": "Auto-send",
     "model": {
       "placeholder": "Select a speech-to-text model",
-      "requiredMessage": "Select a speech-to-text model"
+      "requiredMessage": "Speech-to-text model is required"
     }
   },
   "speechPlayback": {
@@ -87,7 +87,7 @@
     "browser": "Browser playback (free)",
     "model": {
       "placeholder": "Select a text-to-speech model",
-      "requiredMessage": "Select a text-to-speech model"
+      "requiredMessage": "Text-to-speech model is required"
     }
   }
 }

@@ -10,6 +10,7 @@
   },
   "loginSettings": "平台登录设置",
   "website": "网站",
+  "login": "登录",
   "websiteLogoHint": "顶部网站显示 Logo，建议尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超过 {size}MB",
   "loginLogoHint": "登录页面左侧 Logo，建议尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超过 {size} MB",
   "loginBackground": "登录背景图",

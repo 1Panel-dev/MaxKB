@@ -10,6 +10,7 @@
   },
   "loginSettings": "平台登錄設置",
   "website": "網站",
+  "login": "登錄",
   "websiteLogoHint": "頂部網站顯示 Logo，建議尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超過 {size}MB",
   "loginLogoHint": "登錄頁面左側 Logo，建議尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超過 {size} MB",
   "loginBackground": "登錄背景圖",

@@ -26,13 +26,13 @@
       "label": "Parameter",
       "placeholder": "Enter a parameter",
       "selectPlaceholder": "Select a parameter",
-      "requiredMessage": "Enter a parameter",
-      "selectRequiredMessage": "Select a parameter"
+      "requiredMessage": "Parameter is required",
+      "selectRequiredMessage": "Parameter is required"
     },
     "displayName": {
       "label": "Name",
       "placeholder": "Enter a name",
-      "requiredMessage": "Enter a name"
+      "requiredMessage": "Display name is required"
     },
     "tooltip": {
       "label": "Parameter description",
@@ -45,31 +45,31 @@
     "inputType": {
       "label": "Type",
       "placeholder": "Select a type",
-      "requiredMessage": "Select a type"
+      "requiredMessage": "Type is required"
     },
     "defaultValue": {
       "label": "Default",
       "placeholder": "Enter a default",
-      "requiredMessage": "Enter a default",
-      "selectRequiredMessage": "Select a default",
+      "requiredMessage": "Default value is required",
+      "selectRequiredMessage": "Default value is required",
       "datePlaceholder": "Select a date"
     },
     "optionLabel": {
       "label": "Label",
       "placeholder": "Enter a label",
-      "requiredMessage": "Enter a label",
+      "requiredMessage": "Label is required",
       "treePlaceholder": "Enter an option label"
     },
     "optionValue": {
       "label": "Option value",
       "placeholder": "Enter an option value",
-      "requiredMessage": "Enter an option value"
+      "requiredMessage": "Option value is required"
     },
     "minLength": {
-      "requiredMessage": "Enter the minimum length"
+      "requiredMessage": "Minimum length is required"
     },
     "maxLength": {
-      "requiredMessage": "Enter the maximum length"
+      "requiredMessage": "Maximum length is required"
     },
     "min": {
       "requiredMessage": "Minimum value is required"
@@ -79,7 +79,7 @@
     },
     "step": {
       "label": "Step",
-      "requiredMessage": "Enter a step value",
+      "requiredMessage": "Step value is required",
       "invalidMessage": "Step cannot be zero"
     },
     "dateType": {
@@ -91,38 +91,38 @@
       "placeholder": "Select a format"
     },
     "reference": {
-      "selectRequiredMessage": "Select a variable reference",
+      "selectRequiredMessage": "Variable reference is required",
       "invalidMessage": "Invalid variable reference format",
       "notFoundMessage": "Variable reference not found"
     },
     "model": {
-      "requiredMessage": "Select a model"
+      "requiredMessage": "Model is required"
     },
     "knowledge": {
-      "requiredMessage": "Select knowledge",
+      "requiredMessage": "Knowledge is required",
       "placeholder": "Select knowledge"
     },
     "availableKnowledge": {
-      "requiredMessage": "Select available knowledge",
+      "requiredMessage": "Available knowledge is required",
       "label": "Available knowledge",
       "placeholder": "Select available knowledge"
     },
     "variable": {
-      "requiredMessage": "Select a variable",
+      "requiredMessage": "Variable is required",
       "placeholder": "Select a variable"
     },
     "comparisonValue": {
       "placeholder": "Enter a comparison value",
       "selectPlaceholder": "Select a comparison value",
-      "requiredMessage": "Enter a comparison value",
-      "selectRequiredMessage": "Select a comparison value"
+      "requiredMessage": "Comparison value is required",
+      "selectRequiredMessage": "Comparison value is required"
     },
     "fileTypes": {
-      "requiredMessage": "File types are required",
+      "requiredMessage": "File type selection is required",
       "label": "File types"
     },
     "options": {
-      "requiredMessage": "Add an option",
+      "requiredMessage": "At least one option is required",
       "label": "Options"
     },
     "defaultKnowledge": {
@@ -164,9 +164,9 @@
     "allDocuments": "All documents"
   },
   "messages": {
-    "completeOption": "Enter at least one complete entry",
+    "completeOption": "At least one complete entry is required",
     "parentNotFound": "Parent node not found",
-    "emptyOption": "Label and option value cannot be empty"
+    "emptyOption": "A complete label and option value pair is required"
   },
   "tree": {
     "addRoot": "Add root option",

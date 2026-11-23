@@ -10,6 +10,7 @@
   },
   "loginSettings": "Platform login settings",
   "website": "Website",
+  "login": "Login",
   "websiteLogoHint": "Logo shown in the browser tab. Recommended size: {dimensions}. Supports JPG, PNG, GIF, up to {size}MB",
   "loginLogoHint": "Logo on the left of the login page. Recommended size: {dimensions}. Supports JPG, PNG, GIF, up to {size} MB",
   "loginBackground": "Login background",
@@ -17,12 +18,12 @@
   "name": {
     "label": "Website name",
     "placeholder": "Enter a website name",
-    "requiredMessage": "Enter a website name"
+    "requiredMessage": "Website name is required"
   },
   "slogan": {
     "label": "Welcome message",
     "placeholder": "Enter a website welcome message",
-    "requiredMessage": "Enter a website welcome message"
+    "requiredMessage": "Website welcome message is required"
   },
   "loginPreviewHint": "The preview shows the default MaxKB login page and supports customization",
   "platformSettings": "Platform settings",

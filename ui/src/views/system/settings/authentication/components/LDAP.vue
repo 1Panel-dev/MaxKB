@@ -78,7 +78,7 @@ onMounted(() => loadSetting())
         type="password"
         autocomplete="new-password"
         show-password
-        :placeholder="t('auth.fields.password.placeholder')"
+        :placeholder="t('auth.ldap.password.placeholder')"
       />
     </el-form-item>
     <el-form-item :label="t('auth.ldap.userOu.label')" prop="config.ou">

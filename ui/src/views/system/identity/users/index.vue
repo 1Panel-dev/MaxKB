@@ -176,7 +176,7 @@ onMounted(() => loadSystemUsers())
         <el-table-column type="selection" width="40" />
         <el-table-column prop="nick_name" :label="t('user.name.label')" min-width="150" show-overflow-tooltip />
         <el-table-column prop="username" :label="t('user.username.label')" min-width="150" show-overflow-tooltip />
-        <el-table-column width="140" :label="t('common.status.activeLabel')">
+        <el-table-column width="140">
           <template #header>
             <MkTableFilter
               mode="single"

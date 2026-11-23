@@ -42,8 +42,8 @@ const rules = computed<FormRules<typeof form>>(() => ({
   ],
   'authentication_value.default_value': [{ required: true, message: t('auth.loginSettings.defaultMethod.requiredMessage'), trigger: 'change' }],
   'authentication_value.max_attempts': [
+    { required: true, message: t('common.validation.inputRequired'), trigger: 'change' },
     {
-      required: true,
       type: 'integer',
       min: -1,
       max: 10,
@@ -52,8 +52,8 @@ const rules = computed<FormRules<typeof form>>(() => ({
     },
   ],
   'authentication_value.failed_attempts': [
+    { required: true, message: t('common.validation.inputRequired'), trigger: 'change' },
     {
-      required: true,
       type: 'integer',
       min: 1,
       max: 100,
@@ -62,8 +62,8 @@ const rules = computed<FormRules<typeof form>>(() => ({
     },
   ],
   'authentication_value.lock_time': [
+    { required: true, message: t('common.validation.inputRequired'), trigger: 'change' },
     {
-      required: true,
       type: 'integer',
       min: 1,
       max: 1440,

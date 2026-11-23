@@ -65,12 +65,12 @@
     },
     "visionModel": {
       "placeholder": "Select a vision model",
-      "requiredMessage": "Select a vision model"
+      "requiredMessage": "Vision model is required"
     },
     "enhancementTool": {
       "label": "Enhancement tool",
       "placeholder": "Select an enhancement tool",
-      "requiredMessage": "Select an enhancement tool"
+      "requiredMessage": "Enhancement tool is required"
     },
     "indexEnhancement": "Index enhancement",
     "titleAsQuestion": {

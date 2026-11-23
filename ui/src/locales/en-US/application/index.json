@@ -19,7 +19,7 @@
   "fields": {
     "name": {
       "placeholder": "Enter an agent name",
-      "requiredMessage": "Enter an agent name"
+      "requiredMessage": "Agent name is required"
     },
     "description": {
       "placeholder": "Describe the agent's use cases and purpose, e.g. an XXX assistant that answers questions about using the XXX product"

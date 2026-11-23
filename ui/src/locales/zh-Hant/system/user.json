@@ -28,18 +28,9 @@
     "invalidMessage": "請輸入正確的手機號"
   },
   "password": {
-    "label": "新密碼",
-    "placeholder": "請輸入新密碼",
-    "requiredMessage": "請輸入新密碼",
     "defaultLabel": "默認密碼",
     "changeTitle": "修改用戶密碼",
     "changeSuccess": "密碼修改成功"
-  },
-  "confirmPassword": {
-    "label": "確認密碼",
-    "placeholder": "請再次輸入新密碼",
-    "requiredMessage": "請輸入確認密碼",
-    "mismatchMessage": "輸入的密碼不一致"
   },
   "role": {
     "label": "角色",

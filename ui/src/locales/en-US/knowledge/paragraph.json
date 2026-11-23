@@ -3,7 +3,7 @@
     "detailTitle": "Segment details",
     "relatedQuestions": {
       "label": "Related questions",
-      "requiredMessage": "Enter a related question",
+      "requiredMessage": "Related question is required",
       "lengthMessage": "Questions must not exceed {max} characters"
     },
     "actions": {

@@ -20,15 +20,15 @@
     "label": "Variable",
     "placeholder": "Enter a variable",
     "selectPlaceholder": "Select a variable",
-    "requiredMessage": "Enter a variable",
-    "selectRequiredMessage": "Select a variable",
+    "requiredMessage": "Variable is required",
+    "selectRequiredMessage": "Variable is required",
     "duplicateMessage": "Variable already exists",
     "invalidMessage": "Variables may contain letters, numbers, and underscores",
     "add": "Add variable",
     "edit": "Edit variable",
     "input": {
       "label": "Input variable",
-      "requiredMessage": "Select an input variable"
+      "requiredMessage": "Input variable is required"
     }
   },
   "globalVariables": {
@@ -39,27 +39,27 @@
   },
   "referenceVariable": {
     "placeholder": "Select a variable reference",
-    "requiredMessage": "Select a variable reference",
+    "requiredMessage": "Variable reference is required",
     "invalidMessage": "Invalid variable reference",
     "missingMessage": "The referenced variable does not exist"
   },
   "inputContent": {
     "label": "Input content",
     "placeholder": "Select input content",
-    "requiredMessage": "Select input content"
+    "requiredMessage": "Input content is required"
   },
   "document": {
     "label": "Document",
     "list": "Document list",
     "placeholder": "Select a document",
-    "requiredMessage": "Select a document",
+    "requiredMessage": "Document is required",
     "paragraphPreviewHint": "Only the first {count} segments of each document are shown",
     "characterPreviewHint": "Preview is limited to {count} characters per document"
   },
   "searchQuestion": {
     "label": "Search question",
     "placeholder": "Select a search question",
-    "requiredMessage": "Select a search question"
+    "requiredMessage": "Search question is required"
   },
   "searchScope": {
     "label": "Retrieval scope",

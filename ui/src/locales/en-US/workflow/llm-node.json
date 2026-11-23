@@ -5,7 +5,7 @@
       "label": "Context",
       "description": "When enabled, the selected variable is included as context for this call. When disabled, the model replies using only the current input.",
       "placeholder": "Select a context variable",
-      "requiredMessage": "Select a context variable"
+      "requiredMessage": "Context variable is required"
     },
     "tools": {
       "label": "Tool definitions",
@@ -17,28 +17,28 @@
     "toolName": {
       "label": "Tool name",
       "placeholder": "Enter a tool name",
-      "requiredMessage": "Enter a tool name",
+      "requiredMessage": "Tool name is required",
       "duplicateMessage": "Tool name already exists",
       "missingMessage": "No tool name found"
     },
     "toolDescription": {
       "label": "Tool description",
       "placeholder": "Enter a tool description",
-      "requiredMessage": "Enter a tool description"
+      "requiredMessage": "Tool description is required"
     },
     "toolParameters": {
       "label": "Tool parameters",
       "addTitle": "Add tool parameter",
       "editTitle": "Edit tool parameter",
       "empty": "No parameters",
-      "nameRequiredMessage": "Enter a parameter name",
+      "nameRequiredMessage": "Parameter name is required",
       "nameLengthMessage": "Parameter names cannot exceed {max} characters",
       "typeMessage": "The data type of parameter {name} is not supported",
       "descriptionMessage": "The description of parameter {name} must be text with no more than {max} characters"
     },
     "dataType": {
       "placeholder": "Select a data type",
-      "requiredMessage": "Select a data type"
+      "requiredMessage": "Data type is required"
     },
     "jsonParse": {
       "label": "JSON parsing",

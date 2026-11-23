@@ -3,12 +3,12 @@
   "account": {
     "label": "SMTP account",
     "placeholder": "Enter the SMTP account",
-    "requiredMessage": "Enter the SMTP account"
+    "requiredMessage": "SMTP account is required"
   },
   "senderEmail": {
     "label": "Sender email",
     "placeholder": "Enter the sender email address",
-    "requiredMessage": "Enter the sender email address"
+    "requiredMessage": "Sender email address is required"
   },
   "password": {
     "placeholder": "Enter the sender password"

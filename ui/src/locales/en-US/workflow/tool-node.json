@@ -7,10 +7,10 @@
     "description": "Run tools on MCP servers over SSE or Streamable HTTP",
     "serverConfig": {
       "label": "MCP server config",
-      "requiredMessage": "Configure the MCP server first"
+      "requiredMessage": "MCP server configuration is required"
     },
     "reference": {
-      "requiredMessage": "Select the referenced MCP tool first"
+      "requiredMessage": "Referenced MCP tool is required"
     },
     "tools": {
       "loadSuccess": "Tools retrieved successfully",

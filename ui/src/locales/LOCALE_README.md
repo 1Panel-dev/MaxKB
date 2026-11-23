@@ -135,7 +135,7 @@
 新增或调整拼接时检查完整英文的大小写、词形和语序；需要完整译文时直接建立 key，不用 `.toLowerCase()` 等运行时转换处理翻译文案。用户明确保留的既有 `Logo`、`TOP5` 等写法不批量调整。
 
 - 通用输入／选择占位使用 `Please enter`、`Please select`，不加省略号；有具体对象时使用 `Enter a model name`、`Select a model` 等完整短语，不统一加 Please。
-- 通用必填提示使用 `This field is required`；具体字段优先写明对象，placeholder 与校验仍保留独立 key。
+- 英文必填提示统一使用 `XXX is required`，具体字段写明对象，动态字段使用 `{label} is required`，通用提示使用 `This field is required`。placeholder 与必填校验保留独立 key；必填、范围和格式校验分别维护提示。
 - “知识库”使用 `knowledge`，不加 base／bases；“分段”使用 `segment`／`segments`，代码 key 和文件名仍可沿用 `paragraph`；“子块”使用 `sub-chunk`。
 - 自定义分词使用 `term`，标题为 `Custom term`，创建入口为 `Create term`。
 - “关联”使用 `relate` 词族：`Relate`、`Unrelate`、`Related`、`Unrelated`；结果为 `Related successfully`／`Unrelated successfully`。网页链接仍使用 `link`。
@@ -250,7 +250,11 @@ App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、z
 
 ### 认证与密码
 
-忘记密码页面的标题、提交按钮及已登录后的修改密码入口统一复用 `auth.changePassword.title`，英文为 `Change password`；“忘记密码”入口保留 `auth.forgotPassword.label`。登录 SDK 的前端加载失败提示归 `auth.login.sdkLoadFailed`，脚本地址通过 `{source}` 原样传入。
+登录及认证配置中的密码归 `auth.fields.password`；登录密码占位使用 `auth.fields.password.placeholder`，LDAP 密码占位使用 `auth.ldap.password.placeholder`。
+修改及找回密码统一归 `auth.changePassword`：`title` 用于页面、弹窗、入口和提交按钮，英文为 `Change password`；`forgotPassword` 是“忘记密码”入口，英文为 `Forgot password`。
+新密码与确认密码字段集中在 `auth.changePassword.newPassword`、`auth.changePassword.confirmPassword`，标签、占位及必填提示分别维护；确认密码不一致提示也复用同组。新密码占位不写死长度，找回密码的 6–30 位长度提示只用于对应规则，其他场景按原范围复用 `common.validation.lengthRange`。
+返回登录、获取／重新发送验证码及找回密码结果提示归同组的 `actions`、`messages`；默认密码、修改用户密码标题及管理操作成功提示继续归 `user.password`。
+登录 SDK 的前端加载失败提示归 `auth.login.sdkLoadFailed`，脚本地址通过 `{source}` 原样传入。
 
 ### 资源与授权
 
@@ -443,22 +447,22 @@ MCP 的 JSON 配置校验区分“语法有效”与“必须为对象”，不�
 
 系统业务的文件与命名空间见前文。业务标题继续使用各域的 `title`，系统分组使用 `system.menu`，不为系统资源管理复制模型、知识库、工具或智能体的语言包。
 
-| 内容                       | 归属与约束                                                                                                       |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| 系统共用成员入口与移除标题 | `system.member`，保留“成员”与账号“用户”的区别                                                                    |
-| 用户密码与确认密码         | `user.password`、`user.confirmPassword`；长度范围复用 `common.validation.lengthRange`                            |
-| 用户／用户组分配方式       | `user.assignment`，追加／替换仍提交原布尔协议值                                                                  |
-| 用户及对话用户导入         | 共用 `user.import`，对话用户专属来源说明归 `chatUser.import`；冲突名称保持原文                                   |
-| 对话用户配额               | `chatUser.quota`；数值与 `/` 不翻译，周期复用 `common.schedule`，保留原换算规则                                  |
-| 系统用户组与对话用户组     | 共用 `userGroup`；明确显示“对话用户组”时使用 `system.menu.chatUserGroup`                                         |
-| 角色类型与继承             | `role.types`、`role.inheritedRole`，实际角色名称保留接口原值                                                     |
-| 认证协议和平台名称         | `auth.methods`；本地创建来源仍使用对应用户业务的 `source.local`                                                  |
-| 系统／对话用户认证页面标题 | `system.menu.userAuthentication`／`system.menu.chatUserAuthentication`                                           |
-| 认证字段与配置             | `auth.fields`、`auth.loginSettings`、各协议分组；LDAP 名称统一为 `LDAP`                                          |
-| 邮箱设置                   | `email`；固定 SMTP 英文字段名不翻译，密码复用 `auth.fields.password`                                             |
-| 门户设置                   | `portal.json` 的 `name`、`access`、`cors`；默认名称在初始化时读取，已保存名称不翻译，新建对话复用 `chat.newChat` |
-| 外观设置                   | `appearance`，预览菜单复用 `layout`、`auth`、`role`；默认 slogan 归 `layout.slogan`                              |
-| 操作日志                   | `operateLog`；状态、工作空间和操作复用公共文案，接口翻译数据按语言重新加载                                       |
+| 内容                       | 归属与约束                                                                                                              |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 系统共用成员入口与移除标题 | `system.member`，保留“成员”与账号“用户”的区别                                                                           |
+| 用户密码与确认密码         | 字段及不一致提示复用 `auth.changePassword.newPassword`／`confirmPassword`；长度范围复用 `common.validation.lengthRange` |
+| 用户／用户组分配方式       | `user.assignment`，追加／替换仍提交原布尔协议值                                                                         |
+| 用户及对话用户导入         | 共用 `user.import`，对话用户专属来源说明归 `chatUser.import`；冲突名称保持原文                                          |
+| 对话用户配额               | `chatUser.quota`；数值与 `/` 不翻译，周期复用 `common.schedule`，保留原换算规则                                         |
+| 系统用户组与对话用户组     | 共用 `userGroup`；明确显示“对话用户组”时使用 `system.menu.chatUserGroup`                                                |
+| 角色类型与继承             | `role.types`、`role.inheritedRole`，实际角色名称保留接口原值                                                            |
+| 认证协议和平台名称         | `auth.methods`；本地创建来源仍使用对应用户业务的 `source.local`                                                         |
+| 系统／对话用户认证页面标题 | `system.menu.userAuthentication`／`system.menu.chatUserAuthentication`                                                  |
+| 认证字段与配置             | `auth.fields`、`auth.loginSettings`、各协议分组；LDAP 名称统一为 `LDAP`                                                 |
+| 邮箱设置                   | `email`；固定 SMTP 英文字段名不翻译，密码复用 `auth.fields.password`                                                    |
+| 门户设置                   | `portal.json` 的 `name`、`access`、`cors`；默认名称在初始化时读取，已保存名称不翻译，新建对话复用 `chat.newChat`        |
+| 外观设置                   | `appearance`，预览菜单复用 `layout`、`auth`、`role`；默认 slogan 归 `layout.slogan`                                     |
+| 操作日志                   | `operateLog`；状态、工作空间和操作复用公共文案，接口翻译数据按语言重新加载                                              |
 
 成员移除的影响和统计归各自业务的 `delete`，工作空间的成员人数与关系记录数分别保留；不把用户组、角色、空间关系的“移除”改成“删除”。
 用户名、角色、用户组、工作空间及授权对象名称保留接口原文；未知登录来源按原值显示。语言切换不重新请求这些选项或清空未保存授权。

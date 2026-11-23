@@ -196,7 +196,7 @@ onMounted(() => {
           </template>
           <template #default="{ row }">{{ row.template_id ? t('tool.store.title') : t('common.options.custom') }}</template>
         </el-table-column>
-        <el-table-column :label="t('common.status.label')" width="100">
+        <el-table-column width="100">
           <template #header>
             <MkTableFilter
               mode="single"

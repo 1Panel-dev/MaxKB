@@ -9,7 +9,7 @@
   "expiration": {
     "label": "Expiration time",
     "placeholder": "Select an expiration time",
-    "requiredMessage": "Select an expiration time",
+    "requiredMessage": "Expiration time is required",
     "futureMessage": "Select an expiration time later than the current time",
     "never": "Never expires",
     "expired": "Expired",

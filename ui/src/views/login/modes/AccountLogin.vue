@@ -164,7 +164,7 @@ onMounted(() => {
               :readonly="preview"
             />
           </el-form-item>
-          <img :src="identifyCode" :alt="t('auth.fields.captcha.label')" class="w-35 h-10 cursor-pointer border" @click="refreshCaptcha" />
+          <img :src="identifyCode" class="w-35 h-10 cursor-pointer border" @click="refreshCaptcha" />
         </div>
         <el-form-item>
           <!-- 提交账号登录 -->
@@ -173,7 +173,7 @@ onMounted(() => {
       </el-form>
       <!-- 忘记密码 -->
       <el-button v-if="loginService.forgotPassword" size="default" class="mt-3" link type="primary" @click="loginService.forgotPassword()">
-        {{ t('auth.forgotPassword.label') }}?
+        {{ t('auth.changePassword.forgotPassword') }}?
       </el-button>
     </div>
     <div v-if="accountLoginMethods.length" class="third-login flex-col-center gap-4">
