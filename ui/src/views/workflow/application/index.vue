@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import type { ApplicationDetail, ApplicationStoreTemplate, DefaultModelSettingPayload, WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
+import type { ApiInputField } from '@/workflow-canvas/nodes/base-node/types'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
 import SystemResourceApplicationApi from '@/api/admin/system/resource-management/application/application'
@@ -12,9 +13,10 @@ import SystemResourceModelApi from '@/api/admin/system/resource-management/model
 import WorkspaceApplicationApi from '@/api/admin/workspace/application/application'
 import WorkspaceWorkflowApi from '@/api/admin/workspace/application/workflow'
 import WorkspaceModelApi from '@/api/admin/workspace/model'
+import { CHAT_API_BASE_PATH } from '@/api/constants'
 import { defaultApplicationNodes } from '@/workflow-canvas/config/node-mapping'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
-import { WorkflowMode } from '@/workflow-canvas/types'
+import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonDefaultModelSetting from '../components/default-model-setting/ButtonDefaultModelSetting.vue'
 import EditPublishVersionDialog from '../components/publish-history/EditPublishVersionDialog.vue'
@@ -154,6 +156,31 @@ function validateWorkflow() {
 
 function closeDebug() {
   debugButtonRef.value?.close()
+}
+
+/* 去对话：访问地址与接口传参默认值。 */
+const apiQuery = computed(() => {
+  const query = applicationDetail.value?.work_flow?.nodes
+    ?.find((n) => n.id === WorkflowNodeType.Base)
+    ?.properties?.api_input_field_list?.map((field: ApiInputField) => {
+      return `${field.variable}=${field.default_value}`
+    })
+    .join('&')
+  if (query) {
+    return '?' + query
+  }
+  return ''
+})
+
+const chatBasePath = CHAT_API_BASE_PATH.replace(/\/api$/, '')
+
+function toChat() {
+  if (!applicationDetail.value) return
+  return requestApi.getAccessToken(applicationId).then((ok) => {
+    if (!ok.access_token) return
+    const accessUrl = `${window.location.origin}${chatBasePath}/${ok.access_token}/${apiQuery.value}`
+    window.open(accessUrl, '_blank')
+  })
 }
 
 /* 发布历史：预览保留原草稿，恢复后交由页面保存流程持久化。 */
@@ -398,7 +425,7 @@ onBeforeUnmount(() => stopAutoSave())
         <template #dropdown>
           <MkDropdownMenu>
             <!-- 去对话 -->
-            <MkDropdownItem>
+            <MkDropdownItem @click="toChat">
               <template #icon><MkIcon name="icon_new-chat_outlined" /></template>
               <span>{{ t('application.actions.chat') }}</span>
             </MkDropdownItem>
