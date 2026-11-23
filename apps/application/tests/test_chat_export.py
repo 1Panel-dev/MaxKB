@@ -1,7 +1,11 @@
 # coding=utf-8
 
+from types import SimpleNamespace
+from unittest.mock import patch
+
 from django.test import SimpleTestCase
 
+import application.serializers.application_chat as application_chat_serializer
 from application.serializers.application_chat import ApplicationChatQuerySerializers
 
 
@@ -117,3 +121,51 @@ class ChatExportToRowTests(SimpleTestCase):
         for details in ({}, None, []):
             result = ApplicationChatQuerySerializers.to_row(self.make_row(details))
             self.assertEqual((result[3], result[8], result[9]), ("", "", ""))
+
+
+class ChatExportStreamingTests(SimpleTestCase):
+    def test_export_streams_saved_workbook_in_bounded_chunks(self):
+        workbook_size = 2 * 1024 * 1024 + 123
+
+        class FakeWorksheet:
+            def append(self, _):
+                pass
+
+        class FakeWorkbook:
+            def create_sheet(self, title):
+                self.title = title
+                return FakeWorksheet()
+
+            def save(self, target):
+                target.write(b"x" * workbook_size)
+
+            def close(self):
+                pass
+
+        with (
+            patch.object(
+                ApplicationChatQuerySerializers,
+                "get_query_set",
+                return_value=SimpleNamespace(),
+            ),
+            patch.object(
+                application_chat_serializer,
+                "native_stream_search",
+                return_value=iter([]),
+            ) as stream_search,
+            patch.object(
+                application_chat_serializer.openpyxl,
+                "Workbook",
+                return_value=FakeWorkbook(),
+            ),
+        ):
+            response = ApplicationChatQuerySerializers(data={"select_ids": []}).export(
+                {"select_ids": []},
+                with_valid=False,
+            )
+            chunks = list(response.streaming_content)
+
+        self.assertEqual(stream_search.call_args.kwargs["chunk_size"], 500)
+        self.assertGreater(len(chunks), 1)
+        self.assertLessEqual(max(map(len, chunks)), 1024 * 1024)
+        self.assertEqual(b"".join(chunks), b"x" * workbook_size)

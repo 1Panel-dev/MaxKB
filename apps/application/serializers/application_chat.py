@@ -10,7 +10,7 @@
 import datetime
 import os
 import re
-from io import BytesIO
+from tempfile import TemporaryFile
 from typing import Dict
 
 import openpyxl
@@ -25,11 +25,13 @@ from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
 
 from application.models import Chat, Application, ChatRecord, ChatSourceChoices
-from common.db.search import get_dynamics_model, native_search, native_page_search, native_page_handler
+from common.db.search import get_dynamics_model, native_search, native_page_search, native_stream_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from maxkb.conf import PROJECT_DIR
 from maxkb.settings import TIME_ZONE, edition
+
+EXPORT_CHUNK_SIZE = 1024 * 1024
 
 
 class ApplicationChatResponseSerializers(serializers.Serializer):
@@ -225,10 +227,9 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
             content = message.get("content")
             if not isinstance(content, str) or not content:
                 continue
-            # if message.get("type") == "REASONING":
-            #     thinking_parts.append(content)
-            # el
-            if message.get("type") == "TEXT":
+            if message.get("type") == "REASONING":
+                thinking_parts.append(content)
+            elif message.get("type") == "TEXT":
                 answer_parts.append(content)
         return "\n\n".join(thinking_parts), "\n\n".join(answer_parts)
 
@@ -362,59 +363,57 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
         def stream_response():
             workbook = openpyxl.Workbook(write_only=True)
             worksheet = workbook.create_sheet(title="Sheet1")
-            current_page = 1
-            page_size = 500
-            headers = [
-                gettext("Conversation ID"),
-                gettext("summary"),
-                gettext("User Questions"),
-                gettext("Problem after optimization"),
-                gettext("answer"),
-                gettext("User feedback"),
-                gettext("Feedback reason"),
-                gettext("Other reason content"),
-                gettext("Reference segment number"),
-                gettext("Section title + content"),
-                gettext("Annotation"),
-                gettext("User"),
-                gettext("Consuming tokens"),
-                gettext("Ip Address"),
-                gettext("source"),
-                gettext("Time consumed (s)"),
-                gettext("Question Time"),
-            ]
-            worksheet.append(headers)
-            for data_list in native_page_handler(
-                page_size,
-                self.get_query_set(data.get("select_ids")),
-                primary_key="application_chat_record_temp.id",
-                primary_queryset="default_queryset",
-                get_primary_value=lambda item: item.get("id"),
-                select_string=get_file_content(
-                    os.path.join(
-                        PROJECT_DIR,
-                        "apps",
-                        "application",
-                        "sql",
-                        (
-                            "export_application_chat_ee.sql"
-                            if ["PE", "EE"].__contains__(edition)
-                            else "export_application_chat.sql"
-                        ),
-                    )
-                ),
-                with_table_name=False,
-            ):
-                for item in data_list:
-                    row = [self.reset_value(v) for v in self.to_row(item)]
-                    worksheet.append(row)
-                current_page = current_page + 1
-            output = BytesIO()
-            workbook.save(output)
-            output.seek(0)
-            yield output.getvalue()
-            output.close()
-            workbook.close()
+            try:
+                page_size = 500
+                headers = [
+                    gettext("Conversation ID"),
+                    gettext("summary"),
+                    gettext("User Questions"),
+                    gettext("Problem after optimization"),
+                    gettext("answer"),
+                    gettext("User feedback"),
+                    gettext("Feedback reason"),
+                    gettext("Other reason content"),
+                    gettext("Reference segment number"),
+                    gettext("Section title + content"),
+                    gettext("Annotation"),
+                    gettext("User"),
+                    gettext("Consuming tokens"),
+                    gettext("Ip Address"),
+                    gettext("source"),
+                    gettext("Time consumed (s)"),
+                    gettext("Question Time"),
+                ]
+                worksheet.append(headers)
+                for data_list in native_stream_search(
+                    self.get_query_set(data.get("select_ids")),
+                    select_string=get_file_content(
+                        os.path.join(
+                            PROJECT_DIR,
+                            "apps",
+                            "application",
+                            "sql",
+                            (
+                                "export_application_chat_ee.sql"
+                                if ["PE", "EE"].__contains__(edition)
+                                else "export_application_chat.sql"
+                            ),
+                        )
+                    ),
+                    with_table_name=False,
+                    chunk_size=page_size,
+                ):
+                    for item in data_list:
+                        row = [self.reset_value(v) for v in self.to_row(item)]
+                        worksheet.append(row)
+
+                with TemporaryFile() as output:
+                    workbook.save(output)
+                    output.seek(0)
+                    while chunk := output.read(EXPORT_CHUNK_SIZE):
+                        yield chunk
+            finally:
+                workbook.close()
 
         response = StreamingHttpResponse(
             stream_response(), content_type="application/vnd.open.xmlformats-officedocument.spreadsheetml.sheet"
