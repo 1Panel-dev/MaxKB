@@ -44,17 +44,10 @@ Admin 与 Chat 分别维护请求客户端和业务接口。
 - 工具基础信息和工具工作流使用后端不同资源接口：`workspace/tool/tool.ts` 维护工具增删改查，
   `workspace/tool/workflow.ts` 维护工具工作流的加载、保存、发布与调试。
   工具工作流保存请求的 `default_model_setting` 与详情响应统一复用 `DefaultModelSettingPayload`。
-- 每个业务接口函数必须添加简短的 JSDoc，说明接口的业务作用；注释应描述“获取什么”“保存什么”
-  或“对哪个资源执行什么操作”，不重复参数类型、请求方法等代码已经清楚表达的信息。
-- 每个业务接口使用 `const` 声明的箭头函数，不单独具名导出；在文件末尾通过
-  `export default { ... }` 直接默认导出接口对象，不为默认导出声明中间变量。调用方统一按
-  “文件名 PascalCase + `Api`”命名默认导入并通过该对象调用，不创建只做二次转发的聚合入口。
-  该规则适用于 `admin/auth`、`admin/workspace`、`admin/system` 等业务 API；
-  `admin/core/request.ts` 等请求基础设施可按职责提供具名导出。
-  例如从 `login.ts` 使用 `import LoginApi from '@/api/admin/auth/login'`，再调用
-  `LoginApi.postLogin()`；System Workspace API 使用
-  `import WorkspaceApi from '@/api/admin/system/workspace'`；System 登录设置使用
-  `import AuthSettingApi from '@/api/admin/system/settings/auth-setting'`。
+- 接口函数使用简短 JSDoc 描述业务作用，不重复方法和类型信息。
+- 业务接口使用 const 箭头函数，不单独具名导出；文件末尾直接 export default { ... }，不声明中间对象。
+  调用方按“文件名 PascalCase + Api”默认导入并调用，如 LoginApi.postLogin()。
+  不创建仅转发接口的聚合入口；core/request.ts 等基础设施可按职责具名导出。
 
 系统登录设置的 `system_options` 仅用于登录方式选项，默认登录方式从已选 `login_methods` 中选择。
 保存仅提交 `login_methods`、`default_value`、`max_attempts`、`failed_attempts`、`lock_time`、

@@ -183,27 +183,11 @@ Workspace 根据目标路由中的 workspaceId、knowledgeId 判断权限，权�
 仅作内部元信息、不实际渲染的标题保留原中文，不为全屏工作流、资源详情父路由、分段页、登录、Chat 或错误页的此类标题单独增加翻译 key。
 错误页实际显示的文案共用 `common.error.noPermission`／`noService`，404 数字不翻译。Chat 仍不根据路由标题改写浏览器标题，临时 Demo 保留原文案。
 
-工作空间首页、系统首页及两种资源范围的智能体概览路由共用 `overview.title`；外观设置路由使用 `appearance.title`，外观页面通过已有 `MkViewLayout.title` 传入对应译文。操作日志路由与页面共用 `operateLog.title`。
+菜单与页面标题共用所属业务的翻译 key；资源管理、共享资源和授权分类复用原业务域，不另建标题。
+语言包归属统一见 [国际化规则](../locales/LOCALE_README.md)，路由模块只保存 key，不复制完整文案清单。
+两种智能体设置菜单共用 common.labels.settings；对话用户授权与系统对话用户管理使用各自业务标题。
+系统分组菜单使用 system.menu，保留路由路径、名称和权限规则。
 
-模型相关路由的 `meta.title` 使用 `model.title`。工作空间、系统资源管理和系统共享资源的工具列表路由共用 `tool.title`。
-工作空间智能体列表、系统资源管理智能体列表和资源授权中的智能体分类共用 `application.title`；两种范围的对话日志路由共用 `application.chatLog.title`，发布渠道路由共用 `application.access.title`。
-两种范围的简易设置与高级工作流设置菜单共用 `common.labels.settings`；简易设置页面通过详情布局接收已翻译的标题。
-工作空间、系统资源管理和系统共享资源的知识库列表路由，以及工作空间知识库菜单共用 `knowledge.title`。
-知识库四种资源范围的工作流入口菜单共用 `workflow.title`。
-智能体和知识库各资源范围的“对话用户授权”菜单共用 `authorization.chatUserTitle`，与系统中的对话用户管理标题区分；路由路径、名称和权限规则保持原样。
-工作空间触发器菜单与列表共用 `trigger.title`。
-系统用户管理菜单与列表共用 `user.title`。
-系统对话用户管理菜单与列表共用 `chatUser.title`。
-系统对话用户组菜单与列表共用 `system.menu.chatUserGroup`。
-系统对话用户认证菜单与页面共用 `system.menu.chatUserAuthentication`。
-系统用户认证菜单与页面共用 `system.menu.userAuthentication`。
-门户访问设置菜单与页面共用 `portal.title`。
-邮箱设置菜单与页面共用 `email.title`。
-系统角色管理菜单与列表共用 `role.title`。
-系统工作空间管理菜单与列表共用 `workspace.title`。
-系统用户组菜单与列表共用 `userGroup.title`。
-系统资源授权菜单使用 `authorization.resource.title`，其四类资源子菜单与页面分类分别复用 `application.title`、`knowledge.title`、`tool.title` 和 `model.title`。
-系统分组菜单使用 `system.menu`，文案维护在各语言的 `system/index.json`；身份与权限、资源管理、共享资源、对话端管理和系统设置分别使用对应 key。
 Workspace、System 侧栏在 computed 中生成菜单，并传入当前应用的标题翻译函数；仅翻译存在的 key，
 尚未迁移的中文标题原样展示。导航工具不依赖入口国际化单例，权限判断可省略翻译函数。
 这些列表页将已翻译的 title 显式传入布局；共用资源授权页按当前路由解析标题。
