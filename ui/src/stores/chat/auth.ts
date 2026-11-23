@@ -149,6 +149,15 @@ export const useChatAuthStore = defineStore('chat-auth', {
       })
     },
 
+    /** 使用飞书客户端授权码进行免密登录。 */
+    loginWithLarkClient(code: string) {
+      const scope = this.scope
+      return ChatAuthApi.getLarkOauthCallback(code, getAccessToken(scope)).then(({ token }) => {
+        this.setToken(token, scope)
+        return token
+      })
+    },
+
     /** 退出当前场景的登录状态。 */
     logout() {
       return ChatAuthApi.postLogout(this.accessToken).then(() => this.clearToken())

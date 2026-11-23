@@ -44,3 +44,6 @@
 `/auth/` 与 `/v3/auth/` 下的认证请求返回 401 时直接提示错误，不触发自动重新认证。
 
 公开分享与回答反馈的路径、载荷和只读边界统一见主 API 文档的[公开对话分享](../API_README.md#公开对话分享)与[对话回答反馈](../API_README.md#对话回答反馈)，页面交互见 View 文档。
+
+飞书客户端免密登录 `getLarkOauthCallback` 使用 `/auth/lark/oauth2`，传入 `code` 和可选的
+`accessToken`，返回 `ChatLoginResponse`。应用与门户分别保存 token；部署端需提供相应认证接口。

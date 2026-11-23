@@ -9,6 +9,7 @@ import { useAdminLoginService } from './admin-login-service'
 import LoginLayout from './components/LoginLayout.vue'
 import LoginModePanel from './components/LoginModePanel.vue'
 import { getDingTalkClientAuthCode } from './dingtalk-client-login'
+import { getLarkClientAuthCode } from './lark-client-login'
 import { useStore } from '@/stores'
 
 const route = useRoute()
@@ -29,12 +30,21 @@ onBeforeMount(async () => {
       if (Object.keys(config).length > 0) loginConfig.value = config
     }
 
-    const code = await getDingTalkClientAuthCode(route.query, {
-      missingCode: t('auth.dingtalkClient.messages.missingCode'),
-      authorizationFailed: t('auth.dingtalkClient.messages.authorizationFailed'),
-    })
-    if (!code) return
-    await auth.loginWithDingTalkClient(code)
+    if (route.query.client === 'lark') {
+      const code = await getLarkClientAuthCode(route.query, {
+        missingCode: t('auth.larkClient.messages.missingCode'),
+        authorizationFailed: t('auth.larkClient.messages.authorizationFailed'),
+      })
+      if (!code) return
+      await auth.loginWithLarkClient(code)
+    } else {
+      const code = await getDingTalkClientAuthCode(route.query, {
+        missingCode: t('auth.dingtalkClient.messages.missingCode'),
+        authorizationFailed: t('auth.dingtalkClient.messages.authorizationFailed'),
+      })
+      if (!code) return
+      await auth.loginWithDingTalkClient(code)
+    }
     await loginService.onLoginSuccess()
   } catch {
     // 接口错误由请求层提示，保留普通登录入口。
