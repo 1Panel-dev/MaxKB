@@ -27,13 +27,13 @@
   "name": {
     "label": "Name",
     "placeholder": "Enter a name",
-    "requiredMessage": "Enter a name",
+    "requiredMessage": "Name is required",
     "copySuffix": "Copy"
   },
   "title": {
     "label": "Title",
     "placeholder": "Enter a title",
-    "requiredMessage": "Enter a title"
+    "requiredMessage": "Title is required"
   },
   "description": {
     "label": "Description",
@@ -42,12 +42,12 @@
   "content": {
     "label": "Content",
     "placeholder": "Enter content",
-    "requiredMessage": "Enter content",
+    "requiredMessage": "Content is required",
     "lengthMessage": "Content must not exceed {max} characters"
   },
   "status": {
     "label": "Status",
-    "activeLabel": "Enabled status",
+    "activeLabel": "Status",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "pending": "Queued",
@@ -104,6 +104,7 @@
     "cron": {
       "label": "Cron expression",
       "placeholder": "Enter a Cron expression (e.g. 0 0 1 * *)",
+      "requiredMessage": "Cron expression is required",
       "invalidMessage": "Enter a valid Cron expression (minute hour day month weekday)"
     },
     "switchToPreset": "Switch to preset schedule",
@@ -229,9 +230,9 @@
   "validation": {
     "formInvalid": "Please check the form entries",
     "inputRequired": "This field is required",
-    "inputFieldRequired": "Enter {label}",
+    "inputFieldRequired": "{label} is required",
     "selectRequired": "This field is required",
-    "selectFieldRequired": "Select {label}",
+    "selectFieldRequired": "{label} is required",
     "jsonFormat": "Enter valid JSON",
     "lengthRange": "Length must be {min}-{max} characters",
     "jsonArrayRequired": "Enter a JSON array",

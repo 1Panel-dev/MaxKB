@@ -4,7 +4,7 @@
     "description": "Repeat a series of tasks using the configured iteration count and logic",
     "type": {
       "label": "Loop type",
-      "requiredMessage": "Select a loop type",
+      "requiredMessage": "Loop type is required",
       "array": "Array loop",
       "number": "Counted loop",
       "infinite": "Infinite loop"

@@ -35,9 +35,9 @@ const isSendCodeDisabled = computed(() => !forgotPasswordForm.email.trim() || is
 
 const validateConfirmPassword = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
   if (!value) {
-    callback(new Error(t('auth.fields.confirmPassword.requiredMessage')))
+    callback(new Error(t('auth.changePassword.confirmPassword.requiredMessage')))
   } else if (value !== forgotPasswordForm.password) {
-    callback(new Error(t('auth.fields.confirmPassword.mismatchMessage')))
+    callback(new Error(t('auth.changePassword.confirmPassword.mismatchMessage')))
   } else {
     callback()
   }
@@ -50,8 +50,8 @@ const forgotPasswordRules = computed<FormRules<ForgotPasswordForm>>(() => ({
     { type: 'email', message: t('auth.fields.email.invalidMessage'), trigger: 'blur' },
   ],
   password: [
-    { required: true, message: t('auth.fields.password.requiredMessage'), trigger: 'blur' },
-    { min: 6, max: 30, message: t('auth.forgotPassword.password.lengthMessage'), trigger: 'blur' },
+    { required: true, message: t('auth.changePassword.newPassword.requiredMessage'), trigger: 'blur' },
+    { min: 6, max: 30, message: t('auth.changePassword.newPassword.lengthMessage'), trigger: 'blur' },
   ],
   verificationCode: [{ whitespace: true, required: true, message: t('auth.fields.verificationCode.requiredMessage'), trigger: 'blur' }],
 }))
@@ -75,7 +75,7 @@ const handleSendCode = async () => {
     isSendingCode.value = true
     try {
       await ForgotPasswordApi.postSendVerificationCode(forgotPasswordForm.email)
-      MsgSuccess(t('auth.forgotPassword.messages.codeSent'))
+      MsgSuccess(t('auth.changePassword.messages.codeSent'))
       startCountdown()
     } finally {
       isSendingCode.value = false
@@ -106,7 +106,7 @@ const handleResetPassword = async () => {
       }
 
       await ForgotPasswordApi.postResetPassword({ code, email, password: encryptedData, re_password: encryptedRePassword, encrypted: true })
-      MsgSuccess(t('auth.forgotPassword.messages.passwordReset'))
+      MsgSuccess(t('auth.changePassword.messages.passwordReset'))
       router.push({ name: 'login' })
     } finally {
       isSubmitting.value = false
@@ -124,7 +124,7 @@ onMounted(() => {
     <!-- 返回登录页面 -->
     <el-button class="-mx-1" text @click="router.push({ name: 'login' })">
       <MkIcon name="icon_left_outlined" />
-      <span>{{ t('auth.forgotPassword.actions.backToLogin') }}</span>
+      <span>{{ t('auth.changePassword.actions.backToLogin') }}</span>
     </el-button>
 
     <h2 class="mt-4">{{ t('auth.changePassword.title') }}</h2>
@@ -147,7 +147,7 @@ onMounted(() => {
           <el-input v-model="forgotPasswordForm.verificationCode" :placeholder="t('auth.fields.verificationCode.placeholder')" />
           <!-- 发送邮箱验证码 -->
           <el-button plain class="min-w-35 shrink-0" :disabled="isSendCodeDisabled" :loading="isSendingCode" @click="handleSendCode">
-            {{ countdown > 0 ? `${t('auth.forgotPassword.actions.resendCode')} (${countdown}s)` : t('auth.forgotPassword.actions.sendCode') }}
+            {{ countdown > 0 ? `${t('auth.changePassword.actions.resendCode')} (${countdown}s)` : t('auth.changePassword.actions.sendCode') }}
           </el-button>
         </div>
       </el-form-item>
@@ -157,7 +157,7 @@ onMounted(() => {
           v-model="forgotPasswordForm.password"
           autocomplete="new-password"
           maxlength="30"
-          :placeholder="t('auth.forgotPassword.password.placeholder')"
+          :placeholder="t('auth.changePassword.newPassword.placeholder')"
           show-password
           type="password"
         />
@@ -168,7 +168,7 @@ onMounted(() => {
           v-model="forgotPasswordForm.confirmPassword"
           autocomplete="new-password"
           maxlength="30"
-          :placeholder="t('auth.fields.confirmPassword.placeholder')"
+          :placeholder="t('auth.changePassword.confirmPassword.placeholder')"
           show-password
           type="password"
         />

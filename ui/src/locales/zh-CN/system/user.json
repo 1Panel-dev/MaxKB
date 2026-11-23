@@ -28,18 +28,9 @@
     "invalidMessage": "请输入正确的手机号"
   },
   "password": {
-    "label": "新密码",
-    "placeholder": "请输入新密码",
-    "requiredMessage": "请输入新密码",
     "defaultLabel": "默认密码",
     "changeTitle": "修改用户密码",
     "changeSuccess": "密码修改成功"
-  },
-  "confirmPassword": {
-    "label": "确认密码",
-    "placeholder": "请再次输入新密码",
-    "requiredMessage": "请输入确认密码",
-    "mismatchMessage": "输入的密码不一致"
   },
   "role": {
     "label": "角色",

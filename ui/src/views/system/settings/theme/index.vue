@@ -53,7 +53,7 @@ const THEME_IMAGE_SETTINGS: ThemeImageSetting[] = reactive([
   {
     description: computed(() => t('appearance.loginLogoHint', { dimensions: '126*32', size: 10 })),
     field: 'loginLogo',
-    label: computed(() => `${t('auth.login.label')} Logo`),
+    label: computed(() => `${t('appearance.login')} Logo`),
   },
   {
     description: computed(() => t('appearance.loginBackgroundHint', { vector: '1728*1117', bitmap: '3456*2234', size: 10 })),

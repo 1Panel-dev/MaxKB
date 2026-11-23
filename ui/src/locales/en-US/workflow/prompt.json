@@ -8,11 +8,11 @@
     "label": "User prompt",
     "placeholder": "User prompt. You can reference system variables, such as {reference}",
     "description": "The question or instructions the user sends to the model",
-    "requiredMessage": "Enter a user prompt"
+    "requiredMessage": "User prompt is required"
   },
   "positivePrompt": {
     "label": "Prompt (positive)",
-    "requiredMessage": "Enter a positive prompt"
+    "requiredMessage": "Positive prompt is required"
   },
   "negativePrompt": {
     "label": "Prompt (negative)",

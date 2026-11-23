@@ -8,15 +8,15 @@
       "label": "Tag name",
       "placeholder": "Enter a tag name",
       "selectPlaceholder": "Select a tag",
-      "requiredMessage": "Enter a tag name",
-      "selectRequiredMessage": "Select a tag"
+      "requiredMessage": "Tag name is required",
+      "selectRequiredMessage": "Tag is required"
     },
     "value": {
       "label": "Tag value",
       "placeholder": "Enter a tag value",
       "selectPlaceholder": "Select a tag value",
-      "requiredMessage": "Enter a tag value",
-      "selectRequiredMessage": "Select a tag value",
+      "requiredMessage": "Tag value is required",
+      "selectRequiredMessage": "Tag value is required",
       "unavailableMessage": "This tag value is no longer available. Select another value."
     },
     "actions": {

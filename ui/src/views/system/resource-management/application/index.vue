@@ -170,7 +170,7 @@ onMounted(() => {
             <el-tag v-else type="primary" class="default" size="small">{{ t('application.simple.shortLabel') }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column :label="t('common.status.label')" width="100">
+        <el-table-column width="100">
           <template #header>
             <MkTableFilter
               mode="single"

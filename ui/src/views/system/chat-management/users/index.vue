@@ -187,7 +187,7 @@ onMounted(() => loadChatUsers())
         <el-table-column type="selection" width="40" />
         <el-table-column prop="nick_name" :label="t('user.name.label')" min-width="150" show-overflow-tooltip />
         <el-table-column prop="username" :label="t('user.username.label')" min-width="150" show-overflow-tooltip />
-        <el-table-column width="100" :label="t('common.status.label')">
+        <el-table-column width="100">
           <template #header>
             <MkTableFilter
               mode="single"

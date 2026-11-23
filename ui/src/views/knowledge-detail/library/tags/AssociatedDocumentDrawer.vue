@@ -182,7 +182,7 @@ defineExpose({ open })
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="is_active" :label="t('common.status.activeLabel')" width="120">
+        <el-table-column prop="is_active" width="120">
           <template #header>
             <MkTableFilter
               v-model="selectedDocumentActive"

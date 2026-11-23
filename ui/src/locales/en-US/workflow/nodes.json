@@ -108,7 +108,7 @@
       "label": "First frame image",
       "shortLabel": "First frame",
       "placeholder": "Select a first frame image",
-      "requiredMessage": "Select a first frame image"
+      "requiredMessage": "First frame image is required"
     },
     "lastFrame": {
       "label": "Last frame image",
@@ -157,7 +157,7 @@
       "label": "Reply content",
       "placeholder": "Reply content can reference system variables, such as {reference}",
       "htmlPlaceholder": "HTML content can reference system variables, such as {reference}",
-      "requiredMessage": "Enter reply content"
+      "requiredMessage": "Reply content is required"
     }
   },
   "condition": {
@@ -182,7 +182,7 @@
     "content": {
       "label": "Form output content",
       "description": "Set the content this node outputs, using {form} as the placeholder for the form",
-      "requiredMessage": "Enter form output content"
+      "requiredMessage": "Form output content is required"
     },
     "configuration": "Form configuration",
     "formData": "All form data",

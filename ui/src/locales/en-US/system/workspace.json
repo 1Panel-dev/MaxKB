@@ -7,7 +7,7 @@
   "name": {
     "label": "Workspace name",
     "placeholder": "Enter a workspace name",
-    "requiredMessage": "Enter a workspace name"
+    "requiredMessage": "Workspace name is required"
   },
   "delete": {
     "title": "Delete workspace: {name}?",

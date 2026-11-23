@@ -29,13 +29,13 @@
     "period": {
       "label": "Sync schedule",
       "placeholder": "Select a sync schedule",
-      "requiredMessage": "Select a sync schedule"
+      "requiredMessage": "Sync schedule is required"
     },
     "time": {
-      "requiredMessage": "Select a sync time"
+      "requiredMessage": "Sync time is required"
     },
     "date": {
-      "requiredMessage": "Select a sync date"
+      "requiredMessage": "Sync date is required"
     },
     "interval": {
       "minHoursMessage": "The sync interval must be at least {count} hour. | The sync interval must be at least {count} hours.",

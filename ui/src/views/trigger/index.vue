@@ -212,7 +212,7 @@ onMounted(() => loadTriggers())
           </template>
           <template #default="{ row }">{{ triggerTypeLabels[row.trigger_type as TriggerType] || row.trigger_type }}</template>
         </el-table-column>
-        <el-table-column prop="is_active" :label="t('common.status.activeLabel')" width="120">
+        <el-table-column prop="is_active" width="120">
           <template #header>
             <MkTableFilter
               mode="single"

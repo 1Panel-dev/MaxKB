@@ -173,7 +173,7 @@ defineExpose({ open })
         </template>
         <template #default="{ row }">{{ sourceLabels[row.source_type as keyof typeof sourceLabels] || '-' }}</template>
       </el-table-column>
-      <el-table-column :label="t('common.status.label')" width="100">
+      <el-table-column width="100">
         <template #header>
           <MkTableFilter
             mode="single"

@@ -5,7 +5,7 @@
   "name": {
     "default": "Agent portal",
     "placeholder": "Enter a portal name",
-    "requiredMessage": "Enter a portal name"
+    "requiredMessage": "Portal name is required"
   },
   "access": {
     "title": "Access settings",

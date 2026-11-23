@@ -31,7 +31,7 @@
   },
   "message": {
     "inputPlaceholder": "Type a message...",
-    "missingApiParameters": "Enter values for these parameters in the URL: {fields}",
+    "missingApiParameters": "A value for each URL parameter is required: {fields}",
     "replying": "Replying...",
     "thinking": "Thinking",
     "thinkingCompleted": "Thinking complete",
@@ -120,7 +120,7 @@
     "relatedQuestion": {
       "label": "Related question",
       "placeholder": "Enter a related question",
-      "requiredMessage": "Enter a related question",
+      "requiredMessage": "Related question is required",
       "lengthMessage": "The related question must not exceed {max} characters"
     },
     "titlePlaceholder": "Set a title for this content to make it easier to manage and view"

@@ -37,7 +37,7 @@
       "deleteBranch": "Delete branch"
     },
     "errors": {
-      "modelRequired": "No model specified",
+      "modelRequired": "Model is required",
       "iterationLimit": "Maximum iteration count exceeded: {max}",
       "incompleteTurn": "The turn ended without a complete result",
       "modelCallFailed": "Model call failed",

@@ -6,20 +6,20 @@
   "username": {
     "label": "Username",
     "placeholder": "Enter a username",
-    "requiredMessage": "Enter a username",
+    "requiredMessage": "Username is required",
     "existsMessage": "Username already exists"
   },
   "name": {
     "label": "Name",
     "placeholder": "Enter a name",
-    "requiredMessage": "Enter a name",
+    "requiredMessage": "Name is required",
     "existsMessage": "Name already exists"
   },
   "email": {
     "label": "Email",
-    "placeholder": "Enter an email address",
-    "requiredMessage": "Enter an email address",
-    "invalidMessage": "Enter a valid email address",
+    "placeholder": "Enter an Email",
+    "requiredMessage": "Email is required",
+    "invalidMessage": "Enter a valid email",
     "existsMessage": "Email already exists"
   },
   "phone": {
@@ -28,30 +28,21 @@
     "invalidMessage": "Enter a valid phone"
   },
   "password": {
-    "label": "New password",
-    "placeholder": "Enter a new password",
-    "requiredMessage": "Enter a new password",
     "defaultLabel": "Default password",
     "changeTitle": "Change user password",
     "changeSuccess": "Password changed successfully"
   },
-  "confirmPassword": {
-    "label": "Confirm password",
-    "placeholder": "Re-enter the new password",
-    "requiredMessage": "Confirm the password",
-    "mismatchMessage": "Passwords do not match"
-  },
   "role": {
     "label": "Role",
     "placeholder": "Select a role",
-    "requiredMessage": "Select a role",
+    "requiredMessage": "Role is required",
     "settingsTitle": "Role settings",
     "add": "Add role",
     "set": "Set roles"
   },
   "workspace": {
     "placeholder": "Select a workspace",
-    "requiredMessage": "Select a workspace"
+    "requiredMessage": "Workspace is required"
   },
   "assignment": {
     "label": "Assignment method",
@@ -61,7 +52,7 @@
   "source": {
     "label": "User source",
     "placeholder": "Select a user source",
-    "requiredMessage": "Select a user source",
+    "requiredMessage": "User source is required",
     "local": "System user",
     "localFile": "Local file"
   },

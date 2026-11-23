@@ -6,11 +6,11 @@
   "name": {
     "label": "Role name",
     "placeholder": "Enter a role name",
-    "requiredMessage": "Enter a role name"
+    "requiredMessage": "Role name is required"
   },
   "inheritedRole": {
     "label": "Inherited role",
-    "requiredMessage": "Select an inherited role"
+    "requiredMessage": "Inherited role is required"
   },
   "types": {
     "admin": "System administrator",

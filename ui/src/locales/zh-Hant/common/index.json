@@ -104,6 +104,7 @@
     "cron": {
       "label": "Cron 表達式",
       "placeholder": "請輸入 Cron 表達式（如：0 0 1 * *）",
+      "requiredMessage": "請輸入 Cron 表達式",
       "invalidMessage": "請輸入有效的 Cron 表達式（分鐘 小時 日期 月份 星期）"
     },
     "switchToPreset": "切換為週期設置",
