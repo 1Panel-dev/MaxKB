@@ -39,7 +39,7 @@ from common.auth.constants.role_constants import RoleConstants
 from common.auth.struct.permission import Permission, Role
 from common.db.search import native_search, get_dynamics_model, page_search
 from common.utils.common import format_token_number, get_file_content, number_format
-from knowledge.models import Knowledge
+from knowledge.models import DocumentResourceType, Knowledge
 from maxkb.conf import PROJECT_DIR
 from models_provider.base_model_provider import ModelTypeConst
 from models_provider.models import Model
@@ -809,20 +809,19 @@ class HomePageSerializer(serializers.Serializer):
                 total=Count("id", distinct=True),
                 document_count=Count(
                     "document",
+                    filter=Q(document__resource_type=DocumentResourceType.DOCUMENT),
                     distinct=True,
                 ),
-                failure_count=Count(
+                image_count=Count(
                     "document",
-                    filter=Q(
-                        document__status__contains="3",
-                    ),
+                    filter=Q(document__resource_type=DocumentResourceType.IMAGE),
                     distinct=True,
                 ),
             )
             return {
                 "total": result["total"] or 0,
                 "document_count": result["document_count"] or 0,
-                "failure_count": result["failure_count"] or 0,
+                "image_count": result["image_count"] or 0,
             }
 
     class Tool(serializers.Serializer):
