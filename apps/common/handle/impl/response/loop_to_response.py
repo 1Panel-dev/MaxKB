@@ -14,8 +14,8 @@ from common.handle.impl.response.system_to_response import SystemToResponse
 class LoopToResponse(SystemToResponse):
 
     def to_stream_chunk_response(self, chat_id, chat_record_id, node_id, up_node_id_list, content, is_end,
-                                 completion_tokens,
-                                 prompt_tokens, other_params: dict = None):
+                                 prompt_tokens,
+                                 completion_tokens, other_params: dict = None):
         if other_params is None:
             other_params = {}
         return {'chat_id': str(chat_id), 'chat_record_id': str(chat_record_id), 'operate': True,
