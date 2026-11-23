@@ -142,9 +142,8 @@ function handleSaveTheme() {
 
 /* 实时预览与恢复 */
 function handleThemeColorChange(value: string | number | boolean | null | undefined) {
-  if (typeof value !== 'string' || value === 'custom') return
-  themeSetting.theme = value
-  customThemeColor.value = value
+  if (typeof value !== 'string') return
+  themeSetting.theme = value === 'custom' ? customThemeColor.value : value
   theme.setTheme(toThemeInfo(themeSetting))
 }
 
