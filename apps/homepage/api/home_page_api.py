@@ -311,7 +311,7 @@ class KnowledgeAggregationAPI(APIMixin):
                     fields={
                         "total": serializers.IntegerField(help_text=_("Total knowledge count")),
                         "document_count": serializers.IntegerField(help_text=_("Total document count")),
-                        "failed_document_count": serializers.IntegerField(help_text=_("Failed document count")),
+                        "image_count": serializers.IntegerField(help_text=_("Total image count")),
                     },
                 ),
             },
