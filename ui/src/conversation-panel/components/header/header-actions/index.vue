@@ -19,11 +19,11 @@ function collectActions(children: unknown): VNode[] {
 
 export default defineComponent({
   name: 'HeaderActions',
-  props: { collapse: Boolean },
+  props: { collapse: Boolean, alwaysCollapse: Boolean },
   setup(props, { slots }) {
     return () => {
       const actions = collectActions(slots.default?.())
-      const display = props.collapse && actions.length > 1 ? 'menu' : 'button'
+      const display = props.alwaysCollapse || (props.collapse && actions.length > 1) ? 'menu' : 'button'
       const renderActions = () =>
         actions.map((action) =>
           cloneVNode(action, {
