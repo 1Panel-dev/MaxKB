@@ -536,6 +536,7 @@ Chat／Portal 的历史侧栏首次查询使用列表骨架；`ReverseInfiniteSc
 Chat 标题栏的新建对话按钮独立展示，不参与操作计数和收纳。分享、导出及默认插槽操作由功能本地 `header/header-actions/index.vue` 统一展示：移动端且操作超过一个时全部收进更多菜单，
 其余情况直接显示图标按钮，禁用操作仍计数。移动端通过现有 `useDeviceType()` 判断，收纳条件通过 `collapse` 传入，容器不依赖设备或侧栏 Store。Chat／Portal 标题栏默认插槽直接传入 `MkAction` 或接收 `display` 的操作组件，与内置操作
 一起计数；显示条件写在操作节点上，容器统一覆盖 `display`。支持 Fragment，不检查业务组件内部的显示条件。
+Embed 标题栏在所有设备上展示分享、导出及默认插槽操作，通过 `alwaysCollapse` 始终收进更多菜单，不受操作数量影响。
 
 ### 对话导出
 
