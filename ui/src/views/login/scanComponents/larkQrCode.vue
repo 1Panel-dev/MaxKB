@@ -27,10 +27,9 @@ const initialize = async () => {
   }).toString()
   const qrLogin = window.QRLogin({
     goto: authorizeUrl.toString(),
-    height: '266',
+    height: '280',
     id: 'lark-qr-code',
-    style: 'width:280px;height:280px;margin:0 auto;',
-    width: '266',
+    width: '280',
   })
 
   if (messageHandler) window.removeEventListener('message', messageHandler)
@@ -54,9 +53,20 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="mt-6 flex-center">
+  <div class="mt-6 mb-3 flex-center">
     <img src="@/assets/logo/logo_lark.svg" alt="" width="24px" class="mr-2" />
     <h2>{{ t('auth.qrCode.title', { provider: t('auth.methods.lark') }) }}</h2>
   </div>
-  <div id="lark-qr-code" />
+  <div id="lark-qr-code" class="lark-qr-layout mx-auto w-70" />
 </template>
+
+<style scoped lang="scss">
+.lark-qr-layout {
+  // 扣除飞书 iframe 内部顶部 28px 留白，标题间距由外层 mb-3 保持为 12px。
+  :deep(iframe) {
+    display: block;
+    position: relative;
+    top: -15px;
+  }
+}
+</style>

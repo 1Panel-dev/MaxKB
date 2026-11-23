@@ -6,7 +6,7 @@ import type { QrCodeConfig } from '@/api/types'
 
 defineOptions({ name: 'WecomQrCode' })
 
-const { locale } = useI18n({ useScope: 'global' })
+const { locale, t } = useI18n({ useScope: 'global' })
 const props = defineProps<{ config: QrCodeConfig; loginService: LoginService }>()
 
 const iframeUrl = computed(() => {
@@ -16,7 +16,6 @@ const iframeUrl = computed(() => {
     appid: props.config.corp_id ?? '',
     lang: locale.value === 'en-US' ? 'en' : 'zh',
     login_type: 'CorpApp',
-    panel_size: 'small',
     redirect_uri: props.config.callback_url,
     state: props.loginService.wecomState,
   })
@@ -25,5 +24,30 @@ const iframeUrl = computed(() => {
 </script>
 
 <template>
-  <iframe v-if="iframeUrl" :src="iframeUrl" class="h-95 w-full" />
+  <template v-if="iframeUrl">
+    <div class="mt-6 mb-3 flex-center">
+      <img src="@/assets/logo/logo_enterprise-wechat.svg" alt="" width="24px" class="mr-2" />
+      <h2>{{ t('auth.qrCode.title', { provider: t('auth.methods.wecom') }) }}</h2>
+    </div>
+    <div class="wecom-qr-layout">
+      <iframe :src="iframeUrl" class="h-90 w-full" scrolling="no" />
+    </div>
+  </template>
 </template>
+
+<style scoped lang="scss">
+.wecom-qr-layout {
+  // 将内部 192px 的码图放大到 200px，外框高度与顶部裁切偏移同步缩放。
+  --wecom-qr-scale: calc(200 / 192);
+  height: calc(280px * var(--wecom-qr-scale));
+  overflow: hidden;
+
+  iframe {
+    display: block;
+    position: relative;
+    top: calc(-104px * var(--wecom-qr-scale));
+    transform: scale(var(--wecom-qr-scale));
+    transform-origin: top center;
+  }
+}
+</style>
