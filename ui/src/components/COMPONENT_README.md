@@ -182,7 +182,7 @@ Drawer 没有 `MkDialog` 的外壳挂载控制；需要按需挂载时，由业�
 ### MkComplexSearch
 
 `fields` 使用 `OptionItem<string>`，附加 `multiple`、`remoteMethod`。
-默认输入、选择占位提示复用 common.placeholders，语言切换不清空搜索字段或条件，调用方的字段和选项标签原样展示。
+文本输入占位使用 `common.placeholders.searchBy`，将当前字段标签作为 `{label}` 传入；选择占位使用 `common.placeholders.select`。语言或搜索字段切换时更新占位，语言切换不清空搜索字段或条件，调用方的字段和选项标签原样展示。
 有 `options` 时渲染选择器，否则渲染文本输入；`remoteMethod(query)` 由调用方更新选项，组件管理加载状态。
 `change` 返回 `{ [field]: value }`，多选返回数组；清空返回 `undefined`，切换字段仅在原条件非空时通知清空。
 组合外观复用 [连体表单控件样式](../styles/STYLE_README.md#连体表单控件)，字段和条件控件的默认宽度

@@ -10,11 +10,11 @@
     "menuTitle": {
       "label": "其他參數收納菜單標題"
     },
-    "invalidParameterMessage": "參數僅支持字母、數字和下划線"
+    "invalidParameterMessage": "參數僅支持字母、數字和下劃線"
   },
   "parameters": {
     "duplicateMessage": "參數已存在",
-    "invalidMessage": "僅支持字母、數字和下划線"
+    "invalidMessage": "僅支持字母、數字和下劃線"
   },
   "variable": {
     "label": "變量",
@@ -23,7 +23,7 @@
     "requiredMessage": "請輸入變量",
     "selectRequiredMessage": "請選擇變量",
     "duplicateMessage": "變量已存在",
-    "invalidMessage": "變量可由字母、數字、下划線組成",
+    "invalidMessage": "變量可由字母、數字、下劃線組成",
     "add": "添加變量",
     "edit": "編輯變量",
     "input": {

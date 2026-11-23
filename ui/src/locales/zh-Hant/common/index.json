@@ -80,7 +80,7 @@
   },
   "schedule": {
     "daily": "每日",
-    "weekly": "每周",
+    "weekly": "每週",
     "monthly": "每月",
     "interval": "按間隔",
     "every": "每",
@@ -92,11 +92,11 @@
       "thursday": "週四",
       "friday": "週五",
       "saturday": "週六",
-      "sunday": "周日"
+      "sunday": "週日"
     },
     "units": {
       "days": "天",
-      "weeks": "周",
+      "weeks": "週",
       "months": "月",
       "hours": "小時",
       "minutes": "分鐘"
@@ -225,6 +225,7 @@
     "select": "請選擇",
     "selectField": "請選擇 {label}",
     "search": "搜索",
+    "searchBy": "按{label}搜索",
     "searchByName": "按名稱搜索"
   },
   "validation": {

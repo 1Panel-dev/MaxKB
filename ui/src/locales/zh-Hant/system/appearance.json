@@ -8,7 +8,7 @@
     "purple": "神秘紫",
     "red": "胭脂紅"
   },
-  "loginSettings": "平台登錄設置",
+  "loginSettings": "平臺登錄設置",
   "website": "網站",
   "login": "登錄",
   "websiteLogoHint": "頂部網站顯示 Logo，建議尺寸 {dimensions}，支持 JPG、PNG、GIF，大小不超過 {size}MB",
@@ -26,11 +26,11 @@
     "requiredMessage": "請輸入網站歡迎語"
   },
   "loginPreviewHint": "預覽頁默認為 MaxKB 登錄界面，支持自定義設置",
-  "platformSettings": "平台設置",
+  "platformSettings": "平臺設置",
   "userManualPlaceholder": "請輸入用戶手冊地址",
   "forumPlaceholder": "請輸入論壇求助地址",
   "projectPlaceholder": "請輸入項目地址",
-  "platformPreviewHint": "預覽頁默認為 MaxKB 平台界面，支持自定義設置",
+  "platformPreviewHint": "預覽頁默認為 MaxKB 平臺界面，支持自定義設置",
   "abandonChanges": "放棄更新",
   "saveAndApply": "保存並應用",
   "imageFormatMessage": "僅支持 JPG、PNG 或 GIF 格式的圖片"

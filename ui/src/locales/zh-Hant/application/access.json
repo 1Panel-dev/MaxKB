@@ -12,10 +12,10 @@
       "pasteHint": "複製鏈接填入到"
     },
     "consoles": {
-      "wecom": "企業微信後台",
-      "dingtalk": "釘釘開放平台",
-      "wechat": "微信公眾平台",
-      "lark": "飛書開放平台"
+      "wecom": "企業微信後臺",
+      "dingtalk": "釘釘開放平臺",
+      "wechat": "微信公眾平臺",
+      "lark": "飛書開放平臺"
     },
     "wecomBot": {
       "label": "企業微信智能機器人",
