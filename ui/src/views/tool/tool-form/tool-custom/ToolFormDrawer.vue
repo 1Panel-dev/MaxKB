@@ -16,21 +16,27 @@ import ToolCodeGenerate from '../component/python-code/CodeGenerate.vue'
 import ToolDebugDrawer from './ToolDebugDrawer.vue'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'ToolFormDrawer' })
 
 const { t } = useI18n({ useScope: 'global' })
+
+const canEdit = computed(() => {
+  if (!editId.value) return true
+  if (isSystemResource()) return perm.tool.system.edit()
+  if (isSystemSharedResource()) return perm.tool.share.edit()
+  return perm.tool.workspace.edit(editId.value)
+})
+
 const { auth } = useStore()
 
-const props = withDefaults(
-  defineProps<{
-    api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi
-    title: string
-    folderId: string
-    canEdit?: boolean
-  }>(),
-  { canEdit: true },
-)
+const props = defineProps<{
+  api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi
+  title: string
+  folderId: string
+}>()
 
 const emit = defineEmits<{ closed: []; refresh: []; update: [tool: ToolItem] }>()
 

@@ -15,10 +15,20 @@ import InputFieldTable from './component/input-field/InputFieldTable.vue'
 import ToolCodeGenerate from './component/python-code/CodeGenerate.vue'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
+import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'DataSourceFormDrawer' })
 
 const { t } = useI18n({ useScope: 'global' })
+
+const canEdit = computed(() => {
+  if (!editId.value) return true
+  if (isSystemResource()) return perm.tool.system.edit()
+  if (isSystemSharedResource()) return perm.tool.share.edit()
+  return perm.tool.workspace.edit(editId.value)
+})
+
 const { auth } = useStore()
 
 const props = defineProps<{ api: typeof ToolApi | typeof SystemSharedToolApi | typeof SystemResourceToolApi; folderId: string; title: string }>()
@@ -225,7 +235,7 @@ defineExpose({ open })
 
     <template #footer>
       <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose">{{ t('common.actions.cancel') }}</el-button>
-      <el-button type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
+      <el-button v-if="canEdit" type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
         {{ editId ? t('common.actions.save') : t('common.actions.create') }}
       </el-button>
     </template>

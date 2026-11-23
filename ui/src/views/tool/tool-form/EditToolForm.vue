@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { nextTick, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type SystemResourceToolApi from '@/api/admin/system/resource-management/tool/tool'
 import type SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
@@ -11,17 +11,8 @@ import McpFormDrawer from '@/views/tool/tool-form/McpFormDrawer.vue'
 import SkillToolFormDrawer from '@/views/tool/tool-form/SkillToolFormDrawer.vue'
 import WorkflowFormDialog from '@/views/tool/tool-form/WorkflowFormDialog.vue'
 import ToolFormDrawer from '@/views/tool/tool-form/tool-custom/ToolFormDrawer.vue'
-import { isSystemResource, isSystemSharedResource } from '@/utils/resource-context'
-import perm from '@/permission/index.ts'
 
 const { t } = useI18n({ useScope: 'global' })
-const canEdit = computed(() => {
-  const id = tool.value?.id
-  if (!id) return false
-  if (isSystemResource()) return perm.tool.system.edit()
-  if (isSystemSharedResource()) return perm.tool.share.edit()
-  return perm.tool.workspace.edit(id)
-})
 
 defineOptions({ name: 'EditToolForm' })
 
@@ -107,7 +98,6 @@ defineExpose({ open })
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
       @update="emit('update', $event)"
-      :can-edit="canEdit"
     />
   </template>
 </template>
