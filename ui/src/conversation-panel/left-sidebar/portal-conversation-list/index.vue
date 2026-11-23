@@ -260,7 +260,7 @@ const handleClearGroupConversations = (group: PortalApplicationGroup) => {
                         </MkDropdownItem>
                         <RenameConversation :conversation="conversation" :application-id="group.id" @renamed="conversation.abstract = $event" />
                         <!-- 删除历史对话 -->
-                        <MkDropdownItem divided @click="handleDeleteConversation(group, conversation)">
+                        <MkDropdownItem @click="handleDeleteConversation(group, conversation)">
                           <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
                           <span>{{ t('common.actions.delete') }}</span>
                         </MkDropdownItem>
