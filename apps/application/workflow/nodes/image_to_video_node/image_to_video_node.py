@@ -2,7 +2,6 @@
 import asyncio
 import base64
 import uuid_utils.compat as uuid
-import requests
 from functools import reduce
 from typing import List
 
@@ -13,6 +12,7 @@ from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.i_node import INode
+from application.workflow.media_download import MAX_GENERATED_VIDEO_BYTES, download_http_bytes
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
@@ -87,13 +87,9 @@ class ImageToVideoNode(INode):
         workflow_type = self.get_workflow_type()
         if workflow_type in (WorkflowType.KNOWLEDGE, WorkflowType.TOOL):
             history_chat_record = []
-            chat_id = None
-            chat_record_id = None
             workspace_id = workflow_params.get("workspace_id")
         else:
             history_chat_record = workflow_params.get("history_chat_record", [])
-            chat_id = workflow_params.get("chat_id")
-            chat_record_id = workflow_params.get("chat_record_id")
             workspace_id = workflow_params.get("workspace_id")
 
         if model_id_type == "reference" and model_id_reference:
@@ -157,7 +153,7 @@ class ImageToVideoNode(INode):
 
         file_name = "generated_video.mp4"
         if isinstance(video_urls, str) and video_urls.startswith("http"):
-            video_urls = requests.get(video_urls).content
+            video_urls = download_http_bytes(video_urls, MAX_GENERATED_VIDEO_BYTES)
 
         file = bytes_to_uploaded_file(video_urls, file_name)
         file_url = self._upload_file(file, workflow_type, workflow_params)
@@ -191,7 +187,7 @@ class ImageToVideoNode(INode):
                 encoded_bytes = base64.b64encode(file_bytes)
                 return f"data:{content_type};base64,{encoded_bytes.decode()}"
             return image_url
-        except Exception as e:
+        except Exception:
             raise ValueError(gettext("Failed to obtain the image"))
 
     def _upload_file(self, file, workflow_type, workflow_params):

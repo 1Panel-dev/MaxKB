@@ -11,7 +11,6 @@ import asyncio
 import base64
 from functools import reduce
 
-import requests
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
@@ -20,6 +19,7 @@ from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.i_node import INode
+from application.workflow.media_download import MAX_GENERATED_IMAGE_BYTES, download_http_bytes
 from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
@@ -128,7 +128,7 @@ class ImageGenerateNode(INode):
             file_name = "generated_image.png"
             if isinstance(image_url, str):
                 if image_url.startswith("http"):
-                    image_url = requests.get(image_url).content
+                    image_url = download_http_bytes(image_url, MAX_GENERATED_IMAGE_BYTES)
                 elif image_url.startswith("data:image"):
                     header, encoded = image_url.split(",", 1)
                     image_url = base64.b64decode(encoded)
