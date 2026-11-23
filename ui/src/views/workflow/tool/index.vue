@@ -384,11 +384,12 @@ onBeforeUnmount(() => stopAutoSave())
         @save="handleSaveDefaultModelSetting"
         @apply-to-all="handleApplyDefaultModelToAll"
         v-if="toolWorkflowPermission('read')"
+        :can-edit="toolWorkflowPermission('edit')"
       />
 
       <!-- 调试工具工作流 -->
       <ButtonDebug
-        v-if="toolWorkflowPermission('read')"
+        v-if="toolWorkflowPermission('edit')"
         ref="debugButtonRef"
         v-model:loading="loading"
         :label="t('common.actions.debug')"

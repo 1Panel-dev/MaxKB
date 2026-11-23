@@ -99,7 +99,8 @@ const editDrawerMounted = ref(false)
 const editModelDrawerRef = useTemplateRef<InstanceType<typeof EditModelDrawer>>('editModelDrawerRef')
 
 async function handleOpenEditModel(model: ModelItem) {
-  if (isShared.value || !perm.model.workspace.modify(model.id) || editDrawerMounted.value) return
+  if (isShared.value || editDrawerMounted.value) return
+  if (!perm.model.workspace.modify(model.id) && !perm.model.workspace.isShare()) return
   editDrawerMounted.value = true
   await nextTick()
   editModelDrawerRef.value?.open(getModelProvider(model), model)

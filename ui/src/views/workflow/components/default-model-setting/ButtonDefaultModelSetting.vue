@@ -19,8 +19,9 @@ const props = withDefaults(
     modelApi: typeof ModelApi | typeof SystemModelApi | typeof SharedModelApi
     getGraphData: () => LogicFlow.GraphData | undefined
     disabled?: boolean
+    canEdit?: boolean
   }>(),
-  { modelValue: () => ({}), disabled: false },
+  { modelValue: () => ({}), disabled: false, canEdit: true },
 )
 const emit = defineEmits<{
   open: []
@@ -57,6 +58,7 @@ function handleDrawerClosed() {
     :model-api="modelApi"
     :get-graph-data="getGraphData"
     :disabled="disabled"
+    :can-edit="canEdit"
     @save="emit('save', $event)"
     @apply-to-all="emit('applyToAll', $event)"
     @closed="handleDrawerClosed"
