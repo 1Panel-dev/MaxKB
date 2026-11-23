@@ -1,6 +1,6 @@
 # 页面职责与组织
 
-本文维护页面边界、功能本地目录和关键业务约束。请求协议见
+本文维护页面边界、目录和业务约束。请求协议见
 [API_README.md](../api/API_README.md)，路由与导航见
 [ROUTE_README.md](../router/ROUTE_README.md)，公共组件接口与生命周期见
 [COMPONENT_README.md](../components/COMPONENT_README.md)，画布内部规则见

@@ -76,34 +76,51 @@
 - 三语键按含义分组，顺序一致。字段内按 `label` → `placeholder` → `description` → 校验提示排列；状态组先放标签，再放各状态。
 - `common/index.json` 顶层顺序为 `labels` → `name` → `title` → `description` → `content` → `status` → `options` → `dateRange` → `relativeTime` → `schedule` → `parameters` → `configuration` → `actions` → `dialogs` → `messages` → `error` → `placeholders` → `validation` → `empty`。其他业务沿用现有业务分组顺序。
 
-## 文案与复用边界
+## 文案归属与复用
 
-只翻译已有文案，不为复用 key 改写中文或扩大含义。多处使用不等于通用，相同中文也可能属于不同业务。
-用户输入、接口返回的实体名称、代码、协议值、已保存提示词和节点数据保留原文。
+只翻译已有文案，不为复用 key 改写中文或扩大含义。先按含义判断归属，再考虑复用；组件所在目录不决定语言包位置。
 
-| 文案                                                                              | 归属或使用规则                                                                                           |
-| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| 添加、编辑、删除、保存、取消、导出、调试等通用操作                                | `common.actions`                                                                                         |
-| 创建者、操作、创建／更新时间、问题、语言、备注、来源、数据类型、IP 地址、API 文档 | `common.labels`                                                                                          |
-| 名称、标题、描述、内容                                                            | `common.name`、`common.title`、`common.description`、`common.content`                                    |
-| 带对象的配置标题、未配置                                                          | `common.configuration`，标题通过 `{name}` 传参                                                           |
-| 通用成功／失败、排队、执行、启停状态                                              | `common.status`；启用状态标签使用 `activeLabel`                                                          |
-| 通用操作成功、完成等结果                                                          | `common.messages`，保留编辑／设置／保存／发送等不同含义                                                  |
-| 通用操作失败、请求、网络、权限、服务及音视频播放错误                              | `common.error`，复用原文案，不改写接口返回或具体错误信息                                                 |
-| 引用／引用参数／引用变量／自定义、是／否                                          | `common.options`；带具体业务对象的完整名称按实际展示含义维护                                             |
-| 日期范围、星期、周期、间隔单位和 Cron                                             | `common.dateRange`、`common.schedule`                                                                    |
-| 输入／输出、输入参数／输出参数、错误信息／错误日志                                | 分别使用 `execution.details` 中对应 key，不互相替换                                                      |
-| 用户问题／问题／检索问题                                                          | 分别维护，执行详情原来是“问题”时不能改成“用户问题”                                                       |
-| 回答内容／AI 回答内容                                                             | `workflow.answer.label`／`workflow.answer.aiLabel`，英文分别为 `Response content`／`AI response content` |
-| 默认值和用户内容                                                                  | 默认值在初始化或恢复默认时按当前语言读取；已有值和编辑草稿不随语言重写                                   |
+### 公共文案归属
 
-独立选项“自定义”统一使用 `common.options.custom`，“其他”统一使用 `common.labels.other`；完整名称、说明及不同含义的业务文案仍归对应业务，不为统一翻译修改选项值。
-“引用”“引用参数”“引用变量”分别使用 `common.options.reference`、`referenceParameter`、`referenceVariable`，同级维护；引用变量的占位、校验及错误说明仍归 `workflow.referenceVariable`。
-MCP 设置的来源选项在已有上下文中直接显示“引用”，复用 `common.options.reference`，来源配置值保持原样。
-通用“结果”标签使用 `common.labels.result`；执行结果、条件结果、问题优化结果等完整名称保留业务文案。
-输入、输出、输入参数和输出参数的通用标签，包括工具表单与调试标题，复用 `execution.details`；角色表头的“权限”复用 `authorization.permission.label`，知识库设置的“对话用户授权”复用 `authorization.chatUserTitle`。
+| 内容         | 归属与边界                                                                                              |
+| ------------ | ------------------------------------------------------------------------------------------------------- |
+| 通用操作     | `common.actions`：添加、编辑、删除、复制、导出、恢复默认、调试等                                        |
+| 通用标签     | `common.labels`：创建者、操作、时间、问题、语言、备注、来源、数据类型、IP 地址、其他、结果等            |
+| 通用字段     | `common.name`、`title`、`description`、`content`，各自维护标签、占位及已有校验                          |
+| 配置标题     | `common.configuration`，带对象的标题通过 `{name}` 传参                                                  |
+| 通用状态     | `common.status`：启停、排队、执行、成功、失败等；启用状态标签使用 `activeLabel`                         |
+| 操作结果提示 | `common.messages`：成功、完成等反馈，保留编辑、设置、保存、发送的区别                                   |
+| 错误提示     | `common.error`：通用操作失败、请求、网络、权限、服务及音视频播放错误                                    |
+| 通用选项     | `common.options`：引用、引用参数、引用变量、自定义、是、否                                              |
+| 日期与周期   | `common.dateRange`、`relativeTime`、`schedule`                                                          |
+| 通用校验     | `common.validation`：必填、长度范围、JSON 格式等；占位文案仍归 `common.placeholders` 或具体字段         |
+| 输入与输出   | `execution.details.input`、`output`、`inputParams`、`outputParams`，工具表单及调试标题也复用            |
+| 权限与授权   | 角色表头的“权限”复用 `authorization.permission.label`；“对话用户授权”复用 `authorization.chatUserTitle` |
 
-复制到剪贴板和复制资源生成副本统一使用 `copy` 命名及 `Copy` 词族：通用按钮使用 `common.actions.copy`，复制成功使用 `common.messages.copySuccess`，已复制使用 `common.messages.copied`；业务标题使用 `application.copy.title`、`tool.copyTitle` 等对应业务 key。英文分别为 `Copy`、`Copied successfully`、`Copied`、`Copy agent`、`Copy tool`。表示重复名称、字段或文件的校验仍使用 `duplicate`，不属于复制操作。
+“引用”“引用参数”“引用变量”分别使用 `common.options.reference`、`referenceParameter`、`referenceVariable`。引用变量的占位、校验及错误说明仍归 `workflow.referenceVariable`。MCP 来源选项在已有上下文中直接显示“引用”，也复用 `common.options.reference`。
+
+通用“结果”使用 `common.labels.result`；“执行结果”“条件结果”“问题优化结果”等完整文案归对应业务。“用户问题”“问题”“检索问题”分别维护；“回答内容”和“AI 回答内容”分别使用 `workflow.answer.label`、`aiLabel`，英文为 `Response content`、`AI response content`。
+“错误信息”和“错误日志”分别使用 `execution.details.errorMessage`、`errorLog`，不互相替换。
+
+### 复用判断
+
+- 整理前先统计同一语言中的 key 定义数，再核对代码用途；三语的对应定义不重复计数，多处引用同一个 key 不算重复定义。
+- 只有含义、完整文案及用途一致时才合并。中文相同但英文语义、词形或单复数不同，不直接复用；例如“放大”的 `Maximize` 与 `Zoom in`、“应用”的使用模板与应用配置。
+- 跨业务通用文案归公共能力；业务专属字段、说明、确认句及默认内容留在对应业务。相邻页面或多个调用位置本身不构成提升到 `common` 的理由。
+- `placeholder` 与 `requiredMessage` 用途不同，即使文字相同也保留独立 key。完整对象名称不能为复用而缩成部分词语。
+- 复用现有 key 后同步更新三语和全部有效引用，删除旧定义及由此产生的空分组；动态拼接的 key 也要检查。不新增转发函数、兼容 key 或平行翻译映射。
+- 只调整翻译定义和调用。枚举、接口参数及保存数据中的 `custom`、`CUSTOM`、`customize` 等值保持原样，不因显示文案相同而统一数据协议。
+
+### 原文保留范围
+
+用户输入、接口返回的实体名称、具体错误信息、代码、协议值、已保存提示词和节点数据保留原文。默认内容只在初始化或恢复默认时按当前语言读取，形成草稿后不随语言切换重写。
+
+仅翻译实际展示的界面标题、选项、说明及前端固定提示；不实际渲染的内部路由标题不单独建立翻译 key。品牌、纯格式、固定文件名和代码示例按下文的术语及插值规则处理。Agent 内容遵循[长期排除范围](#agent-长期排除范围)。
+
+### 复制
+
+复制到剪贴板和复制资源生成副本统一使用 `copy` 命名及 `Copy` 词族：按钮使用 `common.actions.copy`，复制成功使用 `common.messages.copySuccess`，已复制使用 `common.messages.copied`；业务标题仍归 `application.copy.title`、`tool.copyTitle` 等对应业务 key。
+英文分别为 `Copy`、`Copied successfully`、`Copied`、`Copy agent`、`Copy tool`。表示重复名称、字段或文件的校验仍使用 `duplicate`，不属于复制操作。
 
 ### 语言与术语
 
@@ -181,10 +198,12 @@ MCP 设置的来源选项在已有上下文中直接显示“引用”，复用 
 
 ## 使用约定
 
+每批只处理用户指定范围，保留未提交改动及明确暂缓的内容。共享组件的修改边界遵循 [组件规则](../components/COMPONENT_README.md#公共组件修改边界)。
+
 ### 直接使用 t
 
 Vue 组件显式导入 `useI18n`，使用 `useI18n({ useScope: 'global' })`；不使用自动注入的 `$t`。
-普通 TS 在入口完成初始化后从 `@/locales` 导入 `t`，在函数执行或响应式展示配置中读取译文。
+普通 TS 从 `@/locales` 导入 `t`，在入口完成初始化后的函数执行或响应式计算中读取译文。
 
 - 界面、已有函数中的校验、确认和结果提示均直接调用 `t()`。直接替换文案无需另行确认。
 - 不新增翻译辅助函数、手写 getter、`labelKey`／`descriptionKey` 属性或平行 key 映射；无法直接使用 `t()` 时先说明原因和方案，得到用户确认后处理。
@@ -192,6 +211,11 @@ Vue 组件显式导入 `useI18n`，使用 `useI18n({ useScope: 'global' })`；�
 - 文案首次读取须在 `createAppI18n` 完成之后，不在模块初始化时固化翻译结果。派生展示数据要保留响应式计算。
 - 校验规则使用 computed 或在校验执行时翻译；表单使用 `:validate-on-rule-change="false"`。不添加语言切换后重新校验表单的 watch，已有错误在下次正常校验时更新。
 - 切换语言只更新展示，保留选择、分页、编辑草稿和已初始化默认内容；只有服务端提供翻译数据的明确场景重新查询。
+
+### 前端提示与错误信息
+
+前端固定的失败提示在现有执行位置直接调用 `t()`；后端返回的 `message` 和浏览器提供的具体错误信息原样显示。不要将所有 `error.message` 替换成同一个通用提示，只有已明确识别的默认错误进入对应翻译分支。
+错误页正文复用 `common.error.noPermission`／`noService`，404 数字保持原样。
 
 ### 服务端翻译与重新查询
 
@@ -216,7 +240,6 @@ App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、z
 用户档案和本地偏好，不刷新页面。Admin 后续加载账号时继续采用已保存的账号语言。
 
 `src/main.ts`、`src/chat.ts` 的 import、样式、初始化和插件注册顺序始终保持，新增国际化内容也不得重排。
-错误页文案使用 `common.error.noPermission`／`noService`，404 数字保持原样。共享组件的修改授权遵循 [组件规则](../components/COMPONENT_README.md#公共组件修改边界)，每批只处理用户指定范围，完成后说明检查结果和下一步，等待用户检查。
 
 ## 公共能力与资源组件
 
@@ -224,6 +247,10 @@ App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、z
 
 智能体、工具、知识库选择弹窗的标题分别复用 `application.title`、`tool.title`、`knowledge.title`；清空、取消和确定复用 `common.actions`，已选数量只翻译 `common.labels.selected`。
 工具弹窗由调用方传入自定义标题时直接显示最终文案；知识库 Embedding 模型一致性说明归 `knowledge.help.embeddingModelHint`。资源和文件夹名称保留接口原值。
+
+### 认证与密码
+
+忘记密码页面的标题、提交按钮及已登录后的修改密码入口统一复用 `auth.changePassword.title`，英文为 `Change password`；“忘记密码”入口保留 `auth.forgotPassword.label`。登录 SDK 的前端加载失败提示归 `auth.login.sdkLoadFailed`，脚本地址通过 `{source}` 原样传入。
 
 ### 资源与授权
 
@@ -310,7 +337,7 @@ Skill、工作流、MCP、数据源分别归 `skill`、`workflow`、`mcp`、`dat
 | 内容                         | 归属                                                                                       |
 | ---------------------------- | ------------------------------------------------------------------------------------------ |
 | 名称、代码等字段提示         | `tool.fields`                                                                              |
-| 来源标签、自定义、引用参数   | `tool.source`，保留引用与引用参数的区别                                                    |
+| 来源与通用选项               | 来源标签复用 `common.labels.source`；自定义、引用参数复用 `common.options`                 |
 | 商店分类、搜索计数和应用入口 | `tool.store`；接口分类、README 和资源内容保留原文                                          |
 | 参数配置与 Python 代码       | `tool.initParams`、`inputParams`、`pythonCode`；输入／输出参数标题复用 `execution.details` |
 | 使用时显示／代码区隐藏说明   | `tool.help`                                                                                |
@@ -333,7 +360,7 @@ MCP 的 JSON 配置校验区分“语法有效”与“必须为对象”，不�
 | `access.json`   | `access`：发布渠道、连接方式、回调及渠道配置                                                                                    |
 
 - 菜单与资源名称复用 `application.title`。完整类型名称、简称、创建标题及说明分别使用 `simple`／`advanced` 中的对应字段。
-- 名称和描述提示归 `application.fields`，描述使用应用场景、用途和示例的完整占位；模板归 `application.template`，不再包 `create`。
+- 名称和描述提示归 `application.fields`，描述使用应用场景、用途和示例的完整占位；内置模板名称、描述和专属默认文案归 `application.template`。
 - 设置中的模型选择复用 `model.ai`，系统／用户提示词、历史与思考复用 `workflow`；知识库参数复用 `knowledge.retrieval`，周期与 Cron 复用 `common.schedule`。
 - 默认开场白、用户提示词、问题优化和无引用分段回答分别归 `application.prologue.defaultValue`、`application.prompt.userDefaultValue`、`application.knowledgeSetting.problemOptimization.defaultValue`、`application.knowledgeSetting.noReferences.defaultValue`。用户提示词保留“使用中文回答”的语义；`{data}`、`{question}`、`{memory}` 和 `<data></data>` 通过命名参数原样传入。
 - 技能名称与输出执行过程归 `application.skills`；MCP 服务配置复用 `tool.mcp`。对话文件上传使用 `application.fileUpload` 与 `upload.types`。
@@ -438,3 +465,10 @@ MCP 的 JSON 配置校验区分“语法有效”与“必须为对象”，不�
 
 外观的主题名归 `appearance.colors`，颜色值及图片映射保持原样；默认 slogan 随语言提供，初始化或恢复默认后形成普通草稿，用户编辑内容不重写。已保存的登录品牌内容也用于外观预览，不能按界面语言改写。
 操作日志菜单、内容及角色权限名称由服务端按当前语言提供；清除策略当前的“天之前的对话记录”措辞保持不变，不借翻译修改业务含义。
+
+## 维护与验证
+
+- 以当前代码和语言包为准，文档只维护目录职责、归属及使用规则，不记录翻译批次、完成数量或迁移历史。
+- 新增、删除或移动文案时同步三语，核对路径、key、类型和排序；同命名空间文件之间不得出现顶层分组冲突。
+- 检查旧 key 残留、静态及动态引用、插值参数和英文单复数；格式化后的显示数字与单复数判断值分别传入。
+- 修改 Vue／TS 时按 [AGENTS.md](../../AGENTS.md) 运行定向 ESLint、类型检查和必要构建；只改本文时核对代码与路径、Prettier 格式及 `git diff --check`。不为检查额外创建项目脚本或翻译辅助函数。

@@ -18,11 +18,9 @@
 
 ## Element Plus 默认行为
 
-Admin 和 Chat 在创建应用前调用 `element-plus.ts` 的 `configureElementPlus()`，将
-`ElFormItem` 的 `for` 默认值设为空字符串，关闭标题与内部控件的自动关联；标题不再激活
-Input、Select 等控件，现有布局样式保留。显式传入非空 `for` 仍可建立关联。
-该配置调整组件 Props 默认值，依赖 Element Plus 的 `labelFor` 实现，升级组件库时须复核；
-无关联的标题由组件渲染为 `div`，不再具有原生 `label` 的自动标签语义。
+Admin／Chat 创建应用前调用 element-plus.ts 的 configureElementPlus()，将 ElFormItem.for 默认值设为空字符串。
+标题渲染为 div，不自动关联或激活控件；显式传非空 for 可建立关联，现有布局保留。
+该配置依赖 Element Plus 的 Props 默认值和 labelFor 实现，升级时须复核。
 
 ## 工作流类型判断
 

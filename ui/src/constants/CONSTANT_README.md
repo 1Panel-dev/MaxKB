@@ -2,17 +2,14 @@
 
 `src/constants` 存放跨页面、跨业务模块的共享常量；单一功能使用的常量留在所属目录。
 
-共享常量按明确业务领域或能力拆分，不维护会过时的逐文件目录树。
-
-不要创建收集无关常量的通用文件，也不要为了统一导出而新增只做二次转发的 `index.ts`。
-常量名称使用能够表达所属领域和用途的全大写命名，使用方从具体文件直接导入。
+按业务领域拆分文件，常量用表达领域和用途的全大写名称；从具体文件导入，
+不创建无关常量合集、目录树清单或仅转发的 index.ts。
 
 `folder.ts` 的 `FOLDER_ENTRY_ID.ALL` 在读取时取当前路由的工作空间 ID，无工作空间上下文时使用 `default`。
 共享入口的 `FOLDER_ENTRY_ID.SHARED` 固定为 `shared`。目录名称的翻译归属见[国际化规则](../locales/LOCALE_README.md#文件夹)。
 
-后端枚举与类型归属统一见 [API_README.md](../api/API_README.md#枚举与类型组织)。`constants` 只维护标签、颜色、选项等前端映射；映射的键应引用
-API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一数据源，`constants/auth.ts`
-只维护它们的展示文案。
+后端枚举和类型归属见 [API 规则](../api/API_README.md#枚举与类型组织)。
+constants 只维护标签、颜色和选项等前端映射，键引用 API 枚举。
 共享展示配置的响应式翻译、初始化顺序和只读约束统一见
 [国际化规则](../locales/LOCALE_README.md#使用约定)，不在此重复维护。
 登录方式共用 `LOGIN_METHOD_LABELS`，角色类型共用 `ROLE_TYPE_LABELS`，分别按 API 枚举读取 `auth.methods` 和 `role.types`。
@@ -25,7 +22,7 @@ API 枚举值。例如角色类型和登录方式以 `src/api/enums` 为唯一�
 `knowledge.web`、`knowledge.lark` 和 `knowledge.workflow` 的翻译。提交接口时仍使用数字枚举值。
 字符串标识统一由 `KNOWLEDGE_TYPE_KEY` 维护，映射、文案和业务判断均引用该常量，避免重复写裸字符串。
 
-`model.ts` 的 `MODEL_TYPE_LABELS` 提供模型类型的响应式名称，供模型业务、系统模型页、工作流默认模型设置和动态表单模型控件使用；协议值保持不变。
+`model.ts` 的 `MODEL_TYPE_LABELS` 提供模型业务、工作流和动态表单共用的响应式模型类型名称，不改变协议值。
 
 `tool.ts` 的 `TOOL_TYPE_OPTIONS` 为工作空间及系统工具列表提供有序的 `value` 和 `label`，筛选继续使用原 `value`，“全部”对应空字符串。
 
