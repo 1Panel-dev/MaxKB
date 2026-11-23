@@ -93,7 +93,7 @@ Admin Router 在 `admin/index.ts` 中统一处理导航初始化：
 2. `login`、`forgot-password`、`404` 为公开路由，不校验登录状态。
 3. URL 查询参数包含 `token` 时，先写入 Admin 认证 Store，用于外部认证回跳，然后使用替换
    导航清理地址栏中的 token。
-4. 访问非公开路由且没有 token 时跳转到 `login`，并通过 `redirect` 查询参数保留原地址，同时透传钉钉客户端入口参数 `client`、`corpId`。
+4. 访问非公开路由且没有 token 时跳转到 `login`，并通过 `redirect` 查询参数保留原地址，同时透传客户端免登入口参数 `client`、`corpId`、`appId`。
 5. token 有效但当前用户尚未加载时，统一加载平台基础档案和当前用户；专业版或
    企业版同时加载服务端外观主题，其他版本恢复默认主题，使刷新页面也能恢复版本、用户和
    外观状态。
@@ -142,7 +142,7 @@ Chat 导航守卫（`chat/index.ts`）：
 6. `enable_auth` 为 false 时获取匿名 token，切换当前场景后放行。匿名认证与登录都携带该场景本地保存的
    token，后端据此沿用同一对话用户。401 时 token 只在 Store 中清除并标记为失效，本地存储保留以便
    重新认证时携带；退出登录才从本地存储删除。
-7. 否则跳转到对应登录页（`portal-login` 或 `chat-login`），并通过 `redirect` 查询参数保留原地址，同时透传钉钉客户端入口参数 `client`、`corpId`。
+7. 否则跳转到对应登录页（`portal-login` 或 `chat-login`），并通过 `redirect` 查询参数保留原地址，同时透传客户端免登入口参数 `client`、`corpId`、`appId`。
 
 当前场景只在放行前切换，请求层直接读取 `auth.token`，导航未完成时不会带上目标场景的 token。
 

@@ -13,6 +13,7 @@ import { CHAT_API_BASE_PATH } from '@/api/constants'
 import NoService from '@/views/chat/error/NoService.vue'
 import LoginModePanel from '@/views/login/components/LoginModePanel.vue'
 import { getDingTalkClientAuthCode } from '@/views/login/dingtalk-client-login'
+import { getLarkClientAuthCode } from '@/views/login/lark-client-login'
 import { useStore } from '@/stores/chat'
 
 defineOptions({ name: 'ChatLogin' })
@@ -133,12 +134,21 @@ onBeforeMount(async () => {
   if (unavailable.value) return
   isClientLoggingIn.value = true
   try {
-    const code = await getDingTalkClientAuthCode(route.query, {
-      missingCode: t('auth.dingtalkClient.messages.missingCode'),
-      authorizationFailed: t('auth.dingtalkClient.messages.authorizationFailed'),
-    })
-    if (!code) return
-    await auth.loginWithDingTalkClient(code)
+    if (route.query.client === 'lark') {
+      const code = await getLarkClientAuthCode(route.query, {
+        missingCode: t('auth.larkClient.messages.missingCode'),
+        authorizationFailed: t('auth.larkClient.messages.authorizationFailed'),
+      })
+      if (!code) return
+      await auth.loginWithLarkClient(code)
+    } else {
+      const code = await getDingTalkClientAuthCode(route.query, {
+        missingCode: t('auth.dingtalkClient.messages.missingCode'),
+        authorizationFailed: t('auth.dingtalkClient.messages.authorizationFailed'),
+      })
+      if (!code) return
+      await auth.loginWithDingTalkClient(code)
+    }
     await loginService.onLoginSuccess()
   } catch {
     // 接口错误由请求层提示，保留普通登录入口。

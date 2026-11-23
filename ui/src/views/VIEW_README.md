@@ -513,6 +513,9 @@ System 资源管理的修正内容与添加知识库选项仅包含当前智能�
   的钉钉客户端免密入口，按需加载 SDK 获取授权码，再调用各入口认证 Store 的
   `loginWithDingTalkClient(code)`；页面统一使用 async／await 完成授权、登录和成功跳转，失败恢复普通登录。
   客户端免登不在登录服务或扫码组件中触发，避免外观预览发起授权。
+  飞书免登使用同目录 `lark-client-login.ts`，识别 `client=lark&appId=...`，通过 SDK 获取授权码，
+  优先 requestAccess，错误码 103 或方法缺失时回退 requestAuthCode，再调用各入口 Store 的
+  `loginWithLarkClient(code)`；SDK 不可用、授权失败或超时后恢复普通登录。
   Admin 与 Chat 登录成功统一使用替换导航，优先返回 `redirect` 记录的站内原地址，没有时进入各自场景首页。
 
 ### 正式对话与门户

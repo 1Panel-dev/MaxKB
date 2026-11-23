@@ -49,8 +49,12 @@ export const useAuthStore = defineStore('auth', {
       })
     },
 
-    asyncLoginWithLark(code: string) {
-      return ExternalLoginApi.getLarkOauthCallback(code).then((response) => this.setToken(response.token))
+    /** 使用飞书客户端授权码登录。 */
+    loginWithLarkClient(code: string) {
+      return ExternalLoginApi.getLarkOauthCallback(code).then(({ token }) => {
+        this.setToken(token)
+        return token
+      })
     },
 
     /** 加载并缓存登录前所需的平台公开档案。 */
