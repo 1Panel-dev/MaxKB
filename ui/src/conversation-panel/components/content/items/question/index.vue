@@ -163,7 +163,7 @@ function getAttachmentDescription(file: QuestionAttachment) {
       </MkTooltip>
       <!-- 进入分享模式 -->
       <MkTooltip v-if="showShare" :content="t('chat.share.label')">
-        <el-button text :disabled="!canShare" @click="shareLink?.enterShare([messageRecordId])">
+        <el-button  text :disabled="!canShare" @click.stop.prevent="shareLink?.enterShare([messageRecordId])">
           <MkIcon name="icon_share_outlined" />
         </el-button>
       </MkTooltip>

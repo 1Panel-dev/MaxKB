@@ -179,7 +179,7 @@ function openFeedback(status: '0' | '1') {
       <!-- 进入分享模式 -->
       <span v-if="showShare">
         <MkTooltip :content="t('chat.share.label')">
-          <el-button text :disabled="!canShare" @click="shareLink?.enterShare([message.recordId])">
+          <el-button text :disabled="!canShare" @click.stop.prevent="shareLink?.enterShare([message.recordId])">
             <MkIcon name="icon_share_outlined" />
           </el-button>
         </MkTooltip>
