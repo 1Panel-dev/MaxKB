@@ -131,7 +131,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout>
+  <MkViewLayout :title="t('application.title')">
     <template #default="{ Header, title }">
       <component :is="Header">
         <h4>{{ title }}</h4>
