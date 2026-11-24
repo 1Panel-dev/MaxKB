@@ -2,9 +2,11 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ModelProviderItem } from '@/api/types'
+import { useStore } from '@/stores'
 import { isWorkspaceResource } from '@/utils/resource-context'
 
 const { t } = useI18n({ useScope: 'global' })
+const { auth } = useStore()
 
 defineOptions({ name: 'ModelProvider' })
 
@@ -32,7 +34,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
 
 <template>
   <div class="px-4">
-    <template v-if="isWorkspaceResource()">
+    <template v-if="isWorkspaceResource() && !auth.isCE">
       <MkListItem class="-mt-2" :active="modelValue.provider === SHARED_MODEL_PROVIDER.provider" @click="handleProviderSelect(SHARED_MODEL_PROVIDER)">
         <MkIcon
           :name="modelValue.provider === SHARED_MODEL_PROVIDER.provider ? 'icon_folder-share_filled' : 'icon_folder_outlined'"

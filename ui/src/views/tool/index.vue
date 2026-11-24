@@ -34,10 +34,12 @@ import {
 } from './tool-card/action-dropdown'
 import { FOLDER_ENTRY_ID } from '@/constants/folder'
 import { TOOL_TYPE_OPTIONS } from '@/constants/tool'
+import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
 
 const { t } = useI18n({ useScope: 'global' })
+const { auth } = useStore()
 
 /* 当前文件夹 */
 
@@ -243,7 +245,7 @@ onMounted(() => {
         </MkTooltip>
       </component>
 
-      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.TOOL" @select="handleFolderSelect" draggable></FolderTree>
+      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.TOOL" :show-shared="!auth.isCE" @select="handleFolderSelect" draggable></FolderTree>
     </template>
 
     <template #default="{ Footer, Header }">
