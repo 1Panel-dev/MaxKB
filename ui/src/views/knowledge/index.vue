@@ -28,10 +28,12 @@ import {
 } from './knowledge-card/action-dropdown'
 import { FOLDER_ENTRY_ID } from '@/constants/folder'
 import { KNOWLEDGE_TYPE_MAP } from '@/constants/knowledge'
+import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { perm } from '@/permission'
 
 const { t } = useI18n({ useScope: 'global' })
+const { auth } = useStore()
 
 /* 知识库详情入口 */
 const route = useRoute()
@@ -217,6 +219,7 @@ function handleBatchDelete() {
         ref="folderTreeRef"
         v-model="currentFolderId"
         :source="RESOURCE_TYPE.KNOWLEDGE"
+        :show-shared="!auth.isCE"
         draggable
         @loaded="handleFolderSelect"
         @select="handleFolderSelect"
