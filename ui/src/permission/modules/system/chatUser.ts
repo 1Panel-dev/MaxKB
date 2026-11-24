@@ -15,7 +15,7 @@ export default {
     /**
    * 系统「对话用户」同步权限
    */
-  sync: () => canSys(P.CHAT_USER_SYNC),
+  sync: () => canSys(P.CHAT_USER_SYNC) && (hasEdition(Edition.PE) || hasEdition(Edition.EE)),
     /**
    * 系统「对话用户」编辑权限
    */
