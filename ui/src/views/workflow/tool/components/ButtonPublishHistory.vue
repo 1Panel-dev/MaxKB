@@ -1,12 +1,21 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import WorkflowApi from '@/api/admin/workspace/tool/workflow'
 import PublishHistoryDrawer from '@/views/workflow/components/publish-history/PublishHistoryDrawer.vue'
 import { MsgSuccess } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'ButtonToolPublishHistory' })
+
+const canEdit = computed(() => {
+  if (isSystemResource()) return Boolean(perm.tool.system.edit())
+  if (isSystemSharedResource()) return Boolean(perm.tool.share.edit())
+  if (isWorkspaceSharedResource()) return Boolean(perm.tool.workspaceShared.edit())
+  return Boolean(perm.tool.workspace.edit(props.toolId))
+})
 
 const { t } = useI18n({ useScope: 'global' })
 
@@ -79,5 +88,6 @@ function handleSubmit(payload: WorkflowVersionPayload, versionId: string) {
     @preview="emit('preview', $event)"
     @restore="emit('restore', $event)"
     @submit="handleSubmit"
+    :can-edit="canEdit"
   />
 </template>
