@@ -235,11 +235,12 @@ App.vue 通过当前 locale 配置 Element Plus，并注册 Day.js 的 zh-cn、z
 Admin 使用 MaxKB-locale，初始化按本地缓存、浏览器语言、默认中文选择，加载账号后继续采用账号语言。
 Chat 不读写 MaxKB-locale：门户使用 portal-locale，各单应用使用 `${accessToken}-locale`。
 初始化先使用浏览器语言；路由守卫获取认证前置配置时，按配置返回的 language、该场景本地缓存、浏览器语言选择并写入该场景缓存。
+加载当前对话用户档案后，优先应用账号 language；档案未提供语言时保留当前语言。同一场景内导航不重复应用认证前置语言，切换场景时重新初始化。
 英语变体归一为 en-US；zh-Hant、zh-TW、zh-HK、zh-MO 归一为 zh-Hant，
 显式 zh-Hans 优先使用简体，其余语言回退 zh-CN。Element Plus 的繁体映射为 zh-tw。
 跨标签页只同步当前 Store 所用缓存 key 的变化。请求头复用原请求层的 user.language。
 登录前的语言选择只保存本地；头部菜单调用当前账号语言接口，成功后同步 Store、
-用户档案和本地偏好，不刷新页面。Admin 后续加载账号时继续采用已保存的账号语言。
+用户档案和本地偏好，不刷新页面。Admin 和 Chat 后续加载账号时继续采用已保存的账号语言。
 
 `src/main.ts`、`src/chat.ts` 的 import、样式、初始化和插件注册顺序始终保持，新增国际化内容也不得重排。
 

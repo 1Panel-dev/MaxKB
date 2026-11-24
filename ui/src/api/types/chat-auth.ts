@@ -51,6 +51,7 @@ export interface ChatUserProfile {
   username: string
   nick_name: string
   email: string
+  language?: string | null
   source: string
   token_quota: Omit<ChatUserTokenQuota, 'period_end'> | null
 }
