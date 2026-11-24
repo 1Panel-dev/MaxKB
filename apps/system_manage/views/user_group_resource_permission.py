@@ -184,22 +184,26 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
             [RoleConstants.EXTENDS_ADMIN],
             [
                 lambda r, kwargs: PermissionConstants[
-                    "RESOURCE_" + kwargs.get("resource").replace("_FOLDER", "") + "_AUTH"
+                    kwargs.get("resource")
+                    + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
                 ]
             ],
             compare=CompareConstants.AND,
         ),
         lambda r, kwargs: PermissionConstants[
-            kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
+            kwargs.get("resource")
+            + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
         ].get_workspace_permission_workspace_manage_role(),
         lambda r, kwargs: PermissionConstants[
-            kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
+            kwargs.get("resource")
+            + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
         ]._build_workspace_permission(resource_id_key="target"),
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [
                 lambda r, kwargs: PermissionConstants[
-                    kwargs.get("resource").replace("_FOLDER", "")
+                    kwargs.get("resource")
+                    + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
                 ]._build_workspace_permission(resource_id_key="target")(r, **kwargs)
             ],
             compare=CompareConstants.AND,
@@ -240,22 +244,26 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
             [RoleConstants.EXTENDS_ADMIN],
             [
                 lambda r, kwargs: PermissionConstants[
-                    "RESOURCE_" + kwargs.get("resource").replace("_FOLDER", "") + "_AUTH"
+                    kwargs.get("resource")
+                    + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
                 ]
             ],
             compare=CompareConstants.AND,
         ),
         lambda r, kwargs: PermissionConstants[
-            kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
+            kwargs.get("resource")
+            + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
         ].get_workspace_permission_workspace_manage_role(),
         lambda r, kwargs: PermissionConstants[
-            kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
+            kwargs.get("resource")
+            + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
         ]._build_workspace_permission(resource_id_key="target"),
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [
                 lambda r, kwargs: PermissionConstants[
-                    kwargs.get("resource").replace("_FOLDER", "")
+                    kwargs.get("resource")
+                    + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
                 ]._build_workspace_permission(resource_id_key="target")(r, **kwargs)
             ],
             compare=CompareConstants.AND,
@@ -291,22 +299,26 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
                 [RoleConstants.EXTENDS_ADMIN],
                 [
                     lambda r, kwargs: PermissionConstants[
-                        "RESOURCE_" + kwargs.get("resource").replace("_FOLDER", "") + "_AUTH"
+                        kwargs.get("resource")
+                        + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
                     ]
                 ],
                 compare=CompareConstants.AND,
             ),
             lambda r, kwargs: PermissionConstants[
-                kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
+                kwargs.get("resource")
+                + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
             ].get_workspace_permission_workspace_manage_role(),
             lambda r, kwargs: PermissionConstants[
-                kwargs.get("resource").replace("_FOLDER", "") + "_RESOURCE_AUTHORIZATION"
+                kwargs.get("resource")
+                + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
             ]._build_workspace_permission(resource_id_key="target"),
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [
                     lambda r, kwargs: PermissionConstants[
-                        kwargs.get("resource").replace("_FOLDER", "")
+                        kwargs.get("resource")
+                        + ("_AUTH" if kwargs.get("resource").endswith("_FOLDER") else "_RESOURCE_AUTHORIZATION")
                     ]._build_workspace_permission(resource_id_key="target")(r, **kwargs)
                 ],
                 compare=CompareConstants.AND,
