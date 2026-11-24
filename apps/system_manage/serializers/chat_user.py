@@ -20,6 +20,7 @@ from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.common import password_encrypt
 from common.utils.rsa_util import decrypt
+from maxkb.const import CONFIG
 from system_manage.models import ChatUser, UserGroup, UserGroupRelation
 from system_manage.models.chat_user_token_quota import ChatUserTokenQuota, QuotaType
 from users.serializers.user import PASSWORD_REGEX
@@ -699,6 +700,20 @@ class ChatUserProfileSerializer(serializers.Serializer):
             "username": user.username,
             "nick_name": user.nick_name,
             "email": user.email,
+            "language": user.language,
             "source": user.source,
             "token_quota": token_quota,
         }
+
+
+class ChatUserLanguageSerializer(serializers.Serializer):
+    language = serializers.CharField(required=True, label=_("language"))
+
+    def switch(self, user_id):
+        self.is_valid(raise_exception=True)
+        language = self.data.get("language")
+        support_languages = [language_code for language_code, _language_name in CONFIG.get_languages()]
+        if language not in support_languages:
+            raise AppApiException(500, _("language only support:") + ",".join(support_languages))
+        QuerySet(ChatUser).filter(id=user_id).update(language=language)
+        return True

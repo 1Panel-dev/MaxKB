@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： user.py
-    @date：2025/4/14 10:20
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： user.py
+@date：2025/4/14 10:20
+@desc:
 """
+
 import uuid_utils.compat as uuid
 from django.db import models
 
@@ -17,12 +18,13 @@ class ChatUser(models.Model):
     nick_name = models.CharField(max_length=150, verbose_name="昵称", db_index=True)
     username = models.CharField(max_length=150, unique=True, verbose_name="用户名", db_index=True)
     password = models.CharField(max_length=150, verbose_name="密码")
+    language = models.CharField(max_length=10, verbose_name="语言", null=True, default=None)
     source = models.CharField(max_length=10, verbose_name="来源", default="LOCAL", db_index=True)
     is_active = models.BooleanField(default=True, db_index=True)
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True, null=True, db_index=True)
     update_time = models.DateTimeField(verbose_name="修改时间", auto_now=True, null=True, db_index=True)
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
 
     class Meta:
@@ -48,17 +50,20 @@ class UserGroupRelation(models.Model):
 
 class ResourceType(models.TextChoices):
     """资源类型"""
-    KNOWLEDGE = 'KNOWLEDGE', '知识库'
-    APPLICATION = 'APPLICATION', '应用'
+
+    KNOWLEDGE = "KNOWLEDGE", "知识库"
+    APPLICATION = "APPLICATION", "应用"
 
 
 class ResourceChatUserAuthorize(models.Model):
     """
     资源对话用户授权表
     """
+
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
-    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True,
-                                    null=True)
+    workspace_id = models.CharField(
+        max_length=64, verbose_name="工作空间id", default="default", db_index=True, null=True
+    )
     user_group = models.ForeignKey(UserGroup, on_delete=models.CASCADE, verbose_name="用户组")
     user = models.ForeignKey(ChatUser, on_delete=models.CASCADE, verbose_name="用户")
     resource_id = models.UUIDField(max_length=128, verbose_name="资源id", db_index=True)
@@ -67,16 +72,18 @@ class ResourceChatUserAuthorize(models.Model):
 
     class Meta:
         db_table = "resource_chat_user_authorize"
-        unique_together = ('user_group_id', 'resource_type', 'resource_id', 'user_id')
+        unique_together = ("user_group_id", "resource_type", "resource_id", "user_id")
 
 
 class ResourceChatUserGroupAuthorize(models.Model):
     """
     资源对话用户组授权表
     """
+
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
-    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True,
-                                    null=True)
+    workspace_id = models.CharField(
+        max_length=64, verbose_name="工作空间id", default="default", db_index=True, null=True
+    )
     user_group = models.ForeignKey(UserGroup, on_delete=models.CASCADE, verbose_name="用户组")
     resource_id = models.UUIDField(max_length=128, verbose_name="资源id", db_index=True)
     resource_type = models.CharField(verbose_name="资源类型", choices=ResourceType.choices, db_index=True)
@@ -84,7 +91,7 @@ class ResourceChatUserGroupAuthorize(models.Model):
 
     class Meta:
         db_table = "resource_chat_user_group_authorize"
-        unique_together = ('user_group_id', 'resource_type', 'resource_id')
+        unique_together = ("user_group_id", "resource_type", "resource_id")
 
 
 class ChatUserApiKey(models.Model):

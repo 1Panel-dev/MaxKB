@@ -44,6 +44,7 @@ v3=[
     path('share/<str:link>', ChatRecordDetailView.as_view()),
     path('chat_message/<str:chat_id>/cancel', v3_views.CancelWorkflowView.as_view(), name='v3_cancel_workflow'),
     path('chat_user/profile', v3_views.ChatUserProfileView.as_view(), name='v3_chat_user_profile'),
+    path('chat_user/current/language', v3_views.ChatUserLanguageView.as_view(), name='v3_chat_user_language'),
     path('chat_user/current/reset_password', v3_views.ResetCurrentUserPasswordView.as_view(), name='v3_reset_password_current'),
     path('api_key', v3_views.ChatUserApiKeyView.as_view()),
     path('portal/application/<int:current_page>/<int:page_size>', v3_views.PortalApplicationView.as_view(), name='v3_portal_application'),

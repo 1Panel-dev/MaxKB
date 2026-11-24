@@ -52,7 +52,11 @@ from knowledge.models import FileSourceType
 from maxkb.const import CONFIG
 from models_provider.api.model import DefaultModelResponse
 from oss.serializers.file import FileSerializer
-from system_manage.serializers.chat_user import RePasswordSerializer, ChatUserProfileSerializer
+from system_manage.serializers.chat_user import (
+    ChatUserLanguageSerializer,
+    ChatUserProfileSerializer,
+    RePasswordSerializer,
+)
 from chat.serializers.chat_user_serializer import ChatUserAccessTokenV3Serializer
 from system_manage.serializers.chat_user_serializer import ChatUserAccessTokenSerializer
 from users.api import CaptchaAPI, LoginAPI
@@ -488,6 +492,27 @@ class ChatUserProfileView(APIView):
     )
     def get(self, request: Request):
         return result.success(ChatUserProfileSerializer().profile(request.user.profile))
+
+
+class ChatUserLanguageView(APIView):
+    authentication_classes = [ChatTokenAuth]
+
+    @extend_schema(
+        methods=["POST"],
+        summary=_("Switch current user language"),
+        description=_("Switch current user language"),
+        operation_id=_("V3 Switch current user language"),  # type: ignore
+        tags=[_("V3 Chat User")],  # type: ignore
+        request=ChatUserLanguageSerializer,
+        responses=DefaultResultSerializer,
+    )
+    @log(
+        menu="Chat User",
+        operate="Switch current user language",
+        get_operation_object=lambda r, k: {"name": r.user.profile.username},
+    )
+    def post(self, request: Request):
+        return result.success(ChatUserLanguageSerializer(data=request.data).switch(request.user.id))
 
 
 FILE_AUTH_COOKIE = "mk_file_auth"
