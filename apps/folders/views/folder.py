@@ -44,18 +44,16 @@ class FolderView(APIView):
             f"{kwargs.get('source')}_FOLDER_CREATE"
         ].get_workspace_permission_workspace_manage_role(),
         ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [
+            permissions=[
                 lambda r, kwargs: Permission(
-                    group=PermissionConstants[kwargs.get("source")].value.group,
-                    sub_group=PermissionConstants[kwargs.get("source")].value.sub_group,
-                    operate=PermissionConstants[kwargs.get("source")].value.operate,
-                    bit_index=PermissionConstants[kwargs.get("source")].value.bit_index,
+                    group=PermissionConstants[f"{kwargs.get('source')}_FOLDER_CREATE"].value.group,
+                    sub_group=PermissionConstants[f"{kwargs.get('source')}_FOLDER_CREATE"].value.sub_group,
+                    operate=PermissionConstants[f"{kwargs.get('source')}_FOLDER_CREATE"].value.operate,
+                    bit_index=PermissionConstants[f"{kwargs.get('source')}_FOLDER_CREATE"].value.bit_index,
                     workspace_id=kwargs.get("workspace_id"),
                     resource_id=r.data.get("parent_id"),
                 )
             ],
-            compare=CompareConstants.AND,
         ),
         RoleConstants.USER.get_workspace_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
