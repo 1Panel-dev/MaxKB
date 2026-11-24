@@ -20,6 +20,8 @@ function loadMessages(locale: Locale) {
 
 interface LanguageState {
   language: string
+  /** 语言缓存 key；未提供时使用 Admin 的 MaxKB-locale，为空时不同步缓存。 */
+  languageStorageKey?: string
   setLanguage: (language: string) => void
 }
 
@@ -48,7 +50,9 @@ export function createAppI18n(user: LanguageState) {
   )
 
   window.addEventListener('storage', (event) => {
-    if (event.storageArea === localStorage && (event.key === LANGUAGE_STORAGE_KEY || event.key === null)) {
+    const languageStorageKey = user.languageStorageKey ?? LANGUAGE_STORAGE_KEY
+    if (!languageStorageKey) return
+    if (event.storageArea === localStorage && (event.key === languageStorageKey || event.key === null)) {
       const language = normalizeLocale(event.newValue || navigator.language)
       if (user.language !== language) user.setLanguage(language)
     }
