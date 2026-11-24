@@ -207,7 +207,7 @@ class LLMNode(INode):
         )
 
         message_list = self._build_messages(node_params)
-        self.write_context("message_list", [_message_to_dict(m) for m in message_list])
+        self.data["message_list"] = [_message_to_dict(m) for m in message_list]
 
         tools = self._get_tools(node_params.get("tools"))
         model = chat_model.bind_tools(tools) if tools else chat_model
@@ -380,7 +380,7 @@ class LLMNode(INode):
             aggregation.aggregate(m)
         details.update(
             {
-                "message_list": self.get_context("message_list"),
+                "message_list": self.data.get("message_list"),
                 "content": self.get_context("content"),
                 "reasoning_content": self.get_context("reasoning_content"),
                 "reasoning_key": self.get_context("reasoning_key"),

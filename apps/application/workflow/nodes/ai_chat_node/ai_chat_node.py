@@ -577,7 +577,7 @@ class AIChatNode(INode):
                 await response.aclose()
 
     def _invoke_response(self, response, text_content_id=None):
-        model_setting = self.get_context("model_setting") or {}
+        model_setting = self.data.get("model_setting") or {}
         reasoning = Reasoning(
             model_setting.get("reasoning_content_start", "<think>"),
             model_setting.get("reasoning_content_end", "</think>"),

@@ -108,18 +108,17 @@ class TextToVideoNode(INode):
         ttv_model = get_model_instance_by_model_workspace_id(model_id, workspace_id, **(model_params_setting or {}))
 
         history_message = self._get_history_message(history_chat_record, dialogue_number)
-        self.write_context(
-            "history_message",
-            [{"content": message.content, "role": message.type} for message in (history_message or [])],
-        )
+        self.data["history_message"] = [
+            {"content": message.content, "role": message.type} for message in (history_message or [])
+        ]
 
         question = self.workflow_manage.generate_prompt(prompt)
-        self.write_context("question", question)
+        self.data["question"] = question
 
         # message_list = [*history_message, question]
         # self.write_context("message_list", [{"content": m.content, "role": m.type} for m in message_list],)
-        self.write_context("dialogue_type", dialogue_type)
-        self.write_context("negative_prompt", self.workflow_manage.generate_prompt(negative_prompt))
+        self.data["dialogue_type"] = dialogue_type
+        self.data["negative_prompt"] = self.workflow_manage.generate_prompt(negative_prompt)
 
         self._check_cancelled()
         video_urls = self.async_runner.run_async(lambda: self._await_generate(ttv_model, question, negative_prompt))
@@ -140,7 +139,7 @@ class TextToVideoNode(INode):
         video_label = f'<video src="{file_url}" controls style="max-width: 100%; width: 100%; height: auto; max-height: 60vh;"></video>'
         video_list = [{"file_id": file_url.split("/")[-1], "file_name": file_name, "url": file_url}]
 
-        self.write_context("answer", video_label)
+        self.data["answer"] = video_label
         self.write_context("video", video_list)
         # self.write_context("chat_model", ttv_model)
 
@@ -246,10 +245,10 @@ class TextToVideoNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "question": self.get_context("question"),
-                "answer": self.get_context("answer"),
+                "question": self.data.get("question"),
+                "answer": self.data.get("answer"),
                 "video": self.get_context("video"),
-                "negative_prompt": self.get_context("negative_prompt"),
+                "negative_prompt": self.data.get("negative_prompt"),
             }
         )
         return details

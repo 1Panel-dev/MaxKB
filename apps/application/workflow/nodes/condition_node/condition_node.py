@@ -46,8 +46,7 @@ class ConditionNode(INode):
         branch = self._evaluate_branches(branch_list)
         branch_id = branch.get("id")
         branch_name = branch.get("type")
-
-        self.write_context("branch_id", branch_id)
+        self.data["branch_id"] = branch_id
         self.write_context("branch_name", branch_name)
 
         self.complete(Status.SUCCESS, [self.branch_anchor(branch_id)])
@@ -65,7 +64,7 @@ class ConditionNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "branch_id": self.get_context("branch_id"),
+                "branch_id": self.data.get("branch_id"),
                 "branch_name": self.get_context("branch_name"),
             }
         )

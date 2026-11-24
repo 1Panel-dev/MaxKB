@@ -261,18 +261,18 @@ class SearchDocumentNode(INode):
         ]
 
         self.write_context("document_list", final_document_ids)
-        self.write_context("document_items", _serialize_items(document_items))
+        self.data["document_items"] = _serialize_items(document_items)
         self.write_context("knowledge_list", final_knowledge_ids)
-        self.write_context("knowledge_items", _serialize_items(knowledge_items))
+        self.data["knowledge_items"] = _serialize_items(knowledge_items)
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
                 "document_list": self.get_context("document_list"),
-                "document_items": self.get_context("document_items"),
+                "document_items": self.data.get("document_items"),
                 "knowledge_list": self.get_context("knowledge_list"),
-                "knowledge_items": self.get_context("knowledge_items"),
+                "knowledge_items": self.data.get("knowledge_items"),
             }
         )
         return details

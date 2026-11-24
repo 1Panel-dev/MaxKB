@@ -68,8 +68,8 @@ class McpNode(INode):
         result = [content.text for content in res.content]
 
         self.write_context("result", result)
-        self.write_context("tool_params", params)
-        self.write_context("mcp_tool", mcp_tool)
+        self.data["tool_params"] = params
+        self.data["mcp_tool"] = mcp_tool
 
     def _handle_variables(self, tool_params: Any) -> Any:
         if isinstance(tool_params, dict):
@@ -93,8 +93,8 @@ class McpNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "mcp_tool": self.get_context("mcp_tool"),
-                "tool_params": self.get_context("tool_params"),
+                "mcp_tool": self.data.get("mcp_tool"),
+                "tool_params": self.data.get("tool_params"),
                 "result": self.get_context("result"),
             }
         )

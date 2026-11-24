@@ -122,7 +122,7 @@ class TextToSpeechNode(INode):
         audio_segments = self.async_runner.run_async(
             lambda: self._process_tts_chunks(content_chunks, tts_model_id, workspace_id, model_params_setting)
         )
-        self.write_context("content", content_chunks[-1] if content_chunks else "")
+        self.data["content"] = content_chunks[-1] if content_chunks else ""
 
         combined_audio = AudioSegment.empty()
         for segment in audio_segments:
@@ -141,7 +141,7 @@ class TextToSpeechNode(INode):
         output_buffer.close()
 
         audio_label = f'<audio src="{file_url}" controls style="width: 300px; height: 43px"></audio>'
-        self.write_context("answer", audio_label)
+        self.data["answer"] = audio_label
         self.write_context("result", audio_list)
 
         if is_result:
@@ -212,8 +212,8 @@ class TextToSpeechNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "content": self.get_context("content"),
-                "answer": self.get_context("answer"),
+                "content": self.data.get("content"),
+                "answer": self.data.get("answer"),
                 "result": self.get_context("result"),
             }
         )

@@ -151,7 +151,7 @@ class ParameterExtractionNode(INode):
         input_variable = self.workflow_manage.get_reference_field(input_variable_ref[0], input_variable_ref[1:])
 
         input_variable_str = str(input_variable)
-        self.write_context("request", input_variable_str)
+        self.data["request"] = input_variable_str
 
         content = _generate_content(input_variable_str, variable_list)
         self._check_cancelled()
@@ -166,7 +166,7 @@ class ParameterExtractionNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "request": self.get_context("request"),
+                "request": self.data.get("request"),
                 "result": self.get_context("result"),
             }
         )

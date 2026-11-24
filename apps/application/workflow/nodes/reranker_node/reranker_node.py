@@ -151,27 +151,24 @@ class RerankerNode(INode):
         if not reranker_model_id:
             raise Exception(_("Model is not allowed to be empty"))
 
-        self.write_context("show_knowledge", show_knowledge)
+        self.data["show_knowledge"] = show_knowledge
 
         documents = _merge_reranker_list(reranker_list)
         documents = [d for d in documents if d.page_content and len(d.page_content) > 0]
 
         if len(documents) == 0:
-            self.write_context("document_list", [])
-            self.write_context("question", question)
+            self.data["document_list"] = []
+            self.data["question"] = question
             self.write_context("result_list", [])
             self.write_context("result", "")
             return
 
         top_n = reranker_setting.get("top_n", 3)
-        self.write_context(
-            "document_list",
-            [
-                {"page_content": document.page_content, "metadata": _reset_metadata(document.metadata)}
-                for document in documents
-            ],
-        )
-        self.write_context("question", question)
+        self.data["document_list"] = [
+            {"page_content": document.page_content, "metadata": _reset_metadata(document.metadata)}
+            for document in documents
+        ]
+        self.data["question"] = question
 
         workspace_id = workflow_params.get("workspace_id")
         reranker_model = get_model_instance_by_model_workspace_id(reranker_model_id, workspace_id, top_n=top_n)
@@ -195,11 +192,11 @@ class RerankerNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "question": self.get_context("question"),
+                "question": self.data.get("question"),
                 "result_list": self.get_context("result_list"),
                 "result": self.get_context("result"),
-                "document_list": self.get_context("document_list"),
-                "show_knowledge": self.get_context("show_knowledge"),
+                "document_list": self.data.get("document_list"),
+                "show_knowledge": self.data.get("show_knowledge"),
             }
         )
         return details

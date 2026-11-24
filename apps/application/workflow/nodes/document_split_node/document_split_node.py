@@ -146,8 +146,7 @@ class DocumentSplitNode(INode):
         with_filter = params.get("with_filter")
         with_filter_type = params.get("with_filter_type")
         with_filter_reference = params.get("with_filter_reference")
-
-        self.write_context("knowledge_id", knowledge_id)
+        self.data["knowledge_id"] = knowledge_id
         file_list = self.get_reference_content(document_list)
 
         # 处理引用类型的参数
@@ -191,12 +190,12 @@ class DocumentSplitNode(INode):
             paragraph_list += results
 
         self.write_context("paragraph_list", paragraph_list)
-        self.write_context("document_list", file_list)
-        self.write_context("limit", limit)
-        self.write_context("chunk_size", chunk_size)
-        self.write_context("with_filter", with_filter)
-        self.write_context("patterns", patterns)
-        self.write_context("split_strategy", split_strategy)
+        self.data["document_list"] = file_list
+        self.data["limit"] = limit
+        self.data["chunk_size"] = chunk_size
+        self.data["with_filter"] = with_filter
+        self.data["patterns"] = patterns
+        self.data["split_strategy"] = split_strategy
 
     def _split_text_document(self, doc, patterns, with_filter, limit):
         sections = [(None, doc["content"])]
@@ -320,11 +319,11 @@ class DocumentSplitNode(INode):
         details.update(
             {
                 "paragraph_list": limited_paragraph_list,
-                "limit": self.get_context("limit"),
-                "chunk_size": self.get_context("chunk_size"),
-                "with_filter": self.get_context("with_filter"),
-                "patterns": self.get_context("patterns"),
-                "split_strategy": self.get_context("split_strategy"),
+                "limit": self.data.get("limit"),
+                "chunk_size": self.data.get("chunk_size"),
+                "with_filter": self.data.get("with_filter"),
+                "patterns": self.data.get("patterns"),
+                "split_strategy": self.data.get("split_strategy"),
                 "enableException": self.node.properties.get("enableException"),
             }
         )

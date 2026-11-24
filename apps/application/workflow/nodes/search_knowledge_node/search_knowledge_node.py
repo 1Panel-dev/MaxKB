@@ -259,9 +259,9 @@ class SearchKnowledgeNode(INode):
             ]
             exclude_paragraph_id_list = list(set(paragraph_id_list))
 
-        self.write_context("question", question)
-        self.write_context("query_image_list", image_items)
-        self.write_context("show_knowledge", show_knowledge)
+        self.data["question"] = question
+        self.data["query_image_list"] = image_items
+        self.data["show_knowledge"] = show_knowledge
 
         document_id_list = None
         if search_scope_type == "referencing":
@@ -355,7 +355,7 @@ class SearchKnowledgeNode(INode):
         _record_recalled_items(embedding_list, result, self.workflow_manage, workflow_params.get("debug", False))
 
         self.write_context("paragraph_list", result)
-        self.write_context("image_list", image_list)
+        self.data["image_list"] = image_list
         self.write_context("is_hit_handling_method_list", [row for row in result if row.get("is_hit_handling_method")])
         self.write_context(
             "data",
@@ -372,11 +372,11 @@ class SearchKnowledgeNode(INode):
 
     def _write_empty_result(self, question):
         self.write_context("paragraph_list", [])
-        self.write_context("image_list", [])
+        self.data["image_list"] = []
         self.write_context("is_hit_handling_method_list", [])
         self.write_context("data", "")
         self.write_context("directly_return", "")
-        self.write_context("question", question)
+        self.data["question"] = question
 
     def _get_reference_content(self, fields: List[str]):
         if fields:
@@ -387,12 +387,12 @@ class SearchKnowledgeNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "question": self.get_context("question"),
-                "query_image_list": self.get_context("query_image_list"),
+                "question": self.data.get("question"),
+                "query_image_list": self.data.get("query_image_list"),
                 "paragraph_list": self.get_context("paragraph_list"),
-                "image_list": self.get_context("image_list"),
+                "image_list": self.data.get("image_list"),
                 "data": self.get_context("data"),
-                "show_knowledge": self.get_context("show_knowledge"),
+                "show_knowledge": self.data.get("show_knowledge"),
             }
         )
         return details

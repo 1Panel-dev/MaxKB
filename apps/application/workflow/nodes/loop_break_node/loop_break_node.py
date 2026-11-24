@@ -38,7 +38,7 @@ class LoopBreakNode(INode):
         condition_list = node_params.get("condition_list", [])
 
         is_break = do_assertion(self.workflow_manage, condition, condition_list)
-        self.write_context("is_break", is_break)
+        self.data["is_break"] = is_break
 
         if is_break:
             self.complete(Status.SUCCESS, signal=Signal.BREAK)
@@ -49,7 +49,7 @@ class LoopBreakNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "is_break": self.get_context("is_break"),
+                "is_break": self.data.get("is_break"),
             }
         )
         return details

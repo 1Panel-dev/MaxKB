@@ -7,7 +7,6 @@
 """
 
 import uuid_utils.compat as uuid
-from django.db import connection
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -95,7 +94,7 @@ class ApplicationNode(INode):
         else:
             question = ""
         question = str(question or "")
-        self.write_context("question", question)
+        self.data["question"] = question
 
         # 解析 api 输入 / 用户输入 → form_data
         form_data = {}
@@ -213,7 +212,7 @@ class ApplicationNode(INode):
             self._current_sub_manage = None
             # 持久化子应用上下文，供后续 resume 的 from_context 读取
             QuerySet(ChatRecord).filter(id=sub_chat_record_id).update(workflow_context=wf_manage.context)
-            usage = self._usage_from_context(wf_manage.context)
+            usage = wf_manage.get_usage()
             self._write_final_context(self._answer, self._reasoning_content, usage)
             # 子应用被取消：如实以 CANCELLED 结束本节点
             if wf_manage.signal == Signal.CANCELLED or self.workflow_manage.signal == Signal.CANCELLED:
@@ -283,32 +282,22 @@ class ApplicationNode(INode):
             return asker if isinstance(asker, dict) else {"username": asker}
         return workflow_params.get("chat_user")
 
-    @staticmethod
-    def _usage_from_context(workflow_context):
-        prompt_tokens = 0
-        completion_tokens = 0
-        for node_context in (workflow_context or {}).values():
-            if isinstance(node_context, dict):
-                prompt_tokens += node_context.get("message_tokens", 0) or 0
-                completion_tokens += node_context.get("answer_tokens", 0) or 0
-        return {"prompt_tokens": prompt_tokens, "completion_tokens": completion_tokens}
-
     def _write_final_context(self, answer, reasoning_content, usage):
-        self.write_context("answer", answer)
         self.write_context("result", answer)
-        self.write_context("reasoning_content", reasoning_content)
-        self.write_context("message_tokens", usage.get("prompt_tokens", 0))
-        self.write_context("answer_tokens", usage.get("completion_tokens", 0))
+        self.data["answer"] = answer
+        self.data["reasoning_content"] = reasoning_content
+        self.data["message_tokens"] = usage.get("prompt_tokens", 0)
+        self.data["answer_tokens"] = usage.get("completion_tokens", 0)
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "question": self.get_context("question"),
-                "answer": self.get_context("answer"),
-                "reasoning_content": self.get_context("reasoning_content"),
-                "message_tokens": self.get_context("message_tokens"),
-                "answer_tokens": self.get_context("answer_tokens"),
+                "question": self.data.get("question"),
+                "answer": self.data.get("answer"),
+                "reasoning_content": self.data.get("reasoning_content"),
+                "message_tokens": self.data.get("message_tokens"),
+                "answer_tokens": self.data.get("answer_tokens"),
             }
         )
         return details

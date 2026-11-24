@@ -38,7 +38,7 @@ class LoopContinueNode(INode):
         condition_list = node_params.get("condition_list", [])
 
         is_continue = do_assertion(self.workflow_manage, condition, condition_list)
-        self.write_context("is_continue", is_continue)
+        self.data["is_continue"] = is_continue
 
         if is_continue:
             self.complete(Status.SUCCESS, signal=Signal.CONTINUE)
@@ -49,7 +49,7 @@ class LoopContinueNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "is_continue": self.get_context("is_continue"),
+                "is_continue": self.data.get("is_continue"),
             }
         )
         return details

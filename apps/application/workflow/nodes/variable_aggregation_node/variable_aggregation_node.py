@@ -73,8 +73,8 @@ class VariableAggregationNode(INode):
         }
 
         self.write_context("result", result)
-        self.write_context("strategy", strategy)
-        self.write_context("group_list", self.reset_group_list(group_list))
+        self.data["strategy"] = strategy
+        self.data["group_list"] = self.reset_group_list(group_list)
         for key, value in result.items():
             self.write_context(key, value)
 
@@ -125,8 +125,8 @@ class VariableAggregationNode(INode):
         details.update(
             {
                 "result": _filter_file_bytes(self.get_context("result")),
-                "strategy": self.get_context("strategy"),
-                "group_list": _filter_file_bytes(self.get_context("group_list")),
+                "strategy": self.data.get("strategy"),
+                "group_list": _filter_file_bytes(self.data.get("group_list")),
                 "status": self.status.value if self.status else None,
             }
         )
