@@ -50,9 +50,6 @@ watch(
   <div class="ding-talk-layout">
     <div id="dingtalk-qr-code" />
   </div>
-  <p class="relative mt-3 text-center text-N600">
-    {{ t('auth.qrCode.scanHint', { provider: t('auth.methods.dingtalk') }) }}
-  </p>
 </template>
 <style lang="scss" scoped>
 .ding-talk-layout {
