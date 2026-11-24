@@ -12,7 +12,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from application.api.application_stats import ApplicationStatsAPI
+from application.api.application_stats import ApplicationRankingPageResult, ApplicationStatsAPI
 from application.serializers.application_stats import ApplicationStatisticsSerializer
 from common import result
 from common.auth import TokenAuth
@@ -120,7 +120,7 @@ class ApplicationStats(APIView):
             summary=_("Application token usage ranking"),
             operation_id=_("Application token usage ranking"),  # type: ignore
             parameters=ApplicationStatsAPI.get_parameters(),
-            responses=ApplicationStatsAPI.get_response(),
+            responses=ApplicationRankingPageResult,
             tags=[_("Application")],  # type: ignore
         )
         @has_permissions(
@@ -151,7 +151,7 @@ class ApplicationStats(APIView):
             summary=_("Application top question ranking"),
             operation_id=_("Application top question ranking"),  # type: ignore
             parameters=ApplicationStatsAPI.get_parameters(),
-            responses=ApplicationStatsAPI.get_response(),
+            responses=ApplicationRankingPageResult,
             tags=[_("Application")],  # type: ignore
         )
         @has_permissions(

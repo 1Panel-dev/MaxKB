@@ -28,7 +28,7 @@ class ApplicationRankingSerializerTests(TestCase):
         self.today_str = today.strftime("%Y-%m-%d")
         self.user = make_user("owner")
         folder = ApplicationFolder.objects.create(
-            id="default",
+            id="ranking-test-folder",
             name="默认分组",
             workspace_id="default",
             user=self.user,
@@ -88,20 +88,20 @@ class ApplicationRankingSerializerTests(TestCase):
         self.make_record(c3, 20, 20)
 
         page = ApplicationStatisticsSerializer(data=self.serializer_data).get_ranking_statistics("userTokens", 1, 2)
-        self.assertEqual(page.total, 3)
-        self.assertEqual(page.size, 2)
-        self.assertEqual(page.current, 1)
-        self.assertEqual(len(page.records), 2)
+        self.assertEqual(page["total"], 3)
+        self.assertEqual(page["size"], 2)
+        self.assertEqual(page["current"], 1)
+        self.assertEqual(len(page["records"]), 2)
         # 按 total_tokens 降序
-        self.assertEqual(page.records[0]["chat_user_id"], "u2")
-        self.assertEqual(page.records[1]["chat_user_id"], "u3")
-        self.assertEqual(page.records[0]["asker"]["username"], "bob")
-        self.assertEqual(page.records[0]["total_tokens"], 50)
-        self.assertEqual(page.records[0]["chat_record_count"], 1)
+        self.assertEqual(page["records"][0]["chat_user_id"], "u2")
+        self.assertEqual(page["records"][1]["chat_user_id"], "u3")
+        self.assertEqual(page["records"][0]["asker"]["username"], "bob")
+        self.assertEqual(page["records"][0]["total_tokens"], 50)
+        self.assertEqual(page["records"][0]["chat_record_count"], 1)
 
         page2 = ApplicationStatisticsSerializer(data=self.serializer_data).get_ranking_statistics("userTokens", 2, 2)
-        self.assertEqual(len(page2.records), 1)
-        self.assertEqual(page2.records[0]["chat_user_id"], "u1")
+        self.assertEqual(len(page2["records"]), 1)
+        self.assertEqual(page2["records"][0]["chat_user_id"], "u1")
 
     def test_questions_ranking_order(self):
         c1 = self.make_chat(self.application, "u1", "alice")
@@ -111,10 +111,10 @@ class ApplicationRankingSerializerTests(TestCase):
         self.make_record(c2, 1, 1)
 
         page = ApplicationStatisticsSerializer(data=self.serializer_data).get_ranking_statistics("questions", 1, 10)
-        self.assertEqual(page.total, 2)
+        self.assertEqual(page["total"], 2)
         # 按对话次数降序
-        self.assertEqual(page.records[0]["chat_user_id"], "u1")
-        self.assertEqual(page.records[0]["chat_record_count"], 2)
+        self.assertEqual(page["records"][0]["chat_user_id"], "u1")
+        self.assertEqual(page["records"][0]["chat_record_count"], 2)
 
     def test_ranking_name_search(self):
         c1 = self.make_chat(self.application, "u1", "alice")
@@ -124,8 +124,8 @@ class ApplicationRankingSerializerTests(TestCase):
 
         data = {**self.serializer_data, "name": "ali"}
         page = ApplicationStatisticsSerializer(data=data).get_ranking_statistics("userTokens", 1, 10)
-        self.assertEqual(page.total, 1)
-        self.assertEqual(page.records[0]["chat_user_id"], "u1")
+        self.assertEqual(page["total"], 1)
+        self.assertEqual(page["records"][0]["chat_user_id"], "u1")
 
     def test_aggregations(self):
         c1 = self.make_chat(self.application, "u1", "alice")

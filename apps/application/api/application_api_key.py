@@ -4,10 +4,10 @@ from drf_spectacular.utils import OpenApiParameter
 from application.serializers.application_access_token import ApiKeyEnableSerializer
 from application.serializers.application_api_key import EditApplicationKeySerializer, ApplicationKeySerializerModel
 from common.mixins.api_mixin import APIMixin
-from common.result import ResultSerializer
+from common.result import ResultPageSerializer, ResultSerializer
 
 
-class ApplicationKeyListResult(ResultSerializer):
+class ApplicationKeyListResult(ResultPageSerializer):
     def get_data(self):
         return ApplicationKeySerializerModel(many=True)
 

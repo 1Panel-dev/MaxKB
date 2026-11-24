@@ -17,6 +17,7 @@ from knowledge.api.knowledge import (
     KnowledgeTreeReadAPI,
     KnowledgeEditAPI,
     KnowledgeReadAPI,
+    KnowledgeTagsAPI,
     KnowledgeMoveAPI,
     KnowledgePageAPI,
     SyncWebAPI,
@@ -768,8 +769,8 @@ class KnowledgeView(APIView):
             description=_("Get all tags of knowledge base"),
             summary=_("Get all tags of knowledge base"),
             operation_id=_("Get all tags of knowledge base"),  # type: ignore
-            parameters=KnowledgeReadAPI.get_parameters(),
-            responses=KnowledgeReadAPI.get_response(),
+            parameters=KnowledgeTagsAPI.get_parameters(),
+            responses=KnowledgeTagsAPI.get_response(),
             tags=[_("Knowledge Base")],  # type: ignore
         )
         @has_permissions(

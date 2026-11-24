@@ -1,8 +1,10 @@
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
+from rest_framework import serializers
 
 from common.mixins.api_mixin import APIMixin
 from common.result import DefaultResultSerializer, ResultPageSerializer, ResultSerializer
+from knowledge.models import Tag
 from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
 from knowledge.serializers.common import GenerateRelatedSerializer
 from knowledge.serializers.knowledge import (
@@ -19,6 +21,37 @@ from knowledge.serializers.knowledge_sync import KnowledgeSyncLogSerializer, Kno
 class KnowledgeCreateResponse(ResultSerializer):
     def get_data(self):
         return KnowledgeModelSerializer()
+
+
+class KnowledgeListResponse(ResultSerializer):
+    def get_data(self):
+        return KnowledgeModelSerializer(many=True)
+
+
+class KnowledgeTagValue(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ("id", "value", "create_time", "update_time")
+
+
+class KnowledgeTagGroup(serializers.Serializer):
+    key = serializers.CharField()
+    values = KnowledgeTagValue(many=True)
+
+
+class KnowledgeTagsResponse(ResultSerializer):
+    def get_data(self):
+        return KnowledgeTagGroup(many=True)
+
+
+class KnowledgeTagsAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [OpenApiParameter("knowledge_ids[]", OpenApiTypes.UUID, many=True)]
+
+    @staticmethod
+    def get_response():
+        return KnowledgeTagsResponse
 
 
 class KnowledgeReadAPI(APIMixin):
@@ -120,6 +153,10 @@ class KnowledgeEditAPI(APIMixin):
 
 
 class KnowledgeTreeReadAPI(KnowledgeReadAPI):
+    @staticmethod
+    def get_response():
+        return KnowledgeListResponse
+
     @staticmethod
     def get_parameters():
         return [
