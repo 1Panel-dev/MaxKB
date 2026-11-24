@@ -37,9 +37,7 @@ const userPasswordRules = computed<FormRules<UpdatePasswordForm>>(() => ({
     { required: true, message: t('auth.changePassword.newPassword.requiredMessage'), trigger: 'blur' },
     { min: 6, max: 20, message: t('common.validation.lengthRange', { min: 6, max: 20 }), trigger: 'blur' },
   ],
-  re_password: [
-    { required: true, whitespace: true, message: t('user.confirmPassword.requiredMessage'), trigger: 'blur' },
-    { validator: validateConfirmPassword, trigger: 'blur' }],
+  re_password: [{ required: true, whitespace: true, validator: validateConfirmPassword, trigger: 'blur' }],
 }))
 
 function open(user: ChatUser) {
