@@ -20,7 +20,7 @@
   "permission": {
     "title": "Permission configuration",
     "category": "Category",
-    "module": "Module name",
+    "module": "Module",
     "target": "Target"
   },
   "delete": {

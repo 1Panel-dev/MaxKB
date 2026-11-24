@@ -80,7 +80,6 @@ export interface ApplicationAccessTokenPayload {
   access_num?: number
   white_active?: boolean
   white_list?: string[]
-  language?: string | null
   authentication?: boolean
   authentication_value?: ApplicationAuthenticationConfig
 }

@@ -62,7 +62,6 @@ export function toDebugAppInfo(detail: ApplicationDetail, displayConfig?: Partia
     show_source: true,
     show_exec: true,
     show_share: false,
-    language: display.language || null,
     show_history: display.show_history,
     draggable: display.draggable,
     avatar: display.avatar,

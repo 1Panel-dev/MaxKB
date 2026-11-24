@@ -31,7 +31,6 @@ export interface ChatApplicationProfile {
   show_source?: boolean
   show_exec?: boolean
   show_share?: boolean
-  language?: string | null
   show_history?: boolean
   draggable?: boolean
   show_guide?: boolean

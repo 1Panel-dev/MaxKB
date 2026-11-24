@@ -25,7 +25,6 @@ const loading = ref(false)
 const loginMethodOptions = ref<OptionItem<string>[]>([])
 const formRef = useTemplateRef<FormInstance>('formRef')
 const form = reactive({
-  language: undefined as string | undefined,
   authentication_value: {} as ApplicationAuthenticationConfig,
   access_num: 100,
   authentication: false,
@@ -88,7 +87,6 @@ function loadAccessRestriction() {
   return fetchConfig()
     .then((config) => {
       Object.assign(form, {
-        language: config.language,
         authentication_value: cloneDeep(config.authentication_value ?? {}),
         access_num: config.access_num,
         authentication: config.authentication ?? false,
@@ -130,8 +128,6 @@ function handleSave() {
         .split('\n')
         .map((origin) => origin.trim())
         .filter(Boolean),
-      // 后端省略 language 会清空配置，访问限制保存时保留原值。
-      language: form.language,
       authentication: form.authentication,
       authentication_value: cloneDeep(form.authentication_value),
     }
