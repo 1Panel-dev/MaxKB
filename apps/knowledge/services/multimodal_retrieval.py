@@ -15,6 +15,10 @@ MAX_QUERY_IMAGE_COUNT = 10
 MAX_QUERY_IMAGE_SIZE = 20 * 1024 * 1024
 
 
+class QueryImageError(AppApiException):
+    """The supplied image attachment cannot be used as a retrieval input."""
+
+
 def get_retrieval_source_metadata(knowledge_type, resource_type, source_file_id=None) -> dict:
     return {
         "knowledge_type": knowledge_type,
@@ -54,36 +58,37 @@ def enrich_paragraph_sources(paragraphs: Iterable[dict]) -> list[dict]:
     ]
 
 
-def load_image_query_inputs(image_items: Iterable[dict], user_id=None) -> list[str]:
+def load_image_query_inputs(image_items: Iterable[dict], user_id=None, *, file_queryset=None) -> list[str]:
     """Resolve uploaded file references into provider-neutral image data URLs."""
     items = list(image_items or [])
     if not items:
         return []
     if len(items) > MAX_QUERY_IMAGE_COUNT:
-        raise AppApiException(
+        raise QueryImageError(
             500,
             _("A maximum of {count} images can be queried at a time").format(count=MAX_QUERY_IMAGE_COUNT),
         )
 
     file_ids = [str(item.get("file_id")) for item in items]
-    files = {str(file.id): file for file in QuerySet(File).filter(id__in=file_ids)}
+    queryset = QuerySet(File) if file_queryset is None else file_queryset
+    files = {str(file.id): file for file in queryset.filter(id__in=file_ids)}
     image_inputs = []
     for file_id in file_ids:
         file = files.get(file_id)
         if file is None:
-            raise AppApiException(500, _("Query image does not exist: {file_id}").format(file_id=file_id))
+            raise QueryImageError(500, _("Query image does not exist: {file_id}").format(file_id=file_id))
 
         owner_id = str((file.meta or {}).get("user_id") or "")
         if owner_id and user_id and owner_id != str(user_id):
-            raise AppApiException(403, _("No permission to access the query image"))
+            raise QueryImageError(403, _("No permission to access the query image"))
 
         mime_type = mimetypes.guess_type(file.file_name)[0] or ""
         if not mime_type.startswith("image/"):
-            raise AppApiException(500, _("Only image files can be used for image queries"))
+            raise QueryImageError(500, _("Only image files can be used for image queries"))
 
         content = file.get_bytes()
         if len(content) > MAX_QUERY_IMAGE_SIZE:
-            raise AppApiException(
+            raise QueryImageError(
                 500,
                 _("The maximum size of a query image cannot exceed {size}MB").format(
                     size=MAX_QUERY_IMAGE_SIZE // 1024 // 1024

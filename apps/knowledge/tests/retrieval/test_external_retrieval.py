@@ -152,6 +152,8 @@ class RetrievalSettingsTests(SimpleTestCase):
                 )
                 data = json.loads(arguments[arguments.index("-d") + 1])
                 self.assertTrue(RetrievalRequest(data=data).is_valid())
+                self.assertEqual(data["image_list"], [])
+                self.assertIn('"file_id"', settings["api_example"])
                 self.assertEqual(data["search_mode"], "embedding")
 
     def test_routes_resolve_to_knowledge_and_preserve_application_mcp(self):
@@ -649,8 +651,10 @@ class RetrievalTransportTests(SimpleTestCase):
                     self.assertEqual(initialized.serverInfo.name, "maxkb-knowledge-mcp")
                     tools = await session.list_tools()
                     self.assertEqual(tools.tools[0].name, f"knowledge_{KID}")
-                    result = await session.call_tool(tools.tools[0].name, {"query_text": "hello"})
-                    self.assertEqual(json.loads(result.content[0].text), self.output)
+                    for arguments in ({"query_text": "hello"}, {"image_list": [{"file_id": DID}]}):
+                        result = await session.call_tool(tools.tools[0].name, arguments)
+                        self.assertEqual(json.loads(result.content[0].text), self.output)
+                        self.mcp.assert_called_with(KID, access.RetrievalIdentity(UID, KEY), arguments)
 
 
 class KnowledgeMCPToolResultTests(SimpleTestCase):
@@ -702,7 +706,8 @@ class GlobalKnowledgeMCPTests(SimpleTestCase):
         authenticate.assert_called_once_with("Bearer k")
         tools = json.loads(response.content)["result"]["tools"]
         self.assertEqual([tool["name"] for tool in tools], ["list_knowledge", "search_knowledge"])
-        self.assertEqual(tools[1]["inputSchema"]["required"], ["knowledge_id", "query_text"])
+        self.assertEqual(tools[1]["inputSchema"]["required"], ["knowledge_id"])
+        self.assertIn("image_list", tools[1]["inputSchema"]["properties"])
 
     def test_rejects_foreign_origin(self):
         response = self.rpc({"jsonrpc": "2.0", "id": 1, "method": "ping"}, HTTP_ORIGIN="https://foreign.example")

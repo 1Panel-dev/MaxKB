@@ -9,11 +9,33 @@ from rest_framework.exceptions import ValidationError
 from chat.mcp.common import initialize_result, json_result, tool_error
 from knowledge.models import Knowledge
 from knowledge.services.external_retrieval import retrieve
+from knowledge.services.multimodal_retrieval import MAX_QUERY_IMAGE_COUNT
 from knowledge.services.retrieval_access import RetrievalError, authorized_ids
 
 # 检索参数，单知识库 MCP 与全局知识库 MCP 的 search_knowledge 共用
 RETRIEVAL_INPUT_PROPERTIES = {
-    "query_text": {"type": "string", "minLength": 1, "maxLength": 8000},
+    "query_text": {
+        "type": "string",
+        "maxLength": 8000,
+        "description": "Search text. Optional when images are supplied.",
+    },
+    "image_list": {
+        "type": "array",
+        "description": "Images uploaded by the current chat user. Use embedding or blend search.",
+        "maxItems": MAX_QUERY_IMAGE_COUNT,
+        "items": {
+            "type": "object",
+            "required": ["file_id"],
+            "properties": {
+                "file_id": {"type": "string", "format": "uuid"},
+                "name": {"type": "string"},
+                "url": {
+                    "type": "string",
+                    "description": "Optional attachment metadata. The file_id selects the image.",
+                },
+            },
+        },
+    },
     "top_number": {"type": "integer", "minimum": 1, "maximum": 50, "default": 5},
     "similarity": {"type": "number", "minimum": 0, "maximum": 1, "default": 0},
     "search_mode": {
@@ -27,6 +49,30 @@ RETRIEVAL_INPUT_PROPERTIES = {
 LIST_KNOWLEDGE_TOOL = "list_knowledge"
 
 SEARCH_KNOWLEDGE_TOOL = "search_knowledge"
+
+
+def retrieval_input_schema(*, with_knowledge_id=False):
+    schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": [],
+        "properties": RETRIEVAL_INPUT_PROPERTIES,
+        "anyOf": [
+            {"required": ["query_text"], "properties": {"query_text": {"pattern": r"\S"}}},
+            {"required": ["image_list"], "properties": {"image_list": {"minItems": 1}}},
+        ],
+    }
+    if with_knowledge_id:
+        schema["required"] = ["knowledge_id"]
+        schema["properties"] = {
+            "knowledge_id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "Knowledge base id from list_knowledge.",
+            },
+            **RETRIEVAL_INPUT_PROPERTIES,
+        }
+    return schema
 
 
 def initialize_knowledge(params):
@@ -73,12 +119,7 @@ class KnowledgeMCPToolHandler:
                 {
                     "name": self.tool_name,
                     "description": description,
-                    "inputSchema": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": ["query_text"],
-                        "properties": RETRIEVAL_INPUT_PROPERTIES,
-                    },
+                    "inputSchema": retrieval_input_schema(),
                 }
             ]
         }
@@ -114,18 +155,7 @@ class ChatUserKnowledgeMCPToolHandler:
                     "name": SEARCH_KNOWLEDGE_TOOL,
                     "description": f"Search a knowledge base from {LIST_KNOWLEDGE_TOOL} by knowledge_id. "
                     "Returns the matching paragraphs with similarity scores and citations.",
-                    "inputSchema": {
-                        "type": "object",
-                        "additionalProperties": False,
-                        "required": ["knowledge_id", "query_text"],
-                        "properties": {
-                            "knowledge_id": {
-                                "type": "string",
-                                "description": f"Id of the knowledge base to search, from {LIST_KNOWLEDGE_TOOL}.",
-                            },
-                            **RETRIEVAL_INPUT_PROPERTIES,
-                        },
-                    },
+                    "inputSchema": retrieval_input_schema(with_knowledge_id=True),
                 },
             ]
         }

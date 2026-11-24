@@ -174,10 +174,26 @@ async function getTools() {
 async function _getTools(mcpServers: string) {
   loading.value = true
   try {
-    const tools = await store.getMcpTools(mcpResourceType, mcpResourceId, mcpServers)
+    const tools = await store.force.getMcpTools(mcpResourceType, mcpResourceId, mcpServers)
     form_data.value.mcp_tools = tools
+    const selected = tools.find((tool) => tool.name === form_data.value.mcp_tool)
+    if (selected?.args_schema) {
+      const previousFields = form_data.value.tool_form_field ?? []
+      const previousParams = paramsOf() ?? {}
+      const previousNested = form_data.value.params_nested ?? ''
+      changeTool()
+      if (previousNested === form_data.value.params_nested) {
+        const params = paramsOf()
+        for (const field of form_data.value.tool_form_field) {
+          const previous = previousFields.find((item) => item.field === field.field && item.input_type === field.input_type)
+          if (!previous) continue
+          field.source = previous.source
+          if (Object.hasOwn(previousParams, field.field)) params[field.field] = previousParams[field.field]
+        }
+      }
+    }
     MsgSuccess(t('workflow.mcp.tools.loadSuccess'))
-    form_data.value.mcp_server = tools.find((item) => item.name === form_data.value.mcp_tool)?.server ?? ''
+    form_data.value.mcp_server = selected?.server ?? ''
   } catch {
     MsgError(t('workflow.mcp.tools.loadFailed'))
   } finally {
@@ -229,6 +245,7 @@ function changeTool() {
   form_data.value.mcp_server = selected?.server ?? ''
   const argsSchema = selected?.args_schema as ArgsSchema | undefined
   form_data.value.tool_form_field = []
+  form_data.value.params_nested = ''
 
   const resolveInputType = (type?: string): string => {
     if (type === 'number') return 'NumberInput'

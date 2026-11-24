@@ -48,6 +48,18 @@ curl "$BASE_URL/chat/api/v3/knowledge/$KNOWLEDGE_ID/retrieve" \
 
 Authorization 必须携带有效的对话用户 API Key。文本最长 8000 字符，top_number 为 1–50（默认 5），
 similarity 为 0–1（默认 0），search_mode 支持 embedding、keywords、blend（默认 embedding）。
+多模态向量模型支持纯图片和图文混合查询。传入 `image_list` 时可以省略 `query_text`，
+并选择 `embedding` 或 `blend`。每次最多 10 张图片，每张最大 20 MiB。
+使用与 API Key 对应的对话用户上传的聊天附件，`file_id` 取自上传结果。纯图片请求体示例：
+
+```json
+{"image_list":[{"file_id":"<已上传图片的 UUID>"}],"top_number":5,"search_mode":"embedding"}
+```
+
+工作流的 MCP 调用节点刷新工具后，可将开始节点的图片列表变量直接绑定到 `image_list`。
+已有应用 MCP 的外部客户端也可以使用其 `upload_file` 工具上传图片，再将返回的 `file_id`
+传给知识库检索工具。附件中的 `name` 和 `url` 可随原始对象一并传入，服务端按文件 ID 读取图片。
+
 检索限定当前知识库，返回 `knowledge_id` 和 `hits`，命中包含段落正文（最多 8000 字符）、
 分数、来源与 `citation`（知识库、文档、段落 ID 和名称）；不生成回答。
 每个命中同时包含 `knowledge_type`（KnowledgeType 数字枚举）、`document_resource_type`（`image` 或 `document`）
@@ -85,4 +97,6 @@ GET/DELETE 返回 405。不提供旧 SSE 或 OAuth 自动发现。带 Origin 的
 
 `python apps/manage.py test knowledge.tests.retrieval.test_external_retrieval` 包含两个开关的组合和缺省值、
 原有 Key、所有授权模式下的必填 Key 校验、授权撤销、跨库过滤、管理员调试、JSON-RPC 和真实 MCP Python SDK 的内存 HTTP 往返测试。
-真实 PostgreSQL/pgvector、模型供应商和外部客户端仍需在配置好的测试环境完成部署验收。
+`knowledge.tests.retrieval.test_external_image_retrieval` 使用 PostgreSQL/pgvector 与固定的测试向量，
+覆盖 REST、单知识库 MCP 和全局 MCP 的图片检索、图文混合查询与上传文件权限。
+部署验收可使用实际的多模态向量模型和外部客户端复测。

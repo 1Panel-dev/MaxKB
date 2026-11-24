@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from knowledge.models import Knowledge
+from knowledge.serializers.knowledge import HitTestSerializer
 from maxkb.const import CONFIG
 
 
@@ -22,14 +23,14 @@ class ExternalServiceSettings(StrictSerializer):
     enabled = serializers.BooleanField()
 
 
-class RetrievalRequest(StrictSerializer):
-    query_text = serializers.CharField(max_length=8000, allow_blank=False)
+class RetrievalRequest(StrictSerializer, HitTestSerializer):
+    query_text = serializers.CharField(max_length=8000, allow_blank=True, default="")
     top_number = serializers.IntegerField(default=5, min_value=1, max_value=50)
     similarity = serializers.FloatField(default=0.0, min_value=0.0, max_value=1.0)
     search_mode = serializers.ChoiceField(choices=["embedding", "keywords", "blend"], default="embedding")
 
     def to_internal_value(self, data):
-        if isinstance(data, dict) and not isinstance(data.get("query_text"), str):
+        if isinstance(data, dict) and "query_text" in data and not isinstance(data["query_text"], str):
             raise serializers.ValidationError({"query_text": [_("query_text must be a string.")]})
         return super().to_internal_value(data)
 
@@ -54,12 +55,19 @@ def service_settings(knowledge, request=None):
         "-H 'Content-Type: application/json'",
         "-H 'Authorization: Bearer <CHAT_USER_API_KEY>'",
     ]
-    payload = {"query_text": "如何使用知识库？", "top_number": 5, "similarity": 0, "search_mode": "embedding"}
+    payload = {
+        "query_text": "如何使用知识库？",
+        "image_list": [],
+        "top_number": 5,
+        "similarity": 0,
+        "search_mode": "embedding",
+    }
     example.append(f"-d {shlex.quote(json.dumps(payload, ensure_ascii=False))}")
+    api_example = " \\\n  ".join(example) + '\n# image_list: [{"file_id": "<UPLOADED_IMAGE_UUID>"}]'
     return {
         "enabled": knowledge.external_service.get("enabled", False),
         "api_url": api_url,
-        "api_example": " \\\n  ".join(example),
+        "api_example": api_example,
         "mcp_url": mcp_url,
         "mcp_config": {f"knowledge_{knowledge.id}": connection},
     }

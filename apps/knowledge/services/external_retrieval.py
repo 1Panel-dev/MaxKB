@@ -2,9 +2,14 @@
 
 import math
 
+from django.utils.translation import gettext as _
+from rest_framework.exceptions import ValidationError
+
 from common.config.embedding_config import VectorStore
 from knowledge.models import (
     Document,
+    File,
+    FileSourceType,
     LocalState,
     Paragraph,
     ParagraphAsset,
@@ -14,7 +19,11 @@ from knowledge.models import (
 )
 from knowledge.serializers.common import get_embedding_model_by_knowledge_id
 from knowledge.serializers.external_retrieval import RetrievalRequest
-from knowledge.services.multimodal_retrieval import get_retrieval_source_metadata
+from knowledge.services.multimodal_retrieval import (
+    QueryImageError,
+    get_retrieval_source_metadata,
+    load_image_query_inputs,
+)
 from knowledge.services.retrieval_access import authorize_external, refresh_identity
 from knowledge.services.retrieval_stats import record_recall_safely
 
@@ -44,6 +53,15 @@ def retrieve(knowledge_id, identity, data):
     excluded = list(Document.objects.filter(knowledge_id=knowledge.id, is_active=False).values_list("id", flat=True))
     mode = SearchMode(data["search_mode"])
     model = get_embedding_model_by_knowledge_id(knowledge.id) if mode != SearchMode.keywords else None
+    image_inputs = []
+    if data["image_list"]:
+        if not model.supports_image_embedding():
+            raise ValidationError({"image_list": _("The current embedding model does not support image embedding")})
+        uploads = File.objects.filter(source_type=FileSourceType.CHAT, meta__user_id=identity.user_id)
+        try:
+            image_inputs = load_image_query_inputs(data["image_list"], file_queryset=uploads)
+        except QueryImageError as exc:
+            raise ValidationError({"image_list": str(exc.message)}) from exc
     matches = VectorStore.get_embedding_vector().hit_test(
         data["query_text"],
         [str(knowledge.id)],
@@ -52,6 +70,7 @@ def retrieve(knowledge_id, identity, data):
         data["similarity"],
         mode,
         model,
+        image_list=image_inputs,
     )
     # Check current credentials and publication again after the potentially slow model call.
     knowledge = authorize_external(knowledge_id, refresh_identity(identity))
