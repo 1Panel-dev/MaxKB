@@ -83,7 +83,6 @@ class ChatAuthProfileSerializer(serializers.Serializer):
             "max_attempts": application_access_token.authentication_value.get("max_attempts", 1),
             "enable_auth": application_access_token.authentication,
             "login_value": login_value,
-            "language": application_access_token.language,
             "rsa_key": get_key_pair_by_sql().get("key"),
             "custom_theme": application_setting.custom_theme
             if application_setting
@@ -252,6 +251,5 @@ class ApplicationProfileSerializer(serializers.Serializer):
             "show_source": application_access_token.show_source,
             "show_exec": application_access_token.show_exec,
             "show_share": True,
-            "language": application_access_token.language,
             **application_setting_dict,
         }

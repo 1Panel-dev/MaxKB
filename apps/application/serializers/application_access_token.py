@@ -33,7 +33,6 @@ class AccessTokenEditSerializer(serializers.Serializer):
     )
     show_source = serializers.BooleanField(required=False, label=_("Whether to display knowledge sources"))
     show_exec = serializers.BooleanField(required=False, label=_("Display execution details"))
-    language = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("language"))
     enable_api_key = serializers.BooleanField(required=False, label=_("Enable API key"))
     authentication = serializers.BooleanField(default=False, label="Do you need authentication")
 
@@ -68,8 +67,6 @@ class AccessTokenSerializer(serializers.Serializer):
             value = validated_data.get(field)
             if value is not None:
                 setattr(application_access_token, field, value)
-
-        application_access_token.language = validated_data.get("language")
 
         authentication = validated_data.get("authentication")
         if authentication is not None:
@@ -130,7 +127,6 @@ class AccessTokenSerializer(serializers.Serializer):
             "white_list": application_access_token.white_list,
             "show_source": application_access_token.show_source,
             "show_exec": application_access_token.show_exec,
-            "language": application_access_token.language,
             "enable_api_key": application_access_token.enable_api_key,
             **other,
         }

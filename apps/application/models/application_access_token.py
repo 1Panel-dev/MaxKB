@@ -32,7 +32,6 @@ class ApplicationAccessToken(AppModelMixin):
     authentication = models.BooleanField(default=False, verbose_name="是否需要认证")
     authentication_value = models.JSONField(verbose_name="认证的值", default=dict)
     enable_api_key = models.BooleanField(default=False, verbose_name="是否启用api key访问应用")
-    language = models.CharField(max_length=10, verbose_name="语言", default=None, null=True)
 
     class Meta:
         db_table = "application_access_token"
