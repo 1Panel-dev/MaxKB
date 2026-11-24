@@ -12,7 +12,7 @@ const { t } = useI18n({ useScope: 'global' })
 
 defineOptions({ name: 'BaseNodeLongTermSetting' })
 
-const props = defineProps<{ modelOptions: ModelItem[]; providerOptions: ModelProviderItem[]; defaultModelSetting?: ModelConfig }>()
+defineProps<{ modelOptions: ModelItem[]; providerOptions: ModelProviderItem[]; defaultModelSetting?: ModelConfig }>()
 const setting = defineModel<LongTermSetting>({ required: true })
 
 // 长期记忆设置：打开时创建草稿，保存后回写配置。
@@ -158,10 +158,6 @@ function validateModel(_rule: unknown, _value: unknown, callback: (error?: Error
     callback(new Error(t('model.ai.requiredMessage')))
     return
   }
-  if (formData.value.long_term_model_id_type === 'default' && !props.defaultModelSetting?.model_id) {
-    callback(new Error(t('workflow.defaultModel.requiredMessage')))
-    return
-  }
   callback()
 }
 
@@ -181,8 +177,12 @@ function submit() {
   </el-button>
   <MkDialog v-model="visible" :title="t('application.longTermMemory.title')" @closed="formRef?.clearValidate()">
     <el-form :validate-on-rule-change="false" ref="formRef" :model="formData" label-position="top" require-asterisk-position="right" @submit.prevent>
-      <el-form-item :label="t('model.ai.label')" prop="long_term_model_id" :rules="{ required: true, validator: validateModel, trigger: 'change' }">
-        <el-radio-group v-model="formData.long_term_model_id_type" class="mb-2">
+      <el-form-item
+        :label="t('model.ai.label')"
+        prop="long_term_model_id"
+        :rules="{ required: formData.long_term_model_id_type === 'custom', validator: validateModel, trigger: 'change' }"
+      >
+        <el-radio-group v-model="formData.long_term_model_id_type" class="mb-2" @change="formRef?.clearValidate('long_term_model_id')">
           <el-radio value="default">{{ t('workflow.defaultModel.label') }}</el-radio>
           <el-radio value="custom">{{ t('common.options.custom') }}</el-radio>
         </el-radio-group>

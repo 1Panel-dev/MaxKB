@@ -11,7 +11,7 @@
     "shared": "Shared knowledge"
   },
   "help": {
-    "embeddingModelHint": "Selected knowledge must use the same embedding model"
+    "embeddingModelHint": "Selected knowledge must use the same embedding"
   },
   "base": {
     "label": "General knowledge",
@@ -63,8 +63,8 @@
       "requiredMessage": "Knowledge description is required"
     },
     "embeddingModel": {
-      "placeholder": "Select an embedding model",
-      "requiredMessage": "Embedding model is required"
+      "placeholder": "Select an embedding",
+      "requiredMessage": "Embedding is required"
     },
     "targetKnowledge": {
       "label": "Target knowledge",
@@ -113,7 +113,7 @@
     }
   },
   "import": {
-    "embeddingNotice": "Knowledge imported successfully. The documents do not have embeddings yet. Select an embedding model in settings, then generate embeddings for the documents."
+    "embeddingNotice": "Knowledge imported successfully. The documents do not have embeddings yet. Select an embedding in settings, then generate embeddings for the documents."
   },
   "export": {
     "title": "Export knowledge",

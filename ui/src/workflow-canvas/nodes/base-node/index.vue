@@ -254,7 +254,7 @@ onMounted(() => {
 
       <!-- 长期记忆 -->
       <el-form-item
-        class="mb-2! mk-hide-asterisk"
+        class="mb-2!"
         prop="long_term_model_id"
         :rules="{
           required: formData.long_term_enable && formData.long_term_model_id_type === 'custom',
@@ -265,7 +265,7 @@ onMounted(() => {
         <template #label>
           <div class="flex-between">
             <span class="flex-align-center gap-1">
-              <span :class="formData.long_term_enable ? 'mk-required' : ''">{{ t('application.longTermMemory.label') }}</span>
+              <span>{{ t('application.longTermMemory.label') }}</span>
 
               <MkTooltip :content="t('application.longTermMemory.description', { memory: START_NODE_REFERENCES.memory })" placement="right">
                 <MkIcon name="icon_info_outlined" class="text-N600!" />

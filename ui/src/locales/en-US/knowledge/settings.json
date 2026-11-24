@@ -16,7 +16,7 @@
       "description": "Set this limit according to your server capacity to avoid service crashes."
     },
     "embeddingModel": {
-      "changeConfirm": "Changing the embedding model requires regenerating embeddings for this knowledge. Continue saving"
+      "changeConfirm": "Changing the embedding requires regenerating embeddings for this knowledge. Continue saving"
     }
   },
   "documentStrategy": {
@@ -64,8 +64,8 @@
       "tool": "Use a tool"
     },
     "visionModel": {
-      "placeholder": "Select a vision model",
-      "requiredMessage": "Vision model is required"
+      "placeholder": "Select a vision",
+      "requiredMessage": "Vision is required"
     },
     "enhancementTool": {
       "label": "Enhancement tool",
