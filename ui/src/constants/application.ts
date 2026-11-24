@@ -8,7 +8,6 @@ import { t } from '@/locales'
 export const APPLICATION_DISPLAY_SETTING_DEFAULT: Readonly<ApplicationDisplaySetting> = reactive({
   show_source: false,
   show_exec: false,
-  language: '',
   show_history: true,
   draggable: true,
   show_share: true,

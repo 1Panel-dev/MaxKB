@@ -100,7 +100,6 @@ export const useChatAuthStore = defineStore('chat-auth', {
 
       return profileRequest.then((authProfile) => {
         useChatThemeStore().setTheme(authProfile.custom_theme?.theme_color)
-        useChatUserStore().applyScopeLanguage(getLanguageStorageKey(scope), authProfile.language)
         return authProfile
       })
     },
