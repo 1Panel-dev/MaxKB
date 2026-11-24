@@ -32,7 +32,7 @@
   },
   "reranker": {
     "label": "Multi-source retrieval",
-    "description": "Rerank retrieval results from multiple knowledge sources using a reranking model",
+    "description": "Rerank retrieval results from multiple knowledge sources using a reranking",
     "content": {
       "label": "Content to rerank",
       "placeholder": "Select content to rerank",

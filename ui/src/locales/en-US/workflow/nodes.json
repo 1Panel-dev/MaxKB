@@ -66,27 +66,27 @@
   },
   "speechToText": {
     "label": "Speech to text",
-    "description": "Convert audio to text using a speech recognition model",
+    "description": "Convert audio to text using a Speech-to-text",
     "model": {
-      "label": "Speech recognition model"
+      "label": "Speech-to-text"
     },
     "audioFile": "Speech file"
   },
   "textToSpeech": {
     "label": "Text to speech",
-    "description": "Convert text to audio using a speech synthesis model",
+    "description": "Convert text to audio using a Text-to-speech",
     "model": {
-      "label": "Speech synthesis model"
+      "label": "Text-to-speech"
     },
     "content": {
       "label": "Text content"
     }
   },
   "imageGenerate": {
-    "label": "Image generation",
+    "label": "Text to image",
     "description": "Generate images from the provided text",
     "model": {
-      "label": "Image generation model"
+      "label": "Text-to-image"
     },
     "positivePrompt": {
       "description": "Describe the elements and visual features you want in the generated image"
@@ -99,7 +99,7 @@
     "label": "Image to video",
     "description": "Generate videos from the provided images",
     "model": {
-      "label": "Image-to-video model"
+      "label": "Image-to-video"
     },
     "positivePrompt": {
       "description": "Describe the motion and visual changes in the video generated from the first frame image"
@@ -120,7 +120,7 @@
     "label": "Text to video",
     "description": "Generate videos from the provided text",
     "model": {
-      "label": "Text-to-video model"
+      "label": "Text-to-video"
     },
     "positivePrompt": {
       "description": "Describe the elements and visual features you want in the generated video"

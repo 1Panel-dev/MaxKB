@@ -47,40 +47,40 @@
   },
   "types": {
     "llm": {
-      "label": "LLM model",
-      "description": "LLM model: a reasoning model for AI conversations in agents."
+      "label": "LLM",
+      "description": "LLM: a reasoning model for AI conversations in agents."
     },
     "embedding": {
-      "label": "Embedding model",
-      "description": "Embedding model: converts documents in Knowledge into vectors."
+      "label": "Embedding",
+      "description": "Embedding: converts documents in Knowledge into vectors."
     },
     "reranker": {
-      "label": "Reranking model",
-      "description": "Reranking model: reorders candidate segments retrieved through multiple paths in advanced agents."
+      "label": "Reranking",
+      "description": "Reranking: reorders candidate segments retrieved through multiple paths in advanced agents."
     },
     "stt": {
-      "label": "Speech recognition",
-      "description": "Speech recognition: converts speech to text when speech recognition is enabled in an agent."
+      "label": "Speech-to-text",
+      "description": "Speech-to-text: converts speech to text when speech recognition is enabled in an agent."
     },
     "tts": {
-      "label": "Speech synthesis",
-      "description": "Speech synthesis: converts text to speech when voice playback is enabled in an agent."
+      "label": "Text-to-speech",
+      "description": "Text-to-speech: converts text to speech when voice playback is enabled in an agent."
     },
     "image": {
-      "label": "Vision model",
-      "description": "Vision model: interprets images in advanced agents."
+      "label": "Vision",
+      "description": "Vision: interprets images in advanced agents."
     },
     "tti": {
-      "label": "Image generation",
-      "description": "Image generation: a vision model for generating images in advanced agents."
+      "label": "Text-to-image",
+      "description": "Text-to-image: a vision model for generating images in advanced agents."
     },
     "itv": {
-      "label": "Image to video",
-      "description": "Image to video: generates videos from images in advanced agents."
+      "label": "Image-to-video",
+      "description": "Image-to-video: generates videos from images in advanced agents."
     },
     "ttv": {
-      "label": "Text to video",
-      "description": "Text to video: generates videos from text in advanced agents."
+      "label": "Text-to-video",
+      "description": "Text-to-video: generates videos from text in advanced agents."
     }
   },
   "actions": {
