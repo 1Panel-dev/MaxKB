@@ -1,7 +1,7 @@
 /** 系统「用户管理」按钮权限。$perm.user.* */
-
-import { PermissionConstants as P } from '../../core'
+import { hasEdition, PermissionConstants as P } from '../../core'
 import { canSys } from '../../policy'
+import { Edition } from '@/permission/core/common'
 
 export default {
   /**
@@ -27,5 +27,5 @@ export default {
   /**
    * 系统「用户管理」导入权限
    */
-  import: () => canSys(P.USER_IMPORT),
+  import: () => canSys(P.USER_IMPORT) && (hasEdition(Edition.PE) || hasEdition(Edition.EE)),
 }
