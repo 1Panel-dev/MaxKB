@@ -1,4 +1,4 @@
-/** 提供当前对话用户档案、密码与 API Key 接口。 */
+/** 提供当前对话用户档案、语言、密码与 API Key 接口。 */
 
 import type { ChatUserApiKey, ChatUserProfile } from '@/api/types'
 import { get, post } from './core/request'
@@ -7,6 +7,9 @@ import { get, post } from './core/request'
 const getChatUserProfile = () => {
   return get<ChatUserProfile>('/v3/chat_user/profile')
 }
+
+/** 保存当前对话用户的语言偏好。 */
+const postCurrentUserLanguage = (language: string) => post<{ language: string }, void>('/v3/chat_user/current/language', { language })
 
 /** 修改当前用户密码，提交 RSA 加密后的表单。 */
 const postResetPassword = (data: { encryptedData: string }, accessToken?: string) =>
@@ -18,4 +21,4 @@ const getApiKey = () => get<ChatUserApiKey>('/v3/api_key')
 /** 重新生成当前用户 API Key，旧 Key 立即失效。 */
 const postApiKey = () => post<undefined, ChatUserApiKey>('/v3/api_key')
 
-export default { getChatUserProfile, postResetPassword, getApiKey, postApiKey }
+export default { postCurrentUserLanguage, getChatUserProfile, postResetPassword, getApiKey, postApiKey }
