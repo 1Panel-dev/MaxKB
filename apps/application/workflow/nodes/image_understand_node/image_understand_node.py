@@ -11,8 +11,9 @@ from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
+from application.workflow.content_type import ContentType
 from application.workflow.i_node import INode
-from application.workflow.message.struct.content import NodeInfo, Position
+from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.reasoning_content import ReasoningContent
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
@@ -63,6 +64,17 @@ class ImageUnderstandNode(INode):
         self.async_runner.cancel()
         super().cancel()
 
+    def write(self, message: Content):
+        """is_result 关闭时不向用户输出正文;思考过程还需开启 reasoning_content_enable"""
+        is_result = self.get_parameters().get("is_result", False)
+        if message.type in (ContentType.TEXT, ContentType.HTML) and not is_result:
+            return
+        if message.type == ContentType.REASONING and not (
+            is_result and (self.data.get("model_setting") or {}).get("reasoning_content_enable", False)
+        ):
+            return
+        super().write(message)
+
     def execute(self):
         workflow_params = self.get_workflow_parameters()
         node_params = self.get_parameters()
@@ -74,7 +86,6 @@ class ImageUnderstandNode(INode):
         prompt = node_params.get("prompt", "")
         dialogue_number = node_params.get("dialogue_number", 0)
         dialogue_type = node_params.get("dialogue_type", "WORKFLOW")
-        is_result = node_params.get("is_result", False)
         image_list_ref = node_params.get("image_list")
         model_params_setting = node_params.get("model_params_setting")
         model_setting = node_params.get("model_setting")
@@ -154,12 +165,11 @@ class ImageUnderstandNode(INode):
                 reasoning_content_id,
                 text_content_id,
                 node_info,
-                is_result,
             )
         )
 
     async def _stream_response(
-        self, response, chat_model, message_list, question, reasoning_content_id, text_content_id, node_info, is_result
+        self, response, chat_model, message_list, question, reasoning_content_id, text_content_id, node_info
     ):
         answer = ""
         reasoning_content = ""
@@ -185,38 +195,16 @@ class ImageUnderstandNode(INode):
                     reasoning_content_chunk = ""
                 reasoning_content += reasoning_content_chunk
 
-                if is_result:
-                    if isinstance(chunk.content, list):
-                        for chunk_item in chunk.content:
-                            text = chunk_item.get("text", "")
-                            if text:
-                                self.write(
-                                    TextContent(
-                                        text_content_id, text, Status.RUNNING, node_info, Position(self.get_node_id())
-                                    )
-                                )
-                            if reasoning_content_chunk and model_setting.get("reasoning_content_enable", False):
-                                self.write(
-                                    ReasoningContent(
-                                        reasoning_content_id,
-                                        reasoning_content_chunk,
-                                        Status.RUNNING,
-                                        node_info,
-                                        Position(self.get_node_id()),
-                                    )
-                                )
-                    else:
-                        if content_chunk:
+                if isinstance(chunk.content, list):
+                    for chunk_item in chunk.content:
+                        text = chunk_item.get("text", "")
+                        if text:
                             self.write(
                                 TextContent(
-                                    text_content_id,
-                                    content_chunk,
-                                    Status.RUNNING,
-                                    node_info,
-                                    Position(self.get_node_id()),
+                                    text_content_id, text, Status.RUNNING, node_info, Position(self.get_node_id())
                                 )
                             )
-                        if reasoning_content_chunk and model_setting.get("reasoning_content_enable", False):
+                        if reasoning_content_chunk:
                             self.write(
                                 ReasoningContent(
                                     reasoning_content_id,
@@ -226,33 +214,53 @@ class ImageUnderstandNode(INode):
                                     Position(self.get_node_id()),
                                 )
                             )
+                else:
+                    if content_chunk:
+                        self.write(
+                            TextContent(
+                                text_content_id,
+                                content_chunk,
+                                Status.RUNNING,
+                                node_info,
+                                Position(self.get_node_id()),
+                            )
+                        )
+                    if reasoning_content_chunk:
+                        self.write(
+                            ReasoningContent(
+                                reasoning_content_id,
+                                reasoning_content_chunk,
+                                Status.RUNNING,
+                                node_info,
+                                Position(self.get_node_id()),
+                            )
+                        )
 
             reasoning_end = reasoning.get_end_reasoning_content()
             answer += reasoning_end.get("content")
             reasoning_content_chunk = ""
             if not response_reasoning_content:
                 reasoning_content_chunk = reasoning_end.get("reasoning_content")
-            if is_result:
-                if reasoning_end.get("content"):
-                    self.write(
-                        TextContent(
-                            text_content_id,
-                            reasoning_end.get("content"),
-                            Status.RUNNING,
-                            node_info,
-                            Position(self.get_node_id()),
-                        )
+            if reasoning_end.get("content"):
+                self.write(
+                    TextContent(
+                        text_content_id,
+                        reasoning_end.get("content"),
+                        Status.RUNNING,
+                        node_info,
+                        Position(self.get_node_id()),
                     )
-                if reasoning_content_chunk and model_setting.get("reasoning_content_enable", False):
-                    self.write(
-                        ReasoningContent(
-                            reasoning_content_id,
-                            reasoning_content_chunk,
-                            Status.RUNNING,
-                            node_info,
-                            Position(self.get_node_id()),
-                        )
+                )
+            if reasoning_content_chunk:
+                self.write(
+                    ReasoningContent(
+                        reasoning_content_id,
+                        reasoning_content_chunk,
+                        Status.RUNNING,
+                        node_info,
+                        Position(self.get_node_id()),
                     )
+                )
 
         # 无论正常结束、抛异常还是被取消中断,都落盘已累积内容并关闭 LLM 流式响应底层连接
         finally:

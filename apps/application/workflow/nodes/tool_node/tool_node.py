@@ -18,8 +18,9 @@ from rest_framework import serializers
 from rest_framework.utils.formatting import lazy_format
 
 from application.workflow.common import CancelledException, WorkflowType
+from application.workflow.content_type import ContentType
 from application.workflow.i_node import INode
-from application.workflow.message.struct.content import NodeInfo, Position
+from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from common.exception.app_exception import AppApiException
@@ -141,11 +142,16 @@ class ToolNode(INode):
         if self._execution.proc:
             self._execution.proc.terminate()
 
+    def write(self, message: Content):
+        """is_result 关闭时不向用户输出正文"""
+        if message.type in (ContentType.TEXT, ContentType.HTML) and not self.get_parameters().get("is_result", False):
+            return
+        super().write(message)
+
     def execute(self):
         node_params = self.get_parameters()
         input_field_list = node_params.get("input_field_list", [])
         code = node_params.get("code")
-        is_result = node_params.get("is_result", False)
 
         params = {
             field.get("name"): convert_value(
@@ -179,10 +185,9 @@ class ToolNode(INode):
 
         self.write_context("result", result)
 
-        if is_result:
-            chunk_id = str(uuid.uuid7())
-            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-            self.write(TextContent(chunk_id, str(result), Status.SUCCESS, node_info, Position(self.get_node_id())))
+        chunk_id = str(uuid.uuid7())
+        node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
+        self.write(TextContent(chunk_id, str(result), Status.SUCCESS, node_info, Position(self.get_node_id())))
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
