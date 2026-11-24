@@ -81,7 +81,7 @@ function toUrl(url?: string) {
       <div v-if="!preview" class="flex-align-center gap-5 ml-5">
         <el-divider direction="vertical" />
         <!-- 企业版: 工作空间下拉框 -->
-        <HeaderWorkspaceDropdown v-if="isWorkspace(mode)" />
+        <HeaderWorkspaceDropdown v-if="isWorkspace(mode) && (auth.isPE || auth.isEE)" />
         <span v-if="isSystem(mode)">{{ t('system.title') }}</span>
       </div>
     </div>
