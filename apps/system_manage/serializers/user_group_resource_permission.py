@@ -29,6 +29,8 @@ from models_provider.models import Model
 from system_manage.models import WorkspaceUserGroupResourcePermission
 from tools.models import Tool
 from users.models.user_group import SystemUserGroup, SystemUserGroupRelation
+from system_manage.models import WorkspaceUserGroupResourcePermission, WorkspaceUserResourcePermission
+from users.serializers.user import is_workspace_manage
 
 
 class PermissionSerializer(serializers.Serializer):
@@ -367,35 +369,48 @@ class ResourceUserGroupPermissionSerializer(serializers.Serializer):
 
         workspace_id = self.data.get("workspace_id")
         auth_target_type = self.data.get("auth_target_type")
+        workspace_manage = is_workspace_manage(current_user_id, workspace_id)
         resource_model = self.RESOURCE_MODEL_MAP[auth_target_type]
 
         from folders.serializers.folder import has_exact_permission_by_role
 
         permission_id = f"{auth_target_type}:READ+AUTH"
-
-        role_type = RoleConstants.USER.value.__str__()
-        has_user_role_exact_permission = has_exact_permission_by_role(
-            current_user_id, workspace_id, permission_id, role_type
-        )
-
-        permission_list = ["MANAGE"]
-        if has_user_role_exact_permission:
-            permission_list = ["MANAGE", "ROLE"]
-
-        current_user_managed_resources_ids = (
-            QuerySet(WorkspaceUserGroupResourcePermission)
-            .filter(
-                workspace_id=workspace_id,
-                user_id=current_user_id,
-                auth_target_type=auth_target_type,
-                target__in=QuerySet(resource_model)
-                .filter(workspace_id=workspace_id, folder__in=folder_ids)
-                .annotate(id_str=Cast("id", TextField()))
-                .values_list("id_str", flat=True),
-                permission_list__overlap=permission_list,
+        if workspace_manage:
+            role_type = RoleConstants.WORKSPACE_MANAGE.value.__str__()
+            has_user_role_exact_permission = has_exact_permission_by_role(
+                current_user_id, workspace_id, permission_id, role_type
             )
-            .values_list("target", flat=True)
-        )
+            if has_user_role_exact_permission:
+                current_user_managed_resources_ids = (
+                    QuerySet(resource_model)
+                    .filter(workspace_id=workspace_id, folder__in=folder_ids)
+                    .annotate(id_str=Cast("id", TextField()))
+                    .values_list("id_str", flat=True)
+                )
+            else:
+                current_user_managed_resources_ids = []
+        else:
+            role_type = RoleConstants.USER.value.__str__()
+            has_user_role_exact_permission = has_exact_permission_by_role(
+                current_user_id, workspace_id, permission_id, role_type
+            )
+            permission_list = ["MANAGE"]
+            if has_user_role_exact_permission:
+                permission_list = ["MANAGE", "ROLE"]
+            current_user_managed_resources_ids = (
+                QuerySet(WorkspaceUserResourcePermission)
+                .filter(
+                    workspace_id=workspace_id,
+                    user_id=current_user_id,
+                    auth_target_type=auth_target_type,
+                    target__in=QuerySet(resource_model)
+                    .filter(workspace_id=workspace_id, folder__in=folder_ids)
+                    .annotate(id_str=Cast("id", TextField()))
+                    .values_list("id_str", flat=True),
+                    permission_list__overlap=permission_list,
+                )
+                .values_list("target", flat=True)
+            )
 
         return current_user_managed_resources_ids
 
