@@ -28,7 +28,6 @@ export interface ApplicationAccessStatusPayload {
 export interface ApplicationDisplaySetting {
   show_source: boolean
   show_exec: boolean
-  language: string
   show_history: boolean
   draggable: boolean
   show_share: boolean
