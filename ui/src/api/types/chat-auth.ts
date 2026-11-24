@@ -12,6 +12,8 @@ export interface AuthProfile<Meta = Record<string, never>> {
   rsa_key: string
   logo: string
   custom_theme?: { theme_color?: string; header_font_color?: string } | null
+  /** 对话界面语言；未设置时使用本地缓存或浏览器语言。 */
+  language?: string | null
   meta: Meta
 }
 

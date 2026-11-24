@@ -83,6 +83,7 @@ class ChatAuthProfileSerializer(serializers.Serializer):
             "max_attempts": application_access_token.authentication_value.get("max_attempts", 1),
             "enable_auth": application_access_token.authentication,
             "login_value": login_value,
+            "language": application_access_token.language,
             "rsa_key": get_key_pair_by_sql().get("key"),
             "custom_theme": application_setting.custom_theme
             if application_setting
@@ -120,6 +121,7 @@ class PortalAuthProfileSerializer(serializers.Serializer):
                     "rsa_key": get_key_pair_by_sql().get("key"),
                     "meta": {"portal_name": ""},
                     "logo": "./favicon.ico",
+                    "language": "zh-CN",
                 },
                 **result,
             }
@@ -135,6 +137,7 @@ class PortalAuthProfileSerializer(serializers.Serializer):
                 "rsa_key": get_key_pair_by_sql().get("key"),
                 "meta": {"portal_name": portal.name},
                 "logo": portal.logo or "./favicon.ico",
+                "language": "zh-CN",
             },
             **result,
         }

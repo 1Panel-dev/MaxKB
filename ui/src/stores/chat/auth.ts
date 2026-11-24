@@ -27,6 +27,11 @@ function getTokenStorageKey(scope: string) {
   return isPortalScope(scope) ? 'chat-portal-token' : `chat-application-token-${scope}`
 }
 
+/** 门户与各单应用分别保存界面语言。 */
+function getLanguageStorageKey(scope: string) {
+  return isPortalScope(scope) ? 'portal-locale' : `${scope}-locale`
+}
+
 /** 读取本地保存的 token，包括已失效的；匿名认证与登录时携带，后端据此沿用同一对话用户。 */
 function getSavedToken(scope: string) {
   return localStorage.getItem(getTokenStorageKey(scope)) || undefined
@@ -84,7 +89,7 @@ export const useChatAuthStore = defineStore('chat-auth', {
       return token === this.expiredToken ? '' : token
     },
 
-    /** 获取并应用指定场景的认证前置主题；与当前场景相同时复用配置。 */
+    /** 获取并应用指定场景的认证前置主题与语言；与当前场景相同时复用配置。 */
     fetchAuthProfile(scope: string): Promise<AuthProfile<unknown>> {
       const profileRequest =
         scope === this.scope && this.authProfile
@@ -95,6 +100,7 @@ export const useChatAuthStore = defineStore('chat-auth', {
 
       return profileRequest.then((authProfile) => {
         useChatThemeStore().setTheme(authProfile.custom_theme?.theme_color)
+        useChatUserStore().applyScopeLanguage(getLanguageStorageKey(scope), authProfile.language)
         return authProfile
       })
     },
