@@ -18,7 +18,7 @@
       "questionLimit": "每个客户端提问限制",
       "perDay": "次/天",
       "authentication": "身份认证",
-      "authenticationHint": "开启身份认证后，智能体和关联的知识库均需要对话用户授权配置，否则用户无权限登录和知识库检索",
+      "authenticationHint": "开启后，仅允许授权的对话用户登录当前智能体",
       "whitelist": "嵌入白名单",
       "whitelistPlaceholder": "请输入允许嵌入第三方的源地址，一行一个，如：",
       "integerRangeMessage": "请输入 {min}～{max} 的整数"

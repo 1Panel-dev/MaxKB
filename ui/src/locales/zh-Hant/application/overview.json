@@ -18,7 +18,7 @@
       "questionLimit": "每個客戶端提問限制",
       "perDay": "次/天",
       "authentication": "身份認證",
-      "authenticationHint": "開啟身份認證後，智能體和關聯的知識庫均需要對話用戶授權配置，否則用戶無權限登錄和知識庫檢索",
+      "authenticationHint": "開啟後，僅允許授權的對話用戶登錄當前智能體",
       "whitelist": "嵌入白名單",
       "whitelistPlaceholder": "請輸入允許嵌入第三方的源地址，一行一個，如：",
       "integerRangeMessage": "請輸入 {min}～{max} 的整數"
