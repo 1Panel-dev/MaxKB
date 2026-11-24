@@ -61,6 +61,7 @@ class ChatRecordOperateSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     chat_record_id = serializers.UUIDField(required=True, label=_("Conversation record id"))
+    chat_user_id = serializers.UUIDField(required=False, allow_null=True, label=_("Chat User ID"))
 
     def is_valid(self, *, debug=False, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -74,6 +75,13 @@ class ChatRecordOperateSerializer(serializers.Serializer):
                 chat_id=self.data.get("chat_id"), chat__application_id=self.data.get("application_id")
         ).exists() and not debug:
             raise AppApiException(500, _("Chat records for the application do not exist"))
+        if not debug:
+            chat_user_id = self.data.get("chat_user_id")
+            if not chat_user_id or not QuerySet(Chat).filter(
+                    id=self.data.get("chat_id"), application_id=self.data.get("application_id"),
+                    chat_user_id=chat_user_id
+            ).exists():
+                raise AppApiException(500, gettext("Conversation does not exist"))
         application_access_token = (
             QuerySet(ApplicationAccessToken).filter(application_id=self.data.get("application_id")).first()
         )
