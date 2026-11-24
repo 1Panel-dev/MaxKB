@@ -33,6 +33,9 @@
 否则为门户认证。`getCaptcha(username, accessToken)` 获取应用登录验证码，后端以 `accessToken`
 查询参数接收应用令牌，暂不支持门户。`chat-user.ts` 的 `getChatUserProfile()` 获取当前对话用户。
 
+`chat-user.ts` 的 `postCurrentUserLanguage(language)` 向 `/v3/chat_user/current/language` POST
+`{ language }`。账户菜单保存成功后通过 Chat User Store 更新界面语言与当前场景缓存，失败保留原语言。
+
 `chat-user.ts` 的 `postResetPassword({ encryptedData })` 提交 RSA 加密的 `{ password, re_password }`，
 公钥取当前认证配置的 `rsa_key`；成功后当前 token 失效，调用方清理认证状态并重新导航。
 `getApiKey()` 与 `postApiKey()` 分别读取、重新生成 `/v3/api_key`，返回 `ChatUserApiKey`。

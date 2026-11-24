@@ -2,10 +2,13 @@
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import type { Locale } from '@/locales/config'
 import { QUOTA_TYPE } from '@/api/enums'
+import ChatUserApi from '@/api/chat/chat-user'
 import { useConversationListStore } from '../conversation-list/index'
 import ApiKeyDialog from './ApiKeyDialog.vue'
 import UserPwdDialog from './UserPwdDialog.vue'
+import { LOCALE_OPTIONS } from '@/locales/config'
 import { useStore } from '@/stores/chat'
 import { formatTokenNumber } from '@/utils/number'
 
@@ -13,9 +16,23 @@ defineOptions({ name: 'ConversationAccountMenu' })
 
 const { t } = useI18n({ useScope: 'global' })
 const { account } = useConversationListStore()
-const { auth } = useStore()
+const { auth, user } = useStore()
 const router = useRouter()
 const route = useRoute()
+
+// 保存语言偏好后更新当前场景的界面与缓存。
+const isChangingLanguage = ref(false)
+const handleChangeLanguage = (language: Locale) => {
+  if (isChangingLanguage.value || language === user.language) return
+  isChangingLanguage.value = true
+  return ChatUserApi.postCurrentUserLanguage(language)
+    .then(() => {
+      user.setLanguage(language)
+    })
+    .finally(() => {
+      isChangingLanguage.value = false
+    })
+}
 
 const menuVisible = ref(false)
 const displayName = computed(() => account.value?.nickName || account.value?.username || t('chat.roles.user'))
@@ -106,6 +123,33 @@ const goLogin = () => {
           <MkDropdownItem @click="apiKeyDialogRef?.open()">
             <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
             <span>API Key</span>
+          </MkDropdownItem>
+          <!-- 切换账号界面语言 -->
+          <MkDropdownItem @click.stop class="p-0!">
+            <MkDropdown class="w-full" trigger="hover" placement="left-start">
+              <div class="flex-between w-full gap-2 py-[5px] px-2">
+                <div class="flex-align-center gap-2">
+                  <MkIcon name="icon_internet_outlined" class="text-N600!" />
+                  <span>{{ t('common.labels.language') }}</span>
+                </div>
+
+                <MkIcon name="icon_right_outlined" class="text-N500!" />
+              </div>
+              <template #dropdown>
+                <MkDropdownMenu class="w-52">
+                  <MkDropdownItem
+                    v-for="language in LOCALE_OPTIONS"
+                    :key="language.value"
+                    selectable
+                    :selected="user.language === language.value"
+                    :disabled="isChangingLanguage"
+                    @click="handleChangeLanguage(language.value)"
+                  >
+                    {{ language.label }}
+                  </MkDropdownItem>
+                </MkDropdownMenu>
+              </template>
+            </MkDropdown>
           </MkDropdownItem>
           <!-- 退出登录 -->
           <MkDropdownItem divided @click="handleLogout">
