@@ -435,7 +435,6 @@ onBeforeUnmount(() => stopAutoSave())
               @open="closeDebug"
               @preview="handlePreviewVersion"
               @restore="handleRestoreVersion"
-              v-if="toolWorkflowPermission('record')"
             />
             <!-- 自动保存 -->
             <MkDropdownItem v-if="toolWorkflowPermission('edit')" @click.stop>

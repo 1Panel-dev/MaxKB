@@ -44,7 +44,7 @@ import { MsgConfirm, MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 import { getResourceScope, isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
 import perm from '@/permission/index.ts'
 
-type KnowledgeWorkflowPermissionMethod = 'workflowEdit' | 'publish' | 'workflowExport'
+type KnowledgeWorkflowPermissionMethod = 'workflowEdit' | 'publish' | 'workflowExport' | 'docCreate'
 
 function knowledgeWorkflowPermission(method: KnowledgeWorkflowPermissionMethod): boolean {
   if (isSystemResource()) return Boolean(perm.knowledge.system[method]())
@@ -508,7 +508,7 @@ onBeforeUnmount(stopAutoSave)
         <template #dropdown>
           <MkDropdownMenu>
             <!-- 导入工作流文档 -->
-            <MkDropdownItem :disabled="loading" @click="handleImportDocument">
+            <MkDropdownItem v-if="knowledgeWorkflowPermission('docCreate')" :disabled="loading" @click="handleImportDocument">
               <template #icon><MkIcon name="icon_import_outlined" /></template>
               <span>{{ t('knowledge.document.import.title') }}</span>
             </MkDropdownItem>
@@ -522,6 +522,7 @@ onBeforeUnmount(stopAutoSave)
               :limit="1"
               :disabled="loading || historyVisible"
               :on-change="handleImportWorkflow"
+              v-if="knowledgeWorkflowPermission('workflowEdit')"
             >
               <MkDropdownItem :disabled="loading" class="w-full">
                 <template #icon><MkIcon name="icon_import_outlined" /></template>
@@ -534,7 +535,7 @@ onBeforeUnmount(stopAutoSave)
               <span>{{ t('workflow.layout.exportWorkflow') }}</span>
             </MkDropdownItem>
             <!-- 查看执行记录 -->
-            <ButtonExecutionRecord :label="t('execution.records.title')" :api="requestApi" :knowledge-id="knowledgeId" />
+            <ButtonExecutionRecord v-if="knowledgeWorkflowPermission('docCreate')" :label="t('execution.records.title')" :api="requestApi" :knowledge-id="knowledgeId" />
             <!-- 发布历史 -->
             <ButtonPublishHistory
               :label="t('workflow.publishHistory.title')"

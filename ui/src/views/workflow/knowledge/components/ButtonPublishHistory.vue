@@ -1,13 +1,22 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { KnowledgeWorkflowApi, WorkflowVersion, WorkflowVersionPayload } from '@/api/types'
 import PublishHistoryDrawer from '@/views/workflow/components/publish-history/PublishHistoryDrawer.vue'
 import { MsgSuccess } from '@/utils/message'
+import { isSystemResource, isSystemSharedResource, isWorkspaceSharedResource } from '@/utils/resource-context'
+import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'ButtonKnowledgePublishHistory' })
 
 const { t } = useI18n({ useScope: 'global' })
+
+const canEdit = computed(() => {
+  if (isSystemResource()) return Boolean(perm.knowledge.system.workflowEdit())
+  if (isSystemSharedResource()) return Boolean(perm.knowledge.share.workflowEdit())
+  if (isWorkspaceSharedResource()) return false
+  return Boolean(perm.knowledge.workspace.workflowEdit(props.knowledgeId))
+})
 
 const props = defineProps<{ label: string; api: KnowledgeWorkflowApi; knowledgeId: string; selectedId?: string; disabled?: boolean }>()
 const visible = defineModel<boolean>('visible', { default: false })
@@ -74,5 +83,6 @@ function handleSubmit(payload: WorkflowVersionPayload, versionId: string) {
     @preview="emit('preview', $event)"
     @restore="emit('restore', $event)"
     @submit="handleSubmit"
+    :can-edit="canEdit"
   />
 </template>

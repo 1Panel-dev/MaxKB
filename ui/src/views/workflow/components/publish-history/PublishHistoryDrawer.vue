@@ -12,12 +12,16 @@ const { t } = useI18n({ useScope: 'global' })
 
 const visible = defineModel<boolean>({ default: false })
 
-defineProps<{
-  versions: WorkflowVersion[]
-  loading?: boolean
-  saving?: boolean
-  selectedId?: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    versions: WorkflowVersion[]
+    loading?: boolean
+    saving?: boolean
+    selectedId?: string
+    canEdit?: boolean
+  }>(),
+  { canEdit: true },
+)
 const emit = defineEmits<{
   preview: [version: WorkflowVersion]
   restore: [version: WorkflowVersion]
@@ -47,10 +51,12 @@ function closeEdit() {
 }
 
 function handlePreview(version: WorkflowVersion) {
+  if (!props.canEdit) return
   emit('preview', version)
 }
 
 function handleRestore(version: WorkflowVersion) {
+  if (!props.canEdit) return
   emit('restore', version)
 }
 
@@ -92,12 +98,12 @@ defineExpose({ closeEdit })
           </div>
           <template #action-dropdown>
             <!-- 编辑版本 -->
-            <MkDropdownItem @click="handleEdit(version)">
+            <MkDropdownItem v-if="canEdit" @click="handleEdit(version)">
               <template #icon><MkIcon name="icon_edit_outlined" /></template>
               <span>{{ t('common.actions.edit') }}</span>
             </MkDropdownItem>
             <!-- 恢复此版本 -->
-            <MkDropdownItem @click="handleRestore(version)">
+            <MkDropdownItem v-if="canEdit" @click="handleRestore(version)">
               <template #icon><MkIcon name="icon_reset_outlined" /></template>
               <span>{{ t('workflow.publishHistory.restore') }}</span>
             </MkDropdownItem>
