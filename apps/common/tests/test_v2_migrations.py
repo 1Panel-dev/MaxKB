@@ -91,12 +91,16 @@ class V2MigrationUpgradeTests(TransactionTestCase):
             access_num=23,
             white_active=True,
             white_list=["example.test"],
+            language="en-US",
         )
         target = [("application", "0016_v3_upgrade")]
         executor = MigrationExecutor(connection)
         executor.migrate(target)
         current = executor.loader.project_state(target).apps
         upgraded = current.get_model("application", "ApplicationAccessToken").objects.get(pk=token.pk)
+        with connection.cursor() as cursor:
+            columns = connection.introspection.get_table_description(cursor, upgraded._meta.db_table)
+            self.assertNotIn("language", {column.name for column in columns})
         self.assertFalse(upgraded.enable_api_key)
         for field in ("application_id", "access_token", "is_active", "access_num", "white_active", "white_list"):
             self.assertEqual(getattr(upgraded, field), getattr(token, field))
@@ -109,6 +113,26 @@ class V2MigrationUpgradeTests(TransactionTestCase):
         upgraded.refresh_from_db()
         self.assertTrue(upgraded.enable_api_key)
 
+    def test_system_manage_v3_entry_adds_optional_language_to_existing_chat_users(self):
+        user = self.v2_state.apps.get_model("system_manage", "ChatUser").objects.create(
+            username="language-upgrade", nick_name="Language upgrade", password="migration-test"
+        )
+        target = [("system_manage", "0006_v3_upgrade")]
+        executor = MigrationExecutor(connection)
+        executor.migrate(target)
+        current = executor.loader.project_state(target).apps
+        upgraded = current.get_model("system_manage", "ChatUser").objects.get(pk=user.pk)
+        self.assertIsNone(upgraded.language)
+        self.assertEqual(upgraded.username, user.username)
+
+        upgraded.language = "zh-CN"
+        upgraded.save(update_fields=["language"])
+        executor = MigrationExecutor(connection)
+        self.assertEqual(executor.migration_plan(target), [])
+        executor.migrate(target)
+        upgraded.refresh_from_db()
+        self.assertEqual(upgraded.language, "zh-CN")
+
     def test_portal_initial_migration_includes_mcp_switch_and_preserves_configuration(self):
         target = [("portal", "0001_initial")]
         executor = MigrationExecutor(connection)
@@ -117,16 +141,19 @@ class V2MigrationUpgradeTests(TransactionTestCase):
         Portal = current.get_model("portal", "Portal")
         portal = Portal.objects.get(pk="019fca92-0371-7a03-a7bb-445ebeb1314c")
         self.assertTrue(portal.enable_agent_mcp_service)
+        self.assertEqual(portal.logo, "./favicon.ico")
 
         portal.enable_agent_mcp_service = False
         portal.name = "custom portal"
-        portal.save(update_fields=["enable_agent_mcp_service", "name"])
+        portal.logo = "/custom-logo.svg"
+        portal.save(update_fields=["enable_agent_mcp_service", "name", "logo"])
         executor = MigrationExecutor(connection)
         self.assertEqual(executor.migration_plan(target), [])
         executor.migrate(target)
         portal.refresh_from_db()
         self.assertFalse(portal.enable_agent_mcp_service)
         self.assertEqual(portal.name, "custom portal")
+        self.assertEqual(portal.logo, "/custom-logo.svg")
         self.assertEqual(Portal.objects.count(), 1)
 
     def test_upgrade_preserves_public_access_and_all_default_model_settings(self):

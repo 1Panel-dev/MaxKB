@@ -56,6 +56,11 @@ class Migration(migrations.Migration):
             name="nick_name",
             field=models.CharField(db_index=True, max_length=150, verbose_name="昵称"),
         ),
+        migrations.AddField(
+            model_name="chatuser",
+            name="language",
+            field=models.CharField(default=None, max_length=10, null=True, verbose_name="语言"),
+        ),
         migrations.CreateModel(
             name="ChatUserApiKey",
             fields=[

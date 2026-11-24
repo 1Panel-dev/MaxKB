@@ -132,4 +132,8 @@ class Migration(migrations.Migration):
             name="enable_api_key",
             field=models.BooleanField(default=False, verbose_name="是否启用api key访问应用"),
         ),
+        migrations.RemoveField(
+            model_name="applicationaccesstoken",
+            name="language",
+        ),
     ]
