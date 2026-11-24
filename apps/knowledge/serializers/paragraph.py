@@ -7,7 +7,7 @@ from celery_once import AlreadyQueued
 from common.chunk import text_to_chunk
 from common.db.search import page_search
 from common.event.listener_manage import ListenerManagement
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, NotFound404
 from common.utils.common import post
 from django.db import transaction
 from django.db.models import Count, F, QuerySet
@@ -165,7 +165,7 @@ class ParagraphSerializers(serializers.Serializer):
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
-                raise AppApiException(500, _("Knowledge id does not exist"))
+                raise NotFound404(404, _("Knowledge id does not exist"))
             if (
                 not QuerySet(Paragraph)
                 .filter(
@@ -266,7 +266,7 @@ class ParagraphSerializers(serializers.Serializer):
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
-                raise AppApiException(500, _("Knowledge id does not exist"))
+                raise NotFound404(404, _("Knowledge id does not exist"))
             if lock_document:
                 _lock_paragraph_documents(self.data["document_id"])
             if (
@@ -539,7 +539,7 @@ class ParagraphSerializers(serializers.Serializer):
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
-                raise AppApiException(500, _("Knowledge id does not exist"))
+                raise NotFound404(404, _("Knowledge id does not exist"))
 
         def get_query_set(self):
             self.is_valid()

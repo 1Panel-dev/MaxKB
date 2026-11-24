@@ -3,7 +3,7 @@
 from functools import partial
 
 from common.db.search import page_search
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import NotFound404
 from common.result import Page
 from django.db import transaction
 from django.db.models import Q, QuerySet
@@ -75,7 +75,7 @@ class KnowledgeSyncSettingOperationSerializer(serializers.Serializer):
     def validate(self, attrs):
         knowledge = self.get_knowledge_queryset(attrs).first()
         if knowledge is None:
-            raise AppApiException(404, _("Scheduled synchronization is not supported for this knowledge base"))
+            raise NotFound404(404, _("Scheduled synchronization is not supported for this knowledge base"))
         attrs["knowledge"] = knowledge
         return attrs
 

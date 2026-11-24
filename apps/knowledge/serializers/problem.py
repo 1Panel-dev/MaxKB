@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.db.search import native_search, native_page_search, get_dynamics_model
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, NotFound404
 from common.utils.common import get_file_content
 from knowledge.models import Problem, ProblemParagraphMapping, Paragraph, Knowledge, LocalState, SourceType
 from knowledge.serializers.common import get_embedding_model_id_by_knowledge_id
@@ -167,7 +167,7 @@ class ProblemSerializers(serializers.Serializer):
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
-                raise AppApiException(500, _("Knowledge id does not exist"))
+                raise NotFound404(404, _("Knowledge id does not exist"))
 
         def list_paragraph(self, with_valid=True):
             if with_valid:
