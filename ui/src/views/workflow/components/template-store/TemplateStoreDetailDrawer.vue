@@ -33,7 +33,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" :title="t('common.labels.details')" size="60%" @closed="handleClosed">
+  <MkDrawer v-model="visible" :title="t('common.labels.details')" close-on-click-modal close-on-press-escape size="60%" @closed="handleClosed">
     <template v-if="workflowTemplate">
       <div class="border-b pb-6 mb-3">
         <div class="flex-between gap-4">
