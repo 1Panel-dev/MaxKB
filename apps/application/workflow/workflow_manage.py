@@ -55,6 +55,8 @@ class WorkflowManage:
         """
         self._lock = threading.Lock()
         self.done = False
+        # 第一个未被捕获的节点异常,工作流结束时统一回调
+        self.error = None
         self.call_back = call_back
         self.workflow = workflow
         self.workflow_type = workflow_type
@@ -121,12 +123,14 @@ class WorkflowManage:
 
     def assertion_end(self, error=None):
         with self._lock:
+            if error and self.error is None:
+                self.error = error
             if self.done:
                 return
             if not self.is_end():
                 return
             self.done = True  # 锁内抢占,保证只有一个线程能往下走
-        self.end(error)  # 回调放到锁外,避免回调里再触碰本 manage 造成重入/死锁
+        self.end(self.error)  # 回调放到锁外,避免回调里再触碰本 manage 造成重入/死锁
 
     def is_end(self):
         """

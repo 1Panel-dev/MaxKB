@@ -129,8 +129,9 @@ class INode:
             return
         self._completed = True
         self.status = status
-        if error:
-            self.data["error"] = str(error)
+        if status == Status.FAIL:
+            # 执行详情与异常分支下游统一从 exception_message 读取异常信息,需在分发下游节点前写入
+            self.write_context("exception_message", str(error) if error else "")
         self.data["run_time"] = time.time() - self.data["start_time"]
         if signal:
             self.workflow_manage.signal = signal
@@ -140,7 +141,9 @@ class INode:
                 self.success_anchor() if [Status.SUCCESS, Status.CANCELLED].__contains__(status) else self.fail_anchor()
             ]
         self._dispatch(anchors)
-        self.workflow_manage.assertion_end(error)
+        self.workflow_manage.assertion_end(
+            None if status == Status.FAIL and self.node.properties.get("enableException") else error
+        )
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         """
@@ -157,7 +160,8 @@ class INode:
             "run_time": self.data.get("run_time"),
             "type": self.type,
             "status": self.status.value if self.status else None,
-            "error": self.data.get("error"),
+            "err_message": self.get_context("exception_message"),
+            "enableException": self.node.properties.get("enableException"),
         }
 
     def _dispatch(self, anchors):

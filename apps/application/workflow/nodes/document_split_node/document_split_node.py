@@ -324,7 +324,6 @@ class DocumentSplitNode(INode):
                 "with_filter": self.data.get("with_filter"),
                 "patterns": self.data.get("patterns"),
                 "split_strategy": self.data.get("split_strategy"),
-                "enableException": self.node.properties.get("enableException"),
             }
         )
         return details

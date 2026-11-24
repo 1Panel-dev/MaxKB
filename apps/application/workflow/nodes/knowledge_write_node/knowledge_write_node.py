@@ -396,7 +396,6 @@ class KnowledgeWriteNode(INode):
         details.update(
             {
                 "write_content": self.data.get("write_content"),
-                "enableException": self.node.properties.get("enableException"),
             }
         )
         return details
