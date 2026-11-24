@@ -18,7 +18,7 @@
       "questionLimit": "Question limit per client",
       "perDay": "times/day",
       "authentication": "Authentication",
-      "authenticationHint": "When authentication is enabled, both the agent and its related knowledge require chat user authorization. Otherwise, users cannot log in or search the knowledge.",
+      "authenticationHint": "When enabled, only authorized chat users can log in to this agent.",
       "whitelist": "Embed allowlist",
       "whitelistPlaceholder": "Enter the allowed origins for embedding, one per line, for example:",
       "integerRangeMessage": "Enter an integer from {min} to {max}"
