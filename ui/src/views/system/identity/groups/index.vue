@@ -266,13 +266,13 @@ onMounted(() => {
           <el-table-column type="selection" width="40" />
           <el-table-column prop="nick_name" :label="t('user.name.label')" min-width="198" show-overflow-tooltip />
           <el-table-column prop="username" :label="t('user.username.label')" min-width="198" show-overflow-tooltip />
-          <el-table-column :label="t('user.role.label')" min-width="198">
+          <el-table-column v-if="!auth.isCE" :label="t('user.role.label')" min-width="198">
             <template #default="{ row }">
               <MkTagGroup v-if="row.roles?.length" :tags="row.roles" />
               <span v-else>-</span>
             </template>
           </el-table-column>
-          <el-table-column prop="source" :label="t('user.source.label')" min-width="198" show-overflow-tooltip>
+          <el-table-column v-if="!auth.isCE" prop="source" :label="t('user.source.label')" min-width="198" show-overflow-tooltip>
             <template #header>
               <MkTableFilter
                 mode="single"
