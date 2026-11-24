@@ -44,7 +44,7 @@ const hasActionDropdown = computed(() => hasRenderableSlotContent(slots['action-
       @click.stop
       @keydown.stop
     >
-      <MkDropdown v-if="hasActionDropdown" trigger="click" :teleported="false">
+      <MkDropdown v-if="hasActionDropdown" trigger="click" :teleported="false" hide-when-empty>
         <el-button text>
           <MkIcon name="icon_more_outlined" />
         </el-button>
