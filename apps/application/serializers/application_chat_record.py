@@ -67,27 +67,19 @@ class ChatRecordOperateSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     chat_record_id = serializers.UUIDField(required=True, label=_("Conversation record id"))
+    chat_user_id = serializers.UUIDField(required=False, allow_null=True, label=_("Chat User ID"))
 
-    def is_valid(self, *, debug=False, raise_exception=False):
+    def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
         workspace_id = self.data.get("workspace_id")
-        query_set = QuerySet(Application).filter(id=self.data.get("application_id"))
+        chat_user_id = self.data.get("chat_user_id")
+        query_set = QuerySet(Chat).filter(id=self.data.get("chat_id"), application_id=self.data.get("application_id"))
         if workspace_id:
-            query_set = query_set.filter(workspace_id=workspace_id)
+            query_set = query_set.filter(application__workspace_id=workspace_id)
+        if chat_user_id:
+            query_set = query_set.filter(chat_user_id=chat_user_id)
         if not query_set.exists():
-            raise AppApiException(500, _("Application id does not exist"))
-        if (
-            not ChatRecord.objects.filter(
-                chat_id=self.data.get("chat_id"), chat__application_id=self.data.get("application_id")
-            ).exists()
-            and not debug
-        ):
-            raise AppApiException(500, _("Chat records for the application do not exist"))
-        application_access_token = (
-            QuerySet(ApplicationAccessToken).filter(application_id=self.data.get("application_id")).first()
-        )
-        if application_access_token is None:
-            raise AppApiException(500, gettext("Application authentication information does not exist"))
+            raise AppApiException(500, gettext("Conversation does not exist"))
 
     def get_chat_record(self):
         chat_record_id = self.data.get("chat_record_id")
@@ -106,20 +98,19 @@ class ChatRecordOperateSerializer(serializers.Serializer):
         )
 
     def one(self, debug):
-        self.is_valid(debug=debug, raise_exception=True)
-        chat_record = self.get_chat_record()
-        if chat_record is None:
-            raise AppApiException(500, gettext("Conversation does not exist"))
+        self.is_valid(raise_exception=True)
         application_access_token = (
             QuerySet(ApplicationAccessToken).filter(application_id=self.data.get("application_id")).first()
         )
-        show_source = False
-        show_exec = False
-        if application_access_token is not None:
-            show_exec = application_access_token.show_exec
-            show_source = application_access_token.show_source
+        if application_access_token is None:
+            raise AppApiException(500, gettext("Application authentication information does not exist"))
+        chat_record = self.get_chat_record()
+        if chat_record is None:
+            raise AppApiException(500, gettext("Conversation does not exist"))
         return ApplicationChatRecordQuerySerializers.reset_chat_record(
-            chat_record, True if debug else show_source, True if debug else show_exec
+            chat_record,
+            True if debug else application_access_token.show_source,
+            True if debug else application_access_token.show_exec,
         )
 
 
