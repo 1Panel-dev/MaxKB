@@ -30,7 +30,7 @@ defineProps<{ name: string; logo: string | null }>()
     </div>
     <div class="min-w-0 flex-1 p-6">
       <div class="flex-between">
-        <h4 class="shrink-0">{{ t('application.categories.all') }}</h4>
+        <h4 class="shrink-0">{{ t('application.title') }}</h4>
         <MkSearchInput readonly class="w-60! max-w-full" />
       </div>
     </div>
