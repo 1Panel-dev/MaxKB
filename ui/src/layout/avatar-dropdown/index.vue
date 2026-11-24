@@ -108,7 +108,7 @@ function toUrl(url?: string) {
             <MkDropdown class="w-full" trigger="hover" placement="left-start">
               <div class="flex-between w-full gap-2 py-[5px] px-2">
                 <div class="flex-align-center gap-2">
-                  <MkIcon name="icon_translate_outlined" class="text-N600!" />
+                  <MkIcon name="icon_internet_outlined" class="text-N600!" />
                   <span>{{ t('common.labels.language') }}</span>
                 </div>
 
