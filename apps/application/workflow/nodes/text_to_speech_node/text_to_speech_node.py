@@ -16,8 +16,9 @@ from pydub import AudioSegment
 from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
+from application.workflow.content_type import ContentType
 from application.workflow.i_node import INode
-from application.workflow.message.struct.content import NodeInfo, Position
+from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from common.exception.app_exception import AppApiException
@@ -78,6 +79,12 @@ class TextToSpeechNode(INode):
         self.async_runner.cancel()
         super().cancel()
 
+    def write(self, message: Content):
+        """is_result 关闭时不向用户输出正文"""
+        if message.type in (ContentType.TEXT, ContentType.HTML) and not self.get_parameters().get("is_result", False):
+            return
+        super().write(message)
+
     def execute(self):
         node_params = self.get_parameters()
         workflow_params = self.get_workflow_parameters()
@@ -88,7 +95,6 @@ class TextToSpeechNode(INode):
         tts_model_id_reference = node_params.get("tts_model_id_reference")
         model_params_setting = node_params.get("model_params_setting")
         content_list_ref = node_params.get("content_list")
-        is_result = node_params.get("is_result", False)
 
         content = (
             self.workflow_manage.get_reference_field(content_list_ref[0], content_list_ref[1:])
@@ -144,11 +150,10 @@ class TextToSpeechNode(INode):
         self.data["answer"] = audio_label
         self.write_context("result", audio_list)
 
-        if is_result:
-            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-            self.write(
-                TextContent(self.get_node_id(), audio_label, Status.SUCCESS, node_info, Position(self.get_node_id()))
-            )
+        node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
+        self.write(
+            TextContent(self.get_node_id(), audio_label, Status.SUCCESS, node_info, Position(self.get_node_id()))
+        )
 
     async def _process_tts_chunks(self, content_chunks, tts_model_id, workspace_id, model_params_setting):
         def process():

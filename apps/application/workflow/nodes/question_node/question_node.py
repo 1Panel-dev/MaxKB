@@ -16,8 +16,9 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
+from application.workflow.content_type import ContentType
 from application.workflow.i_node import INode
-from application.workflow.message.struct.content import NodeInfo, Position
+from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from common.utils.count_tokens import count_local_tokens
@@ -84,6 +85,12 @@ class QuestionNode(INode):
         self.async_runner.cancel()
         super().cancel()
 
+    def write(self, message: Content):
+        """is_result 关闭时不向用户输出正文"""
+        if message.type in (ContentType.TEXT, ContentType.HTML) and not self.get_parameters().get("is_result", False):
+            return
+        super().write(message)
+
     def execute(self):
         node_params = self.get_parameters()
         workflow_params = self.get_workflow_parameters()
@@ -95,7 +102,6 @@ class QuestionNode(INode):
         system = node_params.get("system", "")
         prompt = node_params.get("prompt", "")
         dialogue_number = node_params.get("dialogue_number", 0)
-        is_result = node_params.get("is_result", False)
 
         workflow_type = self.get_workflow_type()
         if workflow_type in (WorkflowType.KNOWLEDGE, WorkflowType.TOOL):
@@ -151,23 +157,21 @@ class QuestionNode(INode):
                 chat_model.astream(message_list),
                 chat_model,
                 message_list,
-                is_result,
             )
         )
 
-    async def _stream_response(self, response, chat_model, message_list, is_result):
+    async def _stream_response(self, response, chat_model, message_list):
         answer = ""
         try:
             async for chunk in response:
                 self._check_cancelled()
                 answer += chunk.content
-                if is_result:
-                    node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-                    self.write(
-                        TextContent(
-                            self.get_node_id(), chunk.content, Status.SUCCESS, node_info, Position(self.get_node_id())
-                        )
+                node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
+                self.write(
+                    TextContent(
+                        self.get_node_id(), chunk.content, Status.SUCCESS, node_info, Position(self.get_node_id())
                     )
+                )
         # 无论正常结束、抛异常还是被取消中断,都落盘已累积内容并关闭 LLM 流式响应底层连接
         finally:
             await asyncio.to_thread(self._write_final_context, chat_model, message_list, answer)

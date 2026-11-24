@@ -15,8 +15,9 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.workflow.common import WorkflowType
+from application.workflow.content_type import ContentType
 from application.workflow.i_node import INode
-from application.workflow.message.struct.content import NodeInfo, Position
+from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.html_content import HtmlContent
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.message.struct.tool_content import ToolContent
@@ -84,6 +85,14 @@ class ReplyNode(INode):
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
     type = "reply-node"
 
+    def write(self, message: Content):
+        """is_result 关闭时不向用户输出回复内容(文本/HTML/工具)"""
+        if message.type in (ContentType.TEXT, ContentType.HTML, ContentType.TOOL) and not self.get_parameters().get(
+            "is_result", False
+        ):
+            return
+        super().write(message)
+
     def execute(self):
         node_params = self.get_parameters()
         chunk_id = uuid.uuid7()
@@ -92,7 +101,6 @@ class ReplyNode(INode):
         fields = node_params.get("fields")
         content = node_params.get("content")
         content_type = node_params.get("content_type") or "TEXT"
-        is_result = node_params.get("is_result", False)
         self.data["content_type"] = content_type
 
         if reply_type == "referencing":
@@ -105,26 +113,24 @@ class ReplyNode(INode):
         if content_type == "TOOL":
             tool_list = _to_tool_list(value)
             self.write_context("answer", tool_list)
-            if is_result:
-                for tool in tool_list:
-                    self.write(
-                        ToolContent(
-                            tool["id"],
-                            tool["name"],
-                            tool["arguments"],
-                            tool["content"],
-                            Status.SUCCESS,
-                            node_info,
-                            position,
-                        )
+            for tool in tool_list:
+                self.write(
+                    ToolContent(
+                        tool["id"],
+                        tool["name"],
+                        tool["arguments"],
+                        tool["content"],
+                        Status.SUCCESS,
+                        node_info,
+                        position,
                     )
+                )
             return
 
         result = _to_text(value)
         self.write_context("answer", result)
-        if is_result:
-            content_class = HtmlContent if content_type == "HTML" else TextContent
-            self.write(content_class(str(chunk_id), result, Status.SUCCESS, node_info, position))
+        content_class = HtmlContent if content_type == "HTML" else TextContent
+        self.write(content_class(str(chunk_id), result, Status.SUCCESS, node_info, position))
 
     def _generate_reply_content(self, prompt):
         if prompt is None:

@@ -11,9 +11,10 @@ from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
+from application.workflow.content_type import ContentType
 from application.workflow.i_node import INode
 from application.workflow.media_download import MAX_GENERATED_VIDEO_BYTES, download_http_bytes
-from application.workflow.message.struct.content import NodeInfo, Position
+from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from common.utils.common import bytes_to_uploaded_file
@@ -67,6 +68,12 @@ class ImageToVideoNode(INode):
         self.async_runner.cancel()
         super().cancel()
 
+    def write(self, message: Content):
+        """is_result 关闭时不向用户输出正文"""
+        if message.type in (ContentType.TEXT, ContentType.HTML) and not self.get_parameters().get("is_result", False):
+            return
+        super().write(message)
+
     def execute(self):
         maxkb_logger.info(f"[ImageToVideoNode] execute START, node_id={self.get_node_id()}")
         workflow_params = self.get_workflow_parameters()
@@ -79,7 +86,6 @@ class ImageToVideoNode(INode):
         negative_prompt = node_params.get("negative_prompt", "")
         dialogue_number = node_params.get("dialogue_number", 0)
         dialogue_type = node_params.get("dialogue_type", "NODE")
-        is_result = node_params.get("is_result", False)
         model_params_setting = node_params.get("model_params_setting")
         first_frame_url_ref = node_params.get("first_frame_url")
         last_frame_url_ref = node_params.get("last_frame_url")
@@ -162,11 +168,8 @@ class ImageToVideoNode(INode):
         self.data["answer"] = video_label
         self.write_context("video", video_list)
 
-        if is_result:
-            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-            self.write(
-                TextContent(str(uuid.uuid7()), video_label, Status.SUCCESS, node_info, Position(self.get_node_id()))
-            )
+        node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
+        self.write(TextContent(str(uuid.uuid7()), video_label, Status.SUCCESS, node_info, Position(self.get_node_id())))
 
     async def _await_generate(self, ttv_model, question, negative_prompt, first_frame_url, last_frame_url):
         return await asyncio.to_thread(

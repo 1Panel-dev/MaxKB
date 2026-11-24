@@ -21,8 +21,9 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.workflow.common import CancelledException, WorkflowType
+from application.workflow.content_type import ContentType
 from application.workflow.i_node import INode
-from application.workflow.message.struct.content import NodeInfo, Position
+from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -194,12 +195,17 @@ class ToolLibNode(INode):
         if self._execution.proc:
             self._execution.proc.terminate()
 
+    def write(self, message: Content):
+        """is_result 关闭时不向用户输出正文"""
+        if message.type in (ContentType.TEXT, ContentType.HTML) and not self.get_parameters().get("is_result", False):
+            return
+        super().write(message)
+
     def execute(self):
         node_params = self.get_parameters()
         workflow_params = self.get_workflow_parameters()
         tool_lib_id = node_params.get("tool_lib_id")
         input_field_list = node_params.get("input_field_list", [])
-        is_result = node_params.get("is_result", False)
 
         workspace_id = workflow_params.get("workspace_id")
         tool_lib = QuerySet(Tool).filter(id=tool_lib_id).first()
@@ -291,10 +297,9 @@ class ToolLibNode(INode):
 
         self.write_context("result", result)
 
-        if is_result:
-            chunk_id = str(uuid.uuid7())
-            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-            self.write(TextContent(chunk_id, str(result), Status.SUCCESS, node_info, Position(self.get_node_id())))
+        chunk_id = str(uuid.uuid7())
+        node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
+        self.write(TextContent(chunk_id, str(result), Status.SUCCESS, node_info, Position(self.get_node_id())))
 
     def tool_exec_record(self, tool_lib, all_params):
         import time

@@ -15,8 +15,9 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
+from application.workflow.content_type import ContentType
 from application.workflow.i_node import INode
-from application.workflow.message.struct.content import NodeInfo, Position
+from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from common.utils.common import split_and_transcribe, any_to_mp3
@@ -82,6 +83,12 @@ class SpeechToTextNode(INode):
         self.async_runner.cancel()
         super().cancel()
 
+    def write(self, message: Content):
+        """is_result 关闭时不向用户输出正文"""
+        if message.type in (ContentType.TEXT, ContentType.HTML) and not self.get_parameters().get("is_result", False):
+            return
+        super().write(message)
+
     def execute(self):
         node_params = self.get_parameters()
         workflow_params = self.get_workflow_parameters()
@@ -91,7 +98,6 @@ class SpeechToTextNode(INode):
         stt_model_id_reference = node_params.get("stt_model_id_reference")
         model_params_setting = node_params.get("model_params_setting")
         audio_list_ref = node_params.get("audio_list")
-        is_result = node_params.get("is_result", False)
 
         audio_list = self.workflow_manage.get_reference_field(audio_list_ref[0], audio_list_ref[1:])
         for audio in audio_list:
@@ -137,9 +143,8 @@ class SpeechToTextNode(INode):
         self.write_context("result", answer)
         self.data["content"] = content
 
-        if is_result:
-            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-            self.write(TextContent(self.get_node_id(), answer, Status.SUCCESS, node_info, Position(self.get_node_id())))
+        node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
+        self.write(TextContent(self.get_node_id(), answer, Status.SUCCESS, node_info, Position(self.get_node_id())))
 
     async def _await_process(self, audio_list, stt_model):
         return await asyncio.to_thread(_process_audio_items, audio_list, stt_model)
