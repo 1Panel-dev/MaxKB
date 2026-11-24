@@ -10,6 +10,7 @@ import ButtonImportUsers from './import-users/ButtonImportUsers.vue'
 import ButtonQuotaSettings from './quota-settings/ButtonQuotaSettings.vue'
 import ButtonChangeUserPassword from './user-password/ButtonChangeUserPassword.vue'
 import { LOGIN_METHOD_LABELS } from '@/constants'
+import { useStore } from '@/stores'
 import { toOrderBy } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { formatTokenNumber } from '@/utils/number'
@@ -17,6 +18,7 @@ import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission/index.ts'
 
 const { t } = useI18n({ useScope: 'global' })
+const { auth } = useStore()
 
 /* 添加编辑用户表单drawer */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
@@ -220,7 +222,7 @@ onMounted(() => loadChatUsers())
           </template>
         </el-table-column>
 
-        <el-table-column :label="t('user.source.label')" width="120">
+        <el-table-column v-if="!auth.isCE" :label="t('user.source.label')" width="120">
           <template #header>
             <MkTableFilter
               mode="single"

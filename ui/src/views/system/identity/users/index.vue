@@ -235,7 +235,7 @@ onMounted(() => loadSystemUsers())
           </template>
         </el-table-column>
 
-        <el-table-column width="120" :label="t('user.source.label')">
+        <el-table-column v-if="!auth.isCE" width="120" :label="t('user.source.label')">
           <template #header>
             <MkTableFilter
               mode="single"
