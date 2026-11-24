@@ -195,7 +195,6 @@ class ToolNode(INode):
             {
                 "result": self.get_context("result"),
                 "params": self.data.get("params"),
-                "enableException": self.node.properties.get("enableException"),
             }
         )
         return details

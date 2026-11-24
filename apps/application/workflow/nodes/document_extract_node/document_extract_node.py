@@ -130,7 +130,6 @@ class DocumentExtractNode(INode):
                 # 不保存 content 全部内容,因为 content 可能非常大
                 "content": [file_content[:500] for file_content in content],
                 "document_list": self.get_context("document_list"),
-                "enableException": self.node.properties.get("enableException"),
             }
         )
         return details

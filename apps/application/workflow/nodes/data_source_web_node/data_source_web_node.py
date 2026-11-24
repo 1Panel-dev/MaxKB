@@ -133,7 +133,6 @@ class DataSourceWebNode(INode):
                 "source_url": self.data.get("source_url"),
                 "selector": self.data.get("selector"),
                 "knowledge_base": self.get_workflow_parameters().get("knowledge_base"),
-                "enableException": self.node.properties.get("enableException"),
             }
         )
         return details

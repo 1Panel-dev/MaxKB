@@ -234,7 +234,6 @@ class ToolWorkflowLibNode(INode):
                 "output": self.data.get("output"),
                 "message_tokens": self.data.get("message_tokens"),
                 "answer_tokens": self.data.get("answer_tokens"),
-                "enableException": self.node.properties.get("enableException"),
             }
         )
 

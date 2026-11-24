@@ -144,7 +144,7 @@ class WorkflowToolRecordTests(SimpleTestCase):
 
         record = self.saved_record()
         self.assertEqual(record.state, State.FAILURE)
-        self.assertEqual(record.meta["details"][-1]["error"], "weather unavailable")
+        self.assertEqual(record.meta["details"][-1]["err_message"], "weather unavailable")
         self.assertEqual(node.status, Status.FAIL)
 
     def test_failed_detail_is_recorded_even_without_callback_error(self):
@@ -174,7 +174,9 @@ class WorkflowToolRecordTests(SimpleTestCase):
 
         self.assertTrue(node._completed)
         self.assertEqual(node.status, Status.FAIL)
-        self.assertEqual(node.data["error"], "record storage unavailable")
+        node.workflow_manage.write_context.assert_any_call(
+            "workflow-tool", "exception_message", "record storage unavailable", False
+        )
 
     def test_ai_tool_call_still_saves_execution_record(self):
         cancel_event = threading.Event()

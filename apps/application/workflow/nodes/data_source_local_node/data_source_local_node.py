@@ -64,7 +64,6 @@ class DataSourceLocalNode(INode):
             {
                 "file_list": self.get_context("file_list"),
                 "knowledge_base": self.get_workflow_parameters().get("knowledge_base"),
-                "enableException": self.node.properties.get("enableException"),
             }
         )
         return details

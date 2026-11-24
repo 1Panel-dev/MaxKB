@@ -146,7 +146,7 @@ class IntentNode(INode):
             if other_branch:
                 self.data["branch_id"] = other_branch["id"]
                 self.write_context("category", other_branch.get("content", other_branch["id"]))
-                self.data["error"] = str(e)
+                self.write_context("exception_message", str(e))
                 self.complete(Status.SUCCESS, [self.branch_anchor(other_branch["id"])])
             else:
                 raise Exception(f"error: {str(e)}")
