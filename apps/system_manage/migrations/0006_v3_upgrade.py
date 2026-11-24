@@ -36,6 +36,14 @@ def migrate_historical_tokens(apps, schema_editor):
         ChatUserTokenQuota.objects.using(alias).bulk_create(objs, batch_size=500)
 
 
+def create_default_user_group(apps, schema_editor):
+    UserGroup = apps.get_model("system_manage", "UserGroup")
+    UserGroup.objects.using(schema_editor.connection.alias).get_or_create(
+        id="default",
+        defaults={"name": "默认用户组"},
+    )
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("system_manage", "0005_resourcemapping"),
@@ -208,6 +216,10 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(
             code=migrate_historical_tokens,
+            reverse_code=django.db.migrations.operations.special.RunPython.noop,
+        ),
+        migrations.RunPython(
+            code=create_default_user_group,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
     ]
