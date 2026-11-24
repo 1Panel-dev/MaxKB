@@ -23,7 +23,7 @@ const props = defineProps<{
 const accountMenuItems: PreviewMenuItem[] = reactive([
   { iconName: 'icon-key_outlined', label: computed(() => t('auth.changePassword.title')) },
   { iconName: 'icon_passkeys_outlined', label: 'API Key' },
-  { iconName: 'icon_translate_outlined', label: computed(() => t('common.labels.language')), rightIcon: true },
+  { iconName: 'icon_internet_outlined', label: computed(() => t('common.labels.language')), rightIcon: true },
 ])
 
 const platformMenuItems = computed<PreviewMenuItem[]>(() => [
