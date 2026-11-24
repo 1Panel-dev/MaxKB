@@ -4,10 +4,12 @@ import { useI18n } from 'vue-i18n'
 import type { ListItem } from '@/api/types'
 import type { CascaderNode, CascaderOption, CascaderProps } from 'element-plus'
 import UserGroupsApi from '@/api/admin/system/user-groups'
+import { useStore } from '@/stores/admin'
 
 defineOptions({ name: 'UserGroupSetting' })
 
 const { t } = useI18n({ useScope: 'global' })
+const { auth } = useStore()
 
 const props = defineProps<{ workspaceIds: string[]; workspaceOptions: ListItem[] }>()
 
@@ -41,7 +43,7 @@ function loadWorkspaceUserGroups(node: CascaderNode, resolve: (options: Cascader
   getWorkspaceUserGroups(String(node.value)).then(resolve).catch(reject)
 }
 
-// 工作空间变化时重建级联选项；编辑态先预加载用户组以完成名称回显。
+// 社区版直接加载默认空间用户组；商业版编辑态预加载以完成名称回显。
 function refreshUserGroupOptions() {
   if (!props.workspaceIds.length) {
     userGroupIds.value = []
@@ -49,24 +51,32 @@ function refreshUserGroupOptions() {
     return
   }
 
-  const preloadRequest = userGroupIds.value?.length ? Promise.all(props.workspaceIds.map(getWorkspaceUserGroups)) : Promise.resolve([])
+  const preloadRequest = auth.isCE || userGroupIds.value?.length ? Promise.all(props.workspaceIds.map(getWorkspaceUserGroups)) : Promise.resolve([])
 
   preloadRequest.then((workspaceUserGroups) => {
-    userGroupOptions.value = props.workspaceOptions
-      .filter(({ id }) => props.workspaceIds.includes(id))
-      .map((workspace) => ({ ...workspace, children: workspaceUserGroups[props.workspaceIds.indexOf(workspace.id)], leaf: false }))
+    userGroupOptions.value = auth.isCE
+      ? workspaceUserGroups.flat()
+      : props.workspaceOptions
+          .filter(({ id }) => props.workspaceIds.includes(id))
+          .map((workspace) => ({ ...workspace, children: workspaceUserGroups[props.workspaceIds.indexOf(workspace.id)], leaf: false }))
 
     const availableUserGroupIds = workspaceUserGroups.flat().map(({ id }) => String(id))
     userGroupIds.value = (userGroupIds.value ?? []).filter((id) => availableUserGroupIds.includes(id))
   })
 }
 
-watch([() => props.workspaceIds, () => props.workspaceOptions], refreshUserGroupOptions, { deep: true, immediate: true })
+watch([() => props.workspaceIds, () => props.workspaceOptions, () => auth.isCE], refreshUserGroupOptions, { deep: true, immediate: true })
 </script>
 
 <template>
   <el-form-item>
+    <!-- 社区版直接多选用户组 -->
+    <el-select v-if="auth.isCE" v-model="userGroupIds" class="w-full" multiple clearable filterable :placeholder="t('userGroup.placeholder')">
+      <el-option v-for="userGroup in userGroupOptions" :key="userGroup.id" :label="userGroup.name" :value="userGroup.id" />
+    </el-select>
+    <!-- 非社区版按工作空间选择用户组 -->
     <el-cascader
+      v-else
       v-model="userGroupIds"
       class="w-full"
       :options="userGroupOptions"
