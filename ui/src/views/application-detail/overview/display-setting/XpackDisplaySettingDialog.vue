@@ -7,7 +7,6 @@ import type { UploadFile } from 'element-plus'
 import { useApplicationDetailContext } from '../../context'
 import DisplaySettingPreview from './components/DisplaySettingPreview.vue'
 import { APPLICATION_DISPLAY_SETTING_DEFAULT } from '@/constants/application'
-import { LOCALE_OPTIONS } from '@/locales/config'
 import { MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'XpackDisplaySettingDialog' })
@@ -162,11 +161,7 @@ onBeforeUnmount(releaseImagePreviews)
                   <el-color-picker v-model="displayForm.custom_theme.header_font_color" />
                 </el-form-item>
               </div>
-              <el-form-item :label="t('common.labels.language')">
-                <el-select v-model="displayForm.language" clearable :placeholder="t('common.placeholders.select')">
-                  <el-option v-for="language in LOCALE_OPTIONS" :key="language.value" :label="language.label" :value="language.value" />
-                </el-select>
-              </el-form-item>
+
               <div class="space-y-2">
                 <template v-for="field in imageFields" :key="field.key">
                   <el-card class="small" shadow="never" style="--el-card-padding: 12px">

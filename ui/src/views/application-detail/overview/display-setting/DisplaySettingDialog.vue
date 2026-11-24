@@ -3,7 +3,6 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { ApplicationDisplaySetting } from '@/api/types'
 import { useApplicationDetailContext } from '../../context'
-import { LOCALE_OPTIONS } from '@/locales/config'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'DisplaySettingDialog' })
@@ -12,7 +11,7 @@ const { t } = useI18n({ useScope: 'global' })
 
 const { applicationId, resourceApi } = useApplicationDetailContext()
 // 社区版仅编辑语言、知识来源与执行详情。
-type DisplaySettingForm = Pick<ApplicationDisplaySetting, 'language' | 'show_source' | 'show_exec'>
+type DisplaySettingForm = Pick<ApplicationDisplaySetting, 'show_source' | 'show_exec'>
 
 // 打开时查询本次配置，关闭动画结束后统一清理草稿。
 const visible = ref(false)
@@ -20,7 +19,6 @@ const loading = ref(false)
 const displayForm = ref<DisplaySettingForm>({
   show_source: false,
   show_exec: false,
-  language: '',
 })
 
 function open() {
@@ -37,7 +35,6 @@ function loadSetting() {
       displayForm.value = {
         show_source: config.show_source ?? false,
         show_exec: config.show_exec ?? false,
-        language: config.language ?? '',
       }
     })
     .finally(() => {
@@ -49,7 +46,6 @@ function handleClosed() {
   displayForm.value = {
     show_source: false,
     show_exec: false,
-    language: '',
   }
 }
 
@@ -74,11 +70,6 @@ defineExpose({ open })
   <MkDialog v-model="visible" :title="t('application.overview.display.title')" @closed="handleClosed">
     <div v-loading="loading">
       <el-form :model="displayForm" label-position="top" require-asterisk-position="right" @submit.prevent>
-        <el-form-item :label="t('common.labels.language')">
-          <el-select v-model="displayForm.language" clearable :placeholder="t('common.placeholders.select')">
-            <el-option v-for="language in LOCALE_OPTIONS" :key="language.value" :label="language.label" :value="language.value" />
-          </el-select>
-        </el-form-item>
         <div class="flex-column gap-3">
           <el-checkbox v-model="displayForm.show_source">{{ t('application.overview.display.showSource') }}</el-checkbox>
           <el-checkbox v-model="displayForm.show_exec">{{ t('application.overview.display.showExecution') }}</el-checkbox>
