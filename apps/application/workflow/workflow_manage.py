@@ -222,6 +222,15 @@ class WorkflowManage:
                 details_result.append(details)
         return details_result
 
+    def get_usage(self):
+        """
+        汇总本工作流已运行节点的 token 用量(节点把 token 写在自己的 data 里)
+        @return: {"prompt_tokens": int, "completion_tokens": int}
+        """
+        prompt_tokens = sum((node.data.get("message_tokens") or 0) for node in self.nodes)
+        completion_tokens = sum((node.data.get("answer_tokens") or 0) for node in self.nodes)
+        return {"prompt_tokens": prompt_tokens, "completion_tokens": completion_tokens}
+
     def generate_prompt(self, prompt):
         """
         处理提示词

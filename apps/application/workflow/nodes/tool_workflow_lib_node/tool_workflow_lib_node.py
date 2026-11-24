@@ -63,14 +63,6 @@ def valid_function(tool_lib, workspace_id):
         raise Exception(gettext("Tool is not active"))
 
 
-def _sum_tokens(context, key):
-    total = 0
-    for node_context in (context or {}).values():
-        if isinstance(node_context, dict) and isinstance(node_context.get(key), (int, float)):
-            total += node_context.get(key)
-    return total
-
-
 class ToolWorkflowLibNode(INode):
     serializer_class = ToolWorkflowLibNodeSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
@@ -154,8 +146,9 @@ class ToolWorkflowLibNode(INode):
             # 调试/详情数据放 self.data，不进可引用 context（run_time 由基类 complete 写入）
             self.data["output"] = output
             self.data["details"] = wf_manage.get_details()
-            self.data["message_tokens"] = _sum_tokens(wf_manage.context, "message_tokens")
-            self.data["answer_tokens"] = _sum_tokens(wf_manage.context, "answer_tokens")
+            usage = wf_manage.get_usage()
+            self.data["message_tokens"] = usage["prompt_tokens"]
+            self.data["answer_tokens"] = usage["completion_tokens"]
 
             try:
                 save_workflow_tool_record(

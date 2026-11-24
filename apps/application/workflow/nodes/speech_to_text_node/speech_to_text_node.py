@@ -121,7 +121,7 @@ class SpeechToTextNode(INode):
         workspace_id = workflow_params.get("workspace_id")
         stt_model = get_model_instance_by_model_workspace_id(stt_model_id, workspace_id, **(model_params_setting or {}))
 
-        self.write_context("audio_list", audio_list)
+        self.data["audio_list"] = audio_list
 
         self._check_cancelled()
         result = self.async_runner.run_async(lambda: self._await_process(audio_list, stt_model))
@@ -133,9 +133,9 @@ class SpeechToTextNode(INode):
                 result_content.append(value)
 
         answer = "\n".join(result_content)
-        self.write_context("answer", answer)
+        self.data["answer"] = answer
         self.write_context("result", answer)
-        self.write_context("content", content)
+        self.data["content"] = content
 
         if is_result:
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
@@ -148,10 +148,10 @@ class SpeechToTextNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "answer": self.get_context("answer"),
+                "answer": self.data.get("answer"),
                 "result": self.get_context("result"),
-                "content": self.get_context("content"),
-                "audio_list": self.get_context("audio_list"),
+                "content": self.data.get("content"),
+                "audio_list": self.data.get("audio_list"),
             }
         )
         return details

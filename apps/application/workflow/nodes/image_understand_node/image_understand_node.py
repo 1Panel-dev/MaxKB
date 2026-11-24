@@ -164,7 +164,7 @@ class ImageUnderstandNode(INode):
         answer = ""
         reasoning_content = ""
         try:
-            model_setting = self.get_context("model_setting") or {}
+            model_setting = self.data.get("model_setting") or {}
             reasoning = Reasoning(
                 model_setting.get("reasoning_content_start", "<think>"),
                 model_setting.get("reasoning_content_end", "</think>"),

@@ -151,12 +151,9 @@ class LoopNode(INode):
             self._current_loop_manage = None
             loop_details_list = self.data.setdefault("loop_details_list", [])
             loop_details_list.append(wf_manage.get_details())
-            self.data["message_tokens"] = (self.data.get("message_tokens") or 0) + sum(
-                (n.data.get("message_tokens") or 0) for n in wf_manage.nodes
-            )
-            self.data["answer_tokens"] = (self.data.get("answer_tokens") or 0) + sum(
-                (n.data.get("answer_tokens") or 0) for n in wf_manage.nodes
-            )
+            usage = wf_manage.get_usage()
+            self.data["message_tokens"] = (self.data.get("message_tokens") or 0) + usage["prompt_tokens"]
+            self.data["answer_tokens"] = (self.data.get("answer_tokens") or 0) + usage["completion_tokens"]
             self.write_context("index", index)
             self.write_context("item", item)
             last_context = self.workflow_manage.get_context(self.node.id, "last_context")

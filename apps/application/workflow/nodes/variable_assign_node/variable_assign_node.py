@@ -42,8 +42,8 @@ class VariableAssignNode(INode):
             if variable["fields"][0] in ASSIGNABLE_GROUPS:
                 result_list.append(self.handle(variable, self.evaluation))
 
-        self.write_context("variable_list", node_params.get("variable_list", []))
-        self.write_context("result_list", result_list)
+        self.data["variable_list"] = node_params.get("variable_list", [])
+        self.data["result_list"] = result_list
 
     def evaluation(self, variable, value):
         # 写到哪一层由 workflow_manage 决定:循环体内的 global/chat/output 会逐级交给根工作流,loop 写到所属循环
@@ -97,8 +97,8 @@ class VariableAssignNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "variable_list": self.get_context("variable_list"),
-                "result_list": self.get_context("result_list"),
+                "variable_list": self.data.get("variable_list"),
+                "result_list": self.data.get("result_list"),
                 "status": self.status.value if self.status else None,
             }
         )

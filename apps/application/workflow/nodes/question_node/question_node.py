@@ -129,25 +129,21 @@ class QuestionNode(INode):
         chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id, **(model_params_setting or {}))
 
         history_message = _get_history_message(history_chat_record, dialogue_number)
-        self.write_context(
-            "history_message",
-            [{"content": message.content, "role": message.type} for message in (history_message or [])],
-        )
+        self.data["history_message"] = [
+            {"content": message.content, "role": message.type} for message in (history_message or [])
+        ]
 
         question = HumanMessage(self.workflow_manage.generate_prompt(prompt))
-        self.write_context("question", question.content)
+        self.data["question"] = question.content
 
         system = self.workflow_manage.generate_prompt(system)
-        self.write_context("system", system)
+        self.data["system"] = system
 
         if system and len(system) > 0:
             message_list = [SystemMessage(system), *history_message, question]
         else:
             message_list = [*history_message, question]
-        self.write_context(
-            "message_list",
-            [{"content": m.content, "role": m.type} for m in message_list],
-        )
+        self.data["message_list"] = [{"content": m.content, "role": m.type} for m in message_list]
 
         self._check_cancelled()
         self.async_runner.run_async(
@@ -184,20 +180,20 @@ class QuestionNode(INode):
             if self.async_runner.cancel_event.is_set()
             else (chat_model.get_num_tokens_from_messages(message_list), chat_model.get_num_tokens(answer))
         )
-        self.write_context("message_tokens", message_tokens)
-        self.write_context("answer_tokens", answer_tokens)
+        self.data["message_tokens"] = message_tokens
+        self.data["answer_tokens"] = answer_tokens
         self.write_context("answer", answer)
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "question": self.get_context("question"),
+                "question": self.data.get("question"),
                 "answer": self.get_context("answer"),
-                "system": self.get_context("system"),
-                "message_tokens": self.get_context("message_tokens"),
-                "answer_tokens": self.get_context("answer_tokens"),
-                "history_message": self.get_context("history_message"),
+                "system": self.data.get("system"),
+                "message_tokens": self.data.get("message_tokens"),
+                "answer_tokens": self.data.get("answer_tokens"),
+                "history_message": self.data.get("history_message"),
             }
         )
         return details

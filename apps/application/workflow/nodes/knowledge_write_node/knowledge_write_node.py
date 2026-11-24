@@ -389,13 +389,13 @@ class KnowledgeWriteNode(INode):
             }
             for document in documents
         ]
-        self.write_context("write_content", write_content_list)
+        self.data["write_content"] = write_content_list
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "write_content": self.get_context("write_content"),
+                "write_content": self.data.get("write_content"),
                 "enableException": self.node.properties.get("enableException"),
             }
         )

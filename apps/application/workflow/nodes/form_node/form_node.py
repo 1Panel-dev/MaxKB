@@ -80,8 +80,8 @@ class FormNode(INode):
             chunk_id = str(uuid.uuid7())
 
         # 写入 context
-        self.write_context("is_submit", is_submit)
-        self.write_context("form_content_format", form_content_format)
+        self.data["is_submit"] = is_submit
+        self.data["form_content_format"] = form_content_format
 
         if is_submit:
             self.write_context("form_data", form_data)
@@ -89,7 +89,7 @@ class FormNode(INode):
                 self.write_context(key, form_data.get(key))
 
         form_field_list = [self._reset_field(field) for field in form_field_list]
-        self.write_context("form_field_list", form_field_list)
+        self.data["form_field_list"] = form_field_list
 
         # 输出表单内容
         node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
@@ -190,10 +190,10 @@ class FormNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "form_field_list": self.get_context("form_field_list"),
+                "form_field_list": self.data.get("form_field_list"),
                 "form_data": self.get_context("form_data"),
-                "is_submit": self.get_context("is_submit"),
-                "form_content_format": self.get_context("form_content_format"),
+                "is_submit": self.data.get("is_submit"),
+                "form_content_format": self.data.get("form_content_format"),
             }
         )
         return details

@@ -122,16 +122,16 @@ class DataSourceWebNode(INode):
             raise
 
         self.write_context("document_list", document_list)
-        self.write_context("source_url", source_url)
-        self.write_context("selector", selector)
+        self.data["source_url"] = source_url
+        self.data["selector"] = selector
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
                 "document_list": self.get_context("document_list"),
-                "source_url": self.get_context("source_url"),
-                "selector": self.get_context("selector"),
+                "source_url": self.data.get("source_url"),
+                "selector": self.data.get("selector"),
                 "knowledge_base": self.get_workflow_parameters().get("knowledge_base"),
                 "enableException": self.node.properties.get("enableException"),
             }

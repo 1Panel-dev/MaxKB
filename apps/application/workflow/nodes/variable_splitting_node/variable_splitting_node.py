@@ -83,7 +83,7 @@ class VariableSplittingNode(INode):
             except Exception:
                 pass
 
-        self.write_context("request", input_variable)
+        self.data["request"] = input_variable
         response = {v["field"]: smart_jsonpath_search(input_variable, v["expression"]) for v in variable_list}
         self.write_context("result", response)
         for key, value in response.items():
@@ -93,7 +93,7 @@ class VariableSplittingNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "request": self.get_context("request"),
+                "request": self.data.get("request"),
                 "result": self.get_context("result"),
                 "status": self.status.value if self.status else None,
             }

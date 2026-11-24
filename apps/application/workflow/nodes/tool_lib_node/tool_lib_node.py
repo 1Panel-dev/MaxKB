@@ -219,7 +219,7 @@ class ToolLibNode(INode):
             ]
         }
 
-        self.write_context("params", params)
+        self.data["params"] = params
         # 合并初始化参数
         init_params_default_value = {i["field"]: i.get("default_value") for i in tool_lib.init_field_list}
         if tool_lib.init_params is not None:
@@ -377,7 +377,7 @@ class ToolLibNode(INode):
         details.update(
             {
                 "result": _filter_file_bytes(self.get_context("result")),
-                "params": self.get_context("params"),
+                "params": self.data.get("params"),
                 "enableException": self.node.properties.get("enableException"),
             }
         )

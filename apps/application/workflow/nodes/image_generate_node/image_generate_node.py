@@ -113,13 +113,12 @@ class ImageGenerateNode(INode):
         tti_model = get_model_instance_by_model_workspace_id(model_id, workspace_id, **(model_params_setting or {}))
 
         history_message = self._get_history_message(history_chat_record, dialogue_number)
-        self.write_context("history_message", [{"content": m.content, "role": m.type} for m in (history_message or [])])
+        self.data["history_message"] = [{"content": m.content, "role": m.type} for m in (history_message or [])]
 
         question = self.workflow_manage.generate_prompt(prompt)
-        self.write_context("question", question)
-        self.write_context("negative_prompt", self.workflow_manage.generate_prompt(negative_prompt or ""))
-        self.write_context("dialogue_type", dialogue_type)
-
+        self.data["question"] = question
+        self.data["negative_prompt"] = self.workflow_manage.generate_prompt(negative_prompt or "")
+        self.data["dialogue_type"] = dialogue_type
         self._check_cancelled()
         image_urls = self.async_runner.run_async(lambda: self._await_generate(tti_model, question, negative_prompt))
 
@@ -139,7 +138,7 @@ class ImageGenerateNode(INode):
             file_urls.append(file_url)
 
         image_list = [{"file_id": path.split("/")[-1], "url": path} for path in file_urls]
-        self.write_context("image_list", image_list)
+        self.write_context("image", image_list)
 
         answer = " ".join([f"![Image]({path})" for path in file_urls])
         self.write_context("answer", answer)
@@ -235,10 +234,10 @@ class ImageGenerateNode(INode):
         details = super().get_details(index, position, old_details, **kwargs)
         details.update(
             {
-                "question": self.get_context("question"),
+                "question": self.data.get("question"),
                 "answer": self.get_context("answer"),
-                "image_list": self.get_context("image_list"),
-                "negative_prompt": self.get_context("negative_prompt"),
+                "image_list": self.get_context("image"),
+                "negative_prompt": self.data.get("negative_prompt"),
             }
         )
         return details
