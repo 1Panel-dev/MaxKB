@@ -18,7 +18,7 @@ class Portal(AppModelMixin):
 
     description = models.TextField(null=True, blank=True, max_length=256, verbose_name="门户描述")
 
-    logo = models.CharField(max_length=512, null=True, blank=True, verbose_name="门户Logo地址")
+    logo = models.CharField(max_length=512, null=True, blank=True, verbose_name="门户Logo地址", default="./favicon.ico")
 
     enable_public_access = models.BooleanField(default=True, verbose_name="是否开启公开访问")
     # API服务配置
