@@ -24,7 +24,7 @@ export interface SystemUserPayload {
   nick_name: string
   password?: string
   phone: string
-  role_setting: SystemUserRoleAssignment[]
+  role_setting?: SystemUserRoleAssignment[]
   encrypted?: boolean
   user_group_ids?: string[]
 }

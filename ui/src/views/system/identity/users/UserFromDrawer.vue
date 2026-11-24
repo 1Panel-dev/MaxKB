@@ -17,16 +17,19 @@ defineOptions({ name: 'UserFromDrawer' })
 
 const { t } = useI18n({ useScope: 'global' })
 const { auth } = useStore()
+const DEFAULT_WORKSPACE_ID = 'default'
 
 const emit = defineEmits<{
   refresh: [resetQuery: boolean] //是否从第一页刷新
 }>()
 
+const hasRoleSetting = computed(() => auth.isEE || auth.isPE)
 const userFormRef = ref<FormInstance>()
 const drawerVisible = ref(false)
 const isEdit = ref(false)
 const userSubmitting = ref(false)
-const userForm = reactive<SystemUserPayload>({
+type SystemUserForm = Omit<SystemUserPayload, 'role_setting'> & { role_setting: SystemUserRoleAssignment[] }
+const userForm = reactive<SystemUserForm>({
   email: '',
   nick_name: '',
   password: '',
@@ -39,7 +42,7 @@ const userForm = reactive<SystemUserPayload>({
 const drawerTitle = computed(() => t(isEdit.value ? 'user.editTitle' : 'user.createTitle'))
 const submitText = computed(() => t(isEdit.value ? 'common.actions.save' : 'common.actions.create'))
 
-const userFormRules = computed<FormRules<SystemUserPayload>>(() => ({
+const userFormRules = computed<FormRules<SystemUserForm>>(() => ({
   username: [
     { whitespace: true, required: true, message: t('user.username.requiredMessage'), trigger: 'blur' },
     { min: 4, max: 64, message: t('common.validation.lengthRange', { min: 4, max: 64 }), trigger: 'blur' },
@@ -65,6 +68,9 @@ function isAdminRole(roleId: string) {
 }
 
 function isUserRole(roleId: string) {
+  if (!hasRoleSetting.value) {
+    return roleId !== ROLE_TYPE.ADMIN
+  }
   return roleOptions.value.find(({ id }) => id === roleId)?.type === ROLE_TYPE.USER
 }
 
@@ -99,14 +105,16 @@ function loadRoleSettingOptions() {
 
 // 用户组相关
 const selectedWorkspaceIds = computed(() => {
-  if (!auth.isEE && !auth.isPE) {
-    return ['default']
+  if (!hasRoleSetting.value) {
+    return [DEFAULT_WORKSPACE_ID]
   }
   return [...new Set(userForm.role_setting.flatMap(({ workspace_ids }) => workspace_ids))]
 })
 
-// 用户组仅在选择包含普通用户角色时展示。
-const showUserGroup = computed(() => userForm.role_setting.some(({ role_id }) => isUserRole(role_id)))
+// CE 没有角色配置，用户组固定展示；商业版仅在选择普通用户角色时展示。
+const showUserGroup = computed(
+  () => !hasRoleSetting.value || userForm.role_setting.some(({ role_id }) => isUserRole(role_id)),
+)
 
 // 移除普通用户角色后清空已选用户组，避免随角色变更残留提交。
 watch(showUserGroup, (visible) => {
@@ -122,14 +130,24 @@ function loadDefaultPassword() {
   })
 }
 
+function getSubmitPayload(): SystemUserPayload {
+  if (hasRoleSetting.value) {
+    return userForm
+  }
+  const payload: SystemUserPayload = { ...userForm }
+  delete payload.role_setting
+  return payload
+}
+
 async function submitUser() {
   if (!userFormRef.value) return
   await userFormRef.value.validate((valid) => {
     if (valid) {
       userSubmitting.value = true
+      const payload = getSubmitPayload()
 
       if (isEdit.value) {
-        UserManageApi.putUser(userForm.id as string, userForm)
+        UserManageApi.putUser(userForm.id as string, payload)
           .then(() => {
             MsgSuccess(t('common.messages.editSuccess'))
             emit('refresh', false)
@@ -142,7 +160,7 @@ async function submitUser() {
         const encryptor = new JSEncrypt()
         encryptor.setPublicKey(auth.baseProfile?.rsa ?? '')
         const encryptedPassword = encryptor.encrypt(userForm.password as string)
-        UserManageApi.postUser({ ...userForm, encrypted: true, password: encryptedPassword as string })
+        UserManageApi.postUser({ ...payload, encrypted: true, password: encryptedPassword as string })
           .then(() => {
             MsgSuccess(t('common.messages.createSuccess'))
             emit('refresh', true)
@@ -175,7 +193,7 @@ function open(user?: SystemUser) {
     })
     isEdit.value = true
   }
-  if (auth.isEE || auth.isPE) {
+  if (hasRoleSetting.value) {
     loadRoleSettingOptions()
   }
   if (!isEdit.value) {
@@ -199,7 +217,7 @@ function resetData() {
   roleSettingOptionsLoading.value = false
   userSubmitting.value = false
   roleOptions.value = []
-  workspaceOptions.value = []
+  workspaceOptions.value = hasRoleSetting.value ? [] : [{ id: DEFAULT_WORKSPACE_ID, name: t('workspace.default') }]
   userFormRef.value?.clearValidate()
 }
 
@@ -252,7 +270,7 @@ defineExpose({ open })
           </el-input>
         </el-form-item>
       </section>
-      <section v-if="auth.isEE || auth.isPE">
+      <section v-if="hasRoleSetting">
         <h4 class="mk-title-decoration mb-4 mt-4">{{ t('user.role.settingsTitle') }}</h4>
         <MkFormList v-model="userForm.role_setting" :add-text="t('user.role.add')" :default-item="{ role_id: '', workspace_ids: [] }">
           <template #default="{ index, item: roleAssignment }">
