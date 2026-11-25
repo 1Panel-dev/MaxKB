@@ -11,12 +11,9 @@ from common.utils.common import password_encrypt
 from common.utils.common import password_verify, needs_password_upgrade
 from common.utils.rsa_util import decrypt
 from system_manage.models import (
-    ResourceChatUserGroupAuthorize,
-    ResourceType,
-    UserGroupRelation,
-    ResourceChatUserAuthorize,
     ChatUser,
 )
+from system_manage.services.chat_user_authorization import ensure_application_chat_user_authorized
 from users.serializers.login import LoginRequest
 
 system_version, system_get_key = Cache_Version.SYSTEM.value
@@ -34,26 +31,7 @@ class ChatUserAccessTokenSerializer(serializers.Serializer):
         # 如果不需要认证就直接
         if not application_access_token.authentication:
             return
-            # 检查用户是否有权限访问该应用
-        is_authorized = ResourceChatUserAuthorize.objects.filter(
-            resource_id=application_id, resource_type=ResourceType.APPLICATION.value, is_auth=True, user_id=user.id
-        ).exists()
-        if not is_authorized:
-            # 获取资源组授权的用户组ID
-            resource_group_ids = ResourceChatUserGroupAuthorize.objects.filter(
-                resource_id=application_id,
-                resource_type=ResourceType.APPLICATION.value,
-                is_auth=True,
-            ).values_list("user_group_id", flat=True)
-
-            # 如果有资源组授权，则检查用户是否属于这些用户组
-            if resource_group_ids.exists():
-                is_authorized = UserGroupRelation.objects.filter(
-                    user_id=user.id, group_id__in=resource_group_ids
-                ).exists()
-
-        if not is_authorized:
-            raise AppApiException(1005, _("The user does not have permission to access the application"))
+        ensure_application_chat_user_authorized(application_id, user.id)
 
     @staticmethod
     def get_auth_setting(access_token):
