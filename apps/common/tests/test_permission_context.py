@@ -2,7 +2,7 @@ from types import SimpleNamespace
 
 from django.test import SimpleTestCase
 
-from common.auth.authentication import check_permissions, has_permissions
+from common.auth.authentication import has_permissions
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.auth.struct.auth import Auth
 from common.exception.app_exception import AppUnauthorizedFailed

@@ -1,7 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
 from application.models import ApplicationAccessToken, ChatUserType
-from common.auth.authentication import check_permissions
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.auth.handle.impl.chat_user_token import get_auth
 from common.exception.app_exception import AppApiException
