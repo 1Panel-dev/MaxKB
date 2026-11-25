@@ -32,6 +32,7 @@
     "label": "工作流知识库",
     "createTitle": "创建工作流知识库",
     "description": "通过自定义工作流方式构建知识库",
+    "publishDataSourceRequiredMessage": "发布知识库工作流前，请至少添加一个数据源节点。",
     "documentImportUnavailableMessage": "当前知识库的工作流未发布，无法导入文档，请先发布工作流。",
     "transform": {
       "title": "转换为工作流知识库",

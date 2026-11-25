@@ -32,6 +32,7 @@
     "label": "Workflow knowledge",
     "createTitle": "Create workflow knowledge",
     "description": "Use a custom workflow to build knowledge.",
+    "publishDataSourceRequiredMessage": "Add at least one data source node before publishing the knowledge workflow.",
     "documentImportUnavailableMessage": "This Knowledge workflow has not been published. Publish it before importing documents.",
     "transform": {
       "title": "Convert to workflow knowledge",

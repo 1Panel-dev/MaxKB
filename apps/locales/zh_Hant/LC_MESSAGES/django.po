@@ -5679,6 +5679,9 @@ msgstr "開始節點不存在"
 msgid "The knowledge base workflow has not been published"
 msgstr "知識庫工作流程尚未發布"
 
+msgid "Add at least one data source node before publishing the knowledge workflow."
+msgstr "發佈知識庫工作流程前，請至少新增一個資料來源節點。"
+
 #: apps/knowledge/serializers/knowledge_workflow.py:535
 #: apps/resource_manage/serializers/knowledge_workflow.py:33
 msgid "knowledge action id"

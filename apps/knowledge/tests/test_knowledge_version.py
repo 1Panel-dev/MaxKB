@@ -106,18 +106,24 @@ class KnowledgeWorkflowPublishTests(TestCase):
         cls.user = User.objects.create(username="workflow-publisher")
         cls.workflow = KnowledgeWorkflow.objects.create(
             knowledge=cls.knowledge,
-            work_flow={"nodes": [], "edges": []},
+            work_flow={
+                "nodes": [{"id": "source", "type": "data-source-local-node", "properties": {"kind": "data-source"}}],
+                "edges": [],
+            },
             default_model_setting={"llm": {"model_id": "test-model"}},
         )
 
-    def publish(self, payload=None):
+    def operation(self):
         return KnowledgeWorkflowSerializer.Operate(
             data={
                 "user_id": str(self.user.id),
                 "workspace_id": "default",
                 "knowledge_id": str(self.knowledge.id),
             }
-        ).publish(payload)
+        )
+
+    def publish(self, payload=None):
+        return self.operation().publish(payload)
 
     def test_publish_persists_title_and_notes_in_history(self):
         notes = "  修复知识库同步\n保留工作流配置\n"
@@ -159,6 +165,48 @@ class KnowledgeWorkflowPublishTests(TestCase):
 
         versions = KnowledgeWorkflowVersion.objects.filter(knowledge=self.knowledge).order_by("create_time")
         self.assertEqual(list(versions.values_list("name", "publish_desc")), [("V1", "First release"), ("V2", "")])
+
+    def test_publish_requires_a_top_level_data_source(self):
+        base = {"id": "knowledge-base-node", "type": "knowledge-base-node"}
+        source = self.workflow.work_flow["nodes"][0]
+        loop = {"id": "loop", "type": "loop-node", "properties": {"node_data": {"loop_body": {"nodes": [source]}}}}
+        for nodes in ([], [base], [base, {"id": "tool", "type": "tool-lib-node"}], [base, loop]):
+            with self.subTest(nodes=nodes):
+                self.workflow.work_flow = {"nodes": nodes, "edges": []}
+                self.workflow.save(update_fields=["work_flow"])
+                with self.assertRaises(AppApiException) as error:
+                    self.publish()
+                self.assertEqual(error.exception.code, 400)
+                self.workflow.refresh_from_db()
+                self.assertFalse(self.workflow.is_publish)
+                self.assertIsNone(self.workflow.publish_time)
+                self.assertFalse(KnowledgeWorkflowVersion.objects.filter(knowledge=self.knowledge).exists())
+
+    def test_invalid_draft_preserves_last_published_version(self):
+        self.publish({"publish_name": "V1"})
+        self.workflow.refresh_from_db()
+        published_at = self.workflow.publish_time
+        version = KnowledgeWorkflowVersion.objects.get(knowledge=self.knowledge)
+        draft = {"nodes": [], "edges": []}
+        self.operation().edit({"work_flow": draft})
+
+        with self.assertRaises(AppApiException):
+            self.publish({"publish_name": "V2"})
+
+        self.workflow.refresh_from_db()
+        self.assertEqual(self.workflow.work_flow, draft)
+        self.assertTrue(self.workflow.is_publish)
+        self.assertEqual(self.workflow.publish_time, published_at)
+        self.assertEqual(KnowledgeWorkflowVersion.objects.get(knowledge=self.knowledge).id, version.id)
+
+    def test_publish_accepts_web_and_tool_data_sources(self):
+        web = {"id": "web", "type": "data-source-web-node"}
+        tool = {"id": "tool", "type": "tool-lib-node", "properties": {"kind": "data-source"}}
+        for nodes in ([web], [tool], [web, tool]):
+            with self.subTest(nodes=nodes):
+                self.workflow.work_flow = {"nodes": nodes, "edges": []}
+                self.workflow.save(update_fields=["work_flow"])
+                self.assertTrue(self.publish())
 
     def test_publish_accepts_field_limits(self):
         self.publish({"publish_name": "版" * 128, "publish_desc": "说" * 1024})

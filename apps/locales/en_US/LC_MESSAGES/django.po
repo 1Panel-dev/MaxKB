@@ -5680,6 +5680,9 @@ msgstr "The start node does not exist"
 msgid "The knowledge base workflow has not been published"
 msgstr "The knowledge base workflow has not been published"
 
+msgid "Add at least one data source node before publishing the knowledge workflow."
+msgstr "Add at least one data source node before publishing the knowledge workflow."
+
 #: apps/knowledge/serializers/knowledge_workflow.py:535
 #: apps/resource_manage/serializers/knowledge_workflow.py:33
 msgid "knowledge action id"

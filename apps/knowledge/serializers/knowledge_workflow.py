@@ -28,7 +28,7 @@ from application.workflow.workflow_manage import CallBack, WorkflowManage
 from application.workflow.workflow_run_registry import WorkflowRunRegistry
 from application.mcp_tools import get_mcp_tools
 from common.db.search import page_search
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, BadRequest400
 from common.field.common import UploadedFileField
 from common.result import result
 from common.utils.common import bytes_to_uploaded_file
@@ -951,6 +951,14 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 .filter(knowledge_id=self.data.get("knowledge_id"), workspace_id=workspace_id)
                 .first()
             )
+            if knowledge_workflow is None or not any(
+                node.get("type") in ("data-source-local-node", "data-source-web-node")
+                or (node.get("type") == "tool-lib-node" and (node.get("properties") or {}).get("kind") == "data-source")
+                for node in knowledge_workflow.work_flow.get("nodes") or []
+            ):
+                raise BadRequest400(
+                    400, _("Add at least one data source node before publishing the knowledge workflow.")
+                )
             validate_workflow_references(knowledge_workflow.work_flow, user_id, workspace_id)
             work_flow_version = KnowledgeWorkflowVersion(
                 work_flow=knowledge_workflow.work_flow,

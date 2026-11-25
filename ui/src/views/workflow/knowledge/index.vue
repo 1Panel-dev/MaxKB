@@ -28,7 +28,7 @@ import WorkspaceSharedWorkflowApi from '@/api/admin/workspace/shared/knowledge/w
 import WorkflowImportDocumentDrawer from '@/views/knowledge-detail/library/document/import-document/WorkflowImportDocumentDrawer.vue'
 import { defaultKnowledgeNodes } from '@/workflow-canvas/config/node-mapping'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
-import { WorkflowMode } from '@/workflow-canvas/types'
+import { WorkflowKind, WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonDefaultModelSetting from '../components/default-model-setting/ButtonDefaultModelSetting.vue'
 import EditPublishVersionDialog from '../components/publish-history/EditPublishVersionDialog.vue'
@@ -268,6 +268,16 @@ const publishDialogRef = useTemplateRef<InstanceType<typeof EditPublishVersionDi
 
 function handleOpenPublish() {
   if (!workflowRef.value || loading.value || historyVisible.value) return
+  const hasDataSource = getGraphData()?.nodes.some(
+    (node) =>
+      node.type === WorkflowNodeType.DataSourceLocalNode ||
+      node.type === WorkflowNodeType.DataSourceWebNode ||
+      (node.type === WorkflowNodeType.ToolLib && node.properties?.kind === WorkflowKind.DataSource),
+  )
+  if (!hasDataSource) {
+    MsgWarning(t('knowledge.workflow.publishDataSourceRequiredMessage'))
+    return
+  }
   loading.value = true
   return workflowRef.value
     .validate()

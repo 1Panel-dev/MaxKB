@@ -32,6 +32,7 @@
     "label": "工作流知識庫",
     "createTitle": "創建工作流知識庫",
     "description": "通過自定義工作流方式構建知識庫",
+    "publishDataSourceRequiredMessage": "發佈知識庫工作流程前，請至少新增一個資料來源節點。",
     "documentImportUnavailableMessage": "當前知識庫的工作流未發佈，無法導入文檔，請先發佈工作流。",
     "transform": {
       "title": "轉換為工作流知識庫",
