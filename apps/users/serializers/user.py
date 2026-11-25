@@ -26,6 +26,7 @@ from common.constants.permission_constants import (
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
+from common.utils.cache_util import consume_cache_value_if_equal
 from common.utils.common import get_random_chars, password_encrypt, password_verify, valid_license
 from common.utils.rsa_util import decrypt
 from django.core import validators
@@ -67,13 +68,14 @@ VERIFY_CODE_EXPIRE_SECONDS = 10 * 60
 VERIFY_CODE_LOCKOUT_SECONDS = 10 * 60
 
 
-def check_verify_code_attempts(email: str, type_code: str, submitted_code: str) -> bool:
+def check_verify_code_attempts(email: str, type_code: str, submitted_code: str, consume: bool = False) -> bool:
     """
     校验验证码并限制错误尝试次数，防止验证码被暴力破解（CWE-307）。
     失败计数按邮箱累计且不随重新发送验证码清零：连续错误达到上限后，进入固定冷却期的
     锁定，锁定期间即使验证码正确也一律拒绝，必须等待冷却期结束才能重新尝试，从而
     避免通过反复发送验证码维持无限猜解节奏。
-    校验通过时返回 True，否则抛出校验异常。
+    校验通过时返回 True，否则抛出校验异常。需要一次性消费验证码时，通过 Redis
+    原子比较并删除，避免并发请求在删除前同时通过校验。
     """
     code_cache_key = email + ":" + type_code
     failed_cache_key = code_cache_key + "_failed_attempts"
@@ -99,6 +101,10 @@ def check_verify_code_attempts(email: str, type_code: str, submitted_code: str) 
             cache.delete(get_key(code_cache_key), version=version)
             cache.set(get_key(lock_cache_key), True, timeout=VERIFY_CODE_LOCKOUT_SECONDS, version=version)
             raise AppApiException(500, _("Too many verification code attempts, please try again later"))
+        raise ExceptionCodeConstants.CODE_ERROR.value.to_app_api_exception()
+
+    if consume and not consume_cache_value_if_equal(
+            get_key(code_cache_key), submitted_code, cache_instance=cache, version=version):
         raise ExceptionCodeConstants.CODE_ERROR.value.to_app_api_exception()
 
     # 校验通过，清除错误尝试计数与锁定
@@ -1070,7 +1076,7 @@ class RePasswordSerializer(serializers.Serializer):
         if self.data.get('password') != self.data.get('re_password'):
             raise AppApiException(ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.code,
                                   ExceptionCodeConstants.PASSWORD_NOT_EQ_RE_PASSWORD.value.message)
-        check_verify_code_attempts(email, "reset_password", self.data.get('code'))
+        check_verify_code_attempts(email, "reset_password", self.data.get('code'), consume=True)
         return True
 
     def reset_password(self):
@@ -1082,8 +1088,6 @@ class RePasswordSerializer(serializers.Serializer):
             email = self.data.get("email")
             QuerySet(User).filter(email=email).update(
                 password=password_encrypt(self.data.get('password')))
-            code_cache_key = email + ":reset_password"
-            cache.delete(get_key(code_cache_key), version=version)
             return True
 
 
