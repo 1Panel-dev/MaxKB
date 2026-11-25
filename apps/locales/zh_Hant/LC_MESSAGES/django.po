@@ -8905,6 +8905,14 @@ msgstr "不存在的ID"
 msgid "No permission for the target folder"
 msgstr "沒有目標資料夾的權限"
 
+#: apps/folders/serializers/folder.py:220
+msgid "A node may not be made a child of itself."
+msgstr "節點無法指定自己成為自己的子節點"
+
+#: apps/folders/serializers/folder.py:222
+msgid "A node may not be made a child of any of its descendants."
+msgstr "節點無法指定自己成為子節點的子節點"
+
 msgid "Application token usage statistics"
 msgstr "智能體令牌使用統計"
 
