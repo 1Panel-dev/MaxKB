@@ -638,13 +638,13 @@ class HomePageSerializer(serializers.Serializer):
             start_time = get_start_time(self.data.get("start_time"))
             end_time = get_end_time(self.data.get("end_time"))
             query_set = QuerySet(ApplicationChatUserStats).filter(
-                create_time__gte=start_time, create_time__lte=end_time
+                create_time__gte=start_time,
+                create_time__lte=end_time,
+                application_id__in=application_queryset,
             )
             application_id = self.data.get("application_id")
             if application_id:
                 query_set = query_set.filter(application_id=application_id)
-            else:
-                query_set = query_set.filter(application_id__in=application_queryset)
             return native_search(
                 {"default_sql": query_set},
                 select_string=get_file_content(
@@ -665,6 +665,13 @@ class HomePageSerializer(serializers.Serializer):
             )
             applicationSerializer.is_valid(raise_exception=True)
             application_query_set = applicationSerializer.get_aggregation_query_set(auth)
+            query_filters = {
+                "application_chat.application_id__in": application_query_set,
+                "application_chat_record.create_time__gte": start_time,
+                "application_chat_record.create_time__lte": end_time,
+            }
+            if application_id:
+                query_filters["application_chat.application_id"] = application_id
             chat_record_aggregate_trend = native_search(
                 {
                     "default_sql": QuerySet(
@@ -674,17 +681,7 @@ class HomePageSerializer(serializers.Serializer):
                                 "application_chat_record.create_time": models.DateTimeField(),
                             }
                         )
-                    ).filter(
-                        **{
-                            **(
-                                {"application_chat.application_id": application_id}
-                                if application_id
-                                else {"application_chat.application_id__in": application_query_set}
-                            ),
-                            "application_chat_record.create_time__gte": start_time,
-                            "application_chat_record.create_time__lte": end_time,
-                        }
-                    )
+                    ).filter(**query_filters)
                 },
                 select_string=get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "application", "sql", "chat_record_count_trend.sql")
