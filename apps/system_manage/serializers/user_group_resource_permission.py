@@ -30,7 +30,8 @@ from system_manage.models import WorkspaceUserGroupResourcePermission
 from tools.models import Tool
 from users.models.user_group import SystemUserGroup, SystemUserGroupRelation
 from system_manage.models import WorkspaceUserGroupResourcePermission, WorkspaceUserResourcePermission
-from users.serializers.user import is_workspace_manage
+from system_manage.serializers.user_resource_permission import get_managed_folder_ids_under_target
+from users.serializers.user import is_workspace_manage, is_builtin_workspace_manage
 
 
 class PermissionSerializer(serializers.Serializer):
@@ -377,9 +378,9 @@ class ResourceUserGroupPermissionSerializer(serializers.Serializer):
         permission_id = f"{auth_target_type}:READ+AUTH"
         if workspace_manage:
             role_type = RoleConstants.WORKSPACE_MANAGE.value.__str__()
-            has_user_role_exact_permission = has_exact_permission_by_role(
-                current_user_id, workspace_id, permission_id, role_type
-            )
+            has_user_role_exact_permission = is_builtin_workspace_manage(
+                current_user_id, workspace_id
+            ) or has_exact_permission_by_role(current_user_id, workspace_id, permission_id, role_type)
             if has_user_role_exact_permission:
                 current_user_managed_resources_ids = (
                     QuerySet(resource_model)
@@ -414,7 +415,7 @@ class ResourceUserGroupPermissionSerializer(serializers.Serializer):
 
         return current_user_managed_resources_ids
 
-    def edit(self, instance, with_valid=True, current_user_id=None):
+    def edit(self, instance, with_valid=True, current_user_id=None, request=None):
         if with_valid:
             self.is_valid(raise_exception=True)
             ResourceUserPermissionEditRequest(data=instance, many=True).is_valid(raise_exception=True)
@@ -433,10 +434,10 @@ class ResourceUserGroupPermissionSerializer(serializers.Serializer):
         if len(valid_user_group_ids) != len(set(user_group_ids)):
             raise AppApiException(500, _("User group does not exist"))
         include_children = users_permission[0].get("include_children")
-        folder_ids = users_permission[0].get("folder_ids")
         # 删除已存在的对应的用户在该资源下的权限
 
         if include_children:
+            folder_ids = get_managed_folder_ids_under_target(request, workspace_id, auth_target_type, target)
             managed_resource_ids = (
                 list(
                     self.get_has_manage_permission_resource_under_folders(
