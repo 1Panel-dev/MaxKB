@@ -1,7 +1,7 @@
 {
   "searchKnowledge": {
     "label": "Knowledge retrieval",
-    "description": "Relate knowledge and find segments relevant to the question",
+    "description": "Retrieve relevant segments from knowledge bases",
     "image": {
       "label": "Search images",
       "placeholder": "Select search images"
@@ -13,7 +13,7 @@
   },
   "searchDocument": {
     "label": "Document tag retrieval",
-    "description": "Find documents matching the specified tags within the configured search scope",
+    "description": "Filter documents by tags",
     "searchMode": {
       "label": "Search settings",
       "auto": "Automatic",
@@ -27,12 +27,12 @@
   },
   "documentExtract": {
     "label": "Document content extraction",
-    "description": "Parse input documents and output structured content",
+    "description": "Parse documents into structured content",
     "content": "Document content"
   },
   "reranker": {
-    "label": "Multi-source retrieval",
-    "description": "Rerank retrieval results from multiple knowledge sources using a reranking",
+    "label": "Multi-source Rerank",
+    "description": "Rerank retrieval results from multiple knowledge bases",
     "content": {
       "label": "Content to rerank",
       "placeholder": "Select content to rerank",

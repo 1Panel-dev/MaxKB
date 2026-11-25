@@ -1,7 +1,7 @@
 {
   "loop": {
     "label": "Loop",
-    "description": "Repeat a series of tasks using the configured iteration count and logic",
+    "description": "Repeat tasks with the configured count and logic",
     "type": {
       "label": "Loop type",
       "requiredMessage": "Loop type is required",

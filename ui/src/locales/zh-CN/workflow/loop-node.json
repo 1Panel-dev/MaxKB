@@ -1,7 +1,7 @@
 {
   "loop": {
-    "label": "循环节点",
-    "description": "通过设置循环次数和逻辑，重复执行一系列任务",
+    "label": "循环",
+    "description": "按设定的次数与逻辑重复执行任务",
     "type": {
       "label": "循环类型",
       "requiredMessage": "请选择循环类型",

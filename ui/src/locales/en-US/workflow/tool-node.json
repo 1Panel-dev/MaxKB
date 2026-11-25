@@ -4,7 +4,7 @@
   },
   "mcp": {
     "label": "MCP call",
-    "description": "Run tools on MCP servers over SSE or Streamable HTTP",
+    "description": "Call tools on MCP servers",
     "serverConfig": {
       "label": "MCP server config",
       "requiredMessage": "MCP server configuration is required"
@@ -25,7 +25,7 @@
   },
   "customTool": {
     "label": "Custom tool",
-    "description": "Process data by running custom scripts"
+    "description": "Process data with custom scripts"
   },
   "tool": {
     "label": "Tool node"

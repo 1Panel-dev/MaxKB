@@ -8,7 +8,7 @@
   },
   "variableAggregation": {
     "label": "變量聚合",
-    "description": "按聚合策略聚合每組的變量",
+    "description": "將多組變量合併為一組輸出",
     "strategy": {
       "label": "聚合策略",
       "requiredMessage": "請選擇聚合策略",
@@ -28,7 +28,7 @@
   },
   "variableSplitting": {
     "label": "變量拆分",
-    "description": "通過配置JSON Path 表達式，對輸入的 JSON 格式變量進行解析和拆分",
+    "description": "使用 JSON Path 拆分 JSON 變量",
     "variables": {
       "label": "拆分變量",
       "requiredMessage": "請添加拆分變量"
@@ -43,7 +43,7 @@
   },
   "parameterExtraction": {
     "label": "參數提取",
-    "description": "利用 AI 模型提取結構化參數",
+    "description": "調用大模型提取結構化參數",
     "parameters": {
       "label": "提取參數",
       "requiredMessage": "請添加提取參數",

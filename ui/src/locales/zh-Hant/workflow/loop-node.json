@@ -1,7 +1,7 @@
 {
   "loop": {
-    "label": "循環節點",
-    "description": "通過設置循環次數和邏輯，重復執行一系列任務",
+    "label": "循環",
+    "description": "按設定的次數與邏輯重複執行任務",
     "type": {
       "label": "循環類型",
       "requiredMessage": "請選擇循環類型",

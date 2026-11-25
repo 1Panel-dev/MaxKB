@@ -1,7 +1,7 @@
 {
   "searchKnowledge": {
     "label": "知識庫檢索",
-    "description": "關聯知識庫，查找與問題相關的分段",
+    "description": "檢索與問題相關的知識庫分段",
     "image": {
       "label": "檢索圖片",
       "placeholder": "請選擇檢索圖片"
@@ -13,7 +13,7 @@
   },
   "searchDocument": {
     "label": "文檔標籤檢索",
-    "description": "從設定的檢索範圍中，根據文檔標籤檢索出滿足條件的文檔",
+    "description": "按標籤篩選出符合條件的文檔",
     "searchMode": {
       "label": "檢索設置",
       "auto": "自動",
@@ -27,12 +27,12 @@
   },
   "documentExtract": {
     "label": "文檔內容提取",
-    "description": "解析輸入文檔，輸出結構化文檔內容",
+    "description": "解析文檔並輸出結構化內容",
     "content": "文檔內容"
   },
   "reranker": {
     "label": "多路召回",
-    "description": "使用重排模型對多個知識庫的檢索結果進行二次召回",
+    "description": "重排多個知識庫的檢索結果",
     "content": {
       "label": "重排內容",
       "placeholder": "請選擇重排內容",

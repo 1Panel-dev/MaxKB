@@ -49,6 +49,7 @@ function handleNodeDragStart(event: PointerEvent, workflowNode: WorkflowMenuNode
                   <!-- 点击或拖拽添加节点 -->
                   <el-card
                     class="small cursor-pointer hover:border-primary!"
+                    body-class="flex-align-center"
                     shadow="never"
                     @click="emit('select', workflowNode)"
                     @pointerdown="handleNodeDragStart($event, workflowNode)"
