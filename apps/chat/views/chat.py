@@ -40,33 +40,6 @@ def stream_image(response):
         if chunk:  # 过滤掉保持连接的空块
             yield chunk
 
-
-class ResourceProxy(APIView):
-    def get(self, request: Request):
-        image_url = request.query_params.get("url")
-        if not image_url:
-            return result.error("Missing 'url' parameter")
-        try:
-
-            # 发送GET请求，流式获取图片内容
-            response = requests.get(
-                image_url,
-                stream=True,  # 启用流式响应
-                allow_redirects=True,
-                timeout=10
-            )
-            content_type = response.headers.get('Content-Type', '').split(';')[0]
-            # 创建Django流式响应
-            django_response = StreamingHttpResponse(
-                stream_image(response),  # 使用生成器
-                content_type=content_type
-            )
-
-            return django_response
-        except Exception as e:
-            return result.error(f"Image request failed: {str(e)}")
-
-
 class OpenAIView(APIView):
     authentication_classes = [ChatTokenAuth]
 
