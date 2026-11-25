@@ -172,3 +172,32 @@ def filter_knowledge_detail(request, workspace_id, knowledge_id, detail):
     ):
         detail["meta"].pop("sync_setting", None)
     return detail
+
+
+def check_migration_target(request, workspace_id, source_id, target_id, document_ids, target_document_id=None):
+    if target_document_id is None:
+        docs = Document.objects.filter(
+            knowledge_id=source_id, knowledge__workspace_id=workspace_id, id__in=document_ids
+        )
+        rows = list(docs.values_list("id", "resource_type"))
+        if {str(row[0]) for row in rows} != set(map(str, document_ids)):
+            raise AppUnauthorizedFailed(403, _("No permission to access"))
+        required = {
+            PermissionConstants.KNOWLEDGE_IMAGE_CREATE
+            if kind == DocumentResourceType.IMAGE
+            else PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE
+            for _, kind in rows
+        }
+    else:
+        target = Document.objects.filter(
+            id=target_document_id, knowledge_id=target_id, knowledge__workspace_id=workspace_id
+        ).first()
+        if target is None:
+            raise AppUnauthorizedFailed(403, _("No permission to access"))
+        required = {
+            PermissionConstants.KNOWLEDGE_IMAGE_EDIT
+            if target.resource_type == DocumentResourceType.IMAGE
+            else PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT
+        }
+    if not required or not all(has_knowledge_permission(request, workspace_id, target_id, perm) for perm in required):
+        raise AppUnauthorizedFailed(403, _("No permission to access"))

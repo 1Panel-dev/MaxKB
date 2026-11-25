@@ -24,6 +24,7 @@ from knowledge.api.paragraph import (
     ParagraphMigrateAPI,
     ParagraphAdjustOrderAPI,
 )
+from knowledge.permissions import check_migration_target
 from knowledge.permissions import (
     document_permission,
 )
@@ -140,6 +141,7 @@ class ParagraphView(APIView):
             target_knowledge_id: str,
             target_document_id,
         ):
+            check_migration_target(request, workspace_id, knowledge_id, target_knowledge_id, [], target_document_id)
             return result.success(
                 ParagraphSerializers.Migrate(
                     data={

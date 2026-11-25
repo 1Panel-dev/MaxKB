@@ -270,3 +270,15 @@ class WorkspaceKnowledgePermissionMapTests(SimpleTestCase):
                         knowledge_permission(permission).hasPermission(request, workspace_id="ws", knowledge_id="kb"),
                         permission in expected,
                     )
+
+
+class MigrationTargetPermissionTests(SimpleTestCase):
+    @patch("knowledge.permissions.has_knowledge_permission", return_value=False)
+    @patch("knowledge.permissions.Document.objects.filter")
+    def test_source_grant_is_not_used_for_target(self, documents, permission):
+        from knowledge.permissions import check_migration_target
+
+        documents.return_value.values_list.return_value = [("doc", "DOCUMENT")]
+        with self.assertRaises(AppUnauthorizedFailed):
+            check_migration_target(None, "workspace", "source", "target", ["doc"])
+        permission.assert_called_once_with(None, "workspace", "target", P.KNOWLEDGE_DOCUMENT_CREATE)

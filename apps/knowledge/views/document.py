@@ -45,6 +45,7 @@ from knowledge.api.document import (
     WebDocumentCreateAPI,
 )
 from knowledge.api.tag import DocsTagDeleteAPI
+from knowledge.permissions import check_migration_target
 from knowledge.permissions import (
     batch_document_permission,
     cancel_document_task_permission,
@@ -1076,6 +1077,7 @@ class DocumentView(APIView):
             ),
         )
         def put(self, request: Request, workspace_id, knowledge_id: str, target_knowledge_id: str):
+            check_migration_target(request, workspace_id, knowledge_id, target_knowledge_id, request.data)
             return result.success(
                 DocumentSerializers.Migrate(
                     data={

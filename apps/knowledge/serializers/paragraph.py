@@ -734,7 +734,8 @@ class ParagraphSerializers(serializers.Serializer):
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
             document_list = QuerySet(Document).filter(
-                id__in=[self.data.get("document_id"), self.data.get("target_document_id")]
+                id__in=[self.data.get("document_id"), self.data.get("target_document_id")],
+                **({"knowledge__workspace_id": workspace_id} if workspace_id else {}),
             )
             document_id = self.data.get("document_id")
             target_document_id = self.data.get("target_document_id")
