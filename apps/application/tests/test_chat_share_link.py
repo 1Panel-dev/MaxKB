@@ -7,12 +7,13 @@ from application.models import Application, ApplicationFolder, Chat, ChatRecord,
 from application.serializers.application_chat_link import (
     ChatRecordShareLinkSerializer,
     ChatShareLinkDetailSerializer,
-    save_public_file_access,
+    extract_oss_file_urls,
+    is_public_chat_attachment,
 )
 from common.exception.app_exception import AppApiException
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.utils.chat_link_code import UUIDEncoder
-from knowledge.models import PublicFileAccess
+from knowledge.models import FileSourceType
 from xpack.models.application_setting import ApplicationSetting
 
 
@@ -44,10 +45,10 @@ class ChatShareLinkFileAccessTests(TestCase):
             answer_text_list=[[]],
         )
 
-        save_public_file_access([record])
+        urls = extract_oss_file_urls([record.answer_text_list, record.question, record.messages])
 
         self.assertSetEqual(
-            set(PublicFileAccess.objects.filter(source_type="FILE").values_list("source_id", flat=True)),
+            {url.removeprefix("./oss/file/") for url in urls},
             {
                 "01a1f272-85ca-7187-96f2-dbcdffa10f2e",
                 "01a1f272-868f-7588-93e5-2fbaef22b6b1",
@@ -83,10 +84,12 @@ class ChatShareLinkFileAccessTests(TestCase):
 
         ChatShareLinkDetailSerializer(data={"link": UUIDEncoder.encode(share_link.id)}).get_record_list()
 
-        self.assertSetEqual(
-            set(PublicFileAccess.objects.filter(source_type="FILE").values_list("source_id", flat=True)),
-            {question_image_id, answer_audio_id},
-        )
+        attachment = SimpleNamespace(id=question_image_id, source_id=str(chat.id), source_type=FileSourceType.CHAT)
+        self.assertTrue(is_public_chat_attachment(attachment))
+        attachment.id = answer_audio_id
+        self.assertTrue(is_public_chat_attachment(attachment))
+        share_link.delete()
+        self.assertFalse(is_public_chat_attachment(attachment))
 
 
 class ChatShareLinkAvatarTests(TestCase):

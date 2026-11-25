@@ -9,7 +9,7 @@
 import re
 
 from django.core.cache import cache
-from django.db.models import QuerySet
+from django.db.models import F, Q, QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -18,7 +18,7 @@ from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
 from common.utils.chat_link_code import UUIDEncoder
-from knowledge.models import PublicFileAccess
+from knowledge.models import FileSourceType
 import uuid_utils.compat as uuid
 
 
@@ -69,33 +69,30 @@ def extract_oss_file_urls(content):
     return file_urls
 
 
-def save_public_file_access(chat_record_list):
-    """提取聊天记录中的所有文件ID并入库 PublicFileAccess"""
-    file_ids = set()
-    for chat_record in chat_record_list:
-        urls = extract_oss_file_urls([chat_record.answer_text_list, chat_record.question, chat_record.messages])
-        for url in urls:
-            file_id = url.replace("./oss/file/", "")
-            if file_id:
-                file_ids.add(file_id)
-
-    if not file_ids:
-        return
-
-    existing = set(
-        PublicFileAccess.objects.filter(source_type="FILE", source_id__in=list(file_ids)).values_list(
-            "source_id", flat=True
-        )
+def is_public_chat_attachment(file):
+    """A public link grants access only to attachments in its selected records."""
+    if file.source_type != FileSourceType.CHAT:
+        return False
+    links = ChatShareLink.objects.filter(
+        chat_id=file.source_id,
+        chat__is_deleted=False,
+        application_id=F("chat__application_id"),
+        share_type=ShareLinkType.PUBLIC,
     )
-
-    new_records = [
-        PublicFileAccess(id=uuid.uuid7(), source_type="FILE", source_id=file_id)
-        for file_id in file_ids
-        if file_id not in existing
-    ]
-
-    if new_records:
-        PublicFileAccess.objects.bulk_create(new_records)
+    application_id = links.values_list("application_id", flat=True).first()
+    if application_id is None:
+        return False
+    setting = get_application_setting(application_id)
+    if setting is not None and not setting.show_share:
+        return False
+    url = f"./oss/file/{file.id}"
+    candidates = (
+        ChatRecord.objects.filter(chat_id=file.source_id)
+        .filter(Q(messages__icontains=url) | Q(question__icontains=url) | Q(answer_text_list__icontains=url))
+        .values_list("id", "messages", "question", "answer_text_list")
+    )
+    record_ids = [record_id for record_id, *fields in candidates if url in extract_oss_file_urls(fields)]
+    return bool(record_ids) and links.filter(chat_record_ids__overlap=record_ids).exists()
 
 
 class ChatRecordShareLinkSerializer(serializers.Serializer):
@@ -154,8 +151,6 @@ class ChatRecordShareLinkSerializer(serializers.Serializer):
 
         if existing:
             return {"link": UUIDEncoder.encode(existing.id)}
-        chat_record_list = ChatRecord.objects.filter(id__in=sorted_ids)
-        save_public_file_access(chat_record_list)
         chat_share_link_model = ChatShareLink(
             id=uuid.uuid7(),
             chat_id=chat_id,
@@ -180,7 +175,9 @@ class ChatShareLinkDetailSerializer(serializers.Serializer):
         link = self.data.get("link")
         share_link_id = UUIDEncoder.decode_to_str(link)
 
-        share_link_query_set = ChatShareLink.objects.filter(id=share_link_id).first()
+        share_link_query_set = ChatShareLink.objects.filter(
+            id=share_link_id, share_type=ShareLinkType.PUBLIC, application_id=F("chat__application_id")
+        ).first()
         if not share_link_query_set:
             raise AppApiException(500, _("Share link does not exist"))
         if share_link_query_set.chat.is_deleted:
@@ -194,12 +191,12 @@ class ChatShareLinkDetailSerializer(serializers.Serializer):
         chat_record_model_list = ChatRecord.objects.filter(
             id__in=share_link_model.chat_record_ids, chat_id=share_link_model.chat_id
         ).order_by("create_time")
-        save_public_file_access(chat_record_model_list)
 
         abstract = Chat.objects.filter(id=share_link_model.chat_id).values_list("abstract", flat=True).first()
         chat_record_list = ShareChatRecordModelSerializer(chat_record_model_list, many=True).data
 
         application_setting = get_application_setting(share_link_model.application_id)
+        validate_share_enabled(application_setting)
         app_info = {}
         if application_setting is not None:
             app_info = {

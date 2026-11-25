@@ -6,7 +6,8 @@ from types import SimpleNamespace
 import uuid_utils.compat as uuid
 from django.db.models.functions import Cast
 
-from application.models import Application, ApplicationAccessToken, ChatShareLink, Chat
+from application.models import Application, ApplicationAccessToken, Chat
+from application.serializers.application_chat_link import is_public_chat_attachment
 from common.auth.authentication import get_is_permissions
 from common.auth.common import parse_token, SystemToken, ChatToken
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
@@ -310,7 +311,9 @@ def auth(file, mk_file_auth, *, allow_content_read=True):
     if file.source_type in _PUBLIC_SOURCE_TYPES:
         return
     # PublicFileAccess 中记录的文件允许公开访问
-    if QuerySet(PublicFileAccess).filter(source_type="FILE", source_id=str(file.id)).exists():
+    if QuerySet(PublicFileAccess).filter(
+        source_type="DINGTALK", source_id=str(file.id)
+    ).exists() or is_public_chat_attachment(file):
         return
     if file.source_type == FileSourceType.APPLICATION_SETTINGS:
         return
@@ -359,10 +362,7 @@ def _auth_chat(file, token):
         ## 如果当前用户能访问到这个对话,那么就有资源的访问权限
         if QuerySet(Chat).filter(chat_user_id=user_id, id=file.source_id, is_deleted=False).exists():
             return
-        # 非本人:存在分享链接才允许
-        if not QuerySet(ChatShareLink).filter(chat_id=file.source_id).exists():
-            _deny()
-        return
+        _deny()
 
     knowledge_id = _knowledge_id_for_file_source(file.source_type, file.source_id)
     if knowledge_id is None:
