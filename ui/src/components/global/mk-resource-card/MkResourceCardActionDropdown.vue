@@ -11,7 +11,7 @@ const hasDropdownItems = computed(() => hasRenderableSlotContent(slots.default?.
 </script>
 
 <template>
-  <MkDropdown v-if="hasDropdownItems" trigger="click" placement="bottom-end" persistent :teleported="false">
+  <MkDropdown v-if="hasDropdownItems" trigger="click" placement="bottom-end" persistent :teleported="false" hide-when-empty>
     <el-button class="-mb-[2px] -mr-1" text>
       <MkIcon name="icon_more_outlined" />
     </el-button>
