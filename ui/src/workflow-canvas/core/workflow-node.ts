@@ -198,9 +198,17 @@ export class WorkflowNodeModel extends HtmlNodeModel<WorkflowNodeProperties> {
   getUpNodeFieldList(containSelf: boolean, useCache: boolean): WorkflowNodeField[] {
     const upstreamFields = Object.values(this.getUpNodeFieldDict(containSelf, useCache)).flat()
     const startNodeModel = this.graphModel.getNodeModelById(WorkflowNodeType.Start) as unknown as WorkflowNodeModel | undefined
+    // 知识库工作流没有 start-node，全局变量由知识库基本信息节点提供。该节点无锚点、不可连边，
+    // 无法经由上游遍历进入 getUpNodeFieldDict，需像 start-node 一样作为分组提供方无条件并入。
+    const knowledgeBaseNodeModel = this.graphModel.getNodeModelById(WorkflowNodeType.KnowledgeBase) as unknown as WorkflowNodeModel | undefined
     // 循环体嵌套画布通过 graphModel 暴露父画布字段，这里向上叠加一层。
     const parentFields = (this.graphModel as WorkflowGraphModel).getUpNodeFieldList?.(containSelf, useCache) ?? []
-    return [...(startNodeModel?.getNodeFieldList() ?? []), ...upstreamFields, ...parentFields]
+    return [
+      ...(startNodeModel?.getNodeFieldList() ?? []),
+      ...(knowledgeBaseNodeModel?.getNodeFieldList() ?? []),
+      ...upstreamFields,
+      ...parentFields,
+    ]
   }
 
   clearNextNodeField(containSelf: boolean) {
