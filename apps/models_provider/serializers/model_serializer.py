@@ -521,6 +521,7 @@ class ModelSerializer(serializers.Serializer):
             )
 
         def _build_model_data(self, model):
+            creator = model.user
             return {
                 "id": str(model.id),
                 "provider": model.provider,
@@ -530,8 +531,8 @@ class ModelSerializer(serializers.Serializer):
                 "status": model.status,
                 "meta": model.meta,
                 "user_id": model.user_id,
-                "username": model.user.username,
-                "nick_name": model.user.nick_name,
+                "username": creator.username if creator else "",
+                "nick_name": creator.nick_name if creator else "",
             }
 
         def page(self, current_page, page_size):

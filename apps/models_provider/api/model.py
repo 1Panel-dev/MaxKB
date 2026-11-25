@@ -47,7 +47,7 @@ class ModelSummarySerializer(serializers.Serializer):
     status = serializers.CharField(required=True, label=_("status"))
     meta = serializers.DictField(required=False, allow_null=True, label=_("model meta"))
     user = serializers.UUIDField(required=False, label=_("user id"))
-    user_id = serializers.UUIDField(required=False, label=_("user id"))
+    user_id = serializers.UUIDField(required=False, allow_null=True, label=_("user id"))
     username = serializers.CharField(required=False, allow_blank=True, label=_("username"))
     nick_name = serializers.CharField(required=False, allow_blank=True, label=_("nick name"))
     credential = serializers.CharField(required=False, label=_("certification information"))
