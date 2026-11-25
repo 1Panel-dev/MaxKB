@@ -62,6 +62,9 @@ def fetch_url(url, file_limit, binary=False, headers=None, allowed_networks=None
             # requests otherwise buffers redirect bodies even when redirects are disabled.
             session.resolve_redirects = lambda *args, **kwargs: iter(())
             with session.get(url, headers=headers, stream=True, timeout=(5, 10), allow_redirects=False) as response:
+                if response.is_redirect:
+                    return {"status_code": response.status_code, "location": response.headers["Location"],
+                            "Content-Type": "", "Content-Length": 0, "content": ""}
                 length = response.headers.get("Content-Length")
                 if length is not None:
                     if not length.isascii() or not length.isdecimal():
@@ -97,10 +100,16 @@ def fetch_url(url, file_limit, binary=False, headers=None, allowed_networks=None
 """
 
 
-def fetch_public_url(url, file_limit, **options):
-    """Validate the addresses used by the isolated download and bound its response."""
+def fetch_public_url(url, file_limit, *, follow_redirects=False, **options):
+    """Resolve every requested destination in its own bounded, isolated download."""
+    from urllib.parse import urljoin
     from common.utils.tool_code import ToolExecutor
 
-    return ToolExecutor().exec_code(
-        FETCH_URL_CODE, {"url": url, "file_limit": file_limit, **options}, function_name="fetch_url"
-    )
+    for _ in range(6):
+        result = ToolExecutor().exec_code(
+            FETCH_URL_CODE, {"url": url, "file_limit": file_limit, **options}, function_name="fetch_url"
+        )
+        if not follow_redirects or not result.get("location"):
+            return result
+        url = urljoin(url, result["location"])
+    raise ValueError("Too many redirects")

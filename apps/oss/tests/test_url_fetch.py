@@ -26,3 +26,16 @@ class PublicDownloadTests(SimpleTestCase):
             with self.assertRaisesRegex(ValueError, "disallowed IP"):
                 namespace["fetch_url"]("https://example.com", 32)
         connect.assert_not_called()
+
+    def test_media_redirect_revalidates_the_next_location(self):
+        from application.workflow.media_download import download_http_bytes
+
+        with patch(
+            "common.utils.tool_code.ToolExecutor.exec_code",
+            side_effect=[
+                {"status_code": 302, "location": "/media"},
+                {"status_code": 200, "content": "YWJj"},
+            ],
+        ) as run:
+            self.assertEqual(download_http_bytes("https://example.com/start", 32), b"abc")
+        self.assertEqual(run.call_args.args[1], {"url": "https://example.com/media", "file_limit": 32, "binary": True})
