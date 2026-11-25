@@ -55,3 +55,16 @@ class ChatRecordSourceTests(SimpleTestCase):
         self.assertEqual(result["paragraph_list"][0]["knowledge_type"], KnowledgeType.LARK)
         self.assertEqual(result["paragraph_list"][0]["document_resource_type"], DocumentResourceType.DOCUMENT)
         self.assertIsNone(result["paragraph_list"][0]["document_image_id"])
+
+
+class AnnotationScopeTests(SimpleTestCase):
+    @patch("application.serializers.application_chat_record.QuerySet")
+    def test_annotation_is_scoped_to_application_and_workspace(self, query):
+        from application.serializers.application_chat_record import get_improve_chat_record
+
+        get_improve_chat_record(
+            {"application_id": "app", "chat_id": "chat", "chat_record_id": "record", "workspace_id": "workspace"}
+        )
+        initial = query.return_value.filter
+        initial.assert_called_once_with(id="record", chat_id="chat", chat__application_id="app")
+        initial.return_value.filter.assert_called_once_with(chat__application__workspace_id="workspace")
