@@ -135,10 +135,25 @@ onMounted(() => {
             <el-option :label="t('workflow.loop.type.infinite')" value="LOOP" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="formData.loop_type === 'ARRAY'" :label="t('workflow.loop.array')" prop="array">
+        <el-form-item
+          v-if="formData.loop_type === 'ARRAY'"
+          :label="t('workflow.loop.array')"
+          prop="array"
+          :rules="{
+            type: 'array',
+            required: true,
+            message: t('workflow.variable.selectPlaceholder'),
+            trigger: 'change',
+          }"
+        >
           <NodeCascader ref="nodeCascaderRef" v-model="formData.array" :node-model="model" :placeholder="t('workflow.variable.selectPlaceholder')" />
         </el-form-item>
-        <el-form-item v-else-if="formData.loop_type === 'NUMBER'" :label="t('workflow.loop.number')" prop="number">
+        <el-form-item
+          v-else-if="formData.loop_type === 'NUMBER'"
+          :label="t('workflow.loop.number')"
+          prop="number"
+          :rules="{ required: true, message: t('common.validation.inputRequired'), trigger: 'change' }"
+        >
           <el-input-number v-model="formData.number" :min="1" :step="1" controls-position="right" align="left" />
         </el-form-item>
       </el-form>
