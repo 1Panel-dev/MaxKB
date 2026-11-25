@@ -663,12 +663,8 @@ class HomePageSerializer(serializers.Serializer):
             end_time = get_end_time(self.data.get("end_time"))
             query_set = QuerySet(ApplicationChatUserStats).filter(
                 create_time__gte=start_time,
-                create_time__lte=end_time)
-            application_id = self.data.get('application_id')
-            if application_id:
-                query_set = query_set.filter(application_id=application_id)
-            else:
-                query_set = query_set.filter(application_id__in=application_queryset)
+                create_time__lte=end_time,
+                application_id__in=application_queryset)
             return native_search(
                 {'default_sql': query_set},
                 select_string=get_file_content(
@@ -687,12 +683,13 @@ class HomePageSerializer(serializers.Serializer):
             applicationSerializer.is_valid(raise_exception=True)
             application_query_set = applicationSerializer.get_aggregation_query_set(
                 auth)
+            if application_id:
+                application_query_set = application_query_set.filter(id=application_id)
             chat_record_aggregate_trend = native_search(
                 {'default_sql': QuerySet(model=get_dynamics_model(
                     {'application_chat.application_id': models.UUIDField(),
                      'application_chat_record.create_time': models.DateTimeField()})).filter(
-                    **{**({'application_chat.application_id': application_id} if application_id else {
-                        'application_chat.application_id__in': application_query_set}),
+                    **{'application_chat.application_id__in': application_query_set,
                        'application_chat_record.create_time__gte': start_time,
                        'application_chat_record.create_time__lte': end_time}
                 )},
