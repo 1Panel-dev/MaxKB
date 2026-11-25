@@ -599,37 +599,10 @@ def get_url_content(url, application_id: str):
     file_limit = 50 * 1024 * 1024
     if application.file_upload_setting and application.file_upload_setting.get("fileLimit"):
         file_limit = application.file_upload_setting.get("fileLimit") * 1024 * 1024
-    try:
-        from common.utils.tool_code import ToolExecutor
+    from oss.url_fetch import fetch_public_url
 
-        response = ToolExecutor().exec_code(
-            """
-    def get_url_content(url):
-        import requests
-        requests.packages.urllib3.disable_warnings()
-        response = requests.get(url, verify=False, allow_redirects=False)
-        content_type = response.headers.get('Content-Type', '')
-        if 'text' in content_type or 'json' in content_type:
-            content = response.text
-        else:
-            import base64
-            content = base64.b64encode(response.content).decode('utf-8')
-        return {
-            "status_code": response.status_code,
-            "Content-Type": content_type,
-            "Content-Length": response.headers.get('Content-Length', 0),
-            "content": content,
-        }
-    """,
-            {"url": url},
-        )
+    try:
+        response = fetch_public_url(url, file_limit)
     except Exception as e:
-        raise AppApiException(500, str(e))
-    if int(response.get("Content-Length")) > file_limit:
-        raise AppApiException(500, _("File size exceeds limit"))
-    return {
-        "status_code": response.get("status_code"),
-        "Content-Type": response.get("Content-Type"),
-        "Content-Length": response.get("Content-Length"),
-        "content": response.get("content"),
-    }
+        raise AppApiException(500, str(e)) from e
+    return {key: response[key] for key in ("status_code", "Content-Type", "Content-Length", "content")}
