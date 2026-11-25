@@ -631,6 +631,13 @@ class AIChatNode(INode):
 
         # 工具(workflow/custom) + 智能体(子应用) → LangChain tools；
         # MCP(自定义/库内) → mcp_servers 配置；技能 → 交给引擎侧 init_skills 初始化
+        from common.utils.workflow_reference import require_workflow_tools
+
+        require_workflow_tools(
+            [*(tool_ids or []), *(skill_tool_ids or [])],
+            self.get_workflow_parameters().get("workflow_user_id"),
+            workspace_id,
+        )
         tools = get_tool_tools(
             source_type,
             source_id,

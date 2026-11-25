@@ -86,7 +86,10 @@ class ToolWorkflowLibNode(INode):
         workflow_params = self.get_workflow_parameters()
         tool_lib_id = node_params.get("tool_lib_id")
         input_field_list = node_params.get("input_field_list", [])
+        from common.utils.workflow_reference import require_workflow_tools
+
         workspace_id = workflow_params.get("workspace_id")
+        require_workflow_tools([tool_lib_id], workflow_params.get("workflow_user_id"), workspace_id)
         position = workflow_params.get("position")
         tool_workflow_version = (
             QuerySet(ToolWorkflowVersion).filter(tool_id=tool_lib_id).order_by("-create_time")[0:1].first()
@@ -106,13 +109,14 @@ class ToolWorkflowLibNode(INode):
             "chat_record_id": tool_record_id,
             "tool_id": str(tool_lib_id),
             "stream": True,
-            "workspace_id": workspace_id,
             "position": position.get("children") if position else None,
             "chunk_id": workflow_params.get("chunk_id"),
             "form_data": workflow_params.get("form_data"),
             "default_model_setting": tool_workflow_version.default_model_setting or {},
             **parameters,
             **inherited_retrieval_context(workflow_params),
+            "workflow_user_id": tool_workflow_version.publish_user_id,
+            "workspace_id": tool_lib.workspace_id,
         }
 
         node_id = self.get_node_id()

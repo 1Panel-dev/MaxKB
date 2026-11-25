@@ -60,10 +60,11 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id, cancel_eve
             "chat_record_id": tool_record_id,
             "tool_id": str(tool_id),
             "stream": True,
-            "workspace_id": workspace_id,
             "default_model_setting": qv.default_model_setting or {},
             **kwargs,
             **inherited_retrieval_context({"workspace_id": workspace_id, **(workflow_params or {})}),
+            "workspace_id": tool.workspace_id,
+            "workflow_user_id": qv.publish_user_id,
         }
 
         # WorkflowManage.run() 在后台线程异步执行节点，完成时机由 on_complete 回调驱动，

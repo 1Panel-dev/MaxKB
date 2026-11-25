@@ -196,6 +196,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 "user_id": self.data.get("user_id"),
                 "default_model_setting": default_model_setting,
                 **{k: v for k, v in instance.items() if k not in identity_keys},
+                "workflow_user_id": self.data.get("user_id"),
             }
 
             workflow = new_instance(tool_workflow.work_flow, WorkflowType.TOOL)

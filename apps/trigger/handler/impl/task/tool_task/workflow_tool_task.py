@@ -103,8 +103,9 @@ class ToolTask(BaseToolTriggerTask):
             parameters = {
                 "tool_id": tool_id,
                 "stream": True,
-                "workspace_id": tool.workspace_id,
                 **field_parameters,
+                "workspace_id": tool.workspace_id,
+                "workflow_user_id": tool_workflow_version.publish_user_id,
             }
 
             # 后台任务:非流式,run() 起线程异步执行,完成后经 on_complete 通知,这里阻塞等结果

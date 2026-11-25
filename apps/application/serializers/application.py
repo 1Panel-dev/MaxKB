@@ -31,6 +31,7 @@ from folders.serializers.resource_move import validate_edit_folder, validate_mov
 from common.cache_data.application_access_token_cache import del_application_access_token
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_page_search, native_search
+from common.utils.workflow_reference import get_authorized_tool_ids
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
 from common.utils.common import (
@@ -69,7 +70,7 @@ from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
 from tools.serializers.tool import ToolExportModelSerializer
 from trigger.models import Trigger, TriggerTask
 from users.models import User
-from users.serializers.user import is_workspace_manage, is_workspace_manage_permission_read
+from users.serializers.user import is_workspace_manage_permission_read
 
 
 def _walk_workflow_nodes(work_flow, collector):
@@ -123,34 +124,6 @@ def get_bound_application_ids(instance: Dict) -> List[str]:
 
     _walk_workflow_nodes(instance.get("work_flow"), collect)
     return list(application_ids)
-
-
-def get_authorized_tool_ids(user_id: str, workspace_id: str, tool_ids: List[str]) -> List[str]:
-    """
-    返回 tool_ids 中当前用户被授权绑定/使用的工具id。
-    工作空间管理员默认拥有全部工具权限;其他用户必须在 workspace_user_resource_permission
-    中存在针对该工具的显式授权记录(默认拒绝)。
-    """
-    if not tool_ids:
-        return []
-    tool_ids = list({str(t) for t in tool_ids})
-    if is_workspace_manage(user_id, workspace_id):
-        return tool_ids
-    granted_tool_ids = {
-        str(permission.target)
-        for permission in QuerySet(WorkspaceUserResourcePermission).filter(
-            workspace_id=workspace_id,
-            user_id=user_id,
-            auth_target_type=AuthTargetType.TOOL.value,
-            target__in=tool_ids,
-        )
-        if "VIEW" in permission.permission_list or "ROLE" in permission.permission_list
-    }
-    get_authorized_tool = DatabaseModelManage.get_model("get_authorized_tool")
-    if get_authorized_tool is not None:
-        shared_tool_query_set = QuerySet(Tool).filter(id__in=tool_ids, scope=ToolScope.SHARED)
-        granted_tool_ids.update(str(tool.id) for tool in get_authorized_tool(shared_tool_query_set, workspace_id))
-    return [tool_id for tool_id in tool_ids if tool_id in granted_tool_ids]
 
 
 def get_authorized_application_ids(user_id: str, workspace_id: str, application_ids: List[str]) -> List[str]:

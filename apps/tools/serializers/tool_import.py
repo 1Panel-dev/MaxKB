@@ -6,14 +6,13 @@
 from typing import Dict, List, Tuple
 
 import uuid_utils.compat as uuid
+from common.utils.workflow_reference import get_authorized_tool_ids
 from common.exception.app_exception import AppApiException
 from common.utils.common import generate_uuid
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework.utils.formatting import lazy_format
-from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from tools.models import Tool
-from users.serializers.user import is_workspace_manage
 
 
 def _walk_workflow_nodes(work_flow, collector):
@@ -48,30 +47,6 @@ def get_bound_tool_ids(instance: Dict) -> List[str]:
 
     _walk_workflow_nodes(instance.get("work_flow"), collect)
     return list(tool_ids)
-
-
-def get_authorized_tool_ids(user_id: str, workspace_id: str, tool_ids: List[str]) -> List[str]:
-    """
-    返回 tool_ids 中当前用户被授权绑定/使用的工具id。
-    工作空间管理员默认拥有全部工具权限;其他用户必须在 workspace_user_resource_permission
-    中存在针对该工具的显式授权记录(默认拒绝)。
-    """
-    if not tool_ids:
-        return []
-    tool_ids = list({str(t) for t in tool_ids})
-    if is_workspace_manage(user_id, workspace_id):
-        return tool_ids
-    granted_tool_ids = {
-        str(permission.target)
-        for permission in QuerySet(WorkspaceUserResourcePermission).filter(
-            workspace_id=workspace_id,
-            user_id=user_id,
-            auth_target_type=AuthTargetType.TOOL.value,
-            target__in=tool_ids,
-        )
-        if "VIEW" in permission.permission_list or "ROLE" in permission.permission_list
-    }
-    return [tool_id for tool_id in tool_ids if tool_id in granted_tool_ids]
 
 
 def resolve_import_tools(tool_list: List[Dict], workspace_id: str, user_id: str, force_new=False) -> Tuple[Dict, List]:

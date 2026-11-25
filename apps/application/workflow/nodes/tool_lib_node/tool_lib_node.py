@@ -207,7 +207,10 @@ class ToolLibNode(INode):
         tool_lib_id = node_params.get("tool_lib_id")
         input_field_list = node_params.get("input_field_list", [])
 
+        from common.utils.workflow_reference import require_workflow_tools
+
         workspace_id = workflow_params.get("workspace_id")
+        require_workflow_tools([tool_lib_id], workflow_params.get("workflow_user_id"), workspace_id)
         tool_lib = QuerySet(Tool).filter(id=tool_lib_id).first()
         valid_function(tool_lib, workspace_id)
         params = {
