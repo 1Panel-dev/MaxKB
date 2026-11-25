@@ -43,7 +43,7 @@ from common.utils.common import flat_map, get_file_content, is_valid_uuid
 from knowledge.models import Document, Paragraph
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model, Status
-from models_provider.tools import get_model_instance_by_model_workspace_id
+from models_provider.tools import get_model_by_id, get_model_instance_by_model_workspace_id
 from system_manage.models.resource_mapping import ResourceMapping
 
 
@@ -205,11 +205,8 @@ class PromptGenerateSerializer(serializers.Serializer):
 
         messages[-1]['content'] = q
         SUPPORTED_MODEL_TYPES = ["LLM", "IMAGE"]
-        model_exist = QuerySet(Model).filter(
-            id=model_id,
-            model_type__in=SUPPORTED_MODEL_TYPES
-        ).exists()
-        if not model_exist:
+        model = get_model_by_id(model_id, workspace_id)
+        if model.model_type not in SUPPORTED_MODEL_TYPES:
             raise Exception(_("Model does not exist or is not an LLM model"))
 
         def process():
