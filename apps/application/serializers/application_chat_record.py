@@ -343,10 +343,14 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
             raise AppApiException(500, _("Application id does not exist"))
         if not Document.objects.filter(id=self.data["document_id"], knowledge_id=self.data["knowledge_id"]).exists():
             raise AppApiException(500, gettext("The document id is incorrect"))
-        if not ChatRecord.objects.filter(
-            chat_id__in=self.data["chat_ids"], chat__application_id=self.data["application_id"]
-        ).exists():
+        authorized_ids = self.get_records().values_list("chat_id", flat=True).distinct()
+        if set(map(str, self.data["chat_ids"])) != set(map(str, authorized_ids)):
             raise AppApiException(500, gettext("The chat id is incorrect"))
+
+    def get_records(self):
+        return ChatRecord.objects.filter(
+            chat_id__in=self.data["chat_ids"], chat__application_id=self.data["application_id"]
+        )
 
     @staticmethod
     def post_embedding_paragraph(paragraph_ids, knowledge_id):
@@ -379,8 +383,8 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
         knowledge_id = instance["knowledge_id"]
 
         # 获取所有聊天记录
-        chat_record_list = list(ChatRecord.objects.filter(chat_id__in=chat_ids))
-        if len(chat_record_list) < len(chat_ids):
+        chat_record_list = list(self.get_records())
+        if {str(record.chat_id) for record in chat_record_list} != set(map(str, chat_ids)):
             raise AppApiException(500, gettext("Conversation records that do not exist"))
 
         # 批量创建段落和问题映射

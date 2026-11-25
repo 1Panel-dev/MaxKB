@@ -68,3 +68,12 @@ class AnnotationScopeTests(SimpleTestCase):
         initial = query.return_value.filter
         initial.assert_called_once_with(id="record", chat_id="chat", chat__application_id="app")
         initial.return_value.filter.assert_called_once_with(chat__application__workspace_id="workspace")
+
+    @patch("application.serializers.application_chat_record.ChatRecord.objects.filter")
+    def test_bulk_import_reads_only_records_in_authorized_application(self, query):
+        from application.serializers.application_chat_record import ApplicationChatRecordAddKnowledgeSerializer
+        from types import SimpleNamespace
+
+        serializer = SimpleNamespace(data={"application_id": "app", "chat_ids": ["one", "two"]})
+        ApplicationChatRecordAddKnowledgeSerializer.get_records(serializer)
+        query.assert_called_once_with(chat_id__in=["one", "two"], chat__application_id="app")
