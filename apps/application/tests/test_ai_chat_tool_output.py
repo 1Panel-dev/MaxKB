@@ -282,7 +282,7 @@ class AIChatToolOutputTests(SimpleTestCase):
                 patch.object(agent_module, "init_skills", new=MagicMock()),
                 patch.object(
                     agent_module,
-                    "MultiServerMCPClient",
+                    "create_mcp_client",
                     return_value=SimpleNamespace(get_tools=AsyncMock(return_value=[])),
                 ),
                 patch.object(agent_module, "SandboxShellBackend"),
@@ -445,7 +445,7 @@ class AIChatAgentBackendTests(SimpleTestCase):
             TemporaryDirectory(prefix="maxkb-backend-test-") as directory,
             patch.object(agent_module, "init_skills", new=MagicMock()),
             patch.object(
-                agent_module, "MultiServerMCPClient", return_value=SimpleNamespace(get_tools=AsyncMock(return_value=[]))
+                agent_module, "create_mcp_client", return_value=SimpleNamespace(get_tools=AsyncMock(return_value=[]))
             ),
             patch.object(agent_module, "SandboxShellBackend", return_value="shell-backend"),
             patch.object(

@@ -407,7 +407,7 @@ class LangChainHTTPCompatibilityTests(SimpleTestCase):
             patch.object(agent_module, "init_skills", new=MagicMock()),
             patch.object(
                 agent_module,
-                "MultiServerMCPClient",
+                "create_mcp_client",
                 return_value=SimpleNamespace(get_tools=AsyncMock(return_value=[])),
             ),
         ):
@@ -446,7 +446,7 @@ class LangChainHTTPCompatibilityTests(SimpleTestCase):
             patch.object(agent_module.CONFIG, "get", return_value="1"),
             patch.object(
                 agent_module,
-                "MultiServerMCPClient",
+                "create_mcp_client",
                 return_value=SimpleNamespace(get_tools=AsyncMock(return_value=[])),
             ),
         ):

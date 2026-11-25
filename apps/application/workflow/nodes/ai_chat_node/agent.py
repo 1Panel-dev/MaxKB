@@ -20,7 +20,7 @@ import uuid_utils.compat as uuid
 from deepagents import create_deep_agent
 from langchain.agents.middleware import AgentMiddleware
 from langchain_core.utils._merge import merge_lists as _original_merge_lists
-from langchain_mcp_adapters.client import MultiServerMCPClient
+from common.mcp.client import create_mcp_client
 from langgraph.checkpoint.memory import MemorySaver
 
 from application.workflow.backend.sandbox_shell import SandboxShellBackend
@@ -188,7 +188,7 @@ def create_agent(
 
     async def _run():
         checkpointer = MemorySaver()
-        client = MultiServerMCPClient(json.loads(mcp_servers))
+        client = create_mcp_client(json.loads(mcp_servers))
         tools = await client.get_tools()
         for tool in tools:
             tool.handle_tool_error = True

@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
-from langchain_mcp_adapters.client import MultiServerMCPClient
+from common.mcp.client import create_mcp_client
 from rest_framework import serializers
 
 from application.workflow.common import WorkflowType
@@ -60,7 +60,7 @@ class McpNode(INode):
         self._check_cancelled()
 
         async def call_tool(t, a):
-            client = MultiServerMCPClient(servers)
+            client = create_mcp_client(servers)
             async with client.session(mcp_server) as s:
                 return await s.call_tool(t, a)
 
