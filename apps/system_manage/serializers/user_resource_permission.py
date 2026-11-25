@@ -32,7 +32,7 @@ from maxkb.settings import edition
 from models_provider.models import Model
 from system_manage.models import WorkspaceUserResourcePermission
 from tools.models import Tool
-from users.serializers.user import is_workspace_manage
+from users.serializers.user import is_workspace_manage, is_builtin_workspace_manage
 
 
 class PermissionSerializer(serializers.Serializer):
@@ -449,8 +449,8 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
         permission_id = f"{auth_target_type}:READ+AUTH"
         if workspace_manage:
             role_type = RoleConstants.WORKSPACE_MANAGE.value.__str__()
-            has_user_role_exact_permission = has_exact_permission_by_role(current_user_id, workspace_id, permission_id,
-                                                                          role_type)
+            has_user_role_exact_permission = is_builtin_workspace_manage(current_user_id, workspace_id) or \
+                has_exact_permission_by_role(current_user_id, workspace_id, permission_id, role_type)
             if has_user_role_exact_permission:
                 current_user_managed_resources_ids = QuerySet(resource_model).filter(workspace_id=workspace_id,
                                                                                      folder__in=folder_ids).annotate(
@@ -476,6 +476,36 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
 
         return current_user_managed_resources_ids
 
+    def get_has_manage_permission_folders_under_target(self, current_user_id, target):
+        """
+        由服务端根据 target 计算 target 及其子文件夹中当前用户可管理的文件夹，不信任客户端传入的 folder_ids
+        """
+        workspace_id = self.data.get("workspace_id")
+        auth_target_type = self.data.get("auth_target_type")
+
+        from folders.serializers.folder import get_folder_type, has_exact_permission_by_role
+
+        folder_model = get_folder_type(auth_target_type)
+        if folder_model is None:
+            return [target]
+        target_folder = QuerySet(folder_model).filter(id=target, workspace_id=workspace_id).first()
+        if target_folder is None:
+            return [target]
+        descendant_folder_ids = list(target_folder.get_descendants(include_self=False).filter(
+            workspace_id=workspace_id).values_list('id', flat=True))
+        if not is_workspace_manage(current_user_id, workspace_id):
+            permission_id = f"{auth_target_type}:READ+AUTH"
+            permission_list = ['MANAGE']
+            if has_exact_permission_by_role(current_user_id, workspace_id, permission_id,
+                                            RoleConstants.USER.value.__str__()):
+                permission_list = ['MANAGE', 'ROLE']
+            descendant_folder_ids = list(QuerySet(WorkspaceUserResourcePermission).filter(
+                workspace_id=workspace_id, user_id=current_user_id, auth_target_type=auth_target_type,
+                target__in=descendant_folder_ids,
+                permission_list__overlap=permission_list).values_list('target', flat=True))
+        # target 本身的授权权限已在视图层校验
+        return [target] + descendant_folder_ids
+
     def edit(self, instance, with_valid=True, current_user_id=None):
         if with_valid:
             self.is_valid(raise_exception=True)
@@ -489,10 +519,10 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
 
         users_id = [item["user_id"] for item in users_permission]
         include_children = users_permission[0].get('include_children')
-        folder_ids = users_permission[0].get('folder_ids')
         # 删除已存在的对应的用户在该资源下的权限
 
         if include_children:
+            folder_ids = self.get_has_manage_permission_folders_under_target(current_user_id, target)
             managed_resource_ids = list(
                 self.get_has_manage_permission_resource_under_folders(current_user_id, folder_ids, )) + folder_ids
 
