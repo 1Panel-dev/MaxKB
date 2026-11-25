@@ -34,6 +34,9 @@ def collect_static():
     logging.info("Collect static files")
     try:
         management.call_command("collectstatic", "--no-input", "-c", verbosity=0, interactive=False)
+        from common.locale import deploy_external_locales
+
+        deploy_external_locales()
         logging.info("Collect static files done")
     except:
         pass
@@ -112,8 +115,8 @@ def dev():
 if __name__ == "__main__":
     os.environ["HF_HOME"] = "/opt/maxkb-app/model/base"
     os.environ["TMPDIR"] = "/opt/maxkb-app/tmp"
-    if not os.environ.get('MAXKB_SECRET_KEY'):
-        os.environ['MAXKB_SECRET_KEY'] = get_random_secret_key()
+    if not os.environ.get("MAXKB_SECRET_KEY"):
+        os.environ["MAXKB_SECRET_KEY"] = get_random_secret_key()
     parser = argparse.ArgumentParser(
         description="""
            qabot service control tools;

@@ -3,7 +3,16 @@ import { watch } from 'vue'
 import { createI18n } from 'vue-i18n'
 import type { Locale } from './config'
 import type { DefaultLocaleMessageSchema } from 'vue-i18n'
-import { DEFAULT_LOCALE, LANGUAGE_STORAGE_KEY, LOCALE_OPTIONS, getLocaleNamespace, normalizeLocale } from './config'
+import {
+  BUILTIN_LOCALE_CODES,
+  DEFAULT_LOCALE,
+  LANGUAGE_STORAGE_KEY,
+  LOCALE_OPTIONS,
+  getLocaleNamespace,
+  normalizeLocale,
+  resolveSupportedLocale,
+} from './config'
+import { getRuntimeLocaleMessages, loadRuntimeLocales } from './runtime'
 
 const localeFiles = import.meta.glob<Record<string, unknown>>('./*/**/*.json', { eager: true, import: 'default' })
 
@@ -16,6 +25,10 @@ function loadMessages(locale: Locale) {
     Object.assign((domains[domain] ??= {}), messages)
   }
   return domains
+}
+
+function getRuntimeLocaleBaseUrl() {
+  return import.meta.env.VITE_APP_NAME === 'chat' ? '/static/chat/locales' : '/static/admin/locales'
 }
 
 interface LanguageState {
@@ -35,25 +48,40 @@ export function createAppI18n(user: LanguageState) {
     globalInjection: false,
     locale: normalizeLocale(user.language),
     fallbackLocale: DEFAULT_LOCALE,
-    messages: Object.fromEntries(LOCALE_OPTIONS.map(({ value }) => [value, loadMessages(value)])) as Record<Locale, DefaultLocaleMessageSchema>,
+    messages: Object.fromEntries(
+      [...BUILTIN_LOCALE_CODES].map((locale) => [locale, loadMessages(locale)]),
+    ) as Record<Locale, DefaultLocaleMessageSchema>,
   })
   t = i18n.global.t
 
+  let runtimeLocalesLoaded = false
+  const applyLocale = () => {
+    const locale = runtimeLocalesLoaded ? resolveSupportedLocale(user.language) : normalizeLocale(user.language)
+    i18n.global.locale.value = locale
+    document.documentElement.lang = locale
+  }
+
   watch(
     () => user.language,
-    (language) => {
-      const locale = normalizeLocale(language)
-      i18n.global.locale.value = locale
-      document.documentElement.lang = locale
-    },
+    applyLocale,
     { immediate: true, flush: 'sync' },
   )
+
+  void loadRuntimeLocales(getRuntimeLocaleBaseUrl()).then(() => {
+    for (const { value: locale } of LOCALE_OPTIONS) {
+      const messages = getRuntimeLocaleMessages(locale)
+      if (messages) i18n.global.mergeLocaleMessage(locale, messages as DefaultLocaleMessageSchema)
+    }
+    runtimeLocalesLoaded = true
+    applyLocale()
+  })
 
   window.addEventListener('storage', (event) => {
     const languageStorageKey = user.languageStorageKey ?? LANGUAGE_STORAGE_KEY
     if (!languageStorageKey) return
     if (event.storageArea === localStorage && (event.key === languageStorageKey || event.key === null)) {
-      const language = normalizeLocale(event.newValue || navigator.language)
+      const sourceLanguage = event.newValue || navigator.language
+      const language = runtimeLocalesLoaded ? resolveSupportedLocale(sourceLanguage) : normalizeLocale(sourceLanguage)
       if (user.language !== language) user.setLanguage(language)
     }
   })

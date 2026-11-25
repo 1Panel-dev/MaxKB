@@ -5,7 +5,7 @@ import type { ThemeInfo } from '@/api/admin/auth/types'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import DefaultThemeAnimation from './DefaultThemeAnimation.vue'
 import { DEFAULT_THEME_COLOR, DEFAULT_THEME_SETTING, getThemeImg } from '@/constants'
-import { LOCALE_OPTIONS } from '@/locales/config'
+import { LOCALE_OPTIONS, resolveSupportedLocale } from '@/locales/config'
 import { useStore } from '@/stores'
 
 defineOptions({ name: 'LoginLayout' })
@@ -15,7 +15,8 @@ const props = withDefaults(defineProps<{ preview?: boolean; themeInfo?: ThemeInf
 defineSlots<{ default: () => unknown }>()
 
 const { theme, user } = useStore()
-const currentLanguageLabel = computed(() => LOCALE_OPTIONS.find((option) => option.value === user.language)?.label)
+const currentLocale = computed(() => resolveSupportedLocale(user.language))
+const currentLanguageLabel = computed(() => LOCALE_OPTIONS.find((option) => option.value === currentLocale.value)?.label)
 
 const layoutThemeInfo = computed(() => props.themeInfo ?? theme.themeInfo)
 const customLoginImage = computed(() => layoutThemeInfo.value?.loginImage?.trim() ?? '')
@@ -45,7 +46,7 @@ const loginImage = computed(() => customLoginImage.value || getThemeImg(layoutTh
         <template #dropdown>
           <MkDropdownMenu class="w-52">
             <template v-for="option in LOCALE_OPTIONS" :key="option.value">
-              <MkDropdownItem selectable :selected="user.language === option.value" @click="user.setLanguage(option.value)">
+              <MkDropdownItem selectable :selected="currentLocale === option.value" @click="user.setLanguage(option.value)">
                 {{ option.label }}
               </MkDropdownItem>
             </template>

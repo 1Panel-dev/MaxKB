@@ -95,7 +95,7 @@ const normalizeBasePath = (basePath?: string) => {
 const stripBasePath = (urlPath: string, basePath: string) => {
   const normalizedBasePath = normalizeBasePath(basePath)
 
-  if (!normalizedBasePath) {
+  if (!normalizedBasePath || !urlPath.startsWith(normalizedBasePath)) {
     return urlPath
   }
 

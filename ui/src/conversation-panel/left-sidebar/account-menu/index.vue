@@ -8,7 +8,7 @@ import ChatUserApi from '@/api/chat/chat-user'
 import { useConversationListStore } from '../conversation-list/index'
 import ApiKeyDialog from './ApiKeyDialog.vue'
 import UserPwdDialog from './UserPwdDialog.vue'
-import { LOCALE_OPTIONS } from '@/locales/config'
+import { LOCALE_OPTIONS, resolveSupportedLocale } from '@/locales/config'
 import { useStore } from '@/stores/chat'
 import { formatTokenNumber } from '@/utils/number'
 
@@ -19,6 +19,7 @@ const { account } = useConversationListStore()
 const { auth, user } = useStore()
 const router = useRouter()
 const route = useRoute()
+const currentLocale = computed(() => resolveSupportedLocale(user.language))
 
 // 保存语言偏好后更新当前场景的界面与缓存。
 const isChangingLanguage = ref(false)
@@ -141,7 +142,7 @@ const goLogin = () => {
                     v-for="language in LOCALE_OPTIONS"
                     :key="language.value"
                     selectable
-                    :selected="user.language === language.value"
+                    :selected="currentLocale === language.value"
                     :disabled="isChangingLanguage"
                     @click="handleChangeLanguage(language.value)"
                   >
