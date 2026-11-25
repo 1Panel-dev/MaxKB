@@ -19,7 +19,7 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="visible" :title="t('workflow.publishHistory.descriptionLabel')" @closed="description = ''">
-    {{ description || t('workflow.publishHistory.emptyDescription') }}
+    <div class="whitespace-pre-wrap">{{ description || t('workflow.publishHistory.emptyDescription') }}</div>
   </MkDialog>
 </template>
 
