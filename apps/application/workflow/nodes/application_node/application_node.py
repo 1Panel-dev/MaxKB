@@ -87,6 +87,14 @@ class ApplicationNode(INode):
         if application_id == workflow_params.get("application_id"):
             raise Exception(_("The sub application cannot use the current node"))
 
+        from application.serializers.application import validate_application_bindings
+
+        validate_application_bindings(
+            workflow_params.get("workflow_user_id"),
+            workflow_params.get("workspace_id"),
+            {"application_ids": [application_id]},
+        )
+
         # 解析用户问题
         question_address = node_params.get("question_reference_address") or []
         if question_address:
@@ -173,6 +181,9 @@ class ApplicationNode(INode):
                 "chat_id": current_chat_id,
                 "chat_record_id": sub_chat_record_id,
                 "application_id": application_id,
+                "workflow_user_id": workflow_params.get("workflow_user_id")
+                if debug
+                else sub_application.publish_user_id,
                 "question": question,
                 "stream": True,
                 "form_data": workflow_params.get("form_data") if is_submit else form_data,

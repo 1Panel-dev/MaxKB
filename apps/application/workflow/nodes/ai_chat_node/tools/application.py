@@ -120,6 +120,9 @@ def get_application_func(source_type, source_id, application, workflow_params, w
                 "chat_id": current_chat_id,
                 "chat_record_id": sub_chat_record_id,
                 "application_id": application_id,
+                "workflow_user_id": workflow_params.get("workflow_user_id")
+                if debug
+                else sub_application.publish_user_id,
                 "question": question,
                 "stream": True,
                 "form_data": {},
@@ -179,7 +182,12 @@ def get_application_tools(source_type, source_id, application_ids, workspace_id,
         return []
     from application.models import Application
 
-    applications = QuerySet(Application).filter(id__in=application_ids, is_publish=True)
+    from application.serializers.application import validate_application_bindings
+
+    validate_application_bindings(
+        workflow_params.get("workflow_user_id"), workspace_id, {"application_ids": application_ids}
+    )
+    applications = QuerySet(Application).filter(id__in=application_ids, workspace_id=workspace_id, is_publish=True)
     results = []
     for application in applications:
         func = get_application_func(source_type, source_id, application, workflow_params, workspace_id, cancel_event)

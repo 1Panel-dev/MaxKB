@@ -318,6 +318,7 @@ class ChatSerializers(serializers.Serializer):
             QuerySet(Chat).filter(id=chat_id).update(update_time=timezone.now())
 
         parameters = {
+            "workflow_user_id": chat_user_id if debug else application.publish_user_id,
             "retrieval_identity": identity_from_server(chat_user_id, chat_user_type, debug),
             "history_chat_record": history_chat_record,
             "question": message,

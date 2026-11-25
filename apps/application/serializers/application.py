@@ -41,6 +41,8 @@ from common.utils.common import (
     restricted_loads,
 )
 from common.utils.logger import maxkb_logger
+from common.auth.constants.permission_constants import PermissionConstants
+from common.utils.workflow_reference import authorized_resource_ids, require_authorized_ids
 from common.utils.tool_code import ToolExecutor
 from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
 from django.core import validators
@@ -114,6 +116,8 @@ def get_bound_application_ids(instance: Dict) -> List[str]:
         application_ids.add(str(app_id))
 
     def collect(node_data):
+        if node_data.get("application_id"):
+            application_ids.add(str(node_data["application_id"]))
         for app_id in node_data.get("application_ids") or []:
             application_ids.add(str(app_id))
 
@@ -150,27 +154,20 @@ def get_authorized_tool_ids(user_id: str, workspace_id: str, tool_ids: List[str]
 
 
 def get_authorized_application_ids(user_id: str, workspace_id: str, application_ids: List[str]) -> List[str]:
-    """
-    返回 application_ids 中当前用户被授权绑定/使用的应用id。
-    工作空间管理员默认拥有全部应用权限;其他用户必须在 workspace_user_resource_permission
-    中存在针对该应用的显式授权记录(默认拒绝)。
-    """
     if not application_ids:
         return []
-    application_ids = list({str(a) for a in application_ids})
-    if is_workspace_manage(user_id, workspace_id):
-        return application_ids
-    granted_application_ids = {
-        str(permission.target)
-        for permission in QuerySet(WorkspaceUserResourcePermission).filter(
-            workspace_id=workspace_id,
-            user_id=user_id,
-            auth_target_type=AuthTargetType.APPLICATION.value,
-            target__in=application_ids,
-        )
-        if "VIEW" in permission.permission_list or "ROLE" in permission.permission_list
-    }
-    return [app_id for app_id in application_ids if app_id in granted_application_ids]
+    return authorized_resource_ids(
+        Application.objects.filter(id__in=application_ids),
+        user_id,
+        workspace_id,
+        "application",
+        PermissionConstants.APPLICATION_READ,
+    )
+
+
+def validate_application_bindings(user_id, workspace_id, instance):
+    ids = get_bound_application_ids(instance)
+    require_authorized_ids(ids, get_authorized_application_ids(user_id, workspace_id, ids))
 
 
 def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: Dict):
@@ -927,6 +924,7 @@ class ApplicationSerializer(serializers.Serializer):
                     _("No permission to use tool(s): {tool_ids}"), tool_ids=", ".join(unauthorized_tool_ids)
                 )
                 raise AppApiException(403, str(message))
+        validate_application_bindings(user_id, workspace_id, application)
         application_model = self.to_application(application, workspace_id, user_id, update_tool_map, folder_id)
         tool_model_list = [self.to_tool(f, workspace_id, user_id) for f in tool_list]
         application_model.save()
@@ -1311,6 +1309,9 @@ class ApplicationOperateSerializer(serializers.Serializer):
         application = (
             QuerySet(Application).filter(id=self.data.get("application_id"), workspace_id=workspace_id).first()
         )
+        validate_application_bindings(
+            user_id, workspace_id, {"work_flow": application.work_flow, "application_ids": application.application_ids}
+        )
         if application.type == ApplicationTypeChoices.WORK_FLOW:
             work_flow = application.work_flow
             if work_flow is None:
@@ -1637,6 +1638,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             if node.get("type") == "loop-node":
                 for n in node.get("properties", {}).get("node_data", {}).get("loop_body", {}).get("nodes", []):
                     hand_node(n, update_tool_map)
+        validate_application_bindings(self.data.get("user_id"), app.workspace_id, {"work_flow": work_flow})
         app.work_flow = work_flow
         application = mk_instance.application
         app.name = application.get("name")
