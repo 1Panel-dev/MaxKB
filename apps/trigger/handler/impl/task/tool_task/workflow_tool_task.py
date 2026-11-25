@@ -14,7 +14,9 @@ import traceback
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 
+from application.models import ChatUserType
 from application.workflow.common import WorkflowType, get_node_parameters, new_instance
+from application.workflow.file_access import root_context
 from application.workflow.nodes import get_node_class
 from application.workflow.status import Status
 from application.workflow.workflow_manage import CallBack, WorkflowManage
@@ -106,6 +108,8 @@ class ToolTask(BaseToolTriggerTask):
                 **field_parameters,
                 "workspace_id": tool.workspace_id,
                 "workflow_user_id": tool_workflow_version.publish_user_id,
+                # 触发器无真实用户:每次运行使用一次性匿名身份,只能读工具自身文件和本次运行生成的文件
+                **root_context(ChatUserType.ANONYMOUS_USER.value, uuid.uuid7(), WorkflowType.TOOL, tool_id),
             }
 
             # 后台任务:非流式,run() 起线程异步执行,完成后经 on_complete 通知,这里阻塞等结果

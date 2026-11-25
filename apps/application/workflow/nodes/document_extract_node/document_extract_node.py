@@ -14,9 +14,10 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.workflow.common import WorkflowType
+from application.workflow.file_access import generated_file_target, get_authorized_file
 from application.workflow.i_node import INode
 from common.handle.impl.text.zip_split_handle import ZipSplitHandle
-from knowledge.models import File, FileSourceType
+from knowledge.models import File
 from knowledge.serializers.document import FileBufferHandle, parse_table_handle_list, split_handles
 
 splitter = "\n`-----------------------------------`\n"
@@ -40,48 +41,24 @@ class DocumentExtractNode(INode):
             if document_reference
             else None
         )
-        chat_id = workflow_params.get("chat_id")
-
         self.write_context("document_list", document)
         if document is None or not isinstance(document, list):
             self.write_context("content", "")
             self.write_context("document_list", [])
             return
 
-        # 按工作流类型确定归属资源 id(知识库/应用/工具),均取自工作流入参
-        application_id = None
-        tool_id = None
-        knowledge_id = None
-        workflow_type = self.get_workflow_type()
-        if workflow_type == WorkflowType.KNOWLEDGE:
-            knowledge_id = workflow_params.get("knowledge_id")
-        elif workflow_type == WorkflowType.APPLICATION:
-            application_id = workflow_params.get("application_id")
-        elif workflow_type == WorkflowType.TOOL:
-            tool_id = workflow_params.get("tool_id")
-
-        # doc 文件中内嵌的图片另存为文件
+        # doc 文件中内嵌的图片另存为文件,按根资源存储(见 generated_file_target)
         def save_image(image_list):
+            source_type, source_id, target_meta = generated_file_target(workflow_params)
             for image in image_list:
-                meta = {
-                    "debug": False if (application_id or knowledge_id or tool_id) else True,
-                    "chat_id": chat_id,
-                    "application_id": str(application_id) if application_id else None,
-                    "knowledge_id": str(knowledge_id) if knowledge_id else None,
-                    "tool_id": str(tool_id) if tool_id else None,
-                    "file_id": str(image.id),
-                }
+                meta = {**target_meta, "file_id": str(image.id)}
                 file_bytes = image.meta.pop("content")
                 new_file = File(
                     id=meta["file_id"],
                     file_name=image.file_name,
                     file_size=len(file_bytes),
-                    source_type=FileSourceType.APPLICATION.value
-                    if application_id
-                    else FileSourceType.KNOWLEDGE.value
-                    if knowledge_id
-                    else FileSourceType.TOOL.value,
-                    source_id=application_id or knowledge_id or tool_id,
+                    source_type=source_type,
+                    source_id=source_id,
                     meta=meta,
                 )
                 if not QuerySet(File).filter(id=new_file.id).exists():
@@ -91,7 +68,7 @@ class DocumentExtractNode(INode):
         content = []
         document_list = []
         for doc in document:
-            file = QuerySet(File).filter(id=doc["file_id"]).first()
+            file = get_authorized_file(doc["file_id"], workflow_params)
             buffer = io.BytesIO(file.get_bytes())
             buffer.name = doc["name"]  # this is the important line
 

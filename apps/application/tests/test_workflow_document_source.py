@@ -101,12 +101,12 @@ class WorkflowDocumentSourceTests(SimpleTestCase):
 
     @patch("application.workflow.nodes.document_extract_node.document_extract_node.split_handles")
     @patch("application.workflow.nodes.document_extract_node.document_extract_node.parse_table_handle_list", [])
-    @patch("application.workflow.nodes.document_extract_node.document_extract_node.QuerySet")
-    def test_file_extraction_preserves_remote_metadata(self, query_set, split_handles):
+    @patch("application.workflow.nodes.document_extract_node.document_extract_node.get_authorized_file")
+    def test_file_extraction_preserves_remote_metadata(self, get_authorized_file, split_handles):
         file_id = "00000000-0000-0000-0000-000000000002"
         file = MagicMock(id=file_id)
         file.get_bytes.return_value = b"text"
-        query_set.return_value.filter.return_value.first.return_value = file
+        get_authorized_file.return_value = file
         parser = MagicMock()
         parser.get_content.return_value = "text"
         split_handles.__iter__.return_value = iter([parser])

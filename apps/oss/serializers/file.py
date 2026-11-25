@@ -185,6 +185,15 @@ def _deny():
     raise AppUnauthorizedFailed(403, gettext("No permission to access"))
 
 
+def _is_public_file(file):
+    """工具图标等 TOOL 文件公开;工作流运行中生成的 TOOL 文件(如工具触发器产物)需按工具读权限鉴权"""
+    from application.workflow.file_access import WORKFLOW_GENERATED
+
+    if file.source_type == FileSourceType.TOOL and (file.meta or {}).get(WORKFLOW_GENERATED):
+        return False
+    return file.source_type in _PUBLIC_SOURCE_TYPES
+
+
 def _knowledge_id_for_file_source(source_type, source_id):
     if source_type == FileSourceType.DOCUMENT:
         return QuerySet(Document).filter(id=source_id).values_list("knowledge_id", flat=True).first()
@@ -308,7 +317,7 @@ def auth(file, mk_file_auth, *, allow_content_read=True):
     if CONFIG.get("FILE_AUTH", "1") != "1":
         return
     # 公共/临时文件无需鉴权
-    if file.source_type in _PUBLIC_SOURCE_TYPES:
+    if _is_public_file(file):
         return
     # PublicFileAccess 中记录的文件允许公开访问
     if QuerySet(PublicFileAccess).filter(
@@ -490,6 +499,21 @@ def _auth_system(file, user_id, *, allow_content_read=True):
             auth_target_type="KNOWLEDGE",
             read_permission=PermissionConstants.KNOWLEDGE_READ.value,
             additional_read_permissions=_knowledge_content_read_permissions(file) if allow_content_read else (),
+        )
+    elif file.source_type == FileSourceType.TOOL:
+        # 仅工作流生成的 TOOL 文件会走到这里(其余 TOOL 文件公开)
+        tool = QuerySet(Tool).filter(id=file.source_id).first()
+        if tool is None:
+            _deny()
+        if str(RoleConstants.ADMIN) in user_auth.roles:
+            return
+        _check_workspace_resource_permission(
+            user_auth,
+            user_id,
+            workspace_id=tool.workspace_id,
+            target_id=tool.id,
+            auth_target_type="TOOL",
+            read_permission=PermissionConstants.TOOL_READ.value,
         )
     else:
         _deny()

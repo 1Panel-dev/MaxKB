@@ -12,14 +12,14 @@ from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.content_type import ContentType
+from application.workflow.file_access import get_authorized_file, save_generated_file
 from application.workflow.i_node import INode
 from application.workflow.media_download import MAX_GENERATED_VIDEO_BYTES, download_http_bytes
 from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from common.utils.common import bytes_to_uploaded_file
-from knowledge.models import FileSourceType, File
-from oss.serializers.file import FileSerializer, mime_types
+from oss.serializers.file import mime_types
 from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from common.exception.app_exception import AppApiException
@@ -181,7 +181,7 @@ class ImageToVideoNode(INode):
             if isinstance(image_url, list):
                 image_url = image_url[0].get("file_id") if "file_id" in image_url[0] else image_url[0].get("url")
             if isinstance(image_url, str) and not image_url.startswith("http"):
-                file = QuerySet(File).filter(id=image_url).first()
+                file = get_authorized_file(image_url, self.get_workflow_parameters())
                 file_bytes = file.get_bytes()
                 file_type = file.file_name.split(".")[-1].lower()
                 content_type = mime_types.get(file_type, "application/octet-stream")
@@ -192,45 +192,7 @@ class ImageToVideoNode(INode):
             raise ValueError(gettext("Failed to obtain the image"))
 
     def _upload_file(self, file, workflow_type, workflow_params):
-        if workflow_type == WorkflowType.KNOWLEDGE:
-            return self._upload_knowledge_file(file, workflow_params)
-        if workflow_type == WorkflowType.TOOL:
-            return self._upload_tool_file(file, workflow_params)
-        return self._upload_application_file(file, workflow_params)
-
-    def _upload_knowledge_file(self, file, workflow_params):
-        knowledge_id = workflow_params.get("knowledge_id")
-        meta = {"debug": False, "knowledge_id": knowledge_id}
-        file_url = FileSerializer(
-            data={"file": file, "meta": meta, "source_id": knowledge_id, "source_type": FileSourceType.KNOWLEDGE.value}
-        ).upload()
-        return file_url
-
-    def _upload_tool_file(self, file, workflow_params):
-        tool_id = workflow_params.get("tool_id")
-        meta = {
-            "debug": False,
-            "tool_id": tool_id,
-        }
-        file_url = FileSerializer(
-            data={"file": file, "meta": meta, "source_id": tool_id, "source_type": FileSourceType.TOOL.value}
-        ).upload()
-        return file_url
-
-    def _upload_application_file(self, file, workflow_params):
-        application_id = workflow_params.get("application_id")
-        chat_id = workflow_params.get("chat_id")
-        chat_user_id = workflow_params.get("chat_user_id")
-        meta = {"chat_id": chat_id, "application_id": application_id, "user_id": chat_user_id}
-        file_url = FileSerializer(
-            data={
-                "file": file,
-                "meta": meta,
-                "source_id": chat_id,
-                "source_type": FileSourceType.CHAT.value,
-            }
-        ).upload()
-        return file_url
+        return save_generated_file(file, workflow_params)
 
     def _generate_history_ai_message(self, chat_record):
         for val in chat_record.details.values():

@@ -23,7 +23,9 @@ from typing import Dict, List
 import requests
 import uuid_utils.compat as uuid
 from common.utils.common import to_stream_response_simple
+from application.models import ChatUserType
 from application.workflow.common import WorkflowType, new_instance
+from application.workflow.file_access import ROOT_KEYS, root_context
 from application.workflow.message.aggregator import AggregationManager
 from application.workflow.nodes import get_node_class
 from application.workflow.status import Status
@@ -186,7 +188,14 @@ class ToolWorkflowSerializer(serializers.Serializer):
             # 运行身份取自认证上下文(DB 工作空间 + 登录用户),请求体不得覆盖,
             # 防止低权限用户伪造 workspace_id/user_id 绕过工具引用授权;
             # chat_record_id 仅用于沿用同一条执行记录,工具工作流本身不作为运行参数
-            identity_keys = {"workspace_id", "user_id", "chat_user_id", "chat_user_type", "chat_record_id"}
+            identity_keys = {
+                "workspace_id",
+                "user_id",
+                "chat_user_id",
+                "chat_user_type",
+                "chat_record_id",
+                *ROOT_KEYS,
+            }
             # 对齐旧引擎 get_body():输入字段值 + 执行身份,不含对话语义字段(question/chat_record_id)
             parameters = {
                 "tool_id": self.data.get("tool_id"),
@@ -197,6 +206,12 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 "default_model_setting": default_model_setting,
                 **{k: v for k, v in instance.items() if k not in identity_keys},
                 "workflow_user_id": self.data.get("user_id"),
+                **root_context(
+                    ChatUserType.SYSTEM_USER.value,
+                    self.data.get("user_id"),
+                    WorkflowType.TOOL,
+                    self.data.get("tool_id"),
+                ),
             }
 
             workflow = new_instance(tool_workflow.work_flow, WorkflowType.TOOL)

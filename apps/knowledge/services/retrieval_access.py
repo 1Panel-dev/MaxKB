@@ -82,7 +82,19 @@ def identity_from_server(user_id, user_type, debug=False):
 def inherited_retrieval_context(parameters):
     return {
         key: parameters.get(key)
-        for key in ("retrieval_identity", "chat_user_id", "chat_user_type", "workspace_id", "debug")
+        for key in (
+            "retrieval_identity",
+            "chat_user_id",
+            "chat_user_type",
+            "workspace_id",
+            "debug",
+            # 工作流发起者身份与根资源(application.workflow.file_access.ROOT_KEYS),子工作流原样继承
+            "root_user_type",
+            "root_user_id",
+            "root_workflow_type",
+            "root_resource_id",
+            "root_chat_id",
+        )
     }
 
 

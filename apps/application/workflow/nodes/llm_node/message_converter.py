@@ -78,10 +78,10 @@ def _parse_arguments(arguments) -> dict:
         return {}
 
 
-def _user_parts(item: dict) -> list:
+def _user_parts(item: dict, load_file) -> list:
     parts = []
     images = item.get("images") or []
-    image_parts, _ = _process_images([{"url": i} if isinstance(i, str) else i for i in images])
+    image_parts, _ = _process_images([{"url": i} if isinstance(i, str) else i for i in images], load_file)
     parts.extend(image_parts)
     for video in item.get("videos") or []:
         url = video if isinstance(video, str) else (video or {}).get("url")
@@ -97,7 +97,8 @@ def _user_parts(item: dict) -> list:
 
 
 class _Converter:
-    def __init__(self):
+    def __init__(self, load_file):
+        self.load_file = load_file
         self.result: list[BaseMessage] = []
         self.system = ""
         self.user = ""
@@ -176,7 +177,7 @@ class _Converter:
             self.flush_system()
             self.flush_assistant()
             self.user += content
-            self.user_parts.extend(_user_parts(item))
+            self.user_parts.extend(_user_parts(item, self.load_file))
         elif _type == "ASSISTANT":
             self.flush_system()
             self.flush_user()
@@ -201,8 +202,11 @@ class _Converter:
         return self.result
 
 
-def to_messages(value) -> list[BaseMessage]:
-    """把引用变量里的消息列表转换为 LangChain 消息;非数组或 JSON 字符串解析失败时返回空列表"""
+def to_messages(value, load_file) -> list[BaseMessage]:
+    """
+    把引用变量里的消息列表转换为 LangChain 消息;非数组或 JSON 字符串解析失败时返回空列表
+    load_file(file_id) 必须经过工作流文件鉴权,见 application.workflow.file_access.get_authorized_file
+    """
     if isinstance(value, str):
         try:
             value = json.loads(value)
@@ -210,7 +214,7 @@ def to_messages(value) -> list[BaseMessage]:
             return []
     if not isinstance(value, list):
         return []
-    return _Converter().convert(value)
+    return _Converter(load_file).convert(value)
 
 
 def to_reasoning_chunk(chunk):
