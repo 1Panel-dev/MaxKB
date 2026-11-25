@@ -238,33 +238,24 @@ class Fork:
 
     @staticmethod
     def _sandbox_requests_get(base_fork_url: str, headers: dict):
-        from common.utils.tool_code import ToolExecutor
+        from maxkb.const import CONFIG
+        from oss.url_fetch import fetch_public_url
 
-        response = ToolExecutor().exec_code(
-            """
-def fetch_url(url, headers):
-    import base64
-    import requests
-
-    requests.packages.urllib3.disable_warnings()
-    response = requests.get(url, verify=False, headers=headers)
-    return {
-        "status_code": response.status_code,
-        "content": base64.b64encode(response.content).decode("ascii"),
-        "encoding": response.encoding,
-        "apparent_encoding": response.apparent_encoding,
-        "content_type": response.headers.get("Content-Type", ""),
-    }
-""",
-            {"url": base_fork_url, "headers": headers},
-            function_name="fetch_url",
+        response = fetch_public_url(
+            base_fork_url,
+            10 * 1024 * 1024,
+            headers=headers,
+            binary=True,
+            detect_encoding=True,
+            follow_redirects=True,
+            allowed_networks=CONFIG.get("WEB_SOURCE_ALLOWED_NETWORKS", []),
         )
         return SandboxFetchResponse(
             response.get("status_code"),
             base64.b64decode(response.get("content")),
             response.get("encoding"),
             response.get("apparent_encoding"),
-            response.get("content_type", ""),
+            response.get("Content-Type", ""),
         )
 
     @staticmethod

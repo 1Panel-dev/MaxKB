@@ -65,18 +65,12 @@ class ForkContentTypeTests(SimpleTestCase):
 
     def test_sandbox_fetch_carries_content_type_from_http_response(self):
         body = self.response("# Markdown", "text/markdown; charset=utf-8")
-        with patch("common.utils.tool_code.ToolExecutor") as executor:
+        import base64
 
-            def execute(code, _parameters, *, function_name):
-                namespace = {}
-                with patch(
-                    "requests.get",
-                    return_value=SimpleNamespace(**vars(body), headers={"Content-Type": body.content_type}),
-                ):
-                    exec(code, namespace)
-                    return namespace[function_name]("https://example.com/page.md", {})
-
-            executor.return_value.exec_code.side_effect = execute
+        result = {"status_code": 200, "content": base64.b64encode(body.content), "Content-Type": body.content_type}
+        with patch("oss.url_fetch.fetch_public_url", return_value=result) as fetch:
             response = Fork.requests_get("https://example.com/page.md", {})
+        self.assertTrue(fetch.call_args.kwargs["follow_redirects"])
+        self.assertIn("allowed_networks", fetch.call_args.kwargs)
         self.assertEqual(response.content, body.content)
         self.assertEqual(response.content_type, body.content_type)
