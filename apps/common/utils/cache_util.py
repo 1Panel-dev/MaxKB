@@ -9,6 +9,23 @@
 from django.core.cache import cache
 
 
+_CONSUME_IF_EQUAL_SCRIPT = """
+local cached_value = redis.call('get', KEYS[1])
+if cached_value and cached_value == ARGV[1] then
+    return redis.call('del', KEYS[1])
+end
+return 0
+"""
+
+
+def consume_cache_value_if_equal(key: str, expected_value, cache_instance=cache, version=None) -> bool:
+    """Atomically delete a Redis cache entry only when its value matches."""
+    redis_client = cache_instance.client.get_client(write=True)
+    cache_key = cache_instance.make_key(key, version=version)
+    encoded_value = cache_instance.client.encode(expected_value)
+    return redis_client.eval(_CONSUME_IF_EQUAL_SCRIPT, 1, cache_key, encoded_value) == 1
+
+
 def get_data_by_default_cache(key: str, get_data, cache_instance=cache, version=None, kwargs=None):
     """
     获取数据, 先从缓存中获取,如果获取不到再调用get_data 获取数据
