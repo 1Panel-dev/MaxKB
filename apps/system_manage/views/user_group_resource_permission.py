@@ -278,7 +278,7 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
                     "target": target,
                     "auth_target_type": resource.replace("_FOLDER", ""),
                 }
-            ).edit(instance=request.data, current_user_id=str(request.user.id))
+            ).edit(instance=request.data, current_user_id=str(request.user.id), request=request)
         )
 
     class Page(APIView):

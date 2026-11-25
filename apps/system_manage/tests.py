@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from django.core.cache import cache
 from django.http import QueryDict
@@ -18,6 +18,8 @@ from common.exception.app_exception import AppUnauthorizedFailed
 from role_setting.models import RolePermission, RoleSetting, UserRoleRelation
 from system_manage.models import ChatUser, UserGroup, UserGroupRelation
 from system_manage.models.log_management import Log
+from system_manage.serializers import user_group_resource_permission as user_group_resource_permission_serializer
+from system_manage.serializers import user_resource_permission as user_resource_permission_serializer
 from system_manage.serializers.chat_user import ChatUserSerializer
 from system_manage.views import (
     resource_chat_user_group,
@@ -704,3 +706,119 @@ class ChatUserEditTests(TestCase):
         operate.re_password({"password": "Password1!", "re_password": "Password1!"}, with_valid=True)
 
         self.assertTrue(UserGroupRelation.objects.filter(user=user, group=group).exists())
+
+
+class ResourceAuthorizationIncludeChildrenTests(SimpleTestCase):
+    """GHSA-223f-r4v5-8782: include_children 授权不能信任客户端传入的 folder_ids"""
+
+    workspace_id = "workspace-1"
+    target = "folder-root"
+    folder_edit_bit = 1 << PermissionConstants.APPLICATION_FOLDER_EDIT.value.bit_index
+
+    @staticmethod
+    def build_request(roles, permissions=None):
+        return SimpleNamespace(
+            user=SimpleNamespace(id="user-1"),
+            auth=SimpleNamespace(roles=set(roles), permissions=permissions or {}),
+        )
+
+    def managed_folder_ids(self, request, descendant_folder_ids, target_is_folder=True):
+        module = user_resource_permission_serializer
+        with (
+            patch.object(module, "QuerySet") as query_set,
+            patch.object(module, "get_descendant_folder_ids", return_value=descendant_folder_ids),
+        ):
+            query_set.return_value.filter.return_value.exists.return_value = target_is_folder
+            return module.get_managed_folder_ids_under_target(request, self.workspace_id, "APPLICATION", self.target)
+
+    def test_descendant_folder_ids_follow_parent_chain_in_workspace(self):
+        rows = [
+            (self.target, None),
+            ("child-a", self.target),
+            ("child-b", self.target),
+            ("grandchild-a", "child-a"),
+            ("other-root-child", "other-root"),
+        ]
+        with patch.object(user_resource_permission_serializer, "QuerySet") as query_set:
+            query_set.return_value.filter.return_value.values_list.return_value = rows
+            result = user_resource_permission_serializer.get_descendant_folder_ids(
+                MagicMock(), self.workspace_id, self.target
+            )
+        self.assertEqual({"child-a", "child-b", "grandchild-a"}, set(result))
+
+    def test_user_only_gets_descendant_folders_with_folder_edit_permission(self):
+        request = self.build_request(
+            {f"USER:w:{self.workspace_id}"},
+            {f"APPLICATION:w:{self.workspace_id}:r:child-a": self.folder_edit_bit},
+        )
+        result = self.managed_folder_ids(request, ["child-a", "child-b"])
+        self.assertEqual([self.target, "child-a"], result)
+
+    def test_workspace_manager_gets_all_descendant_folders(self):
+        request = self.build_request({f"WORKSPACE_MANAGE:w:{self.workspace_id}"})
+        result = self.managed_folder_ids(request, ["child-a", "child-b"])
+        self.assertEqual([self.target, "child-a", "child-b"], result)
+
+    def test_non_folder_target_only_authorizes_target(self):
+        request = self.build_request({"ADMIN"})
+        result = self.managed_folder_ids(request, ["child-a"], target_is_folder=False)
+        self.assertEqual([self.target], result)
+
+    def assert_edit_ignores_client_folder_ids(self, serializer_module, serializer_class, subject):
+        request = self.build_request({f"USER:w:{self.workspace_id}"})
+        instance = [
+            {
+                **subject,
+                "permission": "MANAGE",
+                "include_children": True,
+                "folder_ids": ["victim-application"],
+            }
+        ]
+        with (
+            patch.object(serializer_module, "QuerySet") as query_set,
+            patch.object(serializer_module, "clear_user_permission_cache"),
+            patch.object(
+                serializer_module, "get_managed_folder_ids_under_target", return_value=[self.target]
+            ) as get_managed_folder_ids,
+            patch.object(
+                serializer_class, "get_has_manage_permission_resource_under_folders", return_value=["own-application"]
+            ),
+        ):
+            query_set.return_value.filter.return_value.values_list.return_value = [subject.get("user_group_id")]
+            serializer_class(
+                data={"workspace_id": self.workspace_id, "target": self.target, "auth_target_type": "APPLICATION"}
+            ).edit(instance=instance, current_user_id="user-1", request=request)
+
+        get_managed_folder_ids.assert_called_once_with(request, self.workspace_id, "APPLICATION", self.target)
+        saved = query_set.return_value.bulk_create.call_args.args[0]
+        self.assertEqual({self.target, "own-application"}, {item.target for item in saved})
+
+    def test_user_authorization_ignores_client_folder_ids(self):
+        self.assert_edit_ignores_client_folder_ids(
+            user_resource_permission_serializer,
+            user_resource_permission_serializer.ResourceUserPermissionSerializer,
+            {"user_id": "user-1"},
+        )
+
+    def test_user_group_authorization_ignores_client_folder_ids(self):
+        self.assert_edit_ignores_client_folder_ids(
+            user_group_resource_permission_serializer,
+            user_group_resource_permission_serializer.ResourceUserGroupPermissionSerializer,
+            {"user_group_id": "group-1"},
+        )
+
+    def test_builtin_workspace_manager_gets_all_child_resources(self):
+        serializer = user_resource_permission_serializer.ResourceUserPermissionSerializer(
+            data={"workspace_id": self.workspace_id, "target": self.target, "auth_target_type": "APPLICATION"}
+        )
+        serializer.is_valid(raise_exception=True)
+        module = user_resource_permission_serializer
+        with (
+            patch.object(module, "is_workspace_manage", return_value=True),
+            patch.object(module, "is_builtin_workspace_manage", return_value=True),
+            patch("folders.serializers.folder.has_exact_permission_by_role", return_value=False),
+            patch.object(module, "QuerySet") as query_set,
+        ):
+            resources = query_set.return_value.filter.return_value.annotate.return_value.values_list.return_value
+            result = serializer.get_has_manage_permission_resource_under_folders("user-1", [self.target])
+        self.assertIs(resources, result)

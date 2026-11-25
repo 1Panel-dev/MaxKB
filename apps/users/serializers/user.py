@@ -207,6 +207,22 @@ def is_workspace_manage(user_id: str, workspace_id: str):
     return QuerySet(User).filter(id=user_id, role=RoleConstants.ADMIN.value.__str__()).exists()
 
 
+def is_builtin_workspace_manage(user_id: str, workspace_id: str):
+    """
+    是否为内置工作空间管理员（EE 为内置 WORKSPACE_MANAGE 角色，非 EE 为 ADMIN）
+    """
+    workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+    role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
+    is_x_pack_ee = workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
+    if is_x_pack_ee:
+        return (
+            QuerySet(workspace_user_role_mapping_model)
+            .filter(user_id=user_id, workspace_id=workspace_id, role_id=RoleConstants.WORKSPACE_MANAGE.value.__str__())
+            .exists()
+        )
+    return QuerySet(User).filter(id=user_id, role=RoleConstants.ADMIN.value.__str__()).exists()
+
+
 def is_workspace_manage_permission_read(user_id: str, workspace_id: str, permission_id):
     workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
     role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
