@@ -17,6 +17,10 @@ type RefreshableEdgeModel = { updatePathByAnchor?: () => void }
 
 type WorkflowNodeConfig = { chatFields?: WorkflowNodeField[]; fields?: WorkflowNodeField[]; globalFields?: WorkflowNodeField[] }
 
+type WorkflowGraphModel = GraphModel & {
+  getUpNodeFieldList?: (containSelf: boolean, useCache: boolean) => WorkflowNodeField[]
+}
+
 interface WorkflowNodeProperties extends IHtmlNodeProperties {
   api_input_field_list?: unknown[]
   chat_input_field_list?: unknown[]
@@ -194,7 +198,9 @@ export class WorkflowNodeModel extends HtmlNodeModel<WorkflowNodeProperties> {
   getUpNodeFieldList(containSelf: boolean, useCache: boolean): WorkflowNodeField[] {
     const upstreamFields = Object.values(this.getUpNodeFieldDict(containSelf, useCache)).flat()
     const startNodeModel = this.graphModel.getNodeModelById(WorkflowNodeType.Start) as unknown as WorkflowNodeModel | undefined
-    return [...(startNodeModel?.getNodeFieldList() ?? []), ...upstreamFields]
+    // 循环体嵌套画布通过 graphModel 暴露父画布字段，这里向上叠加一层。
+    const parentFields = (this.graphModel as WorkflowGraphModel).getUpNodeFieldList?.(containSelf, useCache) ?? []
+    return [...(startNodeModel?.getNodeFieldList() ?? []), ...upstreamFields, ...parentFields]
   }
 
   clearNextNodeField(containSelf: boolean) {
