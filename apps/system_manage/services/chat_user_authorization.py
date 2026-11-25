@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 from django.utils.translation import gettext_lazy as _
 
 from application.models import ApplicationAccessToken, ChatUserType
@@ -25,9 +27,8 @@ def ensure_application_chat_user_authorized(
 
     login_type = str(chat_user.source or "").upper()
     auth = get_auth(login_type, chat_user_id, application_id)
-    if not check_permissions(
-        ChatPermissionConstants.get_aggregate_permissions(),
-        auth=auth,
+    if not ChatPermissionConstants.get_aggregate_permissions().hasPermission(
+        SimpleNamespace(auth=auth),
         application_id=application_id,
     ):
         raise AppApiException(1005, _("The user does not have permission to access the application"))
