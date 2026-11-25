@@ -39,3 +39,12 @@ class PublicDownloadTests(SimpleTestCase):
         ) as run:
             self.assertEqual(download_http_bytes("https://example.com/start", 32), b"abc")
         self.assertEqual(run.call_args.args[1], {"url": "https://example.com/media", "file_limit": 32, "binary": True})
+
+    def test_gemini_loads_remote_frames_through_public_download(self):
+        from models_provider.impl.gemini_model_provider.model import ttv
+
+        response = {"status_code": 200, "Content-Type": "image/png", "content": "YWJj"}
+        with patch.object(ttv, "fetch_public_url", return_value=response) as fetch:
+            image = ttv.GenerationVideoModel._load_image_as_sdk_type(None, "https://example.com/frame")
+        self.assertEqual((image.image_bytes, image.mime_type), (b"abc", "image/png"))
+        fetch.assert_called_once_with("https://example.com/frame", 50 * 1024 * 1024, binary=True, follow_redirects=True)
