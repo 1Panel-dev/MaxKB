@@ -2087,7 +2087,12 @@ class DocumentSerializers(serializers.Serializer):
             try:
                 for document_id in document_id_list:
                     generate_related_by_document_id.delay(
-                        document_id, model_id, model_params_setting, prompt, state_list
+                        document_id,
+                        model_id,
+                        model_params_setting,
+                        prompt,
+                        state_list,
+                        knowledge_id=self.data["knowledge_id"],
                     )
             except AlreadyQueued:
                 pass
