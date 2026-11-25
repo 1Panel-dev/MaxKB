@@ -22,3 +22,16 @@ class ToolBindingTests(SimpleTestCase):
         with self.assertRaises(AppApiException):
             require_workflow_tools(["shared", "restricted"], "actor", "workspace")
         authorized.assert_called_once_with("actor", "workspace", ["shared", "restricted"])
+
+
+class McpBindingTests(SimpleTestCase):
+    @patch(
+        "application.workflow.nodes.ai_chat_node.tools.mcp.require_workflow_tools",
+        side_effect=AppApiException(403, "denied"),
+    )
+    def test_resolving_mcp_config_requires_the_workflow_actor(self, authorize):
+        from application.workflow.nodes.ai_chat_node.tools.mcp import get_referenced_mcp_tools
+
+        with self.assertRaises(AppApiException):
+            get_referenced_mcp_tools(["tool"], {"workflow_user_id": "actor", "workspace_id": "team"})
+        authorize.assert_called_once_with(["tool"], "actor", "team")

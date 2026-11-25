@@ -652,11 +652,15 @@ class ToolSerializer(serializers.Serializer):
             query_set = QuerySet(Tool).filter(id=self.data.get("id"))
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
-            if not query_set.exists():
-                get_authorized_tool = DatabaseModelManage.get_model("get_authorized_tool")
-                if get_authorized_tool:
-                    if not get_authorized_tool(QuerySet(Tool).filter(id=self.data.get("id")), workspace_id).exists():
-                        raise AppApiException(500, _("Tool id does not exist"))
+            tool = query_set.select_related("user").first()
+            if tool is None:
+                get_shared = DatabaseModelManage.get_model("get_authorized_tool")
+                if get_shared and workspace_id:
+                    shared = Tool.objects.filter(id=self.data["id"], scope=ToolScope.SHARED)
+                    tool = get_shared(shared, workspace_id).select_related("user").first()
+            if tool is None:
+                raise AppApiException(500, _("Tool id does not exist"))
+            return tool
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -780,8 +784,7 @@ class ToolSerializer(serializers.Serializer):
                     deploy(TriggerModelSerializer(trigger).data, **{})
 
         def one(self):
-            self.is_one_valid(raise_exception=True)
-            tool = QuerySet(Tool).filter(id=self.data.get("id")).select_related("user").first()
+            tool = self.is_one_valid(raise_exception=True)
             nick_name = tool.user.nick_name if tool and tool.user else None
             if tool.init_params:
                 tool.init_params = json.loads(rsa_long_decrypt(tool.init_params))

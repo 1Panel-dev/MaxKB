@@ -3,7 +3,6 @@ import asyncio
 import json
 from typing import List, Dict, Any
 
-from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from common.mcp.client import create_mcp_client
 from rest_framework import serializers
@@ -12,7 +11,7 @@ from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
 from application.workflow.status import Status
 from common.utils.tool_code import ToolExecutor
-from tools.models import Tool
+from application.workflow.nodes.ai_chat_node.tools.mcp import get_referenced_mcp_tools
 
 
 class McpNodeSerializer(serializers.Serializer):
@@ -42,7 +41,7 @@ class McpNode(INode):
         if mcp_source == "referencing":
             if not mcp_tool_id:
                 raise ValueError("MCP tool ID is required when mcp_source is 'referencing'.")
-            tool = QuerySet(Tool).filter(id=mcp_tool_id).first()
+            tool = get_referenced_mcp_tools([mcp_tool_id], self.get_workflow_parameters()).first()
             if not tool:
                 raise ValueError(f"Tool with ID {mcp_tool_id} not found.")
             if not tool.is_active:

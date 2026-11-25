@@ -653,7 +653,9 @@ class AIChatNode(INode):
             self.get_workflow_parameters(),
             cancel_event=self.async_runner.cancel_event,
         )
-        mcp_servers_config = get_mcp_servers(mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, self._handle_variables)
+        mcp_servers_config = get_mcp_servers(
+            mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, self._handle_variables, self.get_workflow_parameters()
+        )
         ToolExecutor().validate_mcp_transport(json.dumps(mcp_servers_config))
 
         if tools or mcp_servers_config or skill_tool_ids:
