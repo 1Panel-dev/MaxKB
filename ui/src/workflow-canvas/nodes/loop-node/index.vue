@@ -154,7 +154,7 @@ onMounted(() => {
           prop="number"
           :rules="{ required: true, message: t('common.validation.inputRequired'), trigger: 'change' }"
         >
-          <el-input-number v-model="formData.number" :min="1" :step="1" controls-position="right" align="left" />
+          <el-input-number v-model="formData.number" :min="1" :step="1" :value-on-clear="1" step-strictly controls-position="right" align="left" />
         </el-form-item>
       </el-form>
     </div>
