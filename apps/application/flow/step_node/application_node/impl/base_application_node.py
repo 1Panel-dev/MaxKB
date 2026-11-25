@@ -240,7 +240,7 @@ class BaseApplicationNode(IApplicationNode):
                  'chat_record_id': record_id,
                  'child_node': child_node_value,
                  'node_data': node_data,
-                 'form_data': kwargs}
+                 'form_data': kwargs}, check_file_access=False
                 )
 
         if response.status_code == 200:

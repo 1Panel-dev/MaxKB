@@ -37,6 +37,7 @@ from common.result import result
 from common.utils.common import bytes_to_uploaded_file, generate_uuid, restricted_loads
 from common.utils.logger import maxkb_logger
 from common.utils.workflow_reference import validate_resource_references
+from common.utils.file_reference import validate_tool_file_references
 from common.utils.tool_code import ToolExecutor
 from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
 from django.db import transaction
@@ -164,6 +165,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).first()
             workspace_id = tool_workflow.workspace_id
+            validate_tool_file_references(instance, self.data.get("tool_id"), self.data.get("user_id"))
             tool_record_id = instance.get("chat_record_id") or str(uuid.uuid7())
             took_execute = ToolExecute(self.data.get("tool_id"), tool_record_id, workspace_id, None, None, True)
             record = took_execute.get_record()
