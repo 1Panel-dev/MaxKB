@@ -397,6 +397,7 @@ onBeforeUnmount(() => {
       <MkQuickCreate
         v-if="knowledgeDocPermission('docCreate')"
         ref="quickCreateRef"
+        :maxlength="128"
         :text="t('knowledge.document.actions.quickCreate')"
         :placeholder="t('knowledge.document.name.placeholder')"
         @create="handleCreateDocument"
