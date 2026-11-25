@@ -5,8 +5,6 @@
 @desc: 适配层,复用 AggregatePermission
 """
 
-from types import SimpleNamespace
-
 from django.utils.translation import gettext_lazy as _
 
 from common.auth.constants.compare_constants import CompareConstants
