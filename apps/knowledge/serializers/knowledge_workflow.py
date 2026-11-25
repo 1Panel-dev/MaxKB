@@ -34,7 +34,7 @@ from common.result import result
 from common.utils.common import bytes_to_uploaded_file
 from common.utils.common import restricted_loads
 from common.utils.logger import maxkb_logger
-from common.utils.file_reference import bind_knowledge_uploads
+from common.utils.file_reference import bind_knowledge_uploads, validate_knowledge_file_references
 from common.utils.workflow_reference import get_exportable_tools, validate_resource_references
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
@@ -188,6 +188,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).first()
         validate_resource_references({'work_flow': knowledge_workflow.work_flow},
                                      self.data.get('workspace_id'), str(user.id))
+        validate_knowledge_file_references(instance, self.data.get("knowledge_id"), user.id)
         knowledge_action_id = uuid.uuid7()
         meta = {"user_id": str(user.id), "user_name": user.username}
         KnowledgeAction(
@@ -248,6 +249,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         )
         validate_resource_references({'work_flow': knowledge_workflow_version.work_flow},
                                      self.data.get('workspace_id'), str(user.id))
+        validate_knowledge_file_references(instance, self.data.get("knowledge_id"), user.id)
         bind_knowledge_uploads(file_ids, self.data.get("knowledge_id"), user.id)
         knowledge_action_id = uuid.uuid7()
         meta = {"user_id": str(user.id), "user_name": user.username}

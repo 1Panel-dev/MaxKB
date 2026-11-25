@@ -169,7 +169,7 @@ class MCPToolHandler:
                 "source": {"type": ChatSourceChoices.ONLINE.value},
                 "debug": False,
             }
-        ).chat(payload)
+        ).chat(payload, check_file_access=False)
         chunks = []
         for raw_line in resp:
             line = raw_line.decode("utf-8", errors="replace").rstrip("\r\n")
