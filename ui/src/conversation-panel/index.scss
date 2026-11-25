@@ -106,8 +106,12 @@
   background: var(--el-overlay-color-lighter);
 }
 
-/* 对话调试和嵌入标题栏：在中性底色上叠加浅主题色。 */
+/* 对话调试：在中性底色上叠加浅主题色。 */
 .mk-conversation-debug-header {
+  background: color-mix(in srgb, var(--mk-primary) 5%, var(--mk-N100));
+}
+/* 嵌入标题栏：在中性底色上叠加浅主题色。 */
+.mk-conversation-embed-header {
   background: color-mix(in srgb, var(--mk-primary) 5%, var(--mk-N100));
 }
 
