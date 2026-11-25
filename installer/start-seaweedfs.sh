@@ -1,8 +1,9 @@
 #!/bin/bash
 
-set -e
-
-mkdir -p "${SEAWEEDFS_VOLUMES:-/opt/maxkb/data/seaweedfs}"
+if [ ! -d "${SEAWEEDFS_VOLUMES:-/opt/maxkb/data/seaweedfs}" ]; then
+    mkdir -p "${SEAWEEDFS_VOLUMES:-/opt/maxkb/data/seaweedfs}"
+    chmod 700 "${SEAWEEDFS_VOLUMES:-/opt/maxkb/data/seaweedfs}"
+fi
 
 S3_ENDPOINT="${SEAWEEDFS_S3_ENDPOINT:-http://127.0.0.1:8333}"
 S3_PORT="${S3_ENDPOINT##*:}"
