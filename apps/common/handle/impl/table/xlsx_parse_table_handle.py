@@ -1,6 +1,5 @@
 # coding=utf-8
 import io
-import logging
 import traceback
 
 from openpyxl import load_workbook
@@ -64,9 +63,8 @@ class XlsxParseTableHandle(BaseParseTableHandle):
             validate_xlsx_buffer(io.BytesIO(buffer))
             wb = load_workbook(io.BytesIO(buffer))
             try:
-                image_dict: dict = xlsx_embed_cells_images(io.BytesIO(buffer))
-                save_image([item for item in image_dict.values()])
-            except Exception as e:
+                image_dict: dict = xlsx_embed_cells_images(io.BytesIO(buffer), save_image)
+            except Exception:
                 image_dict = {}
             result = []
             for sheetname in wb.sheetnames:
@@ -91,9 +89,7 @@ class XlsxParseTableHandle(BaseParseTableHandle):
             # 加载 Excel 文件
             workbook = load_workbook(file)
             try:
-                image_dict: dict = xlsx_embed_cells_images(file)
-                if len(image_dict) > 0:
-                    save_image(image_dict.values())
+                image_dict: dict = xlsx_embed_cells_images(file, save_image)
             except Exception as e:
                 maxkb_logger.error(f"Exception: {e}")
                 image_dict = {}

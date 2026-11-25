@@ -11,52 +11,70 @@ import io
 import traceback
 from typing import List
 
-import openpyxl
 from openpyxl import load_workbook
 
 from common.handle.base_split_handle import BaseSplitHandle
-from common.handle.impl.common_handle import xlsx_embed_cells_images, validate_xlsx_buffer
-from common.handle.impl.xlsx_utils import iter_sheet_content_rows
+from common.handle.impl.common_handle import read_xlsx_images, validate_xlsx_buffer
+from common.handle.impl.xlsx_utils import get_sheet_content_max_column, iter_sheet_content_rows
 from common.utils.logger import maxkb_logger
 
 splitter = "\n`-----------------------------------`\n"
 
 
-def post_cell(image_dict, cell_value):
-    image = image_dict.get(cell_value, None)
-    if image is not None:
-        return f"![](./oss/file/{image.id})"
-    return cell_value.replace("\n", "<br>").replace("|", "&#124;")
+def load_images(source, workbook, save_image):
+    if save_image is None:
+        return {}, {}
+    try:
+        return read_xlsx_images(source, workbook, save_image)
+    except Exception:
+        maxkb_logger.exception("Error processing embedded XLSX images")
+        return {}, {}
 
 
-def row_to_md(row, image_dict):
+def sheet_rows(sheet, drawings):
+    if not drawings:
+        yield from iter_sheet_content_rows(sheet)
+        return
+    last_row = sheet.max_row
+    width = max(get_sheet_content_max_column(sheet), max(column for row, column in drawings))
+    yield from sheet.iter_rows(max_row=last_row, max_col=width)
+    # A drawing can lie beyond the last data row. Only visit the additional rows that contain images.
+    for row in sorted({row for row, column in drawings if row > last_row}):
+        yield from sheet.iter_rows(min_row=row, max_row=row, max_col=width)
+
+
+def cell_content(value, formula_images, drawings):
+    formula_image = formula_images.get(value)
+    if formula_image is not None:
+        value = f"![](./oss/file/{formula_image.id})"
+    if drawings:
+        parts = [str(value)] if value is not None and value != "" else []
+        parts.extend(f"![](./oss/file/{image.id})" for image in drawings)
+        return "\n".join(parts)
+    return value
+
+
+def row_to_md(row, image_dict, drawings):
+    values = (cell_content(cell.value, image_dict, drawings.get((cell.row, cell.column))) for cell in row)
     return (
         "| "
-        + " | ".join(
-            [
-                post_cell(image_dict, str(cell.value if cell.value is not None else "")) if cell is not None else ""
-                for cell in row
-            ]
-        )
+        + " | ".join(str(v if v is not None else "").replace("\n", "<br>").replace("|", "&#124;") for v in values)
         + " |\n"
     )
 
 
-def handle_sheet(file_name, sheet, image_dict, limit: int):
-    rows = iter_sheet_content_rows(sheet)
+def handle_sheet(file_name, sheet, image_dict, limit: int, drawings):
+    rows = sheet_rows(sheet, drawings)
     paragraphs = []
     result = {"name": file_name, "content": paragraphs}
-    try:
-        title_row_list = next(rows)
-        title_md_content = row_to_md(title_row_list, image_dict)
-        title_md_content += "| " + " | ".join(["---" if cell is not None else "" for cell in title_row_list]) + " |\n"
-    except Exception as e:
+    title_row = next(rows, None)
+    if not title_row:
         return result
-    if len(title_row_list) == 0:
-        return result
+    title_md_content = row_to_md(title_row, image_dict, drawings)
+    title_md_content += "| " + " | ".join(["---"] * len(title_row)) + " |\n"
     result_item_content = ""
     for row in rows:
-        next_md_content = row_to_md(row, image_dict)
+        next_md_content = row_to_md(row, image_dict, drawings)
         next_md_content_len = len(next_md_content)
         result_item_content_len = len(result_item_content)
         if len(result_item_content) == 0:
@@ -70,48 +88,21 @@ def handle_sheet(file_name, sheet, image_dict, limit: int):
                 result_item_content = title_md_content + next_md_content
     if len(result_item_content) > 0:
         paragraphs.append({"content": result_item_content, "title": ""})
+    elif drawings:
+        paragraphs.append({"content": title_md_content, "title": ""})
     return result
 
 
 class XlsxSplitHandle(BaseSplitHandle):
-    def fill_merged_cells(self, sheet, image_dict):
-        data = []
-
-        # 获取第一行作为标题行
-        headers = []
-        rows = iter_sheet_content_rows(sheet)
-        try:
-            title_row = next(rows)
-        except StopIteration:
-            return data
-        for idx, cell in enumerate(title_row):
-            if cell.value is None:
-                headers.append(" " * (idx + 1))
-            else:
-                headers.append(cell.value)
-
-        # 从第二行开始遍历每一行
-        for row in rows:
-            row_data = {}
-            for col_idx, cell in enumerate(row):
-                cell_value = cell.value
-
-                # 如果单元格为空，并且该单元格在合并单元格内，获取合并单元格的值
-                if cell_value is None:
-                    for merged_range in sheet.merged_cells.ranges:
-                        if cell.coordinate in merged_range:
-                            cell_value = sheet[merged_range.min_row][merged_range.min_col - 1].value
-                            break
-
-                image = image_dict.get(cell_value, None)
-                if image is not None:
-                    cell_value = f"![](./oss/file/{image.id})"
-
-                # 使用标题作为键，单元格的值作为值存入字典
-                row_data[headers[col_idx]] = cell_value
-            data.append(row_data)
-
-        return data
+    def merged_row_values(self, sheet, row, image_dict, drawings):
+        for cell in row:
+            value = cell.value
+            if value is None:
+                for merged_range in sheet.merged_cells.ranges:
+                    if cell.coordinate in merged_range:
+                        value = sheet.cell(merged_range.min_row, merged_range.min_col).value
+                        break
+            yield cell_content(value, image_dict, drawings.get((cell.row, cell.column)))
 
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
         buffer = get_buffer(file)
@@ -119,23 +110,17 @@ class XlsxSplitHandle(BaseSplitHandle):
             validate_xlsx_buffer(io.BytesIO(buffer))
             if type(limit) is str:
                 limit = int(limit)
-            workbook = openpyxl.load_workbook(io.BytesIO(buffer))
-            try:
-                image_dict: dict = xlsx_embed_cells_images(io.BytesIO(buffer))
-                save_image([item for item in image_dict.values()])
-            except Exception as e:
-                image_dict = {}
-            worksheets = workbook.worksheets
-            worksheets_size = len(worksheets)
+            workbook = load_workbook(io.BytesIO(buffer))
+            image_dict, drawings = load_images(io.BytesIO(buffer), workbook, save_image)
             return [
-                row
-                for row in [
-                    handle_sheet(file.name, sheet, image_dict, limit)
-                    if worksheets_size == 1 and sheet.title == "Sheet1"
-                    else handle_sheet(sheet.title, sheet, image_dict, limit)
-                    for sheet in worksheets
-                ]
-                if row is not None
+                handle_sheet(
+                    file.name if len(workbook.worksheets) == 1 and sheet.title == "Sheet1" else sheet.title,
+                    sheet,
+                    image_dict,
+                    limit,
+                    drawings.get(sheet.title, {}),
+                )
+                for sheet in workbook.worksheets
             ]
         except Exception as e:
             maxkb_logger.error(f"Error processing XLSX file {file.name}: {e}, {traceback.format_exc()}")
@@ -144,38 +129,27 @@ class XlsxSplitHandle(BaseSplitHandle):
     def get_content(self, file, save_image):
         try:
             # 加载 Excel 文件
+            validate_xlsx_buffer(file)
             workbook = load_workbook(file)
-            try:
-                image_dict: dict = xlsx_embed_cells_images(file)
-                if len(image_dict) > 0:
-                    save_image(image_dict.values())
-            except Exception as e:
-                maxkb_logger.error(f"Exception: {e}")
-                image_dict = {}
-            md_tables = ""
-            # 遍历所有工作表
-            for sheetname in workbook.sheetnames:
-                sheet = workbook[sheetname]
-                rows = self.fill_merged_cells(sheet, image_dict)
-                if len(rows) == 0:
+            image_dict, drawings = load_images(file, workbook, save_image)
+            tables = []
+            for sheet in workbook.worksheets:
+                sheet_drawings = drawings.get(sheet.title, {})
+                rows = sheet_rows(sheet, sheet_drawings)
+                header = next(rows, None)
+                if not header:
                     continue
-
-                # 添加 sheet 名称作为标题
-                md_tables += f"## {sheetname}\n\n"
-
-                # 提取表头和内容
-                headers = [f"{key}" for key, value in rows[0].items()]
-
-                # 构建 Markdown 表格
-                md_table = "| " + " | ".join(headers) + " |\n"
-                md_table += "| " + " | ".join(["---"] * len(headers)) + " |\n"
+                headers = []
+                for idx, cell in enumerate(header):
+                    value = cell_content(cell.value, image_dict, sheet_drawings.get((cell.row, cell.column)))
+                    headers.append(" " * (idx + 1) if value is None else self._escape_cell_content(value))
+                lines = ["| " + " | ".join(headers) + " |", "| " + " | ".join(["---"] * len(header)) + " |"]
                 for row in rows:
-                    r = [self._escape_cell_content(value) for key, value in row.items()]
-                    md_table += "| " + " | ".join(r) + " |\n"
-
-                md_tables += md_table + "\n\n"
-
-            return md_tables
+                    values = self.merged_row_values(sheet, row, image_dict, sheet_drawings)
+                    lines.append("| " + " | ".join(self._escape_cell_content(value) for value in values) + " |")
+                if len(lines) > 2 or sheet_drawings:
+                    tables.append(f"## {sheet.title}\n\n" + "\n".join(lines) + "\n\n\n")
+            return "".join(tables)
         except Exception as e:
             maxkb_logger.error(f"excel split handle error: {e}")
             return f"error: {e}"

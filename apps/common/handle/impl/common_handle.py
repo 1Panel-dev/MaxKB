@@ -7,22 +7,22 @@
 @desc:
 """
 
-import io
 import traceback
+from collections import defaultdict
 from io import BytesIO
+from itertools import chain
 from xml.etree.ElementTree import fromstring
 from zipfile import ZipFile
 
 import uuid_utils.compat as uuid
 from PIL import Image as PILImage
+from PIL import ImageFile
 from openpyxl.drawing.image import Image as openpyxl_Image
 from openpyxl.packaging.relationship import get_rels_path, get_dependents
-from openpyxl.xml.constants import SHEET_DRAWING_NS, REL_NS, SHEET_MAIN_NS
+from openpyxl.xml.constants import MAX_COLUMN, MAX_ROW, SHEET_DRAWING_NS, REL_NS, SHEET_MAIN_NS
 
 from common.utils.logger import maxkb_logger
 from knowledge.models import File
-
-from PIL import ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -119,56 +119,74 @@ def handle_images(deps, archive: ZipFile) -> []:
     return images
 
 
-def xlsx_embed_cells_images(buffer) -> {}:
-    archive = ZipFile(buffer)
-    validate_xlsx_archive(archive)
-    # 解析cellImage.xml文件
-    deps = get_dependents(archive, get_rels_path("xl/cellimages.xml"))
-    image_rel = handle_images(deps=deps, archive=archive)
-    # 工作表及其中图片ID
-    sheet_list = {}
-    for item in archive.namelist():
-        if not item.startswith("xl/worksheets/sheet"):
-            continue
-        key = item.split("/")[-1].split(".")[0].split("sheet")[-1]
-        sheet_list[key] = parse_element_sheet_xml(fromstring(archive.read(item)))
-    cell_images_xml = parse_element(fromstring(archive.read("xl/cellimages.xml")))
-    cell_images_rel = {}
-    for image in image_rel:
-        cell_images_rel[image.embed] = image
-    for cnv, embed in cell_images_xml.items():
-        cell_images_xml[cnv] = cell_images_rel.get(embed)
-    result = {}
-    total_pixels = 0
-    for key, img in cell_images_xml.items():
-        all_cells = [cell for _sheet_id, sheet in sheet_list.items() if sheet is not None for cell in sheet or []]
+def _formula_image_references(archive):
+    manifest = "xl/cellimages.xml"
+    members = set(archive.namelist())
+    if manifest not in members or get_rels_path(manifest) not in members:
+        return
+    deps = get_dependents(archive, get_rels_path(manifest))
+    images = {image.embed: image for image in handle_images(deps, archive)}
+    formulas = {
+        formula
+        for name in archive.namelist()
+        if name.startswith("xl/worksheets/sheet") and name.endswith(".xml")
+        for formula in parse_element_sheet_xml(fromstring(archive.read(name)))
+        if isinstance(formula, str)
+    }
+    for key, embed in parse_element(fromstring(archive.read(manifest))).items():
+        if embed in images:
+            for formula in formulas:
+                if key in formula:
+                    yield "=" + formula, images[embed]
 
-        image_excel_id_list = [cell for cell in all_cells if isinstance(cell, str) and key in cell]
-        # print(key, img)
-        if img is None:
-            continue
-        if len(image_excel_id_list) > 0:
-            image_excel_id = image_excel_id_list[-1]
-            f = archive.open(img.target)
-            img_byte = io.BytesIO()
-            try:
-                with PILImage.open(f) as im:
-                    width, height = im.size
-                    pixels = width * height
-                    if pixels > MAX_EMBED_IMAGE_PIXELS:
-                        maxkb_logger.warning(
-                            f"Skip oversized embedded image {img.path}: {width}x{height} pixels exceeds limit"
-                        )
-                        continue
-                    total_pixels += pixels
-                    if total_pixels > MAX_EMBED_IMAGE_AGGREGATE_PIXELS:
-                        maxkb_logger.warning("Skip embedded images in archive: aggregate pixels exceed limit")
-                        break
-                    im.convert("RGB").save(img_byte, format="JPEG")
-            except Exception as e:
-                maxkb_logger.error(f"Error decoding image {img.target}: {e}, {traceback.format_exc()}")
-                continue
-            image = File(id=uuid.uuid7(), file_name=img.path, meta={"debug": False, "content": img_byte.getvalue()})
-            result["=" + image_excel_id] = image
-    archive.close()
-    return result
+
+def _drawing_image_references(workbook):
+    for sheet in workbook.worksheets:
+        for image in sheet._images:
+            # Both one-cell and two-cell anchors use a zero-based start marker.
+            start = getattr(image.anchor, "_from", None)
+            if start is not None and 0 <= start.row < MAX_ROW and 0 <= start.col < MAX_COLUMN:
+                yield (sheet.title, start.row + 1, start.col + 1), image
+
+
+def read_xlsx_images(buffer, workbook=None, save_image=None):
+    formula_images = {}
+    drawing_images = defaultdict(dict)
+    files = {}
+    total_pixels = 0
+    with ZipFile(buffer) as archive:
+        validate_xlsx_archive(archive)
+        references = _formula_image_references(archive)
+        if workbook is not None:
+            references = chain(references, _drawing_image_references(workbook))
+        for position, image in references:
+            content = image.ref.getvalue()
+            if content not in files:
+                pixels = image.width * image.height
+                if pixels > MAX_EMBED_IMAGE_PIXELS or total_pixels + pixels > MAX_EMBED_IMAGE_AGGREGATE_PIXELS:
+                    maxkb_logger.warning(f"Skipping embedded image exceeding pixel limit: {image.width}x{image.height}")
+                    continue
+                total_pixels += pixels
+                try:
+                    encoded = BytesIO()
+                    with PILImage.open(BytesIO(content)) as decoded:
+                        decoded.convert("RGB").save(encoded, format="JPEG")
+                    files[content] = File(
+                        id=uuid.uuid7(), file_name="image.jpg", meta={"debug": False, "content": encoded.getvalue()}
+                    )
+                except Exception as exc:
+                    maxkb_logger.warning(f"Error decoding embedded XLSX image: {exc}")
+                    continue
+            if isinstance(position, str):
+                formula_images[position] = files[content]
+            else:
+                sheet, row, column = position
+                drawing_images[sheet].setdefault((row, column), []).append(files[content])
+    if files and save_image is not None:
+        save_image(list(files.values()))
+    return formula_images, drawing_images
+
+
+def xlsx_embed_cells_images(buffer, save_image=None):
+    formula_images, _ = read_xlsx_images(buffer, save_image=save_image)
+    return formula_images

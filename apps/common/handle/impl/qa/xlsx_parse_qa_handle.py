@@ -22,7 +22,7 @@ def handle_sheet(file_name, sheet, image_dict):
     try:
         title_row_list = next(rows)
         title_row_list = [row.value for row in title_row_list]
-    except Exception as e:
+    except Exception:
         return {"name": file_name, "paragraphs": []}
     if len(title_row_list) == 0:
         return {"name": file_name, "paragraphs": []}
@@ -58,9 +58,8 @@ class XlsxParseQAHandle(BaseParseQAHandle):
             validate_xlsx_buffer(io.BytesIO(buffer))
             workbook = openpyxl.load_workbook(io.BytesIO(buffer))
             try:
-                image_dict: dict = xlsx_embed_cells_images(io.BytesIO(buffer))
-                save_image([item for item in image_dict.values()])
-            except Exception as e:
+                image_dict: dict = xlsx_embed_cells_images(io.BytesIO(buffer), save_image)
+            except Exception:
                 image_dict = {}
             worksheets = workbook.worksheets
             worksheets_size = len(worksheets)
