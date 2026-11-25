@@ -18,6 +18,7 @@ from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage, Sys
 from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, CancelledException, WorkflowType
+from application.workflow.file_access import get_authorized_file
 from application.workflow.i_node import INode
 from application.workflow.message.aggregator import AggregationManager
 from application.workflow.message.struct.content import Content, NodeInfo, Position
@@ -218,7 +219,10 @@ class LLMNode(INode):
     def _build_messages(self, node_params):
         if node_params.get("enable_context") and node_params.get("context_variable"):
             context_variable = node_params.get("context_variable")
-            messages = to_messages(self.workflow_manage.get_reference_field(context_variable[0], context_variable[1:]))
+            messages = to_messages(
+                self.workflow_manage.get_reference_field(context_variable[0], context_variable[1:]),
+                lambda file_id: get_authorized_file(file_id, self.get_workflow_parameters()),
+            )
         else:
             messages = []
 

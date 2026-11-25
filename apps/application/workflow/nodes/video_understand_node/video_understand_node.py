@@ -11,6 +11,7 @@ from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.content_type import ContentType
+from application.workflow.file_access import get_authorized_file
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.reasoning_content import ReasoningContent
@@ -19,7 +20,6 @@ from application.workflow.status import Status
 from application.workflow.tools import Reasoning
 from common.utils.count_tokens import count_local_tokens
 from common.exception.app_exception import AppApiException
-from knowledge.models import File
 from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
@@ -374,9 +374,8 @@ class VideoUnderstandNode(INode):
                 )
         return HumanMessage(content=chat_record.problem_text)
 
-    @staticmethod
-    def _file_id_to_base64(file_id: str, video_model):
-        file = QuerySet(File).filter(id=file_id).first()
+    def _file_id_to_base64(self, file_id: str, video_model):
+        file = get_authorized_file(file_id, self.get_workflow_parameters())
         file_bytes = file.get_bytes()
         return video_model.upload_file_and_get_url(file_bytes, file.file_name)
 
@@ -388,7 +387,7 @@ class VideoUnderstandNode(INode):
             for v in video:
                 if "file_id" in v:
                     file_id = v["file_id"]
-                    file = QuerySet(File).filter(id=file_id).first()
+                    file = get_authorized_file(file_id, self.get_workflow_parameters())
                     url = video_model.upload_file_and_get_url(file.get_bytes(), file.file_name)
                     videos.append({"type": "video_url", "video_url": {"url": url}})
                 elif "url" in v and v["url"].startswith("http"):

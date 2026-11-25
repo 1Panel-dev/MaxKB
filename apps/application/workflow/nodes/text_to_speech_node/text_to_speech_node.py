@@ -17,16 +17,15 @@ from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.content_type import ContentType
+from application.workflow.file_access import save_generated_file
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from common.exception.app_exception import AppApiException
 from common.utils.common import _remove_empty_lines
-from knowledge.models import FileSourceType
 from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id
-from oss.serializers.file import FileSerializer
 
 
 class TextToSpeechNodeSerializer(serializers.Serializer):
@@ -172,46 +171,7 @@ class TextToSpeechNode(INode):
         return await asyncio.to_thread(process)
 
     def _upload_file(self, file, workflow_params, workflow_type):
-        if workflow_type == WorkflowType.KNOWLEDGE:
-            return self._upload_knowledge_file(file, workflow_params)
-        if workflow_type == WorkflowType.TOOL:
-            return self._upload_tool_file(file, workflow_params)
-        return self._upload_application_file(file, workflow_params)
-
-    def _upload_knowledge_file(self, file, workflow_params):
-        knowledge_id = workflow_params.get("knowledge_id")
-        return FileSerializer(
-            data={
-                "file": file,
-                "meta": {"debug": False, "knowledge_id": knowledge_id},
-                "source_id": knowledge_id,
-                "source_type": FileSourceType.KNOWLEDGE.value,
-            }
-        ).upload()
-
-    def _upload_tool_file(self, file, workflow_params):
-        tool_id = workflow_params.get("tool_id")
-        return FileSerializer(
-            data={
-                "file": file,
-                "meta": {"debug": False, "tool_id": tool_id},
-                "source_id": tool_id,
-                "source_type": FileSourceType.TOOL.value,
-            }
-        ).upload()
-
-    def _upload_application_file(self, file, workflow_params):
-        application_id = workflow_params.get("application_id")
-        chat_id = workflow_params.get("chat_id")
-        chat_user_id = workflow_params.get("chat_user_id")
-        return FileSerializer(
-            data={
-                "file": file,
-                "meta": {"debug": False, "chat_id": chat_id, "application_id": application_id, "user_id": chat_user_id},
-                "source_id": chat_id,
-                "source_type": FileSourceType.CHAT.value,
-            }
-        ).upload()
+        return save_generated_file(file, workflow_params)
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)

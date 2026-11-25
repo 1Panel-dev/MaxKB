@@ -41,6 +41,7 @@ from chat.serializers.chat_history import ChatHistory
 from application.workflow.common import WorkflowType, new_instance
 from application.workflow.message.aggregator import AggregationManager
 from application.workflow.message.struct.failure_content import FailureContent
+from application.workflow.file_access import root_context
 from application.workflow.message_queue import get_message_queue
 from application.workflow.nodes import get_start_node
 from application.workflow.nodes.start_node.start_node import get_default_global_variable
@@ -320,6 +321,9 @@ class ChatSerializers(serializers.Serializer):
         parameters = {
             "workflow_user_id": chat_user_id if debug else application.publish_user_id,
             "retrieval_identity": identity_from_server(chat_user_id, chat_user_type, debug),
+            **root_context(
+                chat_user_type, chat_user_id, WorkflowType.APPLICATION, self.data.get("application_id"), chat_id
+            ),
             "history_chat_record": history_chat_record,
             "question": message,
             "chat_id": chat_id,

@@ -71,11 +71,14 @@ class WorkflowExcelSplitTests(SimpleTestCase):
         with (
             patch("application.workflow.nodes.document_extract_node.document_extract_node.QuerySet") as query_set,
             patch(
+                "application.workflow.nodes.document_extract_node.document_extract_node.get_authorized_file",
+                return_value=file,
+            ),
+            patch(
                 "application.workflow.nodes.document_extract_node.document_extract_node.File.save", autospec=True
             ) as save_file,
             patch("common.handle.impl.table.xlsx_parse_table_handle.xlsx_embed_cells_images", return_value={}),
         ):
-            query_set.return_value.filter.return_value.first.return_value = file
             query_set.return_value.filter.return_value.exists.return_value = False
             node.execute()
         self.saved_files = [call.args for call in save_file.call_args_list]

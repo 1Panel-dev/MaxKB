@@ -19,7 +19,9 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
 
+from application.models import ChatUserType
 from application.workflow.common import WorkflowType, new_instance
+from application.workflow.file_access import root_context
 from application.workflow.i_node import Signal
 from application.workflow.nodes import get_node_class
 from system_manage.services.resource_mapping import save_workflow_mapping
@@ -403,6 +405,9 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             "workflow_source": workflow_source_meta(work_flow, instance),
             "sync_log_id": str(sync_log_id) if sync_log_id else None,
             "workflow_sync_document": sync_document,
+            **root_context(
+                ChatUserType.SYSTEM_USER.value, user.id, WorkflowType.KNOWLEDGE, self.data.get("knowledge_id")
+            ),
         }
         if sync_document is not None:
             # A child URL must retain the source scope and identity of the selected stable document.

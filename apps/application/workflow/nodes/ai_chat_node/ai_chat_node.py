@@ -26,6 +26,7 @@ from langchain_core.messages import (
 from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
+from application.workflow.file_access import get_authorized_file
 from application.workflow.i_node import INode
 from application.workflow.message.aggregator import AggregationManager
 from application.workflow.message.struct.content import NodeInfo, Position, Content
@@ -47,7 +48,6 @@ from common.utils.logger import maxkb_logger
 from common.utils.messages_util import to_ai_message_list, to_human_message_list
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
-from knowledge.models import File
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
 from common.exception.app_exception import AppApiException
@@ -215,7 +215,8 @@ def _get_history_message(history_chat_record, dialogue_number, dialogue_type, ru
     return history_message
 
 
-def _process_images(image):
+def _process_images(image, load_file):
+    """load_file(file_id) 必须经过工作流文件鉴权,见 application.workflow.file_access.get_authorized_file"""
     images = []
     image_list = []
     if isinstance(image, str) and image.startswith("http"):
@@ -224,10 +225,7 @@ def _process_images(image):
     elif image is not None and len(image) > 0:
         for img in image:
             if "file_id" in img:
-                file_id = img["file_id"]
-                file = QuerySet(File).filter(id=file_id).first()
-                if file is None:
-                    continue
+                file = load_file(img["file_id"])
                 image_list.append({"url": f"./oss/file/{file.id}"})
                 image_bytes = file.get_bytes()
                 base64_image = base64.b64encode(image_bytes).decode("utf-8")
@@ -241,7 +239,7 @@ def _process_images(image):
     return images, image_list
 
 
-def _process_videos(video, video_model):
+def _process_videos(video, video_model, load_file):
     videos = []
     video_list = []
     if isinstance(video, str) and video.startswith("http"):
@@ -250,10 +248,7 @@ def _process_videos(video, video_model):
     elif video is not None and len(video) > 0:
         for v in video:
             if "file_id" in v:
-                file_id = v["file_id"]
-                file = QuerySet(File).filter(id=file_id).first()
-                if file is None:
-                    continue
+                file = load_file(v["file_id"])
                 video_list.append({"url": f"./oss/file/{file.id}"})
                 url = video_model.upload_file_and_get_url(file.get_bytes(), file.file_name)
                 videos.append({"type": "video_url", "video_url": {"url": url}})
@@ -461,6 +456,9 @@ class AIChatNode(INode):
                 r = chat_model.invoke(message_list_with_system)
                 self._invoke_response(r, text_content_id)
 
+    def _load_file(self, file_id):
+        return get_authorized_file(file_id, self.get_workflow_parameters())
+
     def _generate_prompt_question(self, question_str, model, vision, image_list, video_list):
         images = []
         _image_list = []
@@ -469,10 +467,10 @@ class AIChatNode(INode):
         if vision:
             if image_list:
                 image = self.workflow_manage.get_reference_field(image_list[0], image_list[1:])
-                images, _image_list = _process_images(image)
+                images, _image_list = _process_images(image, self._load_file)
             if video_list:
                 video = self.workflow_manage.get_reference_field(video_list[0], video_list[1:])
-                videos, _video_list = _process_videos(video, model)
+                videos, _video_list = _process_videos(video, model, self._load_file)
         self.data["image_list"] = _image_list
         self.data["video_list"] = _video_list
         return HumanMessage(content=[*videos, *images, {"type": "text", "text": question_str}])

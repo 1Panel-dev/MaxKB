@@ -16,13 +16,13 @@ from rest_framework import serializers
 
 from application.workflow.common import AsyncRunner, WorkflowType
 from application.workflow.content_type import ContentType
+from application.workflow.file_access import get_authorized_file
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 from common.utils.common import split_and_transcribe, any_to_mp3
 from common.exception.app_exception import AppApiException
-from knowledge.models import File
 from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
@@ -47,8 +47,7 @@ class SpeechToTextNodeSerializer(serializers.Serializer):
             raise AppApiException(500, _("The model of the node does not exist"))
 
 
-def _process_audio_item(audio_item, model):
-    file = QuerySet(File).filter(id=audio_item["file_id"]).first()
+def _process_audio_item(file, model):
     file_format = file.file_name.split(".")[-1]
     with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as temp_file:
         temp_file.write(file.get_bytes())
@@ -64,9 +63,9 @@ def _process_audio_item(audio_item, model):
         os.remove(temp_mp3_path)
 
 
-def _process_audio_items(audio_list, model):
+def _process_audio_items(file_list, model):
     with ThreadPoolExecutor(max_workers=5) as executor:
-        results = list(executor.map(lambda item: _process_audio_item(item, model), audio_list))
+        results = list(executor.map(lambda file: _process_audio_item(file, model), file_list))
     return results
 
 
@@ -128,9 +127,10 @@ class SpeechToTextNode(INode):
         stt_model = get_model_instance_by_model_workspace_id(stt_model_id, workspace_id, **(model_params_setting or {}))
 
         self.data["audio_list"] = audio_list
+        file_list = [get_authorized_file(audio["file_id"], workflow_params) for audio in audio_list]
 
         self._check_cancelled()
-        result = self.async_runner.run_async(lambda: self._await_process(audio_list, stt_model))
+        result = self.async_runner.run_async(lambda: self._await_process(file_list, stt_model))
         content = []
         result_content = []
         for item in result:
@@ -146,8 +146,8 @@ class SpeechToTextNode(INode):
         node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
         self.write(TextContent(self.get_node_id(), answer, Status.SUCCESS, node_info, Position(self.get_node_id())))
 
-    async def _await_process(self, audio_list, stt_model):
-        return await asyncio.to_thread(_process_audio_items, audio_list, stt_model)
+    async def _await_process(self, file_list, stt_model):
+        return await asyncio.to_thread(_process_audio_items, file_list, stt_model)
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
