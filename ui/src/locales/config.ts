@@ -85,9 +85,9 @@ export function resolveSupportedLocale(language: string | null | undefined): Loc
   return LOCALE_OPTIONS.find(({ value }) => value.toLowerCase() === locale.toLowerCase())?.value ?? DEFAULT_LOCALE
 }
 
-/** Markdown 编辑器没有对应语言包时使用英文。 */
+/** Markdown 编辑器没有对应语言包时使用默认语言。 */
 export function getMarkdownLocale(language: string | null | undefined): string {
-  return MARKDOWN_LOCALES[normalizeLocale(language)] ?? 'en-US'
+  return MARKDOWN_LOCALES[normalizeLocale(language)] ?? DEFAULT_LOCALE
 }
 
 /** 优先读取本地偏好，其次使用浏览器语言，最终回退简体中文。 */
