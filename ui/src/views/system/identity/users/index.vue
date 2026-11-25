@@ -260,8 +260,9 @@ onMounted(() => loadSystemUsers())
             <div class="flex-align-center">
               <!-- 修改状态 -->
               <el-switch
+                v-if="perm.system.user.edit()"
                 v-model="row.is_active"
-                :disabled="row.role === ROLE_TYPE.ADMIN || row.id === user.userInfo?.id || !perm.system.user.edit()"
+                :disabled="row.role === ROLE_TYPE.ADMIN || row.id === user.userInfo?.id"
                 :before-change="() => handleChangeStatus(row)"
                 size="small"
               />
