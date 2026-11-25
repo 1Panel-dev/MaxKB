@@ -8782,6 +8782,14 @@ msgstr ""
 msgid "No permission for the target folder"
 msgstr ""
 
+#: apps/folders/serializers/folder.py:220
+msgid "A node may not be made a child of itself."
+msgstr ""
+
+#: apps/folders/serializers/folder.py:222
+msgid "A node may not be made a child of any of its descendants."
+msgstr ""
+
 msgid "Application token usage statistics"
 msgstr "Agent token usage statistics"
 

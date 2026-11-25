@@ -600,6 +600,9 @@ const DocumentRouter = {
                   PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(
                     to ? to.params.id : '',
                   ),
+                  PermissionConst.KNOWLEDGE_READ.getKnowledgeWorkspaceResourcePermission(
+                    to ? to.params.id : '',
+                  ),
                 ],
                 [],
                 'AND',
