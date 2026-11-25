@@ -44,15 +44,18 @@ class FileDeleteTests(SimpleTestCase):
             with self.subTest(owner=owner):
                 self.file.meta = {"user_id": owner}
                 with self.assertRaises(AppUnauthorizedFailed):
-                    FileSerializer.Operate(data={"id": self.file_id}).delete(user_id=self.user_id)
+                    FileSerializer.Operate(data={"id": self.file_id}).delete(
+                        SimpleNamespace(user=SimpleNamespace(id=self.user_id))
+                    )
         self.file.delete.assert_not_called()
 
-    def test_nontemporary_file_keeps_existing_resource_authorization(self):
+    def test_resource_delete_checks_write_authority_of_the_api_caller(self):
         self.file.source_type = FileSourceType.DOCUMENT
-        with patch("oss.serializers.file.auth", side_effect=AppUnauthorizedFailed(403, "denied")) as authorize:
+        request = SimpleNamespace(user=SimpleNamespace(id=self.user_id))
+        with patch(
+            "oss.serializers.file.authorize_file_delete", side_effect=AppUnauthorizedFailed(403, "denied")
+        ) as authorize:
             with self.assertRaises(AppUnauthorizedFailed):
-                FileSerializer.Operate(data={"id": self.file_id}).delete(
-                    mk_file_auth="file-token", user_id=self.user_id
-                )
-        authorize.assert_called_once_with(self.file, "file-token", allow_content_read=False)
+                FileSerializer.Operate(data={"id": self.file_id}).delete(request)
+        authorize.assert_called_once_with(self.file, request)
         self.file.delete.assert_not_called()

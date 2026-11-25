@@ -194,6 +194,52 @@ def _knowledge_id_for_file_source(source_type, source_id):
     return None
 
 
+def authorize_file_delete(file, request):
+    if file.source_type == FileSourceType.TOOL:
+        resource = Tool.objects.filter(id=file.source_id).first()
+        kind, permission = "tool", PermissionConstants.TOOL_EDIT
+    elif file.source_type in (FileSourceType.APPLICATION, FileSourceType.CHAT):
+        if file.source_type == FileSourceType.CHAT:
+            if str((file.meta or {}).get("user_id")) == str(request.user.id):
+                return
+            resource = Application.objects.filter(chat__id=file.source_id).first()
+        else:
+            resource = Application.objects.filter(id=file.source_id).first()
+        kind, permission = "application", PermissionConstants.APPLICATION_EDIT
+    elif file.source_type in (FileSourceType.DOCUMENT, FileSourceType.PARAGRAPH, FileSourceType.KNOWLEDGE):
+        knowledge_id = _knowledge_id_for_file_source(file.source_type, file.source_id)
+        resource = Knowledge.objects.filter(id=knowledge_id).first()
+        kind = "knowledge"
+        permission = PermissionConstants.KNOWLEDGE_EDIT
+        if file.source_type != FileSourceType.KNOWLEDGE:
+            (content_read,) = _knowledge_content_read_permissions(file) or (None,)
+            if content_read is None:
+                _deny()
+            permission = (
+                PermissionConstants.KNOWLEDGE_IMAGE_DELETE
+                if content_read == PermissionConstants.KNOWLEDGE_IMAGE_READ.value
+                else PermissionConstants.KNOWLEDGE_DOCUMENT_DELETE
+            )
+    else:
+        if not get_is_permissions(request)(RoleConstants.ADMIN):
+            _deny()
+        return
+    if resource is None:
+        _deny()
+    check = get_is_permissions(request, workspace_id=resource.workspace_id, **{f"{kind}_id": str(resource.id)})
+    if getattr(resource, "scope", None) == "SHARED":
+        allowed = check(RoleConstants.ADMIN, PermissionConstants[f"SHARED_{permission.name}"])
+    else:
+        allowed = check(
+            RoleConstants.ADMIN,
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            getattr(permission, f"get_workspace_{kind}_permission")(),
+            permission.get_workspace_permission_workspace_manage_role(),
+        )
+    if not allowed:
+        _deny()
+
+
 def parse_file_token(mk_file_auth):
     if str(mk_file_auth).startswith("application-") or str(mk_file_auth).startswith("agent-"):
         # 如果是应用的key访问的话 那么就是能访问整个应用的文件 暂定
@@ -609,7 +655,7 @@ class FileSerializer(serializers.Serializer):
                 response["Content-Disposition"] = f"inline; filename={encoded_filename}"
                 return response
 
-        def delete(self, mk_file_auth=None, user_id=None):
+        def delete(self, request):
             self.is_valid(raise_exception=True)
             file_id = self.data.get("id")
             file = QuerySet(File).filter(id=file_id).first()
@@ -620,10 +666,10 @@ class FileSerializer(serializers.Serializer):
                     FileSourceType.TEMPORARY_1_DAY,
                 ):
                     # 上传取消使用已认证用户，公开预览权限不等于删除权限。
-                    if user_id is None or str((file.meta or {}).get("user_id")) != str(user_id):
+                    if str((file.meta or {}).get("user_id")) != str(request.user.id):
                         _deny()
                 else:
-                    auth(file, mk_file_auth, allow_content_read=False)
+                    authorize_file_delete(file, request)
                 file.delete()
             return True
 
