@@ -4615,6 +4615,14 @@ msgstr "Folder does not exist"
 msgid "No permission for the target folder"
 msgstr "No permission for the target folder"
 
+#: apps/folders/serializers/folder.py:256
+msgid "A node may not be made a child of itself."
+msgstr "A node may not be made a child of itself."
+
+#: apps/folders/serializers/folder.py:258
+msgid "A node may not be made a child of any of its descendants."
+msgstr "A node may not be made a child of any of its descendants."
+
 #: apps/folders/serializers/folder.py:285
 msgid "Cannot delete root folder"
 msgstr "Cannot delete root folder"

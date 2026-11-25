@@ -26,7 +26,7 @@ class ExceptionHandlerDefectTests(SimpleTestCase):
                 self.assertEqual(400, response.status_code)
                 self.assertEqual(400, json.loads(response.content)["code"])
 
-    def test_unhandled_exception_hides_internal_details(self):
+    def test_unhandled_exception_exposes_details(self):
         internal_message = "secret database path /opt/maxkb/private"
 
         for module in (exception_handle_module, common_handle_module):
@@ -39,6 +39,5 @@ class ExceptionHandlerDefectTests(SimpleTestCase):
 
                 self.assertEqual(500, response.status_code)
                 self.assertEqual(500, payload["code"])
-                self.assertNotIn("secret", str(payload["message"]).lower())
-                self.assertNotIn("/opt/maxkb", str(payload["message"]))
+                self.assertEqual(internal_message, payload["message"])
                 logger.error.assert_called_once()

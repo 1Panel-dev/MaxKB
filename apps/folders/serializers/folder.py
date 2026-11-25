@@ -252,6 +252,11 @@ class FolderSerializer(serializers.Serializer):
                 and current_id != current_node.workspace_id
                 and current_node.parent_id != parent_id
             ):
+                if parent_id == current_id:
+                    raise AppApiException(500, _("A node may not be made a child of itself."))
+                if current_node.get_descendants().filter(id=parent_id).exists():
+                    raise AppApiException(500, _("A node may not be made a child of any of its descendants."))
+
                 source_type = self.data.get("source")
                 if (
                     parent_id == current_node.workspace_id
