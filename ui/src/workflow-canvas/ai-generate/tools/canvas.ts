@@ -2,7 +2,7 @@ import { nextTick, reactive } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { ModelConfig } from '@/api/types'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
-import type { ShapeItem, WorkflowNodeField } from '@/workflow-canvas/types'
+import type { ShapeItem } from '@/workflow-canvas/types'
 import type LogicFlow from '@logicflow/core'
 import type { BaseNodeModel, Model } from '@logicflow/core'
 import { getMenuNodes } from '@/workflow-canvas/node-menu/menu'
@@ -253,10 +253,7 @@ export interface FieldOptionGroup {
 export function getFieldOptions(lf: LogicFlow, nodeId: string): FieldOptionGroup[] {
   const node = getNode(lf, nodeId)
   if (!node) return []
-  const graphModel = lf.graphModel as LogicFlow['graphModel'] & {
-    getUpNodeFieldList?: (containSelf: boolean, useCache: boolean) => WorkflowNodeField[]
-  }
-  const groups = [...node.getUpNodeFieldList(false, false), ...(graphModel.getUpNodeFieldList?.(false, false) ?? [])]
+  const groups = node.getUpNodeFieldList(false, false)
   const seen = new Set<string>()
   return groups
     .filter((group) => group.children?.length && !seen.has(group.value) && seen.add(group.value))

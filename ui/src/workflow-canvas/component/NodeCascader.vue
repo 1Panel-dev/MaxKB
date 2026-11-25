@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import { useFormItem } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
@@ -7,14 +7,11 @@ import type { WorkflowNodeField } from '@/workflow-canvas/types'
 import type { BaseNodeModel } from '@logicflow/core'
 import type { CascaderInstance } from 'element-plus'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
-import { WorkflowMode } from '@/workflow-canvas/types'
 import { iconComponent } from '../icons/utils'
 
 defineOptions({ name: 'WorkflowNodeCascader', inheritAttrs: false })
 
 const { t } = useI18n({ useScope: 'global' })
-
-type WorkflowGraphModel = WorkflowNodeModel['graphModel'] & { getUpNodeFieldList?: (containSelf: boolean, useCache: boolean) => WorkflowNodeField[] }
 
 const props = withDefaults(defineProps<{ global?: boolean; modelValue: string[]; nodeModel: BaseNodeModel; validateEvent?: boolean }>(), {
   global: false,
@@ -24,7 +21,6 @@ const props = withDefaults(defineProps<{ global?: boolean; modelValue: string[];
 const emit = defineEmits<{ 'update:modelValue': [value: string[]] }>()
 const { formItem } = useFormItem()
 
-const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
 const options = ref<WorkflowNodeField[]>([])
 const cascaderRootRef = useTemplateRef<HTMLElement>('cascaderRootRef')
 const cascaderRef = useTemplateRef<CascaderInstance>('cascaderRef')
@@ -50,27 +46,10 @@ const selectedNodeField = computed(() => {
 })
 
 const getOptionsValue = () => {
-  if ([WorkflowMode.ApplicationLoop, WorkflowMode.KnowledgeLoop, WorkflowMode.ToolLoop].includes(workflowMode)) {
-    return props.global
-      ? getUpNodeFieldList(false, true).filter(
-          (field) => ['global', 'chat', 'output', 'loop'].includes(field.value) && Boolean(field.children?.length),
-        )
-      : getUpNodeFieldList(false, true).filter((field) => Boolean(field.children?.length))
-  } else {
-    return props.global
-      ? nodeModel.value
-          .getUpNodeFieldList(false, true)
-          .filter((field) => ['global', 'chat', 'output'].includes(field.value) && Boolean(field.children?.length))
-      : nodeModel.value.getUpNodeFieldList(false, true).filter((field) => Boolean(field.children?.length))
-  }
+  const fieldList = nodeModel.value.getUpNodeFieldList(false, true).filter((field) => Boolean(field.children?.length))
+  return props.global ? fieldList.filter((field) => ['global', 'chat', 'output', 'loop'].includes(field.value)) : fieldList
 }
 
-function getUpNodeFieldList(containSelf: boolean, useCache: boolean) {
-  const result = [...nodeModel.value.getUpNodeFieldList(containSelf, useCache)]
-  const graphModel = props.nodeModel.graphModel as WorkflowGraphModel
-  result.push(...(graphModel.getUpNodeFieldList?.(containSelf, useCache) ?? []))
-  return result.filter((field) => Boolean(field.children?.length))
-}
 function refreshOptions(visible = true) {
   if (visible) options.value = getOptionsValue()
 }
