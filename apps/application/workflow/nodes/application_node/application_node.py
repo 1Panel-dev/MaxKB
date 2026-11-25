@@ -20,6 +20,7 @@ from application.workflow.status import Status
 from application.workflow.workflow_manage import WorkflowManage, CallBack
 from chat.serializers.chat_history import ChatHistory
 from common.exception.app_exception import AppApiException
+from system_manage.services.chat_user_authorization import ensure_workflow_application_chat_user_authorized
 
 
 def string_to_uuid(input_str):
@@ -94,6 +95,8 @@ class ApplicationNode(INode):
             workflow_params.get("workspace_id"),
             {"application_ids": [application_id]},
         )
+
+        ensure_workflow_application_chat_user_authorized(application_id, workflow_params)
 
         # 解析用户问题
         question_address = node_params.get("question_reference_address") or []

@@ -53,6 +53,7 @@ def get_application_func(source_type, source_id, application, workflow_params, w
         from common.utils.thread_pool import await_complete_or_cancel
         from chat.serializers.chat import get_work_flow
         from chat.serializers.chat_history import ChatHistory
+        from system_manage.services.chat_user_authorization import ensure_workflow_application_chat_user_authorized
 
         question = str(message or "")
         chat_id = workflow_params.get("chat_id")
@@ -65,6 +66,8 @@ def get_application_func(source_type, source_id, application, workflow_params, w
         # 自引用守卫：子应用不能是当前应用本身
         if application_id == str(workflow_params.get("application_id") or ""):
             raise Exception("The sub application cannot use the current agent")
+
+        ensure_workflow_application_chat_user_authorized(application_id, workflow_params)
 
         # 派生子应用聊天 id（父对话 + 子应用稳定映射），与 application_node 一致
         current_chat_id = _application_string_to_uuid(str(chat_id) + application_id)
