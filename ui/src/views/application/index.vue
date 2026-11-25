@@ -314,6 +314,7 @@ function handleBatchDelete() {
                     :api="ApplicationApi"
                     :application="application"
                     @change="application.is_portal = $event"
+                    v-if="(!application.is_portal && perm.application.workspace.portalUp(application.id) && application.is_publish) || (application.is_portal && perm.application.workspace.portalDown(application.id))"
                   />
                   <!-- 导出 -->
                   <ExportApplicationAction
