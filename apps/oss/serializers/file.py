@@ -1,11 +1,13 @@
 # coding=utf-8
 import re
 import urllib
+from types import SimpleNamespace
 
 import uuid_utils.compat as uuid
 from django.db.models.functions import Cast
 
 from application.models import Application, ApplicationAccessToken, ChatShareLink, Chat
+from common.auth.authentication import get_is_permissions
 from common.auth.common import parse_token, SystemToken, ChatToken
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.auth.constants.operate_constants import Operate
@@ -42,6 +44,7 @@ from maxkb.const import CONFIG
 from rest_framework import serializers
 from system_manage.models import ChatUserApiKey, WorkspaceUserGroupResourcePermission, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping, ResourceType
+from tools.models import Tool, ToolScope, ToolType
 from tools.serializers.tool import UploadedFileField
 from users.models import User
 
@@ -220,6 +223,41 @@ def parse_file_token(mk_file_auth):
 
 
 def auth(file, mk_file_auth, *, allow_content_read=True):
+    if file.source_type == FileSourceType.TOOL or (file.meta or {}).get("skill_file"):
+        skill = Tool.objects.filter(tool_type=ToolType.SKILL, code=str(file.id)).first()
+        if skill is not None or (file.meta or {}).get("skill_file"):
+            if not mk_file_auth:
+                _deny()
+            token = parse_file_token(mk_file_auth)
+            if AuthenticationType(token.type) != AuthenticationType.SYSTEM_USER:
+                _deny()
+            user = User.objects.filter(id=token.id, is_active=True).first()
+            if user is None:
+                _deny()
+            if skill is None:
+                if file.source_type == FileSourceType.TOOL or str((file.meta or {}).get("user_id")) != str(user.id):
+                    _deny()
+            else:
+                request = SimpleNamespace(user=user, auth=get_auth(user))
+                check = get_is_permissions(request, tool_id=str(skill.id), workspace_id=skill.workspace_id)
+                if skill.scope == ToolScope.SHARED:
+                    allowed = check(
+                        RoleConstants.ADMIN,
+                        PermissionConstants.SHARED_TOOL_EDIT,
+                        PermissionConstants.SHARED_TOOL_EXPORT,
+                    )
+                else:
+                    allowed = check(
+                        RoleConstants.ADMIN,
+                        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                        PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
+                        PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
+                        PermissionConstants.TOOL_EXPORT.get_workspace_tool_permission(),
+                        PermissionConstants.TOOL_EXPORT.get_workspace_permission_workspace_manage_role(),
+                    )
+                if not allowed:
+                    _deny()
+            return
     if CONFIG.get("FILE_AUTH", "1") != "1":
         return
     # 公共/临时文件无需鉴权

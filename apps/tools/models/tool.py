@@ -1,5 +1,7 @@
 import uuid_utils.compat as uuid
 from django.db import models
+from django.db.models.signals import pre_delete, pre_save
+from django.dispatch import receiver
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
@@ -15,23 +17,23 @@ class ToolFolder(MPTTModel, AppModelMixin):
     desc = models.CharField(max_length=200, null=True, blank=True, verbose_name="描述")
     user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
-    parent = TreeForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True, related_name='children')
+    parent = TreeForeignKey("self", on_delete=models.DO_NOTHING, null=True, blank=True, related_name="children")
 
     class Meta:
         db_table = "tool_folder"
 
     class MPTTMeta:
-        order_insertion_by = ['name']
+        order_insertion_by = ["name"]
 
 
 class ToolScope(models.TextChoices):
-    SHARED = "SHARED", '共享'
+    SHARED = "SHARED", "共享"
     WORKSPACE = "WORKSPACE", "工作空间可用"
-    INTERNAL = "INTERNAL", '内置'
+    INTERNAL = "INTERNAL", "内置"
 
 
 class ToolType(models.TextChoices):
-    INTERNAL = "INTERNAL", '内置'
+    INTERNAL = "INTERNAL", "内置"
     CUSTOM = "CUSTOM", "自定义"
     SKILL = "SKILL", "技能"
     MCP = "MCP", "MCP工具"
@@ -40,10 +42,10 @@ class ToolType(models.TextChoices):
 
 
 class ToolTaskTypeChoices(models.TextChoices):
-    APPLICATION = 'APPLICATION'
-    KNOWLEDGE = 'KNOWLEDGE'
-    TOOL = 'TOOL'
-    TRIGGER = 'TRIGGER'
+    APPLICATION = "APPLICATION"
+    KNOWLEDGE = "KNOWLEDGE"
+    TOOL = "TOOL"
+    TRIGGER = "TRIGGER"
 
 
 class Tool(AppModelMixin):
@@ -56,12 +58,14 @@ class Tool(AppModelMixin):
     init_field_list = models.JSONField(verbose_name="启动字段列表", default=list)
     icon = models.CharField(max_length=256, verbose_name="工具库icon", default="")
     is_active = models.BooleanField(default=True, db_index=True)
-    scope = models.CharField(max_length=20, verbose_name='可用范围', choices=ToolScope.choices,
-                             default=ToolScope.WORKSPACE, db_index=True)
-    tool_type = models.CharField(max_length=20, verbose_name='工具类型', choices=ToolType.choices,
-                                 default=ToolType.CUSTOM, db_index=True)
+    scope = models.CharField(
+        max_length=20, verbose_name="可用范围", choices=ToolScope.choices, default=ToolScope.WORKSPACE, db_index=True
+    )
+    tool_type = models.CharField(
+        max_length=20, verbose_name="工具类型", choices=ToolType.choices, default=ToolType.CUSTOM, db_index=True
+    )
     template_id = models.CharField(max_length=128, verbose_name="模版id", null=True, default=None, db_index=True)
-    folder = models.ForeignKey(ToolFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default='default')
+    folder = models.ForeignKey(ToolFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default="default")
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
     init_params = models.CharField(max_length=102400, verbose_name="初始化参数", null=True)
     label = models.CharField(max_length=128, verbose_name="标签", null=True, db_index=True)
@@ -75,12 +79,46 @@ class ToolRecord(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     tool = models.ForeignKey(Tool, on_delete=models.SET_NULL, null=True)
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
-    source_type = models.CharField(verbose_name="触发器任务类型", choices=ToolTaskTypeChoices.choices,
-                                   default=ToolTaskTypeChoices.APPLICATION, max_length=256)
+    source_type = models.CharField(
+        verbose_name="触发器任务类型",
+        choices=ToolTaskTypeChoices.choices,
+        default=ToolTaskTypeChoices.APPLICATION,
+        max_length=256,
+    )
     source_id = models.UUIDField(verbose_name="资源id")
     meta = models.JSONField(default=dict, encoder=SystemEncoder)
-    state = models.CharField(verbose_name='状态', max_length=20, choices=State.choices, default=State.STARTED)
+    state = models.CharField(verbose_name="状态", max_length=20, choices=State.choices, default=State.STARTED)
     run_time = models.FloatField(verbose_name="运行时长", default=0)
 
     class Meta:
         db_table = "tool_record"
+
+
+def protect_skill_file(tool, using=None):
+    """Keep legacy packages private before their Tool reference is removed or replaced."""
+    if tool.tool_type != ToolType.SKILL:
+        return
+    from knowledge.models import File
+
+    try:
+        file_id = uuid.UUID(str(tool.code))
+    except (ValueError, TypeError, AttributeError):
+        return
+    files = File.objects.using(using or tool._state.db).filter(id=file_id)
+    file = files.first()
+    if file is not None and not file.meta.get("skill_file"):
+        files.update(meta={**file.meta, "skill_file": True})
+
+
+@receiver(pre_delete, sender=Tool)
+def protect_deleted_skill_file(sender, instance, using, **kwargs):
+    protect_skill_file(instance, using)
+
+
+@receiver(pre_save, sender=Tool)
+def protect_replaced_skill_file(sender, instance, using, raw=False, update_fields=None, **kwargs):
+    if raw or (update_fields is not None and not {"code", "tool_type"}.intersection(update_fields)):
+        return
+    previous = Tool.objects.using(using).filter(id=instance.id).only("code", "tool_type").first()
+    if previous is not None and (previous.code != instance.code or previous.tool_type != instance.tool_type):
+        protect_skill_file(previous, using)

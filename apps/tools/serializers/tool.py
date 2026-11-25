@@ -46,7 +46,7 @@ from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
-from tools.models import Tool, ToolFolder, ToolRecord, ToolScope, ToolType
+from tools.models import Tool, ToolFolder, ToolRecord, ToolScope, ToolType, protect_skill_file
 from tools.models.tool_workflow import ToolWorkflow
 from tools.serializers.tool_icon import delete_tool_icon, download_tool_icon
 from trigger.models import Trigger, TriggerTask
@@ -564,7 +564,7 @@ class ToolSerializer(serializers.Serializer):
                         sha256_hash=old_file.sha256_hash,
                         source_type=FileSourceType.TOOL,
                         source_id=tool_id,
-                        meta=old_file.meta,
+                        meta={**old_file.meta, "skill_file": True},
                     )
                     new_file.save(old_file.get_bytes())
                     # 更新工具的code为新的文件id
@@ -719,6 +719,8 @@ class ToolSerializer(serializers.Serializer):
                 edit_dict["init_params"] = rsa_long_encrypt(json.dumps(edit_dict["init_params"]))
 
             edit_dict["update_time"] = timezone.now()
+            if "code" in edit_dict and tool.code != edit_dict["code"]:
+                protect_skill_file(tool)
             QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).update(
                 **edit_dict
             )
@@ -736,6 +738,9 @@ class ToolSerializer(serializers.Serializer):
                 if old_file_id != file_id:
                     QuerySet(File).filter(id=old_file_id).delete()
                     QuerySet(File).filter(id=file_id).update(source_id=tool.id, source_type=FileSourceType.TOOL)
+                    skill_file = QuerySet(File).filter(id=file_id).first()
+                    if skill_file:
+                        QuerySet(File).filter(id=file_id).update(meta={**skill_file.meta, "skill_file": True})
 
             return self.one()
 
@@ -968,7 +973,7 @@ class ToolSerializer(serializers.Serializer):
                     file_name=f"{tool.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool.get("id"),
-                    meta={},
+                    meta={"skill_file": True},
                 )
                 skill_file.save(base64.b64decode(code))
                 tool["code"] = skill_file_id
@@ -1142,7 +1147,7 @@ class ToolSerializer(serializers.Serializer):
                     file_name=f"{tool.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool_id,
-                    meta={},
+                    meta={"skill_file": True},
                 )
                 skill_file.save(base64.b64decode(code))
                 code = skill_file_id
@@ -1371,7 +1376,7 @@ class ToolSerializer(serializers.Serializer):
                     file_name=f"{tool_data.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool_id,
-                    meta={},
+                    meta={"skill_file": True},
                 )
                 skill_file.save(base64.b64decode(tool_data.get("code")))
                 tool_data["code"] = skill_file_id
@@ -1450,7 +1455,7 @@ class ToolSerializer(serializers.Serializer):
                     file_name=f"{tool_data.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool.id,
-                    meta={},
+                    meta={"skill_file": True},
                 )
                 skill_file.save(base64.b64decode(tool_data.get("code")))
                 tool_data["code"] = skill_file_id
@@ -1600,7 +1605,11 @@ class ToolSerializer(serializers.Serializer):
             if not file.name.endswith(".zip"):
                 raise AppApiException(1001, _("Unsupported file format"))
             file_id = uuid.uuid7()
-            file = File(id=file_id, file_name=self.data.get("file").name, meta={})
+            file = File(
+                id=file_id,
+                file_name=self.data.get("file").name,
+                meta={"user_id": str(self.data.get("user_id")), "skill_file": True},
+            )
             file.save(self.data.get("file").read())
             return file_id
 
