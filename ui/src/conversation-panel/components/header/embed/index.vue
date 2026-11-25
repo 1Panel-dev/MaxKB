@@ -7,8 +7,10 @@ import { useMessageListStore } from '../../message-list/index'
 import { useShareLinkStoreOptional } from '../../message-list/share/index'
 import ExportAction from '../header-actions/export/ExportAction.vue'
 import HeaderActions from '../header-actions/index.vue'
+import { useStore } from '@/stores/chat'
 
 const { t } = useI18n({ useScope: 'global' })
+const { auth } = useStore()
 const { appInfo, leftSideOpen, toggleLeftSide, newConversation } = useConversationListStore()
 const showShare = useShowShare()
 const msgs = useMessageListStore()
@@ -24,18 +26,22 @@ const shareLink = useShareLinkStoreOptional()
       <MkTooltip :content="t('chat.actions.expandSidebar')">
         <!-- 展开左侧 -->
         <el-button text @click="toggleLeftSide()" class="mr-2">
-          <MkIcon name="icon_sidebar_outlined" :size="18" class="text-N900!" />
+          <MkIcon name="icon_sidebar_outlined" :size="18" :color="auth.authProfile?.custom_theme?.header_font_color || 'var(--mk-N900)'" />
         </el-button>
       </MkTooltip>
     </template>
     <ApplicationIcon :icon="appInfo?.icon" :size="24" class="shrink-0 mr-2" />
-    <h4 class="min-w-0 flex-1 truncate font-semibold" :title="appInfo?.name">
+    <h4
+      class="min-w-0 flex-1 truncate font-semibold"
+      :title="appInfo?.name"
+      :style="{ color: auth.authProfile?.custom_theme?.header_font_color || undefined }"
+    >
       {{ appInfo?.name }}
     </h4>
 
     <MkTooltip :content="t('chat.newChat')">
       <!-- 新建对话 -->
-      <el-button text @click="newConversation()">
+      <el-button text @click="newConversation()" class="mr-1" :color="auth.authProfile?.custom_theme?.header_font_color || 'var(--mk-N900)'">
         <MkIcon name="icon_new-chat_outlined" :size="18" />
       </el-button>
     </MkTooltip>
@@ -55,7 +61,7 @@ const shareLink = useShareLinkStoreOptional()
       <slot />
     </HeaderActions>
     <!-- 占位：嵌入脚本在 iframe 外层右上角叠加放大/还原与关闭按钮，保留与调试头部一致的两个按钮位置 -->
-    <el-button text tabindex="-1" class="invisible pointer-events-none">
+    <el-button text tabindex="-1" class="invisible pointer-events-none ml-1">
       <MkIcon name="icon_magnify_outlined" :size="18" />
     </el-button>
     <el-button text tabindex="-1" class="invisible pointer-events-none">
