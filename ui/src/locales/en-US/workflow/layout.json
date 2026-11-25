@@ -37,7 +37,7 @@
     "streamingUnavailableMessage": "Streaming completion is not supported in the current resource scope: {scope}"
   },
   "menu": {
-    "basicComponents": "Basic components",
+    "basicComponents": "Basic",
     "aiCapabilities": "AI capabilities",
     "businessLogic": "Business logic",
     "dataProcessing": "Data processing"

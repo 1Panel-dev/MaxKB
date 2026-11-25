@@ -1,7 +1,7 @@
 {
   "searchKnowledge": {
     "label": "知识库检索",
-    "description": "关联知识库，查找与问题相关的分段",
+    "description": "检索与问题相关的知识库分段",
     "image": {
       "label": "检索图片",
       "placeholder": "请选择检索图片"
@@ -13,7 +13,7 @@
   },
   "searchDocument": {
     "label": "文档标签检索",
-    "description": "从设定的检索范围中，根据文档标签检索出满足条件的文档",
+    "description": "按标签筛选出符合条件的文档",
     "searchMode": {
       "label": "检索设置",
       "auto": "自动",
@@ -27,12 +27,12 @@
   },
   "documentExtract": {
     "label": "文档内容提取",
-    "description": "解析输入文档，输出结构化文档内容",
+    "description": "解析文档并输出结构化内容",
     "content": "文档内容"
   },
   "reranker": {
     "label": "多路召回",
-    "description": "使用重排模型对多个知识库的检索结果进行二次召回",
+    "description": "重排多个知识库的检索结果",
     "content": {
       "label": "重排内容",
       "placeholder": "请选择重排内容",

@@ -52,12 +52,12 @@
   },
   "aiChat": {
     "label": "AI chat",
-    "description": "Chat with an AI model",
+    "description": "Generate multi-turn replies for conversations",
     "vision": "Vision"
   },
   "intent": {
-    "label": "Intent classification",
-    "description": "Match user questions to predefined intent categories",
+    "label": "Intent Recognition",
+    "description": "Classify the question and route to the matching branch",
     "categories": {
       "label": "Intent categories"
     },
@@ -127,16 +127,16 @@
     }
   },
   "imageUnderstand": {
-    "label": "Image analysis",
-    "description": "Identify objects and scenes in images to answer user questions"
+    "label": "Image Understanding",
+    "description": "Interpret images and output a description or answer"
   },
   "videoUnderstand": {
-    "label": "Video analysis",
-    "description": "Identify objects and scenes in videos to answer user questions"
+    "label": "Video Understanding",
+    "description": "Interpret videos and output a description or answer"
   },
   "questionOptimization": {
-    "label": "Question optimization",
-    "description": "Refine the current question using conversation history to better match knowledge segments",
+    "label": "Query Rewriting",
+    "description": "Rewrite the question with conversation history for better retrieval",
     "systemPrompt": {
       "defaultValue": "# Role\nYou are an expert in question optimization, skilled at accurately inferring user intent from context and refining users' questions.\n\n## Skills\n### Skill 1: Optimize questions\n2. Receive the user's question.\n3. Carefully analyze the meaning of the question based on context.\n4. Output the optimized question.\n\n## Constraints:\n - Return only the optimized question, without additional explanations or comments.\n - Ensure the optimized question accurately reflects the original intent without changing its meaning."
     },
@@ -144,7 +144,7 @@
   },
   "reply": {
     "label": "Specified reply",
-    "description": "Return the specified content, converting referenced variables to strings",
+    "description": "Reply with the specified content in the specified format",
     "format": {
       "label": "Reply format",
       "typeLabel": "Reply type",
@@ -161,8 +161,8 @@
     }
   },
   "condition": {
-    "label": "Condition",
-    "description": "Run different nodes based on conditions",
+    "label": "Conditional Branch",
+    "description": "Route to branches based on conditions",
     "branchName": "Branch name",
     "match": {
       "prefix": "Match",
@@ -178,7 +178,7 @@
   },
   "form": {
     "label": "Form collection",
-    "description": "Collect user information during a conversation and use the form data in subsequent steps",
+    "description": "Collect user information via a form",
     "content": {
       "label": "Form output content",
       "description": "Set the content this node outputs, using {form} as the placeholder for the form",

@@ -1,6 +1,6 @@
 {
   "llm": {
-    "description": "Call an AI model once, optionally providing tool definitions and receiving tool calls",
+    "description": "Generate content or tool calls in a single model call",
     "context": {
       "label": "Context",
       "description": "When enabled, the selected variable is included as context for this call. When disabled, the model replies using only the current input.",

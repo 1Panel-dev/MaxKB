@@ -8,7 +8,7 @@
   },
   "variableAggregation": {
     "label": "Variable aggregation",
-    "description": "Aggregate each group of variables using the configured strategy",
+    "description": "Merge variable groups into one output",
     "strategy": {
       "label": "Aggregation strategy",
       "requiredMessage": "Aggregation strategy is required",
@@ -28,7 +28,7 @@
   },
   "variableSplitting": {
     "label": "Variable splitting",
-    "description": "Parse and split JSON variables using JSON Path expressions",
+    "description": "Split JSON variables using JSON Path",
     "variables": {
       "label": "Split variables",
       "requiredMessage": "At least one split variable is required"
@@ -43,7 +43,7 @@
   },
   "parameterExtraction": {
     "label": "Parameter extraction",
-    "description": "Extract structured parameters using an AI model",
+    "description": "Extract structured parameters with a model",
     "parameters": {
       "label": "Parameters to extract",
       "requiredMessage": "At least one extraction parameter is required",

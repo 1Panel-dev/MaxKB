@@ -4,7 +4,7 @@
   },
   "mcp": {
     "label": "MCP 调用",
-    "description": "通过 SSE/Streamable HTTP 方式执行MCP服务中的工具",
+    "description": "调用 MCP 服务中的工具",
     "serverConfig": {
       "label": "MCP Server Config",
       "requiredMessage": "请先配置 MCP Server"
@@ -25,7 +25,7 @@
   },
   "customTool": {
     "label": "自定义工具",
-    "description": "通过执行自定义脚本，实现数据处理"
+    "description": "执行自定义脚本处理数据"
   },
   "tool": {
     "label": "工具节点"

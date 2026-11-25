@@ -52,12 +52,12 @@
   },
   "aiChat": {
     "label": "AI 对话",
-    "description": "与 AI 大模型进行对话",
+    "description": "基于多轮上下文生成回复",
     "vision": "视觉"
   },
   "intent": {
-    "label": "意图识别",
-    "description": "将用户问题与用户预设的意图分类进行匹配",
+    "label": "意图分类",
+    "description": "将问题归类到预设意图，进入对应分支",
     "categories": {
       "label": "意图分类"
     },
@@ -84,7 +84,7 @@
   },
   "imageGenerate": {
     "label": "图片生成",
-    "description": "根据提供的文本内容生成图片",
+    "description": "根据提示词生成图片",
     "model": {
       "label": "图片生成模型"
     },
@@ -128,15 +128,15 @@
   },
   "imageUnderstand": {
     "label": "图片理解",
-    "description": "识别出图片中的对象、场景等信息回答用户问题"
+    "description": "理解图片内容并输出描述或答案"
   },
   "videoUnderstand": {
     "label": "视频理解",
-    "description": "识别出视频中的对象、场景等信息回答用户问题"
+    "description": "理解视频内容并输出描述或答案"
   },
   "questionOptimization": {
-    "label": "问题优化",
-    "description": "根据历史聊天记录优化完善当前问题，更利于匹配知识库分段",
+    "label": "问题改写",
+    "description": "结合对话历史改写问题，提升检索效果",
     "systemPrompt": {
       "defaultValue": "# 角色\n你是一位问题优化大师，擅长根据上下文精准揣测用户意图，并对用户提出的问题进行优化。\n\n## 技能\n### 技能 1: 优化问题\n2. 接收用户输入的问题。\n3. 依据上下文仔细分析问题含义。\n4. 输出优化后的问题。\n\n## 限制:\n - 仅返回优化后的问题，不进行额外解释或说明。\n - 确保优化后的问题准确反映原始问题意图，不得改变原意。"
     },
@@ -144,7 +144,7 @@
   },
   "reply": {
     "label": "指定回复",
-    "description": "指定回复内容，引用变量会转换为字符串进行输出",
+    "description": "按指定格式回复指定内容",
     "format": {
       "label": "回复格式",
       "typeLabel": "回复类型",
@@ -161,8 +161,8 @@
     }
   },
   "condition": {
-    "label": "判断器",
-    "description": "根据不同条件执行不同的节点",
+    "label": "条件分支",
+    "description": "按条件进入对应分支",
     "branchName": "分支名称",
     "match": {
       "prefix": "符合以下",
@@ -178,7 +178,7 @@
   },
   "form": {
     "label": "表单收集",
-    "description": "在问答过程中用于收集用户信息，可以根据收集到表单数据执行后续流程",
+    "description": "通过表单收集用户信息",
     "content": {
       "label": "表单输出内容",
       "description": "设置执行该节点输出的内容，{form} 为表单的占位符",
