@@ -11,8 +11,8 @@ import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { normalizeLocale } from '@/locales/config'
 
 const { locale } = useI18n({ useScope: 'global' })
-const elementLocales = { 'zh-CN': zhCn, 'en-US': en, 'zh-Hant': zhTw }
-const elementLocale = computed(() => elementLocales[normalizeLocale(locale.value)])
+const elementLocales: Record<string, typeof zhCn> = { 'zh-CN': zhCn, 'en-US': en, 'zh-Hant': zhTw }
+const elementLocale = computed(() => elementLocales[normalizeLocale(locale.value)] ?? en)
 
 const tableConfig = { tooltipOptions: { showAfter: TOOLTIP_SHOW_DELAY } }
 </script>

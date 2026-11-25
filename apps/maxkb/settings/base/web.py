@@ -68,8 +68,16 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": ["common.auth.authenticate.AnonymousAuthentication"],
 }
-STATICFILES_DIRS = [(os.path.join(PROJECT_DIR, "ui", "dist"))]
 STATIC_ROOT = os.path.join(BASE_DIR.parent, "static")
+STATICFILES_DIRS = [(os.path.join(PROJECT_DIR, "ui", "dist"))]
+if DEBUG:
+    # runserver 的 staticfiles handler 不会进入 URLConf，开发期需让 finder 读取运行时部署的语言目录。
+    STATICFILES_DIRS.extend(
+        [
+            ("admin/locales", os.path.join(STATIC_ROOT, "admin", "locales")),
+            ("chat/locales", os.path.join(STATIC_ROOT, "chat", "locales")),
+        ]
+    )
 ROOT_URLCONF = "maxkb.urls"
 APPS_DIR = os.path.join(PROJECT_DIR, "apps")
 

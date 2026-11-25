@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type { Locale } from '@/locales/config'
@@ -9,7 +9,7 @@ import LoginApi from '@/api/admin/auth/login'
 import AboutDialog from './AboutDialog.vue'
 import ApiKeyDialog from './ApiKeyDialog.vue'
 import ChangePasswordDialog from './ChangePasswordDialog.vue'
-import { LOCALE_OPTIONS } from '@/locales/config'
+import { LOCALE_OPTIONS, resolveSupportedLocale } from '@/locales/config'
 import { useStore } from '@/stores'
 import perm from '@/permission/index.ts'
 
@@ -20,6 +20,7 @@ const { t } = useI18n({ useScope: 'global' })
 const isChangingLanguage = ref(false)
 const router = useRouter()
 const { auth, user, theme } = useStore()
+const currentLocale = computed(() => resolveSupportedLocale(user.language))
 
 // 保存账号偏好后同步界面，不刷新页面，避免丢失未保存内容。
 function handleChangeLanguage(language: Locale) {
@@ -120,7 +121,7 @@ function toUrl(url?: string) {
                     v-for="language in LOCALE_OPTIONS"
                     :key="language.value"
                     selectable
-                    :selected="user.language === language.value"
+                    :selected="currentLocale === language.value"
                     :disabled="isChangingLanguage"
                     @click="handleChangeLanguage(language.value)"
                   >
