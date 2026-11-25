@@ -4619,6 +4619,14 @@ msgstr "文件夹不存在"
 msgid "No permission for the target folder"
 msgstr "没有目标文件夹的权限"
 
+#: apps/folders/serializers/folder.py:256
+msgid "A node may not be made a child of itself."
+msgstr "节点无法指定自己成为自己的子节点"
+
+#: apps/folders/serializers/folder.py:258
+msgid "A node may not be made a child of any of its descendants."
+msgstr "节点无法指定自己成为子节点的子节点"
+
 #: apps/folders/serializers/folder.py:285
 msgid "Cannot delete root folder"
 msgstr "无法删除根文件夹"

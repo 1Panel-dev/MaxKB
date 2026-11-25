@@ -117,5 +117,5 @@ def handle_exception(exc, context):
         return result.error(exc.detail)
     if response is None:
         maxkb_logger.error(f"{str(exc)}:{traceback.format_exc()}")
-        return result.error(_("Unknown exception"), response_status=500)
+        return result.error(str(exc), response_status=500)
     return response

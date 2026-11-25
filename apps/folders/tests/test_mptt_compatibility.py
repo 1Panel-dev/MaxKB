@@ -4,8 +4,10 @@ from unittest.mock import patch
 from uuid import UUID
 
 from django.test import TestCase
+from django.utils import translation
 
 from application.models import ApplicationFolder
+from common.exception.app_exception import AppApiException
 from folders.serializers.folder import FolderSerializer, FolderTreeSerializer
 from knowledge.models import KnowledgeFolder
 from tools.models import ToolFolder
@@ -75,6 +77,20 @@ class FolderTreeCompatibilityTests(TestCase):
                 leaf.refresh_from_db()
                 self.assertEqual(list(leaf.get_ancestors().values_list("id", flat=True)), [root.id, right.id, left.id])
                 self.assert_valid_tree(model, root.workspace_id)
+
+    @patch("folders.serializers.folder.has_target_permission", return_value=True)
+    def test_serializer_rejects_moving_folder_to_its_descendant(self, _permission):
+        for source, model in self.folder_types:
+            with self.subTest(source=source):
+                root, left, _, leaf = self.make_tree(model)
+                with translation.override("zh_Hans"):
+                    with self.assertRaises(AppApiException) as context:
+                        self.operation(source, left).edit({"parent_id": leaf.id})
+
+                self.assertEqual(context.exception.code, 500)
+                self.assertEqual(str(context.exception.message), "节点无法指定自己成为子节点的子节点")
+                left.refresh_from_db()
+                self.assertEqual(left.parent_id, root.id)
 
     @patch("folders.serializers.folder.is_workspace_manage", return_value=False)
     @patch("folders.serializers.folder.has_target_permission", return_value=False)
