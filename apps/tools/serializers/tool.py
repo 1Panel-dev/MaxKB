@@ -26,6 +26,7 @@ from common.field.common import UploadedImageField
 from common.result import result
 from common.utils.common import bytes_to_uploaded_file, common_convert_value, generate_uuid, get_file_content
 from common.utils.file_reference import get_owned_upload
+from common.utils.workflow_reference import get_exportable_tools, validate_workflow_references
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
@@ -484,6 +485,8 @@ class ToolSerializer(serializers.Serializer):
                 if instance.get("tool_type") == ToolType.MCP:
                     ToolExecutor().validate_mcp_transport(instance.get("code", ""))
 
+            if instance.get("tool_type") == ToolType.WORKFLOW:
+                validate_workflow_references(instance.get("work_flow"), self.data["user_id"], self.data["workspace_id"])
             # 处理 work_flow_template
             if instance.get("work_flow_template") is not None:
                 template_instance = instance.get("work_flow_template")
@@ -795,7 +798,9 @@ class ToolSerializer(serializers.Serializer):
                         if k in password_fields and tool.init_params[k]:
                             tool.init_params[k] = encryption(tool.init_params[k])
             if tool.tool_type == "SKILL":
-                skill_file = QuerySet(File).filter(id=tool.code).first()
+                skill_file = (
+                    QuerySet(File).filter(id=tool.code, source_type=FileSourceType.TOOL, source_id=str(tool.id)).first()
+                )
                 skill_file_dict = (
                     {
                         "id": str(skill_file.id),
@@ -822,42 +827,25 @@ class ToolSerializer(serializers.Serializer):
             }
 
         def get_child_tool_list(self, work_flow, response):
-            from system_manage.services.resource_mapping import get_tool_id_list
-
-            tool_id_list = get_tool_id_list(work_flow, False)
-            tool_id_list = [
-                tool_id for tool_id in tool_id_list if len([r for r in response if r.get("id") == tool_id]) == 0
-            ]
-            tool_list = []
-            if len(tool_id_list) > 0:
-                tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
-                work_flow_tools = [tool for tool in tool_list if tool.tool_type == ToolType.WORKFLOW]
-                if len(work_flow_tools) > 0:
-                    work_flow_tool_dict = {
-                        tw.tool_id: tw
-                        for tw in QuerySet(ToolWorkflow).filter(tool_id__in=[t.id for t in work_flow_tools])
-                    }
-                    for tool in tool_list:
-                        if tool.tool_type == ToolType.WORKFLOW:
-                            response.append(
-                                {
-                                    **ToolExportModelSerializer(tool).data,
-                                    "work_flow": work_flow_tool_dict.get(tool.id).work_flow,
-                                }
-                            )
-                            self.get_child_tool_list(work_flow_tool_dict.get(tool.id).work_flow, response)
-                        else:
-                            response.append(ToolExportModelSerializer(tool).data)
-                else:
-                    for tool in tool_list:
-                        response.append(ToolExportModelSerializer(tool).data)
-                skill_tools = [tool for tool in tool_list if tool.tool_type == ToolType.SKILL]
-                for tool in skill_tools:
-                    skill_file = QuerySet(File).filter(id=tool.code).first()
-                    if skill_file:
-                        tool.code = base64.b64encode(skill_file.get_bytes()).decode("utf-8")
-                        response.append(ToolExportModelSerializer(tool).data)
-
+            tools = get_exportable_tools({"work_flow": work_flow}, self.data["workspace_id"], self.data.get("user_id"))
+            flows = {
+                row.tool_id: row.work_flow
+                for row in ToolWorkflow.objects.filter(
+                    tool_id__in=[tool.id for tool in tools if tool.tool_type == ToolType.WORKFLOW]
+                )
+            }
+            for tool in tools:
+                if tool.tool_type == ToolType.SKILL:
+                    archive = File.objects.filter(
+                        id=tool.code, source_type=FileSourceType.TOOL, source_id=str(tool.id)
+                    ).first()
+                    if archive is None:
+                        raise AppApiException(404, _("Skill file does not exist"))
+                    tool.code = base64.b64encode(archive.get_bytes()).decode("ascii")
+                item = dict(ToolExportModelSerializer(tool).data)
+                if tool.id in flows:
+                    item["work_flow"] = flows[tool.id]
+                response.append(item)
             return response
 
         def export(self):
@@ -868,7 +856,11 @@ class ToolSerializer(serializers.Serializer):
                 tool_dict = ToolExportModelSerializer(tool).data
                 # 如果是SKILL类型的工具，校验文件是否存在
                 if tool.tool_type == ToolType.SKILL:
-                    skill_file = QuerySet(File).filter(id=tool.code).first()
+                    skill_file = (
+                        QuerySet(File)
+                        .filter(id=tool.code, source_type=FileSourceType.TOOL, source_id=str(tool.id))
+                        .first()
+                    )
                     if skill_file:
                         tool_dict["code"] = base64.b64encode(skill_file.get_bytes()).decode("utf-8")
                 if tool.tool_type == ToolType.WORKFLOW:
@@ -1067,6 +1059,12 @@ class ToolSerializer(serializers.Serializer):
                 tool.get("work_flow"),
                 update_tool_map,
             )
+            created_ids = [item["id"] for item in tool_list]
+            validate_workflow_references(work_flow, user_id, workspace_id, created_ids)
+            for item in tool_list:
+                if item.get("tool_type") == ToolType.WORKFLOW:
+                    item["work_flow"] = self.to_tool_workflow(item["work_flow"], update_tool_map)
+                    validate_workflow_references(item["work_flow"], user_id, workspace_id, created_ids)
             QuerySet(ToolWorkflow).update_or_create(
                 tool_id=tool.get("id"),
                 create_defaults={
@@ -1081,10 +1079,7 @@ class ToolSerializer(serializers.Serializer):
             workflow_tool_model_list = [
                 {
                     "tool_id": t.get("id"),
-                    "workflow": self.to_tool_workflow(
-                        t.get("work_flow"),
-                        update_tool_map,
-                    ),
+                    "workflow": t["work_flow"],
                 }
                 for t in tool_list
                 if t.get("tool_type") == ToolType.WORKFLOW
@@ -1640,7 +1635,9 @@ class ToolSerializer(serializers.Serializer):
 
             if tool is None:
                 raise AppApiException(500, _("Tool does not exist"))
-            skill_file = QuerySet(File).filter(id=tool.code).first()
+            skill_file = (
+                QuerySet(File).filter(id=tool.code, source_type=FileSourceType.TOOL, source_id=str(tool.id)).first()
+            )
             if skill_file is None:
                 raise AppApiException(500, _("Skill file does not exist"))
 

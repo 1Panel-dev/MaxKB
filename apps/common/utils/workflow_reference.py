@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from common.auth.authentication import get_is_permissions
 from common.auth.constants.permission_constants import PermissionConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
-from tools.models import Tool, ToolScope
+from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
 from common.auth.constants.role_constants import RoleConstants
 from common.auth.handle.impl.user_token import get_auth
 from common.exception.app_exception import AppApiException
@@ -42,7 +42,7 @@ def get_authorized_tool_ids(user_id, workspace_id, tool_ids):
         return []
     tools = Tool.objects.filter(id__in=tool_ids)
     local = authorized_resource_ids(
-        tools.filter(scope=ToolScope.WORKSPACE), user_id, workspace_id, "tool", PermissionConstants.TOOL_READ
+        tools.exclude(scope=ToolScope.SHARED), user_id, workspace_id, "tool", PermissionConstants.TOOL_READ
     )
     authorize_shared = DatabaseModelManage.get_model("get_authorized_tool")
     if authorize_shared is None:
@@ -80,3 +80,26 @@ def validate_workflow_references(work_flow, user_id, workspace_id, created_ids=(
     bindings = {"work_flow": work_flow}
     require_workflow_tools(set(get_bound_tool_ids(bindings)) - set(map(str, created_ids)), user_id, workspace_id)
     validate_application_bindings(user_id, workspace_id, bindings)
+
+
+def get_exportable_tools(bindings, workspace_id, user_id):
+    """Expand only workspace tools the caller may export, once per tool."""
+    from application.serializers.application import get_bound_tool_ids
+
+    pending = set(get_bound_tool_ids(bindings))
+    visited = set()
+    result = []
+    while pending:
+        visited.update(pending)
+        tools = list(Tool.objects.filter(id__in=pending).exclude(scope=ToolScope.SHARED))
+        ids = [str(tool.id) for tool in tools]
+        if ids:
+            authorized = authorized_resource_ids(
+                Tool.objects.filter(id__in=ids), user_id, workspace_id, "tool", PermissionConstants.TOOL_EXPORT
+            )
+            require_authorized_ids(ids, authorized)
+        result.extend(tools)
+        child_ids = [tool.id for tool in tools if tool.tool_type == ToolType.WORKFLOW]
+        workflows = ToolWorkflow.objects.filter(tool_id__in=child_ids).values_list("work_flow", flat=True)
+        pending = {pk for flow in workflows for pk in get_bound_tool_ids({"work_flow": flow})} - visited
+    return result

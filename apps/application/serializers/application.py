@@ -1170,17 +1170,18 @@ class ApplicationOperateSerializer(serializers.Serializer):
                 self.is_valid()
             application_id = self.data.get("application_id")
             application = QuerySet(Application).filter(id=application_id).first()
-            from system_manage.services.resource_mapping import get_tool_id_list
+            from common.utils.workflow_reference import get_exportable_tools
 
-            tool_id_list = get_tool_id_list(application.work_flow, True)
-            if len(tool_id_list) > 0:
-                tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
-            else:
-                tool_list = (
-                    QuerySet(Tool)
-                    .filter(id__in=application.tool_ids + application.mcp_tool_ids + application.skill_tool_ids)
-                    .exclude(scope=ToolScope.SHARED)
-                )
+            bindings = (
+                {"work_flow": application.work_flow}
+                if application.type == ApplicationTypeChoices.WORK_FLOW
+                else {
+                    "tool_ids": application.tool_ids,
+                    "mcp_tool_ids": application.mcp_tool_ids,
+                    "skill_tool_ids": application.skill_tool_ids,
+                }
+            )
+            tool_list = get_exportable_tools(bindings, application.workspace_id, self.data["user_id"])
             tw_dict = {
                 tw.tool_id: tw
                 for tw in QuerySet(ToolWorkflow).filter(
@@ -1190,7 +1191,11 @@ class ApplicationOperateSerializer(serializers.Serializer):
             # 如果是技能工具，则需要将code字段转换为文件内容的base64字符串
             for tool in tool_list:
                 if tool.tool_type == ToolType.SKILL:
-                    skill_file = QuerySet(File).filter(id=tool.code).first()
+                    skill_file = (
+                        QuerySet(File)
+                        .filter(id=tool.code, source_type=FileSourceType.TOOL, source_id=str(tool.id))
+                        .first()
+                    )
                     if skill_file:
                         tool.code = base64.b64encode(skill_file.get_bytes()).decode("utf-8")
             application_dict = ApplicationSerializerModel(application).data

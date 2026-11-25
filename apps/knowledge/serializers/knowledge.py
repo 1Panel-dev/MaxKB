@@ -26,6 +26,7 @@ from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
 from common.utils.common import bulk_create_in_batches, get_file_content, parse_image, post
+from common.utils.workflow_reference import get_exportable_tools
 from common.utils.logger import maxkb_logger
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models, transaction
@@ -108,8 +109,7 @@ from knowledge.task.embedding import delete_embedding_by_knowledge, embedding_by
 from knowledge.task.generate import generate_related_by_knowledge_id
 from knowledge.task.sync import sync_replace_web_knowledge, sync_web_knowledge
 from knowledge.tasks import deploy_knowledge_sync_job, remove_knowledge_sync_job
-from system_manage.services.resource_mapping import get_tool_id_list
-from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
+from tools.models import ToolType, ToolWorkflow
 
 
 class KnowledgeBaseCreateRequest(serializers.Serializer):
@@ -823,10 +823,9 @@ class KnowledgeSerializer(serializers.Serializer):
                 if knowledge.type == KnowledgeType.WORKFLOW:
                     knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_id).first()
                     if knowledge_workflow:
-                        tool_id_list = get_tool_id_list(knowledge_workflow.work_flow, True)
-                        tool_list = []
-                        if len(tool_id_list) > 0:
-                            tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
+                        tool_list = get_exportable_tools(
+                            {"work_flow": knowledge_workflow.work_flow}, knowledge.workspace_id, self.data["user_id"]
+                        )
                         tw_dict = {
                             tw.tool_id: tw
                             for tw in QuerySet(ToolWorkflow).filter(
