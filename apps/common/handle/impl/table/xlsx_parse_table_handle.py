@@ -5,8 +5,8 @@ import traceback
 from openpyxl import load_workbook
 
 from common.handle.base_parse_table_handle import BaseParseTableHandle
-from common.handle.impl.common_handle import xlsx_embed_cells_images, validate_xlsx_buffer
-from common.handle.impl.xlsx_utils import iter_sheet_content_rows
+from common.handle.impl.common_handle import validate_xlsx_buffer
+from common.handle.impl.xlsx_utils import iter_sheet_content_rows, load_images, merged_row_values
 from common.utils.logger import maxkb_logger
 
 
@@ -17,12 +17,12 @@ class XlsxParseTableHandle(BaseParseTableHandle):
             return True
         return False
 
-    def fill_merged_cells(self, sheet, image_dict):
+    def fill_merged_cells(self, sheet, image_dict, drawings):
         data = []
 
         # 获取第一行作为标题行
         headers = []
-        rows = iter_sheet_content_rows(sheet)
+        rows = iter_sheet_content_rows(sheet, drawings=drawings)
         try:
             title_row = next(rows)
         except StopIteration:
@@ -35,26 +35,8 @@ class XlsxParseTableHandle(BaseParseTableHandle):
 
         # 从第二行开始遍历每一行
         for row in rows:
-            row_data = {}
-            for col_idx, cell in enumerate(row):
-                cell_value = cell.value
-
-                # 如果单元格为空，并且该单元格在合并单元格内，获取合并单元格的值
-                if cell_value is None:
-                    for merged_range in sheet.merged_cells.ranges:
-                        if cell.coordinate in merged_range:
-                            cell_value = sheet[merged_range.min_row][merged_range.min_col - 1].value
-                            break
-                if cell_value is None:
-                    cell_value = ""
-                image = image_dict.get(cell_value, None)
-                if image is not None:
-                    cell_value = f"![](./oss/file/{image.id})"
-
-                # 使用标题作为键，单元格的值作为值存入字典
-                row_data[headers[col_idx]] = cell_value
-            data.append(row_data)
-
+            values = merged_row_values(sheet, row, image_dict, drawings)
+            data.append({header: value if value is not None else "" for header, value in zip(headers, values)})
         return data
 
     def handle(self, file, get_buffer, save_image):
@@ -62,15 +44,12 @@ class XlsxParseTableHandle(BaseParseTableHandle):
         try:
             validate_xlsx_buffer(io.BytesIO(buffer))
             wb = load_workbook(io.BytesIO(buffer))
-            try:
-                image_dict: dict = xlsx_embed_cells_images(io.BytesIO(buffer), save_image)
-            except Exception:
-                image_dict = {}
+            image_dict, drawings = load_images(io.BytesIO(buffer), wb, save_image)
             result = []
             for sheetname in wb.sheetnames:
                 paragraphs = []
                 ws = wb[sheetname]
-                data = self.fill_merged_cells(ws, image_dict)
+                data = self.fill_merged_cells(ws, image_dict, drawings.get(sheetname, {}))
 
                 for row in data:
                     row_output = "; ".join([f"{key}: {value}" for key, value in row.items()])
@@ -87,17 +66,14 @@ class XlsxParseTableHandle(BaseParseTableHandle):
     def get_content(self, file, save_image):
         try:
             # 加载 Excel 文件
+            validate_xlsx_buffer(file)
             workbook = load_workbook(file)
-            try:
-                image_dict: dict = xlsx_embed_cells_images(file, save_image)
-            except Exception as e:
-                maxkb_logger.error(f"Exception: {e}")
-                image_dict = {}
+            image_dict, drawings = load_images(file, workbook, save_image)
             md_tables = ""
             # 遍历所有工作表
             for sheetname in workbook.sheetnames:
                 sheet = workbook[sheetname]
-                rows = self.fill_merged_cells(sheet, image_dict)
+                rows = self.fill_merged_cells(sheet, image_dict, drawings.get(sheetname, {}))
                 if len(rows) == 0:
                     continue
 
@@ -105,18 +81,14 @@ class XlsxParseTableHandle(BaseParseTableHandle):
                 md_tables += f"## {sheetname}\n\n"
 
                 # 提取表头和内容
-                headers = [f"{key}" for key, value in rows[0].items()]
+                headers = [str(key).replace("|", "&#124;").replace("\n", "<br>") for key in rows[0]]
 
                 # 构建 Markdown 表格
                 md_table = "| " + " | ".join(headers) + " |\n"
                 md_table += "| " + " | ".join(["---"] * len(headers)) + " |\n"
                 for row in rows:
-                    r = [f"{value}" for key, value in row.items()]
-                    md_table += (
-                        "| "
-                        + " | ".join([str(cell).replace("\n", "<br>") if cell is not None else "" for cell in r])
-                        + " |\n"
-                    )
+                    cells = [str(value).replace("|", "&#124;").replace("\n", "<br>") for value in row.values()]
+                    md_table += "| " + " | ".join(cells) + " |\n"
 
                 md_tables += md_table + "\n\n"
 

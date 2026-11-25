@@ -77,7 +77,6 @@ class WorkflowExcelSplitTests(SimpleTestCase):
             patch(
                 "application.workflow.nodes.document_extract_node.document_extract_node.File.save", autospec=True
             ) as save_file,
-            patch("common.handle.impl.table.xlsx_parse_table_handle.xlsx_embed_cells_images", return_value={}),
         ):
             query_set.return_value.filter.return_value.exists.return_value = False
             node.execute()
@@ -87,6 +86,7 @@ class WorkflowExcelSplitTests(SimpleTestCase):
 
     def split(self, documents, **parameters):
         node = DocumentSplitNode.__new__(DocumentSplitNode)
+        node.data = {}
         node.get_parameters = MagicMock(return_value={"document_list": ["extract", "document_list"], **parameters})
         node.get_workflow_parameters = MagicMock(return_value={"knowledge_id": "knowledge-id"})
         node.get_workflow_type = MagicMock(return_value=WorkflowType.KNOWLEDGE)
@@ -218,6 +218,30 @@ class WorkflowExcelSplitTests(SimpleTestCase):
                     self.assertEqual(paragraph["content"], f"{document['name']}回答")
                     self.assertEqual(paragraph["problem_list"], [f"{document['name']}问题"])
 
+    def test_qa_keeps_anchored_images_in_their_answer_cells(self):
+        sheet_book = openpyxl.Workbook()
+        sheet = sheet_book.active
+        sheet.title = "Questions"
+        sheet.append(["分段标题", "分段内容", "问题"])
+        png = b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aM1cAAAAASUVORK5CYII=")
+        for index in range(7):
+            sheet.append([f"Title {index}", "Caption | text" if index == 0 else None, f"Question {index}"])
+            sheet.add_image(openpyxl.drawing.image.Image(io.BytesIO(png)), f"B{index + 2}")
+        data = io.BytesIO()
+        sheet_book.save(data)
+
+        (document,) = self.split(self.extract_file("sheet.xlsx", data.getvalue()), split_strategy="qa")
+
+        self.assertEqual(document["name"], "Questions")
+        self.assertEqual(len(document["paragraphs"]), 7)
+        self.assertEqual(len(self.saved_files), 1)
+        image_file, _ = self.saved_files[0]
+        image_link = f"![](./oss/file/{image_file.id})"
+        for index, paragraph in enumerate(document["paragraphs"]):
+            self.assertEqual(paragraph["title"], f"Title {index}")
+            self.assertEqual(paragraph["content"], ("Caption | text<br>" if index == 0 else "") + image_link)
+            self.assertIn(f"Question {index}", paragraph["problem_list"])
+
     def test_single_sheet_name_matches_qa_including_filename_like_titles(self):
         for name in ("Sheet1", "http说明"):
             with self.subTest(sheet=name):
@@ -270,6 +294,8 @@ class WorkflowExcelDatabaseTests(TestCase):
                 workflow_parameters = {
                     "knowledge_id": str(knowledge.id),
                     "knowledge_action_id": str(uuid4()),
+                    "root_workflow_type": WorkflowType.KNOWLEDGE.value,
+                    "root_resource_id": str(knowledge.id),
                 }
                 extract = DocumentExtractNode.__new__(DocumentExtractNode)
                 extract.get_parameters = MagicMock(return_value={"document_list": ["source", "file_list"]})
@@ -281,13 +307,11 @@ class WorkflowExcelDatabaseTests(TestCase):
                 ]
                 extracted_context = {}
                 extract.write_context = extracted_context.__setitem__
-                with (
-                    patch.object(File, "get_bytes", return_value=payload),
-                    patch("common.handle.impl.table.xlsx_parse_table_handle.xlsx_embed_cells_images", return_value={}),
-                ):
+                with patch.object(File, "get_bytes", return_value=payload):
                     extract.execute()
 
                 split = DocumentSplitNode.__new__(DocumentSplitNode)
+                split.data = {}
                 split.get_parameters = MagicMock(
                     return_value={
                         "document_list": ["extract", "document_list"],

@@ -14,44 +14,11 @@ from typing import List
 from openpyxl import load_workbook
 
 from common.handle.base_split_handle import BaseSplitHandle
-from common.handle.impl.common_handle import read_xlsx_images, validate_xlsx_buffer
-from common.handle.impl.xlsx_utils import get_sheet_content_max_column, iter_sheet_content_rows
+from common.handle.impl.common_handle import validate_xlsx_buffer
+from common.handle.impl.xlsx_utils import cell_content, iter_sheet_content_rows, load_images, merged_row_values
 from common.utils.logger import maxkb_logger
 
 splitter = "\n`-----------------------------------`\n"
-
-
-def load_images(source, workbook, save_image):
-    if save_image is None:
-        return {}, {}
-    try:
-        return read_xlsx_images(source, workbook, save_image)
-    except Exception:
-        maxkb_logger.exception("Error processing embedded XLSX images")
-        return {}, {}
-
-
-def sheet_rows(sheet, drawings):
-    if not drawings:
-        yield from iter_sheet_content_rows(sheet)
-        return
-    last_row = sheet.max_row
-    width = max(get_sheet_content_max_column(sheet), max(column for row, column in drawings))
-    yield from sheet.iter_rows(max_row=last_row, max_col=width)
-    # A drawing can lie beyond the last data row. Only visit the additional rows that contain images.
-    for row in sorted({row for row, column in drawings if row > last_row}):
-        yield from sheet.iter_rows(min_row=row, max_row=row, max_col=width)
-
-
-def cell_content(value, formula_images, drawings):
-    formula_image = formula_images.get(value)
-    if formula_image is not None:
-        value = f"![](./oss/file/{formula_image.id})"
-    if drawings:
-        parts = [str(value)] if value is not None and value != "" else []
-        parts.extend(f"![](./oss/file/{image.id})" for image in drawings)
-        return "\n".join(parts)
-    return value
 
 
 def row_to_md(row, image_dict, drawings):
@@ -64,7 +31,7 @@ def row_to_md(row, image_dict, drawings):
 
 
 def handle_sheet(file_name, sheet, image_dict, limit: int, drawings):
-    rows = sheet_rows(sheet, drawings)
+    rows = iter_sheet_content_rows(sheet, drawings=drawings)
     paragraphs = []
     result = {"name": file_name, "content": paragraphs}
     title_row = next(rows, None)
@@ -94,16 +61,6 @@ def handle_sheet(file_name, sheet, image_dict, limit: int, drawings):
 
 
 class XlsxSplitHandle(BaseSplitHandle):
-    def merged_row_values(self, sheet, row, image_dict, drawings):
-        for cell in row:
-            value = cell.value
-            if value is None:
-                for merged_range in sheet.merged_cells.ranges:
-                    if cell.coordinate in merged_range:
-                        value = sheet.cell(merged_range.min_row, merged_range.min_col).value
-                        break
-            yield cell_content(value, image_dict, drawings.get((cell.row, cell.column)))
-
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
@@ -135,7 +92,7 @@ class XlsxSplitHandle(BaseSplitHandle):
             tables = []
             for sheet in workbook.worksheets:
                 sheet_drawings = drawings.get(sheet.title, {})
-                rows = sheet_rows(sheet, sheet_drawings)
+                rows = iter_sheet_content_rows(sheet, drawings=sheet_drawings)
                 header = next(rows, None)
                 if not header:
                     continue
@@ -145,7 +102,7 @@ class XlsxSplitHandle(BaseSplitHandle):
                     headers.append(" " * (idx + 1) if value is None else self._escape_cell_content(value))
                 lines = ["| " + " | ".join(headers) + " |", "| " + " | ".join(["---"] * len(header)) + " |"]
                 for row in rows:
-                    values = self.merged_row_values(sheet, row, image_dict, sheet_drawings)
+                    values = merged_row_values(sheet, row, image_dict, sheet_drawings)
                     lines.append("| " + " | ".join(self._escape_cell_content(value) for value in values) + " |")
                 if len(lines) > 2 or sheet_drawings:
                     tables.append(f"## {sheet.title}\n\n" + "\n".join(lines) + "\n\n\n")
