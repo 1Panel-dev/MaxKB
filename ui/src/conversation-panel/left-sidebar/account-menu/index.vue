@@ -95,7 +95,7 @@ const goLogin = () => {
           </div>
           <div class="mb-1 flex-align-center">
             <span class="mr-3">Tokens</span>
-            <span class="text-primary">{{ formatTokenNumber(account?.token_quota?.used_tokens ?? 0) }}</span>
+            <span class="font-medium">{{ formatTokenNumber(account?.token_quota?.used_tokens ?? 0) }}</span>
             <span class="text-N500">
               /{{
                 !account?.token_quota || account?.token_quota?.quota_type === QUOTA_TYPE.UNLIMITED
