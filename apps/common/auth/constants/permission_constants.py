@@ -1691,6 +1691,7 @@ class PermissionConstants(Enum):
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE, PermissionScopeConstants.WORKSPACE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
         ),
     )
 
@@ -1700,6 +1701,7 @@ class PermissionConstants(Enum):
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE, PermissionScopeConstants.WORKSPACE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
         ),
     )
 
@@ -1709,6 +1711,7 @@ class PermissionConstants(Enum):
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE, PermissionScopeConstants.WORKSPACE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
         ),
     )
 
@@ -1718,6 +1721,7 @@ class PermissionConstants(Enum):
             role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE, PermissionScopeConstants.WORKSPACE],
+            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
         ),
     )
 
