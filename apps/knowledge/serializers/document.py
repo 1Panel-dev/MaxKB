@@ -34,6 +34,7 @@ from common.handle.impl.text.xls_split_handle import XlsSplitHandle
 from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
 from common.handle.impl.text.zip_split_handle import ZipSplitHandle
 from common.utils.common import bulk_create_in_batches, get_file_content, parse_file_link, parse_image, post
+from common.utils.file_reference import validate_knowledge_source_file
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import flat_map
@@ -1677,12 +1678,13 @@ class DocumentSerializers(serializers.Serializer):
                 raise AppApiException(500, _("Knowledge id does not exist"))
 
         @staticmethod
-        def link_file(source_file_id, document_id):
+        def link_file(source_file_id, document_id, knowledge_id, user_id, validated_sources):
             if source_file_id is None:
                 return
             source_file = QuerySet(File).filter(id=source_file_id).select_for_update().first()
-            if source_file is None:
-                return
+            if str(source_file_id) not in validated_sources:
+                validate_knowledge_source_file(source_file, knowledge_id, user_id)
+                validated_sources.add(str(source_file_id))
             if source_file.source_type in (
                 FileSourceType.KNOWLEDGE,
                 FileSourceType.TEMPORARY_30_MINUTE,
@@ -1737,6 +1739,7 @@ class DocumentSerializers(serializers.Serializer):
             document_model_list = []
             paragraph_model_list = []
             problem_paragraph_object_list = []
+            validated_sources = set()
             # 插入文档
             for document in instance_list:
                 document_paragraph_dict_model = DocumentSerializers.Create.get_document_paragraph_model(
@@ -1744,7 +1747,13 @@ class DocumentSerializers(serializers.Serializer):
                 )
                 # 保存文档和文件的关系
                 document_instance = document_paragraph_dict_model.get("document")
-                linked_file_id = self.link_file(document.get("source_file_id"), document_instance.id)
+                linked_file_id = self.link_file(
+                    document.get("source_file_id"),
+                    document_instance.id,
+                    knowledge_id,
+                    self.data.get("user_id"),
+                    validated_sources,
+                )
                 if linked_file_id is not None:
                     document_instance.meta["source_file_id"] = str(linked_file_id)
                 document_model_list.append(document_instance)

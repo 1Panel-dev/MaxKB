@@ -33,6 +33,7 @@ from common.field.common import UploadedFileField
 from common.result import result
 from common.utils.common import bytes_to_uploaded_file
 from common.utils.common import restricted_loads, generate_uuid
+from common.utils.file_reference import bind_knowledge_uploads
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
@@ -55,7 +56,6 @@ from knowledge.models import (
 from knowledge.models.knowledge_action import KnowledgeAction, State
 from knowledge.serializers.common import update_resource_mapping_by_knowledge
 from knowledge.serializers.knowledge_model import KnowledgeModelSerializer
-from knowledge.services import validate_knowledge_file_size
 from knowledge.services.document_cleanup import delete_document_data
 from knowledge.services.sync_status import start_sync_heartbeat
 from knowledge.services.workflow_sync import (
@@ -320,8 +320,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
         data_source = instance.get("data_source") or {}
         file_ids = [item.get("file_id") for item in data_source.get("file_list") or [] if item.get("file_id")]
-        file_list = list(QuerySet(File).filter(id__in=file_ids)) if file_ids else []
-        validate_knowledge_file_size(knowledge, file_list)
+        bind_knowledge_uploads(file_ids, knowledge, user.id)
         knowledge_action_id = uuid.uuid7()
         meta = {"user_id": str(user.id), "user_name": user.username}
         if sync_document is not None:
@@ -364,15 +363,6 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             transaction.on_commit(launch)
         else:
             launch()
-        # 需要把文件改成永久文件
-        knowledge_id = str(self.data.get("knowledge_id"))
-        for file in file_list:
-            meta = dict(file.meta or {})
-            meta.update(debug=False, knowledge_id=knowledge_id)
-            file.source_type = FileSourceType.KNOWLEDGE.value
-            file.source_id = knowledge_id
-            file.meta = meta
-        QuerySet(File).bulk_update(file_list, ["source_type", "source_id", "meta"])
         return {
             "id": knowledge_action_id,
             "knowledge_id": self.data.get("knowledge_id"),
@@ -397,12 +387,12 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         最终状态由 on_complete 通过 finalize_knowledge_action 落库。
         """
         parameters = {
+            **instance,
             "knowledge_id": self.data.get("knowledge_id"),
             "knowledge_action_id": knowledge_action_id,
             "stream": True,
             "workspace_id": self.data.get("workspace_id"),
             "user_id": str(user.id),
-            **instance,
             "default_model_setting": default_model_setting,
             "workflow_source": workflow_source_meta(work_flow, instance),
             "sync_log_id": str(sync_log_id) if sync_log_id else None,
@@ -493,8 +483,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
         data_source = instance.get("data_source") or {}
         file_ids = [item.get("file_id") for item in data_source.get("file_list") or [] if item.get("file_id")]
-        if file_ids:
-            validate_knowledge_file_size(knowledge, QuerySet(File).filter(id__in=file_ids))
+        bind_knowledge_uploads(file_ids, knowledge, user.id)
         knowledge_workflow_version = (
             QuerySet(KnowledgeWorkflowVersion)
             .filter(knowledge_id=self.data.get("knowledge_id"))

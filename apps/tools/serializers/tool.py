@@ -25,6 +25,7 @@ from common.exception.app_exception import AppApiException
 from common.field.common import UploadedImageField
 from common.result import result
 from common.utils.common import bytes_to_uploaded_file, common_convert_value, generate_uuid, get_file_content
+from common.utils.file_reference import get_owned_upload
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
@@ -553,7 +554,7 @@ class ToolSerializer(serializers.Serializer):
             # 如果是SKILL类型的工具，修改file表中对应的记录
             if instance.get("tool_type") == ToolType.SKILL:
                 file_id = instance.get("code")
-                old_file = QuerySet(File).filter(id=file_id).first()
+                old_file = get_owned_upload(file_id, self.data.get("user_id"))
                 if old_file:
                     # 创建新的文件副本,不复制实际文件内容
                     new_file_id = uuid.uuid7()
@@ -641,6 +642,7 @@ class ToolSerializer(serializers.Serializer):
                 )
 
     class Operate(serializers.Serializer):
+        user_id = serializers.UUIDField(required=False)
         id = serializers.UUIDField(required=True, label=_("tool id"))
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
 
@@ -684,7 +686,12 @@ class ToolSerializer(serializers.Serializer):
             if not QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).exists():
                 raise serializers.ValidationError(_("Tool not found"))
 
-            tool = QuerySet(Tool).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).first()
+            tool = (
+                QuerySet(Tool)
+                .select_for_update()
+                .filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id"))
+                .first()
+            )
             validate_edit_folder(instance, tool)
 
             edit_field_list = [
@@ -718,6 +725,9 @@ class ToolSerializer(serializers.Serializer):
                             edit_dict["init_params"][key] = old_init_params[key]
                 edit_dict["init_params"] = rsa_long_encrypt(json.dumps(edit_dict["init_params"]))
 
+            replacement = None
+            if tool.tool_type == ToolType.SKILL and "code" in edit_dict and str(tool.code) != str(edit_dict["code"]):
+                replacement = get_owned_upload(edit_dict["code"], self.data.get("user_id"))
             edit_dict["update_time"] = timezone.now()
             if "code" in edit_dict and tool.code != edit_dict["code"]:
                 protect_skill_file(tool)
@@ -731,16 +741,13 @@ class ToolSerializer(serializers.Serializer):
                     is_active=instance.get("is_active")
                 )
 
-            # 如果是SKILL类型的工具，修改file表中对应的记录
-            if instance.get("tool_type") == ToolType.SKILL:
-                old_file_id = tool.code
-                file_id = instance.get("code")
-                if old_file_id != file_id:
-                    QuerySet(File).filter(id=old_file_id).delete()
-                    QuerySet(File).filter(id=file_id).update(source_id=tool.id, source_type=FileSourceType.TOOL)
-                    skill_file = QuerySet(File).filter(id=file_id).first()
-                    if skill_file:
-                        QuerySet(File).filter(id=file_id).update(meta={**skill_file.meta, "skill_file": True})
+            if replacement is not None:
+                QuerySet(File).filter(id=tool.code, source_id=str(tool.id), source_type=FileSourceType.TOOL).delete()
+                QuerySet(File).filter(id=replacement.id).update(
+                    source_id=str(tool.id),
+                    source_type=FileSourceType.TOOL,
+                    meta={**replacement.meta, "skill_file": True},
+                )
 
             return self.one()
 

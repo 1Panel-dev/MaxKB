@@ -280,11 +280,14 @@ class KnowledgeWriteNode(INode):
         document_tags_map = {}
         knowledge_tag_dict = {}
 
+        validated_sources = set()
         for document in document_list:
             document["user_id"] = user_id
             document_paragraph_dict_model = get_document_paragraph_model(knowledge_id, document)
             document_instance = document_paragraph_dict_model.get("document")
-            linked_file_id = DocumentSerializers.Batch.link_file(document.get("source_file_id"), document_instance.id)
+            linked_file_id = DocumentSerializers.Batch.link_file(
+                document.get("source_file_id"), document_instance.id, knowledge_id, user_id, validated_sources
+            )
             if linked_file_id is not None:
                 document_instance.meta["source_file_id"] = str(linked_file_id)
             document_model_list.append(document_instance)
