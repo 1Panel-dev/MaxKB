@@ -564,6 +564,8 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
 
         paragraph_id = serializers.UUIDField(required=True, label=_("Paragraph id"))
 
+        application_id = serializers.UUIDField(required=True, label=_("Application ID"))
+
         workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
 
         def delete(self, request=None, scope="WORKSPACE", with_valid=True):
