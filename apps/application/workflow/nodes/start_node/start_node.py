@@ -20,12 +20,26 @@ from application.workflow.i_node import INode
 from application.workflow.status import Status
 
 
+def get_field_key(item: dict):
+    return item.get("variable") or item.get("field")
+
+
 def get_default_global_variable(input_field_list: List):
     return {
-        item.get("variable") or item.get("field"): item.get("default_value")
+        get_field_key(item): item.get("default_value")
         for item in input_field_list
         if item.get("default_value", None) is not None
     }
+
+
+def get_input_global_variable(input_field_list: List, form_data: dict):
+    """默认值打底，再用本次提交的表单值覆盖；没有默认值的字段及 False / 0 等取值同样生效。"""
+    variable = get_default_global_variable(input_field_list)
+    for item in input_field_list:
+        key = get_field_key(item)
+        if key and form_data.get(key) is not None:
+            variable[key] = form_data[key]
+    return variable
 
 
 class ApplicationSerializer(serializers.Serializer):
@@ -45,18 +59,9 @@ class StarNode(INode):
 
         user_input_field_list = base_node.properties.get("user_input_field_list", []) if base_node else []
         api_input_field_list = base_node.properties.get("api_input_field_list", []) if base_node else []
-        default_global = get_default_global_variable(user_input_field_list)
-        default_api_global = get_default_global_variable(api_input_field_list)
         form_data = workflow_params.get("form_data") or {}
-        for key in default_global.keys():
-            value = form_data.get(key)
-            if value:
-                default_global[key] = value
-
-        for key in default_api_global.keys():
-            value = form_data.get(key)
-            if value:
-                default_api_global[key] = value
+        default_global = get_input_global_variable(user_input_field_list, form_data)
+        default_api_global = get_input_global_variable(api_input_field_list, form_data)
         history_chat_record = workflow_params.get("history_chat_record", [])
         history_context = [{"question": r.problem_text, "answer": r.answer_text} for r in history_chat_record]
 
