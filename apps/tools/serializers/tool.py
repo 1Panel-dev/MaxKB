@@ -18,7 +18,7 @@ from application.models import Application
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_page_search, native_search, page_search
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
 from common.field.common import UploadedImageField
 from common.result import result
 from common.utils.common import bytes_to_uploaded_file, common_convert_value, get_file_content
@@ -40,6 +40,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from application.flow.backend.sandbox_mcp import SandboxMCPBackend
 from maxkb.const import CONFIG, PROJECT_DIR
 from models_provider.models import Model
+from models_provider.permissions import can_read_model
 from rest_framework import serializers, status
 from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
@@ -1584,7 +1585,7 @@ class ToolSerializer(serializers.Serializer):
         init_field_list = serializers.ListField(required=False, default=list, label=_("Init Field List"))
         input_field_list = serializers.ListField(required=False, default=list, label=_("Input Field List"))
 
-        def generate_code(self):
+        def generate_code(self, request):
             from application.flow.tools import to_stream_response_simple
             from models_provider.tools import get_model_instance_by_model_workspace_id
 
@@ -1592,6 +1593,10 @@ class ToolSerializer(serializers.Serializer):
 
             workspace_id = self.data.get("workspace_id")
             model_id = self.data.get("model_id")
+            model = Model.objects.filter(id=model_id, model_type="LLM").only("id", "workspace_id").first()
+            if model is None or not can_read_model(request, workspace_id, model):
+                raise AppUnauthorizedFailed(403, _("No permission to access"))
+
             prompt = self.data.get("prompt")
             messages = self.data.get("messages")
             model_params_setting = self.data.get("model_params_setting")
@@ -1606,10 +1611,6 @@ class ToolSerializer(serializers.Serializer):
             )
 
             messages[-1]["content"] = q
-            SUPPORTED_MODEL_TYPES = ["LLM"]
-            model_exist = QuerySet(Model).filter(id=model_id, model_type__in=SUPPORTED_MODEL_TYPES).exists()
-            if not model_exist:
-                raise Exception(_("Model does not exist or is not an LLM model"))
 
             def process():
                 model = get_model_instance_by_model_workspace_id(

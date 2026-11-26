@@ -21,6 +21,7 @@ from common.utils.common import query_params_to_single_dict
 from models_provider.api.model import ModelCreateAPI, GetModelApi, ModelEditApi, ModelListResponse, DefaultModelResponse
 from models_provider.api.provide import ProvideApi
 from models_provider.models import Model
+from models_provider.permissions import WORKSPACE_MODEL_READ_PERMISSIONS
 from models_provider.serializers.model_serializer import ModelSerializer, \
     WorkspaceSharedModelSerializer
 from system_manage.views import encryption_str
@@ -162,12 +163,7 @@ class ModelSetting(APIView):
                        parameters=GetModelApi.get_parameters(),
                        responses=GetModelApi.get_response(),
                        tags=[_('Model')])  # type: ignore
-        @has_permissions(PermissionConstants.MODEL_READ.get_workspace_model_permission(),
-                         PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-                         ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.MODEL.get_workspace_model_permission()],
-                                        CompareConstants.AND), )
+        @has_permissions(*WORKSPACE_MODEL_READ_PERMISSIONS)
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
                 ModelSerializer.Operate(

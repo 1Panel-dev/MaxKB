@@ -840,5 +840,5 @@ class ToolView(APIView):
         )
         def post(self, request: Request, workspace_id: str):
             return ToolSerializer.GenerateCodeSerializer(
-                data={"workspace_id": workspace_id, **request.data}
-            ).generate_code()
+                data={**request.data, "workspace_id": workspace_id}
+            ).generate_code(request)
