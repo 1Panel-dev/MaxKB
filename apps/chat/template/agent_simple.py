@@ -715,6 +715,10 @@ def build_workflow(application):
     data["nodes"][2]["properties"]["node_data"]["knowledge_id_list"] = knowledge_ids
     data["nodes"][2]["properties"]["node_data"]["knowledge_setting"] = knowledge_setting
     ## ai对话
+    data["nodes"][5]["properties"]["node_data"]["model_setting"] = {
+        key: model_setting.get(key)
+        for key in ["reasoning_content_enable", "reasoning_content_start", "reasoning_content_end"]
+    }
     data["nodes"][5]["properties"]["node_data"]["model_id"] = model_id
     data["nodes"][5]["properties"]["node_data"]["model_params_setting"] = model_params_setting
     data["nodes"][5]["properties"]["node_data"]["prompt"] = (
@@ -739,6 +743,10 @@ def build_workflow(application):
     data["nodes"][10]["properties"]["node_data"]["application_ids"] = application.application_ids
     data["nodes"][10]["properties"]["node_data"]["tool_ids"] = application.tool_ids
     data["nodes"][10]["properties"]["node_data"]["dialogue_number"] = application.dialogue_number
+    data["nodes"][10]["properties"]["node_data"]["model_setting"] = {
+        key: model_setting.get(key)
+        for key in ["reasoning_content_enable", "reasoning_content_start", "reasoning_content_end"]
+    }
     ## 未查询到知识库指定回复
     if no_references_setting.get("status") == "designated_answer":
         data["nodes"][6]["properties"]["node_data"]["content"] = no_references_setting.get("value")
