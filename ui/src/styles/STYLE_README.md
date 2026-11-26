@@ -283,9 +283,13 @@ Chromium/Safari 使用 6px 滚动条、4px 圆角滑块和透明轨道，滑块�
 
 ## 布局尺寸
 
-头部高度统一使用 Tailwind 的 `h-header`，侧边栏和主内容区域的高度统一使用
-`h-layout-content`。侧边栏宽度使用 `w-sidebar` 和 `w-sidebar-expanded`。这些类通过
-`tailwind.css` 的 `@theme` 映射到 `variables.scss` 中的布局变量。
+头部高度统一使用 Tailwind 的 `h-header`，侧边栏宽度使用 `w-sidebar` 和
+`w-sidebar-expanded`。这些类通过 `tailwind.css` 的 `@theme` 映射到 `variables.scss`
+中的布局变量。`h-layout-content` 保留供需要视口减去页头高度的场景使用。
+
+`AppLayout` 使用 `flex-column`，告警和页头不收缩，内容行通过 `flex-1 min-h-0`
+占满剩余空间，侧栏和主内容由 Flex 默认拉伸撑满高度，无需设置 `h-layout-content`
+或手动扣除告警高度。
 
 侧边栏最窄宽度统一使用 `variables.scss` 中的 `--mk-sidebar-width`，系统侧边栏展开宽度
 使用 `--mk-sidebar-expanded-width`。组件中通过对应的语义化 Tailwind 类引用，不要重复

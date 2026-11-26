@@ -185,7 +185,7 @@ onMounted(() => loadChatUserGroups())
 
 <template>
   <div v-loading="loading" :inert="loading" class="-mx-6 -mb-6 flex min-h-0 flex-1">
-    <aside class="flex-column h-layout-content w-sidebar-expanded shrink-0 border-r">
+    <aside class="flex-column w-sidebar-expanded shrink-0 border-r">
       <div class="shrink-0 p-4">
         <h4>{{ t('authorization.byGroup') }}</h4>
       </div>
