@@ -2,6 +2,11 @@ import { ROLE_TYPE } from '@/api/enums'
 
 export type RoleType = (typeof ROLE_TYPE)[keyof typeof ROLE_TYPE]
 
+export interface RoleInfo {
+  role_id: string
+  role_name: string
+}
+
 export interface RoleItem {
   id: string
   role_name: string

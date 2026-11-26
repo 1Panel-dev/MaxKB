@@ -1,6 +1,7 @@
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type { CreateWorkspaceMemberPayload, Dict, WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
 import { del, get, post } from '../core/request'
+import { localizeRoleName } from '../role-display'
 
 const prefix = '/system/workspace'
 
@@ -12,7 +13,16 @@ const getSystemWorkspaceList = () => {
 /** 获取工作空间成员列表 **/
 
 const getWorkspaceMemberList = (workspace_id: string, page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<WorkspaceMemberItem>>(`${prefix}/${workspace_id}/user_list/${page.currentPage}/${page.pageSize}`, query)
+  return get<ResponsePage<WorkspaceMemberItem>>(
+    `${prefix}/${workspace_id}/user_list/${page.currentPage}/${page.pageSize}`,
+    query,
+  ).then((result) => ({
+    ...result,
+    records: result.records.map((member) => ({
+      ...member,
+      role_name: localizeRoleName(member.role_id, member.role_name),
+    })),
+  }))
 }
 
 /** 新建或更新工作空间。 */

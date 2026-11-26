@@ -3,6 +3,7 @@ SELECT
     u.nick_name,
     u.username,
     tmp.role_name_list AS role_name,
+    tmp.role_info,
     CASE
         WHEN wurp."permission" IS NULL THEN 'NOT_AUTH'
         ELSE wurp."permission"
@@ -30,6 +31,12 @@ LEFT JOIN (
         ARRAY_AGG(role_setting.role_name) AS role_name_list,
         ARRAY_AGG(role_setting.role_name)::text AS role_name_list_str,
         ARRAY_AGG(role_setting.type) AS type_list,
+        JSONB_AGG(
+            JSONB_BUILD_OBJECT(
+                'role_id', role_setting.id,
+                'role_name', role_setting.role_name
+            )
+        ) AS role_info,
         user_role_relation.user_id
     FROM user_role_relation user_role_relation
     LEFT JOIN role_setting role_setting

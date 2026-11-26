@@ -120,6 +120,8 @@ class ResourceUserPermissionResponse(serializers.Serializer):
     id = serializers.CharField(required=True, label=_("user id"))
     nick_name = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_("nick_name"))
     username = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_("username"))
+    role_name = serializers.ListField(child=serializers.CharField(), required=False, label=_("role name"))
+    role_info = serializers.ListField(child=serializers.DictField(), required=False, label=_("role info"))
     permission = serializers.CharField(required=True, label=_("permission"))
 
 

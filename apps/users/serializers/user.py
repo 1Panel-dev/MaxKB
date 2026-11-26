@@ -134,10 +134,21 @@ class UserProfileResponse(serializers.ModelSerializer):
     is_edit_password = serializers.BooleanField(required=True, label=_("Is Edit Password"))
     permissions = serializers.DictField(child=serializers.CharField(), required=True, label=_("permissions"))
     role = serializers.ListField(child=serializers.CharField(), required=True, label=_("Role"))
+    role_info = serializers.ListField(child=serializers.DictField(), required=False, label=_("Role info"))
 
     class Meta:
         model = User
-        fields = ["id", "username", "nick_name", "email", "role", "permissions", "language", "is_edit_password"]
+        fields = [
+            "id",
+            "username",
+            "nick_name",
+            "email",
+            "role",
+            "role_info",
+            "permissions",
+            "language",
+            "is_edit_password",
+        ]
 
 
 class CreateUserSerializer(serializers.Serializer):
@@ -282,18 +293,16 @@ class UserProfileSerializer(serializers.Serializer):
         workspace_list = get_workspace_list_by_user(user.id)
         user_role_relation_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
         role_name = [user.role]
+        role_info = [{"role_id": user.role, "role_name": user.role}]
         if user_role_relation_model:
             user_role_relations = (
                 user_role_relation_model.objects.filter(user_id=user.id, workspace_id="None")
                 .select_related("role")
                 .distinct("role_id")
             )
-            role_name = [
-                role.role_name
-                for role in sorted(
-                    (relation.role for relation in user_role_relations), key=lambda role: not role.internal
-                )
-            ]
+            roles = sorted((relation.role for relation in user_role_relations), key=lambda role: not role.internal)
+            role_name = [role.role_name for role in roles]
+            role_info = [{"role_id": str(role.id), "role_name": role.role_name} for role in roles]
 
         return {
             "id": user.id,
@@ -309,6 +318,7 @@ class UserProfileSerializer(serializers.Serializer):
             "language": user.language,
             "workspace_list": workspace_list,
             "role_name": role_name,
+            "role_info": role_info,
         }
 
 
@@ -467,7 +477,7 @@ class UserManageSerializer(serializers.Serializer):
             def _get_user_roles(user_ids, is_admin=True):
                 workspace_model = DatabaseModelManage.get_model("workspace_model")
                 if not (role_model and user_role_relation_model and workspace_model):
-                    return {}
+                    return {}, {}, {}, {}
 
                 # 获取所有相关角色关系，并预加载角色信息
                 user_role_relations = (
@@ -488,6 +498,7 @@ class UserManageSerializer(serializers.Serializer):
                 # 构建用户ID到角色ID与工作空间ID映射
                 user_role_setting_mapping = defaultdict(lambda: defaultdict(list))
                 user_role_workspace_mapping = defaultdict(lambda: defaultdict(list))
+                user_role_info_mapping = defaultdict(dict)
 
                 for relation in user_role_relations:
                     user_id = str(relation.user_id)
@@ -497,6 +508,10 @@ class UserManageSerializer(serializers.Serializer):
                     if not is_admin and relation.role.type == RoleConstants.ADMIN.name:
                         continue
                     user_role_mapping[user_id].add(relation.role.role_name)
+                    user_role_info_mapping[user_id][str(role_id)] = {
+                        "role_id": str(role_id),
+                        "role_name": relation.role.role_name,
+                    }
                     if relation.role.type == RoleConstants.ADMIN.name:
                         # 系统管理员不关联工作空间，编辑页不显示空间（保持空列表）
                         user_role_setting_mapping[user_id][role_id]
@@ -512,6 +527,7 @@ class UserManageSerializer(serializers.Serializer):
 
                     # 将 set 转换为 list 以符合返回格式
                 user_role_mapping = {uid: list(roles) for uid, roles in user_role_mapping.items()}
+                user_role_info_mapping = {uid: list(roles.values()) for uid, roles in user_role_info_mapping.items()}
 
                 # 转换为所需的结构
                 result_user_role_setting_mapping = {
@@ -528,7 +544,12 @@ class UserManageSerializer(serializers.Serializer):
                     for user_id, roles in user_role_workspace_mapping.items()
                 }
 
-                return user_role_mapping, result_user_role_setting_mapping, result_user_role_workspace_mapping
+                return (
+                    user_role_mapping,
+                    user_role_info_mapping,
+                    result_user_role_setting_mapping,
+                    result_user_role_workspace_mapping,
+                )
 
             if role_model and user_role_relation_model:
                 # 获取当前用户的所有角色 判断是不是内置的系统管理员
@@ -538,14 +559,18 @@ class UserManageSerializer(serializers.Serializer):
                     role__internal=True,
                 ).exists()
                 user_ids = [user["id"] for user in result["records"]]
-                user_role_mapping, user_role_setting_mapping, user_role_workspace_mapping = _get_user_roles(
-                    user_ids, is_admin
-                )
+                (
+                    user_role_mapping,
+                    user_role_info_mapping,
+                    user_role_setting_mapping,
+                    user_role_workspace_mapping,
+                ) = _get_user_roles(user_ids, is_admin)
 
                 # 将角色信息添加回用户数据中
                 for user in result["records"]:
                     record_user_id = str(user["id"])
                     user["role_name"] = user_role_mapping.get(record_user_id, [])
+                    user["role_info"] = user_role_info_mapping.get(record_user_id, [])
                     user["role_setting"] = user_role_setting_mapping.get(record_user_id, [])
                     user["role_workspace"] = user_role_workspace_mapping.get(record_user_id, [])
 
@@ -802,9 +827,13 @@ class UserManageSerializer(serializers.Serializer):
                         "id": user_id,
                         "nick_name": relation.user.nick_name,
                         "roles": [relation.role.role_name],
+                        "role_info": [{"role_id": str(relation.role.id), "role_name": relation.role.role_name}],
                     }
                 else:
                     user_dict[user_id]["roles"].append(relation.role.role_name)
+                    user_dict[user_id]["role_info"].append(
+                        {"role_id": str(relation.role.id), "role_name": relation.role.role_name}
+                    )
 
             # 将字典值转换为列表形式
             return list(user_dict.values())[:200]
@@ -812,7 +841,13 @@ class UserManageSerializer(serializers.Serializer):
         if nick_name:
             user_list = user_list.filter(Q(nick_name__contains=nick_name) | Q(username__contains=nick_name))
         return [
-            {"id": user.id, "nick_name": user.nick_name, "roles": [RoleConstants.USER.name]} for user in user_list[:200]
+            {
+                "id": user.id,
+                "nick_name": user.nick_name,
+                "roles": [RoleConstants.USER.name],
+                "role_info": [{"role_id": RoleConstants.USER.name, "role_name": RoleConstants.USER.name}],
+            }
+            for user in user_list[:200]
         ]
 
     class BatchDelete(serializers.Serializer):

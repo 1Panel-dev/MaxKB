@@ -1,5 +1,6 @@
 /** 系统资源授权 API 与页面共用的业务类型。 */
 
+import type { RoleInfo } from './system-role'
 import type { ToolType } from './tool'
 import { RESOURCE_AUTHORIZATION_TARGET_TYPE, RESOURCE_PERMISSION, RESOURCE_TYPE } from '@/api/enums'
 
@@ -14,6 +15,7 @@ export interface ResourceUserPermission {
   id: string
   nick_name: string
   username: string
+  role_info?: RoleInfo[]
   role_name?: string[]
   permission: ResourcePermission
 }

@@ -1,5 +1,7 @@
 /** 系统用户 API 与用户管理页面共用的业务类型。 */
 
+import type { RoleInfo } from './system-role'
+
 export interface SystemUserRoleAssignment {
   role_id: string
   workspace_ids: string[]
@@ -38,6 +40,11 @@ export interface SystemUserUpdateRequest {
   user_group_ids?: string[]
 }
 
+export interface SystemUserRoleWorkspace {
+  role_name: string
+  workspace: string[]
+}
+
 /** 系统用户列表项，getUserManagePage 返回的用户记录。 */
 export interface SystemUser {
   id: string
@@ -48,8 +55,9 @@ export interface SystemUser {
   is_active: boolean
   role: string
   source: string
+  role_info?: RoleInfo[]
   role_name?: string[]
-  role_workspace?: Record<string, string[]>
+  role_workspace?: SystemUserRoleWorkspace[]
   role_setting?: SystemUserRoleAssignment[]
   user_group_names?: string[]
   user_group_workspace?: { workspace: string; user_group_names: string[] }[]

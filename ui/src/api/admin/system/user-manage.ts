@@ -9,12 +9,32 @@ import type {
   SystemUserUpdateRequest,
 } from '@/api/types'
 import { del, get, getExportFile, post, put } from '../core/request'
+import { localizeRoleName, localizeRoleSource } from '../role-display'
 
 const prefix = '/user_manage'
 
 /** 获取系统用户分页列表。 */
 const getUserManagePage = (page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<SystemUser>>(`${prefix}/${page.currentPage}/${page.pageSize}`, query)
+  return get<ResponsePage<SystemUser>>(`${prefix}/${page.currentPage}/${page.pageSize}`, query).then((result) => ({
+    ...result,
+    records: result.records.map(localizeSystemUser),
+  }))
+}
+
+function localizeSystemUser(systemUser: SystemUser): SystemUser {
+  const localizedUser = localizeRoleSource(systemUser)
+  if (!systemUser.role_workspace) return localizedUser
+
+  const localizedRoleNames = new Map(
+    (systemUser.role_info ?? []).map((role) => [role.role_name, localizeRoleName(role.role_id, role.role_name)]),
+  )
+  return {
+    ...localizedUser,
+    role_workspace: systemUser.role_workspace.map((role) => ({
+      ...role,
+      role_name: localizedRoleNames.get(role.role_name) ?? role.role_name,
+    })),
+  }
 }
 
 /** 创建系统用户。 */
