@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type { Locale } from '@/locales/config'
@@ -42,6 +42,15 @@ const changePasswordDialogRef = ref<InstanceType<typeof ChangePasswordDialog>>()
 function handleOpenChangePassword() {
   changePasswordDialogRef.value?.open()
 }
+
+// 用户资料和弹窗就绪后提示修改默认密码；刷新页面后仍会重新检查。
+watch(
+  [() => user.userInfo?.is_edit_password, changePasswordDialogRef],
+  ([isDefaultPassword]) => {
+    if (isDefaultPassword === true) handleOpenChangePassword()
+  },
+  { flush: 'post' },
+)
 
 // 查看平台版本与授权信息。
 const aboutDialogRef = ref<InstanceType<typeof AboutDialog>>()
