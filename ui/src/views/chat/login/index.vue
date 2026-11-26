@@ -66,10 +66,11 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
     const params = new URLSearchParams()
     if (accessToken) params.set('accessToken', accessToken)
     new URLSearchParams(getRouteQueryString()).forEach((value, key) => {
-      if (key !== 'accessToken') params.append(key, value)
+      if (key !== 'accessToken' && key !== 'access_token') params.append(key, value)
     })
     const queryString = params.toString()
-    const callbackUrl = `${config.redirectUrl}${queryString ? `?${queryString}` : ''}`
+    const separator = config.redirectUrl.includes('?') ? '&' : '?'
+    const callbackUrl = `${config.redirectUrl}${queryString ? `${separator}${queryString}` : ''}`
     if (authType === LOGIN_METHOD.CAS) {
       if (!config.ldpUri) return ''
       const separator = config.ldpUri.includes('?') ? '&' : '?'
@@ -78,8 +79,8 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
     if (authType === LOGIN_METHOD.OIDC) {
       if (!config.authEndpoint || !config.clientId) return ''
       const scope = config.scope || 'openid+profile+email'
-      let url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${callbackUrl}&response_type=code&scope=${scope}`
-      if (config.state) url += `&state=${config.state}`
+      let url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${encodeURIComponent(callbackUrl)}&response_type=code&scope=${scope}`
+      if (config.state) url += `&state=${encodeURIComponent(config.state)}`
       return url
     }
 
