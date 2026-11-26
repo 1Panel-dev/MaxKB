@@ -1,4 +1,5 @@
 {
+  "licenseMissingOrExpired": "未上传 License 或 License 已过期。",
   "upgrade": "升级",
   "returnWorkspace": "返回工作空间",
   "project": "项目地址",

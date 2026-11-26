@@ -107,7 +107,7 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
 </script>
 
 <template>
-  <div class="-ml-6 -mr-6 -mb-6 grid h-layout-content shrink-0 grid-cols-2 overflow-hidden">
+  <div class="mk-knowledge-hit-test -ml-6 -mr-6 -mb-6 grid min-h-0 flex-1 grid-cols-2 overflow-hidden">
     <!-- 左侧 -->
     <el-scrollbar class="min-h-0 min-w-0" view-class="px-6 pb-6">
       <header class="flex-align-center gap-2 py-4">
@@ -264,3 +264,10 @@ function testKnowledge(query: Required<Pick<KnowledgeHitTestPayload, 'query_text
     @closed="selectedParagraph = undefined"
   />
 </template>
+
+<style scoped lang="scss">
+// 仅约束召回测试的外层内容高度，由左右两栏各自负责滚动。
+:global(.el-scrollbar__view:has(> .mk-knowledge-hit-test)) {
+  height: 100%;
+}
+</style>
