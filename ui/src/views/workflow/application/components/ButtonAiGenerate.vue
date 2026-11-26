@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useTemplateRef } from 'vue'
+import { computed, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DefaultModelSettingPayload } from '@/api/types'
 import type LogicFlow from '@logicflow/core'
 import AiGeneratePanel from '@/workflow-canvas/ai-generate/panel/AiGeneratePanel.vue'
@@ -12,6 +13,12 @@ const props = defineProps<{
   getLogicFlow: () => LogicFlow | undefined
   defaultModelSettings: DefaultModelSettingPayload
 }>()
+const { t } = useI18n({ useScope: 'global' })
+const suggestedRequirements = computed(() => [
+  t('workflow.aiGeneration.applicationExamples.productSupport'),
+  t('workflow.aiGeneration.applicationExamples.pricing'),
+  t('workflow.aiGeneration.applicationExamples.humanSupport'),
+])
 const emit = defineEmits<{ open: [] }>()
 const aiGeneratePanelRef = useTemplateRef<InstanceType<typeof AiGeneratePanel>>('aiGeneratePanelRef')
 
@@ -32,6 +39,7 @@ function handleOpenAiGenerate() {
   <AiGeneratePanel
     ref="aiGeneratePanelRef"
     :get-logic-flow="getLogicFlow"
+    :suggested-requirements="suggestedRequirements"
     :default-model-settings="defaultModelSettings"
     :workflow-mode="WorkflowMode.Application"
   />

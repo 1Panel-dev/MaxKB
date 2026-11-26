@@ -6,7 +6,17 @@
     "placeholder": "Describe your requirements",
     "stopped": "Generation stopped",
     "thinking": "Thinking",
-    "examples": {
+    "knowledgeExamples": {
+      "documentParsing": "Deeply parse complex documents like PDF and PPT, preserving tables and layout structure into segments",
+      "segmentQuestions": "Generate a related question for each segment to support question-based retrieval",
+      "documentTags": "Classify documents into the specified tags based on their content for tag-based retrieval"
+    },
+    "toolExamples": {
+      "publicApi": "Call a public API (e.g. weather, exchange rates) and return structured results",
+      "fileStatistics": "Parse an uploaded Excel or CSV file and return aggregated statistics",
+      "textFormatting": "Process text formats, e.g. extract phone numbers, mask ID numbers, convert date formats"
+    },
+    "applicationExamples": {
       "productSupport": "Build a product support agent that searches the product knowledge first and responds politely when no answer is found.",
       "pricing": "Build an agent that can look up product pricing.",
       "humanSupport": "Build a customer support agent that can hand off to a human when needed."
