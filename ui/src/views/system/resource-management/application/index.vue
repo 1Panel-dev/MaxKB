@@ -220,7 +220,7 @@ onMounted(() => {
                 </el-button>
               </MkTooltip>
               <!-- 进入智能体详情 -->
-              <MkTooltip v-if="perm.application.system.edit()" :content="t('common.actions.manage')">
+              <MkTooltip v-if="perm.application.system.overviewRead() || perm.application.system.accessRead() || perm.application.system.chatLogRead() || perm.application.system.chatUserRead()" :content="t('common.actions.manage')">
                 <el-button text type="primary" @click="handleOpenApplication(row)">
                   <MkIcon name="icon_admin_outlined" />
                 </el-button>
