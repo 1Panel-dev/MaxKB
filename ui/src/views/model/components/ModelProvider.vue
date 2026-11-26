@@ -34,7 +34,7 @@ function handleProviderSelect(provider: ModelProviderItem) {
 
 <template>
   <div class="px-4">
-    <template v-if="isWorkspaceResource() && !auth.isCE">
+    <template v-if="isWorkspaceResource() && (auth.isEE || auth.isPE)">
       <MkListItem class="-mt-2" :active="modelValue.provider === SHARED_MODEL_PROVIDER.provider" @click="handleProviderSelect(SHARED_MODEL_PROVIDER)">
         <MkIcon
           :name="modelValue.provider === SHARED_MODEL_PROVIDER.provider ? 'icon_folder-share_filled' : 'icon_folder_outlined'"

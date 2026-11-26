@@ -245,7 +245,7 @@ onMounted(() => {
         </MkTooltip>
       </component>
 
-      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.TOOL" :show-shared="!auth.isCE" @select="handleFolderSelect" draggable></FolderTree>
+      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.TOOL" :show-shared="auth.isEE || auth.isPE" @select="handleFolderSelect" draggable></FolderTree>
     </template>
 
     <template #default="{ Footer, Header }">

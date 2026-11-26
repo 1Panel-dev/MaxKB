@@ -219,7 +219,7 @@ function handleBatchDelete() {
         ref="folderTreeRef"
         v-model="currentFolderId"
         :source="RESOURCE_TYPE.KNOWLEDGE"
-        :show-shared="!auth.isCE"
+        :show-shared="auth.isEE || auth.isPE"
         draggable
         @loaded="handleFolderSelect"
         @select="handleFolderSelect"

@@ -222,7 +222,7 @@ onMounted(() => loadChatUsers())
           </template>
         </el-table-column>
 
-        <el-table-column v-if="!auth.isCE" :label="t('user.source.label')" width="120">
+        <el-table-column v-if="auth.isEE || auth.isPE" :label="t('user.source.label')" width="120">
           <template #header>
             <MkTableFilter
               mode="single"
@@ -237,13 +237,13 @@ onMounted(() => loadChatUsers())
           </template>
         </el-table-column>
 
-        <el-table-column v-if="!auth.isCE" prop="token_quota.used_tokens" :label="t('chatUser.quota.usage')" width="180" min-width="170" sortable>
+        <el-table-column v-if="auth.isEE || auth.isPE" prop="token_quota.used_tokens" :label="t('chatUser.quota.usage')" width="180" min-width="170" sortable>
           <template #default="{ row }">
             {{ formatQuotaUsage(row.token_quota) }}
           </template>
         </el-table-column>
 
-        <el-table-column v-if="!auth.isCE" :label="t('chatUser.quota.expiresAt')" min-width="180">
+        <el-table-column v-if="auth.isEE || auth.isPE" :label="t('chatUser.quota.expiresAt')" min-width="180">
           <template #default="{ row }">
             {{ row.token_quota?.period_end ? datetimeFormat(row.token_quota?.period_end) : '-' }}
           </template>
