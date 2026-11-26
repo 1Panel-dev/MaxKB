@@ -732,6 +732,7 @@ def build_workflow(application):
     data["nodes"][5]["properties"]["node_data"]["application_ids"] = application.application_ids
     data["nodes"][5]["properties"]["node_data"]["tool_ids"] = application.tool_ids
     data["nodes"][5]["properties"]["node_data"]["dialogue_number"] = application.dialogue_number
+    data["nodes"][5]["properties"]["node_data"]["mcp_output_enable"] = application.mcp_output_enable
     ## 未查询到知识库ai 回复
     data["nodes"][10]["properties"]["node_data"]["model_id"] = model_id
     data["nodes"][10]["properties"]["node_data"]["model_params_setting"] = model_params_setting
@@ -743,6 +744,7 @@ def build_workflow(application):
     data["nodes"][10]["properties"]["node_data"]["application_ids"] = application.application_ids
     data["nodes"][10]["properties"]["node_data"]["tool_ids"] = application.tool_ids
     data["nodes"][10]["properties"]["node_data"]["dialogue_number"] = application.dialogue_number
+    data["nodes"][10]["properties"]["node_data"]["mcp_output_enable"] = application.mcp_output_enable
     data["nodes"][10]["properties"]["node_data"]["model_setting"] = {
         key: model_setting.get(key)
         for key in ["reasoning_content_enable", "reasoning_content_start", "reasoning_content_end"]
