@@ -530,10 +530,6 @@ long syscall(long number, ...) {
         case SYS_fchmodat:
         case SYS_mprotect:
         case SYS_pkey_mprotect:
-#ifdef SYS_open
-        case SYS_open:
-#endif
-        case SYS_openat:
         case SYS_swapon:
         case SYS_swapoff:
         case SYS_kill:
