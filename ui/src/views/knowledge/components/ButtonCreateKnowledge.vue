@@ -155,7 +155,7 @@ function handleImportCreate(file: UploadFile) {
           </div>
         </MkDropdownItem>
         <!-- 创建飞书知识库 -->
-        <MkDropdownItem class="py-2!" @click="handleCreateLarkKnowledge">
+        <MkDropdownItem v-if="!auth.isCE" class="py-2!" @click="handleCreateLarkKnowledge">
           <template #icon><KnowledgeIcon :type="KNOWLEDGE_TYPE.LARK" /></template>
           <div class="min-w-0">
             <p>{{ t('knowledge.lark.label') }}</p>
