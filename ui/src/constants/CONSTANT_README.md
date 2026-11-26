@@ -9,7 +9,7 @@
 共享入口的 `FOLDER_ENTRY_ID.SHARED` 固定为 `shared`。目录名称的翻译归属见[国际化规则](../locales/LOCALE_README.md#文件夹)。
 
 后端枚举和类型归属见 [API 规则](../api/API_README.md#枚举与类型组织)。
-constants 只维护标签、颜色和选项等前端映射，键引用 API 枚举。
+展示常量维护标签、颜色和选项等前端映射，键引用 API 枚举。
 共享展示配置的响应式翻译、初始化顺序和只读约束统一见
 [国际化规则](../locales/LOCALE_README.md#使用约定)，不在此重复维护。
 登录方式共用 `LOGIN_METHOD_LABELS`，角色类型共用 `ROLE_TYPE_LABELS`，分别按 API 枚举读取 `auth.methods` 和 `role.types`。
@@ -55,3 +55,13 @@ constants 只维护标签、颜色和选项等前端映射，键引用 API 枚�
 初始与恢复默认、调试面板（社区版或接口未返回的字段）共用；常量只读，使用方修改前先深拷贝。默认免责声明使用响应式展示配置直接调用 `t()`，深拷贝后作为普通草稿，已有配置与用户输入不随界面语言重写。
 
 `theme.ts` 的 `THEME_OPTIONS` 维护主题色、响应式名称与登录背景图映射，名称直接调用 `t()`，颜色协议值保持不变。`DEFAULT_THEME_SETTING` 的缺省欢迎语使用 `layout.slogan`，按当前语言读取；接口返回的自定义品牌内容保持原文，使用方将缺省值复制到草稿后不随语言重写。
+
+## 浏览器存储 key
+
+`storage-key.ts` 集中维护 Admin 的固定 key。
+读写方从此文件引用，不在页面、Store 或共享组件中重复定义 key 字符串；保留现有 key 值以兼容浏览器已有数据。
+文件夹排序 key 由 `src/components/business/folder-tree/storage-key.ts` 就近维护，
+仅由目录树组件读写，Admin 资源列表和工作流资源菜单通过复用组件使用。
+Chat 专属 key 由 `src/stores/chat/storage-key.ts` 管理，包含门户 token、单应用 token 和单应用用户表单缓存；
+对话组件只引用该模块的 key 生成函数，不依赖认证 Store。对话和门户不使用语言缓存。
+工作流自动保存与 AI 调试日志 key 留在工作流功能内。

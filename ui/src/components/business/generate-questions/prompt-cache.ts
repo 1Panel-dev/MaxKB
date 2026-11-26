@@ -1,8 +1,7 @@
 /** 沿用 v2 PROMPT_CACHE，按用户记忆最近提交的关联问题配置。 */
 import { cloneDeep, isPlainObject } from 'lodash'
 import type { RelatedQuestionsConfig } from '@/api/types'
-
-const PROMPT_CACHE_KEY = 'PROMPT_CACHE'
+import { ADMIN_STORAGE_KEY } from '@/constants/storage-key'
 
 interface PromptCacheEntry {
   user: string
@@ -11,7 +10,7 @@ interface PromptCacheEntry {
 
 function readPromptCache(): PromptCacheEntry[] {
   try {
-    const saved = JSON.parse(localStorage.getItem(PROMPT_CACHE_KEY) || '[]')
+    const saved = JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY.PROMPT_CACHE) || '[]')
     if (Array.isArray(saved)) {
       return saved.filter(
         (entry: PromptCacheEntry) =>
@@ -39,7 +38,7 @@ export function savePromptConfig(userId: string, config: RelatedQuestionsConfig)
   const configs = readPromptCache().filter(({ user }) => user !== userId)
   configs.push({ user: userId, formValue: cloneDeep(config) })
   try {
-    localStorage.setItem(PROMPT_CACHE_KEY, JSON.stringify(configs))
+    localStorage.setItem(ADMIN_STORAGE_KEY.PROMPT_CACHE, JSON.stringify(configs))
   } catch {
     // 存储不可用时跳过记忆，不阻止任务提交或修改当前表单。
   }

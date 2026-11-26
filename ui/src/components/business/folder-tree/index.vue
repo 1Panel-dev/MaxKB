@@ -9,6 +9,7 @@ import FolderApi from '@/api/admin/workspace/folder'
 import ResourceAuthorizationDrawer from '@/components/business/resource-authorization-drawer/index.vue'
 import FolderFormDialog from './FolderFormDialog.vue'
 import VirtualizedTree from './VirtualizedTree.vue'
+import { getFolderCustomSortStorageKey, getFolderSortTypeStorageKey } from './storage-key'
 import { FOLDER_SORT } from './types'
 import { FOLDER_ENTRY_ID } from '@/constants/folder'
 import { useStore } from '@/stores'
@@ -105,8 +106,8 @@ function handleFolderClick(folder: FolderItem) {
 /* 排序 */
 const { user } = useStore()
 const workspaceId = getWorkspaceId()
-const CUSTOM_FOLDER_SORT = `${user.userInfo?.id}-${workspaceId}-${props.source}-folder-custom-sort`
-const FOLDER_SORT_TYPE = `${user.userInfo?.id}-${workspaceId}-${props.source}-folder-sort-type`
+const CUSTOM_FOLDER_SORT = getFolderCustomSortStorageKey(user.userInfo?.id, workspaceId, props.source)
+const FOLDER_SORT_TYPE = getFolderSortTypeStorageKey(user.userInfo?.id, workspaceId, props.source)
 
 const sortOptions: { label: string; value: FolderSort; divided?: boolean }[] = reactive([
   { label: computed(() => t('folder.sort.createdAtAsc')), value: FOLDER_SORT.CREATE_TIME_ASC },

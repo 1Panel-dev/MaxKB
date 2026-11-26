@@ -17,7 +17,7 @@ configureElementPlus()
 const app = createApp(App)
 
 app.use(pinia)
-app.use(createAppI18n(useStore().user))
+app.use(createAppI18n(useStore().user, null))
 app.use(router)
 app.use(ElementPlus)
 

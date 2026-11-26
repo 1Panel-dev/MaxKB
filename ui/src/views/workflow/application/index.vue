@@ -21,6 +21,7 @@ import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonDefaultModelSetting from '../components/default-model-setting/ButtonDefaultModelSetting.vue'
 import EditPublishVersionDialog from '../components/publish-history/EditPublishVersionDialog.vue'
 import { showWorkflowValidateError } from '../components/validate-error'
+import { getWorkflowAutoSaveStorageKey } from '../storage-key'
 import ButtonAiGenerate from './components/ButtonAiGenerate.vue'
 import ButtonDebug from './components/ButtonDebug.vue'
 import ButtonPublishHistory from './components/ButtonPublishHistory.vue'
@@ -111,7 +112,7 @@ function handleSave() {
 
 /* 自动保存：一分钟周期，按资源类型和智能体独立记录开关。 */
 const AUTO_SAVE_INTERVAL = 60_000
-const autoSaveStorageKey = `workflowAutoSave:application:${applicationId}`
+const autoSaveStorageKey = getWorkflowAutoSaveStorageKey('application', applicationId)
 const autoSaveEnabled = ref(localStorage.getItem(autoSaveStorageKey) === 'true')
 let autoSaveTimer: ReturnType<typeof setInterval> | undefined
 const confirmingExit = ref(false)

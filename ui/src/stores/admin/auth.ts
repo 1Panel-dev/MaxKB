@@ -7,8 +7,7 @@ import ExternalLoginApi from '@/api/admin/auth/external-login'
 import LoginApi from '@/api/admin/auth/login'
 import { useThemeStore } from './theme'
 import { useUserStore } from './user'
-
-const TOKEN_STORAGE_KEY = 'token'
+import { ADMIN_STORAGE_KEY } from '@/constants/storage-key'
 
 interface AuthState {
   baseProfile: BaseProfile | null
@@ -16,7 +15,7 @@ interface AuthState {
 }
 
 export const useAuthStore = defineStore('auth', {
-  state: (): AuthState => ({ baseProfile: null, token: localStorage.getItem(TOKEN_STORAGE_KEY) ?? '' }),
+  state: (): AuthState => ({ baseProfile: null, token: localStorage.getItem(ADMIN_STORAGE_KEY.TOKEN) ?? '' }),
 
   getters: {
     isAuthenticated: (state) => Boolean(state.token),
@@ -95,14 +94,14 @@ export const useAuthStore = defineStore('auth', {
     setToken(token: string) {
       if (token !== this.token) useUserStore().clearCurrentUser()
       this.token = token
-      localStorage.setItem(TOKEN_STORAGE_KEY, token)
+      localStorage.setItem(ADMIN_STORAGE_KEY.TOKEN, token)
     },
 
     /** 清除当前登录凭证。 */
     clearToken() {
       this.token = ''
-      localStorage.removeItem(TOKEN_STORAGE_KEY)
-      localStorage.removeItem('workspaceId')
+      localStorage.removeItem(ADMIN_STORAGE_KEY.TOKEN)
+      localStorage.removeItem(ADMIN_STORAGE_KEY.WORKSPACE_ID)
       useUserStore().clearCurrentUser()
     },
   },

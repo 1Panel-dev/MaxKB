@@ -8,6 +8,7 @@ import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import AvatarDropdown from './avatar-dropdown/index.vue'
 import HeaderWorkspaceDropdown from './header-workspace-dropdown/index.vue'
 import { isSystem, isWorkspace } from './utils'
+import { ADMIN_STORAGE_KEY } from '@/constants/storage-key'
 import { Compare, Role, RoleConstants, hasPermission } from '@/permission/core'
 import { useStore } from '@/stores'
 import { getWorkspaceId } from '@/utils/resource-context'
@@ -57,12 +58,12 @@ const canReturnWorkspace = computed(() => isWorkspaceManager.value || isOrdinary
 function switchMode() {
   if (isWorkspace(props.mode)) {
     const workspaceId = getWorkspaceId()
-    if (workspaceId) localStorage.setItem('workspaceId', workspaceId)
+    if (workspaceId) localStorage.setItem(ADMIN_STORAGE_KEY.WORKSPACE_ID, workspaceId)
     router.push({ name: 'system-home' })
     return
   }
   // 缓存的工作空间仅用于从系统管理返回工作空间。
-  const workspaceId = localStorage.getItem('workspaceId') || user.userInfo?.workspace_list?.[0]?.id || 'default'
+  const workspaceId = localStorage.getItem(ADMIN_STORAGE_KEY.WORKSPACE_ID) || user.userInfo?.workspace_list?.[0]?.id || 'default'
   router.push({ name: 'workspace-home', params: { workspaceId } })
 }
 

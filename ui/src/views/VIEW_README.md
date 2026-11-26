@@ -348,7 +348,8 @@ Workspace 共享只读，隐藏创建、编辑、排序、关联修改及批量�
 View 负责路由、资源与模式、图加载、保存／发布／调试编排；画布公开接口及节点行为见画布文档。
 整条页面操作共用一个 loading，最外层 finally 释放，内部保存／加载只返回 Promise。
 
-- 自动保存默认关闭，按 `workflowAutoSave:<resource>:<id>` 独立记录；开启后每 60 秒保存未提交修改。
+- 自动保存默认关闭，按 `workflowAutoSave:<resource>:<id>` 独立记录；key 由 `workflow/storage-key.ts`
+  的 `getWorkflowAutoSaveStorageKey` 统一生成，三类编辑页引用；开启后每 60 秒保存未提交修改。
   加载、保存、发布、历史和退出确认中跳过；成功只更新本次快照，请求期间继续编辑仍算未保存；失败留待重试。
 - 保存使用规范化 `getGraphData()`；默认模型与图一起持久化，失败回滚已保存配置并保持抽屉编辑草稿。
 - 默认模型抽屉接收完整 Model API；“应用到所有节点”递归修改图，保留自定义配置及禁用功能，不自动提交模型草稿。

@@ -4,7 +4,8 @@ import { defineStore } from 'pinia'
 import type { CurrentUserInfo } from '@/api/admin/auth/types'
 import { ROLE_TYPE } from '@/api/enums'
 import CurrentUserApi from '@/api/admin/auth/current-user'
-import { LANGUAGE_STORAGE_KEY, getDefaultLanguage, normalizeLocale } from '@/locales/config'
+import { ADMIN_STORAGE_KEY } from '@/constants/storage-key'
+import { getDefaultLanguage, normalizeLocale } from '@/locales/config'
 
 interface UserState {
   language: string
@@ -50,7 +51,7 @@ export const useUserStore = defineStore('user', {
     /** 更新并持久化当前用户语言。 */
     setLanguage(language: string) {
       this.language = normalizeLocale(language)
-      localStorage.setItem(LANGUAGE_STORAGE_KEY, this.language)
+      localStorage.setItem(ADMIN_STORAGE_KEY.LANGUAGE, this.language)
     },
   },
 })

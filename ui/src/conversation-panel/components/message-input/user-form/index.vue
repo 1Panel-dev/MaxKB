@@ -6,6 +6,7 @@ import type { Dict } from '@/api/types'
 import type { FormField } from '@/components/mk-dynamics-form'
 import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 import { useMessageInputStore } from '../index'
+import { getUserFormStorageKey } from '@/stores/chat/storage-key'
 import { MsgWarning } from '@/utils/message'
 
 defineOptions({ name: 'ConversationUserForm' })
@@ -28,7 +29,7 @@ const { formData, apiFormData, userInputFields, apiInputFields, exposedFieldName
 
 const route = useRoute()
 const accessToken = typeof route.params.accessToken === 'string' ? route.params.accessToken : ''
-const storageKey = accessToken ? `${accessToken}userForm` : ''
+const storageKey = getUserFormStorageKey(accessToken)
 
 const inlineFormRef = ref<InstanceType<typeof MkDynamicsForm>>()
 const popoverFormRef = ref<InstanceType<typeof MkDynamicsForm>>()

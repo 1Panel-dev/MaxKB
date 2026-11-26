@@ -1,7 +1,7 @@
 /** 定义界面语言、偏好存储与语言包命名空间规则。 */
 import { reactive } from 'vue'
+import { ADMIN_STORAGE_KEY } from '@/constants/storage-key'
 
-export const LANGUAGE_STORAGE_KEY = 'MaxKB-locale'
 export const DEFAULT_LOCALE = 'zh-CN'
 
 export interface LocaleOption {
@@ -92,5 +92,5 @@ export function getMarkdownLocale(language: string | null | undefined): string {
 
 /** 优先读取本地偏好，其次使用浏览器语言，最终回退简体中文。 */
 export function getDefaultLanguage(): Locale {
-  return normalizeLocale(localStorage.getItem(LANGUAGE_STORAGE_KEY) || navigator.language)
+  return normalizeLocale(localStorage.getItem(ADMIN_STORAGE_KEY.LANGUAGE) || navigator.language)
 }
