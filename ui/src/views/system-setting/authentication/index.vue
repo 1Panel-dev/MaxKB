@@ -23,7 +23,7 @@ import CAS from './component/CAS.vue'
 import OIDC from './component/OIDC.vue'
 import SCAN from './component/SCAN.vue'
 import OAuth2 from './component/OAuth2.vue'
-import Saml2 from "./component/Saml2.vue";
+import Saml2 from './component/Saml2.vue'
 import Setting from './component/Setting.vue'
 import { t } from '@/locales'
 import useStore from '@/stores'
@@ -35,7 +35,7 @@ const activeName = ref('SETTING')
 const tabList = [
   {
     label: t('views.system.setting'),
-    name: "SETTING",
+    name: 'SETTING',
     component: Setting,
   },
   {
@@ -71,9 +71,9 @@ const tabList = [
 ]
 
 onMounted(() => {
-  if (user.isExpire()) {
-    router.push({ path: `/application` })
-  }
+  // if (user.isExpire()) {
+  //   router.push({ path: `/application` })
+  // }
 })
 </script>
 <style lang="scss" scoped>
