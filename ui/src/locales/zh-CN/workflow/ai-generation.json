@@ -6,7 +6,17 @@
     "placeholder": "请描述你的需求",
     "stopped": "已停止生成",
     "thinking": "思考中",
-    "examples": {
+    "knowledgeExamples": {
+      "documentParsing": "深度解析 PDF、PPT 等复杂文档，保留表格与版式结构写入分段",
+      "segmentQuestions": "给每个分段生成关联问题，让检索支持按问题匹配",
+      "documentTags": "根据文档内容将文档归类到指定的标签，便于按标签分类检索"
+    },
+    "toolExamples": {
+      "publicApi": "调用公开 API 查询数据，如天气、汇率，返回结构化结果",
+      "fileStatistics": "解析上传的 Excel 或 CSV 文件，按条件汇总统计后返回结果",
+      "textFormatting": "对文本做格式处理，如提取手机号、脱敏身份证号、转换日期格式"
+    },
+    "applicationExamples": {
       "productSupport": "做一个产品客服，先查产品知识库回答，查不到时礼貌兜底。",
       "pricing": "做一个可以查询产品收费信息的智能体。",
       "humanSupport": "做一个需要时可以转人工服务的客服智能体。"

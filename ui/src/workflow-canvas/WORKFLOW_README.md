@@ -561,6 +561,9 @@ AI 生成的 validate 工具复用同一入口（`collectWorkflowValidationError
 
 ## AI 生成（`ai-generate/`）
 
+生成面板通过必填的 `suggestedRequirements: string[]` 接收示例需求；智能体、知识库、工具的
+`ButtonAiGenerate` 分别提供对应业务的响应式翻译文案，面板负责展示与发送。
+
 当前用于应用、知识库、工具三类工作流及其循环体，根据用户需求规划、创建节点、连线与配置字段。
 页面通过 WorkflowCanvas.getLogicFlow() 提供画布，生成结果只改图，不自动保存。
 模型选择支持参数设置，不提供添加模型入口；优先沿用默认 LLM 的参数，切换模型加载对应默认参数。

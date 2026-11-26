@@ -28,6 +28,7 @@ const props = withDefaults(
   defineProps<{
     getLogicFlow: () => LogicFlow | undefined
     defaultModelSettings?: DefaultModelSettingPayload
+    suggestedRequirements: string[]
     workflowMode?: WorkflowMode
   }>(),
   { defaultModelSettings: undefined, workflowMode: WorkflowMode.Application },
@@ -51,12 +52,6 @@ const scrollbarRef = useTemplateRef<ScrollbarInstance>('scrollbarRef')
 const activity = createActivity()
 const busy = computed(() => status.value === 'running')
 const started = computed(() => status.value !== 'idle')
-
-const suggestedRequirements = computed(() => [
-  t('workflow.aiGeneration.examples.productSupport'),
-  t('workflow.aiGeneration.examples.pricing'),
-  t('workflow.aiGeneration.examples.humanSupport'),
-])
 
 function sendSuggestedRequirement(question: string) {
   if (!modelId.value || busy.value) return

@@ -6,7 +6,17 @@
     "placeholder": "請描述你的需求",
     "stopped": "已停止生成",
     "thinking": "思考中",
-    "examples": {
+    "knowledgeExamples": {
+      "documentParsing": "深度解析 PDF、PPT 等複雜文件，保留表格與版式結構寫入分段",
+      "segmentQuestions": "給每個分段生成關聯問題，讓檢索支援按問題匹配",
+      "documentTags": "根據文件內容將文件歸類到指定的標籤，便於按標籤分類檢索"
+    },
+    "toolExamples": {
+      "publicApi": "呼叫公開 API 查詢資料，如天氣、匯率，返回結構化結果",
+      "fileStatistics": "解析上傳的 Excel 或 CSV 檔案，按條件彙總統計後返回結果",
+      "textFormatting": "對文字做格式處理，如提取手機號碼、遮蔽身分證號碼、轉換日期格式"
+    },
+    "applicationExamples": {
       "productSupport": "做一個產品客服，先查產品知識庫回答，查不到時禮貌兜底。",
       "pricing": "做一個可以查詢產品收費信息的智能體。",
       "humanSupport": "做一個需要時可以轉人工服務的客服智能體。"

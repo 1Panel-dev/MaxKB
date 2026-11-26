@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useTemplateRef } from 'vue'
+import { computed, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { DefaultModelSettingPayload } from '@/api/types'
 import type LogicFlow from '@logicflow/core'
 import AiGeneratePanel from '@/workflow-canvas/ai-generate/panel/AiGeneratePanel.vue'
@@ -12,6 +13,12 @@ const props = defineProps<{
   getLogicFlow: () => LogicFlow | undefined
   defaultModelSettings: DefaultModelSettingPayload
 }>()
+const { t } = useI18n({ useScope: 'global' })
+const suggestedRequirements = computed(() => [
+  t('workflow.aiGeneration.knowledgeExamples.documentParsing'),
+  t('workflow.aiGeneration.knowledgeExamples.segmentQuestions'),
+  t('workflow.aiGeneration.knowledgeExamples.documentTags'),
+])
 const emit = defineEmits<{ open: [] }>()
 const aiGeneratePanelRef = useTemplateRef<InstanceType<typeof AiGeneratePanel>>('aiGeneratePanelRef')
 
@@ -24,7 +31,7 @@ function handleOpenAiGenerate() {
 </script>
 
 <template>
-  <!-- AI 生成智能体工作流 -->
+  <!-- AI 生成知识库工作流 -->
   <el-button plain :disabled="disabled" @click="handleOpenAiGenerate">
     <MkIcon name="icon_star_colorful" />
     <span>{{ label }}</span>
@@ -32,6 +39,7 @@ function handleOpenAiGenerate() {
   <AiGeneratePanel
     ref="aiGeneratePanelRef"
     :get-logic-flow="getLogicFlow"
+    :suggested-requirements="suggestedRequirements"
     :default-model-settings="defaultModelSettings"
     :workflow-mode="WorkflowMode.Knowledge"
   />
