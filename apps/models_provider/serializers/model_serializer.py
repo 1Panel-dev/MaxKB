@@ -39,6 +39,22 @@ def get_default_model_params_setting(provider, model_type, model_name):
     return []
 
 
+def _model_summary(model: Model):
+    creator = model.user
+    return {
+        "id": str(model.id),
+        "provider": model.provider,
+        "name": model.name,
+        "model_type": model.model_type,
+        "model_name": model.model_name,
+        "status": model.status,
+        "meta": model.meta,
+        "user_id": model.user_id,
+        "username": creator.username if creator else "",
+        "nick_name": creator.nick_name if creator else "",
+    }
+
+
 class ModelModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Model
@@ -454,7 +470,7 @@ class ModelSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             user_id = self.data.get("user_id")
             query_params = self._build_query_params(workspace_id, False, user_id)
-            result = [self._build_model_data(model) for model in query_params.get("model_query_set")]
+            result = [_model_summary(model) for model in query_params.get("model_query_set")]
             return ResourceMappingSerializer().get_resource_count(result)
 
         def model_list(self, workspace_id, with_valid=True):
@@ -471,7 +487,7 @@ class ModelSerializer(serializers.Serializer):
                 shared_queryset = get_authorized_model(shared_queryset, workspace_id)
 
             # 构建共享模型和普通模型列表
-            shared_model = [self._build_model_data(model) for model in shared_queryset]
+            shared_model = [_model_summary(model) for model in shared_queryset]
 
             is_x_pack_ee = self.is_x_pack_ee()
             normal_model = native_search(
@@ -519,21 +535,6 @@ class ModelSerializer(serializers.Serializer):
                     "model_query_set": queryset,
                 }
             )
-
-        def _build_model_data(self, model):
-            creator = model.user
-            return {
-                "id": str(model.id),
-                "provider": model.provider,
-                "name": model.name,
-                "model_type": model.model_type,
-                "model_name": model.model_name,
-                "status": model.status,
-                "meta": model.meta,
-                "user_id": model.user_id,
-                "username": creator.username if creator else "",
-                "nick_name": creator.nick_name if creator else "",
-            }
 
         def page(self, current_page, page_size):
             pass
@@ -612,21 +613,7 @@ class WorkspaceSharedModelSerializer(serializers.Serializer):
 
         queryset = self._build_queryset(workspace_id)
 
-        return [
-            {
-                "id": str(model.id),
-                "provider": model.provider,
-                "name": model.name,
-                "model_type": model.model_type,
-                "model_name": model.model_name,
-                "status": model.status,
-                "meta": model.meta,
-                "user_id": model.user_id,
-                "nick_name": model.user.nick_name,
-                "username": model.user.username,
-            }
-            for model in queryset.order_by("-create_time")
-        ]
+        return [_model_summary(model) for model in queryset.select_related("user").order_by("-create_time")]
 
     def _build_queryset(self, workspace_id):
         queryset = QuerySet(Model)

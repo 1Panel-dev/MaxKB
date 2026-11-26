@@ -14,6 +14,35 @@ from users.models import User
 
 
 class WorkspaceModelListTests(TestCase):
+    def test_shared_model_list_after_creator_deletion(self):
+        workspace_id = "shared-model-list"
+        reader = User.objects.create(username="reader", nick_name="Reader", role="USER")
+        creator = User.objects.create(username="former-creator")
+        shared = Model.objects.create(workspace_id="None", name="Shared", user=creator)
+        owned = Model.objects.create(workspace_id="None", name="Owned", user=reader)
+        Model.objects.create(workspace_id="None", name="Unshared")
+        creator.delete()
+
+        def authorized_models(queryset, requested_workspace):
+            self.assertEqual(requested_workspace, workspace_id)
+            return queryset.filter(id__in=[shared.id, owned.id])
+
+        client = APIClient()
+        reader.type = str(UserType.SYSTEM_USER)
+        role = RoleConstants.USER.get_workspace_role()(None, {"workspace_id": workspace_id})
+        client.force_authenticate(user=reader, token=Auth(roles={str(role)}, permissions={}))
+        with patch.dict(DatabaseModelManage.model_dict, {"get_authorized_model": authorized_models}):
+            response = client.get(f"/admin/api/system/shared/workspace/{workspace_id}/model")
+
+        self.assertEqual(response.status_code, 200)
+        rows = {row["id"]: row for row in response.json()["data"]}
+        self.assertEqual(set(rows), {str(shared.id), str(owned.id)})
+        self.assertIsNone(rows[str(shared.id)]["user_id"])
+        self.assertEqual(rows[str(shared.id)]["username"], "")
+        self.assertEqual(rows[str(shared.id)]["nick_name"], "")
+        self.assertEqual(rows[str(owned.id)]["username"], reader.username)
+        self.assertEqual(rows[str(owned.id)]["nick_name"], reader.nick_name)
+
     def test_embedding_options_include_shared_models_after_creator_deletion(self):
         workspace_id = "embedding-options"
         user = User.objects.create(username="reader", nick_name="Reader", role="USER")
