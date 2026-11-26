@@ -1,3 +1,5 @@
+import type { RoleInfo } from './system-role'
+
 export interface SystemUserGroup {
   id: string
   name: string
@@ -7,6 +9,7 @@ export interface SystemUserGroup {
 
 export interface SystemUserGroupMember {
   id: string
+  role_info?: RoleInfo[]
   roles: string[]
   username: string
   email: string

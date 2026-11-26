@@ -1,6 +1,6 @@
 /** Admin 认证 API 及其 Store 消费方共同使用的类型。 */
 
-import type { WorkspaceItem } from '@/api/types'
+import type { RoleInfo, WorkspaceItem } from '@/api/types'
 
 export interface CurrentUserInfo {
   email: string
@@ -11,6 +11,7 @@ export interface CurrentUserInfo {
   /** 权限位图：key 为「组(+工作空间+资源)」，value 为该组内操作授权位按位或的十六进制字符串（不带 0x 前缀，避免超过 2^53 丢精度）。 */
   permissions: Record<string, string>
   role: string[]
+  role_info?: RoleInfo[]
   role_name?: string[]
   source?: string
   username: string

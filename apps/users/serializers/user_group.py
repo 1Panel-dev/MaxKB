@@ -265,7 +265,9 @@ class UserGroupListPageSerializer(serializers.Serializer):
             # 补充用户在指定工作空间的角色
             role_map = self._get_user_role_map(self.data.get("workspace_id"), result["records"])
             for user in result["records"]:
-                user["roles"] = role_map.get(str(user["id"]), [])
+                role_data = role_map.get(str(user["id"]), {"roles": [], "role_info": []})
+                user["roles"] = role_data["roles"]
+                user["role_info"] = role_data["role_info"]
             return result
 
         def _get_user_role_map(self, workspace_id, records):
@@ -280,9 +282,16 @@ class UserGroupListPageSerializer(serializers.Serializer):
                 workspace_id=workspace_id, user_id__in=user_ids, role__type="USER"
             ).select_related("role", "user")
 
-            role_map = defaultdict(list)
+            role_map = defaultdict(lambda: {"roles": [], "role_info": []})
             for relation in user_role_relations:
-                role_map[str(relation.user_id)].append(relation.role.role_name)
+                role_data = role_map[str(relation.user_id)]
+                role_data["roles"].append(relation.role.role_name)
+                role_data["role_info"].append(
+                    {
+                        "role_id": str(relation.role.id),
+                        "role_name": relation.role.role_name,
+                    }
+                )
             return role_map
 
         def get_query_set(self):

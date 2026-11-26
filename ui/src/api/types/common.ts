@@ -1,3 +1,5 @@
+import type { RoleInfo } from './system-role'
+
 /** 键为字符串的通用字典类型。 */
 export type Dict<T> = Record<string, T>
 
@@ -23,9 +25,9 @@ export interface ExportError {
 export interface CommonUserOption {
   id: string
   nick_name: string
+  role_info?: RoleInfo[]
   roles?: string[]
 }
-
 
 export interface DynamicFormField {
   attrs?: Record<string, unknown>

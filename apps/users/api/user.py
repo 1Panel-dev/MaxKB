@@ -92,6 +92,7 @@ class WorkspaceUser(serializers.Serializer):
     id = serializers.CharField(required=True, label=_("id"))
     nick_name = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_("Nick name"))
     roles = serializers.ListField(child=serializers.CharField(required=False), required=False, label=_("roles"))
+    role_info = serializers.ListField(child=serializers.DictField(), required=False, label=_("Role info"))
 
 
 class WorkspaceUserListResponse(ResultSerializer):

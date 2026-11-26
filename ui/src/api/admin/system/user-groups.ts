@@ -1,6 +1,7 @@
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type { Dict, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
 import { del, get, post } from '../core/request'
+import { localizeRoleInfo } from '../role-display'
 
 const prefix = (workspaceId: string) => `/system/workspace/${workspaceId}/user_group`
 
@@ -21,7 +22,22 @@ const deleteSystemUserGroup = (workspaceId: string, groupId: string) => {
 
 /** 获取指定系统用户组的成员分页列表。 */
 const getSystemUserGroupMembers = (workspaceId: string, groupId: string, page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<SystemUserGroupMember>>(`${prefix(workspaceId)}/${groupId}/user_list/${page.currentPage}/${page.pageSize}`, query)
+  return get<ResponsePage<SystemUserGroupMember>>(
+    `${prefix(workspaceId)}/${groupId}/user_list/${page.currentPage}/${page.pageSize}`,
+    query,
+  ).then((result) => ({
+    ...result,
+    records: result.records.map((member) => {
+      const roleInfo = localizeRoleInfo(member.role_info)
+      return roleInfo
+        ? {
+            ...member,
+            role_info: roleInfo,
+            roles: roleInfo.map(({ role_name }) => role_name),
+          }
+        : member
+    }),
+  }))
 }
 
 /** 向指定系统用户组添加成员。 */

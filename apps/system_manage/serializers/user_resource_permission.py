@@ -434,6 +434,13 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
 
     RESOURCE_MODEL_MAP = {"APPLICATION": Application, "KNOWLEDGE": Knowledge, "TOOL": Tool}
 
+    @staticmethod
+    def parse_role_info(record):
+        role_info = record.get("role_info")
+        if isinstance(role_info, str):
+            record["role_info"] = json.loads(role_info)
+        return record
+
     def get_queryset(self, instance, is_x_pack_ee: bool):
 
         user_query_set = QuerySet(
@@ -535,7 +542,7 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
                 )
             ),
         )
-        return resource_user_permission_list
+        return list(map(self.parse_role_info, resource_user_permission_list))
 
     @staticmethod
     def is_x_pack_ee():
@@ -566,6 +573,7 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
                     ),
                 )
             ),
+            post_records_handler=self.parse_role_info,
         )
         return resource_user_permission_page_list
 

@@ -10,6 +10,7 @@ import type {
   SaveRolePermissionRequest,
 } from '@/api/types'
 import { del, get, post } from '../core/request'
+import { localizeRoleName } from '../role-display'
 
 const prefix = '/system/role'
 
@@ -17,14 +18,24 @@ const prefix = '/system/role'
 const getRoleList = () => {
   return get<{ internal_role: RoleItem[]; custom_role: RoleItem[] } | RoleTypeGroup[]>(prefix).then((data) => {
     if (Array.isArray(data)) {
-      return data
+      return data.map((group) => ({
+        ...group,
+        role_list: group.role_list.map((role) => localizeRoleItem(role)),
+      }))
     }
-    const roles = [...(data.internal_role ?? []), ...(data.custom_role ?? [])]
+    const roles = [...(data.internal_role ?? []), ...(data.custom_role ?? [])].map((role) => localizeRoleItem(role))
     return [...new Set(roles.map((role) => role.type))].map((roleType) => ({
       role_type: roleType,
       role_list: roles.filter((role) => role.type === roleType),
     }))
   })
+}
+
+function localizeRoleItem(role: RoleItem): RoleItem {
+  return {
+    ...role,
+    role_name: localizeRoleName(role.id, role.role_name),
+  }
 }
 
 /** 创建或重命名自定义角色。 */
