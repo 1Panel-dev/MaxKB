@@ -38,6 +38,10 @@ const searchFields = computed<OptionItem<string>[]>(() => [
   { label: t('user.username.label'), value: 'username' },
   { label: t('user.email.label'), value: 'email' },
 ])
+const userGroupColumns = computed(() => [
+  { prop: 'user_group_names', label: t('userGroup.title') },
+  ...(auth.isEE || auth.isPE ? [{ prop: 'workspace', label: t('workspace.title') }] : []),
+])
 const systemUserSearchQuery = ref<Dict<unknown>>()
 const userSourceLabels = computed<Record<LoginMethod, string>>(() => ({
   ...LOGIN_METHOD_LABELS,
@@ -225,17 +229,14 @@ onMounted(() => loadSystemUsers())
             <span v-if="!row.user_group_names?.length">-</span>
             <WorkspaceRelationTags
               v-else
-              :columns="[
-                { prop: 'user_group_names', label: t('userGroup.title') },
-                { prop: 'workspace', label: t('workspace.title') },
-              ]"
+              :columns="userGroupColumns"
               :tags="row.user_group_names"
               :data="row.user_group_workspace ?? []"
             />
           </template>
         </el-table-column>
 
-        <el-table-column v-if="!auth.isCE" width="120" :label="t('user.source.label')">
+        <el-table-column v-if="auth.isEE || auth.isPE" width="120" :label="t('user.source.label')">
           <template #header>
             <MkTableFilter
               mode="single"
