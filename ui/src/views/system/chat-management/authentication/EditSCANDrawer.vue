@@ -116,7 +116,7 @@ defineExpose({ open })
       <!-- 取消 -->
       <el-button plain @click="visible = false">{{ t('common.actions.cancel') }}</el-button>
       <!-- 校验 -->
-      <el-button plain @click="handleValidatePlatform">{{ t('auth.qrCode.validate') }}</el-button>
+      <el-button v-if="perm.system.chatAuth.edit()" plain @click="handleValidatePlatform">{{ t('auth.qrCode.validate') }}</el-button>
       <!-- 保存 -->
       <el-button v-if="perm.system.chatAuth.edit()" type="primary" @click="submit">{{ t('common.actions.save') }}</el-button>
     </template>
