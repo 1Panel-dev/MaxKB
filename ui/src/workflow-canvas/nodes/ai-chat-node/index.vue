@@ -257,7 +257,8 @@ onMounted(() => {
 
         <div class="flex-between w-full gap-3 mb-2">
           <span>{{ t('application.skills.label') }}</span>
-          <el-checkbox :model-value="formData.mcp_output_enable">{{ t('application.skills.outputExecution') }}</el-checkbox>
+          <!-- 控制是否展示技能执行过程 -->
+          <el-checkbox v-model="formData.mcp_output_enable">{{ t('application.skills.outputExecution') }}</el-checkbox>
         </div>
         <div class="mk-white-card w-full">
           <ResourceSetting :setting="formData" @update="updateNodeData" />
