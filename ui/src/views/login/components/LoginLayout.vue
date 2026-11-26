@@ -29,7 +29,7 @@ const loginImage = computed(() => customLoginImage.value || getThemeImg(layoutTh
   <div class="login-layout" :class="{ 'is-preview': preview }">
     <div class="login-background"></div>
 
-    <header class="login-header flex-between">
+    <header class="login-header flex-between mb-6">
       <div class="flex-align-center gap-4">
         <img v-if="layoutThemeInfo?.loginLogo" :src="layoutThemeInfo.loginLogo" alt="MaxKB" class="h-9.5 max-w-50 object-contain object-left" />
         <LogoFull v-else height="38" />
@@ -54,36 +54,33 @@ const loginImage = computed(() => customLoginImage.value || getThemeImg(layoutTh
         </template>
       </MkDropdown>
     </header>
+    <el-scrollbar height="100%" view-class="h-full">
+      <el-row class="login-main p-6 pt-19" align="middle">
+        <el-col :xs="0" :sm="0" :md="13" :lg="13" class="login-decoration">
+          <DefaultThemeAnimation v-if="showDefaultThemeAnimation" />
+          <img v-else :src="loginImage" alt="" class="w-full object-contain" />
+        </el-col>
 
-    <el-row class="login-main" align="middle">
-      <el-col :xs="0" :sm="0" :md="13" :lg="13" class="login-decoration">
-        <DefaultThemeAnimation v-if="showDefaultThemeAnimation" />
-        <img v-else :src="loginImage" alt="" class="w-full object-contain" />
-      </el-col>
-
-      <el-col :xs="24" :sm="24" :md="11" :lg="11" class="flex-center!">
-        <el-card class="login-card w-100">
-          <slot />
-        </el-card>
-      </el-col>
-    </el-row>
+        <el-col :xs="24" :sm="24" :md="11" :lg="11" class="flex-center!">
+          <el-card class="login-card w-100">
+            <slot />
+          </el-card>
+        </el-col>
+      </el-row>
+    </el-scrollbar>
   </div>
 </template>
 
 <style scoped lang="scss">
 .login-layout {
   background: var(--mk-N100);
-  min-height: 100vh;
+  height: 100vh;
   overflow: hidden;
   position: relative;
 
   &.is-preview {
     height: 100%;
     min-height: 0;
-
-    .login-main {
-      height: 100%;
-    }
   }
 }
 
@@ -105,7 +102,7 @@ const loginImage = computed(() => customLoginImage.value || getThemeImg(layoutTh
 }
 
 .login-main {
-  height: 100vh;
+  min-height: 100%;
   margin: 0 auto;
   max-width: 1120px;
   position: relative;
