@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { inject, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useBottomFollow } from '@/conversation-panel/core/bottom-follow'
+import { MESSAGE_LIST_KEY } from '../../message-list'
 
 defineOptions({ name: 'ConversationReasoningContent' })
 
 defineProps<{ content: { content?: string | null; status?: string } }>()
 const { t } = useI18n({ useScope: 'global' })
+const messageList = inject(MESSAGE_LIST_KEY, null)
 // 默认收起，思考中也只显示状态文案，手动展开后查看内容
 const isExpanded = ref(false)
 
@@ -27,7 +29,7 @@ useBottomFollow(useTemplateRef<HTMLElement>('reasoningScrollRef'))
     </template>
     <template #label>
       <MkIcon name="icon_two-ellipses_outlined" />
-      <span class="-mx-1" :class="{ 'mk-dotting': content.status === 'RUNNING' }">
+      <span class="-mx-1" :class="{ 'mk-dotting': content.status === 'RUNNING' && messageList?.streamLoading.value }">
         {{ content.status === 'RUNNING' ? t('chat.message.thinking') : t('chat.message.thinkingCompleted') }}
       </span>
     </template>
