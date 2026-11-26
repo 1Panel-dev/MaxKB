@@ -22,6 +22,7 @@ from typing import Dict, List
 import requests
 import uuid_utils.compat as uuid
 from application.workflow.common import new_instance, WorkflowType
+from application.workflow.visibility_compat import normalize_workflow_visibility
 from application.long_term_memory import schedule_extract_long_term_memory
 from application.models.application import Application, ApplicationFolder, ApplicationTypeChoices, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
@@ -990,6 +991,8 @@ class ApplicationSerializer(serializers.Serializer):
             if node.get("type") == "loop-node":
                 for n in node.get("properties", {}).get("node_data", {}).get("loop_body", {}).get("nodes", []):
                     hand_node(n, update_tool_map)
+        # v2 导出的应用不经过数据库迁移，导入时转换显隐条件
+        normalize_workflow_visibility(work_flow)
         return Application(
             id=uuid.uuid7(),
             user_id=user_id,
