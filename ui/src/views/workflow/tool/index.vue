@@ -30,6 +30,7 @@ import { defaultToolNodes } from '@/workflow-canvas/config/node-mapping'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
+import { getWorkflowAutoSaveStorageKey } from '../storage-key'
 import ButtonAiGenerate from './components/ButtonAiGenerate.vue'
 import ButtonDebug from './components/ButtonDebug.vue'
 import ButtonPublishHistory from './components/ButtonPublishHistory.vue'
@@ -113,7 +114,7 @@ function saveToolWorkflow(graphData = getGraphData(), showMessage = false) {
 
 /* 自动保存：一分钟周期，按资源类型和工具独立记录开关。 */
 const AUTO_SAVE_INTERVAL = 60_000
-const autoSaveStorageKey = `workflowAutoSave:tool:${toolId}`
+const autoSaveStorageKey = getWorkflowAutoSaveStorageKey('tool', toolId)
 const autoSaveEnabled = ref(localStorage.getItem(autoSaveStorageKey) === 'true')
 let autoSaveTimer: ReturnType<typeof setInterval> | undefined
 const confirmingExit = ref(false)

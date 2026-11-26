@@ -9,6 +9,7 @@ import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vu
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 import { LOGIN_METHOD_LABELS } from '@/constants'
+import { ADMIN_STORAGE_KEY } from '@/constants/storage-key'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import perm from '@/permission/index.ts'
@@ -16,7 +17,7 @@ const { auth, user } = useStore()
 const { t } = useI18n({ useScope: 'global' })
 
 /* 选择工作空间列表 */
-const selectedWorkspaceId = ref(user.userInfo?.workspace_list?.[0]?.id ?? 'default')
+const selectedWorkspaceId = ref(localStorage.getItem(ADMIN_STORAGE_KEY.WORKSPACE_ID) || user.userInfo?.workspace_list?.[0]?.id || 'default')
 const workspaceOptions = ref<WorkspaceItem[]>([])
 const loadingView = ref(false)
 

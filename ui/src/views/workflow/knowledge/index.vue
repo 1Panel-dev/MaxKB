@@ -33,6 +33,7 @@ import WorkflowViewLayout from '../components/WorkflowViewLayout.vue'
 import ButtonDefaultModelSetting from '../components/default-model-setting/ButtonDefaultModelSetting.vue'
 import EditPublishVersionDialog from '../components/publish-history/EditPublishVersionDialog.vue'
 import { showWorkflowValidateError } from '../components/validate-error'
+import { getWorkflowAutoSaveStorageKey } from '../storage-key'
 import ButtonAiGenerate from './components/ButtonAiGenerate.vue'
 import ButtonDebug from './components/ButtonDebug.vue'
 import ButtonPublishHistory from './components/ButtonPublishHistory.vue'
@@ -161,7 +162,7 @@ function handleSave() {
 
 /* 自动保存：一分钟周期，按资源类型和知识库独立记录开关。 */
 const AUTO_SAVE_INTERVAL = 60_000
-const autoSaveStorageKey = `workflowAutoSave:knowledge:${knowledgeId}`
+const autoSaveStorageKey = getWorkflowAutoSaveStorageKey('knowledge', knowledgeId)
 const autoSaveEnabled = ref(localStorage.getItem(autoSaveStorageKey) === 'true')
 let autoSaveTimer: ReturnType<typeof setInterval> | undefined
 
@@ -545,7 +546,12 @@ onBeforeUnmount(stopAutoSave)
               <span>{{ t('workflow.layout.exportWorkflow') }}</span>
             </MkDropdownItem>
             <!-- 查看执行记录 -->
-            <ButtonExecutionRecord v-if="knowledgeWorkflowPermission('docCreate')" :label="t('execution.records.title')" :api="requestApi" :knowledge-id="knowledgeId" />
+            <ButtonExecutionRecord
+              v-if="knowledgeWorkflowPermission('docCreate')"
+              :label="t('execution.records.title')"
+              :api="requestApi"
+              :knowledge-id="knowledgeId"
+            />
             <!-- 发布历史 -->
             <ButtonPublishHistory
               :label="t('workflow.publishHistory.title')"

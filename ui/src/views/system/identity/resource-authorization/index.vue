@@ -21,6 +21,7 @@ import PermissionTable from './components/PermissionTable.vue'
 import UserAuthorizationList from './components/UserAuthorizationList.vue'
 import UserGroupAuthorizationList from './components/user-group/UserGroupAuthorizationList.vue'
 import { RESOURCE_AUTHORIZATION_LABELS } from './constants'
+import { ADMIN_STORAGE_KEY } from '@/constants/storage-key'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import { perm } from '@/permission'
@@ -52,7 +53,7 @@ const resourceTypeOptions = computed<OptionItem<ResourceAuthorizationType>[]>(()
 
 /* 选择工作空间列表 */
 const loadingView = ref(false)
-const selectedWorkspaceId = ref(user.userInfo?.workspace_list?.[0]?.id ?? 'default')
+const selectedWorkspaceId = ref(localStorage.getItem(ADMIN_STORAGE_KEY.WORKSPACE_ID) || user.userInfo?.workspace_list?.[0]?.id || 'default')
 const workspaceOptions = ref<WorkspaceItem[]>([])
 
 function handleWorkspaceSelect(workspace: WorkspaceItem) {

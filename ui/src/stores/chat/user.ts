@@ -7,13 +7,11 @@ import { normalizeLocale } from '@/locales/config'
 
 interface ChatUserState {
   language: string
-  /** 当前认证场景的语言缓存 key；门户与各单应用分别保存，不与 Admin 共用。 */
-  languageStorageKey: string
   chatUserProfile: ChatUserProfile | null
 }
 
 export const useChatUserStore = defineStore('chat-user', {
-  state: (): ChatUserState => ({ language: normalizeLocale(navigator.language), languageStorageKey: '', chatUserProfile: null }),
+  state: (): ChatUserState => ({ language: normalizeLocale(navigator.language), chatUserProfile: null }),
 
   actions: {
     /** 加载当前对话用户档案，并应用账号语言。 */
@@ -30,18 +28,10 @@ export const useChatUserStore = defineStore('chat-user', {
       this.chatUserProfile = null
     },
 
-    /** 切换到指定场景的语言：优先使用认证前置配置的语言，其次为该场景的本地缓存，最终使用浏览器语言。 */
-    applyScopeLanguage(languageStorageKey: string, profileLanguage?: string | null) {
-      if (this.languageStorageKey === languageStorageKey) return
-      this.languageStorageKey = languageStorageKey
-      this.setLanguage(profileLanguage || localStorage.getItem(languageStorageKey) || navigator.language)
-    },
-
-    /** 更新当前语言，并持久化到当前场景的缓存。 */
+    /** 更新当前语言与用户档案，不使用浏览器缓存。 */
     setLanguage(language: string) {
       this.language = normalizeLocale(language)
       if (this.chatUserProfile) this.chatUserProfile.language = this.language
-      if (this.languageStorageKey) localStorage.setItem(this.languageStorageKey, this.language)
     },
   },
 })
