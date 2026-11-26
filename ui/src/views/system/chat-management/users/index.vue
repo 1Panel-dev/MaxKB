@@ -261,7 +261,7 @@ onMounted(() => loadChatUsers())
               <el-switch
                 v-model="row.is_active"
                 size="small"
-                :disabled="!perm.system.chatUser.edit()"
+                v-if="perm.system.chatUser.edit()"
                 :before-change="() => handleChangeStatus(row)"
               />
               <el-divider direction="vertical" class="ml-3! mr-2!" />
