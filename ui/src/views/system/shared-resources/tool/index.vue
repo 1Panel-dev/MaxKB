@@ -73,8 +73,14 @@ function handleSearchChange(query?: Dict<unknown>) {
 const toolOperationLoading = ref(false)
 const editToolFormRef = useTemplateRef<InstanceType<typeof EditToolForm>>('editToolFormRef')
 
+function canOpenEditTool(tool: ToolItem) {
+  if (perm.tool.share.edit()) return true
+  const viewableTypes: ToolType[] = [TOOL_TYPE.CUSTOM, TOOL_TYPE.MCP, TOOL_TYPE.SKILL, TOOL_TYPE.DATA_SOURCE]
+  return viewableTypes.includes(tool.tool_type) && perm.tool.share.read()
+}
+
 function handleOpenEditTool(tool: ToolItem) {
-  if (!perm.tool.share.edit()) return
+  if (!canOpenEditTool(tool)) return
   return editToolFormRef.value?.open(tool)
 }
 
