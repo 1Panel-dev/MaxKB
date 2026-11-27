@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type { Locale } from '@/locales/config'
 import { LOGIN_METHOD } from '@/api/enums'
@@ -19,6 +19,7 @@ defineOptions({ name: 'AvatarDropdown' })
 const { t } = useI18n({ useScope: 'global' })
 
 const isChangingLanguage = ref(false)
+const route = useRoute()
 const router = useRouter()
 const { auth, user, theme } = useStore()
 const currentLocale = computed(() => resolveSupportedLocale(user.language))
@@ -44,9 +45,9 @@ function handleOpenChangePassword() {
   changePasswordDialogRef.value?.open()
 }
 
-// 用户资料和弹窗就绪后提示修改默认密码；刷新页面后仍会重新检查。
+// 用户资料和弹窗就绪、工作空间与系统管理切换时检查默认密码；刷新后仍会重新检查。
 watch(
-  [() => user.userInfo?.is_edit_password, changePasswordDialogRef],
+  [() => user.userInfo?.is_edit_password, changePasswordDialogRef, () => route.meta.scope],
   ([isDefaultPassword]) => {
     if (isDefaultPassword === true) handleOpenChangePassword()
   },
