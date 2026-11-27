@@ -497,9 +497,14 @@ def get_chat_user_cookie_path(access_token):
     return f"/chat/{access_token or 'portal'}"
 
 
-def clear_file_auth_cookie(response: HttpResponse, access_token):
+def clear_file_auth_cookie(request: Request, response: HttpResponse, access_token):
     """删除对话用户登录写入的文件凭证 cookie；该 cookie 为 HttpOnly，前端无法自行清除。"""
-    response.delete_cookie(FILE_AUTH_COOKIE, path=get_chat_user_cookie_path(access_token), samesite="Lax")
+    secure = request.is_secure()
+    response.delete_cookie(
+        FILE_AUTH_COOKIE,
+        path=get_chat_user_cookie_path(access_token),
+        samesite="None" if secure else "Lax",
+    )
     return response
 
 
@@ -551,7 +556,7 @@ class BaseAuthView(APIView):
             domain=None,
             secure=secure,
             httponly=True,
-            samesite="Lax",
+            samesite="None" if secure else "Lax",
         )
         return response
 
@@ -591,4 +596,4 @@ class Logout(APIView):
         version, get_key = Cache_Version.CHAT_USER_TOKEN.value
         auth = request.META.get("HTTP_AUTHORIZATION")
         cache.delete(get_key(token=auth[7:]), version=version)
-        return clear_file_auth_cookie(result.success(True), request.query_params.get("accessToken"))
+        return clear_file_auth_cookie(request, result.success(True), request.query_params.get("accessToken"))
