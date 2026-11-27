@@ -12,6 +12,7 @@ export interface AuthProfile<Meta = Record<string, never>> {
   rsa_key: string
   logo: string
   custom_theme?: { theme_color?: string; header_font_color?: string } | null
+  edition?: string
   meta: Meta
 }
 
