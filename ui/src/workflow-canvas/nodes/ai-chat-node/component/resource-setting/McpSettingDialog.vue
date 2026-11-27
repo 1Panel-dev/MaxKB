@@ -52,7 +52,7 @@ function open(setting: McpSetting) {
     .getToolListWithShared({ tool_type: TOOL_TYPE.MCP })
     .then((tools) => {
       if (!visible.value) return
-      mcpOptions.value = tools
+      mcpOptions.value = tools.filter((item) => item.is_active)
       emit('loaded', tools)
     })
     .finally(() => {
