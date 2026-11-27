@@ -19,7 +19,8 @@ const props = withDefaults(
 
 const show = ref(false)
 const isSuccess = computed(() => props.data?.status === 200)
-const showContent = computed(() => isSuccess.value || props.showContentOnError)
+const isCancelled = computed(() => props.data?.status === 201)
+const showContent = computed(() => isSuccess.value || isCancelled.value || props.showContentOnError)
 </script>
 
 <template>
