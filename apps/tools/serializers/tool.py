@@ -1648,12 +1648,12 @@ class ToolBatchOperateSerializer(serializers.Serializer):
         from trigger.serializers.trigger import TriggerModelSerializer
 
         if with_valid:
-            BatchSerializer(data=instance).is_valid(model=Tool, raise_exception=True)
             self.is_valid(raise_exception=True)
-        id_list = instance.get("id_list")
         workspace_id = self.data.get("workspace_id")
 
-        tool_query_set = QuerySet(Tool).filter(id__in=id_list, workspace_id=workspace_id)
+        tool_query_set = QuerySet(Tool).filter(workspace_id=workspace_id)
+        id_list = BatchSerializer.scoped_ids(instance.get("id_list"), tool_query_set.select_for_update())
+        tool_query_set = tool_query_set.filter(id__in=id_list)
 
         for tool in tool_query_set:
             if tool.template_id is None and tool.icon != "":

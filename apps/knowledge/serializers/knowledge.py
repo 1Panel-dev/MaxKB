@@ -1560,11 +1560,11 @@ class KnowledgeBatchOperateSerializer(serializers.Serializer):
     @transaction.atomic
     def batch_delete(self, instance: Dict, with_valid=True):
         if with_valid:
-            BatchSerializer(data=instance).is_valid(model=Knowledge, raise_exception=True)
             self.is_valid(raise_exception=True)
-        id_list = instance.get("id_list")
         workspace_id = self.data.get("workspace_id")
-        knowledge_query_set = QuerySet(Knowledge).filter(id__in=id_list, workspace_id=workspace_id)
+        knowledge_query_set = QuerySet(Knowledge).filter(workspace_id=workspace_id)
+        id_list = BatchSerializer.scoped_ids(instance.get("id_list"), knowledge_query_set.select_for_update())
+        knowledge_query_set = knowledge_query_set.filter(id__in=id_list)
 
         # 删除所有关联
         document_query_set = QuerySet(Document).filter(knowledge__in=knowledge_query_set)

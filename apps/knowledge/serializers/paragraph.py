@@ -574,12 +574,18 @@ class ParagraphSerializers(serializers.Serializer):
         @transaction.atomic
         def batch_delete(self, instance: Dict, with_valid=True):
             if with_valid:
-                BatchSerializer(data=instance).is_valid(model=Paragraph, raise_exception=True)
                 self.is_valid(raise_exception=True)
-            paragraph_id_list = instance.get("id_list")
-            QuerySet(Paragraph).filter(id__in=paragraph_id_list).delete()
+            knowledge_id = self.data["knowledge_id"]
+            document_id = self.data["document_id"]
+            if not QuerySet(Document).select_for_update().filter(id=document_id, knowledge_id=knowledge_id).first():
+                raise AppUnauthorizedFailed(403, _("The document id is incorrect"))
+            paragraphs = QuerySet(Paragraph).filter(document_id=document_id, knowledge_id=knowledge_id)
+            paragraph_id_list = BatchSerializer.scoped_ids(instance.get("id_list"), paragraphs.select_for_update())
+            if not paragraph_id_list:
+                return True
             delete_problems_and_mappings(paragraph_id_list)
-            update_document_char_length(self.data.get("document_id"))
+            paragraphs.filter(id__in=paragraph_id_list).delete()
+            update_document_char_length(document_id)
             # 删除向量库
             delete_embedding_by_paragraph_ids(paragraph_id_list)
             return True

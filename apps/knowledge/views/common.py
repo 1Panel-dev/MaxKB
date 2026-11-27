@@ -13,8 +13,10 @@ def get_document_operation_object(document_id: str):
     return {}
 
 
-def get_document_operation_object_batch(document_id_list: str):
-    document_model_list = QuerySet(model=Document).filter(id__in=document_id_list)
+def get_document_operation_object_batch(document_id_list, knowledge_id, workspace_id=None):
+    document_model_list = QuerySet(model=Document).filter(id__in=document_id_list, knowledge_id=knowledge_id)
+    if workspace_id is not None:
+        document_model_list = document_model_list.filter(knowledge__workspace_id=workspace_id)
     if document_model_list is not None:
         return {
             "name": f'[{",".join([document_model.name for document_model in document_model_list])}]',

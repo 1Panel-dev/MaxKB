@@ -309,7 +309,9 @@ class DocumentView(APIView):
             operate="Modify document hit processing methods in batches",
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get("knowledge_id")),
-                get_document_operation_object_batch(r.data.get("id_list")),
+                get_document_operation_object_batch(
+                    r.data.get("id_list"), keywords["knowledge_id"], keywords["workspace_id"]
+                ),
             ),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -497,7 +499,9 @@ class DocumentView(APIView):
             operate="Cancel tasks in batches",
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get("knowledge_id")),
-                get_document_operation_object_batch(r.data.get("id_list")),
+                get_document_operation_object_batch(
+                    r.data.get("id_list"), keywords["knowledge_id"], keywords["workspace_id"]
+                ),
             ),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -577,7 +581,9 @@ class DocumentView(APIView):
             operate="Batch sync documents",
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get("knowledge_id")),
-                get_document_operation_object_batch(r.data.get("id_list")),
+                get_document_operation_object_batch(
+                    r.data.get("id_list"), keywords["knowledge_id"], keywords["workspace_id"]
+                ),
             ),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -617,7 +623,9 @@ class DocumentView(APIView):
             operate="Delete documents in batches",
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get("knowledge_id")),
-                get_document_operation_object_batch(r.data.get("id_list")),
+                get_document_operation_object_batch(
+                    r.data.get("id_list"), keywords["knowledge_id"], keywords["workspace_id"]
+                ),
             ),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -656,7 +664,9 @@ class DocumentView(APIView):
             operate="Batch refresh document vector library",
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get("knowledge_id")),
-                get_document_operation_object_batch(r.data.get("id_list")),
+                get_document_operation_object_batch(
+                    r.data.get("id_list"), keywords["knowledge_id"], keywords["workspace_id"]
+                ),
             ),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -693,7 +703,9 @@ class DocumentView(APIView):
             operate="Batch refresh document vector library",
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get("knowledge_id")),
-                get_document_operation_object_batch(r.data.get("id_list")),
+                get_document_operation_object_batch(
+                    r.data.get("id_list"), keywords["knowledge_id"], keywords["workspace_id"]
+                ),
             ),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -730,7 +742,9 @@ class DocumentView(APIView):
             operate="Batch add tags to documents",
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get("knowledge_id")),
-                get_document_operation_object_batch(r.data.get("document_ids")),
+                get_document_operation_object_batch(
+                    r.data.get("document_ids"), keywords["knowledge_id"], keywords["workspace_id"]
+                ),
             ),
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -770,7 +784,9 @@ class DocumentView(APIView):
             operate="Batch generate related problems",
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get("knowledge_id")),
-                get_document_operation_object_batch(r.data.get("document_id_list")),
+                get_document_operation_object_batch(
+                    r.data.get("document_id_list"), keywords["knowledge_id"], keywords["workspace_id"]
+                ),
             ),
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -1133,7 +1149,9 @@ class DocumentView(APIView):
                 operate="Batch Delete Documents Tag",
                 get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                     get_knowledge_operation_object(keywords.get("knowledge_id")),
-                    get_document_operation_object_batch(r.data.get("id_list")),
+                    get_document_operation_object_batch(
+                        r.data.get("id_list"), keywords["knowledge_id"], keywords["workspace_id"]
+                    ),
                 ),
             )
             def put(self, request: Request, workspace_id: str, knowledge_id: str, tag_id: str):
@@ -1173,7 +1191,7 @@ class DocumentView(APIView):
             operate="Migrate documents in batches",
             get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
                 get_knowledge_operation_object(keywords.get("knowledge_id")),
-                get_document_operation_object_batch(r.data),
+                get_document_operation_object_batch(r.data, keywords["knowledge_id"], keywords["workspace_id"]),
             ),
         )
         def put(self, request: Request, workspace_id, knowledge_id: str, target_knowledge_id: str):

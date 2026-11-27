@@ -42,7 +42,7 @@ from django.core import validators
 from django.db import models, transaction
 from django.db.models import F, Func, QuerySet, Value
 from django.db.models.aggregates import Max
-from django.db.models.functions import Coalesce, NullIf, Reverse, Substr
+from django.db.models.functions import Cast, Coalesce, NullIf, Reverse, Substr
 from django.db.models.query_utils import Q
 from django.http import HttpResponse
 from django.utils.translation import get_language, gettext, to_locale
@@ -603,7 +603,11 @@ class DocumentSerializers(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
-            document = QuerySet(Document).filter(id=document_id, knowledge_id=self.data.get("knowledge_id")).first()
+            document = QuerySet(Document).select_for_update().filter(
+                id=document_id, knowledge_id=self.data.get("knowledge_id")
+            ).first()
+            if document is None:
+                raise AppUnauthorizedFailed(403, _("document id not exist"))
             state = State.SUCCESS
             if document.type != KnowledgeType.WEB:
                 return True
@@ -1323,6 +1327,10 @@ class DocumentSerializers(serializers.Serializer):
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
 
+        @property
+        def documents(self):
+            return QuerySet(Document).filter(knowledge_id=self.data["knowledge_id"])
+
         @staticmethod
         def link_file(source_file_id, document_id, knowledge_id, user_id):
             if source_file_id is None:
@@ -1427,7 +1435,6 @@ class DocumentSerializers(serializers.Serializer):
 
         def batch_sync(self, instance: Dict, with_valid=True):
             if with_valid:
-                BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
             # 异步同步
             work_thread_pool.submit(
@@ -1441,37 +1448,40 @@ class DocumentSerializers(serializers.Serializer):
                     ).sync()
                     for doc_id in doc_ids
                 ],
-                instance.get("id_list"),
+                BatchSerializer.scoped_ids(instance.get("id_list"), self.documents),
             )
             return True
 
         @transaction.atomic
         def batch_delete(self, instance: Dict, with_valid=True):
             if with_valid:
-                BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("id_list")
-            source_file_ids = [
-                doc["meta"].get("source_file_id")
-                for doc in Document.objects.filter(id__in=document_id_list).values("meta")
-            ]
-            QuerySet(File).filter(id__in=source_file_ids).delete()
-            QuerySet(Document).filter(id__in=document_id_list).delete()
+            document_id_list = BatchSerializer.scoped_ids(instance.get("id_list"), self.documents.select_for_update())
+            if not document_id_list:
+                return True
+            QuerySet(File).filter(source_type=FileSourceType.DOCUMENT, source_id__in=document_id_list).delete()
+            self.documents.filter(id__in=document_id_list).delete()
             QuerySet(DocumentTag).filter(document_id__in=document_id_list).delete()
-            paragraph_ids = QuerySet(Paragraph).filter(document_id__in=document_id_list).values_list("id", flat=True)
+            paragraphs = QuerySet(Paragraph).filter(
+                knowledge_id=self.data["knowledge_id"], document_id__in=document_id_list
+            )
+            paragraph_ids = paragraphs.values_list("id", flat=True)
             # 删除问题关系
             delete_problems_and_mappings(paragraph_ids)
             # 删除段落
-            QuerySet(Paragraph).filter(document_id__in=document_id_list).delete()
+            paragraphs.delete()
             # 删除向量库
             delete_embedding_by_document_list(document_id_list)
             return True
 
+        @transaction.atomic
         def batch_cancel(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 BatchCancelInstanceSerializer(data=instance).is_valid(raise_exception=True)
-            document_id_list = instance.get("id_list")
+            document_id_list = BatchSerializer.scoped_ids(instance.get("id_list"), self.documents.select_for_update())
+            if not document_id_list:
+                return
             ListenerManagement.update_status(
                 QuerySet(Paragraph)
                 .annotate(
@@ -1479,14 +1489,13 @@ class DocumentSerializers(serializers.Serializer):
                     task_type_status=Substr("reversed_status", TaskType(instance.get("type")).value, 1),
                 )
                 .filter(task_type_status__in=[State.PENDING.value, State.STARTED.value])
-                .filter(document_id__in=document_id_list)
+                .filter(document_id__in=document_id_list, knowledge_id=self.data["knowledge_id"])
                 .values("id"),
                 TaskType(instance.get("type")),
                 State.REVOKE,
             )
             ListenerManagement.update_status(
-                QuerySet(Document)
-                .annotate(
+                self.documents.annotate(
                     reversed_status=Reverse("status"),
                     task_type_status=Substr("reversed_status", TaskType(instance.get("type")).value, 1),
                 )
@@ -1497,26 +1506,26 @@ class DocumentSerializers(serializers.Serializer):
                 State.REVOKE,
             )
 
+        @transaction.atomic
         def batch_edit_hit_handling(self, instance: Dict, with_valid=True):
             if with_valid:
-                BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 hit_handling_method = instance.get("hit_handling_method")
                 if hit_handling_method is None:
                     raise AppApiException(500, _("Hit handling method is required"))
                 if hit_handling_method != "optimization" and hit_handling_method != "directly_return":
                     raise AppApiException(500, _("The hit processing method must be directly_return|optimization"))
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("id_list")
+            document_id_list = BatchSerializer.scoped_ids(instance.get("id_list"), self.documents.select_for_update())
             hit_handling_method = instance.get("hit_handling_method")
             directly_return_similarity = instance.get("directly_return_similarity")
             update_dict = {"hit_handling_method": hit_handling_method}
             if directly_return_similarity is not None:
                 update_dict["directly_return_similarity"] = directly_return_similarity
-            QuerySet(Document).filter(id__in=document_id_list).update(**update_dict)
+            self.documents.filter(id__in=document_id_list).update(**update_dict)
             allow_download = instance.get("allow_download")
             if allow_download is not None:
                 # 我需要修改meta meta是存在Document的字段 是一个json字段 但是allow_download可能不存在
-                Document.objects.filter(id__in=document_id_list).update(
+                self.documents.filter(id__in=document_id_list).update(
                     meta=Func(
                         F("meta"),
                         Value(["allow_download"]),
@@ -1530,7 +1539,7 @@ class DocumentSerializers(serializers.Serializer):
         def batch_refresh(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("id_list")
+            document_id_list = BatchSerializer.scoped_ids(instance.get("id_list"), self.documents)
             state_list = instance.get("state_list")
             knowledge_id = self.data.get("knowledge_id")
             for document_id in document_id_list:
@@ -1544,7 +1553,7 @@ class DocumentSerializers(serializers.Serializer):
         def batch_tokenize(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("id_list")
+            document_id_list = BatchSerializer.scoped_ids(instance.get("id_list"), self.documents)
             state_list = instance.get("state_list")
             knowledge_id = self.data.get("knowledge_id")
             for document_id in document_id_list:
@@ -1555,11 +1564,16 @@ class DocumentSerializers(serializers.Serializer):
                 except AlreadyQueued as e:
                     pass
 
+        @transaction.atomic
         def batch_add_tag(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("document_ids")
-            tag_id_list = instance.get("tag_ids")
+            document_id_list = BatchSerializer.scoped_ids(
+                instance.get("document_ids"), self.documents.select_for_update()
+            )
+            tag_id_list = BatchSerializer.scoped_ids(
+                instance.get("tag_ids"), QuerySet(Tag).filter(knowledge_id=self.data["knowledge_id"]).select_for_update()
+            )
             # 批量查询已存在的标签关联关系
             existing_relations = {
                 (str(doc_id), str(tag_id))
@@ -1587,26 +1601,30 @@ class DocumentSerializers(serializers.Serializer):
             if new_relations:
                 QuerySet(DocumentTag).bulk_create(new_relations)
 
-        def batch_export(self, instance: Dict, with_valid=True):
-            if with_valid:
-                BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
-                self.is_valid(raise_exception=True)
-            document_ids = instance.get("id_list")
-            document_list = QuerySet(Document).filter(id__in=document_ids)
-            paragraph_list = native_search(
-                QuerySet(Paragraph).filter(document_id__in=document_ids),
+        def _export_data(self, instance):
+            knowledge_id = self.data["knowledge_id"]
+            document_ids = BatchSerializer.scoped_ids(instance.get("id_list"), self.documents)
+            documents = self.documents.filter(id__in=document_ids)
+            if not document_ids:
+                return [], {}, {}
+            paragraphs = native_search(
+                QuerySet(Paragraph).filter(knowledge_id=knowledge_id, document_id__in=document_ids),
                 get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "knowledge", "sql", "list_paragraph_document_name.sql")
                 ),
             )
-            problem_mapping_list = native_search(
-                QuerySet(ProblemParagraphMapping).filter(document_id__in=document_ids),
+            mappings = native_search(
+                QuerySet(ProblemParagraphMapping).filter(knowledge_id=knowledge_id, document_id__in=document_ids),
                 get_file_content(os.path.join(PROJECT_DIR, "apps", "knowledge", "sql", "list_problem_mapping.sql")),
                 with_table_name=True,
             )
-            data_dict, document_dict = DocumentSerializers.Operate.merge_problem(
-                paragraph_list, problem_mapping_list, document_list
-            )
+            data, names = DocumentSerializers.Operate.merge_problem(paragraphs, mappings, documents)
+            return paragraphs, data, names
+
+        def batch_export(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            _, data_dict, document_dict = self._export_data(instance)
             workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
             response = HttpResponse(content_type="application/vnd.ms-excel")
             workbook.save(response)
@@ -1614,24 +1632,13 @@ class DocumentSerializers(serializers.Serializer):
 
         def batch_export_zip(self, instance: Dict, with_valid=True):
             if with_valid:
-                BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
-            knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
-            document_ids = instance.get("id_list")
-            document_list = QuerySet(Document).filter(id__in=document_ids)
-            paragraph_list = native_search(
-                QuerySet(Paragraph).filter(document_id__in=document_ids),
-                get_file_content(
-                    os.path.join(PROJECT_DIR, "apps", "knowledge", "sql", "list_paragraph_document_name.sql")
-                ),
-            )
-            problem_mapping_list = native_search(
-                QuerySet(ProblemParagraphMapping).filter(document_id__in=document_ids),
-                get_file_content(os.path.join(PROJECT_DIR, "apps", "knowledge", "sql", "list_problem_mapping.sql")),
-                with_table_name=True,
-            )
-            data_dict, document_dict = DocumentSerializers.Operate.merge_problem(
-                paragraph_list, problem_mapping_list, document_list
+            paragraph_list, data_dict, document_dict = self._export_data(instance)
+            knowledge = QuerySet(Knowledge).get(id=self.data["knowledge_id"])
+            files = QuerySet(File).filter(
+                Q(source_type=FileSourceType.KNOWLEDGE, source_id=knowledge.id)
+                | Q(source_type=FileSourceType.DOCUMENT,
+                    source_id__in=self.documents.values_list(Cast("id", models.CharField()), flat=True))
             )
             res = [
                 parse_image(paragraph.get("content")) + parse_file_link(paragraph.get("content"))
@@ -1646,7 +1653,7 @@ class DocumentSerializers(serializers.Serializer):
                 knowledge_file = os.path.join(tempdir, f"{safe_name}.xlsx")
                 workbook.save(knowledge_file)
                 for r in res:
-                    write_image(tempdir, r)
+                    write_image(tempdir, r, files)
                 zip_dir(tempdir, zip_buffer)
             response.write(zip_buffer.getvalue())
             return response
@@ -1792,7 +1799,7 @@ class DocumentSerializers(serializers.Serializer):
             super().is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
             query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
-            if workspace_id and workspace_id != "None":
+            if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
@@ -1805,21 +1812,9 @@ class DocumentSerializers(serializers.Serializer):
 
         def add_tags(self):
             self.is_valid(raise_exception=True)
-            document_id = self.data.get("document_id")
-            tag_ids = self.data.get("tag_ids")
-            existing_tag_ids = set(
-                str(tag_id)
-                for tag_id in QuerySet(DocumentTag)
-                .filter(document_id=document_id, tag_id__in=tag_ids)
-                .values_list("tag_id", flat=True)
-            )
-            new_tags = [
-                DocumentTag(id=uuid.uuid7(), document_id=document_id, tag_id=tag_id)
-                for tag_id in set(tag_ids)
-                if tag_id not in existing_tag_ids
-            ]
-            if new_tags:
-                QuerySet(DocumentTag).bulk_create(new_tags)
+            return DocumentSerializers.Batch(data={
+                "workspace_id": self.data["workspace_id"], "knowledge_id": self.data["knowledge_id"],
+            }).batch_add_tag({"document_ids": [self.data["document_id"]], "tag_ids": self.data["tag_ids"]})
 
     class DeleteTags(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
@@ -1833,7 +1828,7 @@ class DocumentSerializers(serializers.Serializer):
             super().is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
             query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
-            if workspace_id and workspace_id != "None":
+            if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
@@ -1844,11 +1839,16 @@ class DocumentSerializers(serializers.Serializer):
             ):
                 raise AppApiException(500, _("Document id does not exist"))
 
+        @transaction.atomic
         def delete_tags(self):
             self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
-            tag_ids = self.data.get("tag_ids")
-            QuerySet(DocumentTag).filter(document_id=document_id, tag_id__in=tag_ids).delete()
+            tag_ids = BatchSerializer.scoped_ids(
+                self.data["tag_ids"], QuerySet(Tag).filter(knowledge_id=self.data["knowledge_id"]).select_for_update()
+            )
+            QuerySet(DocumentTag).filter(
+                document_id=document_id, document__knowledge_id=self.data["knowledge_id"], tag_id__in=tag_ids
+            ).delete()
 
     class DeleteDocsTag(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
@@ -1859,7 +1859,7 @@ class DocumentSerializers(serializers.Serializer):
             super().is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
             query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
-            if workspace_id and workspace_id != "None":
+            if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
@@ -1870,17 +1870,15 @@ class DocumentSerializers(serializers.Serializer):
             ):
                 raise AppApiException(500, _("Tag id does not exist"))
 
+        @transaction.atomic
         def batch_delete_docs_tag(self, instance, with_valid=True):
             if with_valid:
-                BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
             knowledge_id = self.data.get("knowledge_id")
             tag_id = self.data.get("tag_id")
-            doc_id_list = instance.get("id_list")
-
-            valid_doc_count = Document.objects.filter(id__in=doc_id_list, knowledge_id=knowledge_id).count()
-            if valid_doc_count != len(doc_id_list):
-                raise AppApiException(500, _("Document id does not belong to current knowledge"))
+            doc_id_list = BatchSerializer.scoped_ids(
+                instance.get("id_list"), Document.objects.filter(knowledge_id=knowledge_id).select_for_update()
+            )
 
             DocumentTag.objects.filter(document_id__in=doc_id_list, tag_id=tag_id).delete()
 
