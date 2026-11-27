@@ -51,8 +51,7 @@ const providerOptions = ref<ModelProviderItem[]>([])
 const scrollbarRef = useTemplateRef<ScrollbarInstance>('scrollbarRef')
 const activity = createActivity()
 const busy = computed(() => status.value === 'running')
-const started = computed(() => !['idle','done','error','stopped'].includes(status.value))
-
+const started = computed(() => status.value !== 'idle')
 function sendSuggestedRequirement(question: string) {
   if (!modelId.value || busy.value) return
   requirement.value = question
@@ -285,7 +284,7 @@ defineExpose({ open, close })
               :can-add="false"
               :options="modelOptions"
               :provider-options="providerOptions"
-              :disabled="started"
+              :disabled="busy"
               teleported
             />
           </div>
