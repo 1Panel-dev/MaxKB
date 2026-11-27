@@ -42,7 +42,7 @@ from django.core import validators
 from django.db import models, transaction
 from django.db.models import F, Func, QuerySet, Value
 from django.db.models.aggregates import Max
-from django.db.models.functions import Cast, Coalesce, NullIf, Reverse, Substr
+from django.db.models.functions import Coalesce, NullIf, Reverse, Substr
 from django.db.models.query_utils import Q
 from django.http import HttpResponse
 from django.utils.translation import get_language, gettext, to_locale
@@ -726,9 +726,15 @@ class DocumentSerializers(serializers.Serializer):
         def export_zip(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document = QuerySet(Document).filter(id=self.data.get("document_id")).first()
+            knowledge_id = self.data["knowledge_id"]
+            documents = Document.objects.filter(id=self.data["document_id"], knowledge_id=knowledge_id)
+            if self.data.get("workspace_id"):
+                documents = documents.filter(knowledge__workspace_id=self.data["workspace_id"])
+            document = documents.first()
+            if document is None:
+                raise AppApiException(500, _("document id not exist"))
             paragraph_query_set = (
-                QuerySet(Paragraph).filter(document_id=self.data.get("document_id")).order_by("position")
+                QuerySet(Paragraph).filter(document_id=document.id, knowledge_id=knowledge_id).order_by("position")
             )
             paragraph_list = native_search(
                 paragraph_query_set,
@@ -737,7 +743,7 @@ class DocumentSerializers(serializers.Serializer):
                 ),
             )
             problem_mapping_list = native_search(
-                QuerySet(ProblemParagraphMapping).filter(document_id=self.data.get("document_id")),
+                QuerySet(ProblemParagraphMapping).filter(document_id=document.id, knowledge_id=knowledge_id),
                 get_file_content(os.path.join(PROJECT_DIR, "apps", "knowledge", "sql", "list_problem_mapping.sql")),
                 with_table_name=True,
             )
@@ -754,8 +760,7 @@ class DocumentSerializers(serializers.Serializer):
             with TemporaryDirectory() as tempdir:
                 knowledge_file = os.path.join(tempdir, "document.xlsx")
                 workbook.save(knowledge_file)
-                for r in res:
-                    write_image(tempdir, r)
+                write_image(tempdir, res, knowledge_id)
                 zip_dir(tempdir, zip_buffer)
             response.write(zip_buffer.getvalue())
             return response
@@ -1635,11 +1640,6 @@ class DocumentSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             paragraph_list, data_dict, document_dict = self._export_data(instance)
             knowledge = QuerySet(Knowledge).get(id=self.data["knowledge_id"])
-            files = QuerySet(File).filter(
-                Q(source_type=FileSourceType.KNOWLEDGE, source_id=knowledge.id)
-                | Q(source_type=FileSourceType.DOCUMENT,
-                    source_id__in=self.documents.values_list(Cast("id", models.CharField()), flat=True))
-            )
             res = [
                 parse_image(paragraph.get("content")) + parse_file_link(paragraph.get("content"))
                 for paragraph in paragraph_list
@@ -1652,8 +1652,7 @@ class DocumentSerializers(serializers.Serializer):
                 safe_name = re.sub(r'[<>:"/\\|?*\x00-\x1f]', "_", knowledge.name).strip(" .") or "knowledge"
                 knowledge_file = os.path.join(tempdir, f"{safe_name}.xlsx")
                 workbook.save(knowledge_file)
-                for r in res:
-                    write_image(tempdir, r, files)
+                write_image(tempdir, res, knowledge.id)
                 zip_dir(tempdir, zip_buffer)
             response.write(zip_buffer.getvalue())
             return response

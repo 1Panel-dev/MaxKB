@@ -9,10 +9,12 @@
 import os
 import re
 import zipfile
+from itertools import chain
 from typing import List
 
 import uuid_utils.compat as uuid
-from django.db.models import QuerySet
+from django.db.models import CharField, Q, QuerySet
+from django.db.models.functions import Cast
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -30,7 +32,7 @@ from common.utils.common import get_file_content
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
 from knowledge.models import Document, KnowledgeWorkflow, KnowledgeWorkflowVersion, KnowledgeType
-from knowledge.models import Paragraph, Problem, ProblemParagraphMapping, Knowledge, File
+from knowledge.models import Paragraph, Problem, ProblemParagraphMapping, Knowledge, File, FileSourceType
 from maxkb.conf import PROJECT_DIR
 from models_provider.tools import get_model, get_model_default_params
 from system_manage.models.resource_mapping import ResourceMapping, ResourceType
@@ -196,10 +198,13 @@ def is_valid_uuid(s):
         return False
 
 
-def write_image(zip_path: str, image_list: List[str], files=None):
-    if files is None:
-        files = QuerySet(File)
-    for image in image_list:
+def write_image(zip_path: str, paragraph_images: List[List[str]], knowledge_id):
+    document_ids = Document.objects.filter(knowledge_id=knowledge_id).values_list(Cast('id', CharField()), flat=True)
+    files = File.objects.filter(
+        Q(source_type=FileSourceType.KNOWLEDGE, source_id=knowledge_id)
+        | Q(source_type=FileSourceType.DOCUMENT, source_id__in=document_ids)
+    )
+    for image in chain.from_iterable(paragraph_images):
         # Match (./oss/file/<id>) from both image syntax and regular links/HTML src
         src_match = re.search(r'\bsrc=["\'](\./oss/(?:file|image)/[^"\']+)["\']', image)
         paren_match = re.search(r'\(\./oss/(?:file|image)/([^)]+)\)', image)

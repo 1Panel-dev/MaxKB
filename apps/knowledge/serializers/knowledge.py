@@ -570,8 +570,7 @@ class KnowledgeSerializer(serializers.Serializer):
             with TemporaryDirectory() as tempdir:
                 knowledge_file = os.path.join(tempdir, "knowledge.xlsx")
                 workbook.save(knowledge_file)
-                for r in res:
-                    write_image(tempdir, r)
+                write_image(tempdir, res, knowledge.id)
                 zip_dir(tempdir, zip_buffer)
             response.write(zip_buffer.getvalue())
             return response
@@ -663,8 +662,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 knowledge_file_path = os.path.join(tempdir, "knowledge.xlsx")
                 workbook.save(knowledge_file_path)
 
-                for r in res:
-                    write_image(tempdir, r)
+                write_image(tempdir, res, knowledge.id)
 
                 source_file_path_set = set()
                 source_file_export_list = []
