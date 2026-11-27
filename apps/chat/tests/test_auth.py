@@ -2,9 +2,11 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from django.core import signing
-from django.test import SimpleTestCase
+from django.http import HttpResponse
+from django.test import RequestFactory, SimpleTestCase
+from rest_framework.test import APIRequestFactory, force_authenticate
 
-from chat.views.v3.chat import BaseAuthView
+from chat.views.v3.chat import BaseAuthView, FILE_AUTH_COOKIE, Logout
 from common.auth.constants.operate_constants import Operate
 from common.exception.app_exception import AppApiException
 
@@ -14,6 +16,15 @@ class BaseAuthViewTest(SimpleTestCase):
         self.user = SimpleNamespace(id="chat-user-id", username="chat-user")
         self.view = BaseAuthView()
         self.view.request = Mock()
+
+    def test_file_auth_cookie_supports_cross_site_https_login(self):
+        request = RequestFactory().post("/chat/api/v3/auth/login", HTTP_X_FORWARDED_PROTO="https")
+
+        response = self.view.generate(request, "chat-token", HttpResponse(), path="/chat/portal")
+        cookie = response.cookies[FILE_AUTH_COOKIE]
+
+        self.assertTrue(cookie["secure"])
+        self.assertEqual(cookie["samesite"], "None")
 
     def test_access_token_login_validates_authorization_and_keeps_operate_token(self):
         access_token = "application-access-token"
@@ -101,3 +112,31 @@ class BaseAuthViewTest(SimpleTestCase):
             operation_object={"name": "chat-user"},
             workspace_id="default",
         )
+
+
+class ChatLogoutTest(SimpleTestCase):
+    def test_https_logout_clears_cross_site_file_auth_cookie(self):
+        request = APIRequestFactory().post(
+            "/chat/api/v3/auth/logout?accessToken=access-token",
+            HTTP_AUTHORIZATION="Bearer chat-token",
+            HTTP_X_FORWARDED_PROTO="https",
+        )
+        force_authenticate(
+            request,
+            user=SimpleNamespace(
+                id="chat-user-id",
+                type="CHAT_USER",
+                username="chat-user",
+                email="chat-user@example.com",
+                phone="",
+                nick_name="Chat User",
+            ),
+        )
+
+        with patch("chat.views.v3.chat.cache.delete"), patch("common.log.log.Log.save"):
+            response = Logout.as_view()(request)
+
+        cookie = response.cookies[FILE_AUTH_COOKIE]
+        self.assertEqual(cookie["max-age"], 0)
+        self.assertTrue(cookie["secure"])
+        self.assertEqual(cookie["samesite"], "None")
