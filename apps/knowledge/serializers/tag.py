@@ -18,7 +18,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.exception.app_exception import AppApiException
-from knowledge.models import Tag, Knowledge, DocumentTag
+from knowledge.models import Tag, Knowledge, KnowledgeScope, DocumentTag
 
 
 class TagModelSerializer(serializers.ModelSerializer):
@@ -204,29 +204,27 @@ class TagSerializers(serializers.Serializer):
         knowledge_id = serializers.UUIDField(required=True, label=_('Knowledge ID'))
         name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('search value'))
 
+        def get_knowledge_queryset(self):
+            return Knowledge.objects.filter(
+                workspace_id=self.validated_data['workspace_id'], scope=KnowledgeScope.WORKSPACE
+            )
+
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            workspace_id = self.data.get('workspace_id')
-            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
-            if workspace_id and workspace_id != 'None':
-                query_set = query_set.filter(workspace_id=workspace_id)
+            query_set = self.get_knowledge_queryset().filter(id=self.validated_data['knowledge_id'])
             if not query_set.exists():
                 raise AppApiException(500, _('Knowledge id does not exist'))
+            return query_set
 
         def list(self):
-            self.is_valid(raise_exception=True)
+            knowledge = self.is_valid(raise_exception=True)
+            tags = QuerySet(Tag).filter(knowledge__in=knowledge)
             if self.data.get('name'):
                 name = self.data.get('name')
-                tags = QuerySet(Tag).filter(
-                    knowledge_id=self.data.get('knowledge_id')
-                ).filter(
-                    Q(key__icontains=name) | Q(value__icontains=name)
-                ).values('key', 'value', 'id', 'create_time', 'update_time').order_by('create_time', 'key', 'value')
-            else:
-                # 获取所有标签，按创建时间排序保持稳定顺序
-                tags = QuerySet(Tag).filter(
-                    knowledge_id=self.data.get('knowledge_id')
-                ).values('key', 'value', 'id', 'create_time', 'update_time').order_by('create_time', 'key', 'value')
+                tags = tags.filter(Q(key__icontains=name) | Q(value__icontains=name))
+            tags = tags.values('key', 'value', 'id', 'create_time', 'update_time').order_by(
+                'create_time', 'key', 'value'
+            )
 
             tag_ids = [tag['id'] for tag in tags]
 

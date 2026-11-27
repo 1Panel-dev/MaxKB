@@ -1496,31 +1496,18 @@ class KnowledgeSerializer(serializers.Serializer):
             return True
 
     class Tags(serializers.Serializer):
-        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
-        user_id = serializers.UUIDField(required=True, label=_("user id"))
         knowledge_ids = serializers.ListField(
             required=True, label=_("knowledge ids"), child=serializers.UUIDField(required=True, label=_("id"))
         )
 
-        def list(self):
+        def list(self, authorized_knowledge):
             self.is_valid(raise_exception=True)
-            if self.data.get("name"):
-                name = self.data.get("name")
-                tags = (
-                    QuerySet(Tag)
-                    .filter(knowledge_id__in=self.data.get("knowledge_ids"))
-                    .filter(Q(key__icontains=name) | Q(value__icontains=name))
-                    .values("key", "value", "id", "create_time", "update_time")
-                    .order_by("create_time", "key", "value")
-                )
-            else:
-                # 获取所有标签，按创建时间排序保持稳定顺序
-                tags = (
-                    QuerySet(Tag)
-                    .filter(knowledge_id__in=self.data.get("knowledge_ids"))
-                    .values("key", "value", "id", "create_time", "update_time")
-                    .order_by("create_time", "key", "value")
-                )
+            tags = (
+                QuerySet(Tag)
+                .filter(knowledge__in=authorized_knowledge.filter(id__in=self.validated_data["knowledge_ids"]))
+                .values("key", "value", "id", "create_time", "update_time")
+                .order_by("create_time", "key", "value")
+            )
 
             # 按key分组
             grouped_tags = defaultdict(list)

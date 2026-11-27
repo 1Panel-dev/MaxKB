@@ -9,6 +9,7 @@ from common.constants.permission_constants import PermissionConstants, RoleConst
 from common.log.log import log
 from common.result import result
 from knowledge.api.tag import TagCreateAPI, TagDeleteAPI, TagEditAPI
+from knowledge.permissions import TAG_READ_PERMISSIONS
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.tag import TagSerializers
 
@@ -48,13 +49,7 @@ class KnowledgeTagView(APIView):
         responses=TagCreateAPI.get_response(),
         tags=[_('Knowledge Base/Tag')]  # type: ignore
     )
-    @has_permissions(
-        PermissionConstants.KNOWLEDGE_TAG_READ.get_workspace_knowledge_permission(),
-        PermissionConstants.KNOWLEDGE_TAG_READ.get_workspace_permission_workspace_manage_role(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission([RoleConstants.USER.get_workspace_role()],
-                       [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
-    )
+    @has_permissions(*TAG_READ_PERMISSIONS)
     @log(
         menu='tag', operate="Create a knowledge tag",
         get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id'))

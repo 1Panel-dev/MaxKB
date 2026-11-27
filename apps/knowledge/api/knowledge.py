@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 from rest_framework import serializers
@@ -41,7 +42,10 @@ class KnowledgeReadAPI(APIMixin):
 
 
 class KnowledgeTagsRequest(serializers.Serializer):
-    knowledge_ids = serializers.ListField(child=serializers.UUIDField(), required=True)
+    knowledge_ids = serializers.ListField(
+        child=serializers.UUIDField(), required=True,
+        help_text=_("Only tags from knowledge bases the caller can access are returned."),
+    )
 
 
 class KnowledgeBaseCreateAPI(APIMixin):

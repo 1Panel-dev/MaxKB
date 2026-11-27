@@ -13,6 +13,7 @@ from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAP
     KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI, HitTestAPI, EmbeddingAPI, \
     GetModelAPI, KnowledgeExportAPI, KnowledgeBatchOperateAPI, KnowledgeImportAPI, KnowledgeTagsRequest
 from knowledge.models import KnowledgeScope
+from knowledge.permissions import workspace_tag_knowledge
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeBatchOperateSerializer
 from models_provider.serializers.model_serializer import ModelSerializer
@@ -579,11 +580,10 @@ class KnowledgeView(APIView):
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
         )
         def post(self, request: Request, workspace_id: str):
-            return result.success(KnowledgeSerializer.Tags(data={
-                'user_id': request.user.id,
-                'workspace_id': workspace_id,
-                'knowledge_ids': request.data.get('knowledge_ids', [])
-            }).list())
+            tags = KnowledgeSerializer.Tags(data={'knowledge_ids': request.data.get('knowledge_ids', [])})
+            tags.is_valid(raise_exception=True)
+            knowledge = workspace_tag_knowledge(request, workspace_id, tags.data['knowledge_ids'])
+            return result.success(tags.list(knowledge))
 
 
 class KnowledgeBaseView(APIView):
