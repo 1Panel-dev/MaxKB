@@ -12,9 +12,11 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import KnowledgeCard from '@/views/knowledge/knowledge-card/KnowledgeCard.vue'
 import { FOLDER_ENTRY_ID } from '@/constants/folder'
+import { useStore } from '@/stores'
 import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
 
 const { t } = useI18n({ useScope: 'global' })
+const { auth } = useStore()
 
 defineOptions({ name: 'SelectKnowledgeDialog' })
 
@@ -135,6 +137,7 @@ defineExpose({ open })
           class="pt-4"
           :can-edit="false"
           :source="RESOURCE_TYPE.KNOWLEDGE"
+          :show-shared="auth.isEE || auth.isPE"
           @loaded="selectFolder"
           @select="selectFolder"
         />
