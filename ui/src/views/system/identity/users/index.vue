@@ -288,7 +288,12 @@ onMounted(() => loadSystemUsers())
                 <ButtonChangeUserPassword v-if="perm.system.user.edit()" :user="row" @refresh="loadSystemUsers(false)" />
                 <!-- 删除 -->
                 <MkTooltip :content="t('common.actions.delete')" placement="top" v-if="perm.system.user.delete()">
-                  <el-button type="primary" :disabled="row.id === user.userInfo?.id" text @click.stop="deleteUser(row)">
+                  <el-button
+                    type="primary"
+                    :disabled="row.role === ROLE_TYPE.ADMIN || row.id === user.userInfo?.id"
+                    text
+                    @click.stop="deleteUser(row)"
+                  >
                     <MkIcon name="icon_delete-trash_outlined" />
                   </el-button>
                 </MkTooltip>
