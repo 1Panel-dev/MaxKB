@@ -1733,7 +1733,7 @@ msgstr "提问次数"
 #: apps/system_homepage/serializers/system_homepage.py:383
 #: apps/system_homepage/serializers/system_homepage.py:572
 msgid "Average tokens per request"
-msgstr "单次请求平均Token数"
+msgstr "均 Tokens/轮"
 
 #: apps/application/serializers/application_version.py:45
 #: apps/knowledge/serializers/knowledge_version.py:24
