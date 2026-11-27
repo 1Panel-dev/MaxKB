@@ -30,7 +30,7 @@ const filteredRoleGroups = computed(() => {
   return roleGroups.value
     .map((group) => ({
       ...group,
-      role_list: group.role_list.filter((role) => role.role_name.toLowerCase().includes(keyword)),
+      role_list: group.role_list.filter(({ id, role_name }) => getRoleName(id, role_name).toLowerCase().includes(keyword)),
     }))
     .filter((group) => group.role_list.length > 0)
 })
