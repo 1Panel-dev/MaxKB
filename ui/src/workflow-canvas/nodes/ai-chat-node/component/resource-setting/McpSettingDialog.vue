@@ -6,7 +6,7 @@ import type { McpSetting, McpSource } from '../../types'
 import type { ToolItem } from '@/api/types'
 import type { FormInstance } from 'element-plus'
 import type { Ref } from 'vue'
-import { TOOL_TYPE } from '@/api/enums'
+import { TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { MsgError } from '@/utils/message'
 
@@ -118,8 +118,8 @@ defineExpose({ open })
           <el-option v-for="option in mcpOptions" :key="option.id" :label="option.name" :value="option.id">
             <div class="flex-align-center gap-2">
               <ToolIcon :icon="option.icon" :size="20" :type="option.tool_type" />
-              <span>{{ option.name }}</span>
-              <el-tag v-if="option.source === 'shared'" size="small" type="info">{{ t('resource.shared') }}</el-tag>
+              <span class="min-w-0 truncate" :title="option.name">{{ option.name }}</span>
+              <el-tag v-if="option.scope === TOOL_SCOPE.SHARED" size="small" type="info">{{ t('resource.shared') }}</el-tag>
             </div>
           </el-option>
         </el-select>
