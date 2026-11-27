@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Dict, LoginMethod, OptionItem, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
+import type { Dict, LoginMethod, OptionItem, RoleInfo, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { useStore } from '@/stores'
+import { getRoleName } from '@/utils/role-name'
 
 defineOptions({ name: 'UserGroupMembersDrawer' })
 const { t } = useI18n({ useScope: 'global' })
@@ -125,7 +126,11 @@ defineExpose({ open })
       </el-table-column>
       <el-table-column v-if="auth.isEE || auth.isPE" :label="t('user.role.label')">
         <template #default="{ row }">
-          <MkTagGroup v-if="row.roles?.length" :tags="row.roles" />
+          <MkTagGroup
+            v-if="row.role_info?.length"
+            :tags="row.role_info"
+            :format-label="(role: RoleInfo) => getRoleName(role.role_id, role.role_name)"
+          />
           <span v-else>-</span>
         </template>
       </el-table-column>

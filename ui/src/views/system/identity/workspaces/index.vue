@@ -7,6 +7,7 @@ import WorkspaceApi from '@/api/admin/system/workspace'
 import AddMemberDrawer from './AddMemberDrawer.vue'
 import CreateOrUpdateWorkspaceDialog from './dialog/CreateOrUpdateWorkspaceDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { getRoleName } from '@/utils/role-name'
 import perm from '@/permission/index.ts'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -272,7 +273,9 @@ onMounted(() => loadWorkspaceOptions())
           <el-table-column type="selection" width="40" />
           <el-table-column prop="nick_name" :label="t('user.name.label')" />
           <el-table-column prop="username" :label="t('user.username.label')" />
-          <el-table-column prop="role_name" :label="t('user.role.label')" class-name="border-l!" />
+          <el-table-column :label="t('user.role.label')" class-name="border-l!">
+            <template #default="{ row }">{{ getRoleName(row.role_id, row.role_name) }}</template>
+          </el-table-column>
           <el-table-column :label="t('common.labels.operation')" width="80" fixed="right">
             <template #default="{ row }">
               <!-- 移除成员 -->

@@ -8,7 +8,6 @@ import type {
   ResourceUserPermissionPayload,
 } from '@/api/types'
 import { get, put } from '../../core/request'
-import { localizeRoleSource } from '../../role-display'
 
 const getPrefix = (workspaceId: string) => `/system/workspace/${workspaceId}/resource_management`
 
@@ -23,10 +22,7 @@ const getResourceAuthorization = (
   return get<ResponsePage<ResourceUserPermission>>(
     `${getPrefix(workspaceId)}/resource/${targetId}/resource/${resource}/${page.currentPage}/${page.pageSize}`,
     query,
-  ).then((result) => ({
-    ...result,
-    records: result.records.map(localizeRoleSource),
-  }))
+  )
 }
 
 /** 更新 System 资源管理中的用户权限及文件夹生效范围。 */

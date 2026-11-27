@@ -1,15 +1,18 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends object">
+import { computed } from 'vue'
 import type { TagProps } from 'element-plus'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 
 defineOptions({ name: 'MkTagGroup' })
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     /** 是否禁用标签组浮层 */
     popoverDisabled?: boolean
-    /** 标签文字 */
-    tags?: string[]
+    /** 字符串或待格式化的标签数据 */
+    tags?: (string | T)[]
+    /** 获取对象标签的展示文字 */
+    formatLabel?: (tag: T) => string
     /** 标签尺寸 */
     size?: TagProps['size']
     /** 首个标签的类型 */
@@ -17,12 +20,20 @@ withDefaults(
   }>(),
   { popoverDisabled: false, tags: () => [], type: 'info', size: 'small' },
 )
+
+const tagLabels = computed(() => {
+  const { tags, formatLabel } = props
+  return (tags ?? []).flatMap((tag) => {
+    if (typeof tag === 'string') return [tag]
+    return formatLabel ? [formatLabel(tag)] : []
+  })
+})
 </script>
 
 <template>
   <span class="inline-flex items-center gap-1">
-    <el-tag :type="type" :size="size" :title="tags?.[0]" :disable-transitions="true">
-      {{ tags?.[0] }}
+    <el-tag :type="type" :size="size" :title="tagLabels[0]" :disable-transitions="true">
+      {{ tagLabels[0] }}
     </el-tag>
 
     <el-popover
@@ -32,13 +43,13 @@ withDefaults(
       trigger="hover"
       :popper-style="{ maxWidth: '250px', width: 'auto' }"
       :show-after="TOOLTIP_SHOW_DELAY"
-      v-if="tags?.length > 1"
+      v-if="tagLabels.length > 1"
     >
       <template #reference>
-        <el-tag type="info" :size="size" class="cursor-pointer" :disable-transitions="true">+{{ tags.length - 1 }}</el-tag>
+        <el-tag type="info" :size="size" class="cursor-pointer" :disable-transitions="true">+{{ tagLabels.length - 1 }}</el-tag>
       </template>
       <div class="flex-wrap gap-2 px-4 py-3">
-        <el-tag v-for="tag in tags.slice(1)" :key="tag" type="info" :size="size" :title="tag" :disable-transitions="true">
+        <el-tag v-for="tag in tagLabels.slice(1)" :key="tag" type="info" :size="size" :title="tag" :disable-transitions="true">
           {{ tag }}
         </el-tag>
       </div>

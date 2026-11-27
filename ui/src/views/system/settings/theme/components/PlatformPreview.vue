@@ -49,7 +49,7 @@ const platformMenuItems = computed<PreviewMenuItem[]>(() => [
               <div class="min-w-0">
                 <h6>飞小致</h6>
                 <p class="truncate text-N600" title="feixaozhi">feixaozhi</p>
-                <el-tag size="small" type="primary" class="mt-1">系统管理员</el-tag>
+                <el-tag size="small" type="primary" class="mt-1">{{ t('role.types.admin') }}</el-tag>
               </div>
             </div>
             <div class="border-t py-1">

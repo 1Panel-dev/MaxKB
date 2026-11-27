@@ -16,6 +16,11 @@
 - 依赖 Vue 响应式状态或生命周期的通用组合式函数可以使用 `use-*.ts` 命名。
 - 仅改变样式的响应式需求优先使用 Tailwind；只有需要改变组件状态时才使用响应式工具函数。
 
+## 角色名称
+
+`role-name.ts` 的 `getRoleName(roleId, roleName)` 按固定 ID 从 `ROLE_TYPE_LABELS` 读取内置角色译名，自定义角色显示接口名称。
+在模板或 `computed` 内调用时，角色译名随界面语言更新。
+
 ## Element Plus 默认行为
 
 Admin／Chat 创建应用前调用 element-plus.ts 的 configureElementPlus()，将 ElFormItem.for 默认值设为空字符串。

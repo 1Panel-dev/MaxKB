@@ -12,6 +12,7 @@ import UserGroupSetting from './components/UserGroupSetting.vue'
 import { useStore } from '@/stores'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
+import { getRoleName } from '@/utils/role-name'
 
 defineOptions({ name: 'UserFromDrawer' })
 
@@ -112,9 +113,7 @@ const selectedWorkspaceIds = computed(() => {
 })
 
 // CE 没有角色配置，用户组固定展示；商业版仅在选择普通用户角色时展示。
-const showUserGroup = computed(
-  () => !hasRoleSetting.value || userForm.role_setting.some(({ role_id }) => isUserRole(role_id)),
-)
+const showUserGroup = computed(() => !hasRoleSetting.value || userForm.role_setting.some(({ role_id }) => isUserRole(role_id)))
 
 // 移除普通用户角色后清空已选用户组，避免随角色变更残留提交。
 watch(showUserGroup, (visible) => {
@@ -292,8 +291,8 @@ defineExpose({ open })
                 <el-option
                   v-for="roleOption in roleOptions"
                   :key="roleOption.id"
-                  :label="roleOption.name"
-                  :title="roleOption.name"
+                  :label="getRoleName(roleOption.id, roleOption.name)"
+                  :title="getRoleName(roleOption.id, roleOption.name)"
                   :value="roleOption.id"
                 />
               </el-select>

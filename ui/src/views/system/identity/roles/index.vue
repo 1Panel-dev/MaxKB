@@ -8,6 +8,7 @@ import RolePermissionConfiguration from './components/RolePermissionConfiguratio
 import CreateOrUpdateRoleDialog from './dialog/CreateOrUpdateRoleDialog.vue'
 import { ROLE_TYPE_LABELS } from '@/constants'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { getRoleName } from '@/utils/role-name'
 import perm from '@/permission/index.ts'
 
 type RoleDetailTab = 'permission' | 'member'
@@ -130,7 +131,9 @@ onMounted(() => loadRoles())
                 @click="handleRoleSelect(role)"
               >
                 <template #default>
-                  <span class="min-w-0 truncate" :title="role.role_name">{{ role.role_name }}</span>
+                  <span class="min-w-0 truncate" :title="getRoleName(role.id, role.role_name)">
+                    {{ getRoleName(role.id, role.role_name) }}
+                  </span>
                   <el-tag type="info" size="small" class="ml-[6px]" v-if="role.internal">{{ t('role.internalLabel') }}</el-tag>
                 </template>
                 <template v-if="!role.internal" #action-dropdown>
@@ -156,8 +159,8 @@ onMounted(() => loadRoles())
       <template v-if="currentRole">
         <component :is="Header">
           <div class="flex-align-center min-w-0 flex-1 gap-2">
-            <h4 class="min-w-0 truncate" :title="currentRole.role_name">
-              {{ currentRole.role_name }}
+            <h4 class="min-w-0 truncate" :title="getRoleName(currentRole.id, currentRole.role_name)">
+              {{ getRoleName(currentRole.id, currentRole.role_name) }}
             </h4>
             <el-tag type="info" size="small" class="shrink-0">
               {{ currentRole.internal ? t('role.internalLabel') : ROLE_TYPE_LABELS[currentRole.type] }}

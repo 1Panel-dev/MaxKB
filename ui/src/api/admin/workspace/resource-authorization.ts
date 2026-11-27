@@ -8,7 +8,6 @@ import type {
   ResourceUserPermissionPayload,
 } from '@/api/types'
 import { get, put } from '../core/request'
-import { localizeRoleSource } from '../role-display'
 
 const getPrefix = (workspaceId: string) => `/workspace/${workspaceId}`
 /** 获取指定资源或文件夹的用户权限分页列表。 */
@@ -22,10 +21,7 @@ const getResourceAuthorization = (
   return get<ResponsePage<ResourceUserPermission>>(
     `${getPrefix(workspaceId)}/resource_user_permission/resource/${targetId}/resource/${resource}/${page.currentPage}/${page.pageSize}`,
     query,
-  ).then((result) => ({
-    ...result,
-    records: result.records.map(localizeRoleSource),
-  }))
+  )
 }
 
 /** 更新资源的用户权限，可同时应用到有管理权限的子文件夹及资源。 */
