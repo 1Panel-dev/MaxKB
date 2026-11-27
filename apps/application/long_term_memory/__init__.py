@@ -1,17 +1,18 @@
 import re
 from datetime import timedelta
+from functools import partial
 
-import uuid_utils.compat as uuid
-from django.db.models import Count, QuerySet
+from django.db import transaction
+from django.db.models import Q, QuerySet
 from django.utils import timezone
 from langchain_core.messages import HumanMessage
 
-from application.models import Chat, ChatRecord, Application, ApplicationLongTermMemory
+from application.models import Chat, ChatRecord, Application, ApplicationLongTermMemory, ApplicationVersion, ExecuteType
 from common.utils.logger import maxkb_logger
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from ops import celery_app
 
-long_term_prompt = '''
+long_term_prompt = """
 你是一个专业的用户长期记忆提炼引擎。你的唯一职责是：从对话中精确识别具有持久价值的用户信息，并与已有记忆进行结构化融合，输出供 AI 助手长期使用的用户画像记忆。
 
 ## 输入
@@ -117,41 +118,39 @@ long_term_prompt = '''
 - [维度标签] 内容
 （暂无则写：暂无）
 
-'''
+"""
 
 
-def _get_long_term_config(application, chat_user_id):
-    """
-    提取长期记忆配置，返回 dict 或 None（None 表示不需要提取，已清理记忆）
-    """
-    if application.type == 'WORK_FLOW':
-        node_list = application.work_flow.get('nodes', [])
-        base_node = next((n for n in node_list if n.get('id') == 'base-node'), None)
+def _get_long_term_config(application):
+    if application.type == "WORK_FLOW":
+        node_list = application.work_flow.get("nodes", [])
+        base_node = next((n for n in node_list if n.get("id") == "base-node"), None)
         if base_node is None:
             return None
-        node_data = base_node.get('properties', {}).get('node_data', {})
-        if not node_data.get('long_term_enable', False):
-            QuerySet(ApplicationLongTermMemory).filter(
-                application_id=application.id, chat_user_id=chat_user_id
-            ).delete()
+        node_data = base_node.get("properties", {}).get("node_data", {})
+        if not node_data.get("long_term_enable", False):
             return None
+        if node_data.get("long_term_model_id_type") == "default":
+            model = (application.default_model_setting or {}).get("LLM") or {}
+            model_id = model.get("model_id")
+            model_params = model.get("model_params_setting")
+        else:
+            model_id = node_data.get("long_term_model_id")
+            model_params = node_data.get("long_term_model_params_setting")
         return {
-            'trigger_type': node_data.get('long_term_trigger_type'),
-            'trigger_setting': node_data.get('long_term_trigger_setting') or {'rounds': 10},
-            'model_id': node_data.get('long_term_model_id'),
-            'model_params': node_data.get('long_term_model_params_setting') or {},
+            "trigger_type": node_data.get("long_term_trigger_type"),
+            "trigger_setting": node_data.get("long_term_trigger_setting") or {"rounds": 10},
+            "model_id": model_id,
+            "model_params": model_params or {},
         }
     else:
         if not application.long_term_enable:
-            QuerySet(ApplicationLongTermMemory).filter(
-                application_id=application.id, chat_user_id=chat_user_id
-            ).delete()
             return None
         return {
-            'trigger_type': application.long_term_trigger_type,
-            'trigger_setting': application.long_term_trigger_setting or {'rounds': 10},
-            'model_id': application.long_term_model_id,
-            'model_params': application.long_term_model_params_setting or {},
+            "trigger_type": application.long_term_trigger_type,
+            "trigger_setting": application.long_term_trigger_setting or {"rounds": 10},
+            "model_id": application.long_term_model_id,
+            "model_params": application.long_term_model_params_setting or {},
         }
 
 
@@ -213,7 +212,28 @@ def _get_since_time_from_setting(setting: dict):
     return None
 
 
-def _run_extract(workspace_id, application_id, chat_user_id, config, history_limit=None, since_time=None):
+def _memory_records(application_id, chat_user_id):
+    return ChatRecord.objects.filter(
+        chat__application_id=application_id, chat__chat_user_id=chat_user_id, chat__execute_type=ExecuteType.CHAT
+    ).exclude(run_time=0, problem_text="", answer_text="", messages=[])
+
+
+def _conversation_text(record):
+    question = record.question.get("content") if isinstance(record.question, dict) else None
+    answer = (
+        "\n".join(
+            message["content"]
+            for message in record.messages
+            if isinstance(message, dict)
+            and message.get("type") in ("TEXT", "HTML")
+            and isinstance(message.get("content"), str)
+        )
+        or record.answer_text
+    )
+    return f"用户：{question or record.problem_text}\nAI：{answer}"
+
+
+def _run_extract(workspace_id, application_id, chat_user_id, config, history_limit=None, since_time=None, records=None):
     """
     执行一次长期记忆提取。
     - since_time 不为 None 时：提取该时间点之后产生的对话。
@@ -222,15 +242,9 @@ def _run_extract(workspace_id, application_id, chat_user_id, config, history_lim
     if since_time is None and (history_limit is None or history_limit <= 0):
         return
 
-    qs = (
-        QuerySet(ChatRecord)
-        .filter(
-            chat__application_id=application_id,
-            chat__chat_user_id=chat_user_id,
-        )
-        .order_by('-create_time')
-        .only('problem_text', 'answer_text')
-    )
+    if records is None:
+        records = _memory_records(application_id, chat_user_id)
+    qs = records.order_by("-create_time", "-id").only("question", "messages", "problem_text", "answer_text")
 
     if since_time is not None:
         history_chat_record = list(qs.filter(create_time__gte=since_time))
@@ -239,49 +253,39 @@ def _run_extract(workspace_id, application_id, chat_user_id, config, history_lim
     if len(history_chat_record) == 0:
         return
 
-    chat_model = get_model_instance_by_model_workspace_id(
-        config['model_id'], workspace_id, **config['model_params']
-    )
+    chat_model = get_model_instance_by_model_workspace_id(config["model_id"], workspace_id, **config["model_params"])
     if not chat_model:
         return
 
-    long_term_memory = QuerySet(ApplicationLongTermMemory).filter(
-        application_id=application_id, chat_user_id=chat_user_id
-    ).first()
+    long_term_memory = (
+        QuerySet(ApplicationLongTermMemory).filter(application_id=application_id, chat_user_id=chat_user_id).first()
+    )
 
-    existing_memory = long_term_memory.memory if long_term_memory else ''
+    existing_memory = long_term_memory.memory if long_term_memory else ""
 
     # 反转为时间正序（旧→新）
     history_chat_record = list(reversed(history_chat_record))
 
-    new_conversation = '\n'.join(
-        line
-        for record in history_chat_record
-        for line in (f"用户：{record.problem_text}", f"AI：{record.answer_text}")
-    )
+    new_conversation = "\n".join(_conversation_text(record) for record in history_chat_record)
 
-    content = ''
-    for chunk in chat_model.stream([
-        HumanMessage(
-            content=long_term_prompt
-                    .replace('{{existing_memory}}', existing_memory)
-                    .replace('{{new_conversation}}', new_conversation)
+    content = ""
+    for chunk in chat_model.stream(
+        [
+            HumanMessage(
+                content=long_term_prompt.replace("{{existing_memory}}", existing_memory).replace(
+                    "{{new_conversation}}", new_conversation
+                )
+            )
+        ]
+    ):
+        content += chunk.text
+
+    content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+
+    if content:
+        ApplicationLongTermMemory.objects.update_or_create(
+            application_id=application_id, chat_user_id=chat_user_id, defaults={"memory": content}
         )
-    ]):
-        content += chunk.content
-
-    content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
-
-    if long_term_memory:
-        long_term_memory.memory = content
-        long_term_memory.save()
-    else:
-        ApplicationLongTermMemory(
-            id=uuid.uuid7(),
-            application_id=application_id,
-            chat_user_id=chat_user_id,
-            memory=content,
-        ).save()
 
 
 def _long_term_job_prefix(application_id) -> str:
@@ -298,8 +302,7 @@ def _parse_hhmm(value: str) -> tuple[int, int]:
 
 
 def _weekday_to_cron(d) -> str:
-    mapping = {1: "mon", 2: "tue", 3: "wed", 4: "thu",
-               5: "fri", 6: "sat", 7: "sun", 0: "sun"}
+    mapping = {1: "mon", 2: "tue", 3: "wed", 4: "thu", 5: "fri", 6: "sat", 7: "sun", 0: "sun"}
     di = int(d)
     if di not in mapping:
         raise ValueError("invalid weekday")
@@ -315,8 +318,7 @@ def _remove_long_term_jobs(application_id) -> None:
             try:
                 job.remove()
             except Exception as e:
-                maxkb_logger.warning(
-                    f"remove long_term job failed, job_id={job.id}, err={e}")
+                maxkb_logger.warning(f"remove long_term job failed, job_id={job.id}, err={e}")
 
 
 def _execute_scheduled_extract(workspace_id, application_id):
@@ -328,24 +330,24 @@ def _execute_scheduled_extract(workspace_id, application_id):
         _remove_long_term_jobs(application_id)
         return
 
+    config = _get_long_term_config(application)
+    if not config or config["trigger_type"] != "SCHEDULED":
+        return
+    setting = config["trigger_setting"] or {}
+    since_time = _get_since_time_from_setting(setting)
+    history_limit = None if since_time is not None else setting.get("rounds", 20)
     chat_user_ids = list(
-        QuerySet(Chat).filter(application_id=application_id)
+        QuerySet(Chat)
+        .filter(application_id=application_id, execute_type=ExecuteType.CHAT)
         .exclude(chat_user_id__isnull=True)
-        .values_list('chat_user_id', flat=True)
+        .values_list("chat_user_id", flat=True)
         .distinct()
     )
     for chat_user_id in chat_user_ids:
-        config = _get_long_term_config(application, chat_user_id)
-        if config is None:
-            continue
-        if config['trigger_type'] != 'SCHEDULED':
-            continue
-        setting = config['trigger_setting'] or {}
-        since_time = _get_since_time_from_setting(setting)
-        history_limit = None if since_time is not None else setting.get('rounds', 20)
         try:
-            _run_extract(workspace_id, application_id, chat_user_id, config,
-                         history_limit=history_limit, since_time=since_time)
+            _run_extract(
+                workspace_id, application_id, chat_user_id, config, history_limit=history_limit, since_time=since_time
+            )
         except Exception as e:
             maxkb_logger.warning(
                 f"scheduled extract long_term_memory failed, "
@@ -362,8 +364,7 @@ def _deploy_long_term_daily(workspace_id, application_id, setting):
         try:
             hour, minute = _parse_hhmm(t)
         except Exception:
-            maxkb_logger.warning(
-                f"invalid time={t}, application_id={application_id}")
+            maxkb_logger.warning(f"invalid time={t}, application_id={application_id}")
             continue
         job_id = f"{prefix}daily:{hour:02d}{minute:02d}"
         scheduler.add_job(
@@ -372,8 +373,7 @@ def _deploy_long_term_daily(workspace_id, application_id, setting):
             hour=str(hour),
             minute=str(minute),
             id=job_id,
-            kwargs={"workspace_id": workspace_id,
-                    "application_id": application_id},
+            kwargs={"workspace_id": workspace_id, "application_id": application_id},
             replace_existing=True,
             misfire_grace_time=60,
             max_instances=1,
@@ -387,22 +387,19 @@ def _deploy_long_term_weekly(workspace_id, application_id, setting):
     times = setting.get("time") or []
     days = setting.get("days") or []
     if not times or not days:
-        maxkb_logger.warning(
-            f"empty weekly setting, application_id={application_id}")
+        maxkb_logger.warning(f"empty weekly setting, application_id={application_id}")
         return
     for d in days:
         try:
             dow = _weekday_to_cron(d)
         except Exception:
-            maxkb_logger.warning(
-                f"invalid weekday={d}, application_id={application_id}")
+            maxkb_logger.warning(f"invalid weekday={d}, application_id={application_id}")
             continue
         for t in times:
             try:
                 hour, minute = _parse_hhmm(t)
             except Exception:
-                maxkb_logger.warning(
-                    f"invalid time={t}, application_id={application_id}")
+                maxkb_logger.warning(f"invalid time={t}, application_id={application_id}")
                 continue
             job_id = f"{prefix}weekly:{dow}:{hour:02d}{minute:02d}"
             scheduler.add_job(
@@ -412,8 +409,7 @@ def _deploy_long_term_weekly(workspace_id, application_id, setting):
                 hour=str(hour),
                 minute=str(minute),
                 id=job_id,
-                kwargs={"workspace_id": workspace_id,
-                        "application_id": application_id},
+                kwargs={"workspace_id": workspace_id, "application_id": application_id},
                 replace_existing=True,
                 misfire_grace_time=60,
                 max_instances=1,
@@ -427,8 +423,7 @@ def _deploy_long_term_monthly(workspace_id, application_id, setting):
     times = setting.get("time") or []
     days = setting.get("days") or []
     if not times or not days:
-        maxkb_logger.warning(
-            f"empty monthly setting, application_id={application_id}")
+        maxkb_logger.warning(f"empty monthly setting, application_id={application_id}")
         return
     for d in days:
         try:
@@ -436,15 +431,13 @@ def _deploy_long_term_monthly(workspace_id, application_id, setting):
             if not (1 <= dom <= 31):
                 raise ValueError("invalid day of month")
         except Exception:
-            maxkb_logger.warning(
-                f"invalid day={d}, application_id={application_id}")
+            maxkb_logger.warning(f"invalid day={d}, application_id={application_id}")
             continue
         for t in times:
             try:
                 hour, minute = _parse_hhmm(t)
             except Exception:
-                maxkb_logger.warning(
-                    f"invalid time={t}, application_id={application_id}")
+                maxkb_logger.warning(f"invalid time={t}, application_id={application_id}")
                 continue
             job_id = f"{prefix}monthly:{dom:02d}:{hour:02d}{minute:02d}"
             scheduler.add_job(
@@ -454,8 +447,7 @@ def _deploy_long_term_monthly(workspace_id, application_id, setting):
                 hour=str(hour),
                 minute=str(minute),
                 id=job_id,
-                kwargs={"workspace_id": workspace_id,
-                        "application_id": application_id},
+                kwargs={"workspace_id": workspace_id, "application_id": application_id},
                 replace_existing=True,
                 misfire_grace_time=60,
                 max_instances=1,
@@ -467,16 +459,14 @@ def _deploy_long_term_cron(workspace_id, application_id, setting):
 
     from common.job import scheduler
 
-    cron_expression = setting.get('cron_expression')
+    cron_expression = setting.get("cron_expression")
     if not cron_expression:
-        maxkb_logger.warning(
-            f"empty cron_expression, application_id={application_id}")
+        maxkb_logger.warning(f"empty cron_expression, application_id={application_id}")
         return
     try:
         cron_trigger = CronTrigger.from_crontab(cron_expression.strip())
     except ValueError:
-        maxkb_logger.warning(
-            f"invalid cron_expression={cron_expression}, application_id={application_id}")
+        maxkb_logger.warning(f"invalid cron_expression={cron_expression}, application_id={application_id}")
         return
 
     job_id = f"{_long_term_job_prefix(application_id)}cron:{cron_expression.strip()}"
@@ -484,8 +474,7 @@ def _deploy_long_term_cron(workspace_id, application_id, setting):
         _execute_scheduled_extract,
         trigger=cron_trigger,
         id=job_id,
-        kwargs={"workspace_id": workspace_id,
-                "application_id": application_id},
+        kwargs={"workspace_id": workspace_id, "application_id": application_id},
         replace_existing=True,
         misfire_grace_time=60,
         max_instances=1,
@@ -502,12 +491,10 @@ def _deploy_long_term_interval(workspace_id, application_id, setting):
         if value_i <= 0:
             raise ValueError("interval_value must be positive")
     except Exception:
-        maxkb_logger.warning(
-            f"invalid interval_value={value}, application_id={application_id}")
+        maxkb_logger.warning(f"invalid interval_value={value}, application_id={application_id}")
         return
     if unit not in {"seconds", "minutes", "hours", "days"}:
-        maxkb_logger.warning(
-            f"invalid interval_unit={unit}, application_id={application_id}")
+        maxkb_logger.warning(f"invalid interval_unit={unit}, application_id={application_id}")
         return
 
     job_id = f"{_long_term_job_prefix(application_id)}interval:{unit}:{value_i}"
@@ -515,8 +502,7 @@ def _deploy_long_term_interval(workspace_id, application_id, setting):
         _execute_scheduled_extract,
         trigger="interval",
         id=job_id,
-        kwargs={"workspace_id": workspace_id,
-                "application_id": application_id},
+        kwargs={"workspace_id": workspace_id, "application_id": application_id},
         replace_existing=True,
         misfire_grace_time=60,
         max_instances=1,
@@ -524,36 +510,49 @@ def _deploy_long_term_interval(workspace_id, application_id, setting):
     )
 
 
-@celery_app.task(name="celery:extract_long_term_memory")
-def extract_long_term_memory(workspace_id, application_id, chat_user_id):
-    application = Application.objects.filter(id=application_id).first()
-    if not application:
-        return
+def enqueue_round_memory(application, application_id, chat_user_id, record_id):
+    config = _get_long_term_config(application)
+    if config and config["trigger_type"] == "ROUND":
+        transaction.on_commit(
+            partial(extract_long_term_memory.delay, application.workspace_id, application_id, chat_user_id, record_id),
+            robust=True,
+        )
 
-    config = _get_long_term_config(application, chat_user_id)
+
+@celery_app.task(name="celery:extract_long_term_memory")
+def extract_long_term_memory(workspace_id, application_id, chat_user_id, record_id=None):
+    if record_id is None:
+        application = Application.objects.filter(id=application_id).first()
+    else:
+        application = ApplicationVersion.objects.filter(application_id=application_id).order_by("-create_time").first()
+    config = _get_long_term_config(application) if application else None
     if config is None:
         return
 
-    trigger_type = config['trigger_type']
-    trigger_setting = config['trigger_setting']
+    trigger_type = config["trigger_type"]
+    trigger_setting = config["trigger_setting"]
 
-    if trigger_type != 'ROUND':
+    if trigger_type != "ROUND":
         # 按照时间的，定时任务会处理
         return
 
-    rounds = trigger_setting.get('rounds', 10)
+    rounds = trigger_setting.get("rounds", 10)
     if rounds <= 0:
         return
 
-    current_rounds = QuerySet(ChatRecord).filter(
-        chat__application_id=application_id,
-        chat__chat_user_id=chat_user_id,
-    ).count()
-    maxkb_logger.info(f'extract_long_term_memory: current_rounds={current_rounds}, rounds={rounds}')
-    if current_rounds % rounds != 0:
+    records = _memory_records(application_id, chat_user_id)
+    if record_id is not None:
+        # A queued fifth turn must still see its own history if the sixth has already arrived.
+        timestamp = records.filter(pk=record_id).values_list("create_time", flat=True).first()
+        if timestamp is None:
+            return
+        records = records.filter(Q(create_time__lt=timestamp) | Q(create_time=timestamp, pk__lte=record_id))
+    current_rounds = records.count()
+    maxkb_logger.info(f"extract_long_term_memory: current_rounds={current_rounds}, rounds={rounds}")
+    if current_rounds == 0 or current_rounds % rounds != 0:
         return
 
-    _run_extract(workspace_id, application_id, chat_user_id, config, history_limit=rounds)
+    _run_extract(workspace_id, application_id, chat_user_id, config, history_limit=rounds, records=records)
 
 
 @celery_app.task(name="celery:schedule_extract_long_term_memory")
@@ -570,7 +569,7 @@ def schedule_extract_long_term_memory(workspace_id, application_id, enabled, tri
         QuerySet(ApplicationLongTermMemory).filter(application_id=application_id).delete()
         return
     # 不再是定时触发，则只清理不再部署
-    if trigger_type != 'SCHEDULED':
+    if trigger_type != "SCHEDULED":
         return
 
     setting = trigger_setting or {}

@@ -24,6 +24,7 @@ from rest_framework import serializers
 from rest_framework.request import Request
 
 from common.utils.common import to_stream_response_simple
+from application.long_term_memory import enqueue_round_memory
 from application.models import (
     Application,
     ApplicationVersion,
@@ -39,6 +40,7 @@ from application.serializers.application_chat import ChatCountSerializer
 from application.serializers.common import load_debug_workflow_context, resolve_chat_user, resolve_chat_user_group
 from chat.serializers.chat_history import ChatHistory
 from application.workflow.common import WorkflowType, new_instance
+from application.workflow.i_node import Signal
 from application.workflow.message.aggregator import AggregationManager
 from application.workflow.message.struct.failure_content import FailureContent
 from application.workflow.file_access import root_context
@@ -398,6 +400,8 @@ class ChatSerializers(serializers.Serializer):
                         create_time=timezone.now(),
                     )
                 )
+                if not error and not debug and chat_record_id is None and wf_manage.signal != Signal.CANCELLED:
+                    enqueue_round_memory(application, parameters["application_id"], chat_user_id, chat_record_id_str)
             except Exception as e:
                 if not error:
                     result_queue.put(("error", e))
