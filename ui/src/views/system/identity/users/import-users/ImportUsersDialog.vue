@@ -11,6 +11,7 @@ import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { useStore } from '@/stores'
 import { MsgSuccess, MsgWarning } from '@/utils/message'
+import { getRoleName } from '@/utils/role-name'
 
 defineOptions({ name: 'ImportUsersDialog' })
 
@@ -307,8 +308,8 @@ defineExpose({ open })
           <el-option
             v-for="roleOption in assignableRoles"
             :key="roleOption.id"
-            :label="roleOption.name"
-            :title="roleOption.name"
+            :label="getRoleName(roleOption.id, roleOption.name)"
+            :title="getRoleName(roleOption.id, roleOption.name)"
             :value="roleOption.id"
           />
         </el-select>

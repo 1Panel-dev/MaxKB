@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import type { WorkspaceItem } from '@/api/types'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import { useStore } from '@/stores'
+import { getRoleName } from '@/utils/role-name'
 
 defineOptions({ name: 'HeaderWorkspaceDropdown' })
 const { t } = useI18n({ useScope: 'global' })
@@ -15,7 +16,11 @@ const { user } = useStore()
 
 const workspaceOptions = computed<WorkspaceItem[]>(() => {
   const workspaces = user.userInfo?.workspace_list
-  return workspaces?.length ? workspaces : [{ id: 'default', name: t('workspace.default') }]
+  if (!workspaces?.length) return [{ id: 'default', name: t('workspace.default') }]
+  return workspaces.map((workspace) => ({
+    ...workspace,
+    role_name: workspace.role_info?.map(({ role_id, role_name }) => getRoleName(role_id, role_name)) ?? workspace.role_name,
+  }))
 })
 const selectedWorkspace = ref('default')
 

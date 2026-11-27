@@ -8,6 +8,7 @@ import CurrentUserApi from '@/api/admin/auth/current-user'
 import CommonSystemApi from '@/api/admin/system/common'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import { MsgSuccess } from '@/utils/message'
+import { getRoleName } from '@/utils/role-name'
 
 defineOptions({ name: 'AddWorkspaceMemberDrawer' })
 
@@ -155,8 +156,8 @@ defineExpose({ open })
               <el-option
                 v-for="roleOption in roleOptions"
                 :key="roleOption.id"
-                :label="roleOption.name"
-                :title="roleOption.name"
+                :label="getRoleName(roleOption.id, roleOption.name)"
+                :title="getRoleName(roleOption.id, roleOption.name)"
                 :value="roleOption.id"
               />
             </el-select>

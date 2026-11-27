@@ -11,6 +11,7 @@ import ApiKeyDialog from './ApiKeyDialog.vue'
 import ChangePasswordDialog from './ChangePasswordDialog.vue'
 import { LOCALE_OPTIONS, resolveSupportedLocale } from '@/locales/config'
 import { useStore } from '@/stores'
+import { getRoleName } from '@/utils/role-name'
 import perm from '@/permission/index.ts'
 
 defineOptions({ name: 'AvatarDropdown' })
@@ -98,7 +99,14 @@ function toUrl(url?: string) {
           <div class="min-w-0">
             <h4>{{ user.userInfo?.nick_name }}</h4>
             <div class="text-N600">{{ user.userInfo?.username }}</div>
-            <MkTagGroup v-if="user.userInfo?.role_name?.length" :tags="user.userInfo?.role_name" size="small" class="mt-2" type="primary" />
+            <MkTagGroup
+              v-if="user.userInfo?.role_info?.length"
+              :tags="user.userInfo.role_info"
+              :format-label="(role) => getRoleName(role.role_id, role.role_name)"
+              size="small"
+              class="mt-2"
+              type="primary"
+            />
           </div>
         </div>
         <el-divider />

@@ -4,11 +4,12 @@ import { useI18n } from 'vue-i18n'
 import type { ResourcePermissionOption } from './types'
 import type SystemResourceAuthorizationApi from '@/api/admin/system/resource-management/resource-authorization'
 import type ResourceAuthorizationApi from '@/api/admin/workspace/resource-authorization'
-import type { Dict, ResourceAuthorizationTargetType, ResourcePermission, ResourceUserPermission } from '@/api/types'
+import type { Dict, ResourceAuthorizationTargetType, ResourcePermission, ResourceUserPermission, RoleInfo } from '@/api/types'
 import { RESOURCE_PERMISSION } from '@/api/enums'
 import MkTable from '@/components/global/mk-table/index.vue'
 import { RESOURCE_PERMISSION_OPTIONS } from '@/constants/resource-authorization'
 import { useStore } from '@/stores'
+import { getRoleName } from '@/utils/role-name'
 
 const props = defineProps<{
   api: typeof ResourceAuthorizationApi | typeof SystemResourceAuthorizationApi
@@ -128,7 +129,11 @@ onMounted(() => loadPermissions())
       <el-table-column prop="username" :label="t('user.username.label')" min-width="120" show-overflow-tooltip />
       <el-table-column v-if="auth.isEE || auth.isPE" :label="t('user.role.label')" width="160">
         <template #default="{ row }">
-          <MkTagGroup v-if="row.role_name?.length" :tags="row.role_name" />
+          <MkTagGroup
+            v-if="row.role_info?.length"
+            :tags="row.role_info"
+            :format-label="(role: RoleInfo) => getRoleName(role.role_id, role.role_name)"
+          />
           <span v-else>-</span>
         </template>
       </el-table-column>

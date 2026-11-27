@@ -8,6 +8,7 @@ import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
+import { getRoleName } from '@/utils/role-name'
 
 defineOptions({ name: 'BatchSetUserRoleDialog' })
 
@@ -156,8 +157,8 @@ defineExpose({ open })
               <el-option
                 v-for="roleOption in roleOptions"
                 :key="roleOption.id"
-                :label="roleOption.name"
-                :title="roleOption.name"
+                :label="getRoleName(roleOption.id, roleOption.name)"
+                :title="getRoleName(roleOption.id, roleOption.name)"
                 :value="roleOption.id"
               />
             </el-select>

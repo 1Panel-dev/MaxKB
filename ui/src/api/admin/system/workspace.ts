@@ -1,7 +1,6 @@
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type { CreateWorkspaceMemberPayload, Dict, WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
 import { del, get, post } from '../core/request'
-import { localizeRoleName } from '../role-display'
 
 const prefix = '/system/workspace'
 
@@ -13,16 +12,7 @@ const getSystemWorkspaceList = () => {
 /** 获取工作空间成员列表 **/
 
 const getWorkspaceMemberList = (workspace_id: string, page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<WorkspaceMemberItem>>(
-    `${prefix}/${workspace_id}/user_list/${page.currentPage}/${page.pageSize}`,
-    query,
-  ).then((result) => ({
-    ...result,
-    records: result.records.map((member) => ({
-      ...member,
-      role_name: localizeRoleName(member.role_id, member.role_name),
-    })),
-  }))
+  return get<ResponsePage<WorkspaceMemberItem>>(`${prefix}/${workspace_id}/user_list/${page.currentPage}/${page.pageSize}`, query)
 }
 
 /** 新建或更新工作空间。 */
@@ -58,7 +48,9 @@ export interface WorkspaceBatchRemoveResult {
 
 /** 批量移除工作空间成员。 */
 const postBatchRemoveWorkspaceMembers = (workspaceId: string, userRelationIds: string[]) => {
-  return post<{ user_relation_ids: string[] }, WorkspaceBatchRemoveResult>(`${prefix}/${workspaceId}/batch_remove_member`, { user_relation_ids: userRelationIds })
+  return post<{ user_relation_ids: string[] }, WorkspaceBatchRemoveResult>(`${prefix}/${workspaceId}/batch_remove_member`, {
+    user_relation_ids: userRelationIds,
+  })
 }
 
 export default {

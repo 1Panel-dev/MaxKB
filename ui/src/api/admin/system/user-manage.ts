@@ -9,32 +9,12 @@ import type {
   SystemUserUpdateRequest,
 } from '@/api/types'
 import { del, get, getExportFile, post, put } from '../core/request'
-import { localizeRoleName, localizeRoleSource } from '../role-display'
 
 const prefix = '/user_manage'
 
 /** 获取系统用户分页列表。 */
 const getUserManagePage = (page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<SystemUser>>(`${prefix}/${page.currentPage}/${page.pageSize}`, query).then((result) => ({
-    ...result,
-    records: result.records.map(localizeSystemUser),
-  }))
-}
-
-function localizeSystemUser(systemUser: SystemUser): SystemUser {
-  const localizedUser = localizeRoleSource(systemUser)
-  if (!systemUser.role_workspace) return localizedUser
-
-  const localizedRoleNames = new Map(
-    (systemUser.role_info ?? []).map((role) => [role.role_name, localizeRoleName(role.role_id, role.role_name)]),
-  )
-  return {
-    ...localizedUser,
-    role_workspace: systemUser.role_workspace.map((role) => ({
-      ...role,
-      role_name: localizedRoleNames.get(role.role_name) ?? role.role_name,
-    })),
-  }
+  return get<ResponsePage<SystemUser>>(`${prefix}/${page.currentPage}/${page.pageSize}`, query)
 }
 
 /** 创建系统用户。 */
@@ -72,7 +52,6 @@ const postBatchSetUserWorkspaceRoles = (payload: BatchSetUserWorkspaceRolesReque
   return post<BatchSetUserWorkspaceRolesRequest, boolean>(`${prefix}/batch/add_role_ee`, payload)
 }
 
-
 /** 下载系统用户导入模板。 */
 const getUserManageImportTemplate = () => {
   return getExportFile('user_import_template.xlsx', `${prefix}/template/export`)
@@ -93,4 +72,16 @@ const postSyncSystemUsers = (syncType: string, syncFile?: File, workspaceId?: st
   return post<FormData, ChatUserSyncResult>(`${prefix}/sync/${syncType}`, payload)
 }
 
-export default { deleteUser, getUserManageImportTemplate, getUserManagePage, getUserManageSyncTypes, postUser, postBatchDeleteUsers, postBatchSetUserRoles, postBatchSetUserWorkspaceRoles, postSyncSystemUsers, putUser, putUserPassword }
+export default {
+  deleteUser,
+  getUserManageImportTemplate,
+  getUserManagePage,
+  getUserManageSyncTypes,
+  postUser,
+  postBatchDeleteUsers,
+  postBatchSetUserRoles,
+  postBatchSetUserWorkspaceRoles,
+  postSyncSystemUsers,
+  putUser,
+  putUserPassword,
+}

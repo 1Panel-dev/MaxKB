@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CommonUserOption } from '@/api/types'
 import { useStore } from '@/stores'
+import { getRoleName } from '@/utils/role-name'
 
 defineOptions({ name: 'UserAuthorizationList' })
 
@@ -10,7 +11,7 @@ const emit = defineEmits<{ select: [user: CommonUserOption]; search: [keyword: s
 const { auth } = useStore()
 
 function getUserRoleText(user: CommonUserOption) {
-  return user.roles?.join('，') ?? ''
+  return user.role_info?.map(({ role_id, role_name }) => getRoleName(role_id, role_name)).join('，') ?? ''
 }
 
 function handleUserSelect(user: CommonUserOption) {
@@ -30,7 +31,7 @@ function handleUserSelect(user: CommonUserOption) {
     <template #default="{ row }">
       <div class="flex-align-center min-w-0 flex-1 gap-2">
         <span class="min-w-0 truncate" :title="row.nick_name">{{ row.nick_name }}</span>
-        <span v-if="(auth.isEE || auth.isPE) && row.roles?.length" class="min-w-0 truncate text-N600" :title="getUserRoleText(row)">
+        <span v-if="(auth.isEE || auth.isPE) && row.role_info?.length" class="min-w-0 truncate text-N600" :title="getUserRoleText(row)">
           ({{ getUserRoleText(row) }})
         </span>
       </div>

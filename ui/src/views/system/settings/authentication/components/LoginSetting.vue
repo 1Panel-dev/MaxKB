@@ -11,6 +11,7 @@ import UserGroupsApi from '@/api/admin/system/user-groups'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
+import { getRoleName } from '@/utils/role-name'
 import perm from '@/permission'
 
 defineOptions({ name: 'AuthenticationSetting' })
@@ -235,7 +236,7 @@ onActivated(() => {
           :placeholder="t('user.role.placeholder')"
           @change="handleRoleChange"
         >
-          <el-option v-for="role in roleOptions" :key="role.id" :label="role.name" :value="role.id" />
+          <el-option v-for="role in roleOptions" :key="role.id" :label="getRoleName(role.id, role.name)" :value="role.id" />
         </el-select>
       </el-form-item>
       <el-form-item :label="t('workspace.title')" prop="workspace_id" v-if="auth.isEE && showWorkspaceSelector">

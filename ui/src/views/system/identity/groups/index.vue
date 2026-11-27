@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Dict, LoginMethod, OptionItem, SystemUserGroup, SystemUserGroupMember, WorkspaceItem } from '@/api/types'
+import type { Dict, LoginMethod, OptionItem, RoleInfo, SystemUserGroup, SystemUserGroupMember, WorkspaceItem } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import WorkspaceApi from '@/api/admin/system/workspace'
@@ -12,6 +12,7 @@ import { LOGIN_METHOD_LABELS } from '@/constants'
 import { ADMIN_STORAGE_KEY } from '@/constants/storage-key'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { getRoleName } from '@/utils/role-name'
 import perm from '@/permission/index.ts'
 const { auth, user } = useStore()
 const { t } = useI18n({ useScope: 'global' })
@@ -269,7 +270,11 @@ onMounted(() => {
           <el-table-column prop="username" :label="t('user.username.label')" min-width="198" show-overflow-tooltip />
           <el-table-column v-if="auth.isEE || auth.isPE" :label="t('user.role.label')" min-width="198">
             <template #default="{ row }">
-              <MkTagGroup v-if="row.roles?.length" :tags="row.roles" />
+              <MkTagGroup
+                v-if="row.role_info?.length"
+                :tags="row.role_info"
+                :format-label="(role: RoleInfo) => getRoleName(role.role_id, role.role_name)"
+              />
               <span v-else>-</span>
             </template>
           </el-table-column>

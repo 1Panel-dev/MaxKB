@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { Dict, LoginMethod, OptionItem, SystemUser } from '@/api/types'
+import type { Dict, LoginMethod, OptionItem, RoleInfo, SystemUser } from '@/api/types'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
 import UserManageApi from '@/api/admin/system/user-manage'
 import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
@@ -13,6 +13,7 @@ import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import { useStore } from '@/stores'
 import { toOrderBy } from '@/utils/common'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { getRoleName } from '@/utils/role-name'
 import { datetimeFormat } from '@/utils/time'
 import perm from '@/permission/index.ts'
 
@@ -90,6 +91,18 @@ function loadSystemUsers(resetQuery = false) {
     .finally(() => {
       systemUsersLoading.value = false
     })
+}
+
+function getRoleWorkspaceRows(systemUser: SystemUser) {
+  const roleNames = new Map<string, string>()
+  for (const { role_id, role_name } of systemUser.role_info ?? []) {
+    // 明细以原名关联工作空间，同名角色的明细保留原名。
+    roleNames.set(role_name, roleNames.has(role_name) ? role_name : getRoleName(role_id, role_name))
+  }
+  return (systemUser.role_workspace ?? []).map((relation) => ({
+    ...relation,
+    role_name: roleNames.get(relation.role_name) ?? relation.role_name,
+  }))
 }
 
 /* 修改用户状态 */
@@ -218,8 +231,8 @@ onMounted(() => loadSystemUsers())
                 { prop: 'role_name', label: t('user.role.label') },
                 { prop: 'workspace', label: t('workspace.title') },
               ]"
-              :tags="row.role_name"
-              :data="row.role_workspace"
+              :tags="row.role_info?.map(({ role_id, role_name }: RoleInfo) => getRoleName(role_id, role_name))"
+              :data="getRoleWorkspaceRows(row)"
             />
           </template>
         </el-table-column>
@@ -227,12 +240,7 @@ onMounted(() => loadSystemUsers())
         <el-table-column prop="user_group_names" width="180" :label="t('userGroup.title')">
           <template #default="{ row }">
             <span v-if="!row.user_group_names?.length">-</span>
-            <WorkspaceRelationTags
-              v-else
-              :columns="userGroupColumns"
-              :tags="row.user_group_names"
-              :data="row.user_group_workspace ?? []"
-            />
+            <WorkspaceRelationTags v-else :columns="userGroupColumns" :tags="row.user_group_names" :data="row.user_group_workspace ?? []" />
           </template>
         </el-table-column>
 
