@@ -4,9 +4,10 @@ import { DOCUMENT_RESOURCE_TYPE } from '@/api/enums'
 import { useRightSidebarStore } from '../index'
 import DocumentPreview from './document-preview/index.vue'
 import { getFileIconUrl } from '@/utils/icon'
+import { useViewType } from '@/conversation-panel/view/index.ts'
 
 defineOptions({ name: 'KnowledgeSource' })
-
+const viewType = useViewType()
 const { t } = useI18n({ useScope: 'global' })
 const { knowledgeSource, closeRightSide } = useRightSidebarStore()
 const { previewDocument, sourceParagraphs, count, openDocument } = knowledgeSource
@@ -18,9 +19,14 @@ const { previewDocument, sourceParagraphs, count, openDocument } = knowledgeSour
     <!-- 分段列表预览文档时仅隐藏不卸载，返回后保留滚动位置 -->
     <div class="flex-column h-full" :class="{ invisible: previewDocument }">
       <div class="flex-between shrink-0 px-6 py-4 border-b">
-        <h4>{{ t('chat.knowledgeSource.label') }} ({{ count }})</h4>
+        <div class="flex">
+          <el-button v-if="viewType === 'EMBED'" text @click="closeRightSide()">
+            <MkIcon name="icon_arrow-left_outlined" size="18" />
+          </el-button>
+          <h4>{{ t('chat.knowledgeSource.label') }} ({{ count }})</h4>
+        </div>
         <!-- 关闭知识来源 -->
-        <el-button text @click="closeRightSide()">
+        <el-button v-if="viewType !== 'EMBED'" text @click="closeRightSide()">
           <MkIcon name="icon_close_outlined" size="18" />
         </el-button>
       </div>
@@ -43,28 +49,17 @@ const { previewDocument, sourceParagraphs, count, openDocument } = knowledgeSour
               </template>
 
               <!-- 放大预览召回图片 -->
-              <el-image
-                v-if="paragraph.imageUrl"
-                :src="paragraph.imageUrl"
-                :alt="paragraph.title"
-                fit="contain"
-                class="mb-2"
-                :preview-src-list="[paragraph.imageUrl]"
-                preview-teleported
-              />
+              <el-image v-if="paragraph.imageUrl" :src="paragraph.imageUrl" :alt="paragraph.title" fit="contain"
+                class="mb-2" :preview-src-list="[paragraph.imageUrl]" preview-teleported />
 
               <MdPreview :model-value="paragraph.content" no-img-zoom-in />
 
               <!-- 打开来源文档：PDF 在知识来源内预览，其他文件下载，网页来源打开原网址 -->
-              <el-card v-if="paragraph.documentName" shadow="never" class="small mt-2 cursor-pointer" @click="openDocument(paragraph)">
+              <el-card v-if="paragraph.documentName" shadow="never" class="small mt-2 cursor-pointer"
+                @click="openDocument(paragraph)">
                 <div class="flex-align-center gap-2">
-                  <img
-                    :src="
-                      getFileIconUrl(paragraph.documentName, paragraph.knowledgeType, paragraph.documentResourceType === DOCUMENT_RESOURCE_TYPE.IMAGE)
-                    "
-                    alt=""
-                    class="size-6 shrink-0"
-                  />
+                  <img :src="getFileIconUrl(paragraph.documentName, paragraph.knowledgeType, paragraph.documentResourceType === DOCUMENT_RESOURCE_TYPE.IMAGE)
+                    " alt="" class="size-6 shrink-0" />
                   <span class="min-w-0 truncate" :title="paragraph.documentName">{{ paragraph.documentName }}</span>
                 </div>
               </el-card>

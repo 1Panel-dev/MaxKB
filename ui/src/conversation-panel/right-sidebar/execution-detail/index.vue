@@ -3,11 +3,12 @@ import { useI18n } from 'vue-i18n'
 import ExecutionDetailContent from '@/workflow-canvas/execution-details/index.vue'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import { useRightSidebarStore } from '../index'
+import { useViewType } from '@/conversation-panel/view';
 
 withDefaults(defineProps<{ workflowMode?: WorkflowMode }>(), {
   workflowMode: WorkflowMode.Application,
 })
-
+const viewType = useViewType()
 const { t } = useI18n({ useScope: 'global' })
 const { executionDetail, closeRightSide } = useRightSidebarStore()
 const { executionDetails: detail } = executionDetail
@@ -17,9 +18,15 @@ const { executionDetails: detail } = executionDetail
   <!-- 右侧内容区:执行详情。数据来自 view 层(消息区点击「执行详情」写入) -->
   <div class="execution-detail-panel flex-column h-full">
     <div class="flex-between shrink-0 px-6 py-4 border-b">
-      <h4>{{ t('execution.details.title') }}</h4>
+
+      <div class="flex">
+        <el-button v-if="viewType === 'EMBED'" text @click="closeRightSide()">
+          <MkIcon name="icon_arrow-left_outlined" size="18" />
+        </el-button>
+        <h4>{{ t('execution.details.title') }}</h4>
+      </div>
       <!-- 关闭执行详情 -->
-      <el-button text @click="closeRightSide()">
+      <el-button v-if="viewType !== 'EMBED'" text @click="closeRightSide()">
         <MkIcon name="icon_close_outlined" size="18" />
       </el-button>
     </div>
