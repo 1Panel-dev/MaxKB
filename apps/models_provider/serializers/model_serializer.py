@@ -558,8 +558,18 @@ class ModelSerializer(serializers.Serializer):
             if model is None:
                 raise NotFound404(404, _("Model does not exist"))
 
-            if model.workspace_id != validated_data.get("workspace_id"):
-                raise NotFound404(404, _("Model does not exist"))
+            workspace_id = validated_data.get("workspace_id")
+            if workspace_id is not None and model.workspace_id != workspace_id:
+                # 共享模型属于其它工作空间：校验当前工作空间是否已被授权使用，无权才视为不存在。
+                get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
+                authorized_model = (
+                    get_authorized_model(QuerySet(Model).filter(id=model.id), workspace_id).first()
+                    if get_authorized_model is not None
+                    else None
+                )
+                if authorized_model is None:
+                    raise NotFound404(404, _("Model does not exist"))
+                model = authorized_model
 
             return model
 
@@ -573,6 +583,8 @@ class ModelSerializer(serializers.Serializer):
             model = None
             if with_valid:
                 model = self.is_valid(raise_exception=True)
+            if model.workspace_id != self.validated_data.get("workspace_id"):
+                raise NotFound404(404, _("Model does not exist"))
             if model_params_form is None:
                 model_params_form = []
             if not isinstance(model_params_form, list):
