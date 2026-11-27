@@ -708,6 +708,32 @@ class ChatUserEditTests(TestCase):
         self.assertTrue(UserGroupRelation.objects.filter(user=user, group=group).exists())
 
 
+class ChatUserDeleteTests(TestCase):
+    def setUp(self):
+        self.version, self.get_key = Cache_Version.APPLICATION_THIRD_PARTY.value
+        self.user = ChatUser.objects.create(
+            username="channel-openid",
+            nick_name="Channel User",
+            password="encrypted-password",
+        )
+        self.cache_key = self.get_key(f"chat_user_{self.user.username}")
+        cache.set(
+            self.cache_key,
+            {"user_id": str(self.user.id), "nick_name": self.user.nick_name},
+            version=self.version,
+        )
+
+    def test_delete_removes_third_party_user_cache(self):
+        ChatUserSerializer.Operate(data={"id": self.user.id}).delete(with_valid=True)
+
+        self.assertIsNone(cache.get(self.cache_key, version=self.version))
+
+    def test_batch_delete_removes_third_party_user_cache(self):
+        ChatUserSerializer.BatchDeleteInstance(data={"ids": [self.user.id]}).batch_delete()
+
+        self.assertIsNone(cache.get(self.cache_key, version=self.version))
+
+
 class ResourceAuthorizationIncludeChildrenTests(SimpleTestCase):
     """GHSA-223f-r4v5-8782: include_children 授权不能信任客户端传入的 folder_ids"""
 

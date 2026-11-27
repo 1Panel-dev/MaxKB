@@ -134,7 +134,7 @@ class AnonymousAuthentication(APIView):
 
         access_token = request.data.get("access_token")
         cookie_path = (
-            f"{CONFIG.get_chat_path()}/{access_token}/" if access_token else f"{CONFIG.get_chat_path()}/portal/"
+            f"{CONFIG.get_chat_path()}/{access_token}/" if access_token else f"{CONFIG.get_chat_path()}/portal"
         )
         response.set_cookie(
             key="mk_file_auth",
