@@ -93,25 +93,27 @@ const goLogin = () => {
               <div class="truncate text-N600" :title="account?.username">{{ account?.username || '-' }}</div>
             </div>
           </div>
-          <div class="mb-1 flex-align-center">
-            <span class="mr-3">Tokens</span>
-            <span class="font-medium">{{ formatTokenNumber(account?.token_quota?.used_tokens ?? 0) }}</span>
-            <span class="text-N500">
-              /{{
-                !account?.token_quota || account?.token_quota?.quota_type === QUOTA_TYPE.UNLIMITED
-                  ? t('chatUser.quota.unlimited')
-                  : formatTokenNumber(account?.token_quota?.token_limit)
-              }}
-            </span>
-          </div>
+          <template v-if="!auth.isCE">
+            <div class="mb-1 flex-align-center">
+              <span class="mr-3">Tokens</span>
+              <span class="font-medium">{{ formatTokenNumber(account?.token_quota?.used_tokens ?? 0) }}</span>
+              <span class="text-N500">
+                /{{
+                  !account?.token_quota || account?.token_quota?.quota_type === QUOTA_TYPE.UNLIMITED
+                    ? t('chatUser.quota.unlimited')
+                    : formatTokenNumber(account?.token_quota?.token_limit)
+                }}
+              </span>
+            </div>
 
-          <el-progress
-            v-if="account?.token_quota && account?.token_quota?.quota_type !== QUOTA_TYPE.UNLIMITED"
-            :percentage="tokenPercentage"
-            :status="tokenPercentage > 80 ? 'warning' : undefined"
-            :show-text="false"
-            :stroke-width="6"
-          />
+            <el-progress
+              v-if="account?.token_quota && account?.token_quota?.quota_type !== QUOTA_TYPE.UNLIMITED"
+              :percentage="tokenPercentage"
+              :status="tokenPercentage > 80 ? 'warning' : undefined"
+              :show-text="false"
+              :stroke-width="6"
+            />
+          </template>
         </div>
         <el-divider />
         <MkDropdownMenu>

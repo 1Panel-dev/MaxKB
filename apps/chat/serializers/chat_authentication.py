@@ -21,6 +21,7 @@ from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import NotFound404, AppUnauthorizedFailed, AppApiException
 from common.utils.rsa_util import get_key_pair_by_sql
+from maxkb.settings import edition
 from portal.models import Portal
 
 
@@ -88,6 +89,7 @@ class ChatAuthProfileSerializer(serializers.Serializer):
             if application_setting
             else {"theme_color": "", "header_font_color": ""},
             "logo": application_access_token.application.icon,
+            "edition": edition,
             "meta": {
                 "application_name": application_access_token.application.name,
                 "application_id": str(application_access_token.application_id),
@@ -120,6 +122,7 @@ class PortalAuthProfileSerializer(serializers.Serializer):
                     "rsa_key": get_key_pair_by_sql().get("key"),
                     "meta": {"portal_name": ""},
                     "logo": "./favicon.ico",
+                    "edition": edition,
                     "language": "zh-CN",
                 },
                 **result,
@@ -136,6 +139,7 @@ class PortalAuthProfileSerializer(serializers.Serializer):
                 "rsa_key": get_key_pair_by_sql().get("key"),
                 "meta": {"portal_name": portal.name},
                 "logo": portal.logo or "./favicon.ico",
+                "edition": edition,
                 "language": "zh-CN",
             },
             **result,

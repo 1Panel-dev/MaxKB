@@ -76,6 +76,8 @@ export const useChatAuthStore = defineStore('chat-auth', {
       if (isPortalScope(state.scope)) return undefined
       return (state.authProfile?.meta as ApplicationAuthProfileMeta | undefined)?.application_id
     },
+    /** 社区版 */
+    isCE: (state) => state.authProfile?.edition === 'CE',
   },
 
   actions: {
