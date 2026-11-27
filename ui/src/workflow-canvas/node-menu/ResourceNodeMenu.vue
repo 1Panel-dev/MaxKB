@@ -15,9 +15,11 @@ import { applicationNode, toolLibNode, toolWorkflowLibNode } from '@/workflow-ca
 import { useWorkflowStore } from '@/workflow-canvas/store'
 import { WorkflowKind } from '@/workflow-canvas/types'
 import { FOLDER_ENTRY_ID } from '@/constants'
+import { useStore } from '@/stores'
 import { isWorkFlow } from '@/utils/common'
 
 const { t } = useI18n({ useScope: 'global' })
+const { auth } = useStore()
 
 defineOptions({ name: 'ResourceNodeMenu' })
 
@@ -151,7 +153,7 @@ onMounted(() => {
 <template>
   <div class="flex h-140 min-h-0">
     <aside v-if="!isSystemScope" class="flex w-sidebar-expanded shrink-0 border-r pt-3">
-      <FolderTree v-model="currentFolderId" :can-edit="false" :show-shared="isToolMenu" :source="source" @select="loadResources" />
+      <FolderTree v-model="currentFolderId" :can-edit="false" :show-shared="(auth.isEE || auth.isPE) && isToolMenu" :source="source" @select="loadResources" />
     </aside>
 
     <section v-loading="loading" class="flex-column min-w-0 flex-1">
