@@ -5,9 +5,7 @@ import os
 import uuid_utils.compat as uuid
 
 from celery import subtask
-from celery.signals import (
-    worker_ready, worker_shutdown, after_setup_logger, task_revoked, task_prerun
-)
+from celery.signals import worker_init, worker_ready, worker_shutdown, after_setup_logger, task_revoked, task_prerun
 from django.core.cache import cache
 from django_apscheduler.models import DjangoJob
 
@@ -16,7 +14,17 @@ from .decorator import get_after_app_ready_tasks, get_after_app_shutdown_clean_t
 from .logger import CeleryThreadTaskFileHandler
 
 logger = logging.getLogger(__file__)
-safe_str = lambda x: x
+
+
+def safe_str(x):
+    return x
+
+
+@worker_init.connect
+def initialize_worker_model_handles(**kwargs):
+    from common.database_model_manage.database_model_manage import DatabaseModelManage
+
+    DatabaseModelManage.init()
 
 
 def init_scheduler():
@@ -33,22 +41,21 @@ def init_scheduler():
     trigger_ids_from_jobs = set()
     job_id_to_trigger_id = {}  # 映射 job_id -> trigger_id
 
-    for job in trigger_jobs:
-        parts = job.id.split(':')
+    for trigger_job in trigger_jobs:
+        parts = trigger_job.id.split(":")
         if len(parts) >= 2:
             trigger_id = uuid.UUID(parts[1])  # 提取 trigger_id
             trigger_ids_from_jobs.add(trigger_id)
-            job_id_to_trigger_id[job.id] = trigger_id
+            job_id_to_trigger_id[trigger_job.id] = trigger_id
 
     # 获取所有有效的 Trigger ID
-    valid_trigger_ids = set(Trigger.objects.filter(
-        id__in=trigger_ids_from_jobs, is_active=True
-    ).values_list('id', flat=True))
+    valid_trigger_ids = set(
+        Trigger.objects.filter(id__in=trigger_ids_from_jobs, is_active=True).values_list("id", flat=True)
+    )
 
     # 找出需要删除的 job (trigger 已不存在的)
     jobs_to_delete = [
-        job_id for job_id, trigger_id in job_id_to_trigger_id.items()
-        if trigger_id not in valid_trigger_ids
+        job_id for job_id, trigger_id in job_id_to_trigger_id.items() if trigger_id not in valid_trigger_ids
     ]
 
     if jobs_to_delete:
@@ -93,7 +100,7 @@ def after_app_shutdown_periodic_tasks(sender=None, **kwargs):
     cache.set("CELERY_APP_SHUTDOWN", 1, 10)
     tasks = get_after_app_shutdown_clean_tasks()
     logger.debug("Worker shutdown signal recv")
-    logger.debug("Clean period tasks: [{}]".format(', '.join(tasks)))
+    logger.debug("Clean period tasks: [{}]".format(", ".join(tasks)))
 
 
 @after_setup_logger.connect
@@ -109,11 +116,13 @@ def add_celery_logger_handler(sender=None, logger=None, loglevel=None, format=No
 
 @task_revoked.connect
 def on_task_revoked(request, terminated, signum, expired, **kwargs):
-    maxkb_logger.info('task_revoked', terminated)
+    maxkb_logger.info("task_revoked", terminated)
 
 
 @task_prerun.connect
 def on_taskaa_start(sender, task_id, **kwargs):
     pass
     # sender.update_state(state='REVOKED',
+
+
 #                     meta={'exc_type': 'Exception', 'exc': 'Exception', 'message': '暂停任务', 'exc_message': ''})

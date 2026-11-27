@@ -1,10 +1,12 @@
 from unittest.mock import MagicMock, patch
 
+from celery.signals import worker_init
 from django.conf import settings
 from django.test import SimpleTestCase
 
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.database_model_manage.handle.impl import default_base_model_handle as handle
+from ops.celery.signal_handler import initialize_worker_model_handles
 from system_manage.models import ResourceChatUserAuthorize, ResourceChatUserGroupAuthorize, ResourceType
 
 KB_GROUP = "01a186b2-bed3-7cd0-9ba3-669bd89e59b1"
@@ -14,6 +16,17 @@ KB_NONE = "01a186b2-bed3-7cd0-9ba3-669bd89e59b4"
 
 
 class DefaultModelHandleTest(SimpleTestCase):
+    def test_worker_loads_the_same_configured_handles_as_web(self):
+        self.assertIn(initialize_worker_model_handles, worker_init._live_receivers(sender=None))
+        with patch.object(DatabaseModelManage, "model_dict", {}):
+            DatabaseModelManage.init()
+            web_handles = DatabaseModelManage.model_dict.copy()
+
+        with patch.object(DatabaseModelManage, "model_dict", {}):
+            initialize_worker_model_handles()
+            self.assertIn("get_knowledge_list_of_authorized", DatabaseModelManage.model_dict)
+            self.assertEqual(DatabaseModelManage.model_dict, web_handles)
+
     def test_community_settings_register_knowledge_authorization(self):
         self.assertIn(
             "common.database_model_manage.handle.impl.default_base_model_handle.DefaultBaseModelHandle",
