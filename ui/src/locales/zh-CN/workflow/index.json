@@ -5,7 +5,7 @@
     "currentForm": "当前表单",
     "exposedFields": {
       "label": "外置参数设置",
-      "description": "仅支持模型、知识库、开关、日期、树形选项器、单选框、多选框组件类型"
+      "description": "仅支持模型、知识库、开关、日期、树形选择器、单选框、多选框组件类型"
     },
     "menuTitle": {
       "label": "其他参数收纳菜单标题"
