@@ -6,13 +6,16 @@ import type { FolderItem, ToolItem, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import SystemToolApi from '@/api/admin/system/resource-management/tool/tool'
 import SystemSharedToolApi from '@/api/admin/system/shared-resources/tool/tool'
+import SharedToolApi from '@/api/admin/workspace/shared/tool'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import { TOOLTIP_SHOW_DELAY } from '@/components/global/mk-tooltip/constants'
 import { FOLDER_ENTRY_ID } from '@/constants/folder'
+import { useStore } from '@/stores'
 import { isSystemResource, isSystemSharedResource, isWorkspaceResource } from '@/utils/resource-context'
 
 const { t } = useI18n({ useScope: 'global' })
+const { auth } = useStore()
 
 defineOptions({ name: 'SelectToolDialog' })
 
@@ -49,11 +52,18 @@ function refreshTool() {
   if (isSystemResource() && !props.workspaceId) return Promise.resolve()
   loading.value = true
   appliedSearchKeyword.value = searchKeyword.value.trim()
-  const requestApi = isSystemResource() ? SystemToolApi : isSystemSharedResource() ? SystemSharedToolApi : ToolApi
+  const isSharedFolder = isWorkspaceScope.value && currentFolder.value.id === FOLDER_ENTRY_ID.SHARED
+  const requestApi = isSystemResource()
+    ? SystemToolApi
+    : isSystemSharedResource()
+      ? SystemSharedToolApi
+      : isSharedFolder
+        ? SharedToolApi
+        : ToolApi
   const query = {
     tool_type_list: props.toolTypes,
     ...(isSystemResource() ? { workspace_id: props.workspaceId } : {}),
-    ...(isWorkspaceScope.value ? { folder_id: currentFolder.value.id } : {}),
+    ...(isWorkspaceScope.value && !isSharedFolder ? { folder_id: currentFolder.value.id } : {}),
     ...(appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : {}),
   }
   return requestApi
@@ -135,7 +145,7 @@ defineExpose({ open })
           ref="folderTreeRef"
           class="pt-4"
           :can-edit="false"
-          :show-shared="false"
+          :show-shared="auth.isEE || auth.isPE"
           :source="RESOURCE_TYPE.TOOL"
           @loaded="selectFolder"
           @select="selectFolder"
