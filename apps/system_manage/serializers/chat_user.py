@@ -6,6 +6,7 @@ from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 
 import uuid_utils.compat as uuid
+from django.core.cache import cache
 from django.core import validators
 from django.db import transaction
 from django.db.models import Q, QuerySet, OuterRef, Subquery, CharField
@@ -14,6 +15,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from common.constants.cache_version import Cache_Version
 from common.constants.exception_code_constants import ExceptionCodeConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search
@@ -24,6 +26,14 @@ from maxkb.const import CONFIG
 from system_manage.models import ChatUser, UserGroup, UserGroupRelation
 from system_manage.models.chat_user_token_quota import ChatUserTokenQuota, QuotaType
 from users.serializers.user import PASSWORD_REGEX
+
+application_third_party_version, application_third_party_get_key = Cache_Version.APPLICATION_THIRD_PARTY.value
+
+
+def clear_application_third_party_chat_user_cache(usernames):
+    cache_keys = [application_third_party_get_key(f"chat_user_{username}") for username in usernames]
+    if cache_keys:
+        cache.delete_many(cache_keys, version=application_third_party_version)
 
 
 class ChatUserInstanceSerializer(serializers.ModelSerializer):
@@ -197,10 +207,12 @@ class ChatUserSerializer(serializers.Serializer):
         ids = serializers.ListField(child=serializers.UUIDField(required=True), required=True, label=_("User IDs"))
 
         def batch_delete(self):
-            user_ids = self.data.get("ids")
-            if not user_ids:
-                raise AppApiException(1004, _("User IDs cannot be empty"))
+            self.is_valid(raise_exception=True)
+            user_ids = self.validated_data.get("ids")
+            usernames = ChatUser.objects.filter(id__in=user_ids).values_list("username", flat=True)
+            usernames = list(usernames)
             ChatUser.objects.filter(id__in=user_ids).delete()
+            clear_application_third_party_chat_user_cache(usernames)
             return True
 
     class BatchAddGroup(serializers.Serializer):
@@ -371,7 +383,10 @@ class ChatUserSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             user_id = self.data.get("id")
+            username = ChatUser.objects.filter(id=user_id).values_list("username", flat=True).first()
             ChatUser.objects.filter(id=user_id).delete()
+            if username:
+                clear_application_third_party_chat_user_cache([username])
             return True
 
         def edit(self, instance, with_valid=True):
