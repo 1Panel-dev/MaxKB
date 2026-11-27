@@ -113,6 +113,34 @@ class V2MigrationUpgradeTests(TransactionTestCase):
         upgraded.refresh_from_db()
         self.assertTrue(upgraded.enable_api_key)
 
+    def test_application_v3_entry_converts_visibility_in_applications_and_versions(self):
+        def workflow(condition):
+            conditions = [condition, {"field": ["other-node", "answer"]}]
+            fields = [{"visibility_rules": {"conditions": conditions}}]
+            return {"nodes": [{"id": "base-node", "properties": {"user_input_field_list": fields}}]}
+
+        apps = self.v2_state.apps
+        folder = apps.get_model("application", "ApplicationFolder").objects.create(
+            id="visibility-upgrade", name="v2 folder", lft=1, rght=2, tree_id=1, level=0
+        )
+        application = apps.get_model("application", "Application").objects.create(
+            folder=folder, work_flow=workflow({"field": ["global", "draft"]})
+        )
+        version = apps.get_model("application", "ApplicationVersion").objects.create(
+            application=application, work_flow=workflow({"field": ["global", "published"]})
+        )
+        target = [("application", "0016_v3_upgrade")]
+        executor = MigrationExecutor(connection)
+        executor.migrate(target)
+        current = executor.loader.project_state(target).apps
+        for model_name, pk, field in (
+            ("Application", application.pk, "draft"),
+            ("ApplicationVersion", version.pk, "published"),
+        ):
+            with self.subTest(model=model_name):
+                upgraded = current.get_model("application", model_name).objects.get(pk=pk)
+                self.assertEqual(upgraded.work_flow, workflow({"field": ["base-node", field], "self": True}))
+
     def test_system_manage_v3_entry_adds_optional_language_to_existing_chat_users(self):
         user = self.v2_state.apps.get_model("system_manage", "ChatUser").objects.create(
             username="language-upgrade", nick_name="Language upgrade", password="migration-test"
