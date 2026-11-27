@@ -445,7 +445,7 @@ onBeforeUnmount(() => stopAutoSave())
               @restore="handleRestoreVersion"
             />
             <!-- 自动保存 -->
-            <MkDropdownItem @click.stop>
+            <MkDropdownItem v-if="applicationWorkflowPermission('edit')" @click.stop>
               <template #icon><MkIcon name="icon_save_outlined" /></template>
               <span>{{ t('workflow.layout.autoSave') }}</span>
               <el-switch v-model="autoSaveEnabled" class="ml-auto" size="small" @click.stop @change="handleAutoSaveChange" />
