@@ -1,7 +1,9 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { APPLICATION_TYPE } from '@/api/enums'
 import { perm } from '@/permission'
+import { useStore } from '@/stores'
 
+const { auth } = useStore()
 export const applicationRoutes: RouteRecordRaw[] = [
   {
     path: 'application',
@@ -85,7 +87,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
               icon: 'icon_application_outlined',
               activeIcon: 'icon_application_filled',
               order: 30,
-              permission: ({ params }) => perm.application.workspace.accessRead(String(params.applicationId)),
+              permission: ({ params }) => perm.application.workspace.accessRead(String(params.applicationId)) && (auth.isPE || auth.isEE),
               next: 'workspace-application-chat-user',
             },
           },
