@@ -5,9 +5,7 @@ import getpass
 import gzip
 import json
 import os
-import pwd
 import random
-import resource
 import socket
 import subprocess
 import sys
@@ -15,6 +13,16 @@ import tempfile
 import time
 from contextlib import contextmanager, suppress
 from textwrap import dedent
+
+# Unix-only modules used for sandbox mode; unavailable on Windows
+try:
+    import pwd
+except ImportError:
+    pwd = None
+try:
+    import resource
+except ImportError:
+    resource = None
 
 import uuid_utils.compat as uuid
 from django.utils.translation import gettext_lazy as _

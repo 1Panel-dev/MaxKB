@@ -177,6 +177,12 @@ def _get_query_keywords(text: str, tokenizer):
     return list(keywords)
 
 
+def get_query_words(text: str, user_words: List[str] = None):
+    """返回与索引一致的切词列表（cut_all），供软 AND 门槛统计命中词数。"""
+    tokenizer = _build_tokenizer(user_words) if user_words else jieba
+    return tokenizer.lcut(text, cut_all=True)
+
+
 def to_query(text: str, user_words: List[str] = None):
     tokenizer = _build_tokenizer(user_words) if user_words else jieba
     lower_text = text.lower()
